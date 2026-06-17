@@ -1,7 +1,7 @@
 "use client";
 
 import { AnimatePresence, motion } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useState } from "react";
 import styles from "./Discover.module.css";
 import Placeholder from "./Placeholder";
 
@@ -49,8 +49,8 @@ const ITEMS = [
     tag: "Caribbean Cuisine",
     location: "85 Kentish Town Rd, London NW1",
     paras: [
-      "A vibrat, halal-certified Caribbean and Latin American restaurant located at 85 Kentish Town Road in Camden, London NW1 8NY.", 
-      "Established in 2007, it was among the first in the city to blends Latin-Caribbean flavours, Guanabana is renowned for its 'Island Roast', a Caribbean twist on the traditional Sunday roast, featuring oak-smoked jerk chicken or grilled beef, accompanied by sides like sweet plantains, roasted potatoes, and spicy jerk gravy."
+      "A vibrat, halal-certified Caribbean and Latin American restaurant located at 85 Kentish Town Road in Camden, London NW1 8NY.",
+      "Established in 2007, it was among the first in the city to blends Latin-Caribbean flavours, Guanabana is renowned for its 'Island Roast', a Caribbean twist on the traditional Sunday roast, featuring oak-smoked jerk chicken or grilled beef, accompanied by sides like sweet plantains, roasted potatoes, and spicy jerk gravy.",
     ],
   },
   {
@@ -59,7 +59,7 @@ const ITEMS = [
     location: "Kentish Town · Soho, London",
     paras: [
       "The world's first Filipino-Japaense ramen joint. First opened in Kentish Town, London, in 2018, offering a unique blend of traditional Japaense ramen with Filipino culinary influences.",
-      "In 2021, Ramo Ramen expanded to a second location in Soho, London, further solidifying its presence in the city's vibrant food scene."
+      "In 2021, Ramo Ramen expanded to a second location in Soho, London, further solidifying its presence in the city's vibrant food scene.",
     ],
   },
   {
@@ -68,77 +68,13 @@ const ITEMS = [
     location: "London",
     paras: [
       "Hoodwood is your go-to neighborhood Caribbean takeaway, serving up bold, smoky flavors with a true taste of the islands. We specialize in oak-smoked chicken plates, slow-cooked over an open flame for a deep, rich, and aromatic flavor.",
-      "Our menu also features handmade Caribbean patties, packed with flavorful fillings and wrapped in a perfectly golden, flaky crust. Whether you're after a quick bite or a hearty meal, Hoodwood is all about honest, fire-kissed cooking that brings people together."
-    ]
+      "Our menu also features handmade Caribbean patties, packed with flavorful fillings and wrapped in a perfectly golden, flaky crust. Whether you're after a quick bite or a hearty meal, Hoodwood is all about honest, fire-kissed cooking that brings people together.",
+    ],
   },
 ];
 
-// render the list a few times so it can loop seamlessly in both directions
-const REPEAT = 3;
-
 export default function Discover() {
   const [active, setActive] = useState(0);
-  const [activeRendered, setActiveRendered] = useState(ITEMS.length); // middle copy
-  const scrollerRef = useRef<HTMLDivElement>(null);
-  const cardRefs = useRef<Array<HTMLButtonElement | null>>([]);
-
-  // infinite loop + active detection
-  useEffect(() => {
-    const c = scrollerRef.current;
-    if (!c) return;
-    const setHeight = () => c.scrollHeight / REPEAT;
-
-    // start centred on the middle copy's first item
-    const init = () => {
-      const card = cardRefs.current[ITEMS.length];
-      if (!card) return;
-      const cr = c.getBoundingClientRect();
-      const kr = card.getBoundingClientRect();
-      c.scrollTop += kr.top - cr.top - (c.clientHeight - kr.height) / 2;
-    };
-    const r0 = requestAnimationFrame(init);
-
-    let raf = 0;
-    const onScroll = () => {
-      cancelAnimationFrame(raf);
-      raf = requestAnimationFrame(() => {
-        // keep the scroll within the middle copy → seamless wrap
-        const sh = setHeight();
-        if (sh > 0) {
-          if (c.scrollTop < sh * 0.5) c.scrollTop += sh;
-          else if (c.scrollTop > sh * 2.5) c.scrollTop -= sh;
-        }
-        const box = c.getBoundingClientRect();
-        const mid = box.top + box.height / 2;
-        let best = 0;
-        let bestDist = Infinity;
-        cardRefs.current.forEach((el, i) => {
-          if (!el) return;
-          const r = el.getBoundingClientRect();
-          const d = Math.abs(r.top + r.height / 2 - mid);
-          if (d < bestDist) {
-            bestDist = d;
-            best = i;
-          }
-        });
-        setActiveRendered(best);
-        setActive(best % ITEMS.length);
-      });
-    };
-    c.addEventListener("scroll", onScroll, { passive: true });
-    return () => {
-      cancelAnimationFrame(r0);
-      cancelAnimationFrame(raf);
-      c.removeEventListener("scroll", onScroll);
-    };
-  }, []);
-
-  const select = (ri: number) => {
-    setActiveRendered(ri);
-    setActive(ri % ITEMS.length);
-    cardRefs.current[ri]?.scrollIntoView({ block: "center", behavior: "smooth" });
-  };
-
   const item = ITEMS[active];
 
   return (
@@ -176,11 +112,6 @@ export default function Discover() {
             </AnimatePresence>
 
             <div className={styles.overlay}>
-              <div className={styles.ovHead}>
-                <span className={styles.ovName}>{item.name}</span>
-                <span className={styles.ovLoc}>{item.location}</span>
-              </div>
-              <span className={styles.ovLine} />
               <div className={styles.ovRow}>
                 <button type="button" className={styles.ovMenu}>
                   Menu
@@ -215,31 +146,24 @@ export default function Discover() {
           </AnimatePresence>
         </div>
 
-        <div className={styles.scroller} ref={scrollerRef} data-lenis-prevent>
-          <div className={styles.scrollerInner}>
-            {Array.from({ length: REPEAT }).flatMap((_, copy) =>
-              ITEMS.map((it, i) => {
-                const ri = copy * ITEMS.length + i;
-                return (
-                  <button
-                    key={ri}
-                    ref={(el) => {
-                      cardRefs.current[ri] = el;
-                    }}
-                    className={`${styles.card} ${activeRendered === ri ? styles.cardActive : ""}`}
-                    onClick={() => select(ri)}
-                  >
-                    <Placeholder ratio="4 / 3" label={it.name} />
-                    <div className={styles.cardMeta}>
-                      <span className={styles.cardName}>{it.name}</span>
-                      <span className={styles.cardTag}>{it.tag}</span>
-                    </div>
-                  </button>
-                );
-              })
-            )}
-          </div>
-        </div>
+        <nav className={styles.list} aria-label="Our restaurants">
+          {ITEMS.map((it, i) => (
+            <button
+              key={it.name}
+              type="button"
+              className={`${styles.listItem} ${active === i ? styles.listActive : ""}`}
+              onMouseEnter={() => setActive(i)}
+              onFocus={() => setActive(i)}
+              onClick={() => setActive(i)}
+              aria-current={active === i}
+            >
+              <span className={styles.listName}>{it.name}</span>
+              <span className={styles.listNum}>
+                {String(i + 1).padStart(2, "0")}
+              </span>
+            </button>
+          ))}
+        </nav>
       </div>
     </section>
   );
