@@ -13,7 +13,7 @@ export default function Statement() {
           <h2 className={styles.statement}>
             <span className={styles.spacer} aria-hidden />
             <RevealText
-              text="A vibrant Filipino/pan-Asian company in the heart of London. Explore our diverse range of stores that embody the essence of tradition with a modern twist."
+              text="From heritage Filipino kitchens to fire-kissed Caribbean grills, every restaurant tells its own story. Explore the family and find your next table across London."
               stagger={0.018}
             />
           </h2>

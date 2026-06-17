@@ -1,16 +1,44 @@
+"use client";
+
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useRef } from "react";
 import styles from "./RestaurantLocations.module.css";
 import Placeholder from "./Placeholder";
-import Parallax from "./Parallax";
 import RevealText from "./RevealText";
 
 export default function RestaurantLocations() {
+  const ref = useRef<HTMLElement>(null);
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+
+  // a centre curtain opens as the section scrolls in
+  const clip = useTransform(
+    scrollYProgress,
+    [0.05, 0.42],
+    ["inset(48% 0% 48% 0%)", "inset(0% 0% 0% 0%)"]
+  );
+  // slow zoom-out + vertical drift behind it for parallax depth
+  const scale = useTransform(scrollYProgress, [0, 1], [1.35, 1.05]);
+  const y = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
+
   return (
-    <section className={styles.section}>
-      <Parallax speed={0.22} className={styles.bg}>
-        <Placeholder ratio="auto" label="Map / locations showcase" />
-      </Parallax>
+    <section ref={ref} className={styles.section}>
+      <motion.div
+        className={styles.reveal}
+        style={{ clipPath: clip, WebkitClipPath: clip }}
+      >
+        <motion.div className={styles.bg} style={{ scale, y }}>
+          <Placeholder ratio="auto" label="Map / locations showcase" />
+        </motion.div>
+      </motion.div>
+
       <h2 className={styles.heading}>
-        <RevealText text="[ List of all the restaurant locations ]" stagger={0.03} />
+        <RevealText
+          text="[ List of all the restaurant locations ]"
+          stagger={0.03}
+        />
       </h2>
     </section>
   );

@@ -16,9 +16,10 @@
   flex: none;
 }
 
+/* golden-ratio split: image block : names list = φ : 1 (1.618 : 1) */
 .body {
   display: grid;
-  grid-template-columns: 1.7fr 1fr;
+  grid-template-columns: 1.618fr 1fr;
   gap: clamp(36px, 5.5vw, 110px);
   align-items: center;
 }
@@ -30,35 +31,10 @@
   gap: clamp(18px, 2.8vh, 40px);
 }
 
-.titleRow {
-  display: flex;
-  align-items: baseline;
-  justify-content: space-between;
-  gap: 1em;
-  border-bottom: 1px solid var(--rule);
-  padding-bottom: clamp(12px, 1.8vh, 26px);
-}
-
-.title {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: clamp(2rem, 4.6vw, 4rem);
-  line-height: 1;
-  color: var(--maroon);
-}
-
-.tag {
-  font-family: var(--font-sans);
-  font-size: 0.8rem;
-  letter-spacing: 0.04em;
-  opacity: 0.65;
-  white-space: nowrap;
-}
-
 /* fixed frame so the image is the same size for every restaurant */
 .bigImage {
   position: relative;
-  aspect-ratio: 16 / 10;
+  aspect-ratio: 1 / 1;
   overflow: hidden;
 }
 
@@ -66,8 +42,23 @@
   position: absolute;
   inset: 0;
 }
-.bigImageLayer > div {
+/* let the placeholder fill, but not the bottom-anchored overlay */
+.bigImageLayer > div:not(.overlay) {
   height: 100%;
+}
+.baseLayer {
+  z-index: 1;
+}
+.topLayer {
+  z-index: 2;
+  will-change: clip-path;
+}
+
+.img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
 }
 
 /* ---------- overlay on the big image ---------- */
@@ -76,11 +67,48 @@
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 2;
-  padding: clamp(14px, 1.5vw, 26px);
+  z-index: 3;
+  padding: clamp(70px, 13vh, 150px) clamp(16px, 1.7vw, 30px) clamp(16px, 1.7vw, 30px);
   display: flex;
   flex-direction: column;
-  gap: clamp(8px, 1vh, 14px);
+  gap: clamp(10px, 1.4vh, 18px);
+  /* scrim so the cream title + buttons stay legible over any photo */
+  background: linear-gradient(
+    to top,
+    rgba(31, 0, 0, 0.7),
+    rgba(31, 0, 0, 0) 100%
+  );
+}
+
+/* restaurant title + tag, now sitting inside the image above the buttons */
+.ovHead {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1em;
+}
+
+.ovTitle {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.6rem, 3vw, 3rem);
+  line-height: 1;
+  color: var(--cream);
+}
+
+.ovTag {
+  font-family: var(--font-sans);
+  font-size: clamp(0.72rem, 0.9vw, 0.85rem);
+  letter-spacing: 0.04em;
+  color: var(--cream);
+  opacity: 0.8;
+  white-space: nowrap;
+}
+
+.ovLine {
+  display: block;
+  height: 1px;
+  background: rgba(248, 243, 234, 0.4);
 }
 
 .ovRow {
@@ -98,7 +126,7 @@
   font-size: 0.8rem;
   letter-spacing: 0.1em;
   text-transform: uppercase;
-  color: var(--maroon);
+  color: var(--cream);
   cursor: pointer;
 }
 
@@ -117,25 +145,25 @@
   transition: opacity 0.3s ease, background-color 0.3s ease, color 0.3s ease;
 }
 
-/* Learn More — solid #2F0000 background, clear (cream) text */
+/* Learn More — solid cream so it reads over the photo */
 .btnSolid {
-  background: #2f0000;
-  color: var(--cream);
-  border: 1px solid #2f0000;
+  background: var(--cream);
+  color: #2f0000;
+  border: 1px solid var(--cream);
 }
 .btnSolid:hover {
-  opacity: 0.88;
+  opacity: 0.85;
 }
 
-/* Book a Table — clear background, #2F0000 stroke + text */
+/* Book a Table — cream stroke + text on a clear background */
 .btnGhost {
   background: transparent;
-  color: #2f0000;
-  border: 1px solid #2f0000;
+  color: var(--cream);
+  border: 1px solid var(--cream);
 }
 .btnGhost:hover {
-  background: #2f0000;
-  color: var(--cream);
+  background: var(--cream);
+  color: #2f0000;
 }
 
 @media (max-width: 520px) {
@@ -149,11 +177,14 @@
   }
 }
 
-/* paragraphs spread across the full width as equal, justified columns */
+/* paragraphs spread across the full width as equal, justified columns.
+   fixed min-height keeps the left column the same height for every restaurant
+   so the list on the right never shifts */
 .text {
   display: flex;
   gap: clamp(28px, 4vw, 80px);
   align-items: flex-start;
+  min-height: 180px;
 }
 
 .textCol {
@@ -170,10 +201,12 @@
 
 /* ---------- right: selectable list of names, flush to the right edge ---------- */
 .list {
+  align-self: start; /* top aligned with the image; drifts down on scroll */
   display: flex;
   flex-direction: column;
   align-items: flex-end;
-  gap: clamp(4px, 1vh, 14px);
+  gap: clamp(0px, 0.4vh, 5px);
+  will-change: transform;
 }
 
 .listItem {
@@ -183,7 +216,7 @@
   gap: 0.8em;
   background: none;
   border: none;
-  padding: 0.18em 0;
+  padding: 0.05em 0;
   text-align: right;
   cursor: pointer;
   color: var(--maroon);
@@ -231,5 +264,6 @@
   .text {
     flex-direction: column;
     gap: 0.6em;
+    min-height: 0;
   }
 }

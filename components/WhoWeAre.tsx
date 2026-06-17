@@ -1,6 +1,7 @@
 import styles from "./WhoWeAre.module.css";
 import Placeholder from "./Placeholder";
 import Reveal from "./Reveal";
+import RevealText from "./RevealText";
 import Parallax from "./Parallax";
 
 const LOREM =
@@ -10,12 +11,18 @@ export default function WhoWeAre() {
   return (
     <section className={styles.section} id="about-us">
       <div className="container">
-        <Reveal className={styles.eyebrow}>(Who are We?)</Reveal>
-
-        <Reveal className={styles.bigType} y={0}>
-          <span>Maginhawa</span>
-          <span className={styles.grp}>Group</span>
-        </Reveal>
+        <div className={styles.statementWrap}>
+          <Reveal className={styles.sEyebrow} as="span">
+            (Who are We?)
+          </Reveal>
+          <h2 className={styles.statement}>
+            <span className={styles.spacer} aria-hidden />
+            <RevealText
+              text="A vibrant Filipino/pan-Asian company in the heart of London. Explore our diverse range of stores that embody the essence of tradition with a modern twist."
+              stagger={0.018}
+            />
+          </h2>
+        </div>
 
         <div className={styles.body}>
           {[0, 1, 2].map((i) => (

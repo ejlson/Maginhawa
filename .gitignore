@@ -12,3 +12,6 @@
 
 # TS build cache
 *.tsbuildinfo
+
+# image source originals (served copies live in /public/images)
+/assets/images/
