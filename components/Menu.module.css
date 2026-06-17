@@ -1,0 +1,58 @@
+/* transparent click-catcher so clicking outside closes the panel */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 74;
+  background: transparent;
+}
+
+/* small panel anchored to the top-right, slides in from the right */
+.panel {
+  position: fixed;
+  top: clamp(54px, 7vh, 70px);
+  right: clamp(12px, 1.6vw, 22px);
+  z-index: 76;
+  width: min(370px, calc(100vw - 24px));
+  /* iOS-style frosted glass */
+  background: rgba(248, 243, 234, 0.55);
+  -webkit-backdrop-filter: blur(22px) saturate(180%);
+  backdrop-filter: blur(22px) saturate(180%);
+  border: 1px solid rgba(248, 243, 234, 0.5);
+  border-radius: 20px;
+  box-shadow: 0 28px 70px -24px rgba(47, 0, 0, 0.4),
+    inset 0 1px 0 rgba(255, 255, 255, 0.4);
+  padding: clamp(18px, 2vw, 26px);
+  transform-origin: top right;
+  overflow: hidden;
+  will-change: transform, opacity;
+}
+
+.list {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(1px, 0.3vh, 5px);
+}
+
+.item {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.45rem, 2.4vw, 1.95rem);
+  line-height: 1.2;
+  color: var(--maroon);
+  opacity: 0.4;
+  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.item:hover,
+.itemActive {
+  opacity: 1;
+  transform: translateX(0.3em);
+}
+
+.thumb {
+  margin-top: clamp(12px, 1.6vh, 18px);
+  border-radius: 10px;
+  overflow: hidden;
+  position: relative;
+}

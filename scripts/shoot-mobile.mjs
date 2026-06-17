@@ -1,0 +1,13 @@
+import puppeteer from "puppeteer-core";
+const CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+const OUT="/tmp/mgnhw_render";
+const b=await puppeteer.launch({executablePath:CHROME,headless:"new",args:["--no-sandbox","--hide-scrollbars"]});
+const p=await b.newPage();
+await p.setViewport({width:390,height:844,deviceScaleFactor:2});
+await p.goto("http://localhost:3000/",{waitUntil:"networkidle0"});
+const s=ms=>new Promise(r=>setTimeout(r,ms));
+await s(3600);
+await p.screenshot({path:`${OUT}/m_hero.png`});
+await p.evaluate(()=>window.scrollTo(0,document.body.scrollHeight*0.34));await s(700);
+await p.screenshot({path:`${OUT}/m_mid.png`});
+await b.close();console.log("mobile done");

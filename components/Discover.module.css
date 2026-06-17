@@ -1,0 +1,297 @@
+.section {
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  margin-top: 0;
+  padding: clamp(60px, 8.5vh, 100px) var(--pad-x) clamp(40px, 6vh, 72px);
+}
+
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  opacity: 0.7;
+  margin-bottom: clamp(10px, 1.6vh, 20px);
+  flex: none;
+}
+
+.body {
+  flex: 1;
+  min-height: 0;
+  display: grid;
+  grid-template-columns: 1.75fr 0.85fr;
+  gap: clamp(36px, 5.5vw, 110px);
+  align-items: stretch;
+}
+
+/* ---------- left: title + large image + text ---------- */
+/* image flexes (minmax 0) so the title and text always stay on screen */
+.left {
+  min-height: 0;
+  display: grid;
+  grid-template-rows: auto minmax(0, 1fr) auto;
+  gap: clamp(18px, 2.8vh, 40px);
+}
+
+.titleRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1em;
+  border-bottom: 1px solid var(--rule);
+  padding-bottom: clamp(12px, 1.8vh, 26px);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(2rem, 4.6vw, 4rem);
+  line-height: 1;
+  color: var(--maroon);
+}
+
+.tag {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  letter-spacing: 0.04em;
+  opacity: 0.65;
+  white-space: nowrap;
+}
+
+.bigImage {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+}
+
+.bigImageLayer {
+  position: absolute;
+  inset: 0;
+}
+.bigImageLayer > div {
+  height: 100%;
+}
+
+/* ---------- overlay on the big image ---------- */
+.overlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
+  padding: clamp(14px, 1.5vw, 26px);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1vh, 14px);
+}
+
+.ovHead {
+  display: flex;
+  flex-direction: column;
+  gap: 0.15em;
+}
+
+.ovName {
+  font-family: var(--font-display);
+  font-weight: 500;
+  text-transform: uppercase;
+  font-size: clamp(1.05rem, 1.9vw, 1.7rem);
+  line-height: 1.02;
+  color: var(--maroon);
+}
+
+.ovLoc {
+  font-family: var(--font-sans);
+  font-size: clamp(0.74rem, 0.95vw, 0.86rem);
+  color: var(--maroon);
+  opacity: 0.78;
+}
+
+.ovLine {
+  display: block;
+  height: 1px;
+  background: var(--rule);
+  margin: clamp(2px, 0.6vh, 8px) 0;
+}
+
+.ovRow {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 12px;
+}
+
+.ovMenu {
+  background: none;
+  border: none;
+  padding: 0.4em 0;
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  color: var(--maroon);
+  cursor: pointer;
+}
+
+.ovActions {
+  display: flex;
+  gap: 10px;
+}
+
+.btnSolid,
+.btnGhost {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  border-radius: 999px;
+  padding: 0.66em 1.3em;
+  white-space: nowrap;
+  transition: opacity 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+}
+
+/* Learn More — solid #2F0000 background, clear (cream) text */
+.btnSolid {
+  background: #2f0000;
+  color: var(--cream);
+  border: 1px solid #2f0000;
+}
+.btnSolid:hover {
+  opacity: 0.88;
+}
+
+/* Book a Table — clear background, #2F0000 stroke + text */
+.btnGhost {
+  background: transparent;
+  color: #2f0000;
+  border: 1px solid #2f0000;
+}
+.btnGhost:hover {
+  background: #2f0000;
+  color: var(--cream);
+}
+
+@media (max-width: 520px) {
+  .ovActions {
+    gap: 6px;
+  }
+  .btnSolid,
+  .btnGhost {
+    padding: 0.55em 0.9em;
+    font-size: 0.74rem;
+  }
+}
+
+/* each paragraph becomes its own column */
+.text {
+  display: flex;
+  gap: clamp(28px, 4vw, 80px);
+  align-items: flex-start;
+}
+
+.textCol {
+  flex: 1;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  line-height: 1.7;
+  opacity: 0.72;
+  max-width: 32ch;
+}
+
+/* ---------- right: scrollable cards ---------- */
+.scroller {
+  align-self: center;
+  height: clamp(320px, 48vh, 480px);
+  overflow-y: auto;
+  scroll-snap-type: y mandatory;
+  scrollbar-width: none;
+  scrollbar-color: var(--rule) transparent;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 8%,
+    #000 92%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0,
+    #000 8%,
+    #000 92%,
+    transparent 100%
+  );
+}
+
+.scroller::-webkit-scrollbar {
+  display: none;
+}
+
+.scrollerInner {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(22px, 3.5vh, 44px);
+  padding: 0 4px;
+}
+
+.card {
+  scroll-snap-align: center;
+  display: block;
+  width: 100%;
+  background: none;
+  border: none;
+  padding: 0;
+  text-align: left;
+  opacity: 0.4;
+  transform: scale(0.96);
+  transition: opacity 0.4s ease, transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.cardActive {
+  opacity: 1;
+  transform: scale(1);
+}
+
+.cardMeta {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 0.6em;
+  margin-top: 0.5em;
+}
+
+.cardName {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: 1.15rem;
+  color: var(--maroon);
+}
+
+.cardTag {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  opacity: 0.6;
+}
+
+@media (max-width: 820px) {
+  .body {
+    grid-template-columns: 1fr;
+    grid-template-rows: 1fr auto;
+  }
+  .scroller {
+    overflow-x: auto;
+    overflow-y: hidden;
+    scroll-snap-type: x mandatory;
+  }
+  .scrollerInner {
+    flex-direction: row;
+    padding: 4px 0;
+  }
+  .card {
+    width: 60vw;
+    flex: none;
+  }
+  .text {
+    flex-direction: column;
+    gap: 0.6em;
+  }
+}

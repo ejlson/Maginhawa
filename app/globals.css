@@ -1,0 +1,129 @@
+/* ===========================================================
+   Maginhawa Group — global styles & editorial design tokens
+   =========================================================== */
+
+/* Contralto (Adobe Fonts / Typekit kit pev2vne) — loaded via <link> in the
+   document head. Family "contralto-medium"; falls back to Fraunces if the
+   kit isn't authorised for the current domain. */
+
+:root {
+  --cream: #f8f3ea;
+  --maroon: #2f0000;
+  --maroon-soft: #3a0a0a;
+  --placeholder: #e2dfd9;
+  --placeholder-line: #c9c3b6;
+  --rule: rgba(47, 0, 0, 0.55);
+
+  --font-display: "contralto-medium", var(--font-fraunces), "Times New Roman", serif;
+  --font-serif: var(--font-fraunces), Georgia, serif;
+  --font-sans: var(--font-inter), -apple-system, "Helvetica Neue", Arial, sans-serif;
+
+  /* all content aligns to the same edges as the giant hero wordmark */
+  --pad-x: clamp(8px, 1.4vw, 22px);
+  --maxw: 1440px;
+}
+
+* {
+  margin: 0;
+  padding: 0;
+  box-sizing: border-box;
+}
+
+html {
+  -webkit-font-smoothing: antialiased;
+  text-rendering: optimizeLegibility;
+}
+
+body {
+  background: var(--cream);
+  color: var(--maroon);
+  font-family: var(--font-sans);
+  font-size: 16px;
+  line-height: 1.4;
+  /* clip (not hidden) so position: sticky still works */
+  overflow-x: clip;
+}
+
+/* Lenis smooth scroll */
+html.lenis,
+html.lenis body {
+  height: auto;
+}
+.lenis.lenis-smooth {
+  scroll-behavior: auto !important;
+}
+.lenis.lenis-stopped {
+  overflow: hidden;
+}
+
+a {
+  color: inherit;
+  text-decoration: none;
+}
+
+button {
+  font-family: inherit;
+  cursor: pointer;
+}
+
+/* clean focus: no ring on mouse/touch, tasteful ring for keyboard users */
+:focus {
+  outline: none;
+}
+:focus-visible {
+  outline: 2px solid var(--maroon);
+  outline-offset: 3px;
+  border-radius: 2px;
+}
+
+::selection {
+  background: var(--maroon);
+  color: var(--cream);
+}
+
+/* lock scroll while the loader is active */
+body.is-loading {
+  overflow: hidden;
+  height: 100vh;
+}
+
+/* ---- shared layout helpers ---- */
+.container {
+  width: 100%;
+  max-width: none;
+  margin-inline: auto;
+  padding-inline: var(--pad-x);
+}
+
+/* cream layer that scrolls up over the pinned (sticky) hero — parallax */
+.afterHero {
+  position: relative;
+  z-index: 1;
+  background: var(--cream);
+}
+
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  letter-spacing: 0.04em;
+  font-weight: 500;
+  opacity: 0.75;
+}
+
+/* Giant edge-to-edge display wordmark used across the site */
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 400;
+  line-height: 0.82;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  font-size: clamp(4rem, 17.5vw, 17rem);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  * {
+    animation-duration: 0.001ms !important;
+    transition-duration: 0.001ms !important;
+  }
+}

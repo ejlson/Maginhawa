@@ -1,0 +1,12 @@
+import puppeteer from "puppeteer-core";
+const CHROME="/Applications/Google Chrome.app/Contents/MacOS/Google Chrome";
+const s=ms=>new Promise(r=>setTimeout(r,ms));
+const b=await puppeteer.launch({executablePath:CHROME,headless:"new",args:["--no-sandbox"]});
+const p=await b.newPage();await p.setViewport({width:1440,height:900});
+const msgs=[];
+p.on('console',m=>{ if(m.type()==='error'||m.type()==='warning') msgs.push(m.type()+": "+m.text().slice(0,200)); });
+p.on('pageerror',e=>msgs.push("PAGEERROR: "+e.message.slice(0,200)));
+await p.goto("http://localhost:3000/",{waitUntil:"networkidle0"});await s(5500);
+await p.evaluate(()=>window.scrollTo(0,window.innerHeight));await s(800);
+console.log(msgs.length? msgs.join("\n") : "no console errors/warnings");
+await b.close();

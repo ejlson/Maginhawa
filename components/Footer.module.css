@@ -1,0 +1,86 @@
+.footer {
+  height: 100svh;
+  box-sizing: border-box;
+  display: flex;
+  flex-direction: column;
+  color: var(--cream);
+  /* columns sit just below the navbar; ©/By EJ pinned at the very bottom */
+  padding: clamp(46px, 6vh, 64px) var(--pad-x) clamp(10px, 1.6vh, 20px);
+  border-top: 1px solid rgba(248, 243, 234, 0.28);
+}
+
+.spacer {
+  flex: 1;
+  min-height: clamp(16px, 4vh, 60px);
+}
+
+.cols {
+  flex: none;
+  display: flex;
+  align-items: flex-start;
+}
+
+.leftCols {
+  display: flex;
+  gap: clamp(18px, 4vw, 72px);
+  flex-wrap: wrap;
+}
+
+.contactCol {
+  margin-left: auto;
+}
+
+.col h4 {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.95rem;
+  margin-bottom: 0.9em;
+}
+
+.col ul {
+  list-style: none;
+  display: flex;
+  flex-direction: column;
+  gap: 0.45em;
+}
+
+.col a {
+  font-family: var(--font-sans);
+  font-size: 0.84rem;
+  opacity: 0.72;
+  transition: opacity 0.3s ease;
+}
+
+.col a:hover {
+  opacity: 1;
+}
+
+/* two-line wordmark, natural proportions (not squished), full bleed width */
+.wordmark {
+  flex: none;
+  width: 100%;
+  display: block;
+}
+
+.wline {
+  font-family: var(--font-display);
+  font-weight: 500;
+  text-transform: uppercase;
+  fill: var(--cream);
+}
+
+.bottomRow {
+  flex: none;
+  display: flex;
+  justify-content: space-between;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  opacity: 0.7;
+  padding-top: 0.7em;
+}
+
+@media (max-width: 640px) {
+  .leftCols {
+    gap: 14px 28px;
+  }
+}

@@ -1,0 +1,59 @@
+.hero {
+  position: sticky;
+  top: 0;
+  width: 100%;
+  height: 100svh;
+  overflow: hidden;
+  z-index: 0;
+}
+
+.panel {
+  position: absolute;
+  top: var(--hero-top);
+  left: var(--hero-side);
+  right: var(--hero-side);
+  bottom: var(--hero-bottom);
+  border-radius: var(--hero-radius);
+  overflow: hidden;
+  background: var(--placeholder);
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* Giant wordmark stretched edge-to-edge across the bottom of the hero */
+.titleWrap {
+  position: absolute;
+  left: var(--pad-x);
+  right: var(--pad-x);
+  bottom: clamp(2px, 0.8vh, 14px);
+  margin: 0;
+  color: var(--cream);
+  mix-blend-mode: difference;
+  pointer-events: none;
+  overflow: hidden;
+}
+
+.titleInner {
+  display: block;
+  width: 100%;
+  will-change: transform;
+}
+
+.titleSvg {
+  display: block;
+  width: 100%;
+  height: auto;
+}
+
+.titleText {
+  font-family: var(--font-display);
+  font-weight: 400;
+  text-transform: uppercase;
+  fill: var(--cream);
+}
+

@@ -1,0 +1,79 @@
+.overlay {
+  position: fixed;
+  inset: 0;
+  z-index: 100;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* The transparent "window". Its huge cream box-shadow paints everything
+   OUTSIDE the rounded rect, so as the rect grows it reveals the hero
+   video sitting behind the overlay. */
+.window {
+  position: absolute;
+  box-shadow: 0 0 0 100vmax var(--cream);
+  will-change: top, left, right, bottom;
+}
+
+/* the whole word "MGNHW" is centred as one unit; the two groups sit
+   adjacent and only split apart during the reveal */
+.letters {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.group,
+.center {
+  display: flex;
+  font-family: var(--font-display);
+  font-weight: 400;
+  font-size: clamp(2.6rem, 8vw, 5.5rem);
+  line-height: 1;
+  color: var(--maroon);
+  will-change: transform, opacity;
+}
+
+/* fixed-width cells so cycling characters don't shift the layout (board feel),
+   kept tight so the resting word reads as one word */
+.flip {
+  display: inline-block;
+  width: 0.72em;
+  text-align: center;
+  perspective: 700px;
+}
+
+.flipInner {
+  display: inline-block;
+  transform-origin: 50% 100%;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
+}
+
+/* loading progress bar pinned to the very bottom of the screen */
+.progress {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 3px;
+  background: rgba(47, 0, 0, 0.12);
+}
+
+.bar {
+  height: 100%;
+  background: var(--maroon);
+  transition: width 0.3s ease;
+}
+
+.count {
+  position: absolute;
+  bottom: 14px;
+  right: var(--pad-x);
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.12em;
+  color: var(--maroon);
+}

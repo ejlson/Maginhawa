@@ -1,0 +1,14 @@
+/node_modules
+/.next
+/out
+/build
+.DS_Store
+*.pem
+.env*
+
+# large media — exceeds GitHub's 100MB limit; keep local only
+/public/videos/*.mp4
+/assets/videos/*.mp4
+
+# TS build cache
+*.tsbuildinfo

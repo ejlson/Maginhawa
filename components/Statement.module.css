@@ -1,0 +1,48 @@
+.section {
+  padding: clamp(120px, 20vh, 280px) 0 clamp(0px, 1vh, 14px);
+}
+
+.wrap {
+  position: relative;
+}
+
+/* eyebrow sits top-left, inline with the indented first line */
+.eyebrow {
+  position: absolute;
+  top: clamp(8px, 1vw, 18px);
+  left: 0;
+  white-space: nowrap;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  opacity: 0.7;
+}
+
+.statement {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.9rem, 4.6vw, 4rem);
+  line-height: 1.08;
+  letter-spacing: -0.006em;
+  color: var(--maroon);
+}
+
+/* pushes only the first line past the eyebrow; wrapped lines run full width */
+.spacer {
+  display: inline-block;
+  width: clamp(150px, 18vw, 320px);
+  height: 0.1em;
+  vertical-align: middle;
+}
+
+@media (max-width: 640px) {
+  .eyebrow {
+    position: static;
+    display: block;
+    width: auto;
+    margin-bottom: 1em;
+  }
+  .spacer {
+    display: none;
+  }
+}

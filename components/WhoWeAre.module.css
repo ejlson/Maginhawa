@@ -1,0 +1,120 @@
+.section {
+  margin-top: clamp(60px, 11vh, 180px);
+  padding: clamp(70px, 11vh, 150px) 0 clamp(80px, 12vh, 160px);
+}
+
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  opacity: 0.7;
+  margin-bottom: clamp(12px, 2vh, 24px);
+}
+
+.bigType {
+  font-family: var(--font-display);
+  text-transform: uppercase;
+  line-height: 0.84;
+  letter-spacing: -0.01em;
+  font-size: clamp(3rem, 13vw, 12.5rem);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  padding: 0.08em 0;
+}
+
+.bigType .grp {
+  display: block;
+  text-align: right;
+  color: var(--maroon);
+}
+
+.body {
+  margin-top: clamp(40px, 6vh, 80px);
+  display: grid;
+  grid-template-columns: repeat(3, 1fr) 1.1fr;
+  gap: clamp(18px, 2.4vw, 44px);
+  align-items: start;
+}
+
+.col {
+  font-family: var(--font-sans);
+  font-size: 0.85rem;
+  line-height: 1.55;
+  opacity: 0.82;
+}
+
+.cta {
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  margin: clamp(48px, 8vh, 110px) 0;
+  justify-content: center;
+}
+
+.pill,
+.circle {
+  background: var(--maroon);
+  color: var(--cream);
+  border: none;
+  border-radius: 999px;
+  font-family: var(--font-serif);
+}
+
+.pill {
+  padding: 1.05em 1.9em;
+  font-size: 1.05rem;
+}
+
+.pill u {
+  text-underline-offset: 3px;
+}
+
+.circle {
+  width: 3.4em;
+  height: 3.4em;
+  font-size: 1.05rem;
+  display: grid;
+  place-items: center;
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.circle:hover {
+  transform: translateX(4px);
+}
+
+.feature {
+  display: grid;
+  grid-template-columns: 1fr 2fr;
+  gap: clamp(20px, 3vw, 56px);
+  align-items: end;
+  margin-bottom: clamp(60px, 10vh, 140px);
+}
+
+.featureLeft {
+  padding-bottom: clamp(0px, 4vh, 60px);
+}
+
+.logoRow {
+  display: grid;
+  grid-template-columns: repeat(5, 1fr);
+  gap: clamp(12px, 1.5vw, 24px);
+}
+
+@media (max-width: 860px) {
+  .body {
+    grid-template-columns: 1fr 1fr;
+  }
+}
+@media (max-width: 640px) {
+  .body {
+    grid-template-columns: 1fr;
+  }
+  .feature {
+    grid-template-columns: 1fr;
+  }
+  .logoRow {
+    grid-template-columns: repeat(2, 1fr);
+  }
+  .bigType .grp {
+    text-align: left;
+  }
+}
