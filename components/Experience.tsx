@@ -34,12 +34,25 @@ export default function Experience() {
   }, []);
 
   const [menuOpen, setMenuOpen] = useState(false);
+  // scroll stays locked through the loader AND while the Maginhawa wordmark
+  // pops up, so the user can't scroll past the hero before it has landed
+  const [locked, setLocked] = useState(true);
   const insets = HERO_INSETS;
 
   useEffect(() => {
-    document.body.classList.toggle("is-loading", intro);
-    return () => document.body.classList.remove("is-loading");
+    if (intro) {
+      setLocked(true);
+      return;
+    }
+    // hero wordmark animates up over ~1.1s once the intro ends — hold here
+    const t = setTimeout(() => setLocked(false), 1300);
+    return () => clearTimeout(t);
   }, [intro]);
+
+  useEffect(() => {
+    document.body.classList.toggle("is-loading", locked);
+    return () => document.body.classList.remove("is-loading");
+  }, [locked]);
 
   const started = !intro;
 

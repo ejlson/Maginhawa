@@ -291,7 +291,15 @@ export default function RestaurantsShowcase() {
           <div className={styles.panel}>
             <span className={styles.phrase}>Visit</span>
 
-            <div ref={scrollerRef} className={styles.scroller} onScroll={onScroll}>
+            <div className={styles.wheel}>
+              {/* a window over the centre row: bright (undarkened) video shows
+                  through, the rest of the screen is dimmed around it */}
+              <span className={styles.spotlight} aria-hidden />
+              <div
+                ref={scrollerRef}
+                className={styles.scroller}
+                onScroll={onScroll}
+              >
               <ul className={styles.list}>
                 {LOOP.map((r) => (
                   <li key={r.gpos} className={styles.row}>
@@ -315,6 +323,7 @@ export default function RestaurantsShowcase() {
                   </li>
                 ))}
               </ul>
+              </div>
             </div>
 
             <VisitArrow

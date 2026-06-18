@@ -11,7 +11,7 @@
   top: 0;
   height: 100svh;
   overflow: hidden;
-  color: #fff;
+  color: var(--cream);
   z-index: 0;
 }
 
@@ -29,20 +29,21 @@
   height: 100%;
   object-fit: cover;
   opacity: 0;
-  filter: brightness(0.55);
   transition: opacity 1s ease;
 }
 .bgVideo[data-active="true"] {
   opacity: 1;
 }
 
-/* darken + soft centre glow so the white type stays legible */
+/* very light base tint only — the real dimming is the spotlight cutout, so the
+   selected restaurant's window reads as bright/undarkened video */
 .scrim {
   position: absolute;
   inset: 0;
-  background:
-    radial-gradient(120% 90% at 50% 50%, rgba(0, 0, 0, 0) 38%, rgba(0, 0, 0, 0.5)),
-    linear-gradient(rgba(0, 0, 0, 0.32), rgba(0, 0, 0, 0.42));
+  background: linear-gradient(
+    rgba(20, 0, 0, 0.1),
+    rgba(20, 0, 0, 0.16)
+  );
 }
 
 /* ---- the name scroller, pinned to the left ---- */
@@ -67,22 +68,49 @@
 }
 
 .phrase {
+  position: relative;
+  z-index: 1;
   flex: 0 0 auto;
   font-family: "contralto-small", var(--font-serif);
   font-size: clamp(1.3rem, 2.4vw, 2rem);
   letter-spacing: 0.01em;
-  color: #fff;
+  color: var(--cream);
   opacity: 0.92;
   white-space: nowrap;
   user-select: none;
 }
 
+/* ---- name wheel + the spotlight window over the selected row ---- */
+.wheel {
+  position: relative;
+  flex: 0 0 auto;
+}
+
+/* a rectangle framing the centre row: its huge box-shadow dims the rest of the
+   screen, so the bright (undarkened) video only shows through this window —
+   names above/below sit partly inside it, partly in the dimmed area */
+.spotlight {
+  position: absolute;
+  z-index: 0;
+  left: -14px;
+  right: -14px;
+  top: 50%;
+  height: calc(var(--row) * 1.3);
+  transform: translateY(-50%);
+  border: 1px solid rgba(248, 243, 234, 0.7);
+  border-radius: 3px;
+  box-shadow: 0 0 0 100vmax rgba(18, 0, 0, 0.62);
+  pointer-events: none;
+}
+
 /* ---- the looping vertical name scroller (shows ~5 rows) ---- */
 .scroller {
   position: relative;
+  z-index: 1;
   flex: 0 0 auto;
   width: max-content;
   padding-right: 0.4em;
+  overscroll-behavior: contain;
   height: calc(var(--row) * 5);
   overflow-y: auto;
   scroll-snap-type: y mandatory;
@@ -127,7 +155,9 @@
   line-height: var(--lh-heading);
   letter-spacing: -0.01em;
   text-align: left;
-  color: #fff;
+  color: var(--cream);
+  /* legible over the bright window */
+  text-shadow: 0 1px 14px rgba(18, 0, 0, 0.5);
   white-space: nowrap;
   transform-origin: left center;
   /* opacity/scale are driven per-frame in JS — no CSS transition (it would
@@ -138,7 +168,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 .name:focus-visible {
-  outline: 1px solid rgba(255, 255, 255, 0.6);
+  outline: 1px solid rgba(248, 243, 234, 0.6);
   outline-offset: 4px;
 }
 .nameActive {
@@ -147,6 +177,8 @@
 
 /* ---- round arrow button, sized to the name text height ---- */
 .magnet {
+  position: relative;
+  z-index: 1;
   flex: 0 0 auto;
   display: inline-block;
   will-change: transform;
@@ -162,10 +194,10 @@
   padding: 0;
   overflow: hidden;
   isolation: isolate;
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  border: 1px solid rgba(248, 243, 234, 0.55);
   border-radius: 999px;
   background: none;
-  color: #fff;
+  color: var(--cream);
   cursor: pointer;
   transition: color 0.45s ease;
   -webkit-tap-highlight-color: transparent;
@@ -201,7 +233,7 @@
 }
 
 .cta:focus-visible {
-  outline: 1px solid rgba(255, 255, 255, 0.6);
+  outline: 1px solid rgba(248, 243, 234, 0.6);
   outline-offset: 4px;
 }
 
