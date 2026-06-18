@@ -101,6 +101,9 @@ const RESTAURANTS = [
 
 const N = RESTAURANTS.length;
 
+// takeaway / café / ice-cream spots that don't take table bookings
+const NO_BOOKING = new Set(["Hoodwood", "Café Mama & Sons", "Mamasons"]);
+
 // restaurant marks
 const LOGOS: Record<string, string> = {
   Bintang: "/logo/bintang.png",
@@ -409,13 +412,15 @@ export default function RestaurantsShowcase() {
                 <span className={styles.actLabel}>Visit {item.name}</span>
                 <span aria-hidden>→</span>
               </button>
-              <button
-                type="button"
-                className={styles.actBtn}
-                onClick={() => navigate("/")}
-              >
-                Book a Table
-              </button>
+              {!NO_BOOKING.has(item.name) && (
+                <button
+                  type="button"
+                  className={styles.actBtn}
+                  onClick={() => navigate("/")}
+                >
+                  Book a Table
+                </button>
+              )}
               <button
                 type="button"
                 className={styles.actBtn}
@@ -460,13 +465,15 @@ export default function RestaurantsShowcase() {
                     >
                       Menu
                     </button>
-                    <button
-                      type="button"
-                      className={styles.cardBtn}
-                      onClick={() => navigate("/")}
-                    >
-                      Book a Table
-                    </button>
+                    {!NO_BOOKING.has(r.name) && (
+                      <button
+                        type="button"
+                        className={styles.cardBtn}
+                        onClick={() => navigate("/")}
+                      >
+                        Book a Table
+                      </button>
+                    )}
                     <button
                       type="button"
                       className={`${styles.cardBtn} ${styles.cardBtnSolid}`}
