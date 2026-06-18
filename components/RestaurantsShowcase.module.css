@@ -95,10 +95,8 @@
   left: -14px;
   right: -14px;
   top: 50%;
-  height: calc(var(--row) * 1.3);
+  height: calc(var(--row) * 2.4);
   transform: translateY(-50%);
-  border: 1px solid rgba(248, 243, 234, 0.7);
-  border-radius: 3px;
   box-shadow: 0 0 0 100vmax rgba(18, 0, 0, 0.62);
   pointer-events: none;
 }
