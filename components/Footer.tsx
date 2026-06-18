@@ -56,7 +56,7 @@ export default function Footer() {
           y="18"
           fontSize="25"
           textLength="100"
-          lengthAdjust="spacing"
+          lengthAdjust="spacingAndGlyphs"
         >
           MAGIN
         </text>
@@ -66,7 +66,7 @@ export default function Footer() {
           y="36"
           fontSize="25"
           textLength="100"
-          lengthAdjust="spacing"
+          lengthAdjust="spacingAndGlyphs"
         >
           HAWA
         </text>

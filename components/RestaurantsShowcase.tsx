@@ -446,20 +446,15 @@ export default function RestaurantsShowcase() {
         <div className={styles.cards} data-hidden={view !== "cards"}>
           <div className={styles.cardsGrid}>
             {RESTAURANTS.map((r) => (
-              <button
-                key={r.name}
-                type="button"
-                className={styles.card}
-                onClick={() => navigate("/")}
-              >
+              <article key={r.name} className={styles.card}>
                 <span className={styles.cardImg}>
                   {PHOTOS[r.name] ? (
                     <img src={PHOTOS[r.name]} alt={r.name} />
                   ) : (
-                    <Placeholder ratio="3 / 4" label={r.name} />
+                    <Placeholder ratio="auto" label={r.name} />
                   )}
                 </span>
-                <span className={styles.cardCaption}>
+                <div className={styles.cardInfo}>
                   {LOGOS[r.name] ? (
                     <img
                       className={styles.cardMark}
@@ -470,8 +465,31 @@ export default function RestaurantsShowcase() {
                     <span className={styles.cardName}>{r.name}</span>
                   )}
                   <span className={styles.cardLoc}>{r.location}</span>
-                </span>
-              </button>
+                  <div className={styles.cardActions}>
+                    <button
+                      type="button"
+                      className={styles.cardBtn}
+                      onClick={() => navigate("/")}
+                    >
+                      Menu
+                    </button>
+                    <button
+                      type="button"
+                      className={styles.cardBtn}
+                      onClick={() => navigate("/")}
+                    >
+                      Book a Table
+                    </button>
+                    <button
+                      type="button"
+                      className={`${styles.cardBtn} ${styles.cardBtnSolid}`}
+                      onClick={() => navigate("/")}
+                    >
+                      Visit
+                    </button>
+                  </div>
+                </div>
+              </article>
             ))}
           </div>
         </div>
