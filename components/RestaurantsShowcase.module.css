@@ -61,7 +61,7 @@
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: clamp(18px, 3vw, 52px);
+  gap: clamp(12px, 1.8vw, 26px);
   /* shared so the arrow button matches the restaurant-name text height */
   --name-size: clamp(1.4rem, 2.6vw, 2.1rem);
 }
@@ -164,8 +164,8 @@
   display: grid;
   place-items: center;
   /* diameter ≈ the restaurant-name line box, so it matches the text height */
-  width: calc(var(--name-size) * 1.6);
-  height: calc(var(--name-size) * 1.6);
+  width: calc(var(--name-size) * 1.25);
+  height: calc(var(--name-size) * 1.25);
   padding: 0;
   overflow: hidden;
   isolation: isolate;

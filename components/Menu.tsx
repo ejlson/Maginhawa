@@ -30,8 +30,8 @@ export default function Menu({
 
   useEffect(() => {
     if (!open) return;
-    const t = getNavTheme();
-    setDark(t === "dark" || t === "blend");
+    // cream over light + video/hero sections; red only over the maroon section
+    setDark(getNavTheme() === "dark");
   }, [open]);
 
   // route links (e.g. "/restaurants") run through the page-transition curtain;
