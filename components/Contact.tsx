@@ -9,10 +9,7 @@ export default function Contact() {
       <div className="container">
         <h2 className={styles.wordmark}>
           <span className={styles.wline}>
-            <RevealText text="Contact" stagger={0.05} />
-          </span>
-          <span className={styles.wline}>
-            <RevealText text="Us" stagger={0.05} />
+            <RevealText text="Contact Us" stagger={0.05} />
           </span>
         </h2>
 
@@ -49,7 +46,7 @@ export default function Contact() {
                 <input type="text" placeholder="Enter your description here" />
               </div>
               <div className={styles.submitRow}>
-                <MagneticButton label="Submit" type="submit" />
+                <MagneticButton label="Submit" type="submit" arrow={false} />
               </div>
             </form>
           </Reveal>

@@ -30,11 +30,13 @@ export default function MagneticButton({
   type = "button",
   onClick,
   ariaLabel,
+  arrow = true,
 }: {
   label: string;
   type?: "button" | "submit";
   onClick?: () => void;
   ariaLabel?: string;
+  arrow?: boolean;
 }) {
   const ref = useRef<HTMLButtonElement>(null);
   const [hover, setHover] = useState(false);
@@ -93,9 +95,11 @@ export default function MagneticButton({
           <span className={styles.l1}>{label}</span>
           <span className={styles.l2}>{label}</span>
         </span>
-        <span className={styles.arrow} aria-hidden>
-          <Arrow />
-        </span>
+        {arrow && (
+          <span className={styles.arrow} aria-hidden>
+            <Arrow />
+          </span>
+        )}
       </button>
     </motion.div>
   );
