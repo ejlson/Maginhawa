@@ -69,15 +69,16 @@
   transition: opacity 0.3s ease;
 }
 
-/* leading line marks the selected item (space reserved so text doesn't shift) */
+/* leading vertical line marks the selected item (space reserved so text
+   doesn't shift) */
 .item::before {
   content: "";
   flex: none;
-  width: 1.3em;
-  height: 1px;
+  width: 2px;
+  height: 0.9em;
   background: currentColor;
-  transform: scaleX(0);
-  transform-origin: left center;
+  transform: scaleY(0);
+  transform-origin: center;
   transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
@@ -87,16 +88,15 @@
 }
 .item:hover::before,
 .itemActive::before {
-  transform: scaleX(1);
+  transform: scaleY(1);
 }
 
-/* portrait image resting flush in the bottom-right corner of the panel */
+/* portrait image resting in the bottom-right, padded off the panel edges */
 .thumb {
   flex: none;
   align-self: flex-end;
-  width: clamp(120px, 34%, 158px);
-  margin-right: calc(-1 * var(--m-pad-x));
-  margin-bottom: calc(-1 * var(--m-pad-b));
+  width: clamp(116px, 32%, 150px);
+  border-radius: 10px;
   overflow: hidden;
   position: relative;
 }
