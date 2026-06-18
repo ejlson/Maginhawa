@@ -12,7 +12,7 @@
   line-height: 0.9;
   letter-spacing: var(--tr-display);
   /* sized to sit on a single line across viewports */
-  font-size: clamp(2.2rem, 11vw, 11rem);
+  font-size: clamp(2.6rem, 13.5vw, 13rem);
 }
 
 .wline {

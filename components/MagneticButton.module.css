@@ -24,6 +24,13 @@
   -webkit-tap-highlight-color: transparent;
 }
 
+/* compact variant (e.g. the contact submit) */
+.small {
+  font-size: var(--t-small);
+  padding: 0.6em 1.5em;
+  border-width: 1px;
+}
+
 /* cream circle that radiates from the cursor on hover */
 .fill {
   position: absolute;
