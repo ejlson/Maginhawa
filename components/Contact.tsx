@@ -1,17 +1,32 @@
 import styles from "./Contact.module.css";
 import Reveal from "./Reveal";
-import RevealText from "./RevealText";
 import MagneticButton from "./MagneticButton";
 
 export default function Contact() {
   return (
     <section className={styles.section} id="contact-us">
       <div className="container">
-        <h2 className={styles.wordmark}>
-          <span className={styles.wline}>
-            <RevealText text="Contact Us" stagger={0.05} />
-          </span>
-        </h2>
+        <Reveal className={styles.wordmark} as="h2">
+          {/* SVG wordmark stretched to fill the full page width */}
+          <svg
+            className={styles.wordSvg}
+            viewBox="0 0 100 16"
+            preserveAspectRatio="xMidYMid meet"
+            role="img"
+            aria-label="Contact Us"
+          >
+            <text
+              className={styles.wordText}
+              x="0"
+              y="13.4"
+              fontSize="17"
+              textLength="100"
+              lengthAdjust="spacingAndGlyphs"
+            >
+              CONTACT US
+            </text>
+          </svg>
+        </Reveal>
 
         <div className={styles.grid}>
           <div className={styles.info}>
@@ -46,7 +61,7 @@ export default function Contact() {
                 <input type="text" placeholder="Enter your description here" />
               </div>
               <div className={styles.submitRow}>
-                <MagneticButton label="Submit" type="submit" arrow={false} small />
+                <MagneticButton label="Submit" type="submit" small />
               </div>
             </form>
           </Reveal>

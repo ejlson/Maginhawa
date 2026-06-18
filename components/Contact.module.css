@@ -5,23 +5,20 @@
 }
 
 .wordmark {
-  font-family: var(--font-display-big);
-  text-transform: uppercase;
-  text-align: right;
-  color: var(--cream);
-  line-height: 0.9;
-  letter-spacing: var(--tr-display);
-  /* sized to sit on a single line across viewports */
-  font-size: clamp(2.6rem, 13.5vw, 13rem);
+  display: block;
 }
 
-.wline {
+/* the wordmark is an SVG whose text is stretched to the full container width */
+.wordSvg {
   display: block;
-  /* vertical breathing room so the caps aren't clipped by the reveal mask;
-     negative margin keeps the lines tightly stacked */
-  padding: 0.14em 0;
-  margin: -0.14em 0;
-  overflow: hidden;
+  width: 100%;
+}
+
+.wordText {
+  font-family: var(--font-display-big);
+  font-weight: 500;
+  letter-spacing: var(--tr-display);
+  fill: var(--cream);
 }
 
 .grid {
@@ -58,7 +55,7 @@
 .form {
   display: flex;
   flex-direction: column;
-  gap: clamp(18px, 3vh, 30px);
+  gap: clamp(10px, 1.8vh, 18px);
 }
 
 .row {
@@ -96,7 +93,7 @@
 }
 
 .submitRow {
-  margin-top: clamp(8px, 2vh, 20px);
+  margin-top: clamp(2px, 0.8vh, 8px);
 }
 
 @media (max-width: 760px) {
