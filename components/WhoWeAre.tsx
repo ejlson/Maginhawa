@@ -37,10 +37,16 @@ export default function WhoWeAre() {
     offset: ["start center", "end center"],
   });
 
-  // even diagonal (left highest → right lowest) — steep cascade
-  const y0 = useTransform(scrollYProgress, [0, 0.5], [-360, 0]);
-  const y1 = useTransform(scrollYProgress, [0, 0.5], [-240, 0]);
-  const y2 = useTransform(scrollYProgress, [0, 0.5], [-120, 0]);
+  // sequential "catch-up" cascade. Even step D between levels; each paragraph
+  // descends one step at a time, joining the one below once it lines up, until
+  // all three reach the bottom:
+  //   phase 1: 01 drops to 02's level   (02, 03 hold)
+  //   phase 2: 01+02 drop to 03's level (03 holds)
+  //   phase 3: all three drop to the bottom
+  const stops = [0, 0.2, 0.4, 0.6];
+  const y0 = useTransform(scrollYProgress, stops, [-360, -240, -120, 0]);
+  const y1 = useTransform(scrollYProgress, stops, [-240, -240, -120, 0]);
+  const y2 = useTransform(scrollYProgress, stops, [-120, -120, -120, 0]);
   const ys = [y0, y1, y2];
 
   return (
