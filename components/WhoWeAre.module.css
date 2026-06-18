@@ -53,34 +53,63 @@
   display: grid;
   grid-template-columns: repeat(3, 1fr) 1.1fr;
   gap: clamp(18px, 2.4vw, 44px);
-  align-items: start;
+  /* paragraphs settle bottom-aligned with the image */
+  align-items: end;
 }
 
 .col {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.4vh, 16px);
+  will-change: transform;
+}
+
+.colHead {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1rem, 1.3vw, 1.25rem);
+  letter-spacing: -0.01em;
+  color: var(--maroon);
+}
+
+.colBody {
   font-family: var(--font-sans);
   font-size: var(--t-small);
   line-height: var(--lh-body);
   opacity: 0.82;
 }
 
-/* image column: photo with the Learn More button beneath it */
 .imageCol {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: clamp(18px, 2.5vh, 32px);
+}
+
+/* Learn More button, beneath the image on the right */
+.cta {
+  margin-top: clamp(28px, 4vh, 56px);
+  display: flex;
+  justify-content: flex-end;
 }
 
 @media (max-width: 860px) {
   .body {
     grid-template-columns: 1fr 1fr;
+    align-items: start;
+  }
+  /* the horizontal staircase only makes sense in the 3-column layout */
+  .col {
+    transform: none !important;
   }
 }
 @media (max-width: 640px) {
   .body {
     grid-template-columns: 1fr;
   }
-  .bigType .grp {
-    text-align: left;
+  /* no cascade when the columns stack */
+  .col {
+    transform: none !important;
+  }
+  .cta {
+    justify-content: flex-start;
   }
 }
