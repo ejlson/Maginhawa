@@ -1,0 +1,112 @@
+.section {
+  padding: clamp(30px, 6vh, 80px) 0 clamp(60px, 10vh, 140px);
+}
+
+.eyebrow {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  opacity: 0.7;
+  margin-bottom: clamp(48px, 9vh, 110px);
+}
+
+.track {
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 3.6em 0;
+}
+
+.rail {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 1px;
+  background: var(--maroon);
+  opacity: 0.3;
+  transform-origin: left center;
+}
+
+.node {
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+}
+
+.dot {
+  position: relative;
+  z-index: 1;
+  width: 10px;
+  height: 10px;
+  border-radius: 50%;
+  background: var(--maroon);
+}
+
+.year {
+  position: absolute;
+  bottom: 1.8em;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.1rem, 1.6vw, 1.5rem);
+  letter-spacing: -0.01em;
+  color: var(--maroon);
+}
+
+.name {
+  position: absolute;
+  top: 1.8em;
+  left: 50%;
+  transform: translateX(-50%);
+  white-space: nowrap;
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  letter-spacing: 0.02em;
+  opacity: 0.72;
+}
+
+/* vertical on small screens */
+@media (max-width: 720px) {
+  .track {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: clamp(22px, 4.5vh, 40px);
+    padding: 0 0 0 18px;
+  }
+  .rail {
+    left: 4px;
+    right: auto;
+    top: 0;
+    bottom: 0;
+    width: 1px;
+    height: auto;
+    transform: none !important;
+  }
+  .node {
+    width: 100%;
+    justify-content: flex-start;
+    gap: 0.9em;
+  }
+  .dot {
+    margin-left: -18px;
+    flex: none;
+  }
+  .year,
+  .name {
+    position: static;
+    transform: none;
+  }
+  .year {
+    font-size: 1.25rem;
+  }
+  .name {
+    font-size: 0.9rem;
+    opacity: 0.7;
+  }
+}

@@ -56,87 +56,89 @@
   padding: 0 clamp(20px, 7vw, 120px);
 }
 
-.stage[data-hidden="true"],
+/* crossfade between the two views (both stay mounted) */
+.stage,
+.cards {
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.stage[data-hidden="true"] {
+  opacity: 0;
+  transform: translateX(-24px);
+  pointer-events: none;
+}
 .cards[data-hidden="true"] {
-  display: none;
+  opacity: 0;
+  transform: translateX(24px);
+  pointer-events: none;
 }
 
-/* ---- card-list view ---- */
+/* ---- card-list view: photo grid on a clean cream surface ---- */
 .cards {
   position: absolute;
   inset: 0;
-  z-index: 2;
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: clamp(10px, 1.4vw, 22px);
-  align-content: center;
-  padding: clamp(84px, 15vh, 150px) clamp(20px, 6vw, 110px)
-    clamp(84px, 14vh, 130px);
+  z-index: 3;
+  background: var(--cream);
+  color: var(--maroon);
   overflow-y: auto;
   overscroll-behavior: contain;
+}
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  gap: clamp(12px, 1.6vw, 28px);
+  align-content: start;
+  padding: clamp(80px, 13vh, 130px) clamp(20px, 5vw, 80px)
+    clamp(80px, 13vh, 120px);
 }
 
 .card {
   display: flex;
   flex-direction: column;
-  overflow: hidden;
-  border: 1px solid rgba(248, 243, 234, 0.25);
-  border-radius: 10px;
-  background: rgba(18, 0, 0, 0.28);
-  -webkit-backdrop-filter: blur(4px);
-  backdrop-filter: blur(4px);
-  color: var(--cream);
+  gap: clamp(10px, 0.9vw, 16px);
+  border: none;
+  background: none;
   text-align: left;
-  cursor: pointer;
-  transition: border-color 0.35s ease,
-    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
-}
-.card:hover {
-  border-color: rgba(248, 243, 234, 0.5);
-  transform: translateY(-3px);
-}
-
-/* the logo on a clean cream tile so every mark sits on the same surface */
-.cardLogo {
-  display: grid;
-  place-items: center;
-  aspect-ratio: 16 / 7;
-  padding: clamp(14px, 2vw, 26px);
-  background: var(--cream);
-}
-.cardLogo img {
-  max-width: 100%;
-  max-height: 100%;
-  object-fit: contain;
-}
-.cardLogoName {
-  font-family: "contralto-small", var(--font-serif);
-  font-size: clamp(1.2rem, 2vw, 1.7rem);
   color: var(--maroon);
+  cursor: pointer;
 }
 
-.cardBody {
+.cardImg {
+  display: block;
+  overflow: hidden;
+  border-radius: 3px;
+}
+.cardImg img {
+  display: block;
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  object-fit: cover;
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.card:hover .cardImg img {
+  transform: scale(1.04);
+}
+
+.cardCaption {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.28em;
-  padding: clamp(14px, 1.6vw, 22px);
+  gap: 0.35em;
+}
+.cardMark {
+  height: clamp(18px, 1.5vw, 24px);
+  width: auto;
+  max-width: 80%;
+  object-fit: contain;
 }
 .cardName {
   font-family: "contralto-small", var(--font-serif);
-  font-size: clamp(1.2rem, 1.8vw, 1.6rem);
-  line-height: 1.05;
-}
-.cardTag {
-  font-family: var(--font-sans);
-  font-size: 0.8rem;
-  opacity: 0.82;
+  font-size: clamp(1.1rem, 1.6vw, 1.4rem);
 }
 .cardLoc {
   font-family: var(--font-sans);
-  font-size: 0.72rem;
+  font-size: 0.74rem;
   letter-spacing: 0.04em;
-  opacity: 0.55;
+  opacity: 0.6;
 }
 
 /* ---- view switch, bottom-left ---- */
@@ -144,17 +146,29 @@
   position: absolute;
   left: clamp(20px, 5vw, 60px);
   bottom: clamp(18px, 4vh, 40px);
-  z-index: 4;
+  z-index: 5;
   display: flex;
   gap: 4px;
   padding: 4px;
   border: 1px solid rgba(248, 243, 234, 0.28);
   border-radius: 999px;
-  background: rgba(18, 0, 0, 0.3);
+  background: rgba(18, 0, 0, 0.42);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
 }
+/* sliding highlight behind the active icon */
+.toggleThumb {
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(248, 243, 234, 0.18);
+}
 .viewToggle button {
+  position: relative;
+  z-index: 1;
   width: 34px;
   height: 34px;
   display: grid;
@@ -165,25 +179,29 @@
   color: var(--cream);
   opacity: 0.55;
   cursor: pointer;
-  transition: opacity 0.3s ease, background 0.3s ease;
+  transition: opacity 0.3s ease;
   -webkit-tap-highlight-color: transparent;
 }
 .viewToggle button[data-active="true"] {
   opacity: 1;
-  background: rgba(248, 243, 234, 0.16);
 }
 .viewToggle svg {
   width: 16px;
   height: 16px;
 }
 
-@media (max-width: 860px) {
-  .cards {
+@media (max-width: 980px) {
+  .cardsGrid {
+    grid-template-columns: repeat(3, 1fr);
+  }
+}
+@media (max-width: 700px) {
+  .cardsGrid {
     grid-template-columns: repeat(2, 1fr);
   }
 }
-@media (max-width: 560px) {
-  .cards {
+@media (max-width: 460px) {
+  .cardsGrid {
     grid-template-columns: 1fr;
   }
 }

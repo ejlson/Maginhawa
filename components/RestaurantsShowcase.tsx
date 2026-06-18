@@ -9,6 +9,7 @@ import DarkZone from "./DarkZone";
 import Footer from "./Footer";
 import { useRouteTransition } from "./PageTransition";
 import VideoBackdrop from "./VideoBackdrop";
+import Placeholder from "./Placeholder";
 
 function ArrowIcon() {
   return (
@@ -169,14 +170,25 @@ const RESTAURANTS = [
 
 const N = RESTAURANTS.length;
 
-// restaurant marks (Ramo has none → falls back to its name)
+// restaurant marks
 const LOGOS: Record<string, string> = {
   Bintang: "/logo/bintang.png",
   Belly: "/logo/belly.png",
   Mamasons: "/logo/mamasons.png",
   "Café Mama & Sons": "/logo/cafemama.png",
   Guanabana: "/logo/guanabana.png",
+  "Ramo Ramen": "/logo/ramo.png",
   Hoodwood: "/logo/hoodwood.png",
+};
+
+// card photography (Mamasons has none → placeholder)
+const PHOTOS: Record<string, string> = {
+  Bintang: "/images/bintang.jpg",
+  Belly: "/images/belly.jpg",
+  "Café Mama & Sons": "/images/cafemama.jpg",
+  Guanabana: "/images/guanabana.jpg",
+  "Ramo Ramen": "/images/ramo.jpg",
+  Hoodwood: "/images/hoowood.jpg",
 };
 
 // many stacked copies → an endless loop. We don't touch scrollTop mid-scroll
@@ -430,35 +442,48 @@ export default function RestaurantsShowcase() {
           </div>
         </div>
 
-        {/* card-list view */}
+        {/* card-list view — photo grid on a clean cream surface */}
         <div className={styles.cards} data-hidden={view !== "cards"}>
-          {RESTAURANTS.map((r, i) => (
-            <button
-              key={r.name}
-              type="button"
-              className={styles.card}
-              onMouseEnter={() => setActive(i)}
-              onFocus={() => setActive(i)}
-              onClick={() => navigate("/")}
-            >
-              <span className={styles.cardLogo}>
-                {LOGOS[r.name] ? (
-                  <img src={LOGOS[r.name]} alt={r.name} />
-                ) : (
-                  <span className={styles.cardLogoName}>{r.name}</span>
-                )}
-              </span>
-              <span className={styles.cardBody}>
-                <span className={styles.cardName}>{r.name}</span>
-                <span className={styles.cardTag}>{r.tag}</span>
-                <span className={styles.cardLoc}>{r.location}</span>
-              </span>
-            </button>
-          ))}
+          <div className={styles.cardsGrid}>
+            {RESTAURANTS.map((r) => (
+              <button
+                key={r.name}
+                type="button"
+                className={styles.card}
+                onClick={() => navigate("/")}
+              >
+                <span className={styles.cardImg}>
+                  {PHOTOS[r.name] ? (
+                    <img src={PHOTOS[r.name]} alt={r.name} />
+                  ) : (
+                    <Placeholder ratio="3 / 4" label={r.name} />
+                  )}
+                </span>
+                <span className={styles.cardCaption}>
+                  {LOGOS[r.name] ? (
+                    <img
+                      className={styles.cardMark}
+                      src={LOGOS[r.name]}
+                      alt={r.name}
+                    />
+                  ) : (
+                    <span className={styles.cardName}>{r.name}</span>
+                  )}
+                  <span className={styles.cardLoc}>{r.location}</span>
+                </span>
+              </button>
+            ))}
+          </div>
         </div>
 
         {/* view switch, bottom-left */}
         <div className={styles.viewToggle} role="group" aria-label="View">
+          <motion.span
+            className={styles.toggleThumb}
+            animate={{ x: view === "cards" ? 38 : 0 }}
+            transition={{ type: "spring", stiffness: 420, damping: 34 }}
+            aria-hidden
+          />
           <button
             type="button"
             data-active={view === "wheel"}

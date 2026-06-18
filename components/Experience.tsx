@@ -10,6 +10,7 @@ import Hero from "./Hero";
 import Discover from "./Discover";
 import RestaurantLocations from "./RestaurantLocations";
 import WhoWeAre from "./WhoWeAre";
+import Timeline from "./Timeline";
 import Blog from "./Blog";
 import Contact from "./Contact";
 import Footer from "./Footer";
@@ -82,6 +83,7 @@ export default function Experience() {
             <Discover />
             <RestaurantLocations />
             <WhoWeAre />
+            <Timeline />
             <Blog />
 
             <DarkZone>
