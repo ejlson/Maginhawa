@@ -72,9 +72,6 @@ export default function RestaurantLocations() {
     [0.05, 0.42],
     ["inset(48% 0% 48% 0%)", "inset(0% 0% 0% 0%)"]
   );
-  // slow zoom-out + vertical drift behind it for parallax depth
-  const scale = useTransform(scrollYProgress, [0, 1], [1.35, 1.05]);
-  const y = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
 
   return (
     <section ref={ref} className={styles.section}>
@@ -82,9 +79,9 @@ export default function RestaurantLocations() {
         className={styles.reveal}
         style={{ clipPath, WebkitClipPath: clipPath }}
       >
-        <motion.div className={styles.bg} style={{ scale, y }}>
+        <div className={styles.bg}>
           <VideoBackdrop src={CLIPS[clip]} className={styles.locVideo} />
-        </motion.div>
+        </div>
         <div className={styles.locScrim} aria-hidden />
       </motion.div>
 
