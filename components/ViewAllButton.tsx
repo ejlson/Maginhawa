@@ -69,8 +69,6 @@ export default function ViewAllButton() {
 
   return (
     <section className={styles.wrap}>
-      <span className={styles.kicker}>(There&apos;s more to explore)</span>
-
       <motion.div className={styles.magnet} style={{ x, y }}>
         <Link
           ref={btnRef}
