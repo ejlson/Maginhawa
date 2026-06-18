@@ -1,6 +1,6 @@
 .section {
-  margin-top: clamp(60px, 11vh, 180px);
-  padding: clamp(70px, 11vh, 150px) 0 clamp(80px, 12vh, 160px);
+  margin-top: clamp(16px, 3vh, 48px);
+  padding: clamp(40px, 7vh, 90px) 0 clamp(80px, 12vh, 160px);
 }
 
 /* statement block (eyebrow inline + big indented statement) — matches the
