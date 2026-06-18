@@ -4,7 +4,7 @@
   flex-direction: column;
   justify-content: center;
   margin-top: 0;
-  padding: clamp(60px, 8.5vh, 100px) var(--pad-x) clamp(48px, 7vh, 90px);
+  padding: clamp(60px, 8.5vh, 100px) var(--pad-x) clamp(40px, 7vh, 90px);
 }
 
 .eyebrow {

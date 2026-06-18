@@ -5,6 +5,7 @@ import { useEffect, useState } from "react";
 import styles from "./Menu.module.css";
 import Placeholder from "./Placeholder";
 import { useRouteTransition } from "./PageTransition";
+import { getNavTheme } from "./Nav";
 
 const ITEMS = [
   { label: "Home", href: "/" },
@@ -23,7 +24,15 @@ export default function Menu({
   onClose: () => void;
 }) {
   const [active, setActive] = useState(0);
+  // match the panel to the section it opens over (dark over hero/maroon)
+  const [dark, setDark] = useState(false);
   const navigate = useRouteTransition();
+
+  useEffect(() => {
+    if (!open) return;
+    const t = getNavTheme();
+    setDark(t === "dark" || t === "blend");
+  }, [open]);
 
   // route links (e.g. "/restaurants") run through the page-transition curtain;
   // in-page hashes (#about-us) keep their default anchor behaviour
@@ -43,10 +52,19 @@ export default function Menu({
 
   return (
     <>
-      {open && <div className={styles.backdrop} onClick={onClose} />}
+      {/* dim the page behind the menu */}
+      <motion.div
+        className={styles.backdrop}
+        initial={false}
+        animate={{ opacity: open ? 1 : 0 }}
+        transition={{ duration: 0.4 }}
+        style={{ pointerEvents: open ? "auto" : "none" }}
+        onClick={onClose}
+        aria-hidden
+      />
 
       <motion.aside
-        className={styles.panel}
+        className={`${styles.panel} ${dark ? styles.dark : ""}`}
         initial={false}
         animate={{ x: open ? "0%" : "118%", opacity: open ? 1 : 0 }}
         transition={{ duration: 0.55, ease: [0.76, 0, 0.24, 1] }}

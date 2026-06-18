@@ -6,6 +6,10 @@ import styles from "./Nav.module.css";
 
 type Theme = "blend" | "light" | "dark";
 
+// latest section theme under the navbar, so the menu can match it on open
+let latestTheme: Theme = "blend";
+export const getNavTheme = (): Theme => latestTheme;
+
 export default function Nav({
   started,
   menuOpen,
@@ -27,6 +31,7 @@ export default function Nav({
       const el = document.elementFromPoint(24, 56);
       const host = el?.closest<HTMLElement>("[data-nav-theme]");
       const t = (host?.dataset.navTheme as Theme) || "blend";
+      latestTheme = t;
       setTheme(t);
     };
     const onScroll = () => {
@@ -56,8 +61,12 @@ export default function Nav({
       animate={show ? { opacity: 1, y: 0 } : { opacity: 0, y: -24 }}
       transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
     >
-      <a className={styles.logo} href="#top">
-        Maginhawa
+      <a className={styles.logo} href="#top" aria-label="Maginhawa">
+        <img
+          className={styles.logoImg}
+          src="/logo/maginhawa.png"
+          alt="Maginhawa"
+        />
       </a>
 
       <button
@@ -80,8 +89,6 @@ export default function Nav({
           transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
         />
       </button>
-
-      <span className={styles.rule} aria-hidden />
     </motion.nav>
   );
 }

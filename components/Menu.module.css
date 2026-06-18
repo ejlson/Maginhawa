@@ -1,30 +1,33 @@
-/* transparent click-catcher so clicking outside closes the panel */
+/* dims the page behind the menu and catches outside clicks */
 .backdrop {
   position: fixed;
   inset: 0;
   z-index: 74;
-  background: transparent;
+  background: rgba(12, 0, 0, 0.55);
 }
 
-/* small panel anchored to the top-right, slides in from the right */
+/* panel flush to the very top-right corner so the nav X sits at its top-right */
 .panel {
   position: fixed;
-  top: clamp(54px, 7vh, 70px);
-  right: clamp(12px, 1.6vw, 22px);
+  top: 0;
+  right: 0;
   z-index: 76;
-  width: min(370px, calc(100vw - 24px));
-  /* clear liquid glass — mostly transparent, the blur does the work */
-  background: rgba(248, 243, 234, 0.2);
-  -webkit-backdrop-filter: blur(30px) saturate(180%);
-  backdrop-filter: blur(30px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 20px;
-  box-shadow: 0 28px 70px -24px rgba(47, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  padding: clamp(18px, 2vw, 26px);
+  width: min(380px, 100vw);
+  /* matches the background of the section it opens over (light by default) */
+  background: var(--cream);
+  color: var(--maroon);
+  border-radius: 0 0 0 18px;
+  box-shadow: -10px 28px 70px -28px rgba(18, 0, 0, 0.5);
+  padding: clamp(58px, 8vh, 84px) clamp(20px, 2vw, 30px) clamp(24px, 3.5vh, 36px);
   transform-origin: top right;
   overflow: hidden;
   will-change: transform, opacity;
+}
+
+/* over the hero / maroon sections */
+.panel.dark {
+  background: var(--maroon);
+  color: var(--cream);
 }
 
 .list {
@@ -39,7 +42,7 @@
   font-weight: 500;
   font-size: clamp(1.45rem, 2.4vw, 1.95rem);
   line-height: var(--lh-heading);
-  color: var(--maroon);
+  color: inherit;
   opacity: 0.4;
   transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
 }

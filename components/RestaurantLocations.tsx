@@ -38,21 +38,22 @@ export default function RestaurantLocations() {
       if (cooldown) return;
       const vh = window.innerHeight;
       const top = el.getBoundingClientRect().top;
-      if (Math.abs(top) < vh * 0.03) return; // already filling the screen
-      // engage from much further out so it almost always pulls into full view
-      if (Math.abs(top) < vh * 0.7) {
+      if (Math.abs(top) < vh * 0.06) return; // already (near) full view
+      // only assist once the section is clearly the dominant one on screen
+      if (Math.abs(top) < vh * 0.3) {
         const l = lenisRef.current;
-        if (l) l.scrollTo(el, { duration: 0.6 });
+        // longer, eased glide for a smoother settle
+        if (l) l.scrollTo(el, { duration: 1.1 });
         else el.scrollIntoView({ behavior: "smooth", block: "start" });
         cooldown = true;
         window.setTimeout(() => {
           cooldown = false;
-        }, 600);
+        }, 1500);
       }
     };
     const onScroll = () => {
       clearTimeout(t);
-      t = window.setTimeout(assist, 110);
+      t = window.setTimeout(assist, 220);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {

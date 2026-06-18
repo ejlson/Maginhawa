@@ -48,11 +48,17 @@
 }
 
 .logo {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: clamp(1rem, 1.4vw, 1.25rem);
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
+  display: inline-flex;
+  align-items: center;
+}
+
+.logoImg {
+  height: clamp(34px, 4.6vh, 52px);
+  width: auto;
+  display: block;
+  /* black line-art → white so the nav's difference blend keeps it visible on
+     both light and dark sections (like the old cream wordmark) */
+  filter: invert(1);
 }
 
 /* ---- hamburger button (3 lines -> X) ---- */
