@@ -34,6 +34,23 @@ function GridIcon() {
   );
 }
 
+function Chevron({ up }: { up?: boolean }) {
+  return (
+    <svg
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.6"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+      style={up ? undefined : { transform: "rotate(180deg)" }}
+    >
+      <path d="M4 10l4-4 4 4" />
+    </svg>
+  );
+}
+
 // NOTE: one video ships today (hero-draft3). Drop a per-restaurant clip in
 // /public/videos and point `video` at it — the background crossfades on its own.
 const RESTAURANTS = [
@@ -83,6 +100,7 @@ const RESTAURANTS = [
 ];
 
 const N = RESTAURANTS.length;
+const pad = (n: number) => String(n).padStart(2, "0");
 
 // restaurant marks
 const LOGOS: Record<string, string> = {
@@ -253,6 +271,14 @@ export default function RestaurantsShowcase() {
     startWheel();
   };
 
+  // step one restaurant up/down (settle snaps to the nearest)
+  const step = (dir: number) => {
+    const root = scrollerRef.current;
+    if (!root || !rowH.current) return;
+    targetTop.current = root.scrollTop + dir * rowH.current;
+    startWheel();
+  };
+
   // native scroll (touch) → repaint + settle
   const onScroll = () => {
     if (!raf.current) {
@@ -326,27 +352,60 @@ export default function RestaurantsShowcase() {
         {/* phrase · name wheel · visit link, centred */}
         <div className={styles.stage} data-hidden={view !== "wheel"}>
           <div className={styles.panel}>
-            <span className={styles.phrase}>Visit</span>
+            <div className={styles.lead}>
+              <span className={styles.counter}>
+                {pad(active + 1)} / {pad(N)}
+              </span>
+              <span className={styles.cuisine}>{item.tag}</span>
+            </div>
 
-            <div ref={scrollerRef} className={styles.scroller} onScroll={onScroll}>
-              <ul className={styles.list}>
-                {LOOP.map((r) => (
-                  <li key={r.gpos} className={styles.row}>
-                    <button
-                      type="button"
-                      data-real={r.realIndex}
-                      ref={(el) => {
-                        itemRefs.current[r.gpos] = el;
-                      }}
-                      className={`${styles.name} ${active === r.realIndex ? styles.nameActive : ""}`}
-                      onClick={(ev) => selectEl(ev.currentTarget)}
-                      aria-current={active === r.realIndex}
-                    >
-                      {r.name}
-                    </button>
-                  </li>
-                ))}
-              </ul>
+            <div className={styles.wheel}>
+              <button
+                type="button"
+                className={styles.step}
+                onClick={() => step(-1)}
+                aria-label="Previous restaurant"
+              >
+                <Chevron up />
+              </button>
+
+              <div className={styles.scrollWrap}>
+                {/* selection window over the centre row */}
+                <span className={styles.selBand} aria-hidden />
+                <div
+                  ref={scrollerRef}
+                  className={styles.scroller}
+                  onScroll={onScroll}
+                >
+                  <ul className={styles.list}>
+                    {LOOP.map((r) => (
+                      <li key={r.gpos} className={styles.row}>
+                        <button
+                          type="button"
+                          data-real={r.realIndex}
+                          ref={(el) => {
+                            itemRefs.current[r.gpos] = el;
+                          }}
+                          className={`${styles.name} ${active === r.realIndex ? styles.nameActive : ""}`}
+                          onClick={(ev) => selectEl(ev.currentTarget)}
+                          aria-current={active === r.realIndex}
+                        >
+                          {r.name}
+                        </button>
+                      </li>
+                    ))}
+                  </ul>
+                </div>
+              </div>
+
+              <button
+                type="button"
+                className={styles.step}
+                onClick={() => step(1)}
+                aria-label="Next restaurant"
+              >
+                <Chevron />
+              </button>
             </div>
 
             <div className={styles.actions}>
@@ -355,7 +414,8 @@ export default function RestaurantsShowcase() {
                 className={`${styles.actBtn} ${styles.actBtnSolid}`}
                 onClick={() => navigate("/")}
               >
-                Visit <span aria-hidden>→</span>
+                <span className={styles.actLabel}>Visit {item.name}</span>
+                <span aria-hidden>→</span>
               </button>
               <button
                 type="button"

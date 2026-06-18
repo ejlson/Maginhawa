@@ -273,27 +273,85 @@
   }
 }
 
-/* "Visit" · name wheel · arrow button — laid out in a left-aligned row */
+/* lead · name wheel (+ steppers) · actions — left-aligned row */
 .panel {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: clamp(12px, 1.8vw, 26px);
-  /* shared so the arrow button matches the restaurant-name text height */
+  gap: clamp(16px, 2.4vw, 40px);
   --name-size: clamp(1.4rem, 2.6vw, 2.1rem);
 }
 
-.phrase {
-  position: relative;
-  z-index: 1;
+/* counter + active cuisine on the left */
+.lead {
   flex: 0 0 auto;
-  font-family: "contralto-small", var(--font-serif);
-  font-size: clamp(1.3rem, 2.4vw, 2rem);
-  letter-spacing: 0.01em;
+  width: clamp(120px, 14vw, 200px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.5em;
   color: var(--cream);
-  opacity: 0.92;
-  white-space: nowrap;
   user-select: none;
+}
+.counter {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  letter-spacing: 0.08em;
+  opacity: 0.6;
+  font-variant-numeric: tabular-nums;
+}
+.cuisine {
+  font-family: var(--font-serif);
+  font-size: clamp(0.95rem, 1.3vw, 1.2rem);
+  line-height: 1.25;
+  opacity: 0.92;
+}
+
+/* wheel column: up stepper · scroller(+band) · down stepper */
+.wheel {
+  flex: 0 0 auto;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: clamp(2px, 0.6vh, 8px);
+}
+.scrollWrap {
+  position: relative;
+}
+/* selection window over the centre name */
+.selBand {
+  position: absolute;
+  left: -0.4em;
+  right: -0.4em;
+  top: 50%;
+  height: var(--row);
+  transform: translateY(-50%);
+  border-top: 1px solid rgba(248, 243, 234, 0.28);
+  border-bottom: 1px solid rgba(248, 243, 234, 0.28);
+  pointer-events: none;
+}
+.step {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 22px;
+  border: none;
+  background: none;
+  color: var(--cream);
+  opacity: 0.5;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.step:hover {
+  opacity: 1;
+}
+.step svg {
+  width: 16px;
+  height: 16px;
+}
+
+.actLabel {
+  white-space: nowrap;
 }
 
 /* ---- the looping vertical name scroller (shows ~5 rows) ---- */
