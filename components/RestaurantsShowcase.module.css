@@ -80,8 +80,9 @@
   background: var(--cream);
   color: var(--maroon);
   overflow: hidden;
+  /* extra bottom space so the view toggle never covers a card */
   padding: clamp(64px, 10vh, 100px) clamp(16px, 3vw, 48px)
-    clamp(18px, 3vh, 34px);
+    clamp(74px, 11vh, 104px);
 }
 .cardsGrid {
   display: grid;
@@ -92,19 +93,17 @@
   min-height: 0;
 }
 
+/* each card is a single photo tile with everything overlaid inside it */
 .card {
-  display: flex;
-  flex-direction: column;
+  position: relative;
   min-height: 0;
-  gap: clamp(7px, 0.8vh, 12px);
-  color: var(--maroon);
+  overflow: hidden;
+  border-radius: 5px;
 }
 
 .cardImg {
-  flex: 1 1 auto;
-  min-height: 0;
-  overflow: hidden;
-  border-radius: 4px;
+  position: absolute;
+  inset: 0;
 }
 .cardImg img,
 .cardImg > div {
@@ -114,65 +113,85 @@
 }
 .cardImg img {
   display: block;
+  /* dim the photo so the cream overlay text/buttons stay legible */
+  filter: brightness(0.72);
   transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .card:hover .cardImg img {
-  transform: scale(1.04);
+  transform: scale(1.05);
 }
 
-.cardInfo {
-  flex: none;
+.cardOverlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.4em;
+  gap: 0.45em;
+  padding: clamp(14px, 1.3vw, 22px);
+  color: var(--cream);
+  background: linear-gradient(
+    to top,
+    rgba(18, 0, 0, 0.9),
+    rgba(18, 0, 0, 0.55) 48%,
+    rgba(18, 0, 0, 0) 100%
+  );
 }
 .cardMark {
-  height: clamp(16px, 1.3vw, 22px);
+  height: clamp(16px, 1.4vw, 24px);
   width: auto;
-  max-width: 85%;
+  max-width: 80%;
   object-fit: contain;
+  /* render any mark as a clean cream silhouette over the photo */
+  filter: brightness(0) invert(1);
+}
+/* Bintang's mark reads small at the shared height — give it a touch more */
+.cardMarkLg {
+  height: clamp(24px, 2.1vw, 36px);
 }
 .cardName {
   font-family: "contralto-small", var(--font-serif);
-  font-size: clamp(1rem, 1.4vw, 1.3rem);
+  font-size: clamp(1.1rem, 1.5vw, 1.4rem);
 }
 .cardLoc {
   font-family: var(--font-sans);
-  font-size: 0.7rem;
+  font-size: 0.72rem;
   letter-spacing: 0.04em;
-  opacity: 0.6;
+  opacity: 0.8;
 }
 
 .cardActions {
   display: flex;
   flex-wrap: wrap;
   gap: 5px;
-  margin-top: 0.2em;
+  margin-top: 0.25em;
 }
 .cardBtn {
   font-family: var(--font-sans);
   font-size: 0.66rem;
   letter-spacing: 0.02em;
   padding: 0.45em 0.85em;
-  border: 1px solid rgba(47, 0, 0, 0.4);
+  border: 1px solid rgba(248, 243, 234, 0.55);
   border-radius: 999px;
   background: none;
-  color: var(--maroon);
+  color: var(--cream);
   cursor: pointer;
   white-space: nowrap;
   transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
   -webkit-tap-highlight-color: transparent;
 }
 .cardBtn:hover {
-  background: var(--maroon);
-  color: var(--cream);
-  border-color: var(--maroon);
+  background: var(--cream);
+  color: var(--maroon);
+  border-color: var(--cream);
 }
 .cardBtnSolid {
-  background: var(--maroon);
-  color: var(--cream);
-  border-color: var(--maroon);
+  background: var(--cream);
+  color: var(--maroon);
+  border-color: var(--cream);
 }
 .cardBtnSolid:hover {
   opacity: 0.85;
@@ -348,66 +367,49 @@
   font-weight: 500;
 }
 
-/* ---- round arrow button, sized to the name text height ---- */
-.magnet {
-  position: relative;
-  z-index: 1;
+/* ---- per-restaurant actions beside the wheel ---- */
+.actions {
   flex: 0 0 auto;
-  display: inline-block;
-  will-change: transform;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(8px, 1vh, 12px);
 }
-
-.cta {
-  position: relative;
-  display: grid;
-  place-items: center;
-  /* diameter ≈ the restaurant-name line box, so it matches the text height */
-  width: calc(var(--name-size) * 1.25);
-  height: calc(var(--name-size) * 1.25);
-  padding: 0;
-  overflow: hidden;
-  isolation: isolate;
-  border: 1px solid rgba(248, 243, 234, 0.55);
+.actBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.6em 1.3em;
+  border: 1px solid rgba(248, 243, 234, 0.5);
   border-radius: 999px;
   background: none;
   color: var(--cream);
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
   cursor: pointer;
-  transition: color 0.45s ease;
+  transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease;
   -webkit-tap-highlight-color: transparent;
 }
-
-/* cream circle that radiates from the cursor on hover */
-.ctaFill {
-  position: absolute;
-  z-index: -1;
-  border-radius: 50%;
+.actBtn:hover {
   background: var(--cream);
-  transform: translate(-50%, -50%) scale(0);
-  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-  pointer-events: none;
-}
-.isHover .ctaFill {
-  transform: translate(-50%, -50%) scale(1);
-}
-.isHover {
   color: var(--maroon);
+  border-color: var(--cream);
 }
-
-.ctaArrow {
-  display: grid;
-  place-items: center;
-  width: 42%;
-  color: inherit;
+.actBtn span {
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
-.ctaArrow svg {
-  width: 100%;
-  height: 100%;
-  display: block;
+.actBtn:hover span {
+  transform: translateX(4px);
 }
-
-.cta:focus-visible {
-  outline: 1px solid rgba(248, 243, 234, 0.6);
-  outline-offset: 4px;
+.actBtnSolid {
+  background: var(--cream);
+  color: var(--maroon);
+  border-color: var(--cream);
+}
+.actBtnSolid:hover {
+  opacity: 0.88;
 }
 
 @media (prefers-reduced-motion: reduce) {

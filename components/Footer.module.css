@@ -67,7 +67,7 @@
   font-family: var(--font-display-big);
   font-weight: 500;
   text-transform: uppercase;
-  letter-spacing: var(--tr-display);
+  /* no letter-spacing here — it fights textLength and offsets the 2nd line */
   fill: var(--cream);
 }
 

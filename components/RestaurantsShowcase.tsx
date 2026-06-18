@@ -1,7 +1,7 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
-import { motion, useMotionValue, useSpring } from "framer-motion";
+import { motion } from "framer-motion";
 import styles from "./RestaurantsShowcase.module.css";
 import Nav from "./Nav";
 import Menu from "./Menu";
@@ -10,22 +10,6 @@ import Footer from "./Footer";
 import { useRouteTransition } from "./PageTransition";
 import VideoBackdrop from "./VideoBackdrop";
 import Placeholder from "./Placeholder";
-
-function ArrowIcon() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <path d="M4 12h15M13 6l6 6-6 6" />
-    </svg>
-  );
-}
 
 // scroll-wheel view: stacked lines with the centre one highlighted
 function WheelIcon() {
@@ -47,76 +31,6 @@ function GridIcon() {
       <rect x="2.5" y="9" width="4.5" height="4.5" rx="1" strokeWidth="1.3" />
       <rect x="9" y="9" width="4.5" height="4.5" rx="1" strokeWidth="1.3" />
     </svg>
-  );
-}
-
-// round arrow button with the home "View All" treatment: magnetic pull + a
-// cream circle that radiates from the cursor on hover (arrow swaps to maroon)
-function VisitArrow({
-  onClick,
-  label,
-}: {
-  onClick: () => void;
-  label: string;
-}) {
-  const ref = useRef<HTMLButtonElement>(null);
-  const [hover, setHover] = useState(false);
-  const [fill, setFill] = useState({ x: 0, y: 0, d: 0 });
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const x = useSpring(mx, { stiffness: 180, damping: 14, mass: 0.3 });
-  const y = useSpring(my, { stiffness: 180, damping: 14, mass: 0.3 });
-
-  const onMove = (e: React.MouseEvent) => {
-    const r = ref.current?.getBoundingClientRect();
-    if (!r) return;
-    mx.set((e.clientX - (r.left + r.width / 2)) * 0.3);
-    my.set((e.clientY - (r.top + r.height / 2)) * 0.3);
-  };
-  const onEnter = (e: React.MouseEvent) => {
-    const r = ref.current?.getBoundingClientRect();
-    if (!r) return;
-    const cx = e.clientX - r.left;
-    const cy = e.clientY - r.top;
-    const d =
-      2 *
-      Math.max(
-        Math.hypot(cx, cy),
-        Math.hypot(r.width - cx, cy),
-        Math.hypot(cx, r.height - cy),
-        Math.hypot(r.width - cx, r.height - cy)
-      );
-    setFill({ x: cx, y: cy, d });
-    setHover(true);
-  };
-  const onLeave = () => {
-    mx.set(0);
-    my.set(0);
-    setHover(false);
-  };
-
-  return (
-    <motion.div className={styles.magnet} style={{ x, y }}>
-      <button
-        ref={ref}
-        type="button"
-        className={`${styles.cta} ${hover ? styles.isHover : ""}`}
-        onMouseEnter={onEnter}
-        onMouseMove={onMove}
-        onMouseLeave={onLeave}
-        onClick={onClick}
-        aria-label={label}
-      >
-        <span
-          className={styles.ctaFill}
-          style={{ left: fill.x, top: fill.y, width: fill.d, height: fill.d }}
-          aria-hidden
-        />
-        <span className={styles.ctaArrow} aria-hidden>
-          <ArrowIcon />
-        </span>
-      </button>
-    </motion.div>
   );
 }
 
@@ -435,10 +349,29 @@ export default function RestaurantsShowcase() {
               </ul>
             </div>
 
-            <VisitArrow
-              onClick={() => navigate("/")}
-              label={`Visit ${item.name}`}
-            />
+            <div className={styles.actions}>
+              <button
+                type="button"
+                className={`${styles.actBtn} ${styles.actBtnSolid}`}
+                onClick={() => navigate("/")}
+              >
+                Visit <span aria-hidden>→</span>
+              </button>
+              <button
+                type="button"
+                className={styles.actBtn}
+                onClick={() => navigate("/")}
+              >
+                Book a Table
+              </button>
+              <button
+                type="button"
+                className={styles.actBtn}
+                onClick={() => navigate("/")}
+              >
+                Menu
+              </button>
+            </div>
           </div>
         </div>
 
@@ -454,10 +387,12 @@ export default function RestaurantsShowcase() {
                     <Placeholder ratio="auto" label={r.name} />
                   )}
                 </span>
-                <div className={styles.cardInfo}>
+                <div className={styles.cardOverlay}>
                   {LOGOS[r.name] ? (
                     <img
-                      className={styles.cardMark}
+                      className={`${styles.cardMark} ${
+                        r.name === "Bintang" ? styles.cardMarkLg : ""
+                      }`}
                       src={LOGOS[r.name]}
                       alt={r.name}
                     />
