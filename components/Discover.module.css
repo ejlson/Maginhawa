@@ -211,9 +211,9 @@
 
 .listItem {
   display: flex;
-  align-items: baseline;
+  align-items: center;
   justify-content: flex-end;
-  gap: 0.8em;
+  gap: clamp(0.7em, 1.2vw, 1.1em);
   background: none;
   border: none;
   padding: 0.05em 0;
@@ -221,7 +221,7 @@
   cursor: pointer;
   color: var(--maroon);
   opacity: 0.3;
-  transition: opacity 0.4s ease, transform 0.45s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.4s ease;
 }
 
 .listItem:hover {
@@ -230,7 +230,6 @@
 
 .listActive {
   opacity: 1;
-  transform: translateX(-0.5em);
 }
 
 .listName {
@@ -240,16 +239,18 @@
   line-height: 1.08;
 }
 
-/* number sits to the right of the name */
-.listNum {
-  font-family: var(--font-sans);
-  font-size: 0.72rem;
-  letter-spacing: 0.04em;
-  padding-top: 0.4em;
-  opacity: 0.6;
-  width: 2.2em;
-  text-align: right;
+/* thin vertical rule at the right edge; only the chosen restaurant's is shown */
+.listMark {
   flex: none;
+  width: 1px;
+  height: clamp(1.1rem, 1.9vw, 1.9rem);
+  background: var(--maroon);
+  opacity: 0;
+  transition: opacity 0.4s ease;
+}
+
+.listActive .listMark {
+  opacity: 1;
 }
 
 @media (max-width: 820px) {

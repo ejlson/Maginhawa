@@ -4,11 +4,12 @@ import { motion, AnimatePresence } from "framer-motion";
 import { useEffect, useState } from "react";
 import styles from "./Menu.module.css";
 import Placeholder from "./Placeholder";
+import { useRouteTransition } from "./PageTransition";
 
 const ITEMS = [
-  { label: "Home", href: "#top" },
-  { label: "Restaurants", href: "#restaurants" },
-  { label: "News", href: "#news" },
+  { label: "Home", href: "/" },
+  { label: "Restaurants", href: "/restaurants" },
+  { label: "Blog", href: "#blog" },
   { label: "About Us", href: "#about-us" },
   { label: "Join Us", href: "#join-us" },
   { label: "Contact Us", href: "#contact-us" },
@@ -22,6 +23,17 @@ export default function Menu({
   onClose: () => void;
 }) {
   const [active, setActive] = useState(0);
+  const navigate = useRouteTransition();
+
+  // route links (e.g. "/restaurants") run through the page-transition curtain;
+  // in-page hashes (#about-us) keep their default anchor behaviour
+  const onItemClick = (e: React.MouseEvent, href: string) => {
+    onClose();
+    if (href.startsWith("/")) {
+      e.preventDefault();
+      navigate(href);
+    }
+  };
 
   useEffect(() => {
     const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
@@ -49,7 +61,7 @@ export default function Menu({
               className={`${styles.item} ${active === i ? styles.itemActive : ""}`}
               onMouseEnter={() => setActive(i)}
               onFocus={() => setActive(i)}
-              onClick={onClose}
+              onClick={(e) => onItemClick(e, it.href)}
             >
               {it.label}
             </a>

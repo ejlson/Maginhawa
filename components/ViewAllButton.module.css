@@ -3,7 +3,7 @@
   flex-direction: column;
   align-items: center;
   gap: clamp(14px, 2.5vh, 30px);
-  padding: clamp(70px, 14vh, 180px) var(--pad-x);
+  padding: clamp(24px, 5vh, 70px) var(--pad-x) clamp(70px, 14vh, 180px);
   text-align: center;
 }
 

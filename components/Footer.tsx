@@ -1,9 +1,9 @@
 import styles from "./Footer.module.css";
 
 const LEFT = [
-  { h: "Home", items: ["Who are we?", "Restaurants", "News", "Join Us", "Contact Us"] },
+  { h: "Home", items: ["Who are we?", "Restaurants", "Blog", "Join Us", "Contact Us"] },
   { h: "Restaurants", items: ["…"] },
-  { h: "News", items: ["…"] },
+  { h: "Blog", items: ["…"] },
   { h: "About Us", items: ["…"] },
   { h: "Join Us", items: ["…"] },
 ];

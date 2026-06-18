@@ -11,10 +11,8 @@ import Hero from "./Hero";
 import Discover from "./Discover";
 import RestaurantLocations from "./RestaurantLocations";
 import WhoWeAre from "./WhoWeAre";
-import News from "./News";
-import Gallery from "./Gallery";
+import Blog from "./Blog";
 import Contact from "./Contact";
-import CTAStatement from "./CTAStatement";
 import Footer from "./Footer";
 import DarkZone from "./DarkZone";
 import type { HeroInsets } from "./types";
@@ -23,8 +21,18 @@ import type { HeroInsets } from "./types";
 // loader window also grows to fill the screen (square corners at full size).
 const HERO_INSETS: HeroInsets = { top: 0, side: 0, bottom: 0, radius: 0 };
 
+// the full-screen intro loader plays once per session — returning to the home
+// page via a client navigation shouldn't replay it (the page-transition curtain
+// covers the change instead)
+let introPlayed = false;
+
 export default function Experience() {
-  const [intro, setIntro] = useState(true);
+  const [intro, setIntro] = useState(() => !introPlayed);
+
+  useEffect(() => {
+    introPlayed = true;
+  }, []);
+
   const [menuOpen, setMenuOpen] = useState(false);
   const insets = HERO_INSETS;
 
@@ -63,12 +71,10 @@ export default function Experience() {
             <ViewAllButton />
             <RestaurantLocations />
             <WhoWeAre />
-            <News />
-            <Gallery />
+            <Blog />
 
             <DarkZone>
               <Contact />
-              <CTAStatement />
               <Footer />
             </DarkZone>
           </div>

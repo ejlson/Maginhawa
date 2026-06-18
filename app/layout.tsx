@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
+import PageTransition from "@/components/PageTransition";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
@@ -32,7 +33,9 @@ export default function RootLayout({
       <head>
         <link rel="stylesheet" href="https://use.typekit.net/pev2vne.css" />
       </head>
-      <body className="is-loading">{children}</body>
+      <body className="is-loading">
+        <PageTransition>{children}</PageTransition>
+      </body>
     </html>
   );
 }

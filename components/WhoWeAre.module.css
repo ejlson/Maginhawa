@@ -102,24 +102,6 @@
   transform: translateX(4px);
 }
 
-.feature {
-  display: grid;
-  grid-template-columns: 1fr 2fr;
-  gap: clamp(20px, 3vw, 56px);
-  align-items: end;
-  margin-bottom: clamp(60px, 10vh, 140px);
-}
-
-.featureLeft {
-  padding-bottom: clamp(0px, 4vh, 60px);
-}
-
-.logoRow {
-  display: grid;
-  grid-template-columns: repeat(5, 1fr);
-  gap: clamp(12px, 1.5vw, 24px);
-}
-
 @media (max-width: 860px) {
   .body {
     grid-template-columns: 1fr 1fr;
@@ -128,12 +110,6 @@
 @media (max-width: 640px) {
   .body {
     grid-template-columns: 1fr;
-  }
-  .feature {
-    grid-template-columns: 1fr;
-  }
-  .logoRow {
-    grid-template-columns: repeat(2, 1fr);
   }
   .bigType .grp {
     text-align: left;

@@ -214,9 +214,7 @@ export default function Discover() {
               aria-current={active === i}
             >
               <span className={styles.listName}>{it.name}</span>
-              <span className={styles.listNum}>
-                {String(i + 1).padStart(2, "0")}
-              </span>
+              <span className={styles.listMark} aria-hidden />
             </button>
           ))}
         </motion.nav>

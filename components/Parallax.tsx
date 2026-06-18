@@ -2,20 +2,31 @@
 
 import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
+import styles from "./Parallax.module.css";
 
 /**
- * Translates its children on the Y axis relative to scroll progress,
- * producing a parallax drift. `speed` > 0 moves slower than scroll
- * (recedes), the element travels `speed * 100%` of its own offset range.
+ * Scroll-linked parallax.
+ *
+ * Default: translates its children on the Y axis relative to scroll progress,
+ * so the whole element drifts (recedes). The element travels `speed * 100%` of
+ * its own offset range.
+ *
+ * `inset`: the frame stays put and the image pans *inside* it — an over-scaled
+ * layer drifts within a clipped frame, an internal parallax rather than moving
+ * the whole block. Pass `ratio` to fix the frame's aspect ratio.
  */
 export default function Parallax({
   children,
   speed = 0.2,
   className,
+  inset = false,
+  ratio,
 }: {
   children: React.ReactNode;
   speed?: number;
   className?: string;
+  inset?: boolean;
+  ratio?: string;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -28,6 +39,21 @@ export default function Parallax({
     [0, 1],
     [`${speed * 100}px`, `${-speed * 100}px`]
   );
+
+  if (inset) {
+    return (
+      <div
+        ref={ref}
+        className={`${styles.frame} ${className ?? ""}`}
+        style={ratio ? { aspectRatio: ratio } : undefined}
+      >
+        {/* over-scaled so the vertical drift never exposes a frame edge */}
+        <motion.div className={styles.inner} style={{ y, scale: 1.22 }}>
+          {children}
+        </motion.div>
+      </div>
+    );
+  }
 
   return (
     <motion.div ref={ref} className={className} style={{ y }}>

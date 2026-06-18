@@ -31,8 +31,8 @@ export default function WhoWeAre() {
             </Reveal>
           ))}
           <Reveal delay={0.24}>
-            <Parallax speed={0.16}>
-              <Placeholder ratio="3 / 4" label="Image" />
+            <Parallax inset ratio="3 / 4" speed={0.16}>
+              <Placeholder label="Image" />
             </Parallax>
           </Reveal>
         </div>
@@ -44,25 +44,6 @@ export default function WhoWeAre() {
           <button className={styles.circle} aria-label="Learn more about us">
             →
           </button>
-        </div>
-
-        <div className={styles.feature}>
-          <Reveal className={styles.featureLeft}>
-            <Placeholder ratio="3 / 4" label="Portrait" />
-          </Reveal>
-          <Reveal delay={0.1}>
-            <Parallax speed={0.12}>
-              <Placeholder ratio="16 / 10" label="Interior" />
-            </Parallax>
-          </Reveal>
-        </div>
-
-        <div className={styles.logoRow}>
-          {Array.from({ length: 5 }).map((_, i) => (
-            <Reveal key={i} delay={i * 0.07}>
-              <Placeholder ratio="1 / 1" label={`Brand ${i + 1}`} />
-            </Reveal>
-          ))}
         </div>
       </div>
     </section>

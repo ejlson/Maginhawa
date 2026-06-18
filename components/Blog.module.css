@@ -1,0 +1,137 @@
+.section {
+  margin-top: clamp(40px, 8vh, 120px);
+  padding: clamp(60px, 9vh, 120px) 0 clamp(80px, 12vh, 160px);
+}
+
+.head {
+  display: grid;
+  grid-template-columns: 1fr 3fr;
+  gap: clamp(16px, 3vw, 48px);
+  align-items: start;
+  margin-bottom: clamp(40px, 6vh, 80px);
+}
+
+.eyebrow {
+  font-family: var(--font-sans);
+  font-size: 0.78rem;
+  opacity: 0.7;
+  padding-top: 0.5em;
+}
+
+.title {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(1.5rem, 3.4vw, 3rem);
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+}
+
+/* featured latest entry — larger two-column block above the grid */
+.featured {
+  display: grid;
+  grid-template-columns: 1.5fr 1fr;
+  gap: clamp(24px, 4vw, 64px);
+  align-items: center;
+  margin-bottom: clamp(24px, 3.5vh, 48px);
+  padding-bottom: clamp(24px, 3.5vh, 48px);
+  border-bottom: 1px solid var(--placeholder-line);
+}
+
+.featuredMedia {
+  border-radius: 2px;
+}
+
+.featuredBody {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.6vw, 20px);
+}
+
+.featuredTag {
+  font-family: var(--font-sans);
+  font-size: 0.74rem;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  opacity: 0.6;
+}
+
+.featuredTitle {
+  font-family: var(--font-serif);
+  font-weight: 400;
+  font-size: clamp(1.6rem, 3vw, 2.6rem);
+  line-height: 1.12;
+  letter-spacing: -0.01em;
+}
+
+.featuredExcerpt {
+  font-family: var(--font-sans);
+  font-size: 0.9rem;
+  line-height: 1.55;
+  opacity: 0.8;
+  max-width: 46ch;
+}
+
+.featuredLink {
+  margin-top: 0.4em;
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  width: fit-content;
+}
+
+.featuredLink span {
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.featuredLink:hover span {
+  transform: translateX(4px);
+}
+
+.grid {
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(18px, 2.2vw, 40px);
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+}
+
+.date {
+  font-family: var(--font-sans);
+  font-size: 0.74rem;
+  letter-spacing: 0.02em;
+  opacity: 0.6;
+}
+
+.cardTitle {
+  font-family: var(--font-serif);
+  font-size: 1.15rem;
+  line-height: 1.2;
+}
+
+.excerpt {
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  line-height: 1.5;
+  opacity: 0.78;
+}
+
+@media (max-width: 860px) {
+  .featured {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+}
+
+@media (max-width: 760px) {
+  .head,
+  .grid {
+    grid-template-columns: 1fr;
+  }
+}

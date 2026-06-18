@@ -4,6 +4,7 @@ import Link from "next/link";
 import { motion, useMotionValue, useSpring } from "framer-motion";
 import { useRef, useState } from "react";
 import styles from "./ViewAllButton.module.css";
+import { useRouteTransition } from "./PageTransition";
 
 const LABEL = "View All Our Restaurants";
 
@@ -26,6 +27,7 @@ function Arrow() {
 export default function ViewAllButton() {
   const btnRef = useRef<HTMLAnchorElement>(null);
   const [hover, setHover] = useState(false);
+  const navigate = useRouteTransition();
   const [fill, setFill] = useState({ x: 0, y: 0, d: 0 });
 
   // magnetic pull toward the cursor
@@ -77,6 +79,10 @@ export default function ViewAllButton() {
           onMouseEnter={onEnter}
           onMouseMove={onMove}
           onMouseLeave={onLeave}
+          onClick={(e) => {
+            e.preventDefault();
+            navigate("/restaurants");
+          }}
           aria-label={LABEL}
         >
           <span

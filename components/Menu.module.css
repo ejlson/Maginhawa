@@ -13,11 +13,11 @@
   right: clamp(12px, 1.6vw, 22px);
   z-index: 76;
   width: min(370px, calc(100vw - 24px));
-  /* iOS-style frosted glass */
-  background: rgba(248, 243, 234, 0.55);
-  -webkit-backdrop-filter: blur(22px) saturate(180%);
-  backdrop-filter: blur(22px) saturate(180%);
-  border: 1px solid rgba(248, 243, 234, 0.5);
+  /* clear liquid glass — mostly transparent, the blur does the work */
+  background: rgba(248, 243, 234, 0.2);
+  -webkit-backdrop-filter: blur(30px) saturate(180%);
+  backdrop-filter: blur(30px) saturate(180%);
+  border: 1px solid rgba(255, 255, 255, 0.35);
   border-radius: 20px;
   box-shadow: 0 28px 70px -24px rgba(47, 0, 0, 0.4),
     inset 0 1px 0 rgba(255, 255, 255, 0.4);
