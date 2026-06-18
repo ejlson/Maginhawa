@@ -80,27 +80,6 @@
   user-select: none;
 }
 
-/* ---- name wheel + the spotlight window over the selected row ---- */
-.wheel {
-  position: relative;
-  flex: 0 0 auto;
-}
-
-/* a rectangle framing the centre row: its huge box-shadow dims the rest of the
-   screen, so the bright (undarkened) video only shows through this window —
-   names above/below sit partly inside it, partly in the dimmed area */
-.spotlight {
-  position: absolute;
-  z-index: 0;
-  left: -14px;
-  right: -14px;
-  top: 50%;
-  height: calc(var(--row) * 2.4);
-  transform: translateY(-50%);
-  box-shadow: 0 0 0 100vmax rgba(18, 0, 0, 0.62);
-  pointer-events: none;
-}
-
 /* ---- the looping vertical name scroller (shows ~5 rows) ---- */
 .scroller {
   position: relative;
