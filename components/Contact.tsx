@@ -36,7 +36,8 @@ export default function Contact() {
             </Reveal>
             <Reveal delay={0.08}>
               <div className={styles.label}>Opening Times</div>
-              <p>Mon – Sun · 11:00 – 23:00</p>
+              <p>Mon – Sun</p>
+              <p>09:00 – 17:00</p>
             </Reveal>
           </div>
 

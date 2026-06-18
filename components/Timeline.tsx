@@ -1,57 +1,74 @@
 "use client";
 
-import { motion } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import styles from "./Timeline.module.css";
-import Reveal from "./Reveal";
+import Placeholder from "./Placeholder";
 
-// opening years (1987/2007/2017/2018 from the restaurant copy; the rest are
-// placeholders until confirmed)
+// opening order (years are placeholders apart from the ones in the copy)
 const EVENTS = [
-  { year: "1987", name: "Bintang" },
-  { year: "2007", name: "Guanabana" },
-  { year: "2017", name: "Mamasons" },
-  { year: "2018", name: "Ramo Ramen" },
-  { year: "2019", name: "Café Mama & Sons" },
-  { year: "2021", name: "Belly" },
-  { year: "2024", name: "Hoodwood" },
+  { year: "1987", name: "Bintang", img: "/images/bintang.jpg" },
+  { year: "2007", name: "Guanabana", img: "/images/guanabana.jpg" },
+  { year: "2017", name: "Mamasons", img: "" },
+  { year: "2018", name: "Hoodwood", img: "/images/hoowood.jpg" },
+  { year: "2019", name: "Ramo Ramen", img: "/images/ramo.jpg" },
+  { year: "2021", name: "Café Mama & Sons", img: "/images/cafemama.jpg" },
+  { year: "2023", name: "Belly", img: "/images/belly.jpg" },
 ];
 
 export default function Timeline() {
+  const sectionRef = useRef<HTMLElement>(null);
+  const trackRef = useRef<HTMLDivElement>(null);
+  const [dist, setDist] = useState(0);
+
+  // how far the track overflows the viewport → the horizontal travel
+  useEffect(() => {
+    const measure = () => {
+      const t = trackRef.current;
+      if (!t) return;
+      setDist(Math.max(0, t.scrollWidth - window.innerWidth));
+    };
+    measure();
+    const t = window.setTimeout(measure, 600); // after images load
+    window.addEventListener("resize", measure);
+    return () => {
+      window.clearTimeout(t);
+      window.removeEventListener("resize", measure);
+    };
+  }, []);
+
+  // the section is (100svh + travel) tall; scrolling that extra distance drives
+  // the track left, then normal scrolling resumes
+  const { scrollYProgress } = useScroll({
+    target: sectionRef,
+    offset: ["start start", "end end"],
+  });
+  const x = useTransform(scrollYProgress, [0, 1], [0, -dist]);
+
   return (
-    <section className={styles.section}>
-      <div className="container">
-        <Reveal className={styles.eyebrow} as="span">
-          (Our Journey)
-        </Reveal>
+    <section
+      ref={sectionRef}
+      className={styles.section}
+      style={{ height: `calc(100svh + ${dist}px)` }}
+    >
+      <div className={styles.sticky}>
+        <span className={styles.eyebrow}>(Our Journey)</span>
 
-        <div className={styles.track}>
-          <motion.span
-            className={styles.rail}
-            initial={{ scaleX: 0 }}
-            whileInView={{ scaleX: 1 }}
-            viewport={{ once: true, margin: "-18% 0px -18% 0px" }}
-            transition={{ duration: 1.2, ease: [0.76, 0, 0.24, 1] }}
-          />
-
-          {EVENTS.map((e, i) => (
-            <motion.div
-              key={e.name}
-              className={styles.node}
-              initial={{ opacity: 0, y: 16 }}
-              whileInView={{ opacity: 1, y: 0 }}
-              viewport={{ once: true, margin: "-10% 0px -10% 0px" }}
-              transition={{
-                duration: 0.55,
-                delay: 0.3 + i * 0.12,
-                ease: [0.22, 1, 0.36, 1],
-              }}
-            >
-              <span className={styles.dot} aria-hidden />
+        <motion.div ref={trackRef} className={styles.track} style={{ x }}>
+          {EVENTS.map((e) => (
+            <div key={e.name} className={styles.item}>
               <span className={styles.year}>{e.year}</span>
+              <div className={styles.itemImg}>
+                {e.img ? (
+                  <img src={e.img} alt={e.name} />
+                ) : (
+                  <Placeholder ratio="3 / 4" label={e.name} />
+                )}
+              </div>
               <span className={styles.name}>{e.name}</span>
-            </motion.div>
+            </div>
           ))}
-        </div>
+        </motion.div>
       </div>
     </section>
   );

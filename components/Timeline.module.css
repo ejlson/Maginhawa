@@ -1,112 +1,75 @@
 .section {
-  padding: clamp(30px, 6vh, 80px) 0 clamp(60px, 10vh, 140px);
+  position: relative;
+}
+
+/* pinned viewport-height stage; the track scrolls horizontally inside it */
+.sticky {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  gap: clamp(24px, 5vh, 56px);
 }
 
 .eyebrow {
-  display: block;
+  flex: none;
+  padding: 0 var(--pad-x);
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   opacity: 0.7;
-  margin-bottom: clamp(48px, 9vh, 110px);
 }
 
 .track {
-  position: relative;
   display: flex;
-  justify-content: space-between;
-  align-items: center;
-  padding: 3.6em 0;
+  align-items: flex-start;
+  gap: clamp(28px, 4vw, 80px);
+  padding: 0 clamp(20px, 7vw, 120px);
+  will-change: transform;
 }
 
-.rail {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  height: 1px;
-  background: var(--maroon);
-  opacity: 0.3;
-  transform-origin: left center;
-}
-
-.node {
-  position: relative;
+.item {
+  flex: 0 0 auto;
+  width: clamp(260px, 26vw, 400px);
   display: flex;
-  align-items: center;
-  justify-content: center;
-}
-
-.dot {
-  position: relative;
-  z-index: 1;
-  width: 10px;
-  height: 10px;
-  border-radius: 50%;
-  background: var(--maroon);
+  flex-direction: column;
+  gap: clamp(12px, 1.6vh, 22px);
 }
 
 .year {
-  position: absolute;
-  bottom: 1.8em;
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: nowrap;
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(1.1rem, 1.6vw, 1.5rem);
+  font-size: clamp(2.2rem, 4.2vw, 4.2rem);
+  line-height: 1;
+  letter-spacing: var(--tr-display);
+  color: var(--maroon);
+}
+
+.itemImg {
+  width: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
+  border-radius: 4px;
+}
+.itemImg img,
+.itemImg > div {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+.name {
+  font-family: var(--font-serif);
+  font-size: clamp(1.05rem, 1.5vw, 1.4rem);
   letter-spacing: -0.01em;
   color: var(--maroon);
 }
 
-.name {
-  position: absolute;
-  top: 1.8em;
-  left: 50%;
-  transform: translateX(-50%);
-  white-space: nowrap;
-  font-family: var(--font-sans);
-  font-size: 0.78rem;
-  letter-spacing: 0.02em;
-  opacity: 0.72;
-}
-
-/* vertical on small screens */
-@media (max-width: 720px) {
-  .track {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: clamp(22px, 4.5vh, 40px);
-    padding: 0 0 0 18px;
-  }
-  .rail {
-    left: 4px;
-    right: auto;
-    top: 0;
-    bottom: 0;
-    width: 1px;
-    height: auto;
-    transform: none !important;
-  }
-  .node {
-    width: 100%;
-    justify-content: flex-start;
-    gap: 0.9em;
-  }
-  .dot {
-    margin-left: -18px;
-    flex: none;
-  }
-  .year,
-  .name {
-    position: static;
-    transform: none;
-  }
-  .year {
-    font-size: 1.25rem;
-  }
-  .name {
-    font-size: 0.9rem;
-    opacity: 0.7;
+@media (max-width: 640px) {
+  .item {
+    width: 74vw;
   }
 }
