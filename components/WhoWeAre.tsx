@@ -34,11 +34,12 @@ export default function WhoWeAre() {
     offset: ["start end", "center center"],
   });
 
-  // the paragraphs start as a staircase (left highest → right lowest) and
-  // settle bottom-aligned with the image as the section scrolls in
-  const y0 = useTransform(scrollYProgress, [0.08, 0.55], [-150, 0]);
-  const y1 = useTransform(scrollYProgress, [0.08, 0.55], [-85, 0]);
-  const y2 = useTransform(scrollYProgress, [0.08, 0.55], [-20, 0]);
+  // even diagonal (left highest → right lowest). As the section scrolls in,
+  // each paragraph slides down to bottom-align with the image; scrolling back
+  // up returns them to the cascade (the transforms track scroll both ways).
+  const y0 = useTransform(scrollYProgress, [0.05, 0.55], [-210, 0]);
+  const y1 = useTransform(scrollYProgress, [0.05, 0.55], [-140, 0]);
+  const y2 = useTransform(scrollYProgress, [0.05, 0.55], [-70, 0]);
   const ys = [y0, y1, y2];
 
   return (
