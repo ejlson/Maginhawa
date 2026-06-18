@@ -3,12 +3,12 @@
 }
 
 .wordmark {
-  font-family: var(--font-display);
+  font-family: var(--font-display-big);
   text-transform: uppercase;
   text-align: right;
   color: var(--cream);
   line-height: 0.86;
-  letter-spacing: -0.01em;
+  letter-spacing: var(--tr-display);
   font-size: clamp(3.4rem, 15vw, 15rem);
   border-bottom: 1px solid rgba(248, 243, 234, 0.25);
   padding-bottom: 0.06em;
@@ -39,13 +39,15 @@
 
 .label {
   font-family: var(--font-serif);
-  font-size: 1.4rem;
+  font-size: var(--t-h3);
+  line-height: var(--lh-heading);
   margin-bottom: 0.35em;
 }
 
 .info p {
   font-family: var(--font-sans);
-  font-size: 0.92rem;
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
   opacity: 0.85;
 }
 
@@ -68,7 +70,8 @@
 
 .field label {
   font-family: var(--font-serif);
-  font-size: 1.3rem;
+  font-size: var(--t-h3);
+  line-height: var(--lh-heading);
   margin-bottom: 0.5em;
 }
 
@@ -78,7 +81,8 @@
   border-bottom: 1px solid rgba(248, 243, 234, 0.4);
   color: var(--cream);
   font-family: var(--font-sans);
-  font-size: 0.95rem;
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
   padding: 0.5em 0;
   outline: none;
   transition: border-color 0.3s ease;

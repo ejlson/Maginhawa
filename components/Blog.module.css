@@ -13,7 +13,8 @@
 
 .eyebrow {
   font-family: var(--font-sans);
-  font-size: 0.78rem;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
   opacity: 0.7;
   padding-top: 0.5em;
 }
@@ -21,8 +22,8 @@
 .title {
   font-family: var(--font-serif);
   font-weight: 400;
-  font-size: clamp(1.5rem, 3.4vw, 3rem);
-  line-height: 1.12;
+  font-size: var(--t-h2);
+  line-height: var(--lh-heading);
   letter-spacing: -0.01em;
 }
 
@@ -49,8 +50,8 @@
 
 .featuredTag {
   font-family: var(--font-sans);
-  font-size: 0.74rem;
-  letter-spacing: 0.06em;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
   text-transform: uppercase;
   opacity: 0.6;
 }
@@ -58,15 +59,15 @@
 .featuredTitle {
   font-family: var(--font-serif);
   font-weight: 400;
-  font-size: clamp(1.6rem, 3vw, 2.6rem);
-  line-height: 1.12;
+  font-size: var(--t-h2);
+  line-height: var(--lh-heading);
   letter-spacing: -0.01em;
 }
 
 .featuredExcerpt {
   font-family: var(--font-sans);
-  font-size: 0.9rem;
-  line-height: 1.55;
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
   opacity: 0.8;
   max-width: 46ch;
 }
@@ -74,7 +75,7 @@
 .featuredLink {
   margin-top: 0.4em;
   font-family: var(--font-sans);
-  font-size: 0.82rem;
+  font-size: var(--t-small);
   letter-spacing: 0.02em;
   display: inline-flex;
   align-items: center;
@@ -104,21 +105,21 @@
 
 .date {
   font-family: var(--font-sans);
-  font-size: 0.74rem;
-  letter-spacing: 0.02em;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
   opacity: 0.6;
 }
 
 .cardTitle {
   font-family: var(--font-serif);
-  font-size: 1.15rem;
-  line-height: 1.2;
+  font-size: var(--t-h3);
+  line-height: var(--lh-heading);
 }
 
 .excerpt {
   font-family: var(--font-sans);
-  font-size: 0.82rem;
-  line-height: 1.5;
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
   opacity: 0.78;
 }
 

@@ -9,8 +9,8 @@
 
 .eyebrow {
   font-family: var(--font-sans);
-  font-size: 0.78rem;
-  letter-spacing: 0.02em;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
   opacity: 0.7;
   margin-bottom: clamp(10px, 1.6vh, 20px);
   flex: none;
@@ -91,15 +91,16 @@
 .ovTitle {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(1.6rem, 3vw, 3rem);
-  line-height: 1;
+  font-size: var(--t-h2);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
   color: var(--cream);
 }
 
 .ovTag {
   font-family: var(--font-sans);
-  font-size: clamp(0.72rem, 0.9vw, 0.85rem);
-  letter-spacing: 0.04em;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
   color: var(--cream);
   opacity: 0.8;
   white-space: nowrap;
@@ -123,8 +124,8 @@
   border: none;
   padding: 0.4em 0;
   font-family: var(--font-sans);
-  font-size: 0.8rem;
-  letter-spacing: 0.1em;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
   text-transform: uppercase;
   color: var(--cream);
   cursor: pointer;
@@ -138,7 +139,8 @@
 .btnSolid,
 .btnGhost {
   font-family: var(--font-sans);
-  font-size: 0.82rem;
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
   border-radius: 999px;
   padding: 0.66em 1.3em;
   white-space: nowrap;
@@ -191,8 +193,8 @@
   flex: 1 1 0;
   min-width: 0;
   font-family: var(--font-sans);
-  font-size: 0.82rem;
-  line-height: 1.7;
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
   opacity: 0.72;
   text-align: justify;
   text-justify: inter-word;
@@ -235,8 +237,9 @@
 .listName {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(1.4rem, 2.4vw, 2.5rem);
-  line-height: 1.08;
+  font-size: var(--t-h2);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tr-display);
 }
 
 /* thin vertical rule at the right edge; only the chosen restaurant's is shown */

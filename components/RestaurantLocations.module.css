@@ -39,7 +39,8 @@
 .heading span {
   font-family: var(--font-display);
   text-transform: uppercase;
-  font-size: clamp(1.6rem, 4.4vw, 3.4rem);
-  letter-spacing: 0.01em;
+  font-size: var(--t-display);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
   color: var(--maroon);
 }

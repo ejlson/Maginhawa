@@ -51,9 +51,10 @@
 }
 
 .titleText {
-  font-family: var(--font-display);
+  font-family: var(--font-display-big);
   font-weight: 400;
   text-transform: uppercase;
+  letter-spacing: var(--tr-display);
   fill: var(--cream);
 }
 

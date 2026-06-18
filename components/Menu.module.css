@@ -38,7 +38,7 @@
   font-family: var(--font-display);
   font-weight: 500;
   font-size: clamp(1.45rem, 2.4vw, 1.95rem);
-  line-height: 1.2;
+  line-height: var(--lh-heading);
   color: var(--maroon);
   opacity: 0.4;
   transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
