@@ -86,6 +86,8 @@ export default function Menu({
           ))}
         </nav>
 
+        <span className={styles.divider} aria-hidden />
+
         <div className={styles.thumb}>
           <motion.div
             key={active}
@@ -93,7 +95,7 @@ export default function Menu({
             animate={{ opacity: 1, scale: 1 }}
             transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
           >
-            <Placeholder ratio="16 / 9" label={ITEMS[active].label} />
+            <Placeholder ratio="3 / 4" label={ITEMS[active].label} />
           </motion.div>
         </div>
       </motion.aside>
