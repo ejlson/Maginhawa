@@ -7,11 +7,9 @@
   text-transform: uppercase;
   text-align: right;
   color: var(--cream);
-  line-height: 0.86;
+  line-height: 0.78;
   letter-spacing: var(--tr-display);
   font-size: clamp(3.4rem, 15vw, 15rem);
-  border-bottom: 1px solid rgba(248, 243, 234, 0.25);
-  padding-bottom: 0.06em;
 }
 
 .wline {
@@ -37,24 +35,27 @@
   gap: clamp(28px, 5vh, 56px);
 }
 
-.label {
-  font-family: var(--font-serif);
-  font-size: var(--t-h3);
-  line-height: var(--lh-heading);
-  margin-bottom: 0.35em;
+/* shared small-caps label for both the info block and the form fields */
+.label,
+.field label {
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  opacity: 0.6;
+  margin-bottom: 0.8em;
 }
 
 .info p {
-  font-family: var(--font-sans);
-  font-size: var(--t-small);
-  line-height: var(--lh-body);
-  opacity: 0.85;
+  font-family: var(--font-serif);
+  font-size: var(--t-lead);
+  line-height: var(--lh-heading);
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: clamp(22px, 3.5vh, 36px);
+  gap: clamp(26px, 4vh, 44px);
 }
 
 .row {
@@ -68,49 +69,31 @@
   flex-direction: column;
 }
 
-.field label {
-  font-family: var(--font-serif);
-  font-size: var(--t-h3);
-  line-height: var(--lh-heading);
-  margin-bottom: 0.5em;
-}
-
 .field input {
   background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(248, 243, 234, 0.4);
+  border-bottom: 1px solid rgba(248, 243, 234, 0.35);
   color: var(--cream);
-  font-family: var(--font-sans);
-  font-size: var(--t-body);
-  line-height: var(--lh-body);
-  padding: 0.5em 0;
+  font-family: var(--font-serif);
+  font-size: var(--t-lead);
+  line-height: var(--lh-heading);
+  padding: 0.55em 0;
   outline: none;
   transition: border-color 0.3s ease;
 }
 
 .field input::placeholder {
-  color: rgba(248, 243, 234, 0.55);
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  color: rgba(248, 243, 234, 0.45);
 }
 
 .field input:focus {
   border-color: var(--cream);
 }
 
-.submit {
-  align-self: flex-start;
-  background: var(--cream);
-  color: var(--maroon);
-  border: none;
-  border-radius: 10px;
-  font-family: var(--font-serif);
-  font-size: 1.15rem;
-  padding: 0.7em 2.4em;
+.submitRow {
   margin-top: clamp(8px, 2vh, 20px);
-  transition: opacity 0.3s ease;
-}
-
-.submit:hover {
-  opacity: 0.85;
 }
 
 @media (max-width: 760px) {

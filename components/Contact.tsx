@@ -1,6 +1,7 @@
 import styles from "./Contact.module.css";
 import Reveal from "./Reveal";
 import RevealText from "./RevealText";
+import MagneticButton from "./MagneticButton";
 
 export default function Contact() {
   return (
@@ -47,9 +48,9 @@ export default function Contact() {
                 <label>Description</label>
                 <input type="text" placeholder="Enter your description here" />
               </div>
-              <button type="submit" className={styles.submit}>
-                Submit
-              </button>
+              <div className={styles.submitRow}>
+                <MagneticButton label="Submit" type="submit" />
+              </div>
             </form>
           </Reveal>
         </div>
