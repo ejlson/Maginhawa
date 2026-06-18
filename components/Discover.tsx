@@ -113,6 +113,8 @@ export default function Discover() {
     offset: ["start end", "end start"],
   });
   const listY = useTransform(scrollYProgress, (v) => v * travel.current);
+  // the photo drifts within its fixed frame as the page scrolls
+  const imgY = useTransform(scrollYProgress, [0, 1], [-30, 30]);
 
   const select = (i: number) => {
     if (i === active) return;
@@ -125,7 +127,12 @@ export default function Discover() {
   const renderCard = (it: (typeof ITEMS)[number]) => (
     <>
       {it.image ? (
-        <img className={styles.img} src={it.image} alt={it.name} />
+        <motion.img
+          className={styles.img}
+          src={it.image}
+          alt={it.name}
+          style={{ y: imgY, scale: 1.16 }}
+        />
       ) : (
         <Placeholder ratio="auto" label={it.name} />
       )}
