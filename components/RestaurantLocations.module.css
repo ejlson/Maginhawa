@@ -27,6 +27,24 @@
   border: none;
 }
 
+.locVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* dark wash so the View-All button stays legible over the footage */
+.locScrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(120% 100% at 50% 50%, rgba(18, 0, 0, 0.25), rgba(18, 0, 0, 0.62)),
+    linear-gradient(rgba(18, 0, 0, 0.35), rgba(18, 0, 0, 0.5));
+}
+
 /* the View-All button, centred over the map showcase */
 .cta {
   position: absolute;

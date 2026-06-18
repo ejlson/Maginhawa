@@ -28,22 +28,21 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0;
-  transition: opacity 1s ease;
-}
-.bgVideo[data-active="true"] {
-  opacity: 1;
 }
 
-/* very light base tint only — the real dimming is the spotlight cutout, so the
-   selected restaurant's window reads as bright/undarkened video */
+/* darken the footage — heavier on the left where the names sit — so the cream
+   type stays legible over any clip */
 .scrim {
   position: absolute;
   inset: 0;
-  background: linear-gradient(
-    rgba(20, 0, 0, 0.1),
-    rgba(20, 0, 0, 0.16)
-  );
+  background:
+    linear-gradient(
+      to right,
+      rgba(18, 0, 0, 0.78) 0%,
+      rgba(18, 0, 0, 0.4) 45%,
+      rgba(18, 0, 0, 0.18) 100%
+    ),
+    linear-gradient(rgba(18, 0, 0, 0.2), rgba(18, 0, 0, 0.4));
 }
 
 /* ---- the name scroller, pinned to the left ---- */

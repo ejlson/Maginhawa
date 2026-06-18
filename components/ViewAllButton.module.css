@@ -19,7 +19,7 @@
   gap: 0.45em;
   overflow: hidden;
   isolation: isolate;
-  border: 1.5px solid #2f0000;
+  border: 1.5px solid var(--cream);
   border-radius: 999px;
   padding: 0.7em 1.5em;
   font-family: var(--font-display);
@@ -27,7 +27,7 @@
   font-size: var(--t-h3);
   line-height: var(--lh-heading);
   letter-spacing: var(--tr-display);
-  color: #2f0000;
+  color: var(--cream);
   will-change: transform;
 }
 
@@ -36,7 +36,7 @@
   position: absolute;
   z-index: -1;
   border-radius: 50%;
-  background: #2f0000;
+  background: var(--cream);
   transform: translate(-50%, -50%) scale(0);
   transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
@@ -58,12 +58,12 @@
   transition: transform 0.55s cubic-bezier(0.76, 0, 0.24, 1);
 }
 .l1 {
-  color: #2f0000;
+  color: var(--cream);
 }
 .l2 {
   position: absolute;
   inset: 0;
-  color: var(--cream);
+  color: var(--maroon);
   transform: translateY(110%);
 }
 .isHover .l1 {
@@ -78,7 +78,7 @@
   place-items: center;
   width: 0.9em;
   height: 0.9em;
-  color: #2f0000;
+  color: var(--cream);
   transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1), color 0.45s ease;
 }
 .arrow svg {
@@ -88,5 +88,5 @@
 }
 .isHover .arrow {
   transform: translateX(0.28em);
-  color: var(--cream);
+  color: var(--maroon);
 }

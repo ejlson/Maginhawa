@@ -3,28 +3,50 @@
   padding: clamp(60px, 9vh, 120px) 0 clamp(80px, 12vh, 160px);
 }
 
+/* matches the WhoWeAre intro: eyebrow inline-left, statement indented so its
+   wrapped lines sit under the eyebrow */
 .head {
-  display: grid;
-  grid-template-columns: 1fr 3fr;
-  gap: clamp(16px, 3vw, 48px);
-  align-items: start;
+  position: relative;
   margin-bottom: clamp(40px, 6vh, 80px);
 }
 
 .eyebrow {
+  position: absolute;
+  top: clamp(8px, 1vw, 18px);
+  left: 0;
+  white-space: nowrap;
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   opacity: 0.7;
-  padding-top: 0.5em;
 }
 
 .title {
-  font-family: var(--font-serif);
-  font-weight: 400;
-  font-size: var(--t-h2);
-  line-height: var(--lh-heading);
-  letter-spacing: -0.01em;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--t-display);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
+  color: var(--maroon);
+}
+
+.spacer {
+  display: inline-block;
+  width: clamp(150px, 18vw, 320px);
+  height: 0.1em;
+  vertical-align: middle;
+}
+
+@media (max-width: 640px) {
+  .eyebrow {
+    position: static;
+    display: block;
+    width: auto;
+    margin-bottom: 1em;
+  }
+  .spacer {
+    display: none;
+  }
 }
 
 /* featured latest entry — larger two-column block above the grid */

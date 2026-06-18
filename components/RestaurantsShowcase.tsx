@@ -8,6 +8,7 @@ import Menu from "./Menu";
 import DarkZone from "./DarkZone";
 import Footer from "./Footer";
 import { useRouteTransition } from "./PageTransition";
+import VideoBackdrop from "./VideoBackdrop";
 
 function ArrowIcon() {
   return (
@@ -102,7 +103,7 @@ const RESTAURANTS = [
     name: "Bintang",
     tag: "Filipino Fusion Restaurant",
     location: "Camden, London",
-    video: "/videos/hero-draft3.mp4",
+    video: "/videos/bintang.mp4",
   },
   {
     name: "Belly",
@@ -114,13 +115,13 @@ const RESTAURANTS = [
     name: "Mamasons",
     tag: "Filipino Ice Cream Parlour",
     location: "Camden · Soho, London",
-    video: "/videos/hero-draft3.mp4",
+    video: "/videos/mamasons.mp4",
   },
   {
     name: "Café Mama & Sons",
     tag: "Filipino x Japanese Café",
     location: "London",
-    video: "/videos/hero-draft3.mp4",
+    video: "/videos/cafemama.mp4",
   },
   {
     name: "Guanabana",
@@ -132,7 +133,7 @@ const RESTAURANTS = [
     name: "Ramo Ramen",
     tag: "Filipino-Japanese Ramen",
     location: "Kentish Town · Soho",
-    video: "/videos/hero-draft3.mp4",
+    video: "/videos/ramo.mp4",
   },
   {
     name: "Hoodwood",
@@ -143,8 +144,6 @@ const RESTAURANTS = [
 ];
 
 const N = RESTAURANTS.length;
-// dedupe so identical clips share a single decoder
-const VIDEOS = Array.from(new Set(RESTAURANTS.map((r) => r.video)));
 
 // many stacked copies → an endless loop. We don't touch scrollTop mid-scroll
 // (that kills inertia and feels janky); instead we silently re-centre on the
@@ -353,21 +352,9 @@ export default function RestaurantsShowcase() {
       <Menu open={menuOpen} onClose={() => setMenuOpen(false)} />
 
       <section className={styles.hero} data-nav-theme="blend">
-        {/* full-bleed background; the active restaurant's clip fades in */}
+        {/* full-bleed background; the active restaurant's clip crossfades in */}
         <div className={styles.bg} aria-hidden>
-          {VIDEOS.map((src) => (
-            <video
-              key={src}
-              className={styles.bgVideo}
-              src={src}
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="auto"
-              data-active={item.video === src}
-            />
-          ))}
+          <VideoBackdrop src={item.video} className={styles.bgVideo} />
           <div className={styles.scrim} />
         </div>
 

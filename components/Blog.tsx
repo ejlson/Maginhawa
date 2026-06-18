@@ -31,11 +31,14 @@ export default function Blog() {
     <section className={styles.section} id="blog">
       <div className="container">
         <div className={styles.head}>
-          <Reveal className={styles.eyebrow}>(Blog)</Reveal>
+          <Reveal className={styles.eyebrow} as="span">
+            (Blog)
+          </Reveal>
           <h2 className={styles.title}>
+            <span className={styles.spacer} aria-hidden />
             <RevealText
               text="Explore the latest stories, openings, and ideas shaping the Maginhawa Group."
-              stagger={0.022}
+              stagger={0.018}
             />
           </h2>
         </div>
