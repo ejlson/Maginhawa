@@ -21,11 +21,11 @@
   isolation: isolate;
   border: 1.5px solid #2f0000;
   border-radius: 999px;
-  padding: 0.62em 1.4em;
+  padding: 0.7em 1.5em;
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: var(--t-display);
-  line-height: var(--lh-display);
+  font-size: var(--t-h3);
+  line-height: var(--lh-heading);
   letter-spacing: var(--tr-display);
   color: #2f0000;
   will-change: transform;

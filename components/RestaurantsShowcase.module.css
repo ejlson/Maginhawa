@@ -90,7 +90,6 @@
   overscroll-behavior: contain;
   height: calc(var(--row) * 5);
   overflow-y: auto;
-  scroll-snap-type: y mandatory;
   scrollbar-width: none;
   /* fade the top/bottom edges of the window */
   -webkit-mask-image: linear-gradient(

@@ -152,6 +152,11 @@ const VIDEOS = Array.from(new Set(RESTAURANTS.map((r) => r.video)));
 // content is pixel-identical and the move is invisible.
 const COPIES = 11;
 const MID = Math.floor(COPIES / 2);
+
+// wheel feel — lower = slower. SENS scales raw wheel delta; EASE is the
+// fraction of the remaining distance covered each frame.
+const WHEEL_SENS = 0.4;
+const WHEEL_EASE = 0.08;
 const LOOP = Array.from({ length: COPIES * N }, (_, k) => ({
   ...RESTAURANTS[k % N],
   realIndex: k % N,
@@ -169,6 +174,8 @@ export default function RestaurantsShowcase() {
   const activeRef = useRef(0);
   const raf = useRef(0);
   const settle = useRef(0);
+  const targetTop = useRef(0); // where the eased wheel scroll is heading
+  const wheelRaf = useRef(0);
 
   // this route is all dark — paint the page (and overscroll) maroon so no
   // cream/white ever shows, and release the global loader scroll lock
@@ -214,17 +221,79 @@ export default function RestaurantsShowcase() {
     }
   };
 
-  // once scrolling stops, jump by whole copies back to the middle band so we
-  // never run out of list — invisible because every copy is identical
-  const recenter = () => {
+  // ease scrollTop toward the wheel target, a fraction per frame, keeping both
+  // inside the middle copy (whole-copy jumps are invisible — every copy matches)
+  const stepWheel = () => {
+    const root = scrollerRef.current;
+    if (!root) {
+      wheelRaf.current = 0;
+      return;
+    }
+    const cur = root.scrollTop;
+    const diff = targetTop.current - cur;
+    if (Math.abs(diff) < 0.5) {
+      root.scrollTop = targetTop.current;
+      render();
+      wheelRaf.current = 0;
+      return;
+    }
+    root.scrollTop = cur + diff * WHEEL_EASE;
+    const ch = copyH.current;
+    if (ch) {
+      const k = Math.round((root.scrollTop - MID * ch) / ch);
+      if (k !== 0) {
+        root.scrollTop -= k * ch;
+        targetTop.current -= k * ch;
+      }
+    }
+    render();
+    wheelRaf.current = requestAnimationFrame(stepWheel);
+  };
+
+  const startWheel = () => {
+    if (!wheelRaf.current) wheelRaf.current = requestAnimationFrame(stepWheel);
+  };
+
+  // snap the target to the nearest name's centre (and recentre the copy)
+  const settleNow = () => {
     const root = scrollerRef.current;
     const ch = copyH.current;
     if (!root || !ch) return;
-    const mid = MID * ch;
-    const k = Math.round((root.scrollTop - mid) / ch);
-    if (k !== 0) root.scrollTop -= k * ch;
+    const k = Math.round((root.scrollTop - MID * ch) / ch);
+    if (k !== 0) {
+      root.scrollTop -= k * ch;
+      targetTop.current -= k * ch;
+    }
+    const center = root.scrollTop + root.clientHeight / 2;
+    let best = Infinity;
+    let bestTop = targetTop.current;
+    for (const el of itemRefs.current) {
+      if (!el) continue;
+      const c = el.offsetTop + el.offsetHeight / 2;
+      const d = Math.abs(center - c);
+      if (d < best) {
+        best = d;
+        bestTop = c - root.clientHeight / 2;
+      }
+    }
+    targetTop.current = bestTop;
+    startWheel();
   };
 
+  const scheduleSettle = () => {
+    clearTimeout(settle.current);
+    settle.current = window.setTimeout(settleNow, 130);
+  };
+
+  // scroll to a clicked name through the same eased motion
+  const selectEl = (el: HTMLElement) => {
+    const root = scrollerRef.current;
+    if (!root) return;
+    targetTop.current = el.offsetTop + el.offsetHeight / 2 - root.clientHeight / 2;
+    startWheel();
+  };
+
+  // native scroll (touch) → repaint + settle
   const onScroll = () => {
     if (!raf.current) {
       raf.current = requestAnimationFrame(() => {
@@ -232,9 +301,23 @@ export default function RestaurantsShowcase() {
         render();
       });
     }
-    clearTimeout(settle.current);
-    settle.current = window.setTimeout(recenter, 140);
+    scheduleSettle();
   };
+
+  // intercept the wheel so we control the (slower) scroll speed ourselves
+  useEffect(() => {
+    const root = scrollerRef.current;
+    if (!root) return;
+    const onWheel = (e: WheelEvent) => {
+      e.preventDefault();
+      targetTop.current += e.deltaY * WHEEL_SENS;
+      startWheel();
+      scheduleSettle();
+    };
+    root.addEventListener("wheel", onWheel, { passive: false });
+    return () => root.removeEventListener("wheel", onWheel);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, []);
 
   // measure rows, park on the middle copy, paint the first frame
   useEffect(() => {
@@ -244,6 +327,7 @@ export default function RestaurantsShowcase() {
       rowH.current = root.querySelector("li")?.offsetHeight ?? 0;
       copyH.current = rowH.current * N;
       root.scrollTop = MID * copyH.current; // park on the middle copy
+      targetTop.current = root.scrollTop;
       render();
     };
     measure();
@@ -251,6 +335,7 @@ export default function RestaurantsShowcase() {
     return () => {
       window.removeEventListener("resize", measure);
       if (raf.current) cancelAnimationFrame(raf.current);
+      if (wheelRaf.current) cancelAnimationFrame(wheelRaf.current);
       clearTimeout(settle.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -302,12 +387,7 @@ export default function RestaurantsShowcase() {
                         itemRefs.current[r.gpos] = el;
                       }}
                       className={`${styles.name} ${active === r.realIndex ? styles.nameActive : ""}`}
-                      onClick={(ev) =>
-                        ev.currentTarget.scrollIntoView({
-                          block: "center",
-                          behavior: "smooth",
-                        })
-                      }
+                      onClick={(ev) => selectEl(ev.currentTarget)}
                       aria-current={active === r.realIndex}
                     >
                       {r.name}
