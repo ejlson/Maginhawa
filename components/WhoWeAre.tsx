@@ -37,10 +37,10 @@ export default function WhoWeAre() {
     offset: ["start center", "end center"],
   });
 
-  // even diagonal (left highest → right lowest)
-  const y0 = useTransform(scrollYProgress, [0, 0.5], [-210, 0]);
-  const y1 = useTransform(scrollYProgress, [0, 0.5], [-140, 0]);
-  const y2 = useTransform(scrollYProgress, [0, 0.5], [-70, 0]);
+  // even diagonal (left highest → right lowest) — steep cascade
+  const y0 = useTransform(scrollYProgress, [0, 0.5], [-360, 0]);
+  const y1 = useTransform(scrollYProgress, [0, 0.5], [-240, 0]);
+  const y2 = useTransform(scrollYProgress, [0, 0.5], [-120, 0]);
   const ys = [y0, y1, y2];
 
   return (
