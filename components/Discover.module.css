@@ -91,8 +91,8 @@
 .ovTitle {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: var(--t-h2);
-  line-height: var(--lh-display);
+  font-size: var(--t-h3);
+  line-height: var(--lh-heading);
   letter-spacing: var(--tr-display);
   color: var(--cream);
 }
@@ -139,10 +139,10 @@
 .btnSolid,
 .btnGhost {
   font-family: var(--font-sans);
-  font-size: var(--t-small);
+  font-size: var(--t-label);
   line-height: var(--lh-body);
   border-radius: 999px;
-  padding: 0.66em 1.3em;
+  padding: 0.6em 1.2em;
   white-space: nowrap;
   transition: opacity 0.3s ease, background-color 0.3s ease, color 0.3s ease;
 }
@@ -209,6 +209,8 @@
   align-items: flex-end;
   gap: clamp(0px, 0.4vh, 5px);
   will-change: transform;
+  /* shared so the active-marker rule matches the name text height */
+  --list-name: clamp(1.2rem, 2.1vw, 1.85rem);
 }
 
 .listItem {
@@ -237,16 +239,17 @@
 .listName {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: var(--t-h2);
+  font-size: var(--list-name);
   line-height: var(--lh-heading);
   letter-spacing: var(--tr-display);
 }
 
-/* thin vertical rule at the right edge; only the chosen restaurant's is shown */
+/* thin vertical rule at the right edge; only the chosen restaurant's is shown.
+   its height tracks the name text height */
 .listMark {
   flex: none;
   width: 1px;
-  height: clamp(1.1rem, 1.9vw, 1.9rem);
+  height: var(--list-name);
   background: var(--maroon);
   opacity: 0;
   transition: opacity 0.4s ease;
