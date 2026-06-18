@@ -79,9 +79,7 @@
 .card {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  gap: 0.3em;
-  padding: clamp(16px, 1.8vw, 28px);
+  overflow: hidden;
   border: 1px solid rgba(248, 243, 234, 0.25);
   border-radius: 10px;
   background: rgba(18, 0, 0, 0.28);
@@ -90,18 +88,43 @@
   color: var(--cream);
   text-align: left;
   cursor: pointer;
-  transition: background 0.35s ease, border-color 0.35s ease,
+  transition: border-color 0.35s ease,
     transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 .card:hover {
-  background: rgba(248, 243, 234, 0.12);
   border-color: rgba(248, 243, 234, 0.5);
   transform: translateY(-3px);
 }
 
+/* the logo on a clean cream tile so every mark sits on the same surface */
+.cardLogo {
+  display: grid;
+  place-items: center;
+  aspect-ratio: 16 / 7;
+  padding: clamp(14px, 2vw, 26px);
+  background: var(--cream);
+}
+.cardLogo img {
+  max-width: 100%;
+  max-height: 100%;
+  object-fit: contain;
+}
+.cardLogoName {
+  font-family: "contralto-small", var(--font-serif);
+  font-size: clamp(1.2rem, 2vw, 1.7rem);
+  color: var(--maroon);
+}
+
+.cardBody {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.28em;
+  padding: clamp(14px, 1.6vw, 22px);
+}
 .cardName {
   font-family: "contralto-small", var(--font-serif);
-  font-size: clamp(1.3rem, 2vw, 1.8rem);
+  font-size: clamp(1.2rem, 1.8vw, 1.6rem);
   line-height: 1.05;
 }
 .cardTag {

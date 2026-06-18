@@ -169,6 +169,16 @@ const RESTAURANTS = [
 
 const N = RESTAURANTS.length;
 
+// restaurant marks (Ramo has none → falls back to its name)
+const LOGOS: Record<string, string> = {
+  Bintang: "/logo/bintang.png",
+  Belly: "/logo/belly.png",
+  Mamasons: "/logo/mamasons.png",
+  "Café Mama & Sons": "/logo/cafemama.png",
+  Guanabana: "/logo/guanabana.png",
+  Hoodwood: "/logo/hoodwood.png",
+};
+
 // many stacked copies → an endless loop. We don't touch scrollTop mid-scroll
 // (that kills inertia and feels janky); instead we silently re-centre on the
 // middle copy once scrolling settles. The jump is a whole-copy multiple, so the
@@ -431,9 +441,18 @@ export default function RestaurantsShowcase() {
               onFocus={() => setActive(i)}
               onClick={() => navigate("/")}
             >
-              <span className={styles.cardName}>{r.name}</span>
-              <span className={styles.cardTag}>{r.tag}</span>
-              <span className={styles.cardLoc}>{r.location}</span>
+              <span className={styles.cardLogo}>
+                {LOGOS[r.name] ? (
+                  <img src={LOGOS[r.name]} alt={r.name} />
+                ) : (
+                  <span className={styles.cardLogoName}>{r.name}</span>
+                )}
+              </span>
+              <span className={styles.cardBody}>
+                <span className={styles.cardName}>{r.name}</span>
+                <span className={styles.cardTag}>{r.tag}</span>
+                <span className={styles.cardLoc}>{r.location}</span>
+              </span>
             </button>
           ))}
         </div>
