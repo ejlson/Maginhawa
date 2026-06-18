@@ -28,23 +28,24 @@ const PARAS = [
 ];
 
 export default function WhoWeAre() {
-  const ref = useRef<HTMLDivElement>(null);
+  const bodyRef = useRef<HTMLDivElement>(null);
+  // anchored to the viewport centre: the row sits cascaded while it's in the
+  // lower half, then slides down to bottom-align with the image as it scrolls
+  // up past centre (and back to the cascade on the way down)
   const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "center center"],
+    target: bodyRef,
+    offset: ["start center", "end center"],
   });
 
-  // even diagonal (left highest → right lowest). As the section scrolls in,
-  // each paragraph slides down to bottom-align with the image; scrolling back
-  // up returns them to the cascade (the transforms track scroll both ways).
-  const y0 = useTransform(scrollYProgress, [0.05, 0.55], [-210, 0]);
-  const y1 = useTransform(scrollYProgress, [0.05, 0.55], [-140, 0]);
-  const y2 = useTransform(scrollYProgress, [0.05, 0.55], [-70, 0]);
+  // even diagonal (left highest → right lowest)
+  const y0 = useTransform(scrollYProgress, [0, 0.5], [-210, 0]);
+  const y1 = useTransform(scrollYProgress, [0, 0.5], [-140, 0]);
+  const y2 = useTransform(scrollYProgress, [0, 0.5], [-70, 0]);
   const ys = [y0, y1, y2];
 
   return (
     <section className={styles.section} id="about-us">
-      <div className="container" ref={ref}>
+      <div className="container">
         <div className={styles.statementWrap}>
           <Reveal className={styles.sEyebrow} as="span">
             (Who are We?)
@@ -58,7 +59,7 @@ export default function WhoWeAre() {
           </h2>
         </div>
 
-        <div className={styles.body}>
+        <div className={styles.body} ref={bodyRef}>
           {PARAS.map((p, i) => (
             <motion.div key={p.n} className={styles.col} style={{ y: ys[i] }}>
               <span className={styles.colHead}>
