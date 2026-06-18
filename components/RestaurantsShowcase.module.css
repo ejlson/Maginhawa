@@ -56,6 +56,115 @@
   padding: 0 clamp(20px, 7vw, 120px);
 }
 
+.stage[data-hidden="true"],
+.cards[data-hidden="true"] {
+  display: none;
+}
+
+/* ---- card-list view ---- */
+.cards {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: repeat(3, 1fr);
+  gap: clamp(10px, 1.4vw, 22px);
+  align-content: center;
+  padding: clamp(84px, 15vh, 150px) clamp(20px, 6vw, 110px)
+    clamp(84px, 14vh, 130px);
+  overflow-y: auto;
+  overscroll-behavior: contain;
+}
+
+.card {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3em;
+  padding: clamp(16px, 1.8vw, 28px);
+  border: 1px solid rgba(248, 243, 234, 0.25);
+  border-radius: 10px;
+  background: rgba(18, 0, 0, 0.28);
+  -webkit-backdrop-filter: blur(4px);
+  backdrop-filter: blur(4px);
+  color: var(--cream);
+  text-align: left;
+  cursor: pointer;
+  transition: background 0.35s ease, border-color 0.35s ease,
+    transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.card:hover {
+  background: rgba(248, 243, 234, 0.12);
+  border-color: rgba(248, 243, 234, 0.5);
+  transform: translateY(-3px);
+}
+
+.cardName {
+  font-family: "contralto-small", var(--font-serif);
+  font-size: clamp(1.3rem, 2vw, 1.8rem);
+  line-height: 1.05;
+}
+.cardTag {
+  font-family: var(--font-sans);
+  font-size: 0.8rem;
+  opacity: 0.82;
+}
+.cardLoc {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  opacity: 0.55;
+}
+
+/* ---- view switch, bottom-left ---- */
+.viewToggle {
+  position: absolute;
+  left: clamp(20px, 5vw, 60px);
+  bottom: clamp(18px, 4vh, 40px);
+  z-index: 4;
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid rgba(248, 243, 234, 0.28);
+  border-radius: 999px;
+  background: rgba(18, 0, 0, 0.3);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+.viewToggle button {
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  color: var(--cream);
+  opacity: 0.55;
+  cursor: pointer;
+  transition: opacity 0.3s ease, background 0.3s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.viewToggle button[data-active="true"] {
+  opacity: 1;
+  background: rgba(248, 243, 234, 0.16);
+}
+.viewToggle svg {
+  width: 16px;
+  height: 16px;
+}
+
+@media (max-width: 860px) {
+  .cards {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 560px) {
+  .cards {
+    grid-template-columns: 1fr;
+  }
+}
+
 /* "Visit" · name wheel · arrow button — laid out in a left-aligned row */
 .panel {
   display: flex;

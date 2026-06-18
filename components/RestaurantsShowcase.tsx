@@ -26,6 +26,29 @@ function ArrowIcon() {
   );
 }
 
+// scroll-wheel view: stacked lines with the centre one highlighted
+function WheelIcon() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" aria-hidden>
+      <line x1="3.5" y1="4" x2="12.5" y2="4" strokeWidth="1" opacity="0.55" />
+      <line x1="3.5" y1="8" x2="12.5" y2="8" strokeWidth="1.6" />
+      <line x1="3.5" y1="12" x2="12.5" y2="12" strokeWidth="1" opacity="0.55" />
+    </svg>
+  );
+}
+
+// card-list view: 2×2 grid
+function GridIcon() {
+  return (
+    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" aria-hidden>
+      <rect x="2.5" y="2.5" width="4.5" height="4.5" rx="1" strokeWidth="1.3" />
+      <rect x="9" y="2.5" width="4.5" height="4.5" rx="1" strokeWidth="1.3" />
+      <rect x="2.5" y="9" width="4.5" height="4.5" rx="1" strokeWidth="1.3" />
+      <rect x="9" y="9" width="4.5" height="4.5" rx="1" strokeWidth="1.3" />
+    </svg>
+  );
+}
+
 // round arrow button with the home "View All" treatment: magnetic pull + a
 // cream circle that radiates from the cursor on hover (arrow swaps to maroon)
 function VisitArrow({
@@ -166,6 +189,7 @@ const LOOP = Array.from({ length: COPIES * N }, (_, k) => ({
 export default function RestaurantsShowcase() {
   const [active, setActive] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
+  const [view, setView] = useState<"wheel" | "cards">("wheel");
   const navigate = useRouteTransition();
   const scrollerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -364,7 +388,7 @@ export default function RestaurantsShowcase() {
         </div>
 
         {/* phrase · name wheel · visit link, centred */}
-        <div className={styles.stage}>
+        <div className={styles.stage} data-hidden={view !== "wheel"}>
           <div className={styles.panel}>
             <span className={styles.phrase}>Visit</span>
 
@@ -394,6 +418,46 @@ export default function RestaurantsShowcase() {
               label={`Visit ${item.name}`}
             />
           </div>
+        </div>
+
+        {/* card-list view */}
+        <div className={styles.cards} data-hidden={view !== "cards"}>
+          {RESTAURANTS.map((r, i) => (
+            <button
+              key={r.name}
+              type="button"
+              className={styles.card}
+              onMouseEnter={() => setActive(i)}
+              onFocus={() => setActive(i)}
+              onClick={() => navigate("/")}
+            >
+              <span className={styles.cardName}>{r.name}</span>
+              <span className={styles.cardTag}>{r.tag}</span>
+              <span className={styles.cardLoc}>{r.location}</span>
+            </button>
+          ))}
+        </div>
+
+        {/* view switch, bottom-left */}
+        <div className={styles.viewToggle} role="group" aria-label="View">
+          <button
+            type="button"
+            data-active={view === "wheel"}
+            onClick={() => setView("wheel")}
+            aria-label="Wheel view"
+            aria-pressed={view === "wheel"}
+          >
+            <WheelIcon />
+          </button>
+          <button
+            type="button"
+            data-active={view === "cards"}
+            onClick={() => setView("cards")}
+            aria-label="Card view"
+            aria-pressed={view === "cards"}
+          >
+            <GridIcon />
+          </button>
         </div>
       </section>
 

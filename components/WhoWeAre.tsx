@@ -72,10 +72,12 @@ export default function WhoWeAre() {
               style={{ y: ys[i] }}
               onMouseEnter={() => setActive(i)}
             >
-              <span className={styles.ghost} aria-hidden>
-                {p.n}
-              </span>
-              <span className={styles.colHead}>{p.title}</span>
+              <div className={styles.colHead}>
+                <span className={styles.num} aria-hidden>
+                  {p.n}
+                </span>
+                <span className={styles.title}>{p.title}</span>
+              </div>
               <p className={styles.colBody}>{p.body}</p>
             </motion.div>
           ))}
