@@ -35,7 +35,7 @@ export default function WhoWeAre() {
             <Parallax inset ratio="3 / 4" speed={0.16}>
               <Placeholder label="Image" />
             </Parallax>
-            <MagneticButton label="Learn More About Us" theme="light" />
+            <MagneticButton label="Learn More About Us" theme="light" small />
           </Reveal>
         </div>
       </div>
