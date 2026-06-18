@@ -131,8 +131,8 @@ const MID = Math.floor(COPIES / 2);
 
 // wheel feel — lower = slower. SENS scales raw wheel delta; EASE is the
 // fraction of the remaining distance covered each frame.
-const WHEEL_SENS = 0.4;
-const WHEEL_EASE = 0.08;
+const WHEEL_SENS = 0.22;
+const WHEEL_EASE = 0.06;
 const LOOP = Array.from({ length: COPIES * N }, (_, k) => ({
   ...RESTAURANTS[k % N],
   realIndex: k % N,
