@@ -63,43 +63,12 @@
   opacity: 0.82;
 }
 
-.cta {
+/* image column: photo with the Learn More button beneath it */
+.imageCol {
   display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: clamp(48px, 8vh, 110px) 0;
-  justify-content: center;
-}
-
-.pill,
-.circle {
-  background: var(--maroon);
-  color: var(--cream);
-  border: none;
-  border-radius: 999px;
-  font-family: var(--font-serif);
-}
-
-.pill {
-  padding: 1.05em 1.9em;
-  font-size: 1.05rem;
-}
-
-.pill u {
-  text-underline-offset: 3px;
-}
-
-.circle {
-  width: 3.4em;
-  height: 3.4em;
-  font-size: 1.05rem;
-  display: grid;
-  place-items: center;
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.circle:hover {
-  transform: translateX(4px);
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(18px, 2.5vh, 32px);
 }
 
 @media (max-width: 860px) {

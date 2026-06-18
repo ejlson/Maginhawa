@@ -3,6 +3,7 @@ import Placeholder from "./Placeholder";
 import Reveal from "./Reveal";
 import RevealText from "./RevealText";
 import Parallax from "./Parallax";
+import MagneticButton from "./MagneticButton";
 
 const LOREM =
   "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Sed a vestibulum nulla, eu imperdiet lorem. Proin scelerisque eget elit in dapibus. Vestibulum id lorem sapien.";
@@ -30,20 +31,12 @@ export default function WhoWeAre() {
               {LOREM}
             </Reveal>
           ))}
-          <Reveal delay={0.24}>
+          <Reveal delay={0.24} className={styles.imageCol}>
             <Parallax inset ratio="3 / 4" speed={0.16}>
               <Placeholder label="Image" />
             </Parallax>
+            <MagneticButton label="Learn More About Us" theme="light" />
           </Reveal>
-        </div>
-
-        <div className={styles.cta}>
-          <button className={styles.pill}>
-            Learn More <u>About Us</u>
-          </button>
-          <button className={styles.circle} aria-label="Learn more about us">
-            →
-          </button>
         </div>
       </div>
     </section>

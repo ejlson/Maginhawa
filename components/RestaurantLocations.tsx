@@ -1,6 +1,5 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import styles from "./RestaurantLocations.module.css";
 import ViewAllButton from "./ViewAllButton";
@@ -39,20 +38,21 @@ export default function RestaurantLocations() {
       if (cooldown) return;
       const vh = window.innerHeight;
       const top = el.getBoundingClientRect().top;
-      if (Math.abs(top) < vh * 0.06) return; // already filling the screen
-      if (Math.abs(top) < vh * 0.45) {
+      if (Math.abs(top) < vh * 0.03) return; // already filling the screen
+      // engage from much further out so it almost always pulls into full view
+      if (Math.abs(top) < vh * 0.7) {
         const l = lenisRef.current;
-        if (l) l.scrollTo(el, { duration: 0.7 });
+        if (l) l.scrollTo(el, { duration: 0.6 });
         else el.scrollIntoView({ behavior: "smooth", block: "start" });
         cooldown = true;
         window.setTimeout(() => {
           cooldown = false;
-        }, 1200);
+        }, 600);
       }
     };
     const onScroll = () => {
       clearTimeout(t);
-      t = window.setTimeout(assist, 150);
+      t = window.setTimeout(assist, 110);
     };
     window.addEventListener("scroll", onScroll, { passive: true });
     return () => {
@@ -61,29 +61,14 @@ export default function RestaurantLocations() {
     };
   }, []);
 
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "end start"],
-  });
-
-  // a centre curtain opens as the section scrolls in
-  const clipPath = useTransform(
-    scrollYProgress,
-    [0.05, 0.42],
-    ["inset(48% 0% 48% 0%)", "inset(0% 0% 0% 0%)"]
-  );
-
   return (
     <section ref={ref} className={styles.section}>
-      <motion.div
-        className={styles.reveal}
-        style={{ clipPath, WebkitClipPath: clipPath }}
-      >
+      <div className={styles.reveal}>
         <div className={styles.bg}>
           <VideoBackdrop src={CLIPS[clip]} className={styles.locVideo} />
         </div>
         <div className={styles.locScrim} aria-hidden />
-      </motion.div>
+      </div>
 
       <div className={styles.cta}>
         <ViewAllButton />

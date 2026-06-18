@@ -4,6 +4,10 @@
 }
 
 .btn {
+  /* fg = resting border/text + the radiating fill; bg = the colour the label
+     and arrow flip to once the fill arrives. Dark theme by default. */
+  --btn-fg: var(--cream);
+  --btn-bg: var(--maroon);
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -11,7 +15,7 @@
   gap: 0.5em;
   overflow: hidden;
   isolation: isolate;
-  border: 1.5px solid var(--cream);
+  border: 1.5px solid var(--btn-fg);
   border-radius: 999px;
   padding: 0.68em 1.6em;
   font-family: var(--font-display);
@@ -19,10 +23,16 @@
   font-size: var(--t-h3);
   /* tight line-height so the label and arrow share one optical centre */
   line-height: 1;
-  color: var(--cream);
+  color: var(--btn-fg);
   background: none;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+}
+
+/* light theme (maroon on cream backgrounds) */
+.light {
+  --btn-fg: var(--maroon);
+  --btn-bg: var(--cream);
 }
 
 /* compact variant (e.g. the contact submit) */
@@ -32,12 +42,12 @@
   border-width: 1px;
 }
 
-/* cream circle that radiates from the cursor on hover */
+/* circle that radiates from the cursor on hover */
 .fill {
   position: absolute;
   z-index: -1;
   border-radius: 50%;
-  background: var(--cream);
+  background: var(--btn-fg);
   transform: translate(-50%, -50%) scale(0);
   transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
@@ -46,7 +56,7 @@
   transform: translate(-50%, -50%) scale(1);
 }
 
-/* label swaps cream → maroon as the fill arrives */
+/* label swaps fg → bg as the fill arrives */
 .label {
   position: relative;
   display: inline-block;
@@ -59,12 +69,12 @@
   transition: transform 0.55s cubic-bezier(0.76, 0, 0.24, 1);
 }
 .l1 {
-  color: var(--cream);
+  color: var(--btn-fg);
 }
 .l2 {
   position: absolute;
   inset: 0;
-  color: var(--maroon);
+  color: var(--btn-bg);
   transform: translateY(110%);
 }
 .isHover .l1 {
@@ -79,7 +89,7 @@
   place-items: center;
   width: 0.82em;
   height: 0.82em;
-  color: var(--cream);
+  color: var(--btn-fg);
   transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1), color 0.45s ease;
 }
 .arrow svg {
@@ -89,10 +99,10 @@
 }
 .isHover .arrow {
   transform: translateX(0.28em);
-  color: var(--maroon);
+  color: var(--btn-bg);
 }
 
 .btn:focus-visible {
-  outline: 1px solid var(--cream);
+  outline: 1px solid var(--btn-fg);
   outline-offset: 4px;
 }

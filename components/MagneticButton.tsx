@@ -32,6 +32,7 @@ export default function MagneticButton({
   ariaLabel,
   arrow = true,
   small = false,
+  theme = "dark",
 }: {
   label: string;
   type?: "button" | "submit";
@@ -39,6 +40,7 @@ export default function MagneticButton({
   ariaLabel?: string;
   arrow?: boolean;
   small?: boolean;
+  theme?: "dark" | "light";
 }) {
   const ref = useRef<HTMLButtonElement>(null);
   const [hover, setHover] = useState(false);
@@ -82,7 +84,7 @@ export default function MagneticButton({
         ref={ref}
         type={type}
         onClick={onClick}
-        className={`${styles.btn} ${small ? styles.small : ""} ${hover ? styles.isHover : ""}`}
+        className={`${styles.btn} ${small ? styles.small : ""} ${theme === "light" ? styles.light : ""} ${hover ? styles.isHover : ""}`}
         onMouseEnter={onEnter}
         onMouseMove={onMove}
         onMouseLeave={onLeave}
