@@ -1,12 +1,99 @@
 "use client";
 
 import { useEffect, useRef, useState } from "react";
+import { motion, useMotionValue, useSpring } from "framer-motion";
 import styles from "./RestaurantsShowcase.module.css";
 import Nav from "./Nav";
 import Menu from "./Menu";
 import DarkZone from "./DarkZone";
 import Footer from "./Footer";
 import { useRouteTransition } from "./PageTransition";
+
+function ArrowIcon() {
+  return (
+    <svg
+      viewBox="0 0 24 24"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="2"
+      strokeLinecap="round"
+      strokeLinejoin="round"
+      aria-hidden
+    >
+      <path d="M4 12h15M13 6l6 6-6 6" />
+    </svg>
+  );
+}
+
+// round arrow button with the home "View All" treatment: magnetic pull + a
+// cream circle that radiates from the cursor on hover (arrow swaps to maroon)
+function VisitArrow({
+  onClick,
+  label,
+}: {
+  onClick: () => void;
+  label: string;
+}) {
+  const ref = useRef<HTMLButtonElement>(null);
+  const [hover, setHover] = useState(false);
+  const [fill, setFill] = useState({ x: 0, y: 0, d: 0 });
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const x = useSpring(mx, { stiffness: 180, damping: 14, mass: 0.3 });
+  const y = useSpring(my, { stiffness: 180, damping: 14, mass: 0.3 });
+
+  const onMove = (e: React.MouseEvent) => {
+    const r = ref.current?.getBoundingClientRect();
+    if (!r) return;
+    mx.set((e.clientX - (r.left + r.width / 2)) * 0.3);
+    my.set((e.clientY - (r.top + r.height / 2)) * 0.3);
+  };
+  const onEnter = (e: React.MouseEvent) => {
+    const r = ref.current?.getBoundingClientRect();
+    if (!r) return;
+    const cx = e.clientX - r.left;
+    const cy = e.clientY - r.top;
+    const d =
+      2 *
+      Math.max(
+        Math.hypot(cx, cy),
+        Math.hypot(r.width - cx, cy),
+        Math.hypot(cx, r.height - cy),
+        Math.hypot(r.width - cx, r.height - cy)
+      );
+    setFill({ x: cx, y: cy, d });
+    setHover(true);
+  };
+  const onLeave = () => {
+    mx.set(0);
+    my.set(0);
+    setHover(false);
+  };
+
+  return (
+    <motion.div className={styles.magnet} style={{ x, y }}>
+      <button
+        ref={ref}
+        type="button"
+        className={`${styles.cta} ${hover ? styles.isHover : ""}`}
+        onMouseEnter={onEnter}
+        onMouseMove={onMove}
+        onMouseLeave={onLeave}
+        onClick={onClick}
+        aria-label={label}
+      >
+        <span
+          className={styles.ctaFill}
+          style={{ left: fill.x, top: fill.y, width: fill.d, height: fill.d }}
+          aria-hidden
+        />
+        <span className={styles.ctaArrow} aria-hidden>
+          <ArrowIcon />
+        </span>
+      </button>
+    </motion.div>
+  );
+}
 
 // NOTE: one video ships today (hero-draft3). Drop a per-restaurant clip in
 // /public/videos and point `video` at it — the background crossfades on its own.
@@ -230,14 +317,10 @@ export default function RestaurantsShowcase() {
               </ul>
             </div>
 
-            <button
-              type="button"
-              className={styles.cta}
+            <VisitArrow
               onClick={() => navigate("/")}
-              aria-label={`Visit ${item.name}`}
-            >
-              →
-            </button>
+              label={`Visit ${item.name}`}
+            />
           </div>
         </div>
       </section>
