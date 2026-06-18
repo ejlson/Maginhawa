@@ -1,7 +1,8 @@
 .section {
-  padding-top: clamp(40px, 8vh, 110px);
-  /* keep the form clear of the rule above the footer */
-  padding-bottom: clamp(64px, 11vh, 150px);
+  /* equal gap above the title (DarkZone top padding is 0) and below the submit
+     button before the footer rule */
+  padding-top: clamp(40px, 6.5vh, 88px);
+  padding-bottom: clamp(40px, 6.5vh, 88px);
 }
 
 .wordmark {

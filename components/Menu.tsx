@@ -1,6 +1,6 @@
 "use client";
 
-import { motion, AnimatePresence } from "framer-motion";
+import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import styles from "./Menu.module.css";
 import Placeholder from "./Placeholder";
@@ -69,17 +69,14 @@ export default function Menu({
         </nav>
 
         <div className={styles.thumb}>
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={active}
-              initial={{ opacity: 0, scale: 1.04 }}
-              animate={{ opacity: 1, scale: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-            >
-              <Placeholder ratio="16 / 9" label={ITEMS[active].label} />
-            </motion.div>
-          </AnimatePresence>
+          <motion.div
+            key={active}
+            initial={{ opacity: 0, scale: 1.04 }}
+            animate={{ opacity: 1, scale: 1 }}
+            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
+          >
+            <Placeholder ratio="16 / 9" label={ITEMS[active].label} />
+          </motion.div>
         </div>
       </motion.aside>
     </>

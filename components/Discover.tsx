@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import styles from "./Discover.module.css";
 import Placeholder from "./Placeholder";
@@ -179,22 +179,19 @@ export default function Discover() {
             </motion.div>
           </div>
 
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={item.name}
-              className={styles.text}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              {item.paras.map((para, i) => (
-                <p key={i} className={styles.textCol}>
-                  {para}
-                </p>
-              ))}
-            </motion.div>
-          </AnimatePresence>
+          <motion.div
+            key={item.name}
+            className={styles.text}
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            transition={{ duration: 0.4 }}
+          >
+            {item.paras.map((para, i) => (
+              <p key={i} className={styles.textCol}>
+                {para}
+              </p>
+            ))}
+          </motion.div>
         </div>
 
         <motion.nav

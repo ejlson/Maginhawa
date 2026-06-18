@@ -4,7 +4,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useRef } from "react";
 import styles from "./RestaurantLocations.module.css";
 import Placeholder from "./Placeholder";
-import RevealText from "./RevealText";
+import ViewAllButton from "./ViewAllButton";
 
 export default function RestaurantLocations() {
   const ref = useRef<HTMLElement>(null);
@@ -34,12 +34,9 @@ export default function RestaurantLocations() {
         </motion.div>
       </motion.div>
 
-      <h2 className={styles.heading}>
-        <RevealText
-          text="[ List of all the restaurant locations ]"
-          stagger={0.03}
-        />
-      </h2>
+      <div className={styles.cta}>
+        <ViewAllButton />
+      </div>
     </section>
   );
 }

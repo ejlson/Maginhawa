@@ -27,20 +27,15 @@
   border: none;
 }
 
-.heading {
+/* the View-All button, centred over the map showcase */
+.cta {
   position: absolute;
-  top: clamp(28px, 6vh, 64px);
-  left: 0;
-  right: 0;
-  text-align: center;
+  inset: 0;
   z-index: 2;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
 }
-
-.heading span {
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  font-size: var(--t-display);
-  line-height: var(--lh-display);
-  letter-spacing: var(--tr-display);
-  color: var(--maroon);
+.cta > * {
+  pointer-events: auto;
 }

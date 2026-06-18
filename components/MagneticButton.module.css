@@ -17,7 +17,8 @@
   font-family: var(--font-display);
   font-weight: 500;
   font-size: var(--t-h3);
-  line-height: var(--lh-heading);
+  /* tight line-height so the label and arrow share one optical centre */
+  line-height: 1;
   color: var(--cream);
   background: none;
   cursor: pointer;

@@ -3,7 +3,7 @@
   z-index: 2;
   background: var(--maroon);
   color: var(--cream);
-  padding-top: clamp(30px, 6vh, 80px);
+  padding-top: 0;
   padding-bottom: 0;
   overflow: hidden;
 }

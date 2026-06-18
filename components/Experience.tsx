@@ -6,7 +6,6 @@ import Loader from "./Loader";
 import Nav from "./Nav";
 import Menu from "./Menu";
 import Statement from "./Statement";
-import ViewAllButton from "./ViewAllButton";
 import Hero from "./Hero";
 import Discover from "./Discover";
 import RestaurantLocations from "./RestaurantLocations";
@@ -81,7 +80,6 @@ export default function Experience() {
           <div className="afterHero">
             <Statement />
             <Discover />
-            <ViewAllButton />
             <RestaurantLocations />
             <WhoWeAre />
             <Blog />
