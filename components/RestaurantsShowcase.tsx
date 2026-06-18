@@ -100,7 +100,6 @@ const RESTAURANTS = [
 ];
 
 const N = RESTAURANTS.length;
-const pad = (n: number) => String(n).padStart(2, "0");
 
 // restaurant marks
 const LOGOS: Record<string, string> = {
@@ -352,13 +351,6 @@ export default function RestaurantsShowcase() {
         {/* phrase · name wheel · visit link, centred */}
         <div className={styles.stage} data-hidden={view !== "wheel"}>
           <div className={styles.panel}>
-            <div className={styles.lead}>
-              <span className={styles.counter}>
-                {pad(active + 1)} / {pad(N)}
-              </span>
-              <span className={styles.cuisine}>{item.tag}</span>
-            </div>
-
             <div className={styles.wheel}>
               <button
                 type="button"

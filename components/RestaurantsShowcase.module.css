@@ -53,7 +53,7 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  padding: 0 clamp(20px, 7vw, 120px);
+  padding: 0 clamp(16px, 4vw, 64px);
 }
 
 /* crossfade between the two views (both stay mounted) */
@@ -280,30 +280,6 @@
   align-items: center;
   gap: clamp(16px, 2.4vw, 40px);
   --name-size: clamp(1.4rem, 2.6vw, 2.1rem);
-}
-
-/* counter + active cuisine on the left */
-.lead {
-  flex: 0 0 auto;
-  width: clamp(120px, 14vw, 200px);
-  display: flex;
-  flex-direction: column;
-  gap: 0.5em;
-  color: var(--cream);
-  user-select: none;
-}
-.counter {
-  font-family: var(--font-sans);
-  font-size: 0.78rem;
-  letter-spacing: 0.08em;
-  opacity: 0.6;
-  font-variant-numeric: tabular-nums;
-}
-.cuisine {
-  font-family: var(--font-serif);
-  font-size: clamp(0.95rem, 1.3vw, 1.2rem);
-  line-height: 1.25;
-  opacity: 0.92;
 }
 
 /* wheel column: up stepper · scroller(+band) · down stepper */
