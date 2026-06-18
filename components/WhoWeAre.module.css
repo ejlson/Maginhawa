@@ -80,15 +80,17 @@
 }
 
 .imageCol {
+  position: relative;
   display: flex;
   flex-direction: column;
 }
 
-/* Learn More button, beneath the image on the right */
-.cta {
-  margin-top: clamp(28px, 4vh, 56px);
-  display: flex;
-  justify-content: flex-end;
+/* Learn More button, overlaid in the image's bottom-right corner */
+.imageBtn {
+  position: absolute;
+  right: clamp(12px, 1.5vw, 20px);
+  bottom: clamp(12px, 1.5vw, 20px);
+  z-index: 2;
 }
 
 @media (max-width: 860px) {
@@ -108,8 +110,5 @@
   /* no cascade when the columns stack */
   .col {
     transform: none !important;
-  }
-  .cta {
-    justify-content: flex-start;
   }
 }

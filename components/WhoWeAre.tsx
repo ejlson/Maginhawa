@@ -79,11 +79,10 @@ export default function WhoWeAre() {
             <Parallax inset ratio="3 / 4" speed={0.16}>
               <Placeholder label="Image" />
             </Parallax>
+            <div className={styles.imageBtn}>
+              <MagneticButton label="Learn More About Us" theme="light" small />
+            </div>
           </Reveal>
-        </div>
-
-        <div className={styles.cta}>
-          <MagneticButton label="Learn More About Us" theme="light" small />
         </div>
       </div>
     </section>
