@@ -6,19 +6,19 @@
   background: rgba(12, 0, 0, 0.55);
 }
 
-/* panel flush to the very top-right corner so the nav X sits at its top-right */
+/* panel near the top-right corner (a small gap from the screen edges) */
 .panel {
   position: fixed;
-  top: 0;
-  right: 0;
+  top: clamp(10px, 1.6vh, 16px);
+  right: clamp(10px, 1.4vw, 16px);
   z-index: 76;
-  width: min(380px, 100vw);
+  width: min(380px, calc(100vw - 24px));
   /* matches the background of the section it opens over (light by default) */
   background: var(--cream);
   color: var(--maroon);
-  border-radius: 0 0 0 18px;
+  border-radius: 18px;
   box-shadow: -10px 28px 70px -28px rgba(18, 0, 0, 0.5);
-  padding: clamp(58px, 8vh, 84px) clamp(20px, 2vw, 30px) clamp(24px, 3.5vh, 36px);
+  padding: clamp(54px, 7.5vh, 78px) clamp(20px, 2vw, 30px) clamp(24px, 3.5vh, 36px);
   transform-origin: top right;
   overflow: hidden;
   will-change: transform, opacity;
