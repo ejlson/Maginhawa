@@ -1,45 +1,58 @@
 "use client";
 
 import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./RestaurantLocations.module.css";
-import Placeholder from "./Placeholder";
-import RevealText from "./RevealText";
+import ViewAllButton from "./ViewAllButton";
+import VideoBackdrop from "./VideoBackdrop";
+
+// a few restaurant clips cycle behind the View-All button
+const CLIPS = [
+  "/videos/bintang.mp4",
+  "/videos/cafemama.mp4",
+  "/videos/ramo.mp4",
+  "/videos/mamasons.mp4",
+];
 
 export default function RestaurantLocations() {
   const ref = useRef<HTMLElement>(null);
+  const [clip, setClip] = useState(0);
+
+  useEffect(() => {
+    const id = window.setInterval(
+      () => setClip((c) => (c + 1) % CLIPS.length),
+      7000
+    );
+    return () => window.clearInterval(id);
+  }, []);
+
+  // scroll-driven width expansion:
+  // 0 → video inset to match the page container (same as the rest of the content)
+  // 1 → video stretched edge to edge of the viewport
+  // CSS does the interpolation via the --expand custom property.
   const { scrollYProgress } = useScroll({
     target: ref,
-    offset: ["start end", "end start"],
+    offset: ["start end", "start start"],
   });
-
-  // a centre curtain opens as the section scrolls in
-  const clip = useTransform(
-    scrollYProgress,
-    [0.05, 0.42],
-    ["inset(48% 0% 48% 0%)", "inset(0% 0% 0% 0%)"]
-  );
-  // slow zoom-out + vertical drift behind it for parallax depth
-  const scale = useTransform(scrollYProgress, [0, 1], [1.35, 1.05]);
-  const y = useTransform(scrollYProgress, [0, 1], ["-6%", "6%"]);
+  const expand = useTransform(scrollYProgress, [0, 1], [0, 1]);
 
   return (
-    <section ref={ref} className={styles.section}>
-      <motion.div
-        className={styles.reveal}
-        style={{ clipPath: clip, WebkitClipPath: clip }}
-      >
-        <motion.div className={styles.bg} style={{ scale, y }}>
-          <Placeholder ratio="auto" label="Map / locations showcase" />
-        </motion.div>
-      </motion.div>
+    <motion.section
+      ref={ref}
+      className={styles.section}
+      id="locations"
+      style={{ "--expand": expand } as unknown as React.CSSProperties}
+    >
+      <div className={styles.reveal}>
+        <div className={styles.bg}>
+          <VideoBackdrop src={CLIPS[clip]} className={styles.locVideo} />
+        </div>
+        <div className={styles.locScrim} aria-hidden />
+      </div>
 
-      <h2 className={styles.heading}>
-        <RevealText
-          text="[ List of all the restaurant locations ]"
-          stagger={0.03}
-        />
-      </h2>
-    </section>
+      <div className={styles.cta}>
+        <ViewAllButton />
+      </div>
+    </motion.section>
   );
 }

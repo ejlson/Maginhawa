@@ -1,29 +1,43 @@
 import styles from "./Contact.module.css";
 import Reveal from "./Reveal";
-import RevealText from "./RevealText";
+import MagneticButton from "./MagneticButton";
 
 export default function Contact() {
   return (
     <section className={styles.section} id="contact-us">
       <div className="container">
-        <h2 className={styles.wordmark}>
-          <span className={styles.wline}>
-            <RevealText text="Contact" stagger={0.05} />
-          </span>
-          <span className={styles.wline}>
-            <RevealText text="Us" stagger={0.05} />
-          </span>
-        </h2>
+        <Reveal className={styles.wordmark} as="h2">
+          {/* SVG wordmark stretched to fill the full page width */}
+          <svg
+            className={styles.wordSvg}
+            viewBox="0 0 100 16"
+            preserveAspectRatio="xMidYMid meet"
+            role="img"
+            aria-label="Contact Us"
+          >
+            <text
+              className={styles.wordText}
+              x="0"
+              y="13.4"
+              fontSize="17"
+              textLength="100"
+              lengthAdjust="spacingAndGlyphs"
+            >
+              CONTACT US
+            </text>
+          </svg>
+        </Reveal>
 
         <div className={styles.grid}>
-          <div className={styles.info}>
+          <div className={`${styles.info} measure`}>
             <Reveal>
               <div className={styles.label}>Location</div>
               <p>+44 01234 5678</p>
             </Reveal>
             <Reveal delay={0.08}>
               <div className={styles.label}>Opening Times</div>
-              <p>Mon – Sun · 11:00 – 23:00</p>
+              <p>Mon – Sun</p>
+              <p>09:00 – 17:00</p>
             </Reveal>
           </div>
 
@@ -47,9 +61,9 @@ export default function Contact() {
                 <label>Description</label>
                 <input type="text" placeholder="Enter your description here" />
               </div>
-              <button type="submit" className={styles.submit}>
-                Submit
-              </button>
+              <div className={styles.submitRow}>
+                <MagneticButton label="Submit" type="submit" small hoverAccent />
+              </div>
             </form>
           </Reveal>
         </div>

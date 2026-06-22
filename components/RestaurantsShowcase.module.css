@@ -11,7 +11,7 @@
   top: 0;
   height: 100svh;
   overflow: hidden;
-  color: #fff;
+  color: var(--cream);
   z-index: 0;
 }
 
@@ -28,21 +28,21 @@
   width: 100%;
   height: 100%;
   object-fit: cover;
-  opacity: 0;
-  filter: brightness(0.55);
-  transition: opacity 1s ease;
-}
-.bgVideo[data-active="true"] {
-  opacity: 1;
 }
 
-/* darken + soft centre glow so the white type stays legible */
+/* darken the footage — heavier on the left where the names sit — so the cream
+   type stays legible over any clip */
 .scrim {
   position: absolute;
   inset: 0;
   background:
-    radial-gradient(120% 90% at 50% 50%, rgba(0, 0, 0, 0) 38%, rgba(0, 0, 0, 0.5)),
-    linear-gradient(rgba(0, 0, 0, 0.32), rgba(0, 0, 0, 0.42));
+    linear-gradient(
+      to right,
+      rgba(18, 0, 0, 0.78) 0%,
+      rgba(18, 0, 0, 0.4) 45%,
+      rgba(18, 0, 0, 0.18) 100%
+    ),
+    linear-gradient(rgba(18, 0, 0, 0.2), rgba(18, 0, 0, 0.4));
 }
 
 /* ---- the name scroller, pinned to the left ---- */
@@ -53,37 +53,293 @@
   display: flex;
   align-items: center;
   justify-content: flex-start;
-  padding: 0 clamp(20px, 7vw, 120px);
+  padding: 0 clamp(16px, 4vw, 64px);
 }
 
-/* "Visit" · name wheel · arrow button — laid out in a left-aligned row */
+/* crossfade between the two views (both stay mounted) */
+.stage,
+.cards {
+  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.stage[data-hidden="true"] {
+  opacity: 0;
+  transform: translateX(-24px);
+  pointer-events: none;
+}
+.cards[data-hidden="true"] {
+  opacity: 0;
+  transform: translateX(24px);
+  pointer-events: none;
+}
+
+/* ---- card-list view: photo grid on a clean cream surface (fits one screen) */
+.cards {
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  background: var(--cream);
+  color: var(--maroon);
+  overflow: hidden;
+  /* extra bottom space so the view toggle never covers a card */
+  padding: clamp(64px, 10vh, 100px) clamp(16px, 3vw, 48px)
+    clamp(74px, 11vh, 104px);
+}
+.cardsGrid {
+  display: grid;
+  grid-template-columns: repeat(4, 1fr);
+  grid-auto-rows: 1fr;
+  gap: clamp(10px, 1.2vw, 20px);
+  height: 100%;
+  min-height: 0;
+}
+
+/* each card is a single photo tile with everything overlaid inside it */
+.card {
+  position: relative;
+  min-height: 0;
+  overflow: hidden;
+  border-radius: 5px;
+}
+
+.cardImg {
+  position: absolute;
+  inset: 0;
+}
+.cardImg img,
+.cardImg > div {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+.cardImg img {
+  display: block;
+  /* dim the photo so the cream overlay text/buttons stay legible */
+  filter: brightness(0.72);
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.card:hover .cardImg img {
+  transform: scale(1.05);
+}
+
+.cardOverlay {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 1;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.45em;
+  padding: clamp(14px, 1.3vw, 22px);
+  color: var(--cream);
+  background: linear-gradient(
+    to top,
+    rgba(18, 0, 0, 0.9),
+    rgba(18, 0, 0, 0.55) 48%,
+    rgba(18, 0, 0, 0) 100%
+  );
+}
+.cardMark {
+  height: clamp(16px, 1.4vw, 24px);
+  width: auto;
+  max-width: 80%;
+  object-fit: contain;
+  /* render any mark as a clean cream silhouette over the photo */
+  filter: brightness(0) invert(1);
+}
+/* Bintang's mark reads small at the shared height — give it a touch more */
+.cardMarkLg {
+  height: clamp(24px, 2.1vw, 36px);
+}
+.cardName {
+  font-family: "contralto-small", var(--font-serif);
+  font-size: clamp(1.1rem, 1.5vw, 1.4rem);
+}
+.cardLoc {
+  font-family: var(--font-sans);
+  font-size: 0.72rem;
+  letter-spacing: 0.04em;
+  opacity: 0.8;
+}
+
+.cardActions {
+  display: flex;
+  flex-wrap: wrap;
+  gap: 5px;
+  margin-top: 0.25em;
+}
+.cardBtn {
+  font-family: var(--font-sans);
+  font-size: 0.66rem;
+  letter-spacing: 0.02em;
+  padding: 0.45em 0.85em;
+  border: 1px solid rgba(248, 243, 234, 0.55);
+  border-radius: 999px;
+  background: none;
+  color: var(--cream);
+  cursor: pointer;
+  white-space: nowrap;
+  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.cardBtn:hover {
+  background: var(--cream);
+  color: var(--maroon);
+  border-color: var(--cream);
+}
+.cardBtnSolid {
+  background: var(--cream);
+  color: var(--maroon);
+  border-color: var(--cream);
+}
+.cardBtnSolid:hover {
+  opacity: 0.85;
+}
+
+/* ---- view switch, bottom-left ---- */
+.viewToggle {
+  position: absolute;
+  left: clamp(20px, 5vw, 60px);
+  bottom: clamp(18px, 4vh, 40px);
+  z-index: 5;
+  display: flex;
+  gap: 4px;
+  padding: 4px;
+  border: 1px solid rgba(248, 243, 234, 0.28);
+  border-radius: 999px;
+  background: rgba(18, 0, 0, 0.42);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+}
+/* sliding highlight behind the active icon */
+.toggleThumb {
+  position: absolute;
+  left: 4px;
+  top: 4px;
+  width: 34px;
+  height: 34px;
+  border-radius: 999px;
+  background: rgba(248, 243, 234, 0.18);
+}
+.viewToggle button {
+  position: relative;
+  z-index: 1;
+  width: 34px;
+  height: 34px;
+  display: grid;
+  place-items: center;
+  border: none;
+  border-radius: 999px;
+  background: none;
+  color: var(--cream);
+  opacity: 0.55;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.viewToggle button[data-active="true"] {
+  opacity: 1;
+}
+.viewToggle svg {
+  width: 16px;
+  height: 16px;
+}
+
+/* below the one-screen breakpoint the grid scrolls with fixed-aspect photos */
+@media (max-width: 980px) {
+  .cards {
+    overflow-y: auto;
+    overscroll-behavior: contain;
+  }
+  .cardsGrid {
+    grid-template-columns: repeat(3, 1fr);
+    grid-auto-rows: auto;
+    height: auto;
+  }
+  .cardImg {
+    flex: none;
+    aspect-ratio: 3 / 4;
+  }
+}
+@media (max-width: 700px) {
+  .cardsGrid {
+    grid-template-columns: repeat(2, 1fr);
+  }
+}
+@media (max-width: 460px) {
+  .cardsGrid {
+    grid-template-columns: 1fr;
+  }
+}
+
+/* lead · name wheel (+ steppers) · actions — left-aligned row */
 .panel {
   display: flex;
   flex-direction: row;
   align-items: center;
-  gap: clamp(18px, 3vw, 52px);
+  gap: clamp(16px, 2.4vw, 40px);
+  --name-size: clamp(1.4rem, 2.6vw, 2.1rem);
 }
 
-.phrase {
+/* wheel column: up stepper · scroller(+band) · down stepper */
+.wheel {
   flex: 0 0 auto;
-  font-family: "contralto-small", var(--font-serif);
-  font-size: clamp(1.3rem, 2.4vw, 2rem);
-  letter-spacing: 0.01em;
-  color: #fff;
-  opacity: 0.92;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: clamp(2px, 0.6vh, 8px);
+}
+.scrollWrap {
+  position: relative;
+}
+/* selection window over the centre name */
+.selBand {
+  position: absolute;
+  left: -0.4em;
+  right: -0.4em;
+  top: 50%;
+  height: var(--row);
+  transform: translateY(-50%);
+  border-top: 1px solid rgba(248, 243, 234, 0.28);
+  border-bottom: 1px solid rgba(248, 243, 234, 0.28);
+  pointer-events: none;
+}
+.step {
+  display: grid;
+  place-items: center;
+  width: 100%;
+  height: 22px;
+  border: none;
+  background: none;
+  color: var(--cream);
+  opacity: 0.5;
+  cursor: pointer;
+  transition: opacity 0.3s ease;
+  -webkit-tap-highlight-color: transparent;
+}
+.step:hover {
+  opacity: 1;
+}
+.step svg {
+  width: 16px;
+  height: 16px;
+}
+
+.actLabel {
   white-space: nowrap;
-  user-select: none;
 }
 
 /* ---- the looping vertical name scroller (shows ~5 rows) ---- */
 .scroller {
   position: relative;
+  z-index: 1;
   flex: 0 0 auto;
   width: max-content;
   padding-right: 0.4em;
+  overscroll-behavior: contain;
   height: calc(var(--row) * 5);
   overflow-y: auto;
-  scroll-snap-type: y mandatory;
   scrollbar-width: none;
   /* fade the top/bottom edges of the window */
   -webkit-mask-image: linear-gradient(
@@ -121,11 +377,13 @@
   padding: 0;
   cursor: pointer;
   font-family: "contralto-small", var(--font-serif);
-  font-size: clamp(1.4rem, 2.6vw, 2.1rem);
-  line-height: 1;
+  font-size: var(--name-size);
+  line-height: var(--lh-heading);
   letter-spacing: -0.01em;
   text-align: left;
-  color: #fff;
+  color: var(--cream);
+  /* legible over the bright window */
+  text-shadow: 0 1px 14px rgba(18, 0, 0, 0.5);
   white-space: nowrap;
   transform-origin: left center;
   /* opacity/scale are driven per-frame in JS — no CSS transition (it would
@@ -136,40 +394,56 @@
   -webkit-tap-highlight-color: transparent;
 }
 .name:focus-visible {
-  outline: 1px solid rgba(255, 255, 255, 0.6);
+  outline: 1px solid rgba(248, 243, 234, 0.6);
   outline-offset: 4px;
 }
 .nameActive {
   font-weight: 500;
 }
 
-/* ---- round arrow button, beside the centre of the list ---- */
-.cta {
+/* ---- per-restaurant actions beside the wheel ---- */
+.actions {
   flex: 0 0 auto;
-  display: grid;
-  place-items: center;
-  width: clamp(46px, 4vw, 58px);
-  height: clamp(46px, 4vw, 58px);
-  padding: 0;
-  border: 1px solid rgba(255, 255, 255, 0.55);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(8px, 1vh, 12px);
+}
+.actBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.6em 1.3em;
+  border: 1px solid rgba(248, 243, 234, 0.5);
   border-radius: 999px;
   background: none;
+  color: var(--cream);
+  font-family: var(--font-sans);
+  font-size: 0.82rem;
+  letter-spacing: 0.02em;
+  white-space: nowrap;
   cursor: pointer;
-  font-family: "contralto-small", var(--font-serif);
-  font-size: clamp(1.1rem, 1.6vw, 1.4rem);
-  line-height: 1;
-  color: #fff;
-  transition: background 0.4s ease, color 0.4s ease, transform 0.4s ease;
+  transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease;
   -webkit-tap-highlight-color: transparent;
 }
-.cta:hover {
-  background: #fff;
+.actBtn:hover {
+  background: var(--cream);
   color: var(--maroon);
+  border-color: var(--cream);
+}
+.actBtn span {
+  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+}
+.actBtn:hover span {
   transform: translateX(4px);
 }
-.cta:focus-visible {
-  outline: 1px solid rgba(255, 255, 255, 0.6);
-  outline-offset: 4px;
+.actBtnSolid {
+  background: var(--cream);
+  color: var(--maroon);
+  border-color: var(--cream);
+}
+.actBtnSolid:hover {
+  opacity: 0.88;
 }
 
 @media (prefers-reduced-motion: reduce) {

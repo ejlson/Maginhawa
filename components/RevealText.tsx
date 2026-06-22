@@ -1,7 +1,7 @@
 "use client";
 
-import { motion, useInView } from "framer-motion";
-import { useRef } from "react";
+import { motion, useInView, useReducedMotion } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 
 /**
  * Splits a string into words and reveals them one-by-one (mask + rise)
@@ -21,6 +21,14 @@ export default function RevealText({
   const ref = useRef<HTMLSpanElement>(null);
   const inView = useInView(ref, { once: true, margin: "-10% 0px -10% 0px" });
   const words = text.split(" ");
+  // reduced motion: no per-word rise — render the line in place. Defer reading
+  // the media query until after mount so SSR (always false) and the first
+  // client render agree, avoiding a hydration mismatch on the `transform`.
+  const prefersReduced = useReducedMotion();
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const reduce = mounted ? prefersReduced : false;
+  const hidden = reduce ? "0%" : "125%";
 
   return (
     <span ref={ref} className={className} aria-label={text}>
@@ -38,8 +46,12 @@ export default function RevealText({
         >
           <motion.span
             style={{ display: "inline-block", willChange: "transform" }}
-            initial={{ y: "125%" }}
-            animate={inView ? { y: "0%" } : { y: "125%" }}
+            initial={{ transform: `translateY(${hidden})` }}
+            animate={
+              inView
+                ? { transform: "translateY(0%)" }
+                : { transform: `translateY(${hidden})` }
+            }
             transition={{
               duration: 0.8,
               delay: delay + i * stagger,

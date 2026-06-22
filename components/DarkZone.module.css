@@ -3,7 +3,12 @@
   z-index: 2;
   background: var(--maroon);
   color: var(--cream);
-  padding-top: clamp(30px, 6vh, 80px);
+  /* chapter top — DarkZone is the shift from editorial content to the
+     conversation: contact form, FAQ, leave-a-review. The colour change
+     itself carries some of that work, but the breath above sells it. */
+  padding-top: var(--section-y-lg);
+  /* Footer owns its own bottom padding — keep this at zero so the maroon
+     ends right below "By EJ" instead of trailing on. */
   padding-bottom: 0;
   overflow: hidden;
 }

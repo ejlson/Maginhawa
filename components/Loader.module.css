@@ -4,15 +4,20 @@
   z-index: 100;
   overflow: hidden;
   pointer-events: none;
+  /* easing matching the SMOOTH cubic-bezier used by the TSX motion */
+  --ease-smooth: cubic-bezier(0.62, 0, 0.2, 1);
 }
 
-/* The transparent "window". Its huge cream box-shadow paints everything
-   OUTSIDE the rounded rect, so as the rect grows it reveals the hero
-   video sitting behind the overlay. */
-.window {
+/* Full-viewport cream overlay. A rounded-rect hole is punched out of it with
+   an animated `clip-path: path()` (fill-rule: evenodd); as the hole grows it
+   reveals the hero video sitting behind the overlay. Only `clip-path` (and
+   `opacity` on the cross-fade paths) animates, so the reveal stays GPU
+   composited. */
+.reveal {
   position: absolute;
-  box-shadow: 0 0 0 100vmax var(--cream);
-  will-change: top, left, right, bottom;
+  inset: 0;
+  background: var(--cream);
+  will-change: clip-path;
 }
 
 /* the whole word "MGNHW" is centred as one unit; the two groups sit
@@ -28,10 +33,10 @@
 .group,
 .center {
   display: flex;
-  font-family: var(--font-display);
+  font-family: var(--font-display-big);
   font-weight: 400;
   font-size: clamp(2.6rem, 8vw, 5.5rem);
-  line-height: 1;
+  line-height: var(--lh-display);
   color: var(--maroon);
   will-change: transform, opacity;
 }
@@ -63,9 +68,11 @@
 }
 
 .bar {
+  width: 100%;
   height: 100%;
   background: var(--maroon);
-  transition: width 0.3s ease;
+  transform-origin: left;
+  transition: transform 0.3s var(--ease-smooth);
 }
 
 .count {
@@ -73,7 +80,7 @@
   bottom: 14px;
   right: var(--pad-x);
   font-family: var(--font-sans);
-  font-size: 0.72rem;
-  letter-spacing: 0.12em;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
   color: var(--maroon);
 }

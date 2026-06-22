@@ -21,8 +21,8 @@ export default function Hero({ started }: { started: boolean }) {
       <div className={styles.titleWrap}>
         <motion.span
           className={styles.titleInner}
-          initial={{ y: "110%" }}
-          animate={started ? { y: "0%" } : { y: "110%" }}
+          initial={{ transform: "translateY(110%)" }}
+          animate={{ transform: started ? "translateY(0%)" : "translateY(110%)" }}
           transition={{ duration: 1, ease: [0.22, 1, 0.36, 1], delay: 0.1 }}
         >
           <svg

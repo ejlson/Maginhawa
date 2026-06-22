@@ -1,6 +1,8 @@
 .section {
-  margin-top: clamp(60px, 11vh, 180px);
-  padding: clamp(70px, 11vh, 150px) 0 clamp(80px, 12vh, 160px);
+  margin-top: 0;
+  /* chapter top (real break from the Restaurants chapter), related bottom
+     (WhoWeAre and Press are paired: Maginhawa in its own words / others') */
+  padding: var(--section-y-lg) 0 var(--section-y-sm);
 }
 
 /* statement block (eyebrow inline + big indented statement) — matches the
@@ -15,17 +17,17 @@
   left: 0;
   white-space: nowrap;
   font-family: var(--font-sans);
-  font-size: 0.78rem;
-  letter-spacing: 0.02em;
-  opacity: 0.7;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  color: var(--saffron);
 }
 
 .statement {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(1.9rem, 4.6vw, 4rem);
-  line-height: 1.08;
-  letter-spacing: -0.006em;
+  font-size: var(--t-display);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
   color: var(--maroon);
 }
 
@@ -48,70 +50,144 @@
   }
 }
 
+/* ---- two-column body, golden ratio split ----
+   left: vertical 01 / 02 / 03 stack with small gaps — text gets φ
+   right: narrower portrait photo, stretched so its bottom edge meets the
+   bottom of the third paragraph                                          */
 .body {
-  margin-top: clamp(40px, 6vh, 80px);
+  margin-top: clamp(36px, 6vh, 80px);
   display: grid;
-  grid-template-columns: repeat(3, 1fr) 1.1fr;
-  gap: clamp(18px, 2.4vw, 44px);
-  align-items: start;
+  grid-template-columns: minmax(0, 1.618fr) minmax(0, 1fr);
+  gap: clamp(40px, 5vw, 96px);
+  align-items: stretch;
+}
+
+.textStack {
+  display: flex;
+  flex-direction: column;
+  /* paragraphs settle at the bottom of the column so 03's bottom edge
+     lines up with the image's bottom edge */
+  justify-content: flex-end;
+  /* gap above the hairline — matched by the col padding-top below the line */
+  gap: clamp(10px, 1.4vh, 18px);
+  max-width: 50ch;
+}
+
+/* hairline rule between 01 / 02 / 03 — gap value above and below the rule
+   matches the textStack gap, so the breathing room is symmetric */
+.textStack > *:not(:first-child) .col {
+  border-top: 1px solid var(--rule);
+  padding-top: clamp(10px, 1.4vh, 18px);
 }
 
 .col {
-  font-family: var(--font-sans);
-  font-size: 0.85rem;
-  line-height: 1.55;
-  opacity: 0.82;
-}
-
-.cta {
+  position: relative;
   display: flex;
-  align-items: center;
-  gap: 12px;
-  margin: clamp(48px, 8vh, 110px) 0;
-  justify-content: center;
+  flex-direction: column;
+  gap: clamp(10px, 1.4vh, 16px);
+  outline: none;
 }
 
-.pill,
-.circle {
-  background: var(--maroon);
-  color: var(--cream);
-  border: none;
-  border-radius: 999px;
-  font-family: var(--font-serif);
+/* big numeral + title sit on one baseline */
+.colHead {
+  display: flex;
+  align-items: baseline;
+  gap: 0.5em;
+  color: var(--maroon);
 }
 
-.pill {
-  padding: 1.05em 1.9em;
-  font-size: 1.05rem;
+.num {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(2.4rem, 4.8vw, 4rem);
+  line-height: 0.9;
+  letter-spacing: -0.01em;
+  opacity: 0.22;
+  transition: opacity 0.5s ease;
+}
+.colActive .num {
+  opacity: 0.55;
 }
 
-.pill u {
-  text-underline-offset: 3px;
+.title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.1rem, 1.5vw, 1.4rem);
+  letter-spacing: -0.01em;
 }
 
-.circle {
-  width: 3.4em;
-  height: 3.4em;
-  font-size: 1.05rem;
-  display: grid;
-  place-items: center;
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+.colBody {
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
+  opacity: 0.82;
+  max-width: 44ch;
 }
 
-.circle:hover {
-  transform: translateX(4px);
+/* ---- image column ---- */
+.imageCol {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  min-height: 0;
 }
 
+/* parallax frame sets the row height via a portrait aspect ratio; the text
+   stack on the left justifies to the bottom so both columns share an edge */
+.imgFrameFull {
+  flex: none;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 3;
+}
+
+.photoStack {
+  position: relative;
+  width: 100%;
+  height: 100%;
+}
+.photo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  transition: opacity 0.6s ease;
+}
+
+/* bottom wash so the button stays legible over any photo */
+.photoScrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    to top,
+    rgba(18, 0, 0, 0.55),
+    rgba(18, 0, 0, 0) 38%
+  );
+}
+
+/* Learn More button, overlaid in the image's bottom-right corner */
+.imageBtn {
+  position: absolute;
+  right: clamp(12px, 1.5vw, 20px);
+  bottom: clamp(12px, 1.5vw, 20px);
+  z-index: 2;
+}
+
+/* ---- responsive ---- */
 @media (max-width: 860px) {
   .body {
-    grid-template-columns: 1fr 1fr;
-  }
-}
-@media (max-width: 640px) {
-  .body {
     grid-template-columns: 1fr;
+    gap: clamp(32px, 5vh, 64px);
   }
-  .bigType .grp {
-    text-align: left;
+  /* mobile: photo decouples from the text height and sits as a 4:5 portrait */
+  .imgFrameFull {
+    flex: none;
+    aspect-ratio: 4 / 5;
+  }
+  .textStack {
+    max-width: none;
   }
 }

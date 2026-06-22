@@ -1,6 +1,6 @@
 "use client";
 
-import { AnimatePresence, motion, useScroll, useTransform } from "framer-motion";
+import { motion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import styles from "./Discover.module.css";
 import Placeholder from "./Placeholder";
@@ -11,6 +11,7 @@ const ITEMS = [
     tag: "Filipino Fusion Restaurant",
     location: "93 Kentish Town Rd, London NW1",
     image: "/images/bintang.jpg",
+    logo: "/logo/bintang.png",
     paras: [
       "Originally opened by Chef Omar's parents, Bintang is a renowned Filipino fusion restaurant located at 93 Kentish Town Road, London NW1 8NY.",
       "Established in 1987, it has been a staple in the Camden Town dining scene, offering a blend of Malaysian, Indonesian, Japanese, Vietnamese, and Filipino cuisines.",
@@ -21,6 +22,7 @@ const ITEMS = [
     tag: "Modern Filipino Bistro",
     location: "Camden, London",
     image: "/images/belly.jpg",
+    logo: "/logo/belly.png",
     paras: [
       "Belly is a modern Filipino bistro pulling from Chef Omars rich background from the Philippines and with cooking techniques from France and Japan.",
       "A perfect blend of cultures all in one place going right to the Belly (.)",
@@ -31,6 +33,7 @@ const ITEMS = [
     tag: "London's First Filipino Ice Cream Parlor",
     location: "Camden · Soho · Shoreditch, London",
     image: null,
+    logo: "/logo/mamasons.png",
     paras: [
       "Mamasons Dirty Ice Cream, London's first Filipino ice cream parlour, was founded in 2017.",
       "Inspired by the traditional 'dirty ice cream' sold by street vendors in Manila, the founders aimed to introduce authentic Filipino flavours to London.",
@@ -42,6 +45,7 @@ const ITEMS = [
     tag: "Filipino x Japanese Café",
     location: "London",
     image: "/images/cafemama.jpg",
+    logo: "/logo/cafemama.png",
     paras: [
       "Cafe Mama&sons aims to be apart of your daily life offering you a daily exciting alternative to the boring croissant or pre packaged sandwich.",
       "We offer hand crafted Sandos all with different and exciting fillings from your classic egg salad to the decadent hearty corned beef croquette you wont be dissapointed.",
@@ -53,6 +57,7 @@ const ITEMS = [
     tag: "Caribbean Cuisine",
     location: "85 Kentish Town Rd, London NW1",
     image: "/images/guanabana.jpg",
+    logo: "/logo/guanabana.png",
     paras: [
       "A vibrat, halal-certified Caribbean and Latin American restaurant located at 85 Kentish Town Road in Camden, London NW1 8NY.",
       "Established in 2007, it was among the first in the city to blends Latin-Caribbean flavours, Guanabana is renowned for its 'Island Roast', a Caribbean twist on the traditional Sunday roast, featuring oak-smoked jerk chicken or grilled beef, accompanied by sides like sweet plantains, roasted potatoes, and spicy jerk gravy.",
@@ -63,6 +68,7 @@ const ITEMS = [
     tag: "Filipino-Japanese Fusion Restaurant",
     location: "Kentish Town · Soho, London",
     image: "/images/ramo.jpg",
+    logo: "/logo/ramo.png",
     paras: [
       "The world's first Filipino-Japaense ramen joint. First opened in Kentish Town, London, in 2018, offering a unique blend of traditional Japaense ramen with Filipino culinary influences.",
       "In 2021, Ramo Ramen expanded to a second location in Soho, London, further solidifying its presence in the city's vibrant food scene.",
@@ -73,6 +79,7 @@ const ITEMS = [
     tag: "Caribbean Takeaway",
     location: "London",
     image: "/images/hoowood.jpg",
+    logo: "/logo/hoodwood.png",
     paras: [
       "Hoodwood is your go-to neighborhood Caribbean takeaway, serving up bold, smoky flavors with a true taste of the islands. We specialize in oak-smoked chicken plates, slow-cooked over an open flame for a deep, rich, and aromatic flavor.",
       "Our menu also features handmade Caribbean patties, packed with flavorful fillings and wrapped in a perfectly golden, flaky crust. Whether you're after a quick bite or a hearty meal, Hoodwood is all about honest, fire-kissed cooking that brings people together.",
@@ -113,6 +120,8 @@ export default function Discover() {
     offset: ["start end", "end start"],
   });
   const listY = useTransform(scrollYProgress, (v) => v * travel.current);
+  // the photo drifts within its fixed frame as the page scrolls
+  const imgY = useTransform(scrollYProgress, [0, 1], [-30, 30]);
 
   const select = (i: number) => {
     if (i === active) return;
@@ -120,32 +129,54 @@ export default function Discover() {
     setSeq((s) => s + 1);
   };
 
-  // a full "card" — image + its title/tag/line/buttons — so they reveal
-  // together under the sliding mask
+  // a full "card" — image + title/tag/line at top, descriptive paragraphs
+  // at the bottom; both reveal together under the sliding mask. Action
+  // buttons (Menu / Book a Table / Learn More) live outside the image.
   const renderCard = (it: (typeof ITEMS)[number]) => (
     <>
       {it.image ? (
-        <img className={styles.img} src={it.image} alt={it.name} />
+        <motion.img
+          className={styles.img}
+          src={it.image}
+          alt={it.name}
+          style={{ y: imgY, scale: 1.16 }}
+        />
       ) : (
         <Placeholder ratio="auto" label={it.name} />
       )}
       <div className={styles.overlay}>
-        <div className={styles.ovHead}>
-          <span className={styles.ovTitle}>{it.name}</span>
-          <span className={styles.ovTag}>{it.tag}</span>
+        <div className={styles.ovTop}>
+          <div className={styles.ovHead}>
+            <span
+              className={styles.ovLogo}
+              style={{ "--ov-logo-url": `url(${it.logo})` } as React.CSSProperties}
+              role="img"
+              aria-label={it.name}
+            />
+            <span className={styles.ovTag}>{it.tag}</span>
+          </div>
         </div>
-        <span className={styles.ovLine} />
-        <div className={styles.ovRow}>
-          <button type="button" className={styles.ovMenu}>
-            Menu
-          </button>
+        <div className={styles.ovBottom}>
+          <span className={styles.ovLine} />
+          <div className={styles.ovText}>
+            {it.paras.map((p, i) => (
+              <p key={i} className={styles.ovTextCol}>
+                {p}
+              </p>
+            ))}
+          </div>
           <div className={styles.ovActions}>
-            <a href="#contact-us" className={styles.btnGhost}>
-              Book a Table
-            </a>
-            <a href="#about-us" className={styles.btnSolid}>
-              Learn More
-            </a>
+            <button type="button" className={styles.ovMenu}>
+              Menu
+            </button>
+            <div className={styles.ovActGroup}>
+              <a href="#contact-us" className={styles.btnGhost}>
+                Book a Table
+              </a>
+              <a href="#about-us" className={styles.btnSolid}>
+                Learn More
+              </a>
+            </div>
           </div>
         </div>
       </div>
@@ -179,22 +210,6 @@ export default function Discover() {
             </motion.div>
           </div>
 
-          <AnimatePresence mode="wait">
-            <motion.div
-              key={item.name}
-              className={styles.text}
-              initial={{ opacity: 0 }}
-              animate={{ opacity: 1 }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.4 }}
-            >
-              {item.paras.map((para, i) => (
-                <p key={i} className={styles.textCol}>
-                  {para}
-                </p>
-              ))}
-            </motion.div>
-          </AnimatePresence>
         </div>
 
         <motion.nav

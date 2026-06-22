@@ -14,6 +14,11 @@
   --placeholder-line: #c9c3b6;
   --rule: rgba(47, 0, 0, 0.55);
 
+  /* warm saffron accent — used sparingly on eyebrow labels, the "Latest" tag,
+     and link hover states. Food-tied (turmeric / annatto / scotch bonnet);
+     pairs warm-on-warm with the maroon and lifts off the cream. */
+  --saffron: #c97e3f;
+
   --font-display: "contralto-medium", var(--font-fraunces), "Times New Roman", serif;
   --font-serif: var(--font-fraunces), Georgia, serif;
   --font-sans: var(--font-inter), -apple-system, "Helvetica Neue", Arial, sans-serif;
@@ -46,7 +51,27 @@
   --tr-label: 0.07em;
 
   /* comfortable measure for long-form copy */
-  --measure: 66ch;
+  --measure: 62ch;
+
+  /* fluid spacing scale — shared rhythm for gaps & section padding */
+  --space-2xs: 8px;
+  --space-xs: clamp(10px, 1.2vw, 14px);
+  --space-sm: clamp(14px, 1.6vw, 20px);
+  --space-md: clamp(20px, 2.4vw, 32px);
+  --space-lg: clamp(32px, 4vw, 56px);
+  --space-xl: clamp(48px, 6vw, 88px);
+  --space-2xl: clamp(72px, 9vw, 128px);
+  --space-3xl: clamp(112px, 14vw, 200px);
+
+  /* vertical section rhythm — three semantic tiers, used by every section's
+     padding-block. The gap between two adjacent sections is the sum of their
+     bordering tokens. Choose by the *relationship* between sections:
+       --section-y-sm  → related (sections that flow together as one chapter)
+       --section-y     → section (default breath between distinct sections)
+       --section-y-lg  → chapter (a real break to a new subject)             */
+  --section-y-sm: clamp(48px, 7vh, 112px);
+  --section-y: clamp(72px, 10vh, 160px);
+  --section-y-lg: clamp(120px, 16vh, 240px);
 
   /* all content aligns to the same edges as the giant hero wordmark */
   --pad-x: clamp(8px, 1.4vw, 22px);
@@ -62,6 +87,8 @@
 html {
   -webkit-font-smoothing: antialiased;
   text-rendering: optimizeLegibility;
+  /* no rubber-band / scroll past the very top or bottom of the page */
+  overscroll-behavior: none;
 }
 
 body {
@@ -70,6 +97,7 @@ body {
   font-family: var(--font-sans);
   font-size: 16px;
   line-height: 1.4;
+  overscroll-behavior: none;
   /* clip (not hidden) so position: sticky still works */
   overflow-x: clip;
 }
@@ -107,7 +135,7 @@ button {
 }
 
 ::selection {
-  background: var(--maroon);
+  background: var(--saffron);
   color: var(--cream);
 }
 
@@ -117,12 +145,28 @@ body.is-loading {
   height: 100vh;
 }
 
+/* no scrollbar on the right — smooth scroll handles movement */
+html {
+  scrollbar-width: none; /* Firefox */
+  -ms-overflow-style: none; /* legacy Edge */
+}
+html::-webkit-scrollbar {
+  width: 0;
+  height: 0;
+  display: none;
+}
+
 /* ---- shared layout helpers ---- */
 .container {
   width: 100%;
-  max-width: none;
+  max-width: var(--maxw);
   margin-inline: auto;
   padding-inline: var(--pad-x);
+}
+
+/* constrain long-form, single-column prose to a comfortable reading measure */
+.measure {
+  max-width: var(--measure);
 }
 
 /* cream layer that scrolls up over the pinned (sticky) hero — parallax */

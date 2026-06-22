@@ -1,57 +1,106 @@
-/* transparent click-catcher so clicking outside closes the panel */
+/* dims the page behind the menu and catches outside clicks */
 .backdrop {
   position: fixed;
   inset: 0;
   z-index: 74;
-  background: transparent;
+  background: rgba(12, 0, 0, 0.55);
 }
 
-/* small panel anchored to the top-right, slides in from the right */
+/* panel near the top-right corner (a small gap from the screen edges) */
 .panel {
+  --m-pad-t: clamp(40px, 5.5vh, 56px);
+  --m-pad-x: clamp(14px, 1.6vw, 20px);
+  --m-pad-b: clamp(16px, 2.2vh, 24px);
   position: fixed;
-  top: clamp(54px, 7vh, 70px);
-  right: clamp(12px, 1.6vw, 22px);
+  top: clamp(6px, 1vh, 10px);
+  right: clamp(6px, 1vw, 10px);
   z-index: 76;
-  width: min(370px, calc(100vw - 24px));
-  /* clear liquid glass — mostly transparent, the blur does the work */
-  background: rgba(248, 243, 234, 0.2);
-  -webkit-backdrop-filter: blur(30px) saturate(180%);
-  backdrop-filter: blur(30px) saturate(180%);
-  border: 1px solid rgba(255, 255, 255, 0.35);
-  border-radius: 20px;
-  box-shadow: 0 28px 70px -24px rgba(47, 0, 0, 0.4),
-    inset 0 1px 0 rgba(255, 255, 255, 0.4);
-  padding: clamp(18px, 2vw, 26px);
+  width: min(440px, calc(100vw - 16px));
+  /* list on the left, portrait image resting bottom-right */
+  display: flex;
+  align-items: stretch;
+  /* matches the background of the section it opens over (light by default) */
+  background: var(--cream);
+  color: var(--maroon);
+  border-radius: 18px;
+  box-shadow: -10px 28px 70px -28px rgba(18, 0, 0, 0.5);
+  padding: var(--m-pad-t) var(--m-pad-x) var(--m-pad-b);
   transform-origin: top right;
   overflow: hidden;
   will-change: transform, opacity;
 }
 
+/* over the hero / maroon sections */
+.panel.dark {
+  background: var(--maroon);
+  color: var(--cream);
+}
+
 .list {
+  flex: 1 1 auto;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
+  justify-content: center;
   gap: clamp(1px, 0.3vh, 5px);
 }
 
+/* vertical rule between the list and the image — sits closer to the image */
+.divider {
+  flex: none;
+  align-self: stretch;
+  width: 1px;
+  background: currentColor;
+  opacity: 0.22;
+  margin-left: clamp(18px, 3vw, 34px);
+  margin-right: clamp(8px, 1.2vw, 13px);
+}
+
 .item {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
   font-family: var(--font-display);
   font-weight: 500;
   font-size: clamp(1.45rem, 2.4vw, 1.95rem);
-  line-height: 1.2;
-  color: var(--maroon);
+  line-height: var(--lh-heading);
+  color: inherit;
   opacity: 0.4;
-  transition: opacity 0.3s ease, transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.3s ease;
+}
+
+/* leading vertical line marks the selected item (space reserved so text
+   doesn't shift) */
+.item::before {
+  content: "";
+  flex: none;
+  width: 1px;
+  height: 1em;
+  background: currentColor;
+  transform: scaleY(0);
+  transform-origin: center;
+  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .item:hover,
 .itemActive {
   opacity: 1;
-  transform: translateX(0.3em);
+}
+.itemActive::before {
+  transform: scaleY(1);
+}
+/* gate the hover-reveal so a tap on touch doesn't leave a stuck marker line */
+@media (hover: hover) and (pointer: fine) {
+  .item:hover::before {
+    transform: scaleY(1);
+  }
 }
 
+/* portrait image resting in the bottom-right, padded off the panel edges */
 .thumb {
-  margin-top: clamp(12px, 1.6vh, 18px);
+  flex: none;
+  align-self: flex-end;
+  width: clamp(116px, 32%, 150px);
   border-radius: 10px;
   overflow: hidden;
   position: relative;

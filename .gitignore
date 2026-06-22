@@ -7,11 +7,17 @@
 .env*
 
 # large media — exceeds GitHub's 100MB limit; keep local only
-/public/videos/*.mp4
-/assets/videos/*.mp4
+# (whole dirs, so .MP4/.MOV/etc. uppercase variants are caught too)
+/public/videos/
+/assets/videos/
 
 # TS build cache
 *.tsbuildinfo
 
 # image source originals (served copies live in /public/images)
 /assets/images/
+
+# local Claude Code session state — must never be committed
+.agents/
+.claude/
+skills-lock.json

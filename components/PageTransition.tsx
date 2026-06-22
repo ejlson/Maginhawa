@@ -9,7 +9,7 @@ import {
   useState,
 } from "react";
 import { usePathname, useRouter } from "next/navigation";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import styles from "./PageTransition.module.css";
 
 const IMAGES = [
@@ -99,18 +99,17 @@ export default function PageTransition({
         aria-hidden
       >
         <div className={styles.frame}>
-          <AnimatePresence>
-            <motion.img
-              key={img}
-              src={IMAGES[img]}
-              alt=""
-              className={styles.img}
-              initial={{ clipPath: WIPES[img % WIPES.length] }}
-              animate={{ clipPath: "inset(0 0 0 0)" }}
-              exit={{ opacity: 0 }}
-              transition={{ duration: 0.5, ease: [0.76, 0, 0.24, 1] }}
-            />
-          </AnimatePresence>
+          {/* a single keyed image wipes in from a new edge each tick — no
+              AnimatePresence (its exit-node removal crashes on React 19) */}
+          <motion.img
+            key={img}
+            src={IMAGES[img]}
+            alt=""
+            className={styles.img}
+            initial={{ clipPath: WIPES[img % WIPES.length] }}
+            animate={{ clipPath: "inset(0 0 0 0)" }}
+            transition={{ duration: 0.5, ease: [0.76, 0, 0.24, 1] }}
+          />
         </div>
       </motion.div>
     </TransitionCtx.Provider>

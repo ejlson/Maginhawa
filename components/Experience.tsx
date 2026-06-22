@@ -6,13 +6,16 @@ import Loader from "./Loader";
 import Nav from "./Nav";
 import Menu from "./Menu";
 import Statement from "./Statement";
-import ViewAllButton from "./ViewAllButton";
 import Hero from "./Hero";
 import Discover from "./Discover";
 import RestaurantLocations from "./RestaurantLocations";
 import WhoWeAre from "./WhoWeAre";
+// import Timeline from "./Timeline";
+import Press from "./Press";
 import Blog from "./Blog";
 import Contact from "./Contact";
+import FAQ from "./FAQ";
+import ReviewUs from "./ReviewUs";
 import Footer from "./Footer";
 import DarkZone from "./DarkZone";
 import type { HeroInsets } from "./types";
@@ -34,12 +37,25 @@ export default function Experience() {
   }, []);
 
   const [menuOpen, setMenuOpen] = useState(false);
+  // scroll stays locked through the loader AND while the Maginhawa wordmark
+  // pops up, so the user can't scroll past the hero before it has landed
+  const [locked, setLocked] = useState(true);
   const insets = HERO_INSETS;
 
   useEffect(() => {
-    document.body.classList.toggle("is-loading", intro);
-    return () => document.body.classList.remove("is-loading");
+    if (intro) {
+      setLocked(true);
+      return;
+    }
+    // hero wordmark animates up over ~1.1s once the intro ends — hold here
+    const t = setTimeout(() => setLocked(false), 1300);
+    return () => clearTimeout(t);
   }, [intro]);
+
+  useEffect(() => {
+    document.body.classList.toggle("is-loading", locked);
+    return () => document.body.classList.remove("is-loading");
+  }, [locked]);
 
   const started = !intro;
 
@@ -68,13 +84,16 @@ export default function Experience() {
           <div className="afterHero">
             <Statement />
             <Discover />
-            <ViewAllButton />
             <RestaurantLocations />
             <WhoWeAre />
+            {/* <Timeline /> */}
+            <Press />
             <Blog />
 
             <DarkZone>
               <Contact />
+              <FAQ />
+              <ReviewUs />
               <Footer />
             </DarkZone>
           </div>

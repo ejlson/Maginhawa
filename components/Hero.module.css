@@ -23,6 +23,8 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  /* dim the footage so the wordmark and nav stay legible */
+  filter: brightness(0.62);
 }
 
 /* Giant wordmark stretched edge-to-edge across the bottom of the hero */
@@ -51,9 +53,10 @@
 }
 
 .titleText {
-  font-family: var(--font-display);
+  font-family: var(--font-display-big);
   font-weight: 400;
   text-transform: uppercase;
+  letter-spacing: var(--tr-display);
   fill: var(--cream);
 }
 

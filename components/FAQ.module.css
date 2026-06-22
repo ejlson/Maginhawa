@@ -1,0 +1,115 @@
+.section {
+  /* related both sides — flanked by Contact and ReviewUs, all utility */
+  padding-block: var(--section-y-sm);
+  color: var(--cream);
+}
+
+.head {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
+  gap: clamp(28px, 5vw, 80px);
+  align-items: end;
+  margin-bottom: clamp(28px, 4vh, 48px);
+}
+
+.eyebrow {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--saffron);
+  margin-bottom: clamp(12px, 1.8vh, 18px);
+}
+
+.title {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--t-h2);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tr-display);
+  color: var(--cream);
+  max-width: 16ch;
+}
+
+.aside {
+  font-family: var(--font-serif);
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
+  opacity: 0.7;
+  max-width: 44ch;
+}
+
+@media (max-width: 760px) {
+  .head { grid-template-columns: 1fr; align-items: start; }
+}
+
+/* ---- accordion list ---- */
+.list {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid rgba(248, 243, 234, 0.22);
+}
+
+.list > li {
+  border-bottom: 1px solid rgba(248, 243, 234, 0.22);
+}
+
+.row {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 24px;
+  background: none;
+  border: none;
+  color: inherit;
+  padding: clamp(16px, 2.2vh, 24px) 0;
+  cursor: pointer;
+  text-align: left;
+  transition: padding 0.3s ease;
+}
+
+.row:hover,
+.row:focus-visible {
+  padding-inline: clamp(6px, 1vw, 14px);
+  outline: none;
+}
+
+.question {
+  font-family: var(--font-display-sm);
+  font-weight: 500;
+  font-size: clamp(1.05rem, 1.5vw, 1.35rem);
+  letter-spacing: -0.005em;
+  line-height: 1.2;
+}
+
+.chev {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+  opacity: 0.7;
+}
+
+.chev svg {
+  width: 14px;
+  height: 14px;
+}
+
+.chevOpen {
+  transform: rotate(180deg);
+  opacity: 1;
+}
+
+.answer {
+  font-family: var(--font-serif);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  opacity: 0.85;
+  max-width: 60ch;
+  padding: 0 0 clamp(18px, 2.4vh, 28px);
+}

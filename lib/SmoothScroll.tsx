@@ -3,6 +3,9 @@
 import { useEffect } from "react";
 import Lenis from "lenis";
 
+// shared handle so components can drive smooth scroll (e.g. scroll-assist)
+export const lenisRef: { current: Lenis | null } = { current: null };
+
 /**
  * Wraps the app in Lenis smooth scrolling — gives the weighty, gliding
  * scroll feel the parallax + reveal animations are tuned against.
@@ -26,6 +29,7 @@ export default function SmoothScroll({
       easing: (t) => Math.min(1, 1.001 - Math.pow(2, -10 * t)),
       smoothWheel: true,
     });
+    lenisRef.current = lenis;
 
     let frame = 0;
     const raf = (time: number) => {
@@ -37,6 +41,7 @@ export default function SmoothScroll({
     return () => {
       cancelAnimationFrame(frame);
       lenis.destroy();
+      lenisRef.current = null;
     };
   }, []);
 

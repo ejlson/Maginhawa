@@ -3,15 +3,8 @@
   flex-direction: column;
   align-items: center;
   gap: clamp(14px, 2.5vh, 30px);
-  padding: clamp(24px, 5vh, 70px) var(--pad-x) clamp(70px, 14vh, 180px);
+  padding: 0 var(--pad-x);
   text-align: center;
-}
-
-.kicker {
-  font-family: var(--font-sans);
-  font-size: 0.8rem;
-  letter-spacing: 0.04em;
-  opacity: 0.6;
 }
 
 .magnet {
@@ -26,15 +19,21 @@
   gap: 0.45em;
   overflow: hidden;
   isolation: isolate;
-  border: 1.5px solid #2f0000;
+  border: 1.5px solid var(--cream);
   border-radius: 999px;
-  padding: 0.62em 1.4em;
+  padding: 0.7em 1.5em;
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(1.3rem, 3.2vw, 2.7rem);
-  line-height: 1.05;
-  color: #2f0000;
+  font-size: var(--t-h3);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tr-display);
+  color: var(--cream);
   will-change: transform;
+  /* press feedback — confirms the tap the instant it lands */
+  transition: transform 0.16s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.btn:active {
+  transform: scale(0.97);
 }
 
 /* maroon circle that radiates from the cursor on hover */
@@ -42,7 +41,7 @@
   position: absolute;
   z-index: -1;
   border-radius: 50%;
-  background: #2f0000;
+  background: var(--cream);
   transform: translate(-50%, -50%) scale(0);
   transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
@@ -64,12 +63,12 @@
   transition: transform 0.55s cubic-bezier(0.76, 0, 0.24, 1);
 }
 .l1 {
-  color: #2f0000;
+  color: var(--cream);
 }
 .l2 {
   position: absolute;
   inset: 0;
-  color: var(--cream);
+  color: var(--maroon);
   transform: translateY(110%);
 }
 .isHover .l1 {
@@ -84,7 +83,7 @@
   place-items: center;
   width: 0.9em;
   height: 0.9em;
-  color: #2f0000;
+  color: var(--cream);
   transition: transform 0.5s cubic-bezier(0.76, 0, 0.24, 1), color 0.45s ease;
 }
 .arrow svg {
@@ -94,5 +93,5 @@
 }
 .isHover .arrow {
   transform: translateX(0.28em);
-  color: var(--cream);
+  color: var(--maroon);
 }

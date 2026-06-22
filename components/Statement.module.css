@@ -1,5 +1,7 @@
 .section {
-  padding: clamp(120px, 20vh, 280px) 0 clamp(0px, 1vh, 14px);
+  /* chapter top (opens after the hero), related bottom (leads tightly into
+     the restaurants chapter — Discover follows) */
+  padding: var(--section-y-lg) 0 var(--section-y-sm);
 }
 
 .wrap {
@@ -13,17 +15,18 @@
   left: 0;
   white-space: nowrap;
   font-family: var(--font-sans);
-  font-size: 0.78rem;
-  letter-spacing: 0.02em;
-  opacity: 0.7;
+  color: var(--saffron);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  opacity: 1;
 }
 
 .statement {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(1.9rem, 4.6vw, 4rem);
-  line-height: 1.08;
-  letter-spacing: -0.006em;
+  font-size: var(--t-display);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
   color: var(--maroon);
 }
 

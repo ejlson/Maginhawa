@@ -1,64 +1,68 @@
 .section {
-  padding-top: clamp(40px, 8vh, 110px);
+  /* DarkZone owns the chapter-tier top; this bottom is the related gap
+     before the FAQ accordion */
+  padding-top: 0;
+  padding-bottom: var(--section-y-sm);
 }
 
 .wordmark {
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  text-align: right;
-  color: var(--cream);
-  line-height: 0.86;
-  letter-spacing: -0.01em;
-  font-size: clamp(3.4rem, 15vw, 15rem);
-  border-bottom: 1px solid rgba(248, 243, 234, 0.25);
-  padding-bottom: 0.06em;
+  display: block;
 }
 
-.wline {
+/* the wordmark is an SVG whose text is stretched to the full container width */
+.wordSvg {
   display: block;
-  /* vertical breathing room so the caps aren't clipped by the reveal mask;
-     negative margin keeps the lines tightly stacked */
-  padding: 0.14em 0;
-  margin: -0.14em 0;
-  overflow: hidden;
+  width: 100%;
+}
+
+.wordText {
+  font-family: var(--font-display-big);
+  font-weight: 500;
+  letter-spacing: var(--tr-display);
+  fill: var(--cream);
 }
 
 .grid {
-  margin-top: clamp(50px, 9vh, 120px);
+  margin-top: clamp(22px, 4vh, 52px);
   display: grid;
-  grid-template-columns: 1fr 1.2fr;
-  gap: clamp(30px, 5vw, 90px);
+  grid-template-columns: 1fr 1.1fr;
+  gap: clamp(28px, 4vw, 72px);
   color: var(--cream);
 }
 
 .info {
   display: flex;
   flex-direction: column;
-  gap: clamp(28px, 5vh, 56px);
+  gap: clamp(22px, 4vh, 40px);
 }
 
-.label {
-  font-family: var(--font-serif);
-  font-size: 1.4rem;
-  margin-bottom: 0.35em;
+/* shared small-caps label for both the info block and the form fields */
+.label,
+.field label {
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  opacity: 0.6;
+  margin-bottom: 0.8em;
 }
 
 .info p {
-  font-family: var(--font-sans);
-  font-size: 0.92rem;
-  opacity: 0.85;
+  font-family: var(--font-serif);
+  font-size: var(--t-body);
+  line-height: var(--lh-heading);
 }
 
 .form {
   display: flex;
   flex-direction: column;
-  gap: clamp(22px, 3.5vh, 36px);
+  gap: clamp(10px, 1.8vh, 18px);
 }
 
 .row {
   display: grid;
   grid-template-columns: 1fr 1fr;
-  gap: clamp(20px, 3vw, 48px);
+  gap: clamp(18px, 2.4vw, 36px);
 }
 
 .field {
@@ -66,47 +70,31 @@
   flex-direction: column;
 }
 
-.field label {
-  font-family: var(--font-serif);
-  font-size: 1.3rem;
-  margin-bottom: 0.5em;
-}
-
 .field input {
   background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(248, 243, 234, 0.4);
+  border-bottom: 1px solid rgba(248, 243, 234, 0.35);
   color: var(--cream);
-  font-family: var(--font-sans);
-  font-size: 0.95rem;
-  padding: 0.5em 0;
+  font-family: var(--font-serif);
+  font-size: var(--t-body);
+  line-height: var(--lh-heading);
+  padding: 0.45em 0;
   outline: none;
   transition: border-color 0.3s ease;
 }
 
 .field input::placeholder {
-  color: rgba(248, 243, 234, 0.55);
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  color: rgba(248, 243, 234, 0.45);
 }
 
 .field input:focus {
   border-color: var(--cream);
 }
 
-.submit {
-  align-self: flex-start;
-  background: var(--cream);
-  color: var(--maroon);
-  border: none;
-  border-radius: 10px;
-  font-family: var(--font-serif);
-  font-size: 1.15rem;
-  padding: 0.7em 2.4em;
-  margin-top: clamp(8px, 2vh, 20px);
-  transition: opacity 0.3s ease;
-}
-
-.submit:hover {
-  opacity: 0.85;
+.submitRow {
+  margin-top: clamp(2px, 0.8vh, 8px);
 }
 
 @media (max-width: 760px) {

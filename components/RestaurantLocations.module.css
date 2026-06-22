@@ -1,25 +1,46 @@
 .section {
   position: relative;
   width: 100%;
-  height: 100svh;
-  margin-top: clamp(70px, 12vh, 200px);
+  height: clamp(640px, 138svh, 1200px);
+  margin-top: clamp(16px, 3vh, 48px);
   overflow: hidden;
+  /* --expand: 0 → video sits inside the page container.
+     --expand: 1 → video stretches edge to edge of the viewport.
+     The component drives --expand from scrollYProgress; CSS interpolates the
+     inset and corner radius linearly. */
+  --rest-inset: max(
+    var(--pad-x),
+    calc((100vw - var(--maxw)) / 2 + var(--pad-x))
+  );
+  --side-inset: calc(var(--rest-inset) * (1 - var(--expand, 0)));
+  --bleed-radius: calc(6px * (1 - var(--expand, 0)));
 }
 
-/* clip container — the curtain that opens on scroll */
+/* reduced motion: skip the animation, leave the video at full bleed */
+@media (prefers-reduced-motion: reduce) {
+  .section {
+    --side-inset: 0px;
+    --bleed-radius: 0px;
+  }
+}
+
+/* clip container — sized + cornered by the scroll-driven CSS variables */
 .reveal {
   position: absolute;
-  inset: 0;
+  top: 0;
+  bottom: 0;
+  left: var(--side-inset);
+  right: var(--side-inset);
   overflow: hidden;
-  will-change: clip-path;
+  border-radius: var(--bleed-radius);
+  will-change: left, right, border-radius;
 }
 
 .bg {
   position: absolute;
-  inset: -12% 0;
+  inset: 0;
   width: 100%;
-  height: 124%;
-  will-change: transform;
+  height: 100%;
 }
 
 .bg > div {
@@ -27,19 +48,33 @@
   border: none;
 }
 
-.heading {
+.locVideo {
   position: absolute;
-  top: clamp(28px, 6vh, 64px);
-  left: 0;
-  right: 0;
-  text-align: center;
-  z-index: 2;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.heading span {
-  font-family: var(--font-display);
-  text-transform: uppercase;
-  font-size: clamp(1.6rem, 4.4vw, 3.4rem);
-  letter-spacing: 0.01em;
-  color: var(--maroon);
+/* dark wash so the View-All button stays legible over the footage */
+.locScrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(120% 100% at 50% 50%, rgba(18, 0, 0, 0.25), rgba(18, 0, 0, 0.62)),
+    linear-gradient(rgba(18, 0, 0, 0.35), rgba(18, 0, 0, 0.5));
+}
+
+/* the View-All button — centred over the video, regardless of expand state */
+.cta {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  place-items: center;
+  pointer-events: none;
+}
+.cta > * {
+  pointer-events: auto;
 }
