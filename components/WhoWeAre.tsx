@@ -1,7 +1,6 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef, useState } from "react";
+import { useState } from "react";
 import styles from "./WhoWeAre.module.css";
 import Reveal from "./Reveal";
 import RevealText from "./RevealText";
@@ -31,22 +30,7 @@ const PARAS = [
 ];
 
 export default function WhoWeAre() {
-  const bodyRef = useRef<HTMLDivElement>(null);
   const [active, setActive] = useState(0);
-
-  // anchored to the viewport centre: the row sits cascaded while it's in the
-  // lower half, then slides down to bottom-align with the image as it scrolls up
-  const { scrollYProgress } = useScroll({
-    target: bodyRef,
-    offset: ["start center", "end center"],
-  });
-
-  // sequential catch-up cascade: 01 drops to 02, then 01+02 to 03, then all down
-  const stops = [0, 0.2, 0.4, 0.6];
-  const y0 = useTransform(scrollYProgress, stops, [-360, -240, -120, 0]);
-  const y1 = useTransform(scrollYProgress, stops, [-240, -240, -120, 0]);
-  const y2 = useTransform(scrollYProgress, stops, [-120, -120, -120, 0]);
-  const ys = [y0, y1, y2];
 
   return (
     <section className={styles.section} id="about-us">
@@ -64,27 +48,30 @@ export default function WhoWeAre() {
           </h2>
         </div>
 
-        <div className={styles.body} ref={bodyRef}>
-          {PARAS.map((p, i) => (
-            <motion.div
-              key={p.n}
-              className={`${styles.col} ${active === i ? styles.colActive : ""}`}
-              style={{ y: ys[i] }}
-              onMouseEnter={() => setActive(i)}
-            >
-              <div className={styles.colHead}>
-                <span className={styles.num} aria-hidden>
-                  {p.n}
-                </span>
-                <span className={styles.title}>{p.title}</span>
-              </div>
-              <p className={styles.colBody}>{p.body}</p>
-            </motion.div>
-          ))}
+        <div className={styles.body}>
+          <div className={styles.textStack}>
+            {PARAS.map((p, i) => (
+              <Reveal key={p.n} delay={i * 0.08}>
+                <div
+                  className={`${styles.col} ${active === i ? styles.colActive : ""}`}
+                  onMouseEnter={() => setActive(i)}
+                  onFocus={() => setActive(i)}
+                  tabIndex={0}
+                >
+                  <div className={styles.colHead}>
+                    <span className={styles.num} aria-hidden>
+                      {p.n}
+                    </span>
+                    <span className={styles.title}>{p.title}</span>
+                  </div>
+                  <p className={styles.colBody}>{p.body}</p>
+                </div>
+              </Reveal>
+            ))}
+          </div>
 
-          <Reveal delay={0.24} className={styles.imageCol}>
-            <Parallax inset ratio="3 / 4" speed={0.16}>
-              {/* photo crossfades to match the hovered/active paragraph */}
+          <Reveal className={styles.imageCol} delay={0.16}>
+            <Parallax inset speed={0.16} className={styles.imgFrameFull}>
               <div className={styles.photoStack}>
                 {PARAS.map((p, i) => (
                   <img

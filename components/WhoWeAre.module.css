@@ -1,6 +1,8 @@
 .section {
-  margin-top: clamp(16px, 3vh, 48px);
-  padding: clamp(40px, 7vh, 90px) 0 clamp(80px, 12vh, 160px);
+  margin-top: 0;
+  /* chapter top (real break from the Restaurants chapter), related bottom
+     (WhoWeAre and Press are paired: Maginhawa in its own words / others') */
+  padding: var(--section-y-lg) 0 var(--section-y-sm);
 }
 
 /* statement block (eyebrow inline + big indented statement) — matches the
@@ -17,7 +19,7 @@
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
-  opacity: 0.7;
+  color: var(--saffron);
 }
 
 .statement {
@@ -48,13 +50,34 @@
   }
 }
 
+/* ---- two-column body, golden ratio split ----
+   left: vertical 01 / 02 / 03 stack with small gaps — text gets φ
+   right: narrower portrait photo, stretched so its bottom edge meets the
+   bottom of the third paragraph                                          */
 .body {
-  margin-top: clamp(40px, 6vh, 80px);
+  margin-top: clamp(36px, 6vh, 80px);
   display: grid;
-  grid-template-columns: repeat(3, 1fr) 1.1fr;
-  gap: clamp(18px, 2.4vw, 44px);
-  /* paragraphs settle bottom-aligned with the image */
-  align-items: end;
+  grid-template-columns: minmax(0, 1.618fr) minmax(0, 1fr);
+  gap: clamp(40px, 5vw, 96px);
+  align-items: stretch;
+}
+
+.textStack {
+  display: flex;
+  flex-direction: column;
+  /* paragraphs settle at the bottom of the column so 03's bottom edge
+     lines up with the image's bottom edge */
+  justify-content: flex-end;
+  /* gap above the hairline — matched by the col padding-top below the line */
+  gap: clamp(10px, 1.4vh, 18px);
+  max-width: 50ch;
+}
+
+/* hairline rule between 01 / 02 / 03 — gap value above and below the rule
+   matches the textStack gap, so the breathing room is symmetric */
+.textStack > *:not(:first-child) .col {
+  border-top: 1px solid var(--rule);
+  padding-top: clamp(10px, 1.4vh, 18px);
 }
 
 .col {
@@ -62,21 +85,21 @@
   display: flex;
   flex-direction: column;
   gap: clamp(10px, 1.4vh, 16px);
-  will-change: transform;
+  outline: none;
 }
 
-/* big numeral with the title to its right */
+/* big numeral + title sit on one baseline */
 .colHead {
   display: flex;
   align-items: baseline;
-  gap: 0.4em;
+  gap: 0.5em;
   color: var(--maroon);
 }
 
 .num {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(2.2rem, 4.5vw, 3.6rem);
+  font-size: clamp(2.4rem, 4.8vw, 4rem);
   line-height: 0.9;
   letter-spacing: -0.01em;
   opacity: 0.22;
@@ -89,7 +112,7 @@
 .title {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(1rem, 1.3vw, 1.25rem);
+  font-size: clamp(1.1rem, 1.5vw, 1.4rem);
   letter-spacing: -0.01em;
 }
 
@@ -98,15 +121,26 @@
   font-size: var(--t-small);
   line-height: var(--lh-body);
   opacity: 0.82;
+  max-width: 44ch;
 }
 
+/* ---- image column ---- */
 .imageCol {
   position: relative;
   display: flex;
   flex-direction: column;
+  min-height: 0;
 }
 
-/* crossfading photography */
+/* parallax frame sets the row height via a portrait aspect ratio; the text
+   stack on the left justifies to the bottom so both columns share an edge */
+.imgFrameFull {
+  flex: none;
+  width: 100%;
+  height: auto;
+  aspect-ratio: 2 / 3;
+}
+
 .photoStack {
   position: relative;
   width: 100%;
@@ -121,7 +155,7 @@
   transition: opacity 0.6s ease;
 }
 
-/* bottom wash so the button + caption stay legible over any photo */
+/* bottom wash so the button stays legible over any photo */
 .photoScrim {
   position: absolute;
   inset: 0;
@@ -142,22 +176,18 @@
   z-index: 2;
 }
 
+/* ---- responsive ---- */
 @media (max-width: 860px) {
   .body {
-    grid-template-columns: 1fr 1fr;
-    align-items: start;
-  }
-  /* the horizontal staircase only makes sense in the 3-column layout */
-  .col {
-    transform: none !important;
-  }
-}
-@media (max-width: 640px) {
-  .body {
     grid-template-columns: 1fr;
+    gap: clamp(32px, 5vh, 64px);
   }
-  /* no cascade when the columns stack */
-  .col {
-    transform: none !important;
+  /* mobile: photo decouples from the text height and sits as a 4:5 portrait */
+  .imgFrameFull {
+    flex: none;
+    aspect-ratio: 4 / 5;
+  }
+  .textStack {
+    max-width: none;
   }
 }

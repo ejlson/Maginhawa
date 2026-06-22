@@ -29,6 +29,11 @@
   letter-spacing: var(--tr-display);
   color: var(--cream);
   will-change: transform;
+  /* press feedback — confirms the tap the instant it lands */
+  transition: transform 0.16s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.btn:active {
+  transform: scale(0.97);
 }
 
 /* maroon circle that radiates from the cursor on hover */

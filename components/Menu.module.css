@@ -86,9 +86,14 @@
 .itemActive {
   opacity: 1;
 }
-.item:hover::before,
 .itemActive::before {
   transform: scaleY(1);
+}
+/* gate the hover-reveal so a tap on touch doesn't leave a stuck marker line */
+@media (hover: hover) and (pointer: fine) {
+  .item:hover::before {
+    transform: scaleY(1);
+  }
 }
 
 /* portrait image resting in the bottom-right, padded off the panel edges */

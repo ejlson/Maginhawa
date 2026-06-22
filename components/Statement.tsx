@@ -4,7 +4,7 @@ import RevealText from "./RevealText";
 
 export default function Statement() {
   return (
-    <section className={styles.section} data-nav-theme="light">
+    <section className={styles.section} id="statement" data-nav-theme="light">
       <div className="container">
         <div className={styles.wrap}>
           <Reveal className={styles.eyebrow} as="span">

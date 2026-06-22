@@ -33,6 +33,7 @@ export default function MagneticButton({
   arrow = true,
   small = false,
   theme = "dark",
+  hoverAccent = false,
 }: {
   label: string;
   type?: "button" | "submit";
@@ -41,6 +42,9 @@ export default function MagneticButton({
   arrow?: boolean;
   small?: boolean;
   theme?: "dark" | "light";
+  /** when true, the radiating fill is saffron (text + arrow still flip to
+   *  the btn-bg colour, giving a saffron-button-with-maroon-type hover) */
+  hoverAccent?: boolean;
 }) {
   const ref = useRef<HTMLButtonElement>(null);
   const [hover, setHover] = useState(false);
@@ -84,7 +88,7 @@ export default function MagneticButton({
         ref={ref}
         type={type}
         onClick={onClick}
-        className={`${styles.btn} ${small ? styles.small : ""} ${theme === "light" ? styles.light : ""} ${hover ? styles.isHover : ""}`}
+        className={`${styles.btn} ${small ? styles.small : ""} ${theme === "light" ? styles.light : ""} ${hoverAccent ? styles.hoverAccent : ""} ${hover ? styles.isHover : ""}`}
         onMouseEnter={onEnter}
         onMouseMove={onMove}
         onMouseLeave={onLeave}

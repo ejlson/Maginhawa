@@ -4,14 +4,21 @@ import { useEffect, useState } from "react";
 
 type Clip = { src: string; rotate: number };
 
-// a clip rotated ±90° needs its box swapped (viewport tall × wide) so it still
-// fills the screen after the rotation
+// Re-orient a clip whose footage was shot/encoded rotated.
+//  • a ±90° quarter-turn needs its box swapped (viewport tall × wide) so it
+//    still fills the screen after the rotation
+//  • a 180° turn keeps the box orientation — just spin it in place
 function clipStyle(c: Clip, show: boolean, duration: number): React.CSSProperties {
   const base: React.CSSProperties = {
     opacity: show ? 1 : 0,
     transition: `opacity ${duration}s ease`,
   };
   if (!c.rotate) return base;
+
+  const norm = ((c.rotate % 360) + 360) % 360; // 0 | 90 | 180 | 270
+  if (norm === 180) {
+    return { ...base, transform: "rotate(180deg)" };
+  }
   return {
     ...base,
     width: "100vh",

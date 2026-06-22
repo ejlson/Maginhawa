@@ -29,7 +29,7 @@ export default function Contact() {
         </Reveal>
 
         <div className={styles.grid}>
-          <div className={styles.info}>
+          <div className={`${styles.info} measure`}>
             <Reveal>
               <div className={styles.label}>Location</div>
               <p>+44 01234 5678</p>
@@ -62,7 +62,7 @@ export default function Contact() {
                 <input type="text" placeholder="Enter your description here" />
               </div>
               <div className={styles.submitRow}>
-                <MagneticButton label="Submit" type="submit" small />
+                <MagneticButton label="Submit" type="submit" small hoverAccent />
               </div>
             </form>
           </Reveal>

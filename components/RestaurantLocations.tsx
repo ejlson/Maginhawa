@@ -1,5 +1,6 @@
 "use client";
 
+import { motion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import styles from "./RestaurantLocations.module.css";
 import ViewAllButton from "./ViewAllButton";
@@ -25,8 +26,23 @@ export default function RestaurantLocations() {
     return () => window.clearInterval(id);
   }, []);
 
+  // scroll-driven width expansion:
+  // 0 → video inset to match the page container (same as the rest of the content)
+  // 1 → video stretched edge to edge of the viewport
+  // CSS does the interpolation via the --expand custom property.
+  const { scrollYProgress } = useScroll({
+    target: ref,
+    offset: ["start end", "start start"],
+  });
+  const expand = useTransform(scrollYProgress, [0, 1], [0, 1]);
+
   return (
-    <section ref={ref} className={styles.section}>
+    <motion.section
+      ref={ref}
+      className={styles.section}
+      id="locations"
+      style={{ "--expand": expand } as unknown as React.CSSProperties}
+    >
       <div className={styles.reveal}>
         <div className={styles.bg}>
           <VideoBackdrop src={CLIPS[clip]} className={styles.locVideo} />
@@ -37,6 +53,6 @@ export default function RestaurantLocations() {
       <div className={styles.cta}>
         <ViewAllButton />
       </div>
-    </section>
+    </motion.section>
   );
 }

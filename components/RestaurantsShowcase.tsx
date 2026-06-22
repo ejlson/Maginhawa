@@ -10,6 +10,7 @@ import Footer from "./Footer";
 import { useRouteTransition } from "./PageTransition";
 import VideoBackdrop from "./VideoBackdrop";
 import Placeholder from "./Placeholder";
+import { SLUG_BY_NAME } from "@/lib/restaurants";
 
 // scroll-wheel view: stacked lines with the centre one highlighted
 function WheelIcon() {
@@ -59,7 +60,8 @@ const RESTAURANTS = [
     tag: "Filipino Fusion Restaurant",
     location: "Camden, London",
     video: "/videos/bintang.mp4",
-    rotate: -90, // clip was shot sideways
+    // clip decodes a half-turn off → 180° lands it upright
+    rotate: 180,
   },
   {
     name: "Belly",
@@ -407,7 +409,10 @@ export default function RestaurantsShowcase() {
               <button
                 type="button"
                 className={`${styles.actBtn} ${styles.actBtnSolid}`}
-                onClick={() => navigate("/")}
+                onClick={() => {
+                  const slug = SLUG_BY_NAME[item.name];
+                  if (slug) navigate(`/restaurants/${slug}`);
+                }}
               >
                 <span className={styles.actLabel}>Visit {item.name}</span>
                 <span aria-hidden>→</span>
@@ -477,7 +482,10 @@ export default function RestaurantsShowcase() {
                     <button
                       type="button"
                       className={`${styles.cardBtn} ${styles.cardBtnSolid}`}
-                      onClick={() => navigate("/")}
+                      onClick={() => {
+                        const slug = SLUG_BY_NAME[r.name];
+                        if (slug) navigate(`/restaurants/${slug}`);
+                      }}
                     >
                       Visit
                     </button>

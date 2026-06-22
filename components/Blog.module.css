@@ -1,13 +1,15 @@
 .section {
-  margin-top: clamp(40px, 8vh, 120px);
-  padding: clamp(60px, 9vh, 120px) 0 clamp(80px, 12vh, 160px);
+  margin-top: 0;
+  /* related top (Press just before is the other editorial-content section),
+     chapter bottom (closes the editorial chapter before the DarkZone CTA) */
+  padding: var(--section-y-sm) 0 var(--section-y-lg);
 }
 
-/* matches the WhoWeAre intro: eyebrow inline-left, statement indented so its
-   wrapped lines sit under the eyebrow */
+/* eyebrow inline-left, statement indented so its wrapped lines align under the
+   eyebrow — same pattern as WhoWeAre */
 .head {
   position: relative;
-  margin-bottom: clamp(40px, 6vh, 80px);
+  margin-bottom: clamp(56px, 8vh, 112px);
 }
 
 .eyebrow {
@@ -18,7 +20,7 @@
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
-  opacity: 0.7;
+  color: var(--saffron);
 }
 
 .title {
@@ -28,6 +30,7 @@
   line-height: var(--lh-display);
   letter-spacing: var(--tr-display);
   color: var(--maroon);
+  max-width: 28ch;
 }
 
 .spacer {
@@ -49,25 +52,37 @@
   }
 }
 
-/* featured latest entry — larger two-column block above the grid */
+/* ---- featured latest entry — image left (smaller), text top-right ---- */
 .featured {
   display: grid;
-  grid-template-columns: 1.5fr 1fr;
-  gap: clamp(24px, 4vw, 64px);
-  align-items: center;
-  margin-bottom: clamp(24px, 3.5vh, 48px);
-  padding-bottom: clamp(24px, 3.5vh, 48px);
+  /* image column trimmed; text column gets the lead so it can breathe */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
+  gap: clamp(40px, 6vw, 120px);
+  align-items: start;
+  /* hairline rule separates the latest from the secondary rail below;
+     tighter gap than before — the rule does the dividing work */
+  margin-bottom: clamp(28px, 4vh, 56px);
+  padding-bottom: clamp(28px, 4vh, 56px);
   border-bottom: 1px solid var(--placeholder-line);
+  text-decoration: none;
+  color: inherit;
 }
 
 .featuredMedia {
   border-radius: 2px;
 }
 
+.featuredMedia img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
 .featuredBody {
   display: flex;
   flex-direction: column;
-  gap: clamp(12px, 1.6vw, 20px);
+  gap: clamp(16px, 2vw, 24px);
 }
 
 .featuredTag {
@@ -75,86 +90,214 @@
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
+  display: inline-flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0;
+}
+
+/* "Latest" gets the saffron accent — full saturation */
+.latestMark {
+  color: var(--saffron);
+}
+
+/* date + source stay muted maroon so "Latest" reads as the highlight */
+.tagMuted {
+  color: var(--maroon);
   opacity: 0.6;
 }
 
 .featuredTitle {
-  font-family: var(--font-serif);
-  font-weight: 400;
-  font-size: var(--t-h2);
-  line-height: var(--lh-heading);
-  letter-spacing: -0.01em;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.8rem, 3vw, 2.8rem);
+  line-height: 1.08;
+  letter-spacing: -0.014em;
 }
 
 .featuredExcerpt {
-  font-family: var(--font-sans);
-  font-size: var(--t-small);
+  font-family: var(--font-serif);
+  font-size: var(--t-body);
   line-height: var(--lh-body);
-  opacity: 0.8;
-  max-width: 46ch;
+  opacity: 0.85;
+  max-width: 44ch;
 }
 
 .featuredLink {
-  margin-top: 0.4em;
+  margin-top: 0.6em;
   font-family: var(--font-sans);
-  font-size: var(--t-small);
-  letter-spacing: 0.02em;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
   display: inline-flex;
   align-items: center;
-  gap: 0.55em;
-  width: fit-content;
+  gap: 0.7em;
+  transition: color 0.32s ease;
 }
 
 .featuredLink span {
   transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
-.featuredLink:hover span {
-  transform: translateX(4px);
+@media (hover: hover) and (pointer: fine) {
+  .featured:hover .featuredLink {
+    color: var(--saffron);
+  }
+  .featured:hover .featuredLink span {
+    transform: translateX(6px);
+  }
 }
 
-.grid {
-  display: grid;
-  grid-template-columns: repeat(3, 1fr);
-  gap: clamp(18px, 2.2vw, 40px);
+/* ---- horizontal rail of smaller cards ---- */
+.railWrap {
+  position: relative;
+  margin-inline: calc(-1 * var(--pad-x));
+}
+
+.rail {
+  display: flex;
+  gap: clamp(14px, 1.6vw, 24px);
+  list-style: none;
+  margin: 0;
+  padding: 6px calc(var(--pad-x) * 2) 16px;
+  overflow-x: auto;
+  scroll-snap-type: x mandatory;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+  -webkit-overflow-scrolling: touch;
+  scroll-behavior: smooth;
+}
+.rail::-webkit-scrollbar { display: none; }
+
+.cardItem {
+  flex: 0 0 clamp(240px, 23vw, 340px);
+  scroll-snap-align: start;
 }
 
 .card {
-  display: flex;
-  flex-direction: column;
-  gap: 14px;
+  display: block;
+  text-decoration: none;
+  color: inherit;
+  position: relative;
 }
 
-.date {
-  font-family: var(--font-sans);
+.cardMedia {
+  position: relative;
+  width: 100%;
+  /* shorter landscape ratio — was 4/5 portrait, now lands closer to magazine plates */
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: 2px;
+  background: var(--placeholder);
+}
+
+.cardMedia img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  user-select: none;
+  -webkit-user-drag: none;
+}
+
+.card:hover .cardMedia img,
+.card:focus-visible .cardMedia img {
+  transform: scale(1.04);
+}
+
+/* dark scrim → cream type sits inside the photo */
+.cardOverlay {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
+  gap: 8px;
+  padding: clamp(14px, 1.8vw, 22px);
+  color: var(--cream);
+  background: linear-gradient(
+    to top,
+    rgba(18, 0, 0, 0.78) 0%,
+    rgba(18, 0, 0, 0.25) 50%,
+    rgba(18, 0, 0, 0) 100%
+  );
+  pointer-events: none;
+}
+
+.cardMeta {
+  font-family: var(--font-display-xs);
+  font-weight: 500;
   font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  opacity: 0.6;
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.85;
 }
 
 .cardTitle {
-  font-family: var(--font-serif);
-  font-size: var(--t-h3);
-  line-height: var(--lh-heading);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.05rem, 1.45vw, 1.3rem);
+  line-height: 1.2;
+  letter-spacing: -0.005em;
+  margin: 0;
 }
 
-.excerpt {
-  font-family: var(--font-sans);
-  font-size: var(--t-small);
-  line-height: var(--lh-body);
-  opacity: 0.78;
+/* ---- rail navigation arrows ---- */
+.railArrow {
+  position: absolute;
+  top: 50%;
+  width: clamp(42px, 3.6vw, 54px);
+  height: clamp(42px, 3.6vw, 54px);
+  border: 1.5px solid var(--saffron);
+  background: transparent;
+  border-radius: 50%;
+  color: var(--saffron);
+  display: grid;
+  place-items: center;
+  cursor: pointer;
+  z-index: 4;
+  transform: translateY(-50%);
+  transition: background 0.32s ease, color 0.32s ease, transform 0.32s ease;
+}
+
+.railArrow svg {
+  width: 44%;
+  height: 44%;
+}
+
+.railArrow:hover,
+.railArrow:focus-visible {
+  background: var(--saffron);
+  color: var(--cream);
+  transform: translateY(-50%) scale(1.04);
+  outline: none;
+}
+
+.railArrowLeft {
+  left: calc(var(--pad-x) * 0.6);
+}
+
+.railArrowRight {
+  right: calc(var(--pad-x) * 0.6);
+}
+
+/* on touch / coarse pointers the native swipe is the navigation — hide */
+@media (hover: none), (pointer: coarse) {
+  .railArrow { display: none; }
+}
+
+/* ---- view all CTA ---- */
+.viewAllWrap {
+  margin-top: clamp(56px, 8vh, 112px);
+  display: flex;
+  justify-content: center;
 }
 
 @media (max-width: 860px) {
   .featured {
     grid-template-columns: 1fr;
     align-items: start;
-  }
-}
-
-@media (max-width: 760px) {
-  .head,
-  .grid {
-    grid-template-columns: 1fr;
+    gap: clamp(20px, 4vh, 36px);
   }
 }

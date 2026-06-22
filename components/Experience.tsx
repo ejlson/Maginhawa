@@ -10,9 +10,12 @@ import Hero from "./Hero";
 import Discover from "./Discover";
 import RestaurantLocations from "./RestaurantLocations";
 import WhoWeAre from "./WhoWeAre";
-import Timeline from "./Timeline";
+// import Timeline from "./Timeline";
+import Press from "./Press";
 import Blog from "./Blog";
 import Contact from "./Contact";
+import FAQ from "./FAQ";
+import ReviewUs from "./ReviewUs";
 import Footer from "./Footer";
 import DarkZone from "./DarkZone";
 import type { HeroInsets } from "./types";
@@ -83,11 +86,14 @@ export default function Experience() {
             <Discover />
             <RestaurantLocations />
             <WhoWeAre />
-            <Timeline />
+            {/* <Timeline /> */}
+            <Press />
             <Blog />
 
             <DarkZone>
               <Contact />
+              <FAQ />
+              <ReviewUs />
               <Footer />
             </DarkZone>
           </div>

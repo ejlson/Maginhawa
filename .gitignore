@@ -16,3 +16,8 @@
 
 # image source originals (served copies live in /public/images)
 /assets/images/
+
+# local Claude Code session state — must never be committed
+.agents/
+.claude/
+skills-lock.json

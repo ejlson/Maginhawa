@@ -4,10 +4,13 @@
 }
 
 .btn {
-  /* fg = resting border/text + the radiating fill; bg = the colour the label
-     and arrow flip to once the fill arrives. Dark theme by default. */
+  /* fg = resting border/text; bg = the colour the label and arrow flip to
+     once the fill arrives; fill = the radiating disc colour (defaults to fg
+     but can be overridden — e.g. saffron for accent buttons). Dark theme
+     by default. */
   --btn-fg: var(--cream);
   --btn-bg: var(--maroon);
+  --btn-fill: var(--btn-fg);
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -27,6 +30,11 @@
   background: none;
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
+  /* press feedback — confirms the tap the instant it lands */
+  transition: transform 0.16s cubic-bezier(0.23, 1, 0.32, 1);
+}
+.btn:active {
+  transform: scale(0.97);
 }
 
 /* light theme (maroon on cream backgrounds) */
@@ -47,10 +55,17 @@
   position: absolute;
   z-index: -1;
   border-radius: 50%;
-  background: var(--btn-fg);
+  background: var(--btn-fill);
   transform: translate(-50%, -50%) scale(0);
   transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
   pointer-events: none;
+}
+
+/* saffron-accent variant — the radiating fill is saffron; label + arrow
+   still flip to btn-bg (maroon on the dark theme) so the resulting button
+   reads saffron with maroon text */
+.hoverAccent {
+  --btn-fill: var(--saffron);
 }
 .isHover .fill {
   transform: translate(-50%, -50%) scale(1);

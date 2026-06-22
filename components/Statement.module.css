@@ -1,5 +1,7 @@
 .section {
-  padding: clamp(120px, 20vh, 280px) 0 clamp(0px, 1vh, 14px);
+  /* chapter top (opens after the hero), related bottom (leads tightly into
+     the restaurants chapter — Discover follows) */
+  padding: var(--section-y-lg) 0 var(--section-y-sm);
 }
 
 .wrap {
@@ -13,9 +15,10 @@
   left: 0;
   white-space: nowrap;
   font-family: var(--font-sans);
+  color: var(--saffron);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
-  opacity: 0.7;
+  opacity: 1;
 }
 
 .statement {

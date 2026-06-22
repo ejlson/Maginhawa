@@ -2,13 +2,23 @@
 
 import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
+import { usePathname } from "next/navigation";
 import styles from "./Nav.module.css";
+import { useRouteTransition } from "./PageTransition";
 
 type Theme = "blend" | "light" | "dark";
 
 // latest section theme under the navbar, so the menu can match it on open
 let latestTheme: Theme = "blend";
 export const getNavTheme = (): Theme => latestTheme;
+
+const LINKS = [
+  { label: "Restaurants", href: "/restaurants" },
+  { label: "Blog", href: "/blog" },
+  { label: "About", href: "#about-us" },
+  { label: "Join Us", href: "#join-us" },
+  { label: "Contact", href: "#contact-us" },
+];
 
 export default function Nav({
   started,
@@ -19,10 +29,14 @@ export default function Nav({
   menuOpen: boolean;
   onMenuToggle: () => void;
 }) {
-  // Per request: scrolling DOWN reveals the navbar, scrolling UP hides it.
+  // Scrolling DOWN hides the navbar; scrolling UP reveals it.
   const [hidden, setHidden] = useState(false);
   // Navbar adopts the theme of the section currently behind it.
   const [theme, setTheme] = useState<Theme>("blend");
+  // hairline divider fades in once the page has scrolled past the hero edge
+  const [scrolled, setScrolled] = useState(false);
+  const navigate = useRouteTransition();
+  const pathname = usePathname();
 
   useEffect(() => {
     let last = window.scrollY;
@@ -37,7 +51,9 @@ export default function Nav({
     const onScroll = () => {
       const y = window.scrollY;
       if (y < 80) setHidden(false);
-      else if (Math.abs(y - last) > 6) setHidden(y < last); // up => hide
+      // scroll DOWN (y > last) hides the navbar; scroll UP (y < last) reveals it
+      else if (Math.abs(y - last) > 6) setHidden(y > last);
+      setScrolled(y > 80);
       sampleTheme();
       last = y;
     };
@@ -54,6 +70,24 @@ export default function Nav({
   const activeTheme: Theme = menuOpen ? "light" : theme;
   const show = started && (menuOpen || !hidden);
 
+  // route links use the page-transition curtain; in-page hashes scroll natively
+  const onLinkClick = (e: React.MouseEvent, href: string) => {
+    if (href.startsWith("/")) {
+      e.preventDefault();
+      navigate(href);
+    }
+  };
+
+  // logo: scroll to top when already home, otherwise route through the curtain
+  const onLogoClick = (e: React.MouseEvent) => {
+    e.preventDefault();
+    if (pathname === "/") {
+      window.scrollTo({ top: 0, behavior: "smooth" });
+    } else {
+      navigate("/");
+    }
+  };
+
   return (
     <motion.nav
       className={`${styles.nav} ${styles[activeTheme]}`}
@@ -61,13 +95,32 @@ export default function Nav({
       animate={show ? { opacity: 1, y: 0 } : { opacity: 0, y: -24 }}
       transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
     >
-      <a className={styles.logo} href="#top" aria-label="Maginhawa">
+      <a
+        className={styles.logo}
+        href="/"
+        onClick={onLogoClick}
+        aria-label="Maginhawa — home"
+      >
         <img
           className={styles.logoImg}
           src="/logo/maginhawa.png"
           alt="Maginhawa"
         />
       </a>
+
+      <ul className={styles.links}>
+        {LINKS.map((l) => (
+          <li key={l.label}>
+            <a
+              className={styles.link}
+              href={l.href}
+              onClick={(e) => onLinkClick(e, l.href)}
+            >
+              {l.label}
+            </a>
+          </li>
+        ))}
+      </ul>
 
       <button
         type="button"
@@ -89,6 +142,12 @@ export default function Nav({
           transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
         />
       </button>
+
+      <span
+        className={styles.rule}
+        aria-hidden
+        style={{ opacity: scrolled ? 0.35 : 0 }}
+      />
     </motion.nav>
   );
 }

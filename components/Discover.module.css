@@ -4,14 +4,16 @@
   flex-direction: column;
   justify-content: center;
   margin-top: 0;
-  padding: clamp(60px, 8.5vh, 100px) var(--pad-x) clamp(40px, 7vh, 90px);
+  /* related both sides — Statement above and RestaurantLocations below are
+     part of the same restaurants chapter */
+  padding: var(--section-y-sm) var(--pad-x);
 }
 
 .eyebrow {
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
-  opacity: 0.7;
+  color: var(--saffron);
   margin-bottom: clamp(10px, 1.6vh, 20px);
   flex: none;
 }
@@ -61,40 +63,54 @@
   display: block;
 }
 
-/* ---------- overlay on the big image ---------- */
+/* ---------- overlay covers the whole image: head at top, paragraphs at bottom ---------- */
 .overlay {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
+  inset: 0;
   z-index: 3;
-  padding: clamp(70px, 13vh, 150px) clamp(16px, 1.7vw, 30px) clamp(16px, 1.7vw, 30px);
+  padding: clamp(18px, 2.2vh, 32px) clamp(18px, 2vw, 32px);
   display: flex;
   flex-direction: column;
-  gap: clamp(10px, 1.4vh, 18px);
-  /* scrim so the cream title + buttons stay legible over any photo */
+  justify-content: space-between;
+  gap: clamp(16px, 3vh, 32px);
+  /* scrim at top + bottom; middle stays clear so the photo breathes */
   background: linear-gradient(
-    to top,
-    rgba(31, 0, 0, 0.7),
-    rgba(31, 0, 0, 0) 100%
+    to bottom,
+    rgba(31, 0, 0, 0.6) 0%,
+    rgba(31, 0, 0, 0) 22%,
+    rgba(31, 0, 0, 0) 50%,
+    rgba(31, 0, 0, 0.85) 100%
   );
 }
 
-/* restaurant title + tag, now sitting inside the image above the buttons */
+/* top block: name + tag, with a hairline under them */
+.ovTop {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.2vh, 14px);
+}
+
 .ovHead {
   display: flex;
-  align-items: baseline;
+  /* tag pinned to the very top-right; logo extends downward from the same edge */
+  align-items: flex-start;
   justify-content: space-between;
   gap: 1em;
 }
 
-.ovTitle {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: var(--t-h3);
-  line-height: var(--lh-heading);
-  letter-spacing: var(--tr-display);
-  color: var(--cream);
+/* restaurant mark — replaces the text title.
+   The logo PNG is used as a CSS mask so we can paint the silhouette in
+   exact var(--cream) instead of inverted white. */
+.ovLogo {
+  display: block;
+  height: clamp(36px, 5vh, 56px);
+  /* wide enough for the wordmark logos; mask-size:contain handles narrower
+     square marks (Bintang, Mamasons) by scaling them down within the box */
+  width: clamp(140px, 18vw, 200px);
+  background-color: var(--cream);
+  -webkit-mask: var(--ov-logo-url) no-repeat left center / contain;
+  mask: var(--ov-logo-url) no-repeat left center / contain;
+  user-select: none;
 }
 
 .ovTag {
@@ -112,11 +128,47 @@
   background: rgba(248, 243, 234, 0.4);
 }
 
-.ovRow {
+/* bottom block: paragraphs + action buttons, all inside the photo */
+.ovBottom {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2.4vh, 28px);
+}
+
+.ovText {
+  display: flex;
+  gap: clamp(20px, 2.6vw, 48px);
+  align-items: flex-start;
+}
+
+.ovTextCol {
+  flex: 1 1 0;
+  min-width: 0;
+  font-family: var(--font-serif);
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
+  color: var(--cream);
+  opacity: 0.95;
+  text-align: justify;
+  text-justify: inter-word;
+  hyphens: auto;
+}
+
+/* mobile: stack paragraphs */
+@media (max-width: 640px) {
+  .ovText {
+    flex-direction: column;
+    gap: 0.6em;
+  }
+}
+
+/* ---------- actions row, sitting inside the image under the paragraphs ---------- */
+.ovActions {
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 12px;
+  gap: clamp(12px, 1.6vw, 22px);
+  flex-wrap: wrap;
 }
 
 .ovMenu {
@@ -129,9 +181,14 @@
   text-transform: uppercase;
   color: var(--cream);
   cursor: pointer;
+  opacity: 0.9;
+  transition: opacity 0.3s ease;
+}
+.ovMenu:hover {
+  opacity: 1;
 }
 
-.ovActions {
+.ovActGroup {
   display: flex;
   gap: 10px;
 }
@@ -144,17 +201,17 @@
   border-radius: 999px;
   padding: 0.6em 1.2em;
   white-space: nowrap;
-  transition: opacity 0.3s ease, background-color 0.3s ease, color 0.3s ease;
+  transition: background-color 0.3s ease, color 0.3s ease, opacity 0.3s ease;
 }
 
 /* Learn More — solid cream so it reads over the photo */
 .btnSolid {
   background: var(--cream);
-  color: #2f0000;
+  color: var(--maroon);
   border: 1px solid var(--cream);
 }
 .btnSolid:hover {
-  opacity: 0.85;
+  opacity: 0.88;
 }
 
 /* Book a Table — cream stroke + text on a clear background */
@@ -165,11 +222,11 @@
 }
 .btnGhost:hover {
   background: var(--cream);
-  color: #2f0000;
+  color: var(--maroon);
 }
 
 @media (max-width: 520px) {
-  .ovActions {
+  .ovActGroup {
     gap: 6px;
   }
   .btnSolid,
@@ -177,28 +234,6 @@
     padding: 0.55em 0.9em;
     font-size: 0.74rem;
   }
-}
-
-/* paragraphs spread across the full width as equal, justified columns.
-   fixed min-height keeps the left column the same height for every restaurant
-   so the list on the right never shifts */
-.text {
-  display: flex;
-  gap: clamp(28px, 4vw, 80px);
-  align-items: flex-start;
-  min-height: 180px;
-}
-
-.textCol {
-  flex: 1 1 0;
-  min-width: 0;
-  font-family: var(--font-sans);
-  font-size: var(--t-small);
-  line-height: var(--lh-body);
-  opacity: 0.72;
-  text-align: justify;
-  text-justify: inter-word;
-  hyphens: auto;
 }
 
 /* ---------- right: selectable list of names, flush to the right edge ---------- */
@@ -267,10 +302,5 @@
   }
   .list {
     align-self: start;
-  }
-  .text {
-    flex-direction: column;
-    gap: 0.6em;
-    min-height: 0;
   }
 }

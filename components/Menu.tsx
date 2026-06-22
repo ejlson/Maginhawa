@@ -10,7 +10,7 @@ import { getNavTheme } from "./Nav";
 const ITEMS = [
   { label: "Home", href: "/" },
   { label: "Restaurants", href: "/restaurants" },
-  { label: "Blog", href: "#blog" },
+  { label: "Blog", href: "/blog" },
   { label: "About Us", href: "#about-us" },
   { label: "Join Us", href: "#join-us" },
   { label: "Contact Us", href: "#contact-us" },
