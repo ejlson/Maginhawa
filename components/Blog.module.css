@@ -82,7 +82,10 @@
 .featuredBody {
   display: flex;
   flex-direction: column;
+  /* right-align everything in the body — text + tag + link */
+  align-items: flex-end;
   gap: clamp(16px, 2vw, 24px);
+  text-align: right;
 }
 
 .featuredTag {

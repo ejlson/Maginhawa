@@ -132,7 +132,8 @@
 .ovBottom {
   display: flex;
   flex-direction: column;
-  gap: clamp(16px, 2.4vh, 28px);
+  /* tight gap between the hairline, paragraphs, and buttons */
+  gap: clamp(8px, 1.2vh, 16px);
 }
 
 .ovText {

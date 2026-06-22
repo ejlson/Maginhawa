@@ -69,15 +69,18 @@
      lines up with the image's bottom edge */
   justify-content: flex-end;
   /* gap above the hairline — matched by the col padding-top below the line */
-  gap: clamp(10px, 1.4vh, 18px);
+  gap: clamp(4px, 0.6vh, 10px);
   max-width: 50ch;
 }
 
-/* hairline rule between 01 / 02 / 03 — gap value above and below the rule
-   matches the textStack gap, so the breathing room is symmetric */
+/* hairline rule between 01 / 02 / 03.
+   The numeral's font has internal whitespace above the cap-line, so equal
+   CSS padding both sides reads as a *larger* visible gap on the lower side.
+   Padding-top is dropped to 0 so the cap-top of the next numeral sits
+   roughly the same visible distance below the rule as the body text above. */
 .textStack > *:not(:first-child) .col {
   border-top: 1px solid var(--rule);
-  padding-top: clamp(10px, 1.4vh, 18px);
+  padding-top: 0;
 }
 
 .col {

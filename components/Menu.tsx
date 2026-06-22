@@ -11,9 +11,9 @@ const ITEMS = [
   { label: "Home", href: "/" },
   { label: "Restaurants", href: "/restaurants" },
   { label: "Blog", href: "/blog" },
-  { label: "About Us", href: "#about-us" },
-  { label: "Join Us", href: "#join-us" },
-  { label: "Contact Us", href: "#contact-us" },
+  { label: "About Us", href: "/about" },
+  { label: "Join Us", href: "/join-us" },
+  { label: "Contact Us", href: "/contact" },
 ];
 
 export default function Menu({

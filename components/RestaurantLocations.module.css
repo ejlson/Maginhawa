@@ -7,10 +7,13 @@
   /* --expand: 0 → video sits inside the page container.
      --expand: 1 → video stretches edge to edge of the viewport.
      The component drives --expand from scrollYProgress; CSS interpolates the
-     inset and corner radius linearly. */
+     inset and corner radius linearly.
+     Note: 100% (not 100vw) so the calc resolves against the section's actual
+     width — which excludes the vertical scrollbar — matching the container's
+     content edge precisely. */
   --rest-inset: max(
     var(--pad-x),
-    calc((100vw - var(--maxw)) / 2 + var(--pad-x))
+    calc((100% - var(--maxw)) / 2 + var(--pad-x))
   );
   --side-inset: calc(var(--rest-inset) * (1 - var(--expand, 0)));
   --bleed-radius: calc(6px * (1 - var(--expand, 0)));

@@ -1,0 +1,435 @@
+.page {
+  background: var(--cream);
+  color: var(--maroon);
+  padding-top: clamp(80px, 10vh, 120px);
+  overflow-x: clip;
+}
+
+.back {
+  display: inline-flex;
+  align-items: center;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  opacity: 0.7;
+  padding: 8px 0;
+  margin-bottom: clamp(18px, 2.4vh, 32px);
+}
+.back:hover { opacity: 1; }
+
+.eyebrow {
+  display: block;
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--saffron);
+  margin-bottom: clamp(14px, 2vh, 22px);
+}
+
+.sectionTitle {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(2rem, 4vw, 3.6rem);
+  line-height: 1.05;
+  letter-spacing: -0.018em;
+  margin: 0;
+  max-width: 22ch;
+}
+
+/* ---- Hero ---- */
+.hero {
+  padding-block: var(--section-y-sm) var(--section-y);
+}
+
+.heroTitle {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(2.4rem, 5.5vw, 5.4rem);
+  line-height: 1.02;
+  letter-spacing: -0.02em;
+  max-width: 22ch;
+  margin: 0 0 clamp(28px, 4vh, 56px);
+}
+
+.heroLede {
+  font-family: var(--font-serif);
+  font-size: var(--t-lead);
+  line-height: 1.5;
+  opacity: 0.85;
+  max-width: 54ch;
+  margin: 0;
+}
+
+/* ---- Why work with us — three pillars ---- */
+.pillars {
+  padding-block: var(--section-y);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+}
+
+.pillarGrid {
+  display: grid;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
+  gap: clamp(28px, 4vw, 64px);
+}
+
+.pillar {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.6vh, 18px);
+}
+
+.pillarMark {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(2rem, 3vw, 2.8rem);
+  line-height: 1;
+  letter-spacing: -0.012em;
+  color: var(--saffron);
+}
+
+.pillarTitle {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.25rem, 1.9vw, 1.55rem);
+  line-height: 1.18;
+  letter-spacing: -0.005em;
+  margin: 0;
+}
+
+.pillarBody {
+  font-family: var(--font-serif);
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
+  opacity: 0.85;
+  margin: 0;
+}
+
+/* ---- Open roles list ---- */
+.roles {
+  padding-block: var(--section-y);
+}
+
+.rolesHead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: end;
+  gap: clamp(28px, 4vw, 64px);
+  margin-bottom: clamp(36px, 5vh, 64px);
+}
+
+.rolesAside {
+  font-family: var(--font-serif);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  opacity: 0.82;
+  max-width: 46ch;
+}
+
+.roleList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid var(--rule);
+}
+
+.roleItem {
+  border-bottom: 1px solid var(--rule);
+}
+
+.roleRow {
+  width: 100%;
+  display: grid;
+  grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.4fr) minmax(0, 1fr) auto;
+  gap: clamp(16px, 3vw, 40px);
+  align-items: baseline;
+  padding: clamp(20px, 2.6vh, 32px) 0;
+  background: none;
+  border: none;
+  color: inherit;
+  text-align: left;
+  cursor: pointer;
+  transition: padding 0.32s ease, background-color 0.32s ease;
+}
+.roleRow:hover,
+.roleRow:focus-visible {
+  background: rgba(47, 0, 0, 0.04);
+  padding-inline: clamp(8px, 1.4vw, 20px);
+  outline: none;
+}
+
+.roleTitle {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.2rem, 1.95vw, 1.7rem);
+  line-height: 1.18;
+  letter-spacing: -0.005em;
+}
+
+.roleMeta {
+  font-family: var(--font-serif);
+  font-size: var(--t-small);
+  line-height: 1.35;
+  opacity: 0.82;
+}
+
+.roleType {
+  font-family: var(--font-display-xs);
+  font-weight: 500;
+  font-size: var(--t-label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  opacity: 0.62;
+  white-space: nowrap;
+}
+
+.roleChev {
+  flex: none;
+  width: 22px;
+  height: 22px;
+  display: grid;
+  place-items: center;
+  opacity: 0.7;
+  transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+}
+.roleChev svg { width: 14px; height: 14px; }
+.roleChevOpen { transform: rotate(180deg); opacity: 1; }
+
+.roleDetail {
+  padding: 0 0 clamp(28px, 3.4vh, 44px);
+  display: grid;
+  grid-template-columns: minmax(0, 1.4fr) minmax(0, 1fr) minmax(0, 1fr);
+  gap: clamp(20px, 3vw, 48px);
+}
+
+.roleDetailLead {
+  font-family: var(--font-serif);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  opacity: 0.88;
+  max-width: 44ch;
+  margin: 0;
+}
+
+.roleDetailHead {
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--saffron);
+  margin: 0 0 clamp(10px, 1.4vh, 16px);
+}
+
+.roleDetailList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1vh, 12px);
+}
+
+.roleDetailItem {
+  display: grid;
+  grid-template-columns: 14px 1fr;
+  gap: 10px;
+  font-family: var(--font-serif);
+  font-size: var(--t-small);
+  line-height: 1.45;
+  opacity: 0.88;
+}
+
+.roleDetailItem::before {
+  content: "→";
+  color: var(--saffron);
+  font-family: var(--font-sans);
+  line-height: 1.45;
+}
+
+.roleApply {
+  grid-column: 1 / -1;
+  margin-top: clamp(12px, 2vh, 22px);
+  display: flex;
+  justify-content: flex-end;
+}
+
+.roleApplyBtn {
+  display: inline-flex;
+  align-items: center;
+  gap: 10px;
+  padding: 0.6em 1.4em;
+  border: 1px solid var(--maroon);
+  background: transparent;
+  color: var(--maroon);
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  border-radius: 999px;
+  cursor: pointer;
+  transition: background 0.3s ease, color 0.3s ease;
+}
+
+.roleApplyBtn:hover,
+.roleApplyBtn:focus-visible {
+  background: var(--saffron);
+  color: var(--cream);
+  outline: none;
+}
+
+/* ---- Application form ---- */
+.form {
+  padding-block: var(--section-y) var(--section-y-lg);
+  border-top: 1px solid var(--rule);
+}
+
+.formHead {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  align-items: end;
+  gap: clamp(28px, 4vw, 64px);
+  margin-bottom: clamp(36px, 5vh, 64px);
+}
+
+.formAside {
+  font-family: var(--font-serif);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  opacity: 0.82;
+  max-width: 48ch;
+}
+
+.formInner {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: clamp(18px, 2.4vw, 32px) clamp(24px, 3vw, 48px);
+  max-width: 880px;
+}
+
+.field {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+}
+
+.fieldFull {
+  grid-column: 1 / -1;
+}
+
+.field label {
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  opacity: 0.62;
+}
+
+.field input,
+.field select,
+.field textarea {
+  background: transparent;
+  border: none;
+  border-bottom: 1px solid rgba(47, 0, 0, 0.35);
+  color: var(--maroon);
+  font-family: var(--font-serif);
+  font-size: var(--t-body);
+  line-height: 1.4;
+  padding: 0.5em 0;
+  outline: none;
+  transition: border-color 0.3s ease;
+  width: 100%;
+  appearance: none;
+}
+
+.field textarea {
+  min-height: 120px;
+  resize: vertical;
+  font-family: var(--font-serif);
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  color: rgba(47, 0, 0, 0.42);
+}
+
+.field input:focus,
+.field select:focus,
+.field textarea:focus {
+  border-color: var(--saffron);
+}
+
+.field select {
+  cursor: pointer;
+  /* native arrow */
+  background-image: url("data:image/svg+xml;utf8,<svg xmlns='http://www.w3.org/2000/svg' width='12' height='12' viewBox='0 0 16 16' fill='none' stroke='%232f0000' stroke-width='1.5' stroke-linecap='round' stroke-linejoin='round'><path d='M3 6l5 5 5-5'/></svg>");
+  background-repeat: no-repeat;
+  background-position: right 0.2em center;
+  background-size: 12px;
+  padding-right: 1.6em;
+}
+
+.submitRow {
+  grid-column: 1 / -1;
+  display: flex;
+  justify-content: flex-start;
+  margin-top: clamp(8px, 1.4vh, 16px);
+}
+
+.note {
+  grid-column: 1 / -1;
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  opacity: 0.65;
+  margin: 0;
+  max-width: 56ch;
+}
+
+.successCard {
+  grid-column: 1 / -1;
+  background: rgba(201, 126, 63, 0.08);
+  border-left: 2px solid var(--saffron);
+  padding: clamp(18px, 2.4vh, 28px) clamp(20px, 2.4vw, 32px);
+  font-family: var(--font-serif);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+}
+
+.successCard strong {
+  display: block;
+  font-family: var(--font-display);
+  font-size: clamp(1.1rem, 1.4vw, 1.3rem);
+  margin-bottom: 6px;
+  font-weight: 500;
+}
+
+/* ---- Responsive ---- */
+@media (max-width: 860px) {
+  .pillarGrid {
+    grid-template-columns: 1fr;
+  }
+  .rolesHead,
+  .formHead {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+  .roleRow {
+    grid-template-columns: 1fr auto;
+    grid-template-rows: auto auto auto;
+    gap: 6px 16px;
+  }
+  .roleTitle { grid-column: 1; grid-row: 1; }
+  .roleChev { grid-column: 2; grid-row: 1; }
+  .roleMeta { grid-column: 1 / -1; grid-row: 2; }
+  .roleType { grid-column: 1 / -1; grid-row: 3; }
+  .roleDetail {
+    grid-template-columns: 1fr;
+  }
+  .formInner {
+    grid-template-columns: 1fr;
+  }
+}
