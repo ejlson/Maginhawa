@@ -19,6 +19,11 @@ export type Restaurant = {
   // https://search.google.com/local/writereview?placeid=<PLACE_ID>
   // If absent, the UI falls back to a Google Maps search for the restaurant.
   googleReviewUrl?: string;
+  // Optional list of menu page images (PNG/JPG paths under /public). Powers
+  // the Menu overlay in Discover / RestaurantsShowcase / RestaurantDetail.
+  menuPages?: string[];
+  // Optional small-caps subtitle shown above the menu pages — e.g. "February 2026"
+  menuLabel?: string;
 };
 
 export const RESTAURANTS: Restaurant[] = [
@@ -46,6 +51,13 @@ export const RESTAURANTS: Restaurant[] = [
     image: "/images/cafemama.jpg",
     logo: "/logo/cafemama.png",
     bookable: false,
+    menuPages: [
+      "/menu/cafemama/page-1.png",
+      "/menu/cafemama/page-2.png",
+      "/menu/cafemama/page-3.png",
+      "/menu/cafemama/page-4.png",
+    ],
+    menuLabel: "February 2026",
   },
   {
     slug: "mamasons",

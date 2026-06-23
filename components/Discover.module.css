@@ -183,10 +183,16 @@
   color: var(--cream);
   cursor: pointer;
   opacity: 0.9;
-  transition: opacity 0.3s ease;
+  transition: opacity 0.3s ease, color 0.3s ease;
 }
-.ovMenu:hover {
+.ovMenu:hover:not(:disabled),
+.ovMenu:focus-visible:not(:disabled) {
   opacity: 1;
+  color: var(--saffron);
+}
+.ovMenu:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 
 .ovActGroup {

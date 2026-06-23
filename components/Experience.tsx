@@ -11,7 +11,9 @@ import Discover from "./Discover";
 import RestaurantLocations from "./RestaurantLocations";
 import WhoWeAre from "./WhoWeAre";
 // import Timeline from "./Timeline";
-import Press from "./Press";
+// Press section content now lives inside WhoWeAre (rotating quote + masthead
+// marquee sit alongside the "About us" press image).
+// import Press from "./Press";
 import Blog from "./Blog";
 import Contact from "./Contact";
 import FAQ from "./FAQ";
@@ -87,7 +89,7 @@ export default function Experience() {
             <RestaurantLocations />
             <WhoWeAre />
             {/* <Timeline /> */}
-            <Press />
+            {/* Press content merged into <WhoWeAre /> */}
             <Blog />
 
             <DarkZone>

@@ -12,7 +12,7 @@ const ITEMS = [
   { label: "Restaurants", href: "/restaurants" },
   { label: "Blog", href: "/blog" },
   { label: "About Us", href: "/about" },
-  { label: "Join Us", href: "/join-us" },
+  { label: "Careers", href: "/join-us" },
   { label: "Contact Us", href: "/contact" },
 ];
 

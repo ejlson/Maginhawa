@@ -10,7 +10,8 @@ import Footer from "./Footer";
 import { useRouteTransition } from "./PageTransition";
 import VideoBackdrop from "./VideoBackdrop";
 import Placeholder from "./Placeholder";
-import { SLUG_BY_NAME } from "@/lib/restaurants";
+import { SLUG_BY_NAME, getRestaurant } from "@/lib/restaurants";
+import MenuOverlay from "./MenuOverlay";
 
 // scroll-wheel view: stacked lines with the centre one highlighted
 function WheelIcon() {
@@ -148,7 +149,23 @@ export default function RestaurantsShowcase() {
   const [active, setActive] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [view, setView] = useState<"wheel" | "cards">("wheel");
+  // slug of the restaurant whose menu modal is currently open (or null)
+  const [menuFor, setMenuFor] = useState<string | null>(null);
   const navigate = useRouteTransition();
+
+  // helper: open the menu overlay for a given display name, but only if the
+  // restaurant actually has menu pages set in lib/restaurants.ts
+  const openMenuFor = (name: string) => {
+    const slug = SLUG_BY_NAME[name];
+    const r = slug ? getRestaurant(slug) : undefined;
+    if (slug && r?.menuPages && r.menuPages.length > 0) setMenuFor(slug);
+  };
+  const hasMenu = (name: string) => {
+    const slug = SLUG_BY_NAME[name];
+    const r = slug ? getRestaurant(slug) : undefined;
+    return !!(r?.menuPages && r.menuPages.length > 0);
+  };
+  const menuRestaurant = menuFor ? getRestaurant(menuFor) : undefined;
   const scrollerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const copyH = useRef(0); // pixel height of one full copy (N rows)
@@ -429,7 +446,9 @@ export default function RestaurantsShowcase() {
               <button
                 type="button"
                 className={styles.actBtn}
-                onClick={() => navigate("/")}
+                onClick={() => openMenuFor(item.name)}
+                disabled={!hasMenu(item.name)}
+                aria-label={`View ${item.name} menu`}
               >
                 Menu
               </button>
@@ -466,7 +485,9 @@ export default function RestaurantsShowcase() {
                     <button
                       type="button"
                       className={styles.cardBtn}
-                      onClick={() => navigate("/")}
+                      onClick={() => openMenuFor(r.name)}
+                      disabled={!hasMenu(r.name)}
+                      aria-label={`View ${r.name} menu`}
                     >
                       Menu
                     </button>
@@ -528,6 +549,14 @@ export default function RestaurantsShowcase() {
       <DarkZone>
         <Footer />
       </DarkZone>
+
+      <MenuOverlay
+        open={!!menuFor && !!menuRestaurant?.menuPages?.length}
+        onClose={() => setMenuFor(null)}
+        pages={menuRestaurant?.menuPages ?? []}
+        restaurantName={menuRestaurant?.name ?? ""}
+        subtitle={menuRestaurant?.menuLabel}
+      />
     </main>
   );
 }

@@ -98,13 +98,14 @@
   cursor: pointer;
   transition: background 0.25s ease, color 0.25s ease;
 }
-.btn:hover { background: var(--maroon); color: var(--cream); }
+.btn:hover:not(:disabled) { background: var(--maroon); color: var(--cream); }
+.btn:disabled { opacity: 0.35; cursor: not-allowed; }
 .btnSolid { background: var(--maroon); color: var(--cream); }
-.btnSolid:hover { background: var(--maroon-soft); }
+.btnSolid:hover:not(:disabled) { background: var(--maroon-soft); }
 
 .heroImage {
   position: relative;
-  border-radius: 14px;
+  border-radius: 0;
   overflow: hidden;
   aspect-ratio: 4 / 5;
   background: var(--placeholder);

@@ -98,7 +98,7 @@
   position: relative;
   min-height: 0;
   overflow: hidden;
-  border-radius: 5px;
+  border-radius: 0;
 }
 
 .cardImg {
@@ -183,10 +183,14 @@
   transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
   -webkit-tap-highlight-color: transparent;
 }
-.cardBtn:hover {
+.cardBtn:hover:not(:disabled) {
   background: var(--cream);
   color: var(--maroon);
   border-color: var(--cream);
+}
+.cardBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 .cardBtnSolid {
   background: var(--cream);
@@ -426,10 +430,14 @@
   transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease;
   -webkit-tap-highlight-color: transparent;
 }
-.actBtn:hover {
+.actBtn:hover:not(:disabled) {
   background: var(--cream);
   color: var(--maroon);
   border-color: var(--cream);
+}
+.actBtn:disabled {
+  opacity: 0.35;
+  cursor: not-allowed;
 }
 .actBtn span {
   transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);

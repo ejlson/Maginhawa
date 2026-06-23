@@ -4,30 +4,22 @@
   height: clamp(640px, 138svh, 1200px);
   margin-top: clamp(16px, 3vh, 48px);
   overflow: hidden;
-  /* --expand: 0 → video sits inside the page container.
+  /* --expand: 0 → video sits inside the page container (pad-x on each side).
      --expand: 1 → video stretches edge to edge of the viewport.
-     The component drives --expand from scrollYProgress; CSS interpolates the
-     inset and corner radius linearly.
-     Note: 100% (not 100vw) so the calc resolves against the section's actual
-     width — which excludes the vertical scrollbar — matching the container's
-     content edge precisely. */
-  --rest-inset: max(
-    var(--pad-x),
-    calc((100% - var(--maxw)) / 2 + var(--pad-x))
-  );
+     The component drives --expand from scrollYProgress; CSS interpolates
+     the inset linearly. Corners are square at every state. */
+  --rest-inset: var(--pad-x);
   --side-inset: calc(var(--rest-inset) * (1 - var(--expand, 0)));
-  --bleed-radius: calc(6px * (1 - var(--expand, 0)));
 }
 
 /* reduced motion: skip the animation, leave the video at full bleed */
 @media (prefers-reduced-motion: reduce) {
   .section {
     --side-inset: 0px;
-    --bleed-radius: 0px;
   }
 }
 
-/* clip container — sized + cornered by the scroll-driven CSS variables */
+/* clip container — sized by the scroll-driven CSS variables, square corners */
 .reveal {
   position: absolute;
   top: 0;
@@ -35,8 +27,7 @@
   left: var(--side-inset);
   right: var(--side-inset);
   overflow: hidden;
-  border-radius: var(--bleed-radius);
-  will-change: left, right, border-radius;
+  will-change: left, right;
 }
 
 .bg {

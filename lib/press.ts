@@ -14,20 +14,23 @@ export type PressMention = {
 
 // Outlets shown in the "As Featured In" strip on the home page. These are the
 // recognisable mastheads — each shouts credibility on its own.
-export const FEATURED_OUTLETS: { name: string; tier?: "headline" }[] = [
+// `logo` is an optional path to a real outlet logo file (drop the file at
+// `/public/logos/press/<slug>.svg` and add the path here). When absent, the
+// outlet's name renders as a wordmark fallback.
+export const FEATURED_OUTLETS: { name: string; tier?: "headline"; logo?: string }[] = [
   { name: "The Times", tier: "headline" },
-  { name: "Michelin Guide", tier: "headline" },
-  { name: "The Independent" },
-  { name: "BBC Good Food" },
+  { name: "Michelin Guide", tier: "headline", logo: "/logos/press/michelin.png" },
+  { name: "The Independent", logo: "/logos/press/theindependent.png" },
+  { name: "BBC Good Food", logo: "/logos/press/bbcgoodfood.png" },
   { name: "Time Out" },
-  { name: "Forbes" },
+  { name: "Forbes", logo: "/logos/press/forbes.png" },
   { name: "The Observer" },
-  { name: "Evening Standard" },
+  { name: "Evening Standard", logo: "/logos/press/eveningstandard.png" },
   { name: "The Week" },
-  { name: "Metro" },
+  { name: "Metro", logo: "/logos/press/metro.png" },
   { name: "Square Meal" },
   { name: "Olive Magazine" },
-  { name: "City AM" },
+  { name: "City AM", logo: "/logos/press/cityam.png" },
   { name: "Visit London" },
 ];
 
@@ -97,7 +100,7 @@ export const PRESS: PressMention[] = [
     quote: "Belly named among Time Out's five best new London openings of 2025.",
     date: "—",
     url: "https://www.timeout.com/london/news/the-5-best-new-london-restaurants-that-opened-in-2025-121825",
-    restaurants: ["belly"],
+    restaurants: ["belly", "cafemama"],
   },
   {
     outlet: "Evening Standard",

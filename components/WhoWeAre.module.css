@@ -1,165 +1,177 @@
+/* =========================================================================
+   WhoWeAre — editorial "Who is Maginhawa Group?" section
+   12-col grid that flows like a printed magazine: header split, wide hero,
+   two short body columns, founder portrait + named subhead + paired
+   portraits, pull quote, and a closing press-style credit.
+   ========================================================================= */
+
 .section {
-  margin-top: 0;
-  /* chapter top (real break from the Restaurants chapter), related bottom
-     (WhoWeAre and Press are paired: Maginhawa in its own words / others') */
+  /* chapter top (real break from Restaurants), related bottom (pairs with
+     the Press section that follows) */
   padding: var(--section-y-lg) 0 var(--section-y-sm);
 }
 
-/* statement block (eyebrow inline + big indented statement) — matches the
-   Discover Our Restaurants intro style */
-.statementWrap {
-  position: relative;
+.grid {
+  display: grid;
+  grid-template-columns: repeat(12, minmax(0, 1fr));
+  column-gap: clamp(16px, 2vw, 32px);
+  row-gap: clamp(18px, 2.6vh, 44px);
+  align-items: start;
 }
 
-.sEyebrow {
-  position: absolute;
-  top: clamp(8px, 1vw, 18px);
-  left: 0;
+/* ---- Header row ---- */
+.headerLeft {
+  grid-column: 1 / 5;
+  grid-row: 1;
+  align-self: start;
+}
+
+.eyebrow {
+  display: block;
+  padding-top: clamp(2px, 0.4vw, 6px);
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  color: var(--saffron);
   white-space: nowrap;
+}
+
+.headline {
+  margin-top: clamp(4px, 0.6vh, 10px);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.9rem, 4.2vw, 4rem);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
+  color: var(--maroon);
+  display: flex;
+  flex-direction: column;
+}
+.headlineLine {
+  display: block;
+  white-space: nowrap;
+}
+
+.intro {
+  grid-column: 5 / 13;
+  grid-row: 1;
+  align-self: start;
+  padding-top: clamp(2px, 0.4vw, 6px);
+  font-family: var(--font-sans);
+  font-size: var(--t-body);
+  line-height: 1.45;
+  color: var(--maroon);
+}
+.intro p { opacity: 0.92; }
+
+/* ---- Wide editorial photograph ---- */
+.hero {
+  grid-column: 1 / 13;
+  grid-row: 2;
+}
+.heroFrame {
+  width: 100%;
+  height: auto;
+}
+.heroFrame img,
+.imgFrame img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* ---- Two short body columns ---- */
+.body1,
+.body2 {
+  grid-row: 3;
+  font-family: var(--font-sans);
+  font-size: var(--t-body);
+  line-height: 1.45;
+  color: var(--maroon);
+  max-width: 36ch;
+}
+.body1 { grid-column: 1 / 5; }
+.body2 { grid-column: 5 / 9; }
+.body1 p,
+.body2 p { opacity: 0.88; }
+
+/* ---- Founder block ---- */
+.chefImage {
+  grid-column: 5 / 8;
+  grid-row: 4;
+}
+.imgFrame {
+  width: 100%;
+  height: auto;
+}
+
+.chefRight {
+  grid-column: 9 / 13;
+  grid-row: 4;
+  margin-left: clamp(-56px, -3.5vw, -32px);
+  padding-top: clamp(14px, 1.6vh, 22px);
+  border-top: 1px solid rgba(47, 0, 0, 0.85);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1vh, 14px);
+}
+
+.chefEyebrow {
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   color: var(--saffron);
 }
 
-.statement {
+.chefName {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: var(--t-display);
-  line-height: var(--lh-display);
+  font-size: clamp(2.4rem, 5vw, 4.2rem);
+  line-height: 0.95;
   letter-spacing: var(--tr-display);
   color: var(--maroon);
+  margin-top: -0.2em;
 }
 
-.spacer {
-  display: inline-block;
-  width: clamp(150px, 18vw, 320px);
-  height: 0.1em;
-  vertical-align: middle;
-}
-
-@media (max-width: 640px) {
-  .sEyebrow {
-    position: static;
-    display: block;
-    width: auto;
-    margin-bottom: 1em;
-  }
-  .spacer {
-    display: none;
-  }
-}
-
-/* ---- two-column body, golden ratio split ----
-   left: vertical 01 / 02 / 03 stack with small gaps — text gets φ
-   right: narrower portrait photo, stretched so its bottom edge meets the
-   bottom of the third paragraph                                          */
-.body {
-  margin-top: clamp(36px, 6vh, 80px);
-  display: grid;
-  grid-template-columns: minmax(0, 1.618fr) minmax(0, 1fr);
-  gap: clamp(40px, 5vw, 96px);
-  align-items: stretch;
-}
-
-.textStack {
+.chefBody {
   display: flex;
   flex-direction: column;
-  /* paragraphs settle at the bottom of the column so 03's bottom edge
-     lines up with the image's bottom edge */
-  justify-content: flex-end;
-  /* gap above the hairline — matched by the col padding-top below the line */
-  gap: clamp(4px, 0.6vh, 10px);
-  max-width: 50ch;
+  gap: 0.6em;
+  margin-top: clamp(2px, 0.4vh, 8px);
+  max-width: 42ch;
 }
-
-/* hairline rule between 01 / 02 / 03.
-   The numeral's font has internal whitespace above the cap-line, so equal
-   CSS padding both sides reads as a *larger* visible gap on the lower side.
-   Padding-top is dropped to 0 so the cap-top of the next numeral sits
-   roughly the same visible distance below the rule as the body text above. */
-.textStack > *:not(:first-child) .col {
-  border-top: 1px solid var(--rule);
-  padding-top: 0;
-}
-
-.col {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: clamp(10px, 1.4vh, 16px);
-  outline: none;
-}
-
-/* big numeral + title sit on one baseline */
-.colHead {
-  display: flex;
-  align-items: baseline;
-  gap: 0.5em;
-  color: var(--maroon);
-}
-
-.num {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: clamp(2.4rem, 4.8vw, 4rem);
-  line-height: 0.9;
-  letter-spacing: -0.01em;
-  opacity: 0.22;
-  transition: opacity 0.5s ease;
-}
-.colActive .num {
-  opacity: 0.55;
-}
-
-.title {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: clamp(1.1rem, 1.5vw, 1.4rem);
-  letter-spacing: -0.01em;
-}
-
-.colBody {
+.chefBody p {
   font-family: var(--font-sans);
-  font-size: var(--t-small);
-  line-height: var(--lh-body);
-  opacity: 0.82;
-  max-width: 44ch;
+  font-size: var(--t-body);
+  line-height: 1.45;
+  color: var(--maroon);
+  opacity: 0.88;
 }
 
-/* ---- image column ---- */
-.imageCol {
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  min-height: 0;
+.chefSmall {
+  grid-column: 9 / 13;
+  grid-row: 5;
+  margin-left: clamp(-56px, -3.5vw, -32px);
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(10px, 1.2vw, 18px);
 }
-
-/* parallax frame sets the row height via a portrait aspect ratio; the text
-   stack on the left justifies to the bottom so both columns share an edge */
-.imgFrameFull {
-  flex: none;
-  width: 100%;
-  height: auto;
-  aspect-ratio: 2 / 3;
-}
-
-.photoStack {
+.chefSmallFrame {
   position: relative;
   width: 100%;
-  height: 100%;
+  aspect-ratio: 3 / 4;
+  overflow: hidden;
 }
-.photo {
-  position: absolute;
-  inset: 0;
+.chefSmallFrame img {
   width: 100%;
   height: 100%;
   object-fit: cover;
-  transition: opacity 0.6s ease;
+  display: block;
 }
 
-/* bottom wash so the button stays legible over any photo */
-.photoScrim {
+/* Bottom-up wash so the overlaid "About Us" button reads on any photo */
+.chefSmallScrim {
   position: absolute;
   inset: 0;
   z-index: 1;
@@ -167,30 +179,284 @@
   background: linear-gradient(
     to top,
     rgba(18, 0, 0, 0.55),
-    rgba(18, 0, 0, 0) 38%
+    rgba(18, 0, 0, 0) 42%
   );
 }
 
-/* Learn More button, overlaid in the image's bottom-right corner */
-.imageBtn {
+.chefSmallCta {
   position: absolute;
-  right: clamp(12px, 1.5vw, 20px);
-  bottom: clamp(12px, 1.5vw, 20px);
   z-index: 2;
+  right: clamp(10px, 1.2vw, 18px);
+  bottom: clamp(10px, 1.2vw, 18px);
 }
 
-/* ---- responsive ---- */
-@media (max-width: 860px) {
-  .body {
-    grid-template-columns: 1fr;
-    gap: clamp(32px, 5vh, 64px);
+/* ---- Pull quote — sits beneath the chef portrait ---- */
+.pullQuote {
+  grid-column: 5 / 8;
+  grid-row: 5;
+  align-self: stretch;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+}
+.pullQuoteText {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.9rem, 3.4vw, 3rem);
+  line-height: 1.05;
+  letter-spacing: var(--tr-display);
+  color: var(--maroon);
+  max-width: 16ch;
+}
+.pullQuoteCaption {
+  margin-top: clamp(14px, 1.6vh, 22px);
+  padding-right: clamp(8px, 1.5vw, 24px);
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  color: var(--maroon);
+  opacity: 0.7;
+}
+
+/* ---- Closing press credit ---- */
+.pressImage {
+  grid-column: 1 / 5;
+  grid-row: 6;
+}
+
+.pressQuote {
+  grid-column: 5 / 13;
+  grid-row: 6;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  align-self: stretch;
+  height: 100%;
+  text-align: left;
+}
+.pressQuoteRotator {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+}
+.pressQuoteText {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(2rem, 3.8vw, 3.4rem);
+  line-height: 1.05;
+  letter-spacing: var(--tr-display);
+  color: var(--maroon);
+  max-width: 22ch;
+}
+.pressQuoteText strong {
+  font-weight: 700;
+}
+
+.pressAttribution {
+  margin-top: clamp(20px, 2.4vh, 32px);
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  justify-content: flex-start;
+  gap: clamp(10px, 1.4vw, 18px);
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--maroon);
+  opacity: 0.85;
+}
+.pressDot {
+  display: inline-block;
+  width: 5px;
+  height: 5px;
+  border-radius: 50%;
+  background: var(--maroon);
+  opacity: 0.6;
+}
+
+/* ---- Twin masthead marquees, drifting in opposite directions ---- */
+.marqueeStack {
+  margin-top: auto;
+  padding-block: clamp(8px, 1.2vh, 14px);
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  position: relative;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.2vh, 14px);
+  width: 100%;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 4%,
+    black 96%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    black 4%,
+    black 96%,
+    transparent 100%
+  );
+}
+
+.midRule {
+  flex: none;
+  height: 1px;
+  background: var(--rule);
+  opacity: 0.55;
+}
+
+.marqueeTrack {
+  display: flex;
+  align-items: center;
+  gap: clamp(20px, 2.6vw, 40px);
+  width: max-content;
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  will-change: transform;
+}
+
+.trackForward { animation: weMarqueeForward 52s linear infinite; }
+.trackReverse { animation: weMarqueeReverse 68s linear infinite; }
+
+@keyframes weMarqueeForward {
+  from { transform: translate3d(0, 0, 0); }
+  to   { transform: translate3d(-50%, 0, 0); }
+}
+
+@keyframes weMarqueeReverse {
+  from { transform: translate3d(-50%, 0, 0); }
+  to   { transform: translate3d(0, 0, 0); }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .trackForward,
+  .trackReverse { animation: none; }
+}
+
+.outlet {
+  flex: none;
+  font-family: var(--font-display-sm);
+  font-weight: 500;
+  font-size: clamp(0.95rem, 1.4vw, 1.3rem);
+  letter-spacing: -0.005em;
+  line-height: 1.25;
+  opacity: 0.82;
+  white-space: nowrap;
+  transition: color 0.28s ease, opacity 0.28s ease;
+}
+
+.outletHeadline {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.2rem, 1.9vw, 1.7rem);
+  letter-spacing: -0.012em;
+  opacity: 1;
+}
+
+.outletLogo {
+  display: block;
+  height: clamp(44px, 4.6vw, 68px);
+  width: auto;
+  max-width: 320px;
+  object-fit: contain;
+}
+
+.sep {
+  flex: none;
+  display: inline-block;
+  width: 4px;
+  height: 4px;
+  border-radius: 50%;
+  background: currentColor;
+  opacity: 0.4;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .outlet:hover {
+    color: var(--saffron);
+    opacity: 1;
   }
-  /* mobile: photo decouples from the text height and sits as a 4:5 portrait */
-  .imgFrameFull {
-    flex: none;
-    aspect-ratio: 4 / 5;
+}
+
+/* ---------------- responsive ---------------- */
+@media (max-width: 1024px) {
+  .headerLeft { grid-column: 1 / 6; }
+  .intro { grid-column: 6 / 13; }
+  .body1 { grid-column: 1 / 7; }
+  .body2 { grid-column: 7 / 13; }
+  .chefImage { grid-column: 1 / 6; }
+  .chefRight { grid-column: 6 / 13; }
+  .pullQuote { grid-column: 1 / 6; }
+  .chefSmall { grid-column: 6 / 13; max-width: none; }
+  .pressImage { grid-column: 1 / 6; }
+  .pressQuote { grid-column: 6 / 13; }
+}
+
+@media (max-width: 720px) {
+  .grid {
+    row-gap: clamp(36px, 6vh, 72px);
   }
-  .textStack {
+  .headerLeft {
+    grid-column: 1 / 13;
+    grid-row: 1;
+  }
+  .intro {
+    grid-column: 1 / 13;
+    grid-row: 2;
+    padding-top: 0;
+    max-width: 52ch;
+  }
+  .hero { grid-row: 3; }
+
+  .body1,
+  .body2 {
+    grid-column: 1 / 13;
+    max-width: 52ch;
+  }
+  .body1 { grid-row: 4; }
+  .body2 { grid-row: 5; }
+
+  .chefImage {
+    grid-column: 1 / 13;
+    grid-row: 6;
+  }
+  .chefRight {
+    grid-column: 1 / 13;
+    grid-row: 7;
+  }
+  .chefSmall {
+    grid-column: 1 / 13;
+    grid-row: 8;
     max-width: none;
+  }
+  .pullQuote {
+    grid-column: 1 / 13;
+    grid-row: 9;
+    align-items: flex-start;
+    text-align: left;
+  }
+  .pullQuoteText {
+    max-width: 22ch;
+  }
+  .pullQuoteCaption {
+    padding-right: 0;
+  }
+
+  .pressImage {
+    grid-column: 1 / 13;
+    grid-row: 10;
+  }
+  .pressQuote {
+    grid-column: 1 / 13;
+    grid-row: 11;
+    padding-bottom: 0;
   }
 }

@@ -4,6 +4,7 @@ import { motion, useScroll, useTransform } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import styles from "./Discover.module.css";
 import Placeholder from "./Placeholder";
+import MenuOverlay from "./MenuOverlay";
 
 const ITEMS = [
   {
@@ -46,6 +47,13 @@ const ITEMS = [
     location: "London",
     image: "/images/cafemama.jpg",
     logo: "/logo/cafemama.png",
+    menuPages: [
+      "/menu/cafemama/page-1.png",
+      "/menu/cafemama/page-2.png",
+      "/menu/cafemama/page-3.png",
+      "/menu/cafemama/page-4.png",
+    ],
+    menuLabel: "February 2026",
     paras: [
       "Cafe Mama&sons aims to be apart of your daily life offering you a daily exciting alternative to the boring croissant or pre packaged sandwich.",
       "We offer hand crafted Sandos all with different and exciting fillings from your classic egg salad to the decadent hearty corned beef croquette you wont be dissapointed.",
@@ -91,7 +99,10 @@ export default function Discover() {
   const [active, setActive] = useState(0);
   const [base, setBase] = useState(0); // last fully-revealed image (sits behind)
   const [seq, setSeq] = useState(0); // bumps each switch so the mask re-wipes
+  const [menuOpen, setMenuOpen] = useState(false);
   const item = ITEMS[active];
+  const menuPages = (item as { menuPages?: string[] }).menuPages;
+  const menuLabel = (item as { menuLabel?: string }).menuLabel;
 
   // the list drifts down with scroll: top-aligned to the image, ending with
   // its bottom level with the image's bottom
@@ -166,7 +177,19 @@ export default function Discover() {
             ))}
           </div>
           <div className={styles.ovActions}>
-            <button type="button" className={styles.ovMenu}>
+            <button
+              type="button"
+              className={styles.ovMenu}
+              onClick={() => {
+                const pages = (it as { menuPages?: string[] }).menuPages;
+                if (pages && pages.length > 0) setMenuOpen(true);
+              }}
+              disabled={
+                !(it as { menuPages?: string[] }).menuPages ||
+                ((it as { menuPages?: string[] }).menuPages || []).length === 0
+              }
+              aria-label={`View ${it.name} menu`}
+            >
               Menu
             </button>
             <div className={styles.ovActGroup}>
@@ -234,6 +257,14 @@ export default function Discover() {
           ))}
         </motion.nav>
       </div>
+
+      <MenuOverlay
+        open={menuOpen && !!menuPages && menuPages.length > 0}
+        onClose={() => setMenuOpen(false)}
+        pages={menuPages ?? []}
+        restaurantName={item.name}
+        subtitle={menuLabel}
+      />
     </section>
   );
 }

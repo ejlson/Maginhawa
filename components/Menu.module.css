@@ -101,7 +101,7 @@
   flex: none;
   align-self: flex-end;
   width: clamp(116px, 32%, 150px);
-  border-radius: 10px;
+  border-radius: 0;
   overflow: hidden;
   position: relative;
 }

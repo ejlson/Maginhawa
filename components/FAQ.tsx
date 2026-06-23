@@ -18,13 +18,10 @@ const ITEMS: { q: string; a: string }[] = [
     a: "Every kitchen has vegetarian, vegan and gluten-free options, and we're happy to adapt where we can. Add a note to your booking or ask your server when you sit down — we'll point you to the dishes we can adjust.",
   },
   {
-    q: "Are children welcome?",
-    a: "Yes, across all of our restaurants. High chairs and smaller plates are available. If it helps, mention it in your booking so we can have the table ready when you arrive.",
-  },
-  {
     q: "Do you do private hire or large groups?",
     a: "We host private dinners, supper clubs and full-restaurant hires across the group. For parties of eight or more, reach out via the contact form above and we'll come back to you with options.",
   },
+  
 ];
 
 function Chevron() {

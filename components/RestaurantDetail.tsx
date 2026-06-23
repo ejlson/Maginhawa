@@ -6,6 +6,7 @@ import Menu from "./Menu";
 import Reveal from "./Reveal";
 import Footer from "./Footer";
 import DarkZone from "./DarkZone";
+import MenuOverlay from "./MenuOverlay";
 import { useRouteTransition } from "./PageTransition";
 import styles from "./RestaurantDetail.module.css";
 import type { Restaurant } from "@/lib/restaurants";
@@ -17,7 +18,9 @@ export default function RestaurantDetail({
   restaurant: Restaurant;
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
+  const [menuOverlayOpen, setMenuOverlayOpen] = useState(false);
   const navigate = useRouteTransition();
+  const hasMenu = !!(restaurant.menuPages && restaurant.menuPages.length > 0);
   const press = pressForRestaurant(restaurant.slug);
 
   // page is light cream — release the dark backdrop the showcase set
@@ -94,7 +97,13 @@ export default function RestaurantDetail({
                     Book a Table
                   </button>
                 )}
-                <button type="button" className={styles.btn}>
+                <button
+                  type="button"
+                  className={styles.btn}
+                  onClick={() => hasMenu && setMenuOverlayOpen(true)}
+                  disabled={!hasMenu}
+                  aria-label={`View ${restaurant.name} menu`}
+                >
                   View Menu
                 </button>
               </Reveal>
@@ -152,6 +161,14 @@ export default function RestaurantDetail({
           <Footer />
         </DarkZone>
       </main>
+
+      <MenuOverlay
+        open={menuOverlayOpen && hasMenu}
+        onClose={() => setMenuOverlayOpen(false)}
+        pages={restaurant.menuPages ?? []}
+        restaurantName={restaurant.name}
+        subtitle={restaurant.menuLabel}
+      />
     </>
   );
 }

@@ -156,11 +156,12 @@ html::-webkit-scrollbar {
   display: none;
 }
 
-/* ---- shared layout helpers ---- */
+/* ---- shared layout helpers ----
+   .container is full-bleed minus var(--pad-x) — matches the footer's
+   content edges. The --maxw token is preserved for any component that
+   wants to opt-in to the older centred-1440 layout. */
 .container {
   width: 100%;
-  max-width: var(--maxw);
-  margin-inline: auto;
   padding-inline: var(--pad-x);
 }
 
@@ -195,9 +196,111 @@ html::-webkit-scrollbar {
   font-size: clamp(4rem, 17.5vw, 17rem);
 }
 
+/* persistent depth-of-field band — a fixed overlay pinned to the bottom of
+   the viewport that blurs whatever sits behind it. A mask gradient fades the
+   blur in from transparent (top of band) to fully opaque (bottom edge), so
+   content sharpens as it scrolls upward out of the band. */
+/* Stacked depth-of-field bands — two layers pinned to the bottom of the
+   viewport, each with a softer blur and a smoother mask. Layering produces
+   a gradient blur (light → strong) rather than a single hard band, which
+   reads as a much smoother focus falloff. */
+.scrollBlur,
+.scrollBlur::before,
+.scrollBlur::after {
+  position: fixed;
+  inset: auto 0 0 0;
+  pointer-events: none;
+}
+.scrollBlur {
+  height: 35px;
+  z-index: 40;
+  -webkit-backdrop-filter: blur(5px);
+  backdrop-filter: blur(5px);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.04) 18%,
+    rgba(0, 0, 0, 0.14) 38%,
+    rgba(0, 0, 0, 0.32) 58%,
+    rgba(0, 0, 0, 0.58) 78%,
+    rgba(0, 0, 0, 0.86) 92%,
+    rgba(0, 0, 0, 1) 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.04) 18%,
+    rgba(0, 0, 0, 0.14) 38%,
+    rgba(0, 0, 0, 0.32) 58%,
+    rgba(0, 0, 0, 0.58) 78%,
+    rgba(0, 0, 0, 0.86) 92%,
+    rgba(0, 0, 0, 1) 100%
+  );
+  /* dedicated GPU layer — keeps the blur stable when an animated element
+     (e.g. MagneticButton's radiating hover fill) sits behind the band */
+  transform: translate3d(0, 0, 0);
+  will-change: backdrop-filter;
+  contain: layout style paint;
+}
+.scrollBlur::before {
+  content: "";
+  height: 22px;
+  z-index: 41;
+  -webkit-backdrop-filter: blur(12px);
+  backdrop-filter: blur(12px);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.1) 30%,
+    rgba(0, 0, 0, 0.45) 60%,
+    rgba(0, 0, 0, 0.85) 85%,
+    rgba(0, 0, 0, 1) 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.1) 30%,
+    rgba(0, 0, 0, 0.45) 60%,
+    rgba(0, 0, 0, 0.85) 85%,
+    rgba(0, 0, 0, 1) 100%
+  );
+  transform: translate3d(0, 0, 0);
+  will-change: backdrop-filter;
+  contain: layout style paint;
+}
+.scrollBlur::after {
+  content: "";
+  position: fixed;
+  inset: auto 0 0 0;
+  pointer-events: none;
+  height: 12px;
+  z-index: 42;
+  -webkit-backdrop-filter: blur(22px);
+  backdrop-filter: blur(22px);
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.25) 40%,
+    rgba(0, 0, 0, 0.75) 75%,
+    rgba(0, 0, 0, 1) 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.25) 40%,
+    rgba(0, 0, 0, 0.75) 75%,
+    rgba(0, 0, 0, 1) 100%
+  );
+  transform: translate3d(0, 0, 0);
+  will-change: backdrop-filter;
+  contain: layout style paint;
+}
+
 @media (prefers-reduced-motion: reduce) {
   * {
     animation-duration: 0.001ms !important;
     transition-duration: 0.001ms !important;
   }
+  /* respect reduced-motion users — drop the persistent backdrop blur */
+  .scrollBlur { display: none; }
 }

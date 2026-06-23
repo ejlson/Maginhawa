@@ -95,6 +95,10 @@ export default function RootLayout({
       </head>
       <body className="is-loading">
         <PageTransition>{children}</PageTransition>
+        {/* persistent depth-of-field band at the bottom of the viewport —
+            content sitting in the lower portion of the screen always reads
+            slightly defocused and resolves as it scrolls upward */}
+        <div className="scrollBlur" aria-hidden />
       </body>
     </html>
   );

@@ -15,8 +15,8 @@ export const getNavTheme = (): Theme => latestTheme;
 const LINKS = [
   { label: "Restaurants", href: "/restaurants" },
   { label: "Blog", href: "/blog" },
-  { label: "About", href: "/about" },
-  { label: "Join Us", href: "/join-us" },
+  { label: "About Us", href: "/about" },
+  { label: "Careers", href: "/join-us" },
   { label: "Contact", href: "/contact" },
 ];
 
