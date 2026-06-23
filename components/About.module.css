@@ -86,10 +86,18 @@
 }
 .heroLineTop {
   text-align: left;
+  /* Display fonts carry a small left side-bearing on the M — nudge the
+     glyph back so the visible left edge of the M sits flush with the
+     image's left edge. */
+  margin-left: -0.02em;
 }
 .heroLineBottom {
   text-align: right;
   justify-self: end;
+  /* Pull the wordmark up so its visible cap-line aligns with the top of
+     the aside paragraph beside it. Without this the font's ascender/cap
+     space pushes the visible top of GROUP well below the aside. */
+  margin-top: -0.1em;
 }
 
 /* Image frame has an explicit aspect ratio capped by a viewport-relative

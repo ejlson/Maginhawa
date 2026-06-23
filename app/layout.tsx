@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
 import PageTransition from "@/components/PageTransition";
+import SmoothScroll from "@/lib/SmoothScroll";
 import { OrganizationJsonLd, WebSiteJsonLd } from "@/lib/jsonld";
 
 const fraunces = Fraunces({
@@ -94,7 +95,11 @@ export default function RootLayout({
         <WebSiteJsonLd />
       </head>
       <body className="is-loading">
-        <PageTransition>{children}</PageTransition>
+        {/* Lenis lives at the root so the smooth-scroll feel is consistent
+            on every route, not just the home page. */}
+        <SmoothScroll>
+          <PageTransition>{children}</PageTransition>
+        </SmoothScroll>
         {/* persistent depth-of-field band at the bottom of the viewport —
             content sitting in the lower portion of the screen always reads
             slightly defocused and resolves as it scrolls upward */}

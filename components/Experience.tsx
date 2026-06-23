@@ -1,7 +1,6 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import SmoothScroll from "@/lib/SmoothScroll";
 import Loader from "./Loader";
 import Nav from "./Nav";
 import Menu from "./Menu";
@@ -62,47 +61,45 @@ export default function Experience() {
   const started = !intro;
 
   return (
-    <SmoothScroll>
-      <div
-        style={
-          {
-            "--hero-top": `${insets.top}px`,
-            "--hero-side": `${insets.side}px`,
-            "--hero-bottom": `${insets.bottom}px`,
-            "--hero-radius": `${insets.radius}px`,
-          } as React.CSSProperties
-        }
-      >
-        <Nav
-          started={started}
-          menuOpen={menuOpen}
-          onMenuToggle={() => setMenuOpen((o) => !o)}
-        />
-        <Menu open={menuOpen} onClose={() => setMenuOpen(false)} />
+    <div
+      style={
+        {
+          "--hero-top": `${insets.top}px`,
+          "--hero-side": `${insets.side}px`,
+          "--hero-bottom": `${insets.bottom}px`,
+          "--hero-radius": `${insets.radius}px`,
+        } as React.CSSProperties
+      }
+    >
+      <Nav
+        started={started}
+        menuOpen={menuOpen}
+        onMenuToggle={() => setMenuOpen((o) => !o)}
+      />
+      <Menu open={menuOpen} onClose={() => setMenuOpen(false)} />
 
-        <main data-nav-theme="light">
-          <Hero started={started} />
+      <main data-nav-theme="light">
+        <Hero started={started} />
 
-          <div className="afterHero">
-            <Statement />
-            <Discover />
-            <RestaurantLocations />
-            <WhoWeAre />
-            {/* <Timeline /> */}
-            {/* Press content merged into <WhoWeAre /> */}
-            <Blog />
+        <div className="afterHero">
+          <Statement />
+          <Discover />
+          <RestaurantLocations />
+          <WhoWeAre />
+          {/* <Timeline /> */}
+          {/* Press content merged into <WhoWeAre /> */}
+          <Blog />
 
-            <DarkZone>
-              <Contact />
-              <FAQ />
-              <ReviewUs />
-              <Footer />
-            </DarkZone>
-          </div>
-        </main>
+          <DarkZone>
+            <Contact />
+            <FAQ />
+            <ReviewUs />
+            <Footer />
+          </DarkZone>
+        </div>
+      </main>
 
-        {intro && <Loader insets={insets} onDone={() => setIntro(false)} />}
-      </div>
-    </SmoothScroll>
+      {intro && <Loader insets={insets} onDone={() => setIntro(false)} />}
+    </div>
   );
 }
