@@ -97,9 +97,12 @@
   --section-y-lg: clamp(120px, 16vh, 240px);
   /* uniform air on either side of a hairline section rule — every section
      that opens with a border-top uses this above AND below the line, so
-     the rules read as one consistent device across the page. Kept ≥30px
-     so the About card's drop shadow (28px reach) never touches a rule. */
-  --rule-gap: clamp(30px, 3.6vh, 46px);
+     the rules read as one consistent device across the page. Sized so a
+     full content→rule→content chapter break totals ~120-260px (the
+     editorial-magazine range; scales with viewport height like the
+     --section-y tiers). Comfortably clears the About card's 28px drop
+     shadow so it never touches a rule. */
+  --rule-gap: clamp(60px, 9vh, 132px);
 
   /* =========================================================================
      LAYOUT GRID — single source of truth for horizontal rhythm.

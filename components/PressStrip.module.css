@@ -3,10 +3,12 @@
 .section {
   /* +10px on the top so the strip breathes further off the Discover
      gallery above it */
-  /* bottom gap above the AboutIntro rule uses the shared --rule-gap,
-     trimmed 12px because the logo marquee's track breathes ~12px of its
-     own air (64px track vs 40px logos) — optically the gap matches */
-  padding: clamp(22px, 2.7vh, 34px) var(--pad-x)
+  /* top: a half-step of the chapter gap — the strip stays "related" to
+     the Discover gallery above (it credits what you just saw) without
+     hugging it. Bottom gap above the AboutIntro rule uses the shared
+     --rule-gap, trimmed 12px because the logo marquee's track breathes
+     ~12px of its own air (64px track vs 40px logos). */
+  padding: calc(var(--rule-gap) / 2) var(--pad-x)
     calc(var(--rule-gap) - 12px);
   display: flex;
   flex-direction: column;
