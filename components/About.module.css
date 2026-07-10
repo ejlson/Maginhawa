@@ -1,7 +1,8 @@
+/* no top padding — the hero video is full-bleed to the very top edge,
+   behind the (transparent, blend-themed) nav, exactly like the home hero */
 .page {
   background: var(--cream);
   color: var(--maroon);
-  padding-top: clamp(56px, 7vh, 96px);
   overflow-x: clip;
 }
 
@@ -18,15 +19,15 @@
 .sectionTitle {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(2rem, 4.2vw, 4rem);
-  line-height: 1.05;
-  letter-spacing: -0.018em;
+  font-size: var(--t-display);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
   margin: 0;
   max-width: 22ch;
 }
 
 .body {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: var(--t-body);
   line-height: var(--lh-body);
   max-width: 52ch;
@@ -46,18 +47,83 @@
   padding: 8px 0;
   margin-bottom: clamp(18px, 2.4vh, 32px);
 }
-.back:hover { opacity: 1; }
 
-/* ---- Hero: MAGINHAWA (full image width) above, thin image in the middle,
-   GROUP at bottom-right (same character height as MAGINHAWA) with intro
-   copy at bottom-left — sandwich layout matching the About mockup. Sized
-   so the image sits roughly mid-viewport on load. ---- */
+.back:hover {
+  opacity: 1;
+}
+
 .hero {
+  /* one knob for the display type */
+  --hero-display-size: clamp(4rem, 14vw, 14rem);
+
+  min-height: 100svh;
   padding-block: 0 var(--section-y-sm);
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: clamp(2px, 0.4vh, 8px);
+  position: relative;
 }
+
+/* staggered rise for the display lines — the home hero's entrance,
+   adapted: an overflow-hidden clip with the word sliding up into view */
+.heroLineClip {
+  display: block;
+  overflow: hidden;
+}
+
+.heroLineInner {
+  display: block;
+  will-change: transform;
+}
+
+/* ---- pinned video scope ----
+   The video pins to the viewport (sticky, 100svh) while everything in
+   .videoContent — hero type, statement/Omar band, story timeline —
+   scrolls over it; the sticky releases at the scope's end, just before
+   Awards & Recognition. */
+.videoScope {
+  position: relative;
+}
+
+.videoBackdrop {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+
+/* content overlays the sticky backdrop via negative margin. Positioned so
+   it paints above the backdrop, but with z-index UNTOUCHED (auto): a
+   stacking context here would isolate the type's difference blend from
+   the video beneath it. */
+.videoContent {
+  position: relative;
+  margin-top: -100svh;
+}
+
+.heroVideo {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* constant legibility scrim — maroon-tinted, heavier toward the lower
+   half where the small print (lede, bios, chapter cards) tends to sit.
+   This is what makes cream type stand out at every scroll position. */
+.videoScrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(31, 0, 0, 0.62) 0%,
+    rgba(31, 0, 0, 0.55) 45%,
+    rgba(31, 0, 0, 0.74) 100%
+  );
+  pointer-events: none;
+}
+
 .srOnly {
   position: absolute;
   width: 1px;
@@ -70,63 +136,44 @@
   border: 0;
 }
 
-/* MAGINHAWA and GROUP render as plain HTML text in their original Contralto
-   display font — no SVG stretching, no glyph distortion. */
 .heroLineTop,
 .heroLineBottom {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(4rem, 14vw, 14rem);
+  font-size: var(--hero-display-size);
   line-height: 0.86;
   letter-spacing: -0.01em;
   text-transform: uppercase;
-  color: var(--maroon);
+  /* the home hero's inverted treatment, now constant — the type always
+     sits over the pinned video */
+  color: var(--cream);
+  mix-blend-mode: difference;
   white-space: nowrap;
   margin: 0;
 }
+
 .heroLineTop {
   text-align: left;
-  /* Display fonts carry a small left side-bearing on the M — nudge the
-     glyph back so the visible left edge of the M sits flush with the
-     image's left edge. */
   margin-left: -0.02em;
 }
+
 .heroLineBottom {
   text-align: right;
   justify-self: end;
-  /* Pull the wordmark up so its visible cap-line aligns with the top of
-     the aside paragraph beside it. Without this the font's ascender/cap
-     space pushes the visible top of GROUP well below the aside. */
   margin-top: -0.1em;
+  /* italic serif inflection on the second word — the reference's
+     "About *Me*" pattern. Revert by deleting these two declarations. */
+  font-family: var(--font-serif);
+  font-style: italic;
 }
 
-/* Image frame has an explicit aspect ratio capped by a viewport-relative
-   max-height so the whole hero (MAGINHAWA + image + bottom row) always
-   fits inside one viewport on any common screen. */
-.heroImage {
-  width: 100%;
-}
-.heroImageFrame {
-  position: relative;
-  width: 100%;
-  aspect-ratio: 4 / 1;
-  max-height: 34vh;
-  overflow: hidden;
-}
-.heroImageImg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
 .heroBottomRow {
   display: grid;
   grid-template-columns: minmax(0, 1fr) auto;
   gap: clamp(24px, 4vw, 64px);
   align-items: start;
 }
+
 .heroAside {
   display: flex;
   flex-direction: column;
@@ -135,211 +182,285 @@
   padding-bottom: 0;
   max-width: 42ch;
 }
+
 .heroLede {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: var(--t-body);
-  line-height: 1.4;
-  opacity: 0.85;
+  line-height: var(--lh-body);
+  /* joins the display lines' constant inverted treatment */
+  color: var(--cream);
+  mix-blend-mode: difference;
+  opacity: 0.9;
   margin: 0;
 }
 
-/* ---- Chef Omar block ---- */
+/* italic-serif emphasis — a saffron Fraunces-italic phrase set inline in
+   display or body copy (hero lede, statement band) */
+.emItalic {
+  font-family: var(--font-serif);
+  font-style: italic;
+  color: var(--saffron);
+  font-weight: inherit;
+}
+
+/* ---- Statement + Omar Shah band ----
+   Scrolls over the pinned video; the shared backdrop scrim provides the
+   dark field, so the band itself is transparent. Cream type throughout. */
+.band {
+  color: var(--cream);
+}
+
+.statement {
+  padding-block: var(--section-y) var(--section-y-sm);
+}
+
+.statementText {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--t-display);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
+  color: var(--cream);
+  margin: 0;
+  max-width: 26ch;
+}
+
 .chef {
   padding-block: var(--section-y-sm) var(--section-y);
-  border-top: 1px solid var(--rule);
 }
+
+/* offset editorial grid — the landscape portrait hugs the left edge at
+   roughly 5 of 12 columns; the name block sits right of it, and the
+   asymmetric two-column small print runs below the name block */
 .chefGrid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.4fr);
-  gap: clamp(32px, 5vw, 96px);
+  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
+  column-gap: clamp(36px, 5vw, 96px);
+  row-gap: clamp(28px, 4vh, 56px);
   align-items: start;
 }
+
 .chefImage {
+  grid-column: 1;
+  grid-row: 1;
   width: 100%;
-  max-width: 420px;
 }
+
+.chefImage img {
+  width: 100%;
+  max-width: 678px; /* native width — never upscaled */
+  height: auto;
+  display: block;
+  border-radius: var(--radius-tile);
+}
+
 .chefText {
+  grid-column: 2;
+  grid-row: 1;
+  align-self: center;
   display: flex;
   flex-direction: column;
-  gap: clamp(12px, 1.8vh, 22px);
-  padding-top: clamp(8px, 1.2vh, 18px);
+  gap: clamp(14px, 2.2vh, 26px);
 }
+
 .chefName {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(2.4rem, 5.4vw, 5rem);
-  line-height: 1;
-  letter-spacing: -0.02em;
-  color: var(--maroon);
+  font-size: clamp(2.8rem, 6.2vw, 6rem);
+  line-height: 0.98;
+  letter-spacing: -0.022em;
+  color: var(--cream);
   margin: 0;
 }
 
-@media (max-width: 860px) {
-  .chefGrid {
-    grid-template-columns: 1fr;
-    align-items: start;
-    gap: clamp(24px, 4vh, 40px);
-  }
-  .chefImage { max-width: 100%; }
-
-  .heroBottomRow {
-    grid-template-columns: 1fr;
-    align-items: start;
-    gap: clamp(20px, 3vh, 32px);
-  }
-  .heroLineBottom {
-    text-align: left;
-    justify-self: start;
-    font-size: clamp(3rem, 14vw, 6rem);
-  }
-  .heroLineTop {
-    font-size: clamp(3rem, 14vw, 6rem);
-  }
-}
-
-/* ---- "Maginhawa" word section ---- */
-.wordSection {
-  padding-block: var(--section-y-lg);
-  text-align: center;
-  border-top: 1px solid var(--rule);
-  border-bottom: 1px solid var(--rule);
-  background: var(--cream);
-}
-
-.bigWord {
-  font-family: var(--font-display-big);
+/* pull-quote line under the name — a single saffron display line */
+.chefQuote {
+  font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(3.2rem, 13vw, 13rem);
-  line-height: 0.9;
-  letter-spacing: -0.02em;
-  text-transform: uppercase;
-  margin: 0;
-  white-space: nowrap;
-}
-
-.bigWordMeta {
-  display: inline-flex;
-  align-items: baseline;
-  gap: 0.5em;
-  font-family: var(--font-serif);
   font-size: var(--t-lead);
-  margin-top: clamp(28px, 4vh, 56px);
-  opacity: 0.82;
+  line-height: var(--lh-heading);
+  letter-spacing: -0.01em;
+  color: var(--saffron);
+  margin: 0;
+  max-width: 26ch;
 }
 
-.partOfSpeech {
+/* asymmetric two-column small print — bio | roll-call, unequal measures */
+.chefColumns {
+  grid-column: 2;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr);
+  gap: clamp(24px, 3vw, 56px);
+  align-items: start;
+}
+
+.chefBody {
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
+  color: var(--cream);
+  opacity: 0.85;
+  margin: 0;
+  max-width: 44ch;
+}
+
+/* ---- Story timeline ---- */
+
+.story {
+  /* no border-top — the maroon band→cream cut above is the divider */
+  padding-block: var(--section-y) var(--section-y);
+}
+
+.storyShell {
+  display: grid;
+  grid-template-columns: minmax(320px, 36vw) minmax(0, 1fr);
+  gap: clamp(56px, 7vw, 140px);
+  align-items: start;
+}
+
+.storyWheel {
+  position: sticky;
+  top: 18vh;
+  height: 64vh;
+  min-height: 480px;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+}
+
+.storyWheelLabel {
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
-  color: var(--saffron);
+  color: var(--cream);
+  opacity: 0.78;
+  margin-bottom: clamp(18px, 3vh, 36px);
 }
 
-.bigWordBody {
-  font-family: var(--font-serif);
-  font-size: var(--t-body);
-  margin: clamp(14px, 2vh, 22px) auto 0;
-  max-width: 56ch;
-  opacity: 0.86;
-}
-
-/* ---- Origin (image + text grid) ---- */
-.origin {
-  padding-block: var(--section-y);
-}
-
-.originGrid {
-  display: grid;
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1fr);
-  gap: clamp(36px, 5vw, 96px);
-  align-items: center;
-}
-
-.originText {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(16px, 2.4vh, 28px);
-}
-
-.originImage {
+.storyWheelStem {
+  width: 1px;
+  height: clamp(54px, 8vh, 96px);
+  /* transparent-saffron endpoints so the stem fades out in-hue instead of
+     drifting through a muddy maroon midpoint */
+  background: linear-gradient(
+    180deg,
+    rgba(201, 126, 63, 0),
+    rgba(201, 126, 63, 0.55),
+    rgba(201, 126, 63, 0)
+  );
   position: relative;
-  border-radius: 0;
+}
+
+.storyWheelStem span {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--saffron);
+  transform: translate(-50%, -50%);
+  box-shadow: 0 0 24px rgba(201, 126, 63, 0.45);
+}
+
+.storyWheelMask {
+  --wheel-step: clamp(5.8rem, 10vw, 11.5rem);
+  /* optical correction — the display serif's unequal ascent/descent leaves
+     the numeral ink sitting off-centre inside the line-height:1 box, so
+     each year gets a small em-based nudge (scales with the clamp) to sit
+     dead-centre between the two stems. Tune this one value. */
+  --story-num-nudge: -0.166em;
+
+  position: relative;
+  display: grid;
+  grid-template-columns: auto auto;
+  /* no gap — the century's trailing -0.05em letter-space becomes the
+     cross-column tracking, so "1987" reads as one evenly-set numeral */
+  gap: 0;
+  height: var(--wheel-step);
+  overflow: hidden;
+  font-family: var(--font-display);
+  font-weight: 500;
+  /* sized BELOW the wheel step so the glyphs sit fully inside the mask —
+     an oversize numeral was being clipped and eaten by the edge fades */
+  font-size: clamp(4.9rem, 8.6vw, 10rem);
+  line-height: 1;
+  letter-spacing: -0.05em;
+}
+
+/* thin edge softeners — a true alpha mask (not colour-gradient overlays),
+   so the fade works over the video backdrop where there is no flat page
+   colour to blend into. Same 8% extent as before. */
+.storyWheelMask {
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    #000 8%,
+    #000 92%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    #000 8%,
+    #000 92%,
+    transparent 100%
+  );
+}
+
+.storyCenturyColumn,
+.storySuffixColumn {
+  height: var(--wheel-step);
   overflow: hidden;
 }
 
-.originImage img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* ---- Stats row ---- */
-.stats {
-  padding-block: var(--section-y);
-  border-top: 1px solid var(--rule);
-  border-bottom: 1px solid var(--rule);
-}
-
-.statsGrid {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: clamp(20px, 3vw, 56px);
-}
-
-.statItem {
+.storyNumberTrack {
   display: flex;
   flex-direction: column;
+  transition: transform 0.45s cubic-bezier(0.23, 1, 0.32, 1);
+  will-change: transform;
+}
+
+.storyNumber {
+  height: var(--wheel-step);
+  display: flex;
   align-items: center;
-  text-align: center;
-  gap: clamp(8px, 1.2vh, 14px);
+  justify-content: center;
+  color: var(--cream);
+  opacity: 0.22;
+  transform: translateY(var(--story-num-nudge)) scale(0.96);
+  transition:
+    opacity 0.25s cubic-bezier(0.23, 1, 0.32, 1),
+    transform 0.25s cubic-bezier(0.23, 1, 0.32, 1),
+    color 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+  font-variant-numeric: tabular-nums;
+  /* no text-shadow — it read as a milky smear behind the numeral on cream */
 }
 
-.statNum {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: clamp(3.4rem, 7vw, 6.5rem);
-  line-height: 0.9;
-  letter-spacing: -0.022em;
+/* both columns hug the shared seam so the four digits set as one numeral:
+   century right-aligned, suffix left-aligned. The suffix carries a 0.05em
+   right margin to cancel its trailing (negative) letter-space, keeping the
+   composite optically centered under the label and stems. */
+.storyCenturyColumn .storyNumber {
+  justify-content: flex-end;
 }
 
-.statSuffix {
+.storySuffixColumn .storyNumber {
+  justify-content: flex-start;
+  margin-right: 0.05em;
+}
+
+.storyNumber.isActive {
+  opacity: 1;
+  transform: translateY(var(--story-num-nudge)) scale(1);
+  color: var(--cream);
+}
+
+.storySuffixColumn .storyNumber.isActive {
   color: var(--saffron);
-}
-
-.statLabel {
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  opacity: 0.65;
-}
-
-/* ---- Chef ---- */
-/* ---- Story timeline (scrollable year-by-year) ----
-   Each chapter is a 2-col grid: a sticky year column on the left that pins
-   to the viewport while the body & photograph on the right scroll past, so
-   each year reads as a deliberate scroll moment. */
-.story {
-  padding-block: var(--section-y) var(--section-y);
-  border-top: 1px solid var(--rule);
-}
-
-.storyHead {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(8px, 1vh, 14px);
-  margin-bottom: clamp(40px, 6vh, 80px);
-  max-width: 56ch;
-}
-.storyHeadAside {
-  font-family: var(--font-serif);
-  font-size: var(--t-body);
-  line-height: var(--lh-body);
-  opacity: 0.8;
 }
 
 .storyList {
@@ -349,86 +470,184 @@
 }
 
 .storyItem {
-  display: grid;
-  grid-template-columns: minmax(180px, 30vw) minmax(0, 1fr);
-  gap: clamp(40px, 6vw, 120px);
-  align-items: start;
-  padding-block: clamp(64px, 12vh, 160px);
-  border-top: 1px solid rgba(47, 0, 0, 0.16);
+  /* tighter rhythm — chapters read as a flowing feed while still tall
+     enough for the centre-line detector to flip cleanly per chapter */
+  min-height: clamp(420px, 58vh, 560px);
+  display: flex;
+  align-items: center;
+  padding-block: clamp(32px, 5vh, 64px);
+  border-top: 1px solid rgba(248, 243, 234, 0.14);
+  opacity: 0.42;
+  transform: translateY(14px);
+  transition:
+    opacity 0.35s cubic-bezier(0.23, 1, 0.32, 1),
+    transform 0.35s cubic-bezier(0.23, 1, 0.32, 1);
 }
+
 .storyItem:first-child {
   border-top: none;
 }
 
-.storyYearWrap {
-  position: relative;
-  height: 100%;
-}
-.storyYear {
-  position: sticky;
-  top: 14vh;
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: clamp(5rem, 13vw, 13rem);
-  line-height: 0.84;
-  letter-spacing: -0.025em;
-  color: var(--maroon);
-  display: flex;
-  flex-direction: column;
-}
-.yearLine {
-  display: block;
+.storyItemActive {
+  opacity: 1;
+  transform: translateY(0);
 }
 
+.storyMobileYear {
+  display: none;
+}
+
+/* glass card — each chapter's content sits on a translucent cream surface;
+   photo column left, text right (stacks on mobile) */
 .storyContent {
+  display: grid;
+  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
+  gap: clamp(20px, 2.5vw, 44px);
+  align-items: center;
+  width: 100%;
+  max-width: 880px;
+  padding: clamp(20px, 2.4vw, 40px);
+  /* slightly more opaque than the old cream-page value (0.55) — the card
+     now floats over video, so the maroon copy inside needs a steadier
+     light surface to stand on */
+  background: rgba(248, 243, 234, 0.72);
+  -webkit-backdrop-filter: blur(14px) saturate(1.1);
+  backdrop-filter: blur(14px) saturate(1.1);
+  border: 1px solid rgba(248, 243, 234, 0.25);
+  border-radius: var(--radius-card);
+}
+
+.storyText {
   display: flex;
   flex-direction: column;
-  gap: clamp(16px, 2.4vh, 32px);
-  max-width: 60ch;
+  gap: clamp(12px, 1.8vh, 22px);
 }
+
+@supports not (backdrop-filter: blur(1px)) {
+  .storyContent {
+    background: var(--cream);
+  }
+}
+
+.storyMeta {
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--saffron);
+}
+
 .storyTitle {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(1.4rem, 2.4vw, 2.2rem);
-  line-height: 1.15;
-  letter-spacing: -0.01em;
+  font-size: var(--t-display);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
   color: var(--maroon);
   margin: 0;
+  max-width: 11ch;
 }
+
 .storyBody {
-  font-family: var(--font-serif);
+  position: relative;
+  font-family: var(--font-sans);
   font-size: var(--t-body);
   line-height: var(--lh-body);
   color: var(--maroon);
-  opacity: 0.85;
+  opacity: 0.86;
   margin: 0;
+  max-width: 58ch;
+  padding-top: clamp(10px, 1.4vh, 18px);
 }
+
+.storyBody::before {
+  content: "";
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 42px;
+  height: 1px;
+  background: var(--saffron);
+}
+
 .storyImageFrame {
   width: 100%;
   aspect-ratio: 4 / 3;
   overflow: hidden;
   background: var(--placeholder);
+  border-radius: var(--radius-media);
+  box-shadow:
+    0 28px 70px -42px rgba(47, 0, 0, 0.55),
+    0 1px 0 rgba(255, 255, 255, 0.5) inset;
 }
+
 .storyImage {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+  filter: saturate(0.96) contrast(0.98);
 }
 
-@media (max-width: 720px) {
-  .storyItem {
-    grid-template-columns: 1fr;
-    gap: clamp(16px, 2.4vh, 24px);
-    padding-block: clamp(40px, 7vh, 80px);
+/* progress dots — compact bar docked under the year wheel (the wheel
+   column is sticky, so the dots stay on screen for the whole story and
+   can never collide with the chapter cards). Evenly spaced. */
+.storyProgress {
+  width: min(300px, 22vw);
+  margin-top: clamp(18px, 3vh, 32px);
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  position: relative;
+}
+
+.storyProgress::before {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  height: 1px;
+  background: rgba(248, 243, 234, 0.24);
+}
+
+.storyProgress span {
+  position: relative;
+  z-index: 1;
+  width: 11px;
+  height: 11px;
+  border-radius: 50%;
+  background: rgba(248, 243, 234, 0.28);
+  border: 1px solid rgba(248, 243, 234, 0.45);
+  transition:
+    transform 0.25s ease,
+    background 0.25s ease,
+    border-color 0.25s ease,
+    box-shadow 0.25s ease;
+}
+
+.storyProgress .progressActive {
+  background: var(--saffron);
+  border-color: var(--saffron);
+  transform: scale(1.35);
+  /* saffron glow only — the old cream halo assumed the cream page */
+  box-shadow: 0 0 0 8px rgba(201, 126, 63, 0.22);
+}
+
+/* reduced motion — the wheel snaps between years and the story items keep
+   a plain opacity fade; no rolling, no rises */
+@media (prefers-reduced-motion: reduce) {
+  .storyNumberTrack {
+    transition: none;
   }
-  .storyYear {
-    position: static;
-    font-size: clamp(2.4rem, 9vw, 3.6rem);
+
+  .storyItem {
+    transform: none;
+    transition: opacity 0.2s ease;
   }
 }
 
 /* ---- Press & Coverage table ---- */
+
 .coverage {
   padding-block: var(--section-y) var(--section-y-lg);
   border-top: 1px solid var(--rule);
@@ -449,6 +668,7 @@
   color: var(--maroon);
   opacity: 0.85;
 }
+
 .coverageDot {
   display: inline-block;
   width: 7px;
@@ -491,6 +711,7 @@
   color: inherit;
   text-decoration: none;
 }
+
 .coverageRow + .coverageRow {
   border-top: 1px solid rgba(47, 0, 0, 0.08);
 }
@@ -517,6 +738,7 @@
   flex-direction: column;
   gap: 2px;
 }
+
 .coverageRestaurantLine {
   display: block;
 }
@@ -527,7 +749,7 @@
   text-transform: uppercase;
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
-  line-height: 1.35;
+  line-height: var(--lh-snug);
   color: var(--maroon);
   opacity: 0.85;
   white-space: nowrap;
@@ -546,78 +768,116 @@
   font-variant-numeric: tabular-nums;
 }
 
+/* ---- Responsive ---- */
+
+@media (max-width: 980px) {
+  .storyShell {
+    grid-template-columns: 1fr;
+  }
+
+  .storyWheel {
+    display: none;
+  }
+
+  .storyItem {
+    min-height: auto;
+    display: block;
+    padding-block: clamp(48px, 8vh, 92px);
+    opacity: 1;
+    transform: none;
+  }
+
+  .storyMobileYear {
+    display: block;
+    margin-bottom: clamp(16px, 2.6vh, 28px);
+    font-family: var(--font-display);
+    font-weight: 500;
+    font-size: clamp(3.2rem, 18vw, 6rem);
+    line-height: 0.9;
+    letter-spacing: -0.04em;
+    color: var(--saffron);
+  }
+
+  .storyTitle {
+    max-width: 14ch;
+  }
+
+  /* chapter cards stack: photo above text */
+  .storyContent {
+    grid-template-columns: 1fr;
+  }
+}
+
+@media (max-width: 860px) {
+  /* Omar block stacks: portrait, then name block, then single-column print */
+  .chefGrid {
+    grid-template-columns: 1fr;
+  }
+
+  .chefImage,
+  .chefText,
+  .chefColumns {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  .chefColumns {
+    grid-template-columns: 1fr;
+  }
+
+  .hero {
+    --hero-display-size: clamp(3rem, 14vw, 6rem);
+  }
+
+  .heroBottomRow {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: clamp(20px, 3vh, 32px);
+  }
+
+  .heroLineBottom {
+    text-align: left;
+    justify-self: start;
+  }
+}
+
 @media (max-width: 720px) {
   .coverageGroup {
     grid-template-columns: 1fr;
     gap: 8px;
     padding-block: clamp(10px, 1.4vh, 16px);
   }
-  .coverageOutlet { padding-top: 0; }
+
+  .coverageOutlet {
+    padding-top: 0;
+  }
+
   .coverageRow {
     grid-template-columns: 1fr;
     gap: 4px;
     padding-block: clamp(8px, 1.2vh, 14px);
   }
-  .coverageDate { text-align: left; }
-}
 
-/* ---- Closing CTA ---- */
-.closing {
-  padding-block: var(--section-y-lg);
-  text-align: center;
-}
-
-.closingTitle {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: clamp(2.4rem, 5vw, 4.4rem);
-  line-height: 1;
-  letter-spacing: -0.018em;
-  margin: 0 0 clamp(20px, 3vh, 32px);
-}
-
-.closingBody {
-  font-family: var(--font-serif);
-  font-size: var(--t-lead);
-  margin: 0 auto clamp(32px, 4vh, 56px);
-  max-width: 48ch;
-  opacity: 0.85;
-}
-
-.closingCta {
-  display: flex;
-  justify-content: center;
-}
-
-/* ---- Responsive ---- */
-@media (max-width: 860px) {
-  .originGrid,
-  .chefGrid {
-    grid-template-columns: 1fr;
-  }
-  .timelineHead {
-    grid-template-columns: 1fr;
-    align-items: start;
-  }
-  .statsGrid {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(24px, 4vh, 40px);
+  .coverageDate {
+    text-align: left;
   }
 }
 
 @media (max-width: 600px) {
-  .timelineList::before {
-    left: clamp(48px, 9vw, 78px);
+  .storyTitle {
+    font-size: clamp(2rem, 12vw, 3.2rem);
   }
-  .timelineItem {
-    grid-template-columns: clamp(48px, 9vw, 78px) 1fr;
-    gap: clamp(20px, 3vw, 36px);
+
+  .storyProgress {
+    gap: 18px;
   }
-  .timelineItem::before {
-    left: clamp(48px, 9vw, 78px);
-  }
-  .bigWord {
-    /* allow wrap on small screens since 13rem is huge */
-    white-space: normal;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .storyNumberTrack,
+  .storyNumber,
+  .storyItem,
+  .storyProgress span {
+    transition: none;
   }
 }

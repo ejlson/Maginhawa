@@ -98,7 +98,7 @@
   position: relative;
   min-height: 0;
   overflow: hidden;
-  border-radius: 0;
+  border-radius: var(--radius-tile);
 }
 
 .cardImg {
@@ -116,6 +116,22 @@
   /* dim the photo so the cream overlay text/buttons stay legible */
   filter: brightness(0.72);
   transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+/* coming-soon card (Bunso) — typographic cream wordmark on a maroon field,
+   matching the home Discover grid's treatment */
+.cardField {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  width: 100%;
+  height: 100%;
+  background: var(--maroon);
+  color: var(--cream);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(2rem, 3vw, 3.2rem);
+  letter-spacing: -0.025em;
+  line-height: 1;
 }
 .card:hover .cardImg img {
   transform: scale(1.05);
@@ -153,13 +169,13 @@
   height: clamp(24px, 2.1vw, 36px);
 }
 .cardName {
-  font-family: "contralto-small", var(--font-serif);
-  font-size: clamp(1.1rem, 1.5vw, 1.4rem);
+  font-family: "contralto-small", var(--font-sans);
+  font-size: var(--t-h3);
 }
 .cardLoc {
   font-family: var(--font-sans);
-  font-size: 0.72rem;
-  letter-spacing: 0.04em;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
   opacity: 0.8;
 }
 
@@ -171,8 +187,8 @@
 }
 .cardBtn {
   font-family: var(--font-sans);
-  font-size: 0.66rem;
-  letter-spacing: 0.02em;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
   padding: 0.45em 0.85em;
   border: 1px solid rgba(248, 243, 234, 0.55);
   border-radius: 999px;
@@ -380,7 +396,7 @@
   margin: 0;
   padding: 0;
   cursor: pointer;
-  font-family: "contralto-small", var(--font-serif);
+  font-family: "contralto-small", var(--font-sans);
   font-size: var(--name-size);
   line-height: var(--lh-heading);
   letter-spacing: -0.01em;
@@ -423,8 +439,8 @@
   background: none;
   color: var(--cream);
   font-family: var(--font-sans);
-  font-size: 0.82rem;
-  letter-spacing: 0.02em;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
   white-space: nowrap;
   cursor: pointer;
   transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease;

@@ -1,313 +1,609 @@
 .section {
-  min-height: 100svh;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  margin-top: 0;
-  /* related both sides — Statement above and RestaurantLocations below are
-     part of the same restaurants chapter */
-  padding: var(--section-y-sm) var(--pad-x);
+  /* zero bottom padding — the air between the grid and the As Featured In
+     strip is that strip's own top padding (clamp(22px, 2.7vh, 34px)), and
+     the head→grid gap here uses the same value, so the grid sits with
+     EQUAL, tighter spacing above and below */
+  padding: clamp(24px, 3.6vh, 48px) var(--pad-x) 0;
+  gap: clamp(22px, 2.7vh, 34px);
 }
 
-.eyebrow {
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  color: var(--saffron);
-  margin-bottom: clamp(10px, 1.6vh, 20px);
-  flex: none;
-}
-
-/* golden-ratio split: image block : names list = φ : 1 (1.618 : 1) */
-.body {
-  display: grid;
-  grid-template-columns: 1.618fr 1fr;
-  gap: clamp(36px, 5.5vw, 110px);
+/* ---------- head row: eyebrow + hover hint ---------- */
+.head {
+  display: flex;
   align-items: center;
-}
-
-/* ---------- left: title + large image + text ---------- */
-.left {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(18px, 2.8vh, 40px);
-}
-
-/* fixed frame so the image is the same size for every restaurant */
-.bigImage {
-  position: relative;
-  aspect-ratio: 1 / 1;
-  overflow: hidden;
-}
-
-.bigImageLayer {
-  position: absolute;
-  inset: 0;
-}
-/* let the placeholder fill, but not the bottom-anchored overlay */
-.bigImageLayer > div:not(.overlay) {
-  height: 100%;
-}
-.baseLayer {
-  z-index: 1;
-}
-.topLayer {
-  z-index: 2;
-  will-change: clip-path;
-}
-
-.img {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-/* ---------- overlay covers the whole image: head at top, paragraphs at bottom ---------- */
-.overlay {
-  position: absolute;
-  inset: 0;
-  z-index: 3;
-  padding: clamp(18px, 2.2vh, 32px) clamp(18px, 2vw, 32px);
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  gap: clamp(16px, 3vh, 32px);
-  /* scrim at top + bottom; middle stays clear so the photo breathes */
-  background: linear-gradient(
-    to bottom,
-    rgba(31, 0, 0, 0.6) 0%,
-    rgba(31, 0, 0, 0) 22%,
-    rgba(31, 0, 0, 0) 50%,
-    rgba(31, 0, 0, 0.85) 100%
-  );
-}
-
-/* top block: name + tag, with a hairline under them */
-.ovTop {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(8px, 1.2vh, 14px);
-}
-
-.ovHead {
-  display: flex;
-  /* tag pinned to the very top-right; logo extends downward from the same edge */
-  align-items: flex-start;
   justify-content: space-between;
   gap: 1em;
 }
 
-/* restaurant mark — replaces the text title.
-   The logo PNG is used as a CSS mask so we can paint the silhouette in
-   exact var(--cream) instead of inverted white. */
-.ovLogo {
-  display: block;
-  height: clamp(36px, 5vh, 56px);
-  /* wide enough for the wordmark logos; mask-size:contain handles narrower
-     square marks (Bintang, Mamasons) by scaling them down within the box */
-  width: clamp(140px, 18vw, 200px);
-  background-color: var(--cream);
-  -webkit-mask: var(--ov-logo-url) no-repeat left center / contain;
-  mask: var(--ov-logo-url) no-repeat left center / contain;
-  user-select: none;
-}
-
-.ovTag {
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7em;
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
-  color: var(--cream);
-  opacity: 0.8;
-  white-space: nowrap;
+  text-transform: uppercase;
+  color: var(--maroon);
 }
 
-.ovLine {
+/* small saffron dot that marks the chapter — matches the AboutIntro
+   eyebrow so both sections share the same "sectioned" editorial rhythm */
+.eyebrow::before {
+  content: "";
   display: block;
-  height: 1px;
-  background: rgba(248, 243, 234, 0.4);
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--saffron);
+  flex: none;
 }
 
-/* bottom block: paragraphs + action buttons, all inside the photo */
-.ovBottom {
-  display: flex;
-  flex-direction: column;
-  /* tight gap between the hairline, paragraphs, and buttons */
-  gap: clamp(8px, 1.2vh, 16px);
+/* pale interaction hint, right-aligned where the old carousel controls
+   sat. Click/tap works on every device, so it shows everywhere. */
+.hint {
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--maroon);
+  opacity: 0.4;
+  text-align: right;
 }
 
-.ovText {
-  display: flex;
-  gap: clamp(20px, 2.6vw, 48px);
-  align-items: flex-start;
+/* ---------- grid ---------- */
+/* The resting container spans the full --pad-x content width, so its edges
+   align with the About Us card below — the two blocks read as one column.
+   Column counts (4 / 3 / 2 / 1 at 980 / 700 / 460) and gap keep the
+   /restaurants card-grid rhythm. The container never changes size on
+   hover — the expansion happens inside its box; the full-viewport fixed
+   backdrop (below) owns the dimming, so no clipping/isolation is needed
+   here any more. */
+.grid {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(10px, 1.2vw, 20px);
 }
 
-.ovTextCol {
-  flex: 1 1 0;
-  min-width: 0;
-  font-family: var(--font-serif);
-  font-size: var(--t-small);
-  line-height: var(--lh-body);
-  color: var(--cream);
-  opacity: 0.95;
-  text-align: justify;
-  text-justify: inter-word;
-  hyphens: auto;
-}
-
-/* mobile: stack paragraphs */
-@media (max-width: 640px) {
-  .ovText {
-    flex-direction: column;
-    gap: 0.6em;
+@media (min-width: 461px) {
+  .grid {
+    grid-template-columns: repeat(2, 1fr);
   }
 }
 
-/* ---------- actions row, sitting inside the image under the paragraphs ---------- */
-.ovActions {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: clamp(12px, 1.6vw, 22px);
-  flex-wrap: wrap;
+@media (min-width: 701px) {
+  .grid {
+    grid-template-columns: repeat(3, 1fr);
+  }
 }
 
-.ovMenu {
-  background: none;
-  border: none;
-  padding: 0.4em 0;
+@media (min-width: 981px) {
+  .grid {
+    grid-template-columns: repeat(4, 1fr);
+  }
+}
+
+/* ---------- entrance reveal ---------- */
+/* Tiles settle into view once the grid scrolls in — opacity + a small rise,
+   staggered per tile via an inline --stagger custom property. One-shot: the
+   observer flips .gridIn on the <ul> and disconnects. The entrance lives on
+   the cell so it never fights the hover styles on the tile inside. */
+.cell {
+  aspect-ratio: 1 / 1;
+  opacity: 0;
+  transform: translateY(14px);
+  transition:
+    opacity 0.5s cubic-bezier(0.23, 1, 0.32, 1),
+    transform 0.5s cubic-bezier(0.23, 1, 0.32, 1);
+  transition-delay: var(--stagger, 0ms);
+}
+
+.gridIn .cell {
+  opacity: 1;
+  transform: none;
+}
+
+/* ---------- backdrop ---------- */
+/* Darkens the ENTIRE viewport behind the expanded card — a fixed layer
+   above all page content (hero, press strip) but below the active tile and
+   the nav. Opacity-only fade, in sync with the frame expansion. Fixed
+   positioning needs no transformed ancestor — the grid and section carry
+   none. Scrolling is locked while it shows (see the component). */
+.backdrop {
+  position: fixed;
+  inset: 0;
+  z-index: 60;
+  background: rgba(47, 0, 0, 0.5);
+  opacity: 0;
+  transition: opacity 480ms cubic-bezier(0.77, 0, 0.175, 1);
+  pointer-events: none;
+}
+
+/* while shown, the backdrop is also the click-away collapse target */
+.backdropOn {
+  opacity: 1;
+  transition-duration: 600ms;
+  pointer-events: auto;
+  cursor: pointer;
+}
+
+/* pale close hint riding the backdrop's own fade — pinned near the bottom
+   centre of the viewport, decorative only (the card's ✕ is the control) */
+.backdropHint {
+  position: absolute;
+  left: 50%;
+  bottom: clamp(20px, 4vh, 40px);
+  transform: translateX(-50%);
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
   color: var(--cream);
-  cursor: pointer;
-  opacity: 0.9;
-  transition: opacity 0.3s ease, color 0.3s ease;
+  opacity: 0.6;
+  white-space: nowrap;
+  pointer-events: none;
 }
-.ovMenu:hover:not(:disabled),
-.ovMenu:focus-visible:not(:disabled) {
+
+/* ---------- tile ---------- */
+/* The click choreography is a spatial morph (GSAP flip-modal feel), so it
+   takes the strong ease-in-out curve. Engaged states run at 600ms (set on
+   the engaged classes below); returns to rest are a slightly quicker 480ms
+   from these base rules — all CSS transitions on inline values, so a
+   collapse retargets cleanly mid-flight. The tile itself is a button-role
+   click target; its transform is owned by the framer magnet springs (no
+   CSS transform transition here, so the two never fight). */
+.tile {
+  position: relative;
+  width: 100%;
+  height: 100%;
+  z-index: 1;
   opacity: 1;
-  color: var(--saffron);
-}
-.ovMenu:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
+  cursor: pointer;
+  transition: opacity 480ms cubic-bezier(0.77, 0, 0.175, 1);
 }
 
-.ovActGroup {
-  display: flex;
-  gap: 10px;
+.tile:focus-visible {
+  outline: 2px solid var(--maroon);
+  outline-offset: 4px;
 }
 
-.btnSolid,
-.btnGhost {
+/* the engaged tile rises above the fixed full-viewport backdrop (z 60);
+   a collapsing tile HOLDS that elevation until its return animation ends,
+   so the card never ducks behind the grid mid-flight */
+.tileActive,
+.tileClosing {
+  z-index: 61;
+}
+
+/* siblings recede a touch further beneath the backdrop for depth */
+.tileDimmed {
+  opacity: 0.75;
+  transition-duration: 600ms;
+}
+
+/* the expanding frame — centred in the cell at rest; the component grows
+   it to 250% × 200% of the cell and lands its centre exactly on the grid's
+   centre via measured inline styles. Width/height here is the deliberate
+   exception to the transform-only rule (a non-uniform scale would distort
+   the photo and logo); it's an absolutely-positioned box, so growing it
+   never reflows the grid. */
+.frame {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  width: 100%;
+  height: 100%;
+  transform: translate(-50%, -50%);
+  border-radius: var(--radius-tile);
+  box-shadow: 0 24px 48px -32px rgba(47, 0, 0, 0.35);
+  transition:
+    width 480ms cubic-bezier(0.77, 0, 0.175, 1),
+    height 480ms cubic-bezier(0.77, 0, 0.175, 1),
+    transform 480ms cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+.tileActive .frame {
+  transition-duration: 600ms;
+}
+
+/* deeper expanded-state shadow, pre-rendered on a pseudo-element so only
+   its opacity animates — never the box-shadow itself */
+.frame::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: -1;
+  border-radius: inherit;
+  box-shadow: 0 48px 96px -36px rgba(47, 0, 0, 0.6);
+  opacity: 0;
+  transition: opacity 480ms cubic-bezier(0.77, 0, 0.175, 1);
+  pointer-events: none;
+}
+
+.tileActive .frame::after {
+  opacity: 1;
+  transition-duration: 600ms;
+}
+
+/* clips the photo + content to the frame's rounded box; everything inside
+   re-lays-out with the frame as it grows */
+.clip {
+  --tile-pad: clamp(14px, 1.6vw, 24px);
+
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  border-radius: inherit;
+}
+
+.photo {
+  object-fit: cover;
+  transform: scale(1);
+  transition: transform 480ms cubic-bezier(0.77, 0, 0.175, 1);
+}
+
+/* light pre-click affordance — a restrained zoom so resting cards feel
+   alive under the cursor (hover-capable devices only) */
+@media (hover: hover) and (pointer: fine) {
+  .tile:not(.tileActive):hover .photo {
+    transform: scale(1.03);
+    transition: transform 250ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  .tile:not(.tileActive):hover .scrim {
+    opacity: 0.8;
+    transition: opacity 250ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+}
+
+.tileActive .photo {
+  transform: scale(1.05);
+  transition-duration: 600ms;
+}
+
+/* photo-less tiles (Mamasons, Bunso) — deep maroon field so the centered
+   cream mark / wordmark carries the tile; the scrim still deepens in the
+   expanded state so the interaction reads the same as the photo tiles */
+.fallback {
+  width: 100%;
+  height: 100%;
+  background: var(--maroon);
+}
+
+/* maroon-toned legibility gradient — strong enough at rest that the cream
+   logo and tag read on the busiest photography, while the middle stays
+   lighter so the photo breathes. Deepens one step further in the expanded
+   state via opacity only. */
+.scrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(47, 0, 0, 0.55) 0%,
+    rgba(47, 0, 0, 0.38) 34%,
+    rgba(47, 0, 0, 0.38) 52%,
+    rgba(47, 0, 0, 0.8) 100%
+  );
+  opacity: 0.9;
+  transition: opacity 480ms cubic-bezier(0.77, 0, 0.175, 1);
+  pointer-events: none;
+}
+
+.tileActive .scrim {
+  opacity: 1;
+  transition-duration: 600ms;
+}
+
+/* ---------- top-right: mini description ---------- */
+.tag {
+  position: absolute;
+  top: var(--tile-pad);
+  right: var(--tile-pad);
+  z-index: 2;
+  max-width: 55%;
+  text-align: right;
   font-family: var(--font-sans);
   font-size: var(--t-label);
-  line-height: var(--lh-body);
-  border-radius: 999px;
-  padding: 0.6em 1.2em;
-  white-space: nowrap;
-  transition: background-color 0.3s ease, color 0.3s ease, opacity 0.3s ease;
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--cream);
+  opacity: 0.9;
+  transition: right 480ms cubic-bezier(0.77, 0, 0.175, 1);
 }
 
-/* Learn More — solid cream so it reads over the photo */
+/* make room for the ✕ button while the card is expanded */
+.tileActive .tag {
+  right: calc(var(--tile-pad) + 52px);
+  transition-duration: 600ms;
+}
+
+/* ---------- top-right: expanded-state close button ---------- */
+/* Explicit close affordance — cream ✕ on translucent maroon, ~40px hit
+   target. Fades/rises in with the same curve as the reveal block and
+   actions; opacity + pointer-events (never visibility) with tabIndex
+   managed in the component so it's only focusable while expanded. */
+.close {
+  position: absolute;
+  top: var(--tile-pad);
+  right: var(--tile-pad);
+  z-index: 3;
+  width: 40px;
+  height: 40px;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  border: 1px solid rgba(255, 253, 245, 0.35);
+  border-radius: 50%;
+  background: rgba(47, 0, 0, 0.55);
+  color: var(--cream);
+  cursor: pointer;
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition:
+    opacity 400ms cubic-bezier(0.23, 1, 0.32, 1),
+    transform 400ms cubic-bezier(0.23, 1, 0.32, 1),
+    background-color 0.25s cubic-bezier(0.23, 1, 0.32, 1);
+  transition-delay: 0ms;
+}
+
+.close svg {
+  width: 14px;
+  height: 14px;
+  display: block;
+}
+
+.tileActive .close {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  transition-delay: 180ms;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .close:hover {
+    background: rgba(47, 0, 0, 0.8);
+  }
+}
+
+.close:focus-visible {
+  outline: 2px solid var(--cream);
+  outline-offset: 2px;
+}
+
+/* ---------- center: brand group ---------- */
+.center {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(10px, 1.4vh, 16px);
+  padding: 10%;
+  text-align: center;
+  pointer-events: none;
+}
+
+/* wordmark/logo + optional credential badge — the badge (Michelin, on
+   Belly) is part of the group, so it stays visible at rest and in the
+   expanded state and moves with the mark */
+.brandGroup {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(10px, 1.4vh, 16px);
+  /* stretch to the tile's width — the logo mask below is %-sized, and a
+     content-sized flex parent would give it a circular (collapsed-to-zero)
+     percentage basis. This is what made the Mamasons/Bunso expanded card
+     render as an empty field. */
+  align-self: stretch;
+}
+
+/* white-mask technique — same --ov-logo-url pattern as the old carousel's
+   ovLogo/previewLogo, cream fill for legibility over the scrim. Sized to
+   command the square: the width tracks the tile, the height cap keeps
+   squat marks from ballooning. Because it's %-based, the mark also grows
+   with the frame in the expanded state — part of the flip-modal feel. */
+.logo {
+  display: block;
+  width: 68%;
+  height: clamp(40px, 7vh, 84px);
+  background-color: var(--cream);
+  -webkit-mask: var(--ov-logo-url) no-repeat center / contain;
+  mask: var(--ov-logo-url) no-repeat center / contain;
+}
+
+/* typographic fallback for tiles with no mark yet (Bunso) */
+.wordmark {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(2.6rem, 4vw, 4.4rem);
+  line-height: 1;
+  letter-spacing: -0.025em;
+  color: var(--cream);
+}
+
+/* secondary badge (Michelin Guide) — a real <img> so the red-and-white
+   credential shows in its true colours */
+.badge {
+  display: block;
+  height: clamp(48px, 6vh, 68px);
+  width: auto;
+  max-width: 70%;
+  object-fit: contain;
+  user-select: none;
+  filter: drop-shadow(0 8px 18px rgba(47, 0, 0, 0.4));
+}
+
+/* ---------- bottom-left: hover reveal ---------- */
+/* Blurb + location rise in from the bottom-left of the expanded card.
+   Asymmetric delay: 140ms behind the frame on enter so the expansion
+   leads and the text follows; immediate on exit. Reveals keep the
+   ease-out curve (they're an enter, not a morph). */
+.revealBlock {
+  position: absolute;
+  left: var(--tile-pad);
+  bottom: var(--tile-pad);
+  z-index: 2;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  text-align: left;
+  gap: clamp(6px, 1vh, 10px);
+  max-width: min(34ch, 60%);
+  opacity: 0;
+  transform: translateY(18px);
+  transition:
+    opacity 400ms cubic-bezier(0.23, 1, 0.32, 1),
+    transform 400ms cubic-bezier(0.23, 1, 0.32, 1);
+  transition-delay: 0ms;
+  pointer-events: none;
+}
+
+.tileActive .revealBlock {
+  opacity: 1;
+  transform: none;
+  transition-delay: 140ms;
+}
+
+.blurb {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  line-height: var(--lh-snug);
+  color: var(--cream);
+}
+
+.location {
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--saffron);
+}
+
+/* ---------- bottom-right: actions ---------- */
+/* Hidden at rest on every device now that tap/click expands; they rise in
+   with the reveal block, trailing it by 40ms. opacity + pointer-events
+   (never visibility) so they stay tabbable and can't be clicked while
+   invisible. */
+.actions {
+  position: absolute;
+  right: var(--tile-pad);
+  bottom: var(--tile-pad);
+  z-index: 3;
+  display: flex;
+  gap: 8px;
+  opacity: 0;
+  transform: translateY(8px);
+  pointer-events: none;
+  transition:
+    opacity 400ms cubic-bezier(0.23, 1, 0.32, 1),
+    transform 400ms cubic-bezier(0.23, 1, 0.32, 1);
+  transition-delay: 0ms;
+}
+
+.tileActive .actions {
+  opacity: 1;
+  transform: none;
+  pointer-events: auto;
+  transition-delay: 180ms;
+}
+
+.btn {
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--cream);
+  background: transparent;
+  border: 1px solid var(--cream);
+  border-radius: 999px;
+  padding: 0.55em 1.15em;
+  cursor: pointer;
+  text-decoration: none;
+  display: inline-flex;
+  align-items: center;
+  line-height: 1;
+  transition:
+    background-color 0.25s cubic-bezier(0.23, 1, 0.32, 1),
+    color 0.25s cubic-bezier(0.23, 1, 0.32, 1),
+    transform 0.12s cubic-bezier(0.23, 1, 0.32, 1);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .btn:hover {
+    background: var(--cream);
+    color: var(--maroon);
+  }
+  .btnSolid:hover {
+    background: var(--saffron);
+    border-color: var(--saffron);
+    color: var(--cream);
+  }
+}
+
+.btn:active {
+  transform: scale(0.97);
+}
+
+.btn:focus-visible {
+  outline: 2px solid var(--maroon);
+  outline-offset: 2px;
+}
+
 .btnSolid {
   background: var(--cream);
   color: var(--maroon);
-  border: 1px solid var(--cream);
-}
-.btnSolid:hover {
-  opacity: 0.88;
 }
 
-/* Book a Table — cream stroke + text on a clear background */
-.btnGhost {
-  background: transparent;
-  color: var(--cream);
-  border: 1px solid var(--cream);
-}
-.btnGhost:hover {
-  background: var(--cream);
-  color: var(--maroon);
-}
-
-@media (max-width: 520px) {
-  .ovActGroup {
-    gap: 6px;
+/* ---------- reduced motion ---------- */
+/* Opacity-only: keep the backdrop fade, scrim deepen, sibling dim and the
+   reveal / button fades; drop the frame expansion, photo zoom and every
+   translate. The !important overrides beat the inline expansion styles set
+   from the component. */
+@media (prefers-reduced-motion: reduce) {
+  .cell {
+    transform: none;
+    transition: opacity 0.4s ease;
   }
-  .btnSolid,
-  .btnGhost {
-    padding: 0.55em 0.9em;
-    font-size: 0.74rem;
+  .tile {
+    transition: opacity 0.2s ease;
   }
-}
-
-/* ---------- right: selectable list of names, flush to the right edge ---------- */
-.list {
-  align-self: start; /* top aligned with the image; drifts down on scroll */
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: clamp(0px, 0.4vh, 5px);
-  will-change: transform;
-  /* shared so the active-marker rule matches the name text height */
-  --list-name: clamp(1.2rem, 2.1vw, 1.85rem);
-}
-
-.listItem {
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-  gap: clamp(0.7em, 1.2vw, 1.1em);
-  background: none;
-  border: none;
-  padding: 0.05em 0;
-  text-align: right;
-  cursor: pointer;
-  color: var(--maroon);
-  opacity: 0.3;
-  transition: opacity 0.4s ease;
-}
-
-.listItem:hover {
-  opacity: 0.6;
-}
-
-.listActive {
-  opacity: 1;
-}
-
-.listName {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: var(--list-name);
-  line-height: var(--lh-heading);
-  letter-spacing: var(--tr-display);
-}
-
-/* thin vertical rule at the right edge; only the chosen restaurant's is shown.
-   its height tracks the name text height */
-.listMark {
-  flex: none;
-  width: 1px;
-  height: var(--list-name);
-  background: var(--maroon);
-  opacity: 0;
-  transition: opacity 0.4s ease;
-}
-
-.listActive .listMark {
-  opacity: 1;
-}
-
-@media (max-width: 820px) {
-  .body {
-    grid-template-columns: 1fr;
-    grid-template-rows: auto auto;
-    gap: clamp(28px, 6vh, 60px);
+  .backdrop {
+    transition: opacity 0.2s ease;
   }
-  .list {
-    align-self: start;
+  .frame {
+    width: 100% !important;
+    height: 100% !important;
+    transform: translate(-50%, -50%) !important;
+    transition: none;
+  }
+  .photo {
+    transform: none !important;
+    transition: none;
+  }
+  .revealBlock {
+    transform: none;
+    transition: opacity 0.2s ease;
+  }
+  .actions {
+    transform: none;
+    transition: opacity 0.2s ease;
+  }
+  .close {
+    transform: none;
+    transition: opacity 0.2s ease;
+  }
+  .tag {
+    transition: none;
+  }
+  .scrim {
+    transition: opacity 0.2s ease;
   }
 }

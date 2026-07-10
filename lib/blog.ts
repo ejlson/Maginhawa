@@ -366,7 +366,6 @@ export const BLOG: BlogEntry[] = [
 // sort newest first
 BLOG.sort((a, b) => (a.date < b.date ? 1 : -1));
 
-export const FEATURED_BLOG = BLOG[0];
-// the home page now scrolls these horizontally; bumped from 3 → 9
-export const TOP_THREE = BLOG.slice(1, 10);
-export const REST = BLOG.slice(10);
+// NOTE: the old FEATURED_BLOG / TOP_THREE / REST slices were removed — the
+// blog index paginates BLOG directly and the home Blog section takes its
+// own slices. Nothing else consumed them.

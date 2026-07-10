@@ -1,8 +1,15 @@
 .section {
+  /* No negative pull-up: Contact starts right where the RestaurantLocations
+     section ends, so the "Contact Us" title never rises into the pinned
+     video's viewport range and can't be overlapped by the shrunken card. */
+  margin-top: 0;
+  position: relative;
+  z-index: 2;
   /* DarkZone owns the chapter-tier top; this bottom is the related gap
      before the FAQ accordion */
   padding-top: 0;
-  padding-bottom: var(--section-y-sm);
+  /* owns the boundary down to the FAQ (whose top padding is zero) */
+  padding-bottom: var(--section-y);
 }
 
 .wordmark {
@@ -48,7 +55,7 @@
 }
 
 .info p {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: var(--t-body);
   line-height: var(--lh-heading);
 }
@@ -75,7 +82,7 @@
   border: none;
   border-bottom: 1px solid rgba(248, 243, 234, 0.35);
   color: var(--cream);
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: var(--t-body);
   line-height: var(--lh-heading);
   padding: 0.45em 0;

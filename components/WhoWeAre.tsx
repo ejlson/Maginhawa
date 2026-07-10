@@ -122,7 +122,7 @@ export default function WhoWeAre() {
             <p>
               From Filipino fusion to Caribbean fire, each kitchen reworks
               tradition with techniques borrowed from France, Japan and the
-              street stalls of Manila. Bold, generous, unmistakably ours.
+              street stalls of Manila.
             </p>
           </Reveal>
 

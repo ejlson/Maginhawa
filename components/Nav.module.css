@@ -81,8 +81,8 @@
   display: inline-block;
   font-family: var(--font-display-xs);
   font-weight: 500;
-  font-size: 0.8125rem;
-  letter-spacing: 0.16em;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
   text-transform: uppercase;
   color: inherit;
   padding: 6px 0;

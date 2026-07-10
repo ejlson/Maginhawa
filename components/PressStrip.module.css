@@ -1,0 +1,124 @@
+/* Quiet credentials row between Discover and AboutIntro. Tight top
+   padding so it flows off the gallery rather than sitting in isolation. */
+.section {
+  /* +10px on the top so the strip breathes further off the Discover
+     gallery above it */
+  /* bottom gap above the AboutIntro rule uses the shared --rule-gap,
+     trimmed 12px because the logo marquee's track breathes ~12px of its
+     own air (64px track vs 40px logos) — optically the gap matches */
+  padding: clamp(22px, 2.7vh, 34px) var(--pad-x)
+    calc(var(--rule-gap) - 12px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  gap: clamp(14px, 2vh, 22px);
+}
+
+.label {
+  align-self: center;
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--maroon);
+  opacity: 1;
+  text-align: center;
+}
+
+/* soft edge fade so the loop doesn't hard-clip at the container edges */
+.viewport {
+  width: 100%;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 6%,
+    #000 94%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 6%,
+    #000 94%,
+    transparent 100%
+  );
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  animation: pressScroll 42s linear infinite;
+  will-change: transform;
+}
+/* NOTE: hover-pause removed — pausing the marquee when the cursor happens
+   to sit over the strip was reading as "the animation stopped randomly".
+   The strip now scrolls uninterrupted; reduced-motion still holds it. */
+
+.list {
+  list-style: none;
+  padding: 0;
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: clamp(44px, 5vw, 88px);
+  padding-right: clamp(44px, 5vw, 88px);
+}
+
+.item {
+  display: flex;
+  align-items: center;
+  flex: none;
+  /* fixed cell height so uneven logo aspect ratios still align on a common
+     baseline. Width is auto so wide wordmarks aren't squeezed. Items can
+     boost their height via `--size-boost` (used for very compact wordmarks
+     like The Independent that would otherwise disappear in the strip). */
+  --size-boost: 1;
+  height: calc(clamp(40px, 5vh, 60px) * var(--size-boost));
+}
+
+/* real <img> tag (not a mask) — some source PNGs have baked-in white
+   backgrounds (CityAM, Metro) which mask-based tinting turns into solid
+   black boxes. `mix-blend-mode: multiply` multiplies the logo pixels
+   with the cream page underneath, so white → cream (invisible) while
+   the dark letterforms stay dark. `filter: grayscale(1)` normalises any
+   coloured logo elements (CityAM's blue "AM") to a uniform dark tone. */
+.logo {
+  height: 100%;
+  width: auto;
+  max-width: clamp(160px, 16vw, 240px);
+  object-fit: contain;
+  display: block;
+  opacity: 0.9;
+  mix-blend-mode: multiply;
+  filter: grayscale(1) contrast(1.08);
+  transition: opacity 0.3s ease;
+  user-select: none;
+}
+.logo:hover {
+  opacity: 1;
+}
+
+/* opt-out for logos that must keep their brand colour (e.g. Michelin
+   Guide's red credential). No grayscale, no multiply — the logo renders
+   as itself against the cream page. */
+.logo[data-preserve-color] {
+  mix-blend-mode: normal;
+  filter: none;
+  opacity: 1;
+}
+
+@keyframes pressScroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    animation: none;
+  }
+}

@@ -70,8 +70,8 @@
 .quoteText {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(2rem, 5vw, 4.2rem);
-  line-height: 1.05;
+  font-size: var(--t-h2);
+  line-height: var(--lh-display);
   letter-spacing: -0.018em;
   max-width: 22ch;
   margin: 0;
@@ -225,9 +225,9 @@
   flex: none;
   font-family: var(--font-display-sm);
   font-weight: 500;
-  font-size: clamp(1.05rem, 1.7vw, 1.5rem);
+  font-size: var(--t-h3);
   letter-spacing: -0.005em;
-  line-height: 1.25;
+  line-height: var(--lh-heading);
   opacity: 0.78;
   white-space: nowrap;
   transition: color 0.28s ease, opacity 0.28s ease;
@@ -244,7 +244,7 @@
 .outletHeadline {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(1.35rem, 2.2vw, 1.95rem);
+  font-size: var(--t-h3);
   letter-spacing: -0.012em;
   opacity: 1;
 }

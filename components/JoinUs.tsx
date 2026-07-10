@@ -9,7 +9,7 @@ import DarkZone from "./DarkZone";
 import Reveal from "./Reveal";
 import RevealText from "./RevealText";
 import MagneticButton from "./MagneticButton";
-import { useRouteTransition } from "./PageTransition";
+import MaskImage from "./MaskImage";
 import styles from "./JoinUs.module.css";
 import { JOBS } from "@/lib/jobs";
 
@@ -52,7 +52,6 @@ export default function JoinUs() {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
   const [position, setPosition] = useState<string>("");
   const [submitted, setSubmitted] = useState(false);
-  const navigate = useRouteTransition();
   const formRef = useRef<HTMLDivElement>(null);
 
   // release any dark backdrop another route may have set
@@ -123,63 +122,65 @@ export default function JoinUs() {
       <Menu open={menuOpen} onClose={() => setMenuOpen(false)} />
 
       <main className={styles.page} data-nav-theme="light">
-        <div className="container">
-          <a
-            className={styles.back}
-            href="/"
-            onClick={(e) => {
-              e.preventDefault();
-              navigate("/");
-            }}
-          >
-            ← Home
-          </a>
 
-          {/* ---- Hero ---- */}
-          <section className={styles.hero}>
-            <Reveal as="span" className={styles.eyebrow}>
-              (Join Us)
-            </Reveal>
-            <h1 className={styles.heroTitle}>
-              <RevealText
-                text="Cook with us. Sit with us. Build something with us."
-                stagger={0.025}
-              />
-            </h1>
-            <Reveal delay={0.3}>
-              <p className={styles.heroLede}>
-                Open positions across seven restaurants and a small Camden HQ.
-                We&apos;re hiring in kitchens, on the floor, behind the bar, and
-                with the team that holds the group together.
+        <section className={styles.section} data-nav-theme="light">
+          <div className={styles.introRow}>
+            <Reveal className={styles.card}>
+              <span className={styles.eyebrow}>Careers</span>
+
+              <h2 className={styles.statement}>
+                Cook with us. Sit with us. Build something with us.
+              </h2>
+
+              <p className={styles.body}>
+                Open positions across our restaurants and a small Camden HQ.
+                We&apos;re hiring in kitchens, on the floor, behind the bar,
+                and with the team that holds the group together.
               </p>
-            </Reveal>
-          </section>
-        </div>
 
-        {/* ---- Three pillars ---- */}
-        <section className={styles.pillars}>
-          <div className="container">
-            <Reveal>
-              <ul className={styles.pillarGrid} style={{ listStyle: "none", margin: 0, padding: 0 }}>
-                {PILLARS.map((p, i) => (
-                  <Reveal key={p.mark} as="li" delay={i * 0.08} className={styles.pillar}>
-                    <span className={styles.pillarMark}>{p.mark}</span>
-                    <h3 className={styles.pillarTitle}>{p.title}</h3>
-                    <p className={styles.pillarBody}>{p.body}</p>
-                  </Reveal>
-                ))}
+              {/* small factual stat row — the group at a glance */}
+              <div className={styles.cardStats} aria-label="The group at a glance">
+                <span>8 restaurants</span>
+                <span className={styles.cardStatsSep} aria-hidden />
+                <span>Family-run since 1987</span>
+                <span className={styles.cardStatsSep} aria-hidden />
+                <span>Camden → Soho</span>
+              </div>
+
+              {/* what working here actually comes with — kept modest */}
+              <ul className={styles.cardPerks} aria-label="What we offer">
+                <li>Staff meals on shift</li>
+                <li>Flexible rotas</li>
+                <li>Training &amp; progression across the group</li>
               </ul>
+
+              {/* live count from lib/jobs.ts, anchoring down to the list */}
+              <a href="#open-roles" className={styles.cardCta}>
+                {JOBS.length} open positions <span aria-hidden>↓</span>
+              </a>
             </Reveal>
+
+            {/* photograph beside the card — separate element, revealed with
+                a bottom-up mask wipe as the page loads into view */}
+            <MaskImage
+              className={styles.introPhoto}
+              src="/images/careers-team.jpg"
+              alt="A Maginhawa team member carrying a tray of fresh pastries"
+              width={733}
+              height={1100}
+              fill
+              sizes="(max-width: 900px) 100vw, 34vw"
+            />
           </div>
         </section>
 
         <div className="container">
           {/* ---- Open roles ---- */}
-          <section className={styles.roles}>
+          <section className={styles.roles} id="open-roles">
             <div className={styles.rolesHead}>
               <div>
                 <Reveal as="span" className={styles.eyebrow}>
-                  (Open Roles)
+                  Open Roles
                 </Reveal>
                 <Reveal>
                   <h2 className={styles.sectionTitle}>
@@ -189,9 +190,7 @@ export default function JoinUs() {
               </div>
               <Reveal delay={0.1}>
                 <p className={styles.rolesAside}>
-                  Click any role to read the details. Use &ldquo;Apply for this
-                  role&rdquo; to jump straight to the application form below
-                  with the position pre-filled.
+                  Click any role to read the details.
                 </p>
               </Reveal>
             </div>
@@ -276,7 +275,7 @@ export default function JoinUs() {
             <div className={styles.formHead}>
               <div>
                 <Reveal as="span" className={styles.eyebrow}>
-                  (Apply)
+                  Apply
                 </Reveal>
                 <Reveal>
                   <h2 className={styles.sectionTitle}>
@@ -287,9 +286,7 @@ export default function JoinUs() {
               <Reveal delay={0.1}>
                 <p className={styles.formAside}>
                   Pick a role from the dropdown — or apply generally if you
-                  don&apos;t see your fit. The form opens an email to{" "}
-                  <strong>hr@mgnhw.com</strong> with your details pre-filled;
-                  send from your own email client when prompted.
+                  don&apos;t see your fit.
                 </p>
               </Reveal>
             </div>

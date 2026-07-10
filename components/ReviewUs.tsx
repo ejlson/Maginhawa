@@ -7,6 +7,9 @@ import { RESTAURANTS, type Restaurant } from "@/lib/restaurants";
 // link isn't set yet — works for every restaurant out of the box, and the
 // data field is there to upgrade with real Place IDs later.
 
+// Coming-soon venues have no doors open yet — nothing to review.
+const REVIEWABLE = RESTAURANTS.filter((r) => !r.comingSoon);
+
 const reviewUrl = (r: Restaurant) =>
   r.googleReviewUrl ??
   `https://www.google.com/maps/search/?api=1&query=${encodeURIComponent(
@@ -33,7 +36,7 @@ export default function ReviewUs() {
         <div className={styles.head}>
           <div>
             <Reveal as="span" className={styles.eyebrow}>
-              (Your Voice Matters)
+              Your Voice Matters
             </Reveal>
             <Reveal>
               <h2 className={styles.title}>
@@ -52,7 +55,7 @@ export default function ReviewUs() {
 
         <Reveal>
           <ul className={styles.grid}>
-            {RESTAURANTS.map((r) => (
+            {REVIEWABLE.map((r) => (
               <li key={r.slug}>
                 <a
                   className={styles.item}

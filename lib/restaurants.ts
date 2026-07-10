@@ -24,6 +24,9 @@ export type Restaurant = {
   menuPages?: string[];
   // Optional small-caps subtitle shown above the menu pages — e.g. "February 2026"
   menuLabel?: string;
+  // Marks placeholder content for a venue that hasn't opened yet — hides the
+  // entry from review prompts while keeping it routable/discoverable.
+  comingSoon?: boolean;
 };
 
 export const RESTAURANTS: Restaurant[] = [
@@ -122,6 +125,19 @@ export const RESTAURANTS: Restaurant[] = [
     logo: "/logo/hoodwood.png",
     bookable: false,
   },
+  {
+    slug: "bunso",
+    name: "Bunso",
+    tagline: "The Youngest of the Family",
+    cuisine: "Filipino",
+    description:
+      "Bunso — 'the youngest' — is the newest member of the Maginhawa family. Full details, menu and location coming soon.",
+    location: "London",
+    image: "/images/bunso-placeholder.jpg",
+    logo: "/logo/maginhawa.png",
+    bookable: false,
+    comingSoon: true,
+  },
 ];
 
 export const getRestaurant = (slug: string) =>
@@ -137,4 +153,5 @@ export const SLUG_BY_NAME: Record<string, string> = {
   Guanabana: "guanabana",
   "Ramo Ramen": "ramo",
   Hoodwood: "hoodwood",
+  Bunso: "bunso",
 };

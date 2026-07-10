@@ -1,26 +1,15 @@
-"use client";
-
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useRef } from "react";
 import styles from "./DarkZone.module.css";
 
+/**
+ * Continuous maroon wrapper for the bottom of the page: the
+ * RestaurantLocations video (shrinking from full-bleed), Careers teaser,
+ * Contact, FAQ, and Footer all share this one dark background so the
+ * chapter reads as one connected section instead of a stack of blocks.
+ */
 export default function DarkZone({ children }: { children: React.ReactNode }) {
-  const ref = useRef<HTMLDivElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start end", "start start"],
-  });
-  // the maroon zone rises up into place as it enters — parallax like the hero
-  const y = useTransform(scrollYProgress, [0, 1], ["14vh", "0vh"]);
-
   return (
-    <motion.div
-      ref={ref}
-      className={styles.zone}
-      data-nav-theme="dark"
-      style={{ y }}
-    >
+    <div className={styles.zone} data-nav-theme="dark">
       {children}
-    </motion.div>
+    </div>
   );
 }

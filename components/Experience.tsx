@@ -4,19 +4,19 @@ import { useEffect, useState } from "react";
 import Loader from "./Loader";
 import Nav from "./Nav";
 import Menu from "./Menu";
-import Statement from "./Statement";
 import Hero from "./Hero";
 import Discover from "./Discover";
+import PressStrip from "./PressStrip";
+import AboutIntro from "./AboutIntro";
 import RestaurantLocations from "./RestaurantLocations";
-import WhoWeAre from "./WhoWeAre";
 // import Timeline from "./Timeline";
 // Press section content now lives inside WhoWeAre (rotating quote + masthead
 // marquee sit alongside the "About us" press image).
 // import Press from "./Press";
 import Blog from "./Blog";
+import CareersTeaser from "./CareersTeaser";
 import Contact from "./Contact";
 import FAQ from "./FAQ";
-import ReviewUs from "./ReviewUs";
 import Footer from "./Footer";
 import DarkZone from "./DarkZone";
 import type { HeroInsets } from "./types";
@@ -82,18 +82,19 @@ export default function Experience() {
         <Hero started={started} />
 
         <div className="afterHero">
-          <Statement />
           <Discover />
-          <RestaurantLocations />
-          <WhoWeAre />
-          {/* <Timeline /> */}
-          {/* Press content merged into <WhoWeAre /> */}
+          <PressStrip />
+          <AboutIntro />
           <Blog />
+          {/* Careers glass card sits right under News. Its negative
+              margin-bottom lets the card dip into the top of the video
+              below for a stacked layer effect. */}
+          <CareersTeaser />
 
           <DarkZone>
+            <RestaurantLocations />
             <Contact />
             <FAQ />
-            <ReviewUs />
             <Footer />
           </DarkZone>
         </div>

@@ -34,7 +34,7 @@
 .col h4 {
   font-family: var(--font-sans);
   font-weight: 500;
-  font-size: 0.95rem;
+  font-size: var(--t-small);
   margin: 0 0 0.9em;
 }
 

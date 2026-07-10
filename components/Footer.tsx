@@ -1,11 +1,11 @@
 import styles from "./Footer.module.css";
 
 const LEFT = [
-  { h: "Home", items: ["Who are we?", "Restaurants", "Blog", "Join Us", "Contact Us"] },
-  { h: "Restaurants", items: ["…"] },
-  { h: "Blog", items: ["…"] },
-  { h: "About Us", items: ["…"] },
-  { h: "Join Us", items: ["…"] },
+  { h: "Home", items: ["Restaurants", "About Us", "Blog", "Careers", "Contact Us"] },
+  { h: "Restaurants", items: [""] },
+  { h: "Blog", items: [""] },
+  { h: "About Us", items: [""] },
+  { h: "Careers", items: ["Open Roles", "Job Applications"] },
 ];
 
 const CONTACT = ["Email", "Instagram", "LinkedIn", "X", "Facebook"];

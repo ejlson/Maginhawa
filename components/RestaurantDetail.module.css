@@ -41,14 +41,14 @@
 .tagline {
   font-family: var(--font-display-sm);
   font-weight: 500;
-  font-size: clamp(1.3rem, 2.2vw, 1.8rem);
-  line-height: 1.2;
+  font-size: var(--t-h3);
+  line-height: var(--lh-heading);
   letter-spacing: -0.005em;
   opacity: 0.9;
 }
 
 .lede {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: var(--t-lead);
   line-height: var(--lh-body);
   max-width: 52ch;
@@ -105,7 +105,7 @@
 
 .heroImage {
   position: relative;
-  border-radius: 0;
+  border-radius: var(--radius-tile);
   overflow: hidden;
   aspect-ratio: 4 / 5;
   background: var(--placeholder);
@@ -146,7 +146,7 @@
 .pressLeadText {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(1.8rem, 4vw, 3rem);
+  font-size: var(--t-h2);
   line-height: 1.08;
   letter-spacing: -0.018em;
   margin: 0;
@@ -186,8 +186,8 @@
 .pressOutlet {
   font-family: var(--font-display-sm);
   font-weight: 500;
-  font-size: clamp(1.05rem, 1.6vw, 1.35rem);
-  line-height: 1.15;
+  font-size: var(--t-h3);
+  line-height: var(--lh-heading);
   transition: color 0.28s ease;
 }
 
@@ -197,15 +197,15 @@
 }
 
 .pressFeature {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: var(--t-body);
-  line-height: 1.4;
+  line-height: var(--lh-body);
   opacity: 0.85;
 }
 
 .pressArrow {
   font-family: var(--font-sans);
-  font-size: 1.25rem;
+  font-size: var(--t-body);
   opacity: 0.6;
   transition: opacity 0.25s ease, transform 0.25s ease;
 }

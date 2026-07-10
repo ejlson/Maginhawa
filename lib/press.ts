@@ -18,20 +18,20 @@ export type PressMention = {
 // `/public/logos/press/<slug>.svg` and add the path here). When absent, the
 // outlet's name renders as a wordmark fallback.
 export const FEATURED_OUTLETS: { name: string; tier?: "headline"; logo?: string }[] = [
-  { name: "The Times", tier: "headline" },
-  { name: "Michelin Guide", tier: "headline", logo: "/logos/press/michelin.png" },
-  { name: "The Independent", logo: "/logos/press/theindependent.png" },
-  { name: "BBC Good Food", logo: "/logos/press/bbcgoodfood.png" },
-  { name: "Time Out" },
-  { name: "Forbes", logo: "/logos/press/forbes.png" },
-  { name: "The Observer" },
-  { name: "Evening Standard", logo: "/logos/press/eveningstandard.png" },
-  { name: "The Week" },
-  { name: "Metro", logo: "/logos/press/metro.png" },
-  { name: "Square Meal" },
-  { name: "Olive Magazine" },
-  { name: "City AM", logo: "/logos/press/cityam.png" },
-  { name: "Visit London" },
+  { name: "The Sunday Times", tier: "headline", logo: "/press%20logo/thesundaytimes.svg" },
+  { name: "Michelin Guide", tier: "headline", logo: "/press%20logo/michelin.svg" },
+  { name: "The Guardian", logo: "/press%20logo/theguardian.svg" },
+  { name: "The Independent", logo: "/press%20logo/theindependent.svg" },
+  { name: "BBC Good Food", logo: "/press%20logo/bbcgoodfood.svg" },
+  { name: "Time Out", logo: "/press%20logo/timeout.svg" },
+  { name: "Forbes", logo: "/press%20logo/forbes.svg" },
+  { name: "Evening Standard", logo: "/press%20logo/eveningstandard.svg" },
+  { name: "The Week", logo: "/press%20logo/theweek.svg" },
+  { name: "Metro", logo: "/press%20logo/metro.svg" },
+  { name: "Country & Townhouse", logo: "/press%20logo/country&townhouse.svg" },
+  { name: "The Infatuation", logo: "/press%20logo/infatuation.svg" },
+  { name: "Hypebeast", logo: "/press%20logo/hypebeast.svg" },
+  { name: "That's Up", logo: "/press%20logo/thatsup.svg" },
 ];
 
 // Standout pull-quotes for the headline strip (rotates beneath the logos).

@@ -7,7 +7,7 @@
 }
 
 .rounded {
-  border-radius: 0;
+  border-radius: var(--radius-tile);
 }
 
 .cross {
@@ -28,8 +28,8 @@
   top: 50%;
   transform: translate(-50%, -50%);
   font-family: var(--font-sans);
-  font-size: 0.72rem;
-  letter-spacing: 0.08em;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
   text-transform: uppercase;
   color: rgba(47, 0, 0, 0.45);
   background: var(--placeholder);

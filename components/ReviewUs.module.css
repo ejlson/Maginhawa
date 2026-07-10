@@ -1,7 +1,8 @@
 .section {
-  /* related top (follows FAQ in the utility group); related bottom — real
-     breath between the review grid and the Footer hairline */
-  padding-block: var(--section-y-sm);
+  /* top is zero — FAQ's bottom padding owns the FAQ→ReviewUs boundary;
+     related bottom — real breath between the review grid and the Footer
+     hairline */
+  padding-block: 0 var(--section-y-sm);
   color: var(--cream);
 }
 
@@ -11,34 +12,47 @@
   grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
   gap: clamp(28px, 5vw, 80px);
   align-items: end;
-  margin-bottom: clamp(36px, 6vh, 64px);
+  margin-bottom: clamp(28px, 4vh, 48px);
 }
 
+/* Saffron-dot eyebrow — same recipe as FAQ / Blog / CareersTeaser so the
+   chapter headers rhyme across the site. */
 .eyebrow {
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7em;
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
-  color: var(--saffron);
+  color: var(--cream);
   margin-bottom: clamp(14px, 2vh, 22px);
+}
+.eyebrow::before {
+  content: "";
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--saffron);
+  flex: none;
 }
 
 .title {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: var(--t-display);
-  line-height: var(--lh-display);
+  font-size: var(--t-h2);
+  line-height: var(--lh-heading);
   letter-spacing: var(--tr-display);
   color: var(--cream);
-  max-width: 18ch;
+  max-width: 17ch;
 }
 
 .lede {
-  font-family: var(--font-serif);
-  font-size: var(--t-lead);
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
   line-height: var(--lh-body);
-  opacity: 0.85;
+  opacity: 0.7;
   max-width: 44ch;
 }
 
@@ -94,7 +108,7 @@
 .itemName {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(1.2rem, 1.7vw, 1.5rem);
+  font-size: var(--t-h3);
   letter-spacing: -0.012em;
   line-height: 1;
 }

@@ -1,25 +1,59 @@
+/* FAQ chapter — lives in the DarkZone under Contact. Matches the visual
+   language of the Blog / Careers chapters: saffron-dot eyebrow, editorial
+   heading, and a two-column head/list layout so the eyebrow + intro sit
+   as a sidebar to the accordion. No rule above — the section flows
+   straight out of Contact on the shared maroon canvas. */
 .section {
-  /* related both sides — flanked by Contact and ReviewUs, all utility */
-  padding-block: var(--section-y-sm);
+  /* top is zero — Contact's bottom padding owns that boundary */
+  padding-block: 0 var(--section-y-sm);
   color: var(--cream);
 }
 
+/* Two-column layout — head reads as a left-hand column ("this is the FAQ
+   chapter"), accordion reads as the right-hand main content. Ratio favours
+   the list (1 : 1.6) since the list is the point; head is the frame. */
 .head {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 0.9fr);
-  gap: clamp(28px, 5vw, 80px);
-  align-items: end;
+  grid-template-columns: 1fr 1.6fr;
+  column-gap: clamp(28px, 5vw, 80px);
+  row-gap: clamp(18px, 2.4vh, 32px);
+  align-items: start;
   margin-bottom: clamp(28px, 4vh, 48px);
 }
 
+/* Left column of the head: eyebrow + title stacked as a sidebar. */
+.headTop {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.8vh, 18px);
+}
+
+/* Right column: intro paragraph. */
+.asideWrap {
+  align-self: end;
+}
+
+/* Saffron-dot eyebrow — same recipe used on Blog and CareersTeaser so the
+   section headers rhyme across the site. Cream text sits on maroon here
+   instead of maroon on cream. */
 .eyebrow {
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7em;
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
-  color: var(--saffron);
-  margin-bottom: clamp(12px, 1.8vh, 18px);
+  color: var(--cream);
+}
+.eyebrow::before {
+  content: "";
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--saffron);
+  flex: none;
 }
 
 .title {
@@ -33,7 +67,7 @@
 }
 
 .aside {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: var(--t-small);
   line-height: var(--lh-body);
   opacity: 0.7;
@@ -41,7 +75,13 @@
 }
 
 @media (max-width: 760px) {
-  .head { grid-template-columns: 1fr; align-items: start; }
+  .head {
+    grid-template-columns: 1fr;
+    align-items: start;
+  }
+  .asideWrap {
+    align-self: start;
+  }
 }
 
 /* ---- accordion list ---- */
@@ -68,7 +108,7 @@
   padding: clamp(16px, 2.2vh, 24px) 0;
   cursor: pointer;
   text-align: left;
-  transition: padding 0.3s ease;
+  transition: padding 0.3s var(--ease-out);
 }
 
 .row:hover,
@@ -80,9 +120,9 @@
 .question {
   font-family: var(--font-display-sm);
   font-weight: 500;
-  font-size: clamp(1.05rem, 1.5vw, 1.35rem);
+  font-size: var(--t-h3);
   letter-spacing: -0.005em;
-  line-height: 1.2;
+  line-height: var(--lh-heading);
 }
 
 .chev {
@@ -91,7 +131,7 @@
   height: 22px;
   display: grid;
   place-items: center;
-  transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.36s var(--ease-out);
   opacity: 0.7;
 }
 
@@ -106,7 +146,7 @@
 }
 
 .answer {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: var(--t-body);
   line-height: var(--lh-body);
   opacity: 0.85;

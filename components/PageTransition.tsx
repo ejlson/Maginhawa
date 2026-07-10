@@ -48,13 +48,39 @@ export default function PageTransition({
 
   const navigate = useCallback<Navigate>(
     (href) => {
-      if (!href || href === pathname || phase !== "idle") return;
+      if (!href || href === pathname) return;
+      // NB: we intentionally do NOT gate on `phase === "idle"`. If the
+      // framer animation ever fails to fire `onAnimationComplete` (reduced
+      // motion, tab suspension, hydration hiccup) the phase gets stuck and
+      // every subsequent click is silently ignored. Instead we accept the
+      // click and force the whole state machine forward from wherever it
+      // was, guaranteeing navigation actually happens.
       target.current = href;
       setImg(0);
       setPhase("cover");
+      // hard fallback: always push the route after the curtain's animation
+      // duration, so nav works even if the animation stalls entirely
+      window.setTimeout(() => {
+        if (target.current === href) {
+          router.push(href);
+        }
+      }, 820);
     },
-    [pathname, phase]
+    [pathname, router]
   );
+
+  // Safety net: if the phase gets stuck (framer's onAnimationComplete
+  // didn't fire), force it back to idle after a max duration. Without
+  // this, once the transition state machine wedges, every future nav
+  // click is dropped silently.
+  useEffect(() => {
+    if (phase === "idle") return;
+    const id = window.setTimeout(() => {
+      setPhase("idle");
+      target.current = null;
+    }, 3500);
+    return () => window.clearTimeout(id);
+  }, [phase]);
 
   // cycle the centre images while the curtain is up
   useEffect(() => {

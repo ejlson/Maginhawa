@@ -1,47 +1,73 @@
 "use client";
 
-import { motion, useScroll, useTransform } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import Image from "next/image";
+import { useCallback, useEffect, useRef, useState } from "react";
+import {
+  motion,
+  useMotionValue,
+  useReducedMotion,
+  useSpring,
+} from "framer-motion";
 import styles from "./Discover.module.css";
-import Placeholder from "./Placeholder";
 import MenuOverlay from "./MenuOverlay";
+import { getRestaurant } from "@/lib/restaurants";
+import { lenisRef } from "@/lib/SmoothScroll";
 
-const ITEMS = [
+// Local presentation copy for the grid — richer blurbs than the canonical
+// lib/restaurants.ts entries, which stay the source of truth for routing,
+// bookability and structured data.
+type DiscoverItem = {
+  slug: string;
+  name: string;
+  tag: string;
+  location: string;
+  image: string | null;
+  logo: string | null;
+  blurb: string;
+  // secondary credential mark (e.g. Michelin Guide for Belly)
+  badge?: string;
+  badgeLabel?: string;
+  // menu overlay pages + small-caps subtitle (e.g. "February 2026")
+  menuPages?: string[];
+  menuLabel?: string;
+};
+
+const ITEMS: DiscoverItem[] = [
   {
+    slug: "bintang",
     name: "Bintang",
     tag: "Filipino Fusion Restaurant",
     location: "93 Kentish Town Rd, London NW1",
     image: "/images/bintang.jpg",
     logo: "/logo/bintang.png",
-    paras: [
-      "Originally opened by Chef Omar's parents, Bintang is a renowned Filipino fusion restaurant located at 93 Kentish Town Road, London NW1 8NY.",
-      "Established in 1987, it has been a staple in the Camden Town dining scene, offering a blend of Malaysian, Indonesian, Japanese, Vietnamese, and Filipino cuisines.",
-    ],
+    blurb:
+      "A Camden staple since 1987 — Chef Omar's family kitchen, blending Malay, Indonesian, Japanese, Vietnamese and Filipino cooking.",
   },
   {
+    slug: "belly",
     name: "Belly",
     tag: "Modern Filipino Bistro",
     location: "Camden, London",
     image: "/images/belly.jpg",
     logo: "/logo/belly.png",
-    paras: [
-      "Belly is a modern Filipino bistro pulling from Chef Omars rich background from the Philippines and with cooking techniques from France and Japan.",
-      "A perfect blend of cultures all in one place going right to the Belly (.)",
-    ],
+    // Belly is the group's Michelin Guide listing — the mark renders as part
+    // of the centered brand group so it stays visible at rest AND expanded.
+    badge: "/logo/michelin-2026-round.png",
+    badgeLabel: "Michelin Selected Restaurant 2026",
+    blurb: "A modern Filipino bistro drawing on French technique.",
   },
   {
+    slug: "mamasons",
     name: "Mamasons",
     tag: "London's First Filipino Ice Cream Parlor",
-    location: "Camden · Soho · Shoreditch, London",
+    location: "Kentish Town · China Town",
     image: null,
     logo: "/logo/mamasons.png",
-    paras: [
-      "Mamasons Dirty Ice Cream, London's first Filipino ice cream parlour, was founded in 2017.",
-      "Inspired by the traditional 'dirty ice cream' sold by street vendors in Manila, the founders aimed to introduce authentic Filipino flavours to London.",
-      "Mamasons has become known for bringing Filipino desserts to a wider audience, earning a special place in the hearts of both the Filipino community and dessert enthusiasts across London.",
-    ],
+    blurb:
+      "London's first Filipino ice cream parlour — Manila-style dirty ice cream, scooped fresh across two sites.",
   },
   {
+    slug: "cafemama",
     name: "Café Mama & Sons",
     tag: "Filipino x Japanese Café",
     location: "London",
@@ -54,217 +80,513 @@ const ITEMS = [
       "/menu/cafemama/page-4.png",
     ],
     menuLabel: "February 2026",
-    paras: [
-      "Cafe Mama&sons aims to be apart of your daily life offering you a daily exciting alternative to the boring croissant or pre packaged sandwich.",
-      "We offer hand crafted Sandos all with different and exciting fillings from your classic egg salad to the decadent hearty corned beef croquette you wont be dissapointed.",
-      "We also server the breakfast crowd with our award winning Longanisa Breakfast Burger (its a must try)!",
-    ],
+    blurb:
+      "Hand-crafted sandos, all-day pandesal breakfasts, homemade baked treats, and quality coffee — your daily escape from the ordinary.",
   },
   {
+    slug: "guanabana",
     name: "Guanabana",
     tag: "Caribbean Cuisine",
     location: "85 Kentish Town Rd, London NW1",
     image: "/images/guanabana.jpg",
     logo: "/logo/guanabana.png",
-    paras: [
-      "A vibrat, halal-certified Caribbean and Latin American restaurant located at 85 Kentish Town Road in Camden, London NW1 8NY.",
-      "Established in 2007, it was among the first in the city to blends Latin-Caribbean flavours, Guanabana is renowned for its 'Island Roast', a Caribbean twist on the traditional Sunday roast, featuring oak-smoked jerk chicken or grilled beef, accompanied by sides like sweet plantains, roasted potatoes, and spicy jerk gravy.",
-    ],
+    blurb:
+      "Kentish Town's Caribbean and Latin American room, best known for its oak-smoked Island Roast — since 2007.",
   },
   {
+    slug: "ramo",
     name: "Ramo Ramen",
-    tag: "Filipino-Japanese Fusion Restaurant",
+    tag: "Filipino-Japanese Ramen",
     location: "Kentish Town · Soho, London",
     image: "/images/ramo.jpg",
     logo: "/logo/ramo.png",
-    paras: [
-      "The world's first Filipino-Japaense ramen joint. First opened in Kentish Town, London, in 2018, offering a unique blend of traditional Japaense ramen with Filipino culinary influences.",
-      "In 2021, Ramo Ramen expanded to a second location in Soho, London, further solidifying its presence in the city's vibrant food scene.",
-    ],
+    blurb:
+      "The world's first Filipino-Japanese ramen joint — Originally from Kentish Town, since 2018, with our current location in Soho.",
   },
   {
+    slug: "hoodwood",
     name: "Hoodwood",
     tag: "Caribbean Takeaway",
     location: "London",
     image: "/images/hoowood.jpg",
     logo: "/logo/hoodwood.png",
-    paras: [
-      "Hoodwood is your go-to neighborhood Caribbean takeaway, serving up bold, smoky flavors with a true taste of the islands. We specialize in oak-smoked chicken plates, slow-cooked over an open flame for a deep, rich, and aromatic flavor.",
-      "Our menu also features handmade Caribbean patties, packed with flavorful fillings and wrapped in a perfectly golden, flaky crust. Whether you're after a quick bite or a hearty meal, Hoodwood is all about honest, fire-kissed cooking that brings people together.",
-    ],
+    blurb:
+      "Oak-smoked jerk plates and handmade patties, fire-kissed over an open flame — Caribbean takeaway, done honestly.",
+  },
+  {
+    // Coming-soon placeholder — no photography or mark yet, so the tile
+    // renders a typographic wordmark on a maroon field instead.
+    slug: "bunso",
+    name: "Bunso",
+    tag: "The Youngest of the Family",
+    location: "London",
+    image: null,
+    logo: null,
+    blurb:
+      "Bunso — 'the youngest' — is the newest member of the Maginhawa family. Full details, menu and location coming soon.",
   },
 ];
 
+// stagger pitch between tiles on scroll-in, in ms (40–60ms feels right)
+const STAGGER_MS = 50;
+
+// ---- click-expansion geometry (GSAP Flip grid→modal feel) ----
+// The clicked tile's frame grows to 250% × 200% of its cell and lands
+// dead-centre on the VIEWPORT (scroll is locked, so the screen centre is
+// stable). Size is capped to the viewport so the card is always fully
+// on-screen.
+const FRAME_SCALE_X = 2.5;
+const FRAME_SCALE_Y = 2;
+
+// measured once per activation, from real rects
+type ExpandGeometry = {
+  // vector from the clicked cell's centre to the card's final centre, px
+  dx: number;
+  dy: number;
+  // expanded frame size, px (capped by the viewport)
+  fw: number;
+  fh: number;
+};
+
 export default function Discover() {
-  const [active, setActive] = useState(0);
-  const [base, setBase] = useState(0); // last fully-revealed image (sits behind)
-  const [seq, setSeq] = useState(0); // bumps each switch so the mask re-wipes
-  const [menuOpen, setMenuOpen] = useState(false);
-  const item = ITEMS[active];
-  const menuPages = (item as { menuPages?: string[] }).menuPages;
-  const menuLabel = (item as { menuLabel?: string }).menuLabel;
+  // which restaurant's menu overlay is open — a slug, not a boolean, so the
+  // grid supports multiple menu-enabled tiles without cross-wiring
+  const [openMenuSlug, setOpenMenuSlug] = useState<string | null>(null);
+  const [inView, setInView] = useState(false);
+  // the tile currently EXPANDED (clicked) — drives the flip-modal card,
+  // computed as inline styles below
+  const [active, setActive] = useState<number | null>(null);
+  // the tile whose COLLAPSE animation is still running — keeps its elevated
+  // z-index until the return journey finishes, so the card never ducks
+  // behind the grid mid-animation
+  const [closing, setClosing] = useState<number | null>(null);
+  // hover-capable device? gates the magnetic drift (never the expansion)
+  const [fineHover, setFineHover] = useState(false);
+  const gridRef = useRef<HTMLUListElement>(null);
+  const tileRefs = useRef<(HTMLElement | null)[]>([]);
+  const geomRef = useRef<ExpandGeometry | null>(null);
+  const closeTimer = useRef(0);
 
-  // the list drifts down with scroll: top-aligned to the image, ending with
-  // its bottom level with the image's bottom
-  const sectionRef = useRef<HTMLElement>(null);
-  const imgRef = useRef<HTMLDivElement>(null);
-  const listRef = useRef<HTMLElement>(null);
-  const travel = useRef(0);
-
+  // one-shot entrance reveal — flips a class once the grid scrolls into
+  // view; the per-tile stagger is pure CSS (transition-delay steps)
   useEffect(() => {
-    const measure = () => {
-      const ih = imgRef.current?.offsetHeight ?? 0;
-      const lh = listRef.current?.offsetHeight ?? 0;
-      travel.current = Math.max(0, ih - lh);
-    };
-    measure();
-    const t = setTimeout(measure, 400);
-    window.addEventListener("resize", measure);
-    return () => {
-      clearTimeout(t);
-      window.removeEventListener("resize", measure);
-    };
+    const el = gridRef.current;
+    if (!el) return;
+    const observer = new IntersectionObserver(
+      ([entry]) => {
+        if (entry.isIntersecting) {
+          setInView(true);
+          observer.disconnect();
+        }
+      },
+      { threshold: 0.05, rootMargin: "0px 0px -10% 0px" },
+    );
+    observer.observe(el);
+    return () => observer.disconnect();
   }, []);
 
-  const { scrollYProgress } = useScroll({
-    target: sectionRef,
-    offset: ["start end", "end start"],
-  });
-  const listY = useTransform(scrollYProgress, (v) => v * travel.current);
-  // the photo drifts within its fixed frame as the page scrolls
-  const imgY = useTransform(scrollYProgress, [0, 1], [-30, 30]);
+  useEffect(() => {
+    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
+    const update = () => setFineHover(mq.matches);
+    update();
+    mq.addEventListener("change", update);
+    return () => mq.removeEventListener("change", update);
+  }, []);
 
-  const select = (i: number) => {
-    if (i === active) return;
-    setActive(i);
-    setSeq((s) => s + 1);
+  const expanding = active !== null && geomRef.current !== null;
+
+  // scroll lock — while the backdrop dims the page, the page doesn't move.
+  // Lenis is stopped for wheel/smooth scrolling and overflow:hidden covers
+  // native/keyboard paths; the effect cleanup restores both on collapse,
+  // unmount and route change, so scroll can never stay stuck.
+  useEffect(() => {
+    if (!expanding) return;
+    const html = document.documentElement;
+    const prevOverflow = html.style.overflow;
+    const prevPadRight = html.style.paddingRight;
+    // compensate the vanishing scrollbar so the page doesn't jump sideways
+    const scrollbar = window.innerWidth - html.clientWidth;
+    if (scrollbar > 0) html.style.paddingRight = `${scrollbar}px`;
+    html.style.overflow = "hidden";
+    lenisRef.current?.stop();
+    return () => {
+      html.style.overflow = prevOverflow;
+      html.style.paddingRight = prevPadRight;
+      lenisRef.current?.start();
+    };
+  }, [expanding]);
+
+  // clear the closing hold — called from the frame's transitionend, with a
+  // timeout fallback (exit duration + margin) in case the event is swallowed
+  const settleClose = useCallback(() => {
+    window.clearTimeout(closeTimer.current);
+    setClosing(null);
+  }, []);
+
+  // collapse — restores scroll (via the effect above), hands focus back to
+  // the tile that opened the card, and holds that tile's z-index until its
+  // return animation completes
+  const collapse = () => {
+    if (active !== null) {
+      tileRefs.current[active]?.focus({ preventScroll: true });
+      setClosing(active);
+      window.clearTimeout(closeTimer.current);
+      closeTimer.current = window.setTimeout(() => setClosing(null), 560);
+    }
+    setActive(null);
   };
 
-  // a full "card" — image + title/tag/line at top, descriptive paragraphs
-  // at the bottom; both reveal together under the sliding mask. Action
-  // buttons (Menu / Book a Table / Learn More) live outside the image.
-  const renderCard = (it: (typeof ITEMS)[number]) => (
-    <>
-      {it.image ? (
-        <motion.img
-          className={styles.img}
-          src={it.image}
-          alt={it.name}
-          style={{ y: imgY, scale: 1.16 }}
-        />
-      ) : (
-        <Placeholder ratio="auto" label={it.name} />
-      )}
-      <div className={styles.overlay}>
-        <div className={styles.ovTop}>
-          <div className={styles.ovHead}>
-            <span
-              className={styles.ovLogo}
-              style={{ "--ov-logo-url": `url(${it.logo})` } as React.CSSProperties}
-              role="img"
-              aria-label={it.name}
-            />
-            <span className={styles.ovTag}>{it.tag}</span>
-          </div>
-        </div>
-        <div className={styles.ovBottom}>
-          <span className={styles.ovLine} />
-          <div className={styles.ovText}>
-            {it.paras.map((p, i) => (
-              <p key={i} className={styles.ovTextCol}>
-                {p}
-              </p>
-            ))}
-          </div>
-          <div className={styles.ovActions}>
-            <button
-              type="button"
-              className={styles.ovMenu}
-              onClick={() => {
-                const pages = (it as { menuPages?: string[] }).menuPages;
-                if (pages && pages.length > 0) setMenuOpen(true);
-              }}
-              disabled={
-                !(it as { menuPages?: string[] }).menuPages ||
-                ((it as { menuPages?: string[] }).menuPages || []).length === 0
-              }
-              aria-label={`View ${it.name} menu`}
-            >
-              Menu
-            </button>
-            <div className={styles.ovActGroup}>
-              <a href="#contact-us" className={styles.btnGhost}>
-                Book a Table
-              </a>
-              <a href="#about-us" className={styles.btnSolid}>
-                Learn More
-              </a>
-            </div>
-          </div>
-        </div>
-      </div>
-    </>
-  );
+  useEffect(() => () => window.clearTimeout(closeTimer.current), []);
+
+  // Escape closes the expanded card
+  useEffect(() => {
+    if (!expanding) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") collapse();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+    // eslint-disable-next-line react-hooks/exhaustive-deps
+  }, [expanding, active]);
+
+  // measure the clicked cell and derive the card's landing spot: the true
+  // centre of the screen. Cells (<li>) never transform, so their rects are
+  // always the rest layout.
+  const engage = (i: number) => {
+    const ul = gridRef.current;
+    const cell = ul?.children[i] as HTMLElement | undefined;
+    if (!ul || !cell) return;
+    const cellRect = cell.getBoundingClientRect();
+    const vw = window.innerWidth;
+    const vh = window.innerHeight;
+
+    // capped to the viewport so the centred card is always fully on-screen
+    const fw = Math.min(cellRect.width * FRAME_SCALE_X, vw * 0.9);
+    const fh = Math.min(cellRect.height * FRAME_SCALE_Y, vh * 0.85);
+
+    // clicked cell centre → viewport centre, in viewport coordinates
+    const cx = cellRect.left + cellRect.width / 2;
+    const cy = cellRect.top + cellRect.height / 2;
+
+    geomRef.current = { dx: vw / 2 - cx, dy: vh / 2 - cy, fw, fh };
+    setActive(i);
+  };
+
+  const toggle = (i: number) => {
+    if (active === i) collapse();
+    else engage(i);
+  };
+
+  // inline style for the expanded frame — CSS transitions animate every
+  // change, so the collapse retargets cleanly mid-flight too
+  const frameStyleFor = (i: number): React.CSSProperties | undefined => {
+    if (!expanding || i !== active) return undefined;
+    const g = geomRef.current!;
+    return {
+      width: `${g.fw}px`,
+      height: `${g.fh}px`,
+      transform: `translate(calc(-50% + ${g.dx}px), calc(-50% + ${g.dy}px))`,
+    };
+  };
+
+  const menuItem = ITEMS.find((it) => it.slug === openMenuSlug);
 
   return (
-    <section
-      ref={sectionRef}
-      className={styles.section}
-      id="restaurants"
-      data-nav-theme="light"
-    >
-      <div className={styles.body}>
-        <div className={styles.left}>
-          <div ref={imgRef} className={styles.bigImage}>
-            {/* previous card sits behind while the new one wipes over it */}
-            <div className={`${styles.bigImageLayer} ${styles.baseLayer}`}>
-              {renderCard(ITEMS[base])}
-            </div>
-            {/* current card (image + title/tag) revealed by a sliding mask */}
-            <motion.div
-              key={seq}
-              className={`${styles.bigImageLayer} ${styles.topLayer}`}
-              initial={{ clipPath: "inset(0% 100% 0% 0%)" }}
-              animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
-              transition={{ duration: 0.7, ease: [0.76, 0, 0.24, 1] }}
-              onAnimationComplete={() => setBase(active)}
-            >
-              {renderCard(item)}
-            </motion.div>
-          </div>
-
-        </div>
-
-        <motion.nav
-          ref={listRef}
-          style={{ y: listY }}
-          className={styles.list}
-          aria-label="Our restaurants"
-        >
-          {ITEMS.map((it, i) => (
-            <button
-              key={it.name}
-              type="button"
-              className={`${styles.listItem} ${active === i ? styles.listActive : ""}`}
-              onMouseEnter={() => select(i)}
-              onFocus={() => select(i)}
-              onClick={() => select(i)}
-              aria-current={active === i}
-            >
-              <span className={styles.listName}>{it.name}</span>
-              <span className={styles.listMark} aria-hidden />
-            </button>
-          ))}
-        </motion.nav>
+    <section className={styles.section} id="restaurants" data-nav-theme="light">
+      <div className={styles.head}>
+        <span className={styles.eyebrow}>Discover All Our Restaurants</span>
+        {/* pale interaction hint — click/tap works everywhere now */}
+        <span className={styles.hint} aria-hidden>
+          (Click to learn more)
+        </span>
       </div>
 
+      <ul
+        ref={gridRef}
+        className={`${styles.grid} ${inView ? styles.gridIn : ""}`}
+        aria-label="Our restaurants"
+      >
+        {ITEMS.map((it, i) => (
+          <Tile
+            key={it.slug}
+            item={it}
+            stagger={i * STAGGER_MS}
+            active={active === i}
+            closing={closing === i}
+            dimmed={expanding && active !== i}
+            // magnetic drift only on hover devices while nothing is expanded
+            magnetOn={fineHover && !expanding}
+            frameStyle={frameStyleFor(i)}
+            onToggle={() => toggle(i)}
+            onOpenMenu={() => setOpenMenuSlug(it.slug)}
+            onClosed={settleClose}
+            tileRef={(el) => {
+              tileRefs.current[i] = el;
+            }}
+          />
+        ))}
+        {/* backdrop — darkens the whole viewport behind the expanded card;
+            clicking it collapses (Escape and card-click also work) */}
+        <li
+          aria-hidden
+          onClick={collapse}
+          className={`${styles.backdrop} ${
+            expanding ? styles.backdropOn : ""
+          }`}
+        >
+          {/* pale hint fading in with the backdrop — decorative only, the
+              card's ✕ button is the accessible close control */}
+          <span className={styles.backdropHint}>
+            Click anywhere outside to close
+          </span>
+        </li>
+      </ul>
+
       <MenuOverlay
-        open={menuOpen && !!menuPages && menuPages.length > 0}
-        onClose={() => setMenuOpen(false)}
-        pages={menuPages ?? []}
-        restaurantName={item.name}
-        subtitle={menuLabel}
+        open={!!menuItem?.menuPages?.length}
+        onClose={() => setOpenMenuSlug(null)}
+        pages={menuItem?.menuPages ?? []}
+        restaurantName={menuItem?.name ?? ""}
+        subtitle={menuItem?.menuLabel}
       />
     </section>
+  );
+}
+
+function Tile({
+  item,
+  stagger,
+  active,
+  closing,
+  dimmed,
+  magnetOn,
+  frameStyle,
+  onToggle,
+  onOpenMenu,
+  onClosed,
+  tileRef,
+}: {
+  item: DiscoverItem;
+  stagger: number;
+  active: boolean;
+  closing: boolean;
+  dimmed: boolean;
+  magnetOn: boolean;
+  frameStyle?: React.CSSProperties;
+  onToggle: () => void;
+  onOpenMenu: () => void;
+  onClosed: () => void;
+  tileRef: (el: HTMLElement | null) => void;
+}) {
+  const canOpenMenu = !!(item.menuPages && item.menuPages.length > 0);
+  // bookability comes from the canonical data, not the local display copy
+  const bookable = getRestaurant(item.slug)?.bookable ?? false;
+
+  // ---- magnetic proximity drift (MagneticButton's spring feel, smaller) --
+  // The card leans a few px toward the cursor while it's over the tile;
+  // spring-smoothed, never 1:1. Off while any card is expanded and under
+  // reduced motion.
+  const reduceMotion = useReducedMotion();
+  const selfRef = useRef<HTMLElement | null>(null);
+  const mx = useMotionValue(0);
+  const my = useMotionValue(0);
+  const x = useSpring(mx, { stiffness: 170, damping: 13, mass: 0.3 });
+  const y = useSpring(my, { stiffness: 170, damping: 13, mass: 0.3 });
+  const magnetLive = magnetOn && !reduceMotion;
+
+  const onMagnetMove = (e: React.MouseEvent) => {
+    if (!magnetLive) return;
+    const r = selfRef.current?.getBoundingClientRect();
+    if (!r) return;
+    // ~±7px at the tile's edges — a subtle lean, not a chase
+    const pull = 7;
+    const ox = ((e.clientX - (r.left + r.width / 2)) / (r.width / 2)) * pull;
+    const oy = ((e.clientY - (r.top + r.height / 2)) / (r.height / 2)) * pull;
+    mx.set(Math.max(-pull, Math.min(pull, ox)));
+    my.set(Math.max(-pull, Math.min(pull, oy)));
+  };
+  const onMagnetLeave = () => {
+    mx.set(0);
+    my.set(0);
+  };
+
+  // release the drift the moment any card expands (or motion is reduced)
+  useEffect(() => {
+    if (!magnetLive) {
+      mx.set(0);
+      my.set(0);
+    }
+  }, [magnetLive, mx, my]);
+
+  return (
+    <li
+      className={styles.cell}
+      style={{ "--stagger": `${stagger}ms` } as React.CSSProperties}
+    >
+      <motion.article
+        ref={(el) => {
+          selfRef.current = el;
+          tileRef(el);
+        }}
+        className={`${styles.tile} ${active ? styles.tileActive : ""} ${
+          closing ? styles.tileClosing : ""
+        } ${dimmed ? styles.tileDimmed : ""}`}
+        style={{ x, y }}
+        role="button"
+        tabIndex={0}
+        aria-expanded={active}
+        aria-label={`${item.name} — details`}
+        onClick={onToggle}
+        onKeyDown={(e) => {
+          if (e.key === "Enter" || e.key === " ") {
+            e.preventDefault();
+            onToggle();
+          }
+        }}
+        onMouseMove={onMagnetMove}
+        onMouseLeave={onMagnetLeave}
+      >
+        {/* the expanding frame — grows to 250% × 200% of the cell and lands
+            centred (the flip-modal move). Width/height here is the
+            deliberate exception to transform-only: a non-uniform scale
+            would distort the photo and logo. */}
+        <div
+          className={styles.frame}
+          style={frameStyle}
+          onTransitionEnd={(e) => {
+            // the return journey has finished → release the z-index hold
+            if (
+              closing &&
+              !active &&
+              e.target === e.currentTarget &&
+              e.propertyName === "transform"
+            ) {
+              onClosed();
+            }
+          }}
+        >
+          <div className={styles.clip}>
+            {item.image ? (
+              <Image
+                className={styles.photo}
+                src={item.image}
+                alt=""
+                fill
+                sizes="(max-width: 460px) 100vw, (max-width: 700px) 50vw, (max-width: 980px) 34vw, 25vw"
+              />
+            ) : (
+              // photo-less tiles (Mamasons, Bunso) — deep maroon field so
+              // the centered cream mark / wordmark carries the tile
+              <div className={styles.fallback} aria-hidden />
+            )}
+            {/* legibility scrim — present at rest, deepens in the expanded
+                state via opacity only */}
+            <div className={styles.scrim} aria-hidden />
+
+            {/* top-right — mini description */}
+            <span className={styles.tag}>{item.tag}</span>
+
+            {/* top-right — explicit close affordance, visible only while
+                the card is expanded. stopPropagation keeps the click from
+                re-toggling through the tile; onToggle collapses because the
+                tile is active. */}
+            <button
+              type="button"
+              className={styles.close}
+              onClick={(e) => {
+                e.stopPropagation();
+                onToggle();
+              }}
+              aria-label="Close"
+              tabIndex={active ? 0 : -1}
+            >
+              <svg
+                viewBox="0 0 16 16"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.4"
+                strokeLinecap="round"
+                aria-hidden
+              >
+                <path d="M3 3l10 10" />
+                <path d="M13 3L3 13" />
+              </svg>
+            </button>
+
+            {/* center — the brand group commands the square */}
+            <div className={styles.center}>
+              <div className={styles.brandGroup}>
+                {item.logo ? (
+                  <span
+                    className={styles.logo}
+                    style={
+                      {
+                        "--ov-logo-url": `url(${item.logo})`,
+                      } as React.CSSProperties
+                    }
+                    role="img"
+                    aria-label={item.name}
+                  />
+                ) : (
+                  <span className={styles.wordmark}>{item.name}</span>
+                )}
+                {item.badge ? (
+                  // eslint-disable-next-line @next/next/no-img-element
+                  <img
+                    className={styles.badge}
+                    src={item.badge}
+                    alt={item.badgeLabel}
+                    draggable={false}
+                  />
+                ) : null}
+              </div>
+            </div>
+
+            {/* bottom-left — blurb + location rise in from the bottom of
+                the expanded card */}
+            <div className={styles.revealBlock}>
+              <p className={styles.blurb}>{item.blurb}</p>
+              <span className={styles.location}>{item.location}</span>
+            </div>
+
+            {/* bottom-right — actions, revealed with the expanded card.
+                stopPropagation keeps their clicks from collapsing it. */}
+            <div className={styles.actions}>
+              {canOpenMenu ? (
+                <button
+                  type="button"
+                  className={styles.btn}
+                  onClick={(e) => {
+                    e.stopPropagation();
+                    onOpenMenu();
+                  }}
+                  aria-label={`View ${item.name} menu`}
+                >
+                  Menu
+                </button>
+              ) : null}
+              {bookable ? (
+                <a
+                  href="#contact-us"
+                  className={`${styles.btn} ${styles.btnSolid}`}
+                  onClick={(e) => e.stopPropagation()}
+                  aria-label={`Book at ${item.name}`}
+                >
+                  Book
+                </a>
+              ) : null}
+              <a
+                href={`/restaurants/${item.slug}`}
+                className={styles.btn}
+                onClick={(e) => e.stopPropagation()}
+                aria-label={`Visit ${item.name}`}
+              >
+                Visit
+              </a>
+            </div>
+          </div>
+        </div>
+      </motion.article>
+    </li>
   );
 }

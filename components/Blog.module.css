@@ -1,306 +1,464 @@
+/* Blog chapter — editorial two-column layout.
+   Rule-of-thirds: featured post spans ~2/3 of the horizontal grid,
+   Latest post rail takes ~1/3. Both surfaces carry their own CTA so
+   each card is a self-contained editorial unit. */
 .section {
-  margin-top: 0;
-  /* related top (Press just before is the other editorial-content section),
-     chapter bottom (closes the editorial chapter before the DarkZone CTA) */
-  padding: var(--section-y-sm) 0 var(--section-y-lg);
-}
-
-/* eyebrow inline-left, statement indented so its wrapped lines align under the
-   eyebrow — same pattern as WhoWeAre */
-.head {
   position: relative;
-  margin-bottom: clamp(56px, 8vh, 112px);
+  isolation: isolate;
+  /* Bottom padding is tight so the section hands off cleanly to the
+     Careers card underneath — CareersTeaser owns the matching top
+     padding, and the hairline rule on Careers is the visual break. */
+  /* uniform --rule-gap on both sides: below its own border-top and above
+     the Careers hairline that follows, matching every rule on the page */
+  padding: var(--rule-gap) var(--pad-x) var(--rule-gap);
+  display: grid;
+  /* 2 : 1 columns — the classic editorial ratio the reference is built on */
+  grid-template-columns: 2fr 1fr;
+  column-gap: clamp(32px, 4.5vw, 80px);
+  row-gap: clamp(20px, 2.5vh, 40px);
+  background:
+    radial-gradient(60% 50% at 18% 32%, rgba(201, 126, 63, 0.05), transparent 70%),
+    radial-gradient(55% 45% at 78% 68%, rgba(201, 126, 63, 0.04), transparent 70%),
+    var(--cream);
+  color: var(--maroon);
+  /* Hairline rule at the top marks the start of the Blog chapter on the
+     cream page — a purposeful editorial break rather than a big gap. */
+  border-top: 1px solid rgba(47, 0, 0, 0.1);
 }
 
+/* ---------- eyebrow (top-left "News" label) ---------- */
 .eyebrow {
-  position: absolute;
-  top: clamp(8px, 1vw, 18px);
-  left: 0;
-  white-space: nowrap;
+  grid-column: 1;
+  grid-row: 1;
+  align-self: center;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7em;
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
-  color: var(--saffron);
-}
-
-.title {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: var(--t-display);
-  line-height: var(--lh-display);
-  letter-spacing: var(--tr-display);
+  text-transform: uppercase;
   color: var(--maroon);
-  max-width: 28ch;
+}
+.eyebrow::before {
+  content: "";
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--saffron);
+  flex: none;
 }
 
-.spacer {
-  display: inline-block;
-  width: clamp(150px, 18vw, 320px);
-  height: 0.1em;
-  vertical-align: middle;
+/* ---------- featured card ---------- */
+/* Reveal wrapper takes the grid slot so the scroll-in animation lives on
+   the outer element while the `<a>` keeps hover behaviour intact. */
+.featuredReveal {
+  grid-column: 1;
+  grid-row: 2;
+  display: block;
 }
 
-@media (max-width: 640px) {
-  .eyebrow {
-    position: static;
-    display: block;
-    width: auto;
-    margin-bottom: 1em;
-  }
-  .spacer {
-    display: none;
-  }
-}
-
-/* ---- featured latest entry — image left (smaller), text top-right ---- */
 .featured {
-  display: grid;
-  /* image column trimmed; text column gets the lead so it can breathe */
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.15fr);
-  gap: clamp(40px, 6vw, 120px);
-  align-items: start;
-  /* hairline rule separates the latest from the secondary rail below;
-     tighter gap than before — the rule does the dividing work */
-  margin-bottom: clamp(28px, 4vh, 56px);
-  padding-bottom: clamp(28px, 4vh, 56px);
-  border-bottom: 1px solid var(--placeholder-line);
-  text-decoration: none;
+  position: relative;
+  display: block;
   color: inherit;
+  text-decoration: none;
 }
 
+/* AnimatePresence swap target — a single positioned box so the hover
+   crossfade cycles a full "image + caption" unit rather than two
+   independent chunks. */
+.featuredInner {
+  position: relative;
+  display: block;
+}
+
+/* The photograph is the whole card now — caption sits INSIDE it on a
+   frosted-glass panel. Roughly 3:2 keeps the magazine-spread feel while
+   giving the caption enough room to breathe. */
 .featuredMedia {
-  border-radius: 0;
+  position: relative;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  background: var(--placeholder);
+  box-shadow: 0 24px 60px -30px rgba(31, 0, 0, 0.28);
 }
-
 .featuredMedia img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
+  transition: transform 0.7s var(--ease-out);
+}
+.featured:hover .featuredMedia img,
+.featured:focus-visible .featuredMedia img {
+  transform: scale(1.02);
 }
 
-.featuredBody {
+/* Dark wash below the caption — bright photos stay legible without the
+   whole image getting muddy. Concentrated in the bottom third so the
+   upper 2/3 of the photograph reads clean. */
+.featuredScrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background: linear-gradient(
+    to bottom,
+    rgba(18, 0, 0, 0) 0%,
+    rgba(18, 0, 0, 0) 45%,
+    rgba(18, 0, 0, 0.35) 78%,
+    rgba(18, 0, 0, 0.55) 100%
+  );
+}
+
+/* Frosted caption panel — iOS-glass recipe pinned to the bottom of the
+   image. Tight blur + slight cream tint so cream text reads over
+   anything behind. */
+.featuredCaption {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  z-index: 2;
   display: flex;
   flex-direction: column;
-  /* right-align everything in the body — text + tag + link */
-  align-items: flex-end;
-  gap: clamp(16px, 2vw, 24px);
-  text-align: right;
+  gap: clamp(10px, 1.4vh, 16px);
+  padding:
+    clamp(20px, 2.2vw, 32px)
+    clamp(22px, 2.6vw, 36px)
+    clamp(20px, 2.4vw, 32px);
+  color: var(--cream);
+  background:
+    linear-gradient(
+      to bottom,
+      rgba(248, 243, 234, 0.05) 0%,
+      rgba(248, 243, 234, 0.12) 100%
+    );
+  backdrop-filter: blur(28px) saturate(1.6);
+  -webkit-backdrop-filter: blur(28px) saturate(1.6);
+  border-top: 1px solid rgba(248, 243, 234, 0.18);
+  box-shadow: inset 0 1px 0 rgba(255, 255, 255, 0.14);
 }
 
-.featuredTag {
+/* Category pill — cream capsule with a saffron dot, absolutely positioned
+   at the TOP-LEFT of the image. Sits above the frosted caption so it reads
+   as the story's stamp rather than another line inside the panel. */
+.categoryPill {
+  position: absolute;
+  top: clamp(14px, 1.6vw, 22px);
+  left: clamp(14px, 1.6vw, 22px);
+  z-index: 3;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  padding: 0.5em 1em 0.5em 0.85em;
+  background: rgba(248, 243, 234, 0.92);
+  color: var(--maroon);
+  border-radius: 999px;
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
-  display: inline-flex;
-  flex-wrap: wrap;
-  align-items: baseline;
-  gap: 0;
+  font-weight: 500;
+  box-shadow: 0 6px 18px -10px rgba(0, 0, 0, 0.4);
+  backdrop-filter: blur(10px) saturate(1.4);
+  -webkit-backdrop-filter: blur(10px) saturate(1.4);
 }
-
-/* "Latest" gets the saffron accent — full saturation */
-.latestMark {
-  color: var(--saffron);
-}
-
-/* date + source stay muted maroon so "Latest" reads as the highlight */
-.tagMuted {
-  color: var(--maroon);
-  opacity: 0.6;
+.categoryPill::before {
+  content: "";
+  width: 7px;
+  height: 7px;
+  border-radius: 50%;
+  background: var(--saffron);
+  flex: none;
 }
 
 .featuredTitle {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(1.8rem, 3vw, 2.8rem);
-  line-height: 1.08;
-  letter-spacing: -0.014em;
+  font-size: var(--t-h2);
+  /* Line-height set to 1.28 so descenders (y, g, p) in the last line
+     have room to render without the `-webkit-line-clamp` overflow
+     clipping them — that clip was reading as a cropped title. */
+  line-height: 1.28;
+  letter-spacing: -0.012em;
+  color: var(--cream);
+  /* Clamp titles to two lines so the caption's height stays fixed. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  /* Small bottom padding — some browsers still round the box tighter than
+     the tallest descender, so the padding is a safety net for glyphs
+     that dip below the baseline (y, g, p, q). */
+  padding-bottom: 2px;
+  transition: color 0.5s var(--ease-in-out);
+}
+.featured:hover .featuredTitle,
+.featured:focus-visible .featuredTitle {
+  color: var(--saffron);
 }
 
+/* Excerpt — short body of text under the title. Kept small and muted so
+   the headline stays the point; two-line clamp holds the caption height
+   steady regardless of how long the excerpt is. */
 .featuredExcerpt {
-  font-family: var(--font-serif);
-  font-size: var(--t-body);
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
   line-height: var(--lh-body);
-  opacity: 0.85;
-  max-width: 44ch;
+  color: rgba(248, 243, 234, 0.82);
+  max-width: 58ch;
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
 }
 
-.featuredLink {
-  margin-top: 0.6em;
+/* Meta line inside the caption — cream, muted. Rail meta is maroon at
+   65% (see below); split them so each reads correctly against its bg. */
+.featuredMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.7em;
-  transition: color 0.32s ease;
+  color: rgba(248, 243, 234, 0.78);
+}
+.metaDot {
+  opacity: 0.7;
 }
 
-.featuredLink span {
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .featured:hover .featuredLink {
-    color: var(--saffron);
-  }
-  .featured:hover .featuredLink span {
-    transform: translateX(6px);
-  }
-}
-
-/* ---- horizontal rail of smaller cards ---- */
-.railWrap {
-  position: relative;
-  margin-inline: calc(-1 * var(--pad-x));
-}
-
+/* ---------- rail (Latest post) ----------
+   The rail sits directly on the cream page — no card wrapper. It's a grid
+   sibling of the featured photograph, so `align-self: stretch` (grid
+   default) hands it the full row height. Its own children
+   (heading → list → CTA) distribute with `justify-content: space-between`,
+   which lands the heading exactly at the featured card's top edge and
+   the CTA exactly at its bottom edge. */
 .rail {
+  grid-column: 2;
+  grid-row: 2;
   display: flex;
-  gap: clamp(14px, 1.6vw, 24px);
+  flex-direction: column;
+  justify-content: space-between;
+  gap: clamp(16px, 2vh, 28px);
+  /* No padding — the featured card carries none either, so both columns
+     align at the exact same top/bottom line. */
+}
+
+.railHeading {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--t-h3);
+  line-height: 1.15;
+  letter-spacing: -0.008em;
+  color: var(--maroon);
+  /* No bottom margin — the parent rail uses justify-content: space-between
+     to place the heading at the featured card's top edge, so we don't want
+     a margin nudging it downward. */
+  margin: 0;
+}
+
+/* The list takes over the middle of the rail. `flex: 1` lets the list
+   grow to fill whatever height the featured card is dictating, and the
+   items inside use `space-between` to spread evenly — so the last row
+   lands right where the CTA slot begins, and each row is spaced
+   proportionally to the tall featured photograph next to it. */
+.railList {
   list-style: none;
   margin: 0;
-  padding: 6px calc(var(--pad-x) * 2) 16px;
-  overflow-x: auto;
-  scroll-snap-type: x mandatory;
-  scrollbar-width: none;
-  -ms-overflow-style: none;
-  -webkit-overflow-scrolling: touch;
-  scroll-behavior: smooth;
-}
-.rail::-webkit-scrollbar { display: none; }
-
-.cardItem {
-  flex: 0 0 clamp(240px, 23vw, 340px);
-  scroll-snap-align: start;
+  padding: 0;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  gap: clamp(14px, 2vh, 24px);
 }
 
-.card {
-  display: block;
-  text-decoration: none;
+.railItem {
+  list-style: none;
+}
+
+.railLink {
+  display: grid;
+  grid-template-columns: clamp(72px, 8vw, 96px) 1fr;
+  gap: clamp(12px, 1.4vw, 18px);
+  align-items: start;
   color: inherit;
-  position: relative;
+  text-decoration: none;
+  transition: transform 0.5s var(--ease-out);
+}
+.railLink:hover,
+.railLink:focus-visible {
+  transform: translateX(2px);
 }
 
-.cardMedia {
+.railThumb {
   position: relative;
-  width: 100%;
-  /* shorter landscape ratio — was 4/5 portrait, now lands closer to magazine plates */
-  aspect-ratio: 4 / 3;
+  display: block;
+  aspect-ratio: 1 / 1;
+  border-radius: var(--radius-media);
   overflow: hidden;
-  border-radius: 0;
   background: var(--placeholder);
+  box-shadow: 0 10px 24px -14px rgba(31, 0, 0, 0.28);
 }
-
-.cardMedia img {
+.railThumb img {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
-  user-select: none;
-  -webkit-user-drag: none;
+  transition: transform 0.7s var(--ease-out);
 }
-
-.card:hover .cardMedia img,
-.card:focus-visible .cardMedia img {
+.railLink:hover .railThumb img,
+.railLink:focus-visible .railThumb img {
   transform: scale(1.04);
 }
 
-/* dark scrim → cream type sits inside the photo */
-.cardOverlay {
-  position: absolute;
-  inset: 0;
+.railBody {
   display: flex;
   flex-direction: column;
-  justify-content: flex-end;
-  gap: 8px;
-  padding: clamp(14px, 1.8vw, 22px);
-  color: var(--cream);
-  background: linear-gradient(
-    to top,
-    rgba(18, 0, 0, 0.78) 0%,
-    rgba(18, 0, 0, 0.25) 50%,
-    rgba(18, 0, 0, 0) 100%
-  );
-  pointer-events: none;
+  gap: clamp(6px, 0.8vh, 10px);
+  min-width: 0;
 }
 
-.cardMeta {
-  font-family: var(--font-display-xs);
-  font-weight: 500;
-  font-size: var(--t-label);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  opacity: 0.85;
-}
-
-.cardTitle {
+.railTitle {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(1.05rem, 1.45vw, 1.3rem);
-  line-height: 1.2;
+  font-size: var(--t-h3);
+  line-height: 1.3;
   letter-spacing: -0.005em;
-  margin: 0;
+  color: var(--maroon);
+  /* Two-line clamp so long headlines don't crowd out the meta line. */
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+  transition: color 0.4s var(--ease-in-out);
 }
-
-/* ---- rail navigation arrows ---- */
-.railArrow {
-  position: absolute;
-  top: 50%;
-  width: clamp(42px, 3.6vw, 54px);
-  height: clamp(42px, 3.6vw, 54px);
-  border: 1.5px solid var(--saffron);
-  background: transparent;
-  border-radius: 50%;
+.railLink:hover .railTitle,
+.railLink:focus-visible .railTitle {
   color: var(--saffron);
-  display: grid;
-  place-items: center;
-  cursor: pointer;
-  z-index: 4;
-  transform: translateY(-50%);
-  transition: background 0.32s ease, color 0.32s ease, transform 0.32s ease;
 }
 
-.railArrow svg {
-  width: 44%;
-  height: 44%;
+/* Rail meta reads on the cream glass card — keep it maroon at ~65% so
+   the title stays the point and the meta whispers underneath. */
+.railMeta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  color: var(--maroon);
+  opacity: 0.6;
 }
 
-.railArrow:hover,
-.railArrow:focus-visible {
-  background: var(--saffron);
+/* ---------- CTAs (inline "read more" affordance) ----------
+   Shared editorial recipe: uppercase label + arrow + expanding underline
+   on hover. Two variants:
+     .featuredCta — cream, sits inside the frosted caption on the image
+     .railCta     — maroon, sits at the foot of the glass rail card
+   Both share `.ctaLabel` and `.ctaArrow` so the underline + arrow slide
+   feel identical across the two cards. */
+.featuredCta,
+.railCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8em;
+  align-self: flex-start;
+  padding-bottom: 4px;
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  text-decoration: none;
+  position: relative;
+  font-weight: 500;
+  transition: color 0.4s var(--ease-in-out);
+}
+.featuredCta {
+  /* Sits above the meta line inside the frosted caption — 4px extra top
+     margin gives it a beat of space from the meta, without breaking the
+     column's rhythm. */
+  margin-top: clamp(4px, 0.6vh, 8px);
   color: var(--cream);
-  transform: translateY(-50%) scale(1.04);
-  outline: none;
+}
+.railCta {
+  /* The parent rail uses justify-content: space-between to pin this CTA
+     to the featured card's bottom edge, so no margin is needed. */
+  color: var(--maroon);
+}
+.featuredCta::after,
+.railCta::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0.32);
+  transform-origin: left center;
+  transition: transform 0.6s var(--ease-out);
+}
+.featured:hover .featuredCta::after,
+.featured:focus-visible .featuredCta::after,
+.railCta:hover::after,
+.railCta:focus-visible::after {
+  transform: scaleX(1);
+}
+.featured:hover .featuredCta,
+.featured:focus-visible .featuredCta {
+  color: var(--saffron);
+}
+.railCta:hover,
+.railCta:focus-visible {
+  color: var(--saffron);
+}
+.ctaLabel {
+  font-weight: 500;
+}
+.ctaArrow {
+  width: clamp(28px, 2.4vw, 38px);
+  height: 10px;
+  transition: transform 0.5s var(--ease-out);
+}
+.featured:hover .featuredCta .ctaArrow,
+.featured:focus-visible .featuredCta .ctaArrow,
+.railCta:hover .ctaArrow,
+.railCta:focus-visible .ctaArrow {
+  transform: translateX(6px);
 }
 
-.railArrowLeft {
-  left: calc(var(--pad-x) * 0.6);
+@media (prefers-reduced-motion: reduce) {
+  .featuredMedia img,
+  .railThumb img,
+  .railLink,
+  .ctaArrow {
+    transition: none;
+  }
 }
 
-.railArrowRight {
-  right: calc(var(--pad-x) * 0.6);
-}
-
-/* on touch / coarse pointers the native swipe is the navigation — hide */
-@media (hover: none), (pointer: coarse) {
-  .railArrow { display: none; }
-}
-
-/* ---- view all CTA ---- */
-.viewAllWrap {
-  margin-top: clamp(56px, 8vh, 112px);
-  display: flex;
-  justify-content: center;
-}
-
-@media (max-width: 860px) {
-  .featured {
+@media (max-width: 900px) {
+  .section {
     grid-template-columns: 1fr;
-    align-items: start;
-    gap: clamp(20px, 4vh, 36px);
+  }
+  .eyebrow,
+  .featuredReveal,
+  .rail {
+    grid-column: 1;
+  }
+  .featuredReveal {
+    grid-row: 2;
+  }
+  .rail {
+    grid-row: 3;
+  }
+  .railLink {
+    grid-template-columns: 96px 1fr;
   }
 }

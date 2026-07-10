@@ -9,7 +9,7 @@ export default function Hero({ started }: { started: boolean }) {
       <div className={styles.panel}>
         <video
           className={styles.video}
-          src="/videos/hero-draft3.mp4"
+          src="/videos/belly-hero.mov"
           autoPlay
           muted
           loop

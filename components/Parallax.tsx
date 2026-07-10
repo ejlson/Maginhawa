@@ -13,7 +13,8 @@ import styles from "./Parallax.module.css";
  *
  * `inset`: the frame stays put and the image pans *inside* it — an over-scaled
  * layer drifts within a clipped frame, an internal parallax rather than moving
- * the whole block. Pass `ratio` to fix the frame's aspect ratio.
+ * the whole block. Pass `ratio` to fix the frame's aspect ratio, or `fill` to
+ * let the frame take the full height of its layout parent instead.
  */
 export default function Parallax({
   children,
@@ -21,12 +22,15 @@ export default function Parallax({
   className,
   inset = false,
   ratio,
+  fill = false,
 }: {
   children: React.ReactNode;
   speed?: number;
   className?: string;
   inset?: boolean;
   ratio?: string;
+  /** frame fills the parent's height — overrides `ratio` */
+  fill?: boolean;
 }) {
   const ref = useRef<HTMLDivElement>(null);
   const { scrollYProgress } = useScroll({
@@ -45,7 +49,9 @@ export default function Parallax({
       <div
         ref={ref}
         className={`${styles.frame} ${className ?? ""}`}
-        style={ratio ? { aspectRatio: ratio } : undefined}
+        style={
+          fill ? { height: "100%" } : ratio ? { aspectRatio: ratio } : undefined
+        }
       >
         {/* over-scaled so the vertical drift never exposes a frame edge */}
         <motion.div className={styles.inner} style={{ y, scale: 1.22 }}>

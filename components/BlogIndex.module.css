@@ -7,31 +7,32 @@
 }
 
 .head {
-  padding-block: var(--section-y-sm) clamp(40px, 6vh, 80px);
+  /* tight top breath — .page's padding already clears the fixed nav, so
+     the head only needs a small gap of its own */
+  padding-block: clamp(16px, 2.5vh, 32px) clamp(28px, 4vh, 56px);
 }
 
-.back {
+/* saffron-dot eyebrow — same chapter mark as Discover / AboutIntro */
+.eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: 0.7em;
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
-  opacity: 0.7;
-  padding: 8px 0;
-  margin-bottom: clamp(18px, 2.4vh, 32px);
-}
-.back:hover { opacity: 1; }
-
-.eyebrow {
-  display: block;
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  color: var(--saffron);
+  color: var(--maroon);
   margin-bottom: clamp(12px, 1.6vh, 18px);
+}
+
+.eyebrow::before {
+  content: "";
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--saffron);
+  flex: none;
 }
 
 .title {
@@ -40,28 +41,20 @@
   font-size: var(--t-display);
   line-height: var(--lh-display);
   letter-spacing: var(--tr-display);
-  max-width: 18ch;
+  max-width: 44ch;
   margin: 0;
 }
 
-.lede {
-  font-family: var(--font-serif);
-  font-size: var(--t-lead);
-  line-height: var(--lh-body);
-  opacity: 0.85;
-  max-width: 56ch;
-  margin-top: clamp(20px, 3vh, 36px);
-}
-
-/* ---- featured row ---- */
+/* ---- featured lede ----
+   Compact editorial lede rather than a hero — a narrower image column and
+   a text stack right, sitting under a hairline rule. */
 .featured {
   display: grid;
-  grid-template-columns: 1.4fr 1fr;
-  gap: clamp(28px, 4vw, 72px);
-  align-items: center;
-  padding-block: clamp(28px, 4vh, 56px);
-  border-top: 1px solid var(--placeholder-line);
-  border-bottom: 1px solid var(--placeholder-line);
+  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
+  column-gap: var(--grid-gutter);
+  align-items: start;
+  padding-block: clamp(20px, 3vh, 36px);
+  border-top: 1px solid rgba(47, 0, 0, 0.12);
   text-decoration: none;
   color: inherit;
 }
@@ -69,8 +62,9 @@
 .featuredMedia {
   position: relative;
   aspect-ratio: 16 / 10;
+  max-height: clamp(340px, 46vh, 520px);
   overflow: hidden;
-  border-radius: 0;
+  border-radius: var(--radius-tile);
   background: var(--placeholder);
 }
 
@@ -84,14 +78,14 @@
 .featuredBody {
   display: flex;
   flex-direction: column;
-  gap: clamp(12px, 1.6vw, 20px);
+  gap: 15px;
 }
 
 .featuredTag {
-  font-family: var(--font-display-xs);
+  font-family: var(--font-sans);
   font-weight: 500;
   font-size: var(--t-label);
-  letter-spacing: 0.12em;
+  letter-spacing: var(--tr-label);
   text-transform: uppercase;
   opacity: 0.65;
 }
@@ -99,14 +93,15 @@
 .featuredTitle {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(2rem, 3.5vw, 3.2rem);
-  line-height: 1.06;
-  letter-spacing: -0.014em;
+  font-size: var(--t-h2);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tr-display);
   margin: 0;
+  max-width: 30ch;
 }
 
 .featuredExcerpt {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: var(--t-body);
   line-height: var(--lh-body);
   opacity: 0.85;
@@ -114,7 +109,6 @@
 }
 
 .featuredLink {
-  margin-top: 0.6em;
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
@@ -131,18 +125,21 @@
   transform: translateX(6px);
 }
 
-/* ---- grid of remaining entries ---- */
+/* ---- grid of remaining entries ----
+   Three columns, gutter matches the site grid token, 15 px between every
+   element inside each card (image → tag → title → excerpt → "read"). */
 .grid {
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(28px, 3vw, 56px) clamp(28px, 3vw, 48px);
-  padding-block: clamp(40px, 6vh, 80px) clamp(40px, 6vh, 80px);
+  column-gap: var(--grid-gutter);
+  row-gap: clamp(40px, 5vh, 64px);
+  padding-block: clamp(32px, 5vh, 56px) clamp(40px, 6vh, 80px);
 }
 
 .card {
   display: flex;
   flex-direction: column;
-  gap: clamp(12px, 1.6vw, 18px);
+  gap: 15px;
   text-decoration: none;
   color: inherit;
   transition: transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
@@ -154,9 +151,9 @@
 
 .cardMedia {
   position: relative;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 16 / 9;
   overflow: hidden;
-  border-radius: 0;
+  border-radius: var(--radius-tile);
   background: var(--placeholder);
 }
 
@@ -195,14 +192,14 @@
 .cardTitle {
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(1.15rem, 1.7vw, 1.5rem);
-  line-height: 1.18;
-  letter-spacing: -0.005em;
+  font-size: var(--t-h3);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tr-display);
   margin: 0;
 }
 
 .cardExcerpt {
-  font-family: var(--font-serif);
+  font-family: var(--font-sans);
   font-size: var(--t-small);
   line-height: var(--lh-body);
   opacity: 0.78;
@@ -214,7 +211,6 @@
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
   opacity: 0.6;
-  margin-top: 6px;
   transition: opacity 0.3s ease;
 }
 
@@ -222,10 +218,123 @@
   opacity: 1;
 }
 
+/* ---- divider between the latest story and older entries ---- */
+.divider {
+  display: flex;
+  align-items: center;
+  gap: 1em;
+  padding-block: clamp(20px, 3vh, 36px) clamp(4px, 0.8vh, 10px);
+}
+
+.divider span {
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--maroon);
+  opacity: 0.55;
+  white-space: nowrap;
+}
+
+.divider::after {
+  content: "";
+  flex: 1;
+  height: 1px;
+  background: rgba(47, 0, 0, 0.12);
+}
+
+/* ---- numbered pagination ----
+   Editorial: tabular numerals, active page in saffron with an underline,
+   pill arrows in the site's control language. */
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: clamp(20px, 3vw, 40px);
+  padding-block: clamp(12px, 2vh, 24px) clamp(48px, 7vh, 88px);
+}
+
+.pageNumbers {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2vw, 26px);
+}
+
+.pageNum {
+  position: relative;
+  padding: 0.4em 0.1em;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  font-variant-numeric: tabular-nums;
+  color: var(--maroon);
+  opacity: 0.55;
+  transition: opacity 0.25s ease, color 0.25s ease;
+}
+
+.pageNum:hover,
+.pageNum:focus-visible {
+  opacity: 1;
+}
+
+.pageNumActive {
+  color: var(--saffron);
+  opacity: 1;
+}
+
+.pageNumActive::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+}
+
+.pageArrow {
+  width: clamp(52px, 4.2vw, 66px);
+  height: clamp(32px, 2.4vw, 38px);
+  border-radius: 999px;
+  border: 1px solid var(--maroon);
+  background: transparent;
+  color: var(--maroon);
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  cursor: pointer;
+  transition: background-color 0.3s ease, color 0.3s ease, transform 0.12s ease,
+    opacity 0.3s ease;
+}
+
+.pageArrow svg {
+  width: 30%;
+  height: 50%;
+  display: block;
+}
+
+.pageArrow:hover:not(:disabled) {
+  background: var(--maroon);
+  color: var(--cream);
+}
+
+.pageArrow:active:not(:disabled) {
+  transform: scale(0.97);
+}
+
+.pageArrow:disabled {
+  opacity: 0.3;
+  cursor: default;
+}
+
 @media (max-width: 980px) {
   .grid { grid-template-columns: repeat(2, minmax(0, 1fr)); }
 }
 @media (max-width: 640px) {
   .featured { grid-template-columns: 1fr; }
+  .featuredMedia { max-height: none; }
   .grid { grid-template-columns: 1fr; }
 }

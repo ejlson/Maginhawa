@@ -7,6 +7,9 @@ import { OrganizationJsonLd, WebSiteJsonLd } from "@/lib/jsonld";
 
 const fraunces = Fraunces({
   subsets: ["latin"],
+  // true italics — serif emphasis (--font-serif + font-style: italic)
+  // renders real Fraunces italic glyphs, not a browser-slanted oblique
+  style: ["normal", "italic"],
   axes: ["opsz"],
   variable: "--font-fraunces",
   display: "swap",

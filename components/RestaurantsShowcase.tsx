@@ -5,8 +5,6 @@ import { motion } from "framer-motion";
 import styles from "./RestaurantsShowcase.module.css";
 import Nav from "./Nav";
 import Menu from "./Menu";
-import DarkZone from "./DarkZone";
-import Footer from "./Footer";
 import { useRouteTransition } from "./PageTransition";
 import VideoBackdrop from "./VideoBackdrop";
 import Placeholder from "./Placeholder";
@@ -68,7 +66,7 @@ const RESTAURANTS = [
     name: "Belly",
     tag: "Modern Filipino Bistro",
     location: "Camden, London",
-    video: "/videos/belly.mp4",
+    video: "/videos/belly-hero.mov",
   },
   {
     name: "Mamasons",
@@ -100,12 +98,22 @@ const RESTAURANTS = [
     location: "London",
     video: "/videos/hero-draft3.mp4",
   },
+  {
+    // coming-soon — no photography, logo or clip yet; the card view renders
+    // a typographic wordmark on a maroon field, and the wheel falls back to
+    // the generic house clip
+    name: "Bunso",
+    tag: "The Youngest of the Family",
+    location: "London",
+    video: "/videos/hero-draft3.mp4",
+  },
 ];
 
 const N = RESTAURANTS.length;
 
-// takeaway / café / ice-cream spots that don't take table bookings
-const NO_BOOKING = new Set(["Hoodwood", "Café Mama & Sons", "Mamasons"]);
+// takeaway / café / ice-cream spots that don't take table bookings —
+// Bunso hasn't opened yet, so no bookings there either
+const NO_BOOKING = new Set(["Hoodwood", "Café Mama & Sons", "Mamasons", "Bunso"]);
 
 // restaurant marks
 const LOGOS: Record<string, string> = {
@@ -464,6 +472,12 @@ export default function RestaurantsShowcase() {
                 <span className={styles.cardImg}>
                   {PHOTOS[r.name] ? (
                     <img src={PHOTOS[r.name]} alt={r.name} />
+                  ) : r.name === "Bunso" ? (
+                    // coming-soon card — a typographic cream wordmark on a
+                    // maroon field stands in for the photography
+                    <span className={styles.cardField} aria-hidden>
+                      Bunso
+                    </span>
                   ) : (
                     <Placeholder ratio="auto" label={r.name} />
                   )}
@@ -477,20 +491,24 @@ export default function RestaurantsShowcase() {
                       src={LOGOS[r.name]}
                       alt={r.name}
                     />
-                  ) : (
+                  ) : r.name !== "Bunso" ? (
+                    // Bunso's field wordmark already names the card
                     <span className={styles.cardName}>{r.name}</span>
-                  )}
+                  ) : null}
                   <span className={styles.cardLoc}>{r.location}</span>
                   <div className={styles.cardActions}>
-                    <button
-                      type="button"
-                      className={styles.cardBtn}
-                      onClick={() => openMenuFor(r.name)}
-                      disabled={!hasMenu(r.name)}
-                      aria-label={`View ${r.name} menu`}
-                    >
-                      Menu
-                    </button>
+                    {/* Bunso has no menu yet — skip even the disabled stub */}
+                    {r.name !== "Bunso" && (
+                      <button
+                        type="button"
+                        className={styles.cardBtn}
+                        onClick={() => openMenuFor(r.name)}
+                        disabled={!hasMenu(r.name)}
+                        aria-label={`View ${r.name} menu`}
+                      >
+                        Menu
+                      </button>
+                    )}
                     {!NO_BOOKING.has(r.name) && (
                       <button
                         type="button"
@@ -545,10 +563,6 @@ export default function RestaurantsShowcase() {
           </button>
         </div>
       </section>
-
-      <DarkZone>
-        <Footer />
-      </DarkZone>
 
       <MenuOverlay
         open={!!menuFor && !!menuRestaurant?.menuPages?.length}

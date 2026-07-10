@@ -1,33 +1,59 @@
+/* Scrollytelling shell — a little taller than the viewport so the sticky
+   video stage can pin during the shrink animation. Kept tight so the
+   video releases before Contact arrives, and doesn't linger long enough
+   to overlap FAQ or the Footer below. */
 .section {
   position: relative;
   width: 100%;
-  height: clamp(640px, 138svh, 1200px);
-  margin-top: clamp(16px, 3vh, 48px);
-  overflow: hidden;
-  /* --expand: 0 → video sits inside the page container (pad-x on each side).
-     --expand: 1 → video stretches edge to edge of the viewport.
-     The component drives --expand from scrollYProgress; CSS interpolates
-     the inset linearly. Corners are square at every state. */
+  /* Short pin — just enough scroll room for the full-bleed → shrink
+     transition. The sticky releases well before Contact would reach the
+     viewport, so the "Contact Us" title can never share the frame with
+     the pinned video. */
+  height: 140svh;
+  /* the video sits on the maroon DarkZone underneath, so no local
+     background needed — keeps the chapter one continuous dark surface */
+  /* --expand: 1 → video edge-to-edge of the viewport (pinned scene).
+     --expand: 0 → video inset to the page container (card state — both
+     the entry and settled framing, matching the horizontal padding used
+     elsewhere so the side gap and top gap are identical). Defaults to 0
+     so the pre-hydration paint matches the card entry state. */
   --rest-inset: var(--pad-x);
   --side-inset: calc(var(--rest-inset) * (1 - var(--expand, 0)));
+  --top-inset: var(--side-inset);
 }
 
-/* reduced motion: skip the animation, leave the video at full bleed */
+/* pinned viewport-height stage — everything visual lives inside this
+   sticky wrapper so the video "holds" while the section body scrolls */
+.stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  overflow: hidden;
+}
+
+/* reduced motion: skip the animation, leave the video at full bleed with
+   square corners (the radius must not animate either) */
 @media (prefers-reduced-motion: reduce) {
-  .section {
-    --side-inset: 0px;
+  .reveal {
+    clip-path: inset(0 round 0);
   }
 }
 
-/* clip container — sized by the scroll-driven CSS variables, square corners */
+/* clip container — fills the stage; the scroll-driven card↔full-bleed
+   framing is done entirely with clip-path, which composites on the GPU.
+   (The previous top/left/right/bottom offsets re-ran layout on every
+   scrubbed frame.) Radius scales with the inset so the corners are square
+   at full bleed and settle at 16px — pairing with --radius-card so the
+   card states match the site's floating cards. */
 .reveal {
   position: absolute;
-  top: 0;
-  bottom: 0;
-  left: var(--side-inset);
-  right: var(--side-inset);
+  inset: 0;
   overflow: hidden;
-  will-change: left, right;
+  clip-path: inset(
+    var(--top-inset) var(--side-inset) var(--top-inset) var(--side-inset)
+      round calc(16px * (1 - var(--expand, 0)))
+  );
+  will-change: clip-path;
 }
 
 .bg {
@@ -35,6 +61,12 @@
   inset: 0;
   width: 100%;
   height: 100%;
+  /* Parallax layer: scaled up so the scroll-driven translate never exposes
+     the video's edges. `--parallax-y` is set from JS (see
+     RestaurantLocations.tsx) and swings between roughly ±8%. */
+  transform: translateY(var(--parallax-y, 0%)) scale(1.2);
+  transform-origin: center;
+  will-change: transform;
 }
 
 .bg > div {

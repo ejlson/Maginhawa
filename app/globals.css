@@ -41,10 +41,15 @@
   --t-small: 0.875rem; /* secondary copy             */
   --t-label: 0.75rem; /* uppercase meta / labels    */
 
-  /* line-heights: tight display → airy body */
-  --lh-display: 0.92;
-  --lh-heading: 1.15;
-  --lh-body: 1.6;
+  /* line-heights: tight display → airy body. Four-tier scale; every
+     component should pick one of these tokens rather than hard-coding. */
+  --lh-display: 0.92;   /* huge wordmark / hero type */
+  --lh-heading: 1.2;    /* section titles, sub-headings */
+  --lh-snug: 1.35;      /* leads, captions, attribution lines */
+  --lh-body: 1.5;       /* body paragraphs */
+
+  /* paragraph rhythm — vertical gap between consecutive body paragraphs */
+  --para-gap: 0.9em;
 
   /* tracking: negative on big display, open on small caps */
   --tr-display: -0.015em;
@@ -52,6 +57,24 @@
 
   /* comfortable measure for long-form copy */
   --measure: 62ch;
+
+  /* custom easing curves — stronger than the CSS keywords so animations
+     have deliberate weight. `--ease-out` for entrances/press feedback,
+     `--ease-in-out` for on-screen movement/morphs, `--ease-drawer` for
+     panel-style motion (from Ionic). Use these across the app instead of
+     `ease`, `ease-out`, `ease-in-out` keywords. */
+  --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
+  --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
+  --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+
+  /* corner-radius scale — two-tier system: radius follows elevation.
+     Flat editorial photo frames stay near-square (print look); floating,
+     shadowed cards carry soft rounding; media nested inside a rounded card
+     takes a smaller concentric radius. Pills stay 999px, dots 50%, and
+     animated radii (Hero) keep their own tokens. */
+  --radius-card: 16px; /* floating cards, panels, photos beside cards */
+  --radius-media: 10px; /* nested media/thumbnails inside rounded cards */
+  --radius-tile: 2px;  /* flat editorial photo frames */
 
   /* fluid spacing scale — shared rhythm for gaps & section padding */
   --space-2xs: 8px;
@@ -70,11 +93,36 @@
        --section-y     → section (default breath between distinct sections)
        --section-y-lg  → chapter (a real break to a new subject)             */
   --section-y-sm: clamp(48px, 7vh, 112px);
-  --section-y: clamp(72px, 10vh, 160px);
+  --section-y: clamp(96px, 12vh, 160px);
   --section-y-lg: clamp(120px, 16vh, 240px);
+  /* uniform air on either side of a hairline section rule — every section
+     that opens with a border-top uses this above AND below the line, so
+     the rules read as one consistent device across the page. Kept ≥30px
+     so the About card's drop shadow (28px reach) never touches a rule. */
+  --rule-gap: clamp(30px, 3.6vh, 46px);
 
-  /* all content aligns to the same edges as the giant hero wordmark */
-  --pad-x: clamp(8px, 1.4vw, 22px);
+  /* =========================================================================
+     LAYOUT GRID — single source of truth for horizontal rhythm.
+
+     The site uses a 12-column grid. Page margin and gutter both START at
+     15 px on small viewports and scale up modestly on larger screens for
+     editorial breathing room. Every component that lays out content across
+     columns should use these tokens (and ideally the `.grid12` utility)
+     instead of defining its own grid in CSS modules.
+
+     Column width (computed by the browser at runtime):
+       col = (container_w − 2·pad-x − 11·gutter) / 12
+
+     At a 1440 px viewport with the values below this resolves to
+     col ≈ 99 px, gutter ≈ 23 px, page margin ≈ 32 px — matching the
+     spacing the rest of the design tokens are tuned against.
+     ========================================================================= */
+  --grid-cols: 12;
+  --grid-gutter: 15px;
+  --grid-margin: clamp(15px, 1.6vw, 32px);
+  /* `--pad-x` is kept for legacy callers; it now mirrors --grid-margin so
+     anything still using the older token stays aligned with the new grid. */
+  --pad-x: var(--grid-margin);
   --maxw: 1440px;
 }
 
@@ -157,17 +205,70 @@ html::-webkit-scrollbar {
 }
 
 /* ---- shared layout helpers ----
-   .container is full-bleed minus var(--pad-x) — matches the footer's
+   .container is full-bleed minus var(--grid-margin) — matches the footer's
    content edges. The --maxw token is preserved for any component that
    wants to opt-in to the older centred-1440 layout. */
 .container {
   width: 100%;
-  padding-inline: var(--pad-x);
+  padding-inline: var(--grid-margin);
 }
+
+/* `.grid12` — drop on any container that needs the 12-column site grid.
+   Children opt into a span by writing inline `grid-column: span N` or via
+   utility classes below. Use this instead of bespoke per-component grids
+   so column edges stay in sync across the site. */
+.grid12 {
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr));
+  column-gap: var(--grid-gutter);
+}
+
+/* Optional span helpers — `<div class="col-6">` spans 6 of the 12 columns.
+   Generate the 12 spans plus 0-based starts so any common slot is reachable
+   without inline styles. Generated programmatically below for terseness. */
+.col-1  { grid-column: span 1; }
+.col-2  { grid-column: span 2; }
+.col-3  { grid-column: span 3; }
+.col-4  { grid-column: span 4; }
+.col-5  { grid-column: span 5; }
+.col-6  { grid-column: span 6; }
+.col-7  { grid-column: span 7; }
+.col-8  { grid-column: span 8; }
+.col-9  { grid-column: span 9; }
+.col-10 { grid-column: span 10; }
+.col-11 { grid-column: span 11; }
+.col-12 { grid-column: span 12; }
 
 /* constrain long-form, single-column prose to a comfortable reading measure */
 .measure {
   max-width: var(--measure);
+}
+
+/* TEMPORARY: 12-column grid overlay — visualises the active layout grid
+   (margins + gutters + 12 columns) as faint pink vertical bars over the
+   whole viewport. Sits above all content via z-index but ignores pointer
+   events. Remove the markup in layout.tsx + this block when no longer
+   needed. */
+.gridOverlay {
+  position: fixed;
+  inset: 0;
+  pointer-events: none;
+  z-index: 9999;
+  padding-inline: var(--grid-margin);
+  display: flex;
+  align-items: stretch;
+}
+.gridOverlay > div {
+  flex: 1 1 auto;
+  display: grid;
+  grid-template-columns: repeat(var(--grid-cols), minmax(0, 1fr));
+  column-gap: var(--grid-gutter);
+}
+.gridOverlay span {
+  display: block;
+  background: rgba(220, 38, 127, 0.08);
+  border-left: 1px solid rgba(220, 38, 127, 0.18);
+  border-right: 1px solid rgba(220, 38, 127, 0.18);
 }
 
 /* cream layer that scrolls up over the pinned (sticky) hero — parallax */
@@ -179,8 +280,8 @@ html::-webkit-scrollbar {
 
 .eyebrow {
   font-family: var(--font-sans);
-  font-size: 0.78rem;
-  letter-spacing: 0.04em;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
   font-weight: 500;
   opacity: 0.75;
 }
@@ -212,7 +313,7 @@ html::-webkit-scrollbar {
   pointer-events: none;
 }
 .scrollBlur {
-  height: 35px;
+  height: 40px;
   z-index: 40;
   -webkit-backdrop-filter: blur(5px);
   backdrop-filter: blur(5px);

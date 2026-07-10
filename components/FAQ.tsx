@@ -21,7 +21,26 @@ const ITEMS: { q: string; a: string }[] = [
     q: "Do you do private hire or large groups?",
     a: "We host private dinners, supper clubs and full-restaurant hires across the group. For parties of eight or more, reach out via the contact form above and we'll come back to you with options.",
   },
-  
+  {
+    q: "Where are your restaurants in London?",
+    a: "We're rooted in north and central London. Belly, Guanabana and Ramo Ramen call Kentish Town home; Bintang and Mamasons are in Camden, with Mamasons and Ramo Ramen also in Soho; and Café Mama & Sons, Hoodwood and Bunso round out the family. Each restaurant's page has its address and directions.",
+  },
+  {
+    q: "What kind of food does Maginhawa Group serve?",
+    a: "Filipino at heart, pan-Asian and Caribbean by kitchen. Across the group you'll find Filipino comfort food and ube ice cream, Filipino-Japanese ramen, hand-crafted sandos and baked goods, grilled pan-Asian plates, and Caribbean flavours. Every menu lives on its restaurant's page.",
+  },
+  {
+    q: "Do you offer takeaway or delivery?",
+    a: "Several of our kitchens — including Café Mama & Sons, Mamasons and Hoodwood — run takeaway, and most of the group is on the major delivery apps. Check your favourite restaurant's page for what's available near you.",
+  },
+  {
+    q: "What does “Maginhawa” mean?",
+    a: "Maginhawa is Tagalog for “comfortable” — a life of ease. It's also the name of Quezon City's most famous food street, and comfort is the thread that runs through everything we cook.",
+  },
+  {
+    q: "How do I apply to work at Maginhawa Group?",
+    a: "We hire across our kitchens, front of house, brand, events and operations. Browse the open roles and apply directly on our careers page — we read every application.",
+  },
 ];
 
 function Chevron() {
@@ -53,15 +72,15 @@ export default function FAQ() {
       />
       <div className="container">
         <div className={styles.head}>
-          <div>
+          <div className={styles.headTop}>
             <Reveal as="span" className={styles.eyebrow}>
-              (Asked Often)
+              FAQ
             </Reveal>
             <Reveal>
               <h2 className={styles.title}>Anything we missed?</h2>
             </Reveal>
           </div>
-          <Reveal delay={0.08}>
+          <Reveal delay={0.08} className={styles.asideWrap}>
             <p className={styles.aside}>
               A few of the questions that come up most. Can&apos;t find what you&apos;re
               after? Drop us a note in the form above.

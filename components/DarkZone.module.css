@@ -3,13 +3,17 @@
   z-index: 2;
   background: var(--maroon);
   color: var(--cream);
-  /* chapter top — DarkZone is the shift from editorial content to the
-     conversation: contact form, FAQ, leave-a-review. The colour change
-     itself carries some of that work, but the breath above sells it. */
-  padding-top: var(--section-y-lg);
+  /* No top padding — the RestaurantLocations sticky video is the first
+     thing inside the zone and should butt directly against the Blog
+     section above it, so the user scrolls straight into full bleed
+     with no dark strip between the two. */
+  padding-top: 0;
   /* Footer owns its own bottom padding — keep this at zero so the maroon
      ends right below "By EJ" instead of trailing on. */
   padding-bottom: 0;
-  overflow: hidden;
+  /* clip (not hidden) so the RestaurantLocations sticky video can still
+     pin to the viewport — overflow: hidden creates a scroll container
+     that breaks sticky behavior. */
+  overflow-x: clip;
 }
 

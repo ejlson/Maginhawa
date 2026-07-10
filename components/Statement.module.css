@@ -1,7 +1,7 @@
 .section {
-  /* chapter top (opens after the hero), related bottom (leads tightly into
-     the restaurants chapter — Discover follows) */
-  padding: var(--section-y-lg) 0 var(--section-y-sm);
+  /* related top (tighter break from the hero now the statement is shorter),
+     near-zero bottom — Discover's own top padding handles the gap to it. */
+  padding: var(--section-y) 0 clamp(8px, 1.4vh, 20px);
 }
 
 .wrap {

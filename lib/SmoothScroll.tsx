@@ -43,7 +43,6 @@ export default function SmoothScroll({
       duration: 1.4,
       // Native touch on mobile already glides and supports pull-to-refresh;
       // let the OS own that surface instead of hijacking it.
-      smoothTouch: false,
       syncTouch: false,
     });
     lenisRef.current = lenis;
