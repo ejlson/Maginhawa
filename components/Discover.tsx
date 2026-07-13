@@ -30,6 +30,7 @@ type DiscoverItem = {
   // menu overlay pages + small-caps subtitle (e.g. "February 2026")
   menuPages?: string[];
   menuLabel?: string;
+  bookingUrl?: string;
 };
 
 const ITEMS: DiscoverItem[] = [
@@ -45,8 +46,8 @@ const ITEMS: DiscoverItem[] = [
       "/menu/bintang/bintang_menu-2.png",
     ],
     menuLabel: "February 2026",
-    blurb:
-      "A Camden staple since 1987 — Chef Omar's family kitchen, blending Malay, Indonesian, Japanese, Vietnamese and Filipino cooking.",
+    blurb: "A Camden staple since 1987 — Chef Omar's family kitchen, blending Malay, Indonesian, Japanese, Vietnamese and Filipino cooking.",
+    bookingUrl: "https://www.opentable.co.uk/booking/restref/availability?lang=en-GB&correlationId=6b35518d-aef1-43a2-8dcc-ad4ef5dc8053&restRef=324126&otSource=Restaurant%20website",
   },
   {
     slug: "belly",
@@ -65,6 +66,7 @@ const ITEMS: DiscoverItem[] = [
     badge: "/logo/michelin-2026-round.png",
     badgeLabel: "Michelin Selected Restaurant 2026",
     blurb: "A modern Filipino bistro drawing on French technique.",
+    bookingUrl: "https://booking.resdiary.com/widget/Standard/BELLYBISTRO/65884",
   },
   {
     slug: "mamasons",
@@ -100,8 +102,8 @@ const ITEMS: DiscoverItem[] = [
     location: "85 Kentish Town Rd, London NW1 8NY",
     image: "/images/guanabana.jpg",
     logo: "/logo/guanabana.png",
-    blurb:
-      "Kentish Town's Caribbean and Latin American room, best known for its oak-smoked Island Roast — since 2007.",
+    blurb: "Kentish Town's Caribbean and Latin American room, best known for its oak-smoked Island Roast — since 2007.",
+    bookingUrl: "https://www.opentable.co.uk/guanabana-reservations-london?restref=79453&lang=en-GB&ot_source=Restaurant%20website",
   },
   {
     slug: "ramo",
@@ -118,8 +120,8 @@ const ITEMS: DiscoverItem[] = [
       "/menu/ramo/drinks-2.png",
     ],
     menuLabel: "February 2026",
-    blurb:
-      "The world's first Filipino-Japanese ramen joint — Originally from Kentish Town, since 2018, with our current location in Soho.",
+    blurb: "The world's first Filipino-Japanese ramen joint — Originally from Kentish Town, since 2018, with our current location in Soho.",
+    bookingUrl: "https://www.sevenrooms.com/reservations/ramosoho/",
   },
   {
     slug: "hoodwood",
@@ -584,8 +586,18 @@ function Tile({
                 </button>
               ) : null}
               {bookable ? (
+                // <a
+                //   href="#contact-us"
+                //   className={`${styles.btn} ${styles.btnSolid}`}
+                //   onClick={(e) => e.stopPropagation()}
+                //   aria-label={`Book at ${item.name}`}
+                // >
+                //   Book
+                // </a>
                 <a
-                  href="#contact-us"
+                  href={item.bookingUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className={`${styles.btn} ${styles.btnSolid}`}
                   onClick={(e) => e.stopPropagation()}
                   aria-label={`Book at ${item.name}`}

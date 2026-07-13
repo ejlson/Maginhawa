@@ -174,6 +174,11 @@ export default function RestaurantsShowcase() {
     const r = slug ? getRestaurant(slug) : undefined;
     return !!(r?.menuPages && r.menuPages.length > 0);
   };
+  const getBookingUrl = (name: string) => {
+  const slug = SLUG_BY_NAME[name];
+  const restaurant = slug ? getRestaurant(slug) : undefined;
+  return restaurant?.bookingUrl;
+};
   const menuRestaurant = menuFor ? getRestaurant(menuFor) : undefined;
   const scrollerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -443,14 +448,15 @@ export default function RestaurantsShowcase() {
                 <span className={styles.actLabel}>Visit {item.name}</span>
                 <span aria-hidden>→</span>
               </button>
-              {!NO_BOOKING.has(item.name) && (
-                <button
-                  type="button"
+              {!NO_BOOKING.has(item.name) && getBookingUrl(item.name) && (
+                <a
+                  href={getBookingUrl(item.name)}
+                  target="_blank"
+                  rel="noopener noreferrer"
                   className={styles.actBtn}
-                  onClick={() => navigate("/")}
                 >
                   Book a Table
-                </button>
+                </a>
               )}
               <button
                 type="button"
@@ -508,14 +514,15 @@ export default function RestaurantsShowcase() {
                         Menu
                       </button>
                     )}
-                    {!NO_BOOKING.has(r.name) && (
-                      <button
-                        type="button"
+                    {!NO_BOOKING.has(r.name) && getBookingUrl(r.name) && (
+                      <a
+                        href={getBookingUrl(r.name)}
+                        target="_blank"
+                        rel="noopener noreferrer"
                         className={styles.cardBtn}
-                        onClick={() => navigate("/")}
                       >
                         Book a Table
-                      </button>
+                      </a>
                     )}
                     <button
                       type="button"

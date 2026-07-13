@@ -14,6 +14,7 @@ export type Restaurant = {
   logo: string;
   url?: string;
   bookable: boolean;
+  bookingUrl?: string;
   priceRange?: string;
   // Optional Google "write a review" deep link — usually
   // https://search.google.com/local/writereview?placeid=<PLACE_ID>
@@ -28,119 +29,6 @@ export type Restaurant = {
   // entry from review prompts while keeping it routable/discoverable.
   comingSoon?: boolean;
 };
-
-// const ITEMS: DiscoverItem[] = [
-//   {
-//     slug: "bintang",
-//     name: "Bintang",
-//     tag: "Filipino Fusion Restaurant",
-//     location: "93 Kentish Town Rd, London NW1 8NY",
-//     image: "/images/bintang.jpg",
-//     logo: "/logo/bintang.png",
-//     menuPages: [
-//       "/menu/bintang/bintang_menu-1.png",
-//       "/menu/bintang/bintang_menu-2.png",
-//     ],
-//     menuLabel: "February 2026",
-//     blurb:
-//       "A Camden staple since 1987 — Chef Omar's family kitchen, blending Malay, Indonesian, Japanese, Vietnamese and Filipino cooking.",
-//   },
-//   {
-//     slug: "belly",
-//     name: "Belly",
-//     tag: "Modern Filipino Bistro",
-//     location: "157 Kentish Town Rd, London NW1 8PD",
-//     image: "/images/belly.jpg",
-//     logo: "/logo/belly.png",
-//     menuPages: [
-//       "/menu/belly/food.png",
-//       "/menu/belly/drinks-1.png",
-//     ],
-//     menuLabel: "February 2026",
-//     // Belly is the group's Michelin Guide listing — the mark renders as part
-//     // of the centered brand group so it stays visible at rest AND expanded.
-//     badge: "/logo/michelin-2026-round.png",
-//     badgeLabel: "Michelin Selected Restaurant 2026",
-//     blurb: "A modern Filipino bistro drawing on French technique.",
-//   },
-//   {
-//     slug: "mamasons",
-//     name: "Mamasons",
-//     tag: "London's First Filipino Ice Cream Parlor",
-//     location: "91 Kentish Town Rd · 32 Newport China Town",
-//     image: null,
-//     logo: "/logo/mamasons.png",
-//     blurb:
-//       "London's first Filipino ice cream parlour — Manila-style dirty ice cream, scooped fresh across two sites.",
-//   },
-//   {
-//     slug: "cafemama",
-//     name: "Café Mama & Sons",
-//     tag: "Filipino x Japanese Café",
-//     location: "83 Kentish Town Rd, London NW1 8NY",
-//     image: "/images/cafemama.jpg",
-//     logo: "/logo/cafemama.png",
-//     menuPages: [
-//       "/menu/cafemama/page-1.png",
-//       "/menu/cafemama/page-2.png",
-//       "/menu/cafemama/page-3.png",
-//       "/menu/cafemama/page-4.png",
-//     ],
-//     menuLabel: "February 2026",
-//     blurb:
-//       "Hand-crafted sandos, all-day pandesal breakfasts, homemade baked treats, and quality coffee — your daily escape from the ordinary.",
-//   },
-//   {
-//     slug: "guanabana",
-//     name: "Guanabana",
-//     tag: "Caribbean Cuisine",
-//     location: "85 Kentish Town Rd, London NW1 8NY",
-//     image: "/images/guanabana.jpg",
-//     logo: "/logo/guanabana.png",
-//     blurb:
-//       "Kentish Town's Caribbean and Latin American room, best known for its oak-smoked Island Roast — since 2007.",
-//   },
-//   {
-//     slug: "ramo",
-//     name: "Ramo Ramen",
-//     tag: "Filipino-Japanese Ramen",
-//     location: "28 Brewer St, Soho, London W1F 0SR",
-//     image: "/images/ramo.jpg",
-//     logo: "/logo/ramo.png",
-//     menuPages: [
-//       "/menu/ramo/lunch-1.png",
-//       "/menu/ramo/alacarte.png",
-//       "/menu/ramo/groupset.png",
-//       "/menu/ramo/drinks-1.png",
-//       "/menu/ramo/drinks-2.png",
-//     ],
-//     menuLabel: "February 2026",
-//     blurb:
-//       "The world's first Filipino-Japanese ramen joint — Originally from Kentish Town, since 2018, with our current location in Soho.",
-//   },
-//   {
-//     slug: "hoodwood",
-//     name: "Hoodwood",
-//     tag: "Caribbean Takeaway",
-//     location: "81 Kentish Town Rd, London NW1 8NY",
-//     image: "/images/hoowood.jpg",
-//     logo: "/logo/hoodwood.png",
-//     blurb:
-//       "Oak-smoked jerk plates and handmade patties, fire-kissed over an open flame — Caribbean takeaway, done honestly.",
-//   },
-//   {
-//     // Coming-soon placeholder — no photography or mark yet, so the tile
-//     // renders a typographic wordmark on a maroon field instead.
-//     slug: "bunso",
-//     name: "Bunso",
-//     tag: "The Youngest of the Family",
-//     location: "1a Hawley Rd, London NW1 8RP",
-//     image: null,
-//     logo: "/images/bunso.png",
-//     blurb:
-//       "Bunso — 'the youngest' — is the newest member of the Maginhawa family. Full details, menu and location coming soon.",
-//   },
-// ];
 
 export const RESTAURANTS: Restaurant[] = [
   {
@@ -159,6 +47,7 @@ export const RESTAURANTS: Restaurant[] = [
     ],
     menuLabel: "February 2026",
     bookable: true,
+    bookingUrl: "https://booking.resdiary.com/widget/Standard/BELLYBISTRO/65884",
     priceRange: "££",
   },
   {
@@ -209,6 +98,7 @@ export const RESTAURANTS: Restaurant[] = [
     menuLabel: "February 2026",
     bookable: true,
     priceRange: "££",
+    bookingUrl: "https://www.opentable.co.uk/booking/restref/availability?lang=en-GB&correlationId=6b35518d-aef1-43a2-8dcc-ad4ef5dc8053&restRef=324126&otSource=Restaurant%20website",
   },
   {
     slug: "guanabana",
@@ -222,6 +112,7 @@ export const RESTAURANTS: Restaurant[] = [
     logo: "/logo/guanabana.png",
     bookable: true,
     priceRange: "££",
+    bookingUrl: "https://www.opentable.co.uk/guanabana-reservations-london?restref=79453&lang=en-GB&ot_source=Restaurant%20website",
   },
   {
     slug: "ramo",
@@ -242,6 +133,7 @@ export const RESTAURANTS: Restaurant[] = [
     ],
     menuLabel: "February 2026",
     bookable: true,
+    bookingUrl: "https://www.sevenrooms.com/reservations/ramosoho/",
     priceRange: "££",
   },
   {
