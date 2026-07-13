@@ -17,7 +17,7 @@ const LINKS = [
   { label: "Blog", href: "/blog" },
   { label: "About Us", href: "/about" },
   { label: "Careers", href: "/join-us" },
-  { label: "Contact", href: "/contact" },
+  { label: "Contact Us", href: "/contact" },
 ];
 
 export default function Nav({

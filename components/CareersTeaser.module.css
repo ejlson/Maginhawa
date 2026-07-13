@@ -16,7 +16,8 @@
    beneath it */
 .head {
   padding: 0 var(--pad-x);
-  margin-bottom: clamp(20px, 3vh, 36px);
+  /* margin-bottom: clamp(20px, 3vh, 36px); */
+  margin-bottom: clamp(10px, 3vh, 18px);
 }
 
 /* the whole band is one link into /join-us. The hairline closes the
@@ -52,7 +53,7 @@
   font-family: var(--font-serif);
   font-style: italic;
   font-weight: 500;
-  font-size: clamp(1.5rem, 2.6vw, 2.6rem);
+  font-size: clamp(4.5rem, 2.6vw, 2.6rem);
   line-height: 1.1;
   color: var(--saffron);
 }

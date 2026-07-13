@@ -100,10 +100,10 @@ const RESTAURANTS = [
   },
   {
     // coming-soon — no photography, logo or clip yet; the card view renders
-    // a typographic wordmark on a maroon field, and the wheel falls back to
+    // a typographic wordmark on a maroon field, and thes wheel falls back to
     // the generic house clip
     name: "Bunso",
-    tag: "The Youngest of the Family",
+    tag: "Filipino-Japanese Kissaten Listening Jazz Bar",
     location: "London",
     video: "/videos/forpilot1.mov",
   },
@@ -474,8 +474,6 @@ export default function RestaurantsShowcase() {
                   {PHOTOS[r.name] ? (
                     <img src={PHOTOS[r.name]} alt={r.name} />
                   ) : r.name === "Bunso" ? (
-                    // coming-soon card — a typographic cream wordmark on a
-                    // maroon field stands in for the photography
                     <span className={styles.cardField} aria-hidden>
                       Bunso
                     </span>

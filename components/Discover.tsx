@@ -40,6 +40,11 @@ const ITEMS: DiscoverItem[] = [
     location: "93 Kentish Town Rd, London NW1 8NY",
     image: "/images/bintang.jpg",
     logo: "/logo/bintang.png",
+    menuPages: [
+      "/menu/bintang/bintang_menu-1.png",
+      "/menu/bintang/bintang_menu-2.png",
+    ],
+    menuLabel: "February 2026",
     blurb:
       "A Camden staple since 1987 — Chef Omar's family kitchen, blending Malay, Indonesian, Japanese, Vietnamese and Filipino cooking.",
   },
@@ -50,6 +55,11 @@ const ITEMS: DiscoverItem[] = [
     location: "157 Kentish Town Rd, London NW1 8PD",
     image: "/images/belly.jpg",
     logo: "/logo/belly.png",
+    menuPages: [
+      "/menu/belly/food.png",
+      "/menu/belly/drinks-1.png",
+    ],
+    menuLabel: "February 2026",
     // Belly is the group's Michelin Guide listing — the mark renders as part
     // of the centered brand group so it stays visible at rest AND expanded.
     badge: "/logo/michelin-2026-round.png",
@@ -100,6 +110,14 @@ const ITEMS: DiscoverItem[] = [
     location: "28 Brewer St, Soho, London W1F 0SR",
     image: "/images/ramo.jpg",
     logo: "/logo/ramo.png",
+    menuPages: [
+      "/menu/ramo/lunch-1.png",
+      "/menu/ramo/alacarte.png",
+      "/menu/ramo/groupset.png",
+      "/menu/ramo/drinks-1.png",
+      "/menu/ramo/drinks-2.png",
+    ],
+    menuLabel: "February 2026",
     blurb:
       "The world's first Filipino-Japanese ramen joint — Originally from Kentish Town, since 2018, with our current location in Soho.",
   },
