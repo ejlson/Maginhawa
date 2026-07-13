@@ -48,11 +48,18 @@
   max-width: 17ch;
 }
 
+/* pale interaction hint — the Discover "(Click to learn more)" recipe,
+   cream on the dark canvas, far right of the head */
 .lede {
   font-family: var(--font-sans);
-  font-size: var(--t-small);
-  line-height: var(--lh-body);
-  opacity: 0.7;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  line-height: var(--lh-snug);
+  opacity: 0.4;
+  text-align: right;
+  justify-self: end;
+  align-self: end;
   max-width: 44ch;
 }
 

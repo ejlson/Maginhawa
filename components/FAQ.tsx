@@ -81,9 +81,9 @@ export default function FAQ() {
             </Reveal>
           </div>
           <Reveal delay={0.08} className={styles.asideWrap}>
-            <p className={styles.aside}>
-              A few of the questions that come up most. Can&apos;t find what you&apos;re
-              after? Drop us a note in the form above.
+            <p className={styles.aside} aria-hidden>
+              (A few of the questions that come up most — can&apos;t find
+              what you&apos;re after? Drop us a note in the form above)
             </p>
           </Reveal>
         </div>

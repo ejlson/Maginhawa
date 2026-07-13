@@ -1,108 +1,176 @@
-/* Careers teaser — the hiring ticker. A slim full-width marquee band on
-   the cream page between the Blog covers and the RestaurantLocations
-   video. Same marquee mechanics as the PressStrip: a track holding two
-   identical sequences, translated -50% on a linear loop. */
+/* Careers teaser — the Open-Roles Index. Sidebar statement in the golden
+   minor column, the live roles as hairline rows in the major. Same
+   thin-arrow row language as Awards & Recognition. */
 .section {
   position: relative;
-  /* hairline rule opens the chapter; uniform --rule-gap air on both
-     sides, matching every rule on the page. No horizontal padding — the
-     ticker deliberately bleeds off both edges of the viewport. */
-  padding-block: var(--rule-gap);
+  padding: var(--rule-gap) var(--pad-x) var(--rule-gap);
   border-top: 1px solid rgba(47, 0, 0, 0.1);
-  overflow: hidden;
-}
-
-/* stationary head — the label holds still top-left while the band moves
-   beneath it */
-.head {
-  padding: 0 var(--pad-x);
-  /* margin-bottom: clamp(20px, 3vh, 36px); */
-  margin-bottom: clamp(10px, 3vh, 18px);
-}
-
-/* the whole band is one link into /join-us. The hairline closes the
-   chapter BELOW the scrolling teams, running the full viewport width to
-   match the ticker's edge-to-edge bleed. */
-.band {
-  display: block;
-  cursor: pointer;
-  padding-bottom: clamp(16px, 2.4vh, 28px);
-  border-bottom: 1px solid rgba(47, 0, 0, 0.1);
-}
-
-.track {
-  display: flex;
-  width: max-content;
-  animation: careersScroll 30s linear infinite;
-  will-change: transform;
-}
-
-/* one half of the loop — spacing inside must equal the spacing the next
-   half continues with, so the seam is invisible */
-.seq {
-  display: inline-flex;
-  align-items: center;
-  gap: clamp(28px, 3.4vw, 64px);
-  padding-right: clamp(28px, 3.4vw, 64px);
-  white-space: nowrap;
-}
-
-/* "We're Hiring" — the italic serif inflection carrying the saffron
-   accent, echoing the hero's italic beats. Stationary in the head. */
-.hiring {
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-weight: 500;
-  font-size: clamp(4.5rem, 2.6vw, 2.6rem);
-  line-height: 1.1;
-  color: var(--saffron);
-}
-
-/* the teams — upright display serif, quiet maroon */
-.team {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: clamp(1.8rem, 3.4vw, 3.4rem);
-  line-height: 1.1;
-  letter-spacing: var(--tr-display);
-  text-transform: uppercase;
   color: var(--maroon);
 }
 
-.dot {
-  width: clamp(6px, 0.7vw, 10px);
-  height: clamp(6px, 0.7vw, 10px);
+.grid {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.618fr);
+  gap: clamp(32px, 5vw, 96px);
+  align-items: start;
+}
+
+/* ---------- left: the frame ---------- */
+.side {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2.4vh, 28px);
+}
+
+.eyebrow {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7em;
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+}
+.eyebrow::before {
+  content: "";
+  display: block;
+  width: 6px;
+  height: 6px;
   border-radius: 50%;
   background: var(--saffron);
   flex: none;
-  opacity: 0.85;
 }
 
-/* hover: the teams warm to saffron — a colour cue only, the marquee
-   keeps moving (pausing on hover reads as the animation breaking; see
-   the PressStrip note) */
-.team {
-  transition: color 0.3s ease;
+.statement {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--t-h2);
+  line-height: var(--lh-heading);
+  letter-spacing: -0.012em;
+  max-width: 16ch;
 }
+
+.highlight {
+  font-family: inherit;
+  font-style: normal;
+  font-weight: inherit;
+  color: var(--saffron);
+}
+
+.cta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8em;
+  margin-top: clamp(4px, 0.8vh, 10px);
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  opacity: 0.8;
+  transition:
+    opacity 0.3s ease,
+    color 0.3s ease;
+}
+
+.ctaLabel {
+  font-weight: 500;
+}
+
+.ctaArrow {
+  width: clamp(26px, 2.4vw, 36px);
+  height: 10px;
+  transition: transform 0.4s var(--ease-out);
+}
+
 @media (hover: hover) and (pointer: fine) {
-  .band:hover .team {
+  .cta:hover {
+    opacity: 1;
     color: var(--saffron);
   }
-}
-
-@keyframes careersScroll {
-  from {
-    transform: translate3d(0, 0, 0);
-  }
-  to {
-    transform: translate3d(-50%, 0, 0);
+  .cta:hover .ctaArrow {
+    transform: translateX(5px);
   }
 }
 
-/* reduced motion: a still band — whatever fits the viewport reads as a
-   static "We're Hiring" strip, still fully clickable */
-@media (prefers-reduced-motion: reduce) {
-  .track {
-    animation: none;
+/* ---------- right: the roles ---------- */
+.roleList {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  border-top: 1px solid rgba(47, 0, 0, 0.14);
+}
+
+.roleList li {
+  border-bottom: 1px solid rgba(47, 0, 0, 0.14);
+}
+
+.roleRow {
+  display: grid;
+  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto;
+  align-items: baseline;
+  gap: clamp(16px, 2vw, 36px);
+  padding-block: clamp(14px, 2vh, 22px);
+  color: inherit;
+  text-decoration: none;
+}
+
+.roleTitle {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--t-h3);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tr-display);
+  transition: color 0.3s ease;
+}
+
+.roleMeta {
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  opacity: 0.6;
+  text-align: right;
+}
+
+.roleArrow {
+  width: 22px;
+  height: 10px;
+  flex: none;
+  align-self: center;
+  opacity: 0.4;
+  transition:
+    transform 0.4s var(--ease-out),
+    opacity 0.3s ease,
+    color 0.3s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .roleRow:hover .roleTitle {
+    color: var(--saffron);
+  }
+  .roleRow:hover .roleArrow {
+    opacity: 1;
+    color: var(--saffron);
+    transform: translateX(5px);
+  }
+}
+
+/* ---------- responsive ---------- */
+@media (max-width: 900px) {
+  .grid {
+    grid-template-columns: 1fr;
+  }
+  .roleRow {
+    grid-template-columns: minmax(0, 1fr) auto;
+  }
+  /* meta drops under the title on the stacked layout */
+  .roleMeta {
+    grid-column: 1;
+    grid-row: 2;
+    text-align: left;
+  }
+  .roleArrow {
+    grid-row: 1 / 3;
   }
 }

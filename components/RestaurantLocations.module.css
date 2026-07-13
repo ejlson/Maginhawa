@@ -36,6 +36,134 @@
   overflow: hidden;
 }
 
+/* the dark surface behind the video — driven by --dark, which completes
+   while the footage is still full-bleed, so the shrink always reveals a
+   finished maroon ground (never a cream→maroon fade in progress) */
+.stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--maroon);
+  opacity: var(--dark, 0);
+}
+
+/* soft lift under the opening card — tracks the same inset rect as the
+   clip (clip-path itself can't cast a shadow) and fades away with the
+   growth so the full-bleed scene carries no stray glow */
+.cardShadow {
+  position: absolute;
+  top: var(--top-inset);
+  bottom: var(--top-inset);
+  left: var(--side-inset);
+  right: var(--side-inset);
+  border-radius: var(--radius-card);
+  box-shadow: 0 28px 70px -32px rgba(31, 0, 0, 0.4);
+  opacity: calc(1 - var(--grow, 0));
+  pointer-events: none;
+}
+
+/* ---- restaurant wordmark marquees INSIDE the video ----
+   Riding the card's top and bottom inner edges (anchored to the same
+   inset vars the clip uses, so they stay glued to the frame while it
+   morphs); top row drifts left, bottom row drifts right. Both fade with
+   the growth. The wordmarks are forced to pure white and blended with
+   `difference` — the home hero wordmark's inverted treatment, and the
+   .reveal clip's stacking context keeps the blend against the footage
+   only. */
+.logoRow {
+  position: absolute;
+  left: var(--side-inset);
+  right: var(--side-inset);
+  display: flex;
+  align-items: center;
+  overflow: hidden;
+  opacity: calc(1 - var(--grow, 0));
+  mix-blend-mode: difference;
+  pointer-events: none;
+  z-index: 2;
+}
+
+.logoRowTop {
+  top: calc(var(--top-inset) + clamp(14px, 2vh, 26px));
+}
+
+.logoRowBottom {
+  bottom: calc(var(--top-inset) + clamp(14px, 2vh, 26px));
+}
+
+.logoTrack {
+  display: flex;
+  width: max-content;
+  animation: locLogoScroll 46s linear infinite;
+  will-change: transform;
+}
+
+/* bottom row runs the opposite way */
+.logoTrackReverse {
+  animation-direction: reverse;
+}
+
+.logoSeq {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(40px, 5vw, 88px);
+  padding-right: clamp(40px, 5vw, 88px);
+}
+
+.logoSeq img {
+  height: clamp(20px, 2.4vw, 32px);
+  width: auto;
+  display: block;
+  /* pure-white glyphs; difference does the rest — identical math to the
+     cream hero wordmark over footage */
+  filter: brightness(0) invert(1);
+  opacity: 0.9;
+}
+
+@keyframes locLogoScroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .logoTrack {
+    animation: none;
+  }
+}
+
+/* ---- editorial hover — card stage only (data-state set from JS) ----
+   The footage leans in a touch, the lift deepens, the wordmarks wake:
+   quiet, print-like emphasis rather than UI bounce. */
+.zoom {
+  position: absolute;
+  inset: 0;
+  transition: transform 0.9s var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .section[data-state="card"] .stage:hover .zoom {
+    transform: scale(1.04);
+  }
+  .section[data-state="card"] .stage:hover .logoSeq img {
+    opacity: 1;
+  }
+}
+
+/* the shadow deepens with the hover — it lives beside .reveal, so the
+   hover is read from the stage */
+.cardShadow {
+  transition: box-shadow 0.6s var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .section[data-state="card"] .stage:hover .cardShadow {
+    box-shadow: 0 36px 90px -34px rgba(31, 0, 0, 0.52);
+  }
+}
+
 /* reduced motion: skip the animation, leave the video at full bleed with
    square corners (the radius must not animate either) */
 @media (prefers-reduced-motion: reduce) {
@@ -52,12 +180,17 @@
   position: absolute;
   inset: 0;
   overflow: hidden;
-  /* radius: 2px in both rest states (card and plate), square at full
-     bleed — the two phase terms are never non-zero at the same time */
+  /* radius: soft card rounding (16px) on the opening card — it carries a
+     shadow now, and rounding follows elevation — square at full bleed,
+     and 10px as it settles onto the dark surface. The two phase terms
+     are never non-zero at the same time. */
   clip-path: inset(
     var(--top-inset) var(--side-inset) var(--top-inset) var(--side-inset)
       round
-      calc(var(--radius-tile) * (1 - var(--grow, 0) + var(--settle, 0)))
+      calc(
+        var(--radius-card) * (1 - var(--grow, 0)) +
+          var(--radius-media) * var(--settle, 0)
+      )
   );
   will-change: clip-path;
 }

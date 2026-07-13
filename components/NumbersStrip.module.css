@@ -1,6 +1,9 @@
-/* Numbers strip — a quiet row of editorial numerals between the About
-   plate and the Blog covers. Hairline rule + uniform --rule-gap air,
-   matching every section rule on the page. */
+/* Numbers strip — the group's story in editorial numerals between the
+   About plate and the Blog covers. Bolder composition: a saffron-dotted
+   small-caps label rides above each numeral, the numerals themselves run
+   huge along one shared baseline, first flush left and last flush right,
+   the row closed by a hairline underneath. Hairline rule + uniform
+   --rule-gap air above, matching every section rule on the page. */
 .section {
   padding: var(--rule-gap) var(--pad-x) var(--rule-gap);
   border-top: 1px solid rgba(47, 0, 0, 0.1);
@@ -10,43 +13,59 @@
 
 .strip {
   margin: 0;
-  display: grid;
-  grid-template-columns: repeat(4, minmax(0, 1fr));
-  gap: clamp(20px, 3vw, 48px);
+  display: flex;
+  align-items: flex-end; /* shared baseline row */
+  justify-content: space-between;
+  gap: clamp(24px, 4vw, 72px);
 }
 
-/* each figure — numeral over its small-caps label, hairline-separated
-   from its neighbour like a printed fact box */
 .item {
   display: flex;
   flex-direction: column-reverse; /* dt/dd source order: label, value —
-     rendered numeral-first */
-  gap: clamp(6px, 1vh, 12px);
-  padding-left: clamp(16px, 2vw, 32px);
-  border-left: 1px solid rgba(47, 0, 0, 0.14);
+     rendered label-above-numeral */
+  gap: clamp(8px, 1.4vh, 16px);
 }
 
 .value {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: var(--t-display);
-  line-height: var(--lh-display);
+  font-size: clamp(3.2rem, 7vw, 7.5rem);
+  line-height: 0.9;
   letter-spacing: var(--tr-display);
   font-variant-numeric: tabular-nums;
 }
 
+/* saffron-dot label — the site's shared eyebrow recipe */
 .label {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7em;
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
   opacity: 0.7;
+  white-space: nowrap;
+}
+.label::before {
+  content: "";
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--saffron);
+  flex: none;
+  opacity: 1;
 }
 
 @media (max-width: 700px) {
   .strip {
+    display: grid;
     grid-template-columns: repeat(2, minmax(0, 1fr));
     row-gap: clamp(28px, 4vh, 44px);
+  }
+  .value {
+    font-size: clamp(2.6rem, 11vw, 4rem);
   }
 }

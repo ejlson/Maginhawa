@@ -45,10 +45,9 @@ export default function ReviewUs() {
             </Reveal>
           </div>
           <Reveal delay={0.1}>
-            <p className={styles.lede}>
-              A few minutes of your words goes a long way — it helps the kitchen,
-              the floor, and the next person looking for somewhere to eat tonight.
-              Pick the restaurant you visited and we&apos;ll take you straight there.
+            <p className={styles.lede} aria-hidden>
+              (A few minutes of your words goes a long way — pick the
+              restaurant you visited and we&apos;ll take you straight there)
             </p>
           </Reveal>
         </div>

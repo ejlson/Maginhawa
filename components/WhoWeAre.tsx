@@ -150,7 +150,7 @@ export default function WhoWeAre() {
               </p>
               <p>
                 Filipino-Japanese ramen at Ramo. Caribbean Sunday roasts at
-                Guanabana. Dirty ice cream at Mamasons. French-trained Filipino
+                Guanabana. Filipino dirty ice cream at Mamasons. French-trained Filipino
                 bistro plates at Belly — added to the Michelin Guide in 2026.
               </p>
               <p>

@@ -9,7 +9,6 @@ import DarkZone from "./DarkZone";
 import Reveal from "./Reveal";
 import RevealText from "./RevealText";
 import MagneticButton from "./MagneticButton";
-import MaskImage from "./MaskImage";
 import styles from "./JoinUs.module.css";
 import { JOBS } from "@/lib/jobs";
 
@@ -52,6 +51,8 @@ export default function JoinUs() {
   const [openIdx, setOpenIdx] = useState<number | null>(null);
   const [position, setPosition] = useState<string>("");
   const [submitted, setSubmitted] = useState(false);
+  // name of the CV the applicant picked — referenced in the email body
+  const [cvName, setCvName] = useState<string>("");
   const formRef = useRef<HTMLDivElement>(null);
 
   // release any dark backdrop another route may have set
@@ -86,7 +87,6 @@ export default function JoinUs() {
     const email = (data.get("email") || "").toString().trim();
     const phone = (data.get("phone") || "").toString().trim();
     const pos = (data.get("position") || position || "General application").toString().trim();
-    const cv = (data.get("cv") || "").toString().trim();
     const msg = (data.get("message") || "").toString().trim();
 
     const subject = `Application — ${pos} — ${name}`;
@@ -95,7 +95,9 @@ export default function JoinUs() {
       `Email: ${email}`,
       phone ? `Phone: ${phone}` : "",
       `Position: ${pos}`,
-      cv ? `CV / Portfolio: ${cv}` : "",
+      // mailto drafts can't carry attachments, so the selected CV is
+      // named in the body and the user attaches it before sending
+      cvName ? `CV: ${cvName} (attached)` : "",
       "",
       "Message:",
       msg,
@@ -123,55 +125,30 @@ export default function JoinUs() {
 
       <main className={styles.page} data-nav-theme="light">
 
+        {/* ---- careers hero — one horizontal video plate spanning the
+             full content width. The big display title sits inside the
+             frame (the About hero's type), the old statement rides the
+             bottom-right corner as a small italic-serif line. ---- */}
         <section className={styles.section} data-nav-theme="light">
-          <div className={styles.introRow}>
-            <Reveal className={styles.card}>
-              <span className={styles.eyebrow}>Careers</span>
-
-              <h2 className={styles.statement}>
-                Cook with us. Sit with us. Build something with us.
-              </h2>
-
-              <p className={styles.body}>
-                Open positions across our restaurants and a small Camden HQ.
-                We&apos;re hiring in kitchens, on the floor, behind the bar,
-                and with the team that holds the group together.
-              </p>
-
-              {/* small factual stat row — the group at a glance */}
-              <div className={styles.cardStats} aria-label="The group at a glance">
-                <span>8 restaurants</span>
-                <span className={styles.cardStatsSep} aria-hidden />
-                <span>Family-run since 1987</span>
-                <span className={styles.cardStatsSep} aria-hidden />
-                <span>Camden → Soho</span>
-              </div>
-
-              {/* what working here actually comes with — kept modest */}
-              <ul className={styles.cardPerks} aria-label="What we offer">
-                <li>Staff meals on shift</li>
-                <li>Flexible rotas</li>
-                <li>Training &amp; progression across the group</li>
-              </ul>
-
-              {/* live count from lib/jobs.ts, anchoring down to the list */}
-              <a href="#open-roles" className={styles.cardCta}>
-                {JOBS.length} open positions <span aria-hidden>↓</span>
-              </a>
-            </Reveal>
-
-            {/* photograph beside the card — separate element, revealed with
-                a bottom-up mask wipe as the page loads into view */}
-            <MaskImage
-              className={styles.introPhoto}
-              src="/images/careers-team.jpg"
-              alt="A Maginhawa team member carrying a tray of fresh pastries"
-              width={733}
-              height={1100}
-              fill
-              sizes="(max-width: 900px) 100vw, 34vw"
+          <Reveal className={styles.heroFrame}>
+            <video
+              className={styles.heroFrameVideo}
+              src="/videos/belly-hero.mov"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              aria-hidden
             />
-          </div>
+            <div className={styles.heroFrameScrim} aria-hidden />
+
+            <h1 className={styles.heroFrameTitle}>Careers</h1>
+
+            <p className={styles.heroFrameTagline}>
+              Cook with us. Sit with us. Build something with us.
+            </p>
+          </Reveal>
         </section>
 
         <div className="container">
@@ -189,8 +166,8 @@ export default function JoinUs() {
                 </Reveal>
               </div>
               <Reveal delay={0.1}>
-                <p className={styles.rolesAside}>
-                  Click any role to read the details.
+                <p className={styles.rolesAside} aria-hidden>
+                  (Click any role to read the details)
                 </p>
               </Reveal>
             </div>
@@ -352,13 +329,27 @@ export default function JoinUs() {
                 </div>
 
                 <div className={`${styles.field} ${styles.fieldFull}`}>
-                  <label htmlFor="apply-cv">CV / portfolio link (optional)</label>
+                  <label htmlFor="apply-cv">Upload your CV (PDF or Word)</label>
                   <input
                     id="apply-cv"
                     name="cv"
-                    type="url"
-                    placeholder="https://… (Google Drive, Dropbox, your site)"
+                    type="file"
+                    accept=".pdf,.doc,.docx"
+                    className={styles.fileInput}
+                    onChange={(e) =>
+                      setCvName(e.currentTarget.files?.[0]?.name ?? "")
+                    }
                   />
+                  {/* styled proxy for the hidden native input — both
+                      labels point at #apply-cv, so either opens the picker */}
+                  <label htmlFor="apply-cv" className={styles.fileTrigger}>
+                    <span
+                      className={cvName ? styles.fileName : styles.filePlaceholder}
+                    >
+                      {cvName || "Choose a file…"}
+                    </span>
+                    <span className={styles.fileBrowse}>Browse</span>
+                  </label>
                 </div>
 
                 <div className={`${styles.field} ${styles.fieldFull}`}>
@@ -373,8 +364,8 @@ export default function JoinUs() {
 
                 <p className={styles.note}>
                   Submitting opens your email client with the application
-                  pre-filled. You can edit before sending. Files are easiest as
-                  a link — we&apos;ll come back to you within five working days.
+                  pre-filled — attach the CV you selected before sending.
+                  We&apos;ll come back to you within five working days.
                 </p>
 
                 <div className={styles.submitRow}>
@@ -395,8 +386,9 @@ export default function JoinUs() {
                       transition={{ duration: 0.4 }}
                     >
                       <strong>Your email is being prepared.</strong>
-                      If a draft didn&apos;t open, send your application to{" "}
-                      hr@mgnhw.com manually — we&apos;ll get it either way.
+                      Remember to attach your CV to the draft. If one
+                      didn&apos;t open, send your application to hr@mgnhw.com
+                      manually — we&apos;ll get it either way.
                     </motion.div>
                   )}
                 </AnimatePresence>

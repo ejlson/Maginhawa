@@ -1,145 +1,73 @@
-/* intro card
-
-*/
-.card {
-  position: relative;
-  padding: clamp(28px, 4vh, 56px) clamp(24px, 3vw, 48px);
-  border-radius: var(--radius-card);
-  color: var(--maroon);
-  background:
-    radial-gradient(
-      140% 100% at 0% 0%,
-      rgba(255, 255, 255, 0.18) 0%,
-      rgba(255, 255, 255, 0.06) 50%,
-      rgba(255, 255, 255, 0.12) 100%
-    );
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(38px) saturate(2);
-  -webkit-backdrop-filter: blur(38px) saturate(2);
-  box-shadow:
-    0 22px 60px -30px rgba(31, 0, 0, 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.07);
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  column-gap: var(--grid-gutter);
-  row-gap: clamp(18px, 2.6vh, 32px);
-}
-
 .section {
   position: relative;
-  z-index: 3;
   padding: clamp(20px, 2.6vw, 36px) var(--pad-x) 0;
-  /* border-top: 1px solid rgba(47, 0, 0, 0.1); */
   background: transparent;
-  margin-bottom: -6vh;
 }
 
-/* two-column intro — glass card left, photograph right. The photo is a
-   separate element (not part of the card) so the pair reads as an
-   editorial spread. Stacks on mobile with the photo below the card. */
-.introRow {
-  display: grid;
-  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
-  gap: clamp(16px, 2vw, 32px);
-  /* stretch — the photo column matches the glass card's height exactly */
-  align-items: stretch;
-}
-
-.introPhoto {
-  border-radius: var(--radius-card);
+/* ---- careers hero — one horizontal video plate spanning the full
+   content width, the height the old careers card held. The display
+   title (the About hero's type) sits inside the frame; the statement
+   rides the bottom-right corner as a small italic-serif line. ---- */
+.heroFrame {
+  position: relative;
+  height: clamp(420px, 64vh, 720px);
+  border-radius: var(--radius-tile);
   overflow: hidden;
+  background: var(--maroon);
+}
+
+.heroFrameVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
   height: 100%;
+  object-fit: cover;
 }
 
-@media (max-width: 900px) {
-  .introRow {
-    grid-template-columns: 1fr;
-  }
-  /* stacked layout — the card no longer constrains the photo's height, so
-     fall back to a fixed portrait ratio */
-  .introRow .introPhoto {
-    height: auto;
-    aspect-ratio: 4 / 5;
-  }
+/* maroon-tinted legibility scrim, weighted to the corners the type sits in */
+.heroFrameScrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    rgba(31, 0, 0, 0.52) 0%,
+    rgba(31, 0, 0, 0.28) 45%,
+    rgba(31, 0, 0, 0.6) 100%
+  );
+  pointer-events: none;
 }
 
-/* small factual stat row — label-style, separated by saffron dots */
-.cardStats {
-  grid-column: 1 / 9;
-  display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 0.9em;
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  color: var(--maroon);
-  opacity: 0.85;
-}
-
-.cardStatsSep {
-  display: inline-block;
-  width: 4px;
-  height: 4px;
-  border-radius: 50%;
-  background: var(--saffron);
-}
-
-/* what we offer — short, modest, label-style list */
-.cardPerks {
-  grid-column: 1 / 9;
-  list-style: none;
+/* the About hero's display treatment — same font, same inverted blend */
+.heroFrameTitle {
+  position: absolute;
+  top: clamp(20px, 3.4vh, 44px);
+  left: clamp(20px, 2.6vw, 48px);
   margin: 0;
-  padding: 0;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 0.6rem;
-}
-
-.cardPerks li {
-  padding: 0.55em 0.85em;
-  border: 1px solid rgba(47, 0, 0, 0.14);
-  border-radius: 999px;
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  color: var(--maroon);
-  background: rgba(255, 255, 255, 0.18);
-}
-
-/* live open-roles count → anchors down to the list */
-.cardCta {
-  grid-column: 1 / 9;
-  justify-self: start;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.7em;
-  padding: 0.4em 0;
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
+  font-family: var(--font-display);
   font-weight: 500;
-  color: var(--maroon);
-  text-decoration: none;
-  border-bottom: 1px solid currentColor;
-  transition: color 0.3s ease;
+  font-size: clamp(5rem, 10vw, 10rem);
+  line-height: 0.86;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--cream);
+  mix-blend-mode: difference;
 }
 
-.cardCta:hover,
-.cardCta:focus-visible {
-  color: var(--saffron);
-}
-
-@media (max-width: 900px) {
-  .cardStats,
-  .cardPerks,
-  .cardCta {
-    grid-column: 1 / -1;
-  }
+/* the small italic-serif beat — the About page's "Who is" voice */
+.heroFrameTagline {
+  position: absolute;
+  right: clamp(20px, 2.6vw, 48px);
+  bottom: clamp(18px, 3vh, 40px);
+  margin: 0;
+  max-width: 26ch;
+  text-align: right;
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.1rem, 2vw, 1.9rem);
+  line-height: 1.25;
+  color: var(--cream);
+  mix-blend-mode: difference;
 }
 
 .eyebrow {
@@ -161,34 +89,6 @@
   border-radius: 50%;
   background: var(--saffron);
   flex: none;
-}
-
-.statement {
-  grid-column: 1 / 9;
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: var(--t-h2);
-  line-height: var(--lh-heading);
-  letter-spacing: -0.012em;
-  color: var(--maroon);
-}
-
-.highlight {
-  font-family: inherit;
-  font-style: normal;
-  font-weight: inherit;
-  color: var(--saffron);
-  letter-spacing: inherit;
-}
-
-.body {
-  grid-column: 1 / 9;
-  font-family: var(--font-sans);
-  font-size: var(--t-small);
-  line-height: var(--lh-body);
-  color: var(--maroon);
-  opacity: 0.78;
-  max-width: 52ch;
 }
 
 .page {
@@ -300,12 +200,17 @@
   margin-bottom: clamp(36px, 5vh, 64px);
 }
 
+/* pale interaction hint — same recipe as the Discover grid's
+   "(Click to learn more)": quiet label caps, far right of the head */
 .rolesAside {
   font-family: var(--font-sans);
-  font-size: var(--t-body);
-  line-height: var(--lh-body);
-  opacity: 0.82;
-  max-width: 46ch;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  opacity: 0.4;
+  text-align: right;
+  justify-self: end;
+  align-self: end;
 }
 
 .roleList {
@@ -474,12 +379,86 @@
   margin-bottom: clamp(36px, 5vh, 64px);
 }
 
+/* pale interaction hint — the Discover "(Click to learn more)" recipe */
 .formAside {
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  line-height: var(--lh-snug);
+  opacity: 0.4;
+  text-align: right;
+  justify-self: end;
+  align-self: end;
+  max-width: 40ch;
+}
+
+/* ---- CV upload — hidden native input + styled underline proxy ----
+   (element+class selector so it outranks the shared `.field input`
+   sizing rules) */
+.field input.fileInput {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* the proxy reads as one of the form's underline fields */
+.fileTrigger {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  border-bottom: 1px solid rgba(47, 0, 0, 0.35);
+  padding: 0.5em 0;
+  cursor: pointer;
+  transition: border-color 0.3s ease;
+  /* the field label above already carries the caps treatment — reset the
+     inherited .field label styles on this second label */
+  text-transform: none;
+  letter-spacing: normal;
+  opacity: 1;
+}
+
+.filePlaceholder {
   font-family: var(--font-sans);
   font-size: var(--t-body);
   line-height: var(--lh-body);
-  opacity: 0.82;
-  max-width: 48ch;
+  opacity: 0.45;
+}
+
+.fileName {
+  font-family: var(--font-sans);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+}
+
+.fileBrowse {
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  opacity: 0.62;
+  flex: none;
+  transition: color 0.3s ease, opacity 0.3s ease;
+}
+
+.fileTrigger:hover {
+  border-color: var(--saffron);
+}
+.fileTrigger:hover .fileBrowse {
+  color: var(--saffron);
+  opacity: 1;
+}
+
+/* keyboard focus on the hidden input lights the proxy */
+.fileInput:focus-visible + .fileTrigger {
+  border-color: var(--saffron);
 }
 
 .formInner {

@@ -29,8 +29,8 @@ export default function SmoothScroll({
       // pulled toward the target by `lerp` (0–1). With no duration-based
       // animation in the wheel path, momentum decays smoothly toward zero
       // each frame and never snaps to a halt. Lower values feel smoother
-      // but laggier; 0.075 balances glide vs responsiveness.
-      lerp: 0.075,
+      // but laggier; 0.055 leans toward glide for the editorial feel.
+      lerp: 0.055,
       smoothWheel: true,
       // Slightly tamed so a single wheel notch doesn't punch the target
       // position far ahead of where the user expects.
