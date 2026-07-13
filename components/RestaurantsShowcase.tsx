@@ -105,7 +105,7 @@ const RESTAURANTS = [
     name: "Bunso",
     tag: "The Youngest of the Family",
     location: "London",
-    video: "/videos/hero-draft3.mp4",
+    video: "/videos/forpilot1.mov",
   },
 ];
 
@@ -124,6 +124,7 @@ const LOGOS: Record<string, string> = {
   Guanabana: "/logo/guanabana.png",
   "Ramo Ramen": "/logo/ramo.png",
   Hoodwood: "/logo/hoodwood.png",
+  Bunso: "/logo/bunso.png",
 };
 
 // card photography (Mamasons has none → placeholder)

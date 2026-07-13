@@ -5,21 +5,26 @@
 .section {
   position: relative;
   width: 100%;
-  /* Short pin — just enough scroll room for the full-bleed → shrink
-     transition. The sticky releases well before Contact would reach the
-     viewport, so the "Contact Us" title can never share the frame with
-     the pinned video. */
-  height: 140svh;
-  /* the video sits on the maroon DarkZone underneath, so no local
-     background needed — keeps the chapter one continuous dark surface */
-  /* --expand: 1 → video edge-to-edge of the viewport (pinned scene).
-     --expand: 0 → video inset to the page container (card state — both
-     the entry and settled framing, matching the horizontal padding used
-     elsewhere so the side gap and top gap are identical). Defaults to 0
-     so the pre-hydration paint matches the card entry state. */
-  --rest-inset: var(--pad-x);
-  --side-inset: calc(var(--rest-inset) * (1 - var(--expand, 0)));
-  --top-inset: var(--side-inset);
+  /* Taller pin — scroll room for the full card → scene → plate arc.
+     The sticky still releases before Contact reaches the viewport. */
+  height: 220svh;
+  /* the section now lives OUTSIDE the DarkZone: the small opening card
+     sits on the cream page, and the settled plate hands off into the
+     dark Contact section below */
+  /* Two independent phases (entry and exit rest states differ):
+     --grow 0→1 takes the small centred 16:9 card to edge-to-edge;
+     --settle 0→1 brings full bleed down to the page container's inset,
+     so the settled plate width matches the dark section's content.
+     Both default to 0: pre-hydration paint is the opening card. */
+  --card-w: min(66vw, 920px);
+  --side-rest: calc((100vw - var(--card-w)) / 2);
+  --top-rest: calc((100svh - var(--card-w) * 9 / 16) / 2);
+  --side-inset: calc(
+    var(--side-rest) * (1 - var(--grow, 0)) + var(--pad-x) * var(--settle, 0)
+  );
+  --top-inset: calc(
+    var(--top-rest) * (1 - var(--grow, 0)) + var(--pad-x) * var(--settle, 0)
+  );
 }
 
 /* pinned viewport-height stage — everything visual lives inside this
@@ -39,19 +44,20 @@
   }
 }
 
-/* clip container — fills the stage; the scroll-driven card↔full-bleed
+/* clip container — fills the stage; the scroll-driven full-bleed→plate
    framing is done entirely with clip-path, which composites on the GPU.
-   (The previous top/left/right/bottom offsets re-ran layout on every
-   scrubbed frame.) Radius scales with the inset so the corners are square
-   at full bleed and settle at 16px — pairing with --radius-card so the
-   card states match the site's floating cards. */
+   Radius scales with the inset so the corners are square at full bleed
+   and settle at the flat 2px tile radius the surrounding plates use. */
 .reveal {
   position: absolute;
   inset: 0;
   overflow: hidden;
+  /* radius: 2px in both rest states (card and plate), square at full
+     bleed — the two phase terms are never non-zero at the same time */
   clip-path: inset(
     var(--top-inset) var(--side-inset) var(--top-inset) var(--side-inset)
-      round calc(16px * (1 - var(--expand, 0)))
+      round
+      calc(var(--radius-tile) * (1 - var(--grow, 0) + var(--settle, 0)))
   );
   will-change: clip-path;
 }

@@ -1,0 +1,52 @@
+/* Numbers strip — a quiet row of editorial numerals between the About
+   plate and the Blog covers. Hairline rule + uniform --rule-gap air,
+   matching every section rule on the page. */
+.section {
+  padding: var(--rule-gap) var(--pad-x) var(--rule-gap);
+  border-top: 1px solid rgba(47, 0, 0, 0.1);
+  background: var(--cream);
+  color: var(--maroon);
+}
+
+.strip {
+  margin: 0;
+  display: grid;
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: clamp(20px, 3vw, 48px);
+}
+
+/* each figure — numeral over its small-caps label, hairline-separated
+   from its neighbour like a printed fact box */
+.item {
+  display: flex;
+  flex-direction: column-reverse; /* dt/dd source order: label, value —
+     rendered numeral-first */
+  gap: clamp(6px, 1vh, 12px);
+  padding-left: clamp(16px, 2vw, 32px);
+  border-left: 1px solid rgba(47, 0, 0, 0.14);
+}
+
+.value {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--t-display);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
+  font-variant-numeric: tabular-nums;
+}
+
+.label {
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+@media (max-width: 700px) {
+  .strip {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    row-gap: clamp(28px, 4vh, 44px);
+  }
+}

@@ -1,235 +1,107 @@
-/* Careers teaser — cream page area, glass card. Negative margin-bottom
-   lets the card dip into the top of the RestaurantLocations dark video
-   below for a soft stacked-layer effect. Positioned above the video with
-   z-index so it reads on top even as the sticky video scrolls behind. */
+/* Careers teaser — the hiring ticker. A slim full-width marquee band on
+   the cream page between the Blog covers and the RestaurantLocations
+   video. Same marquee mechanics as the PressStrip: a track holding two
+   identical sequences, translated -50% on a linear loop. */
 .section {
   position: relative;
-  z-index: 3;
-  /* Tight top padding + a hairline rule at the very top marks the seam
-     between the Blog chapter and the Careers card without the previous
-     large open gap. The rule is the visual break; the padding is a
-     small breath around it. */
-  padding: var(--rule-gap) var(--pad-x) 0;
+  /* hairline rule opens the chapter; uniform --rule-gap air on both
+     sides, matching every rule on the page. No horizontal padding — the
+     ticker deliberately bleeds off both edges of the viewport. */
+  padding-block: var(--rule-gap);
   border-top: 1px solid rgba(47, 0, 0, 0.1);
-  /* NB: no local background — the parent `.afterHero` provides the cream
-     behind the card. Once the negative margin-bottom kicks in, the
-     DarkZone shows through the overlap region so the glass card's
-     translucency actually reveals the dark video beneath. */
-  background: transparent;
-  /* just a small overlap — the very bottom edge of the card dips into
-     the top of the video below, no more than that */
-  margin-bottom: -6vh;
-}
-
-/* two-column row — photograph left, glass card right. The photo is a
-   separate element (not part of the card) so the pair reads as an
-   editorial spread, mirroring the AboutIntro card above. Stacks on
-   mobile with the photo below the card. */
-.row {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.7fr);
-  gap: clamp(16px, 2vw, 32px);
-  /* stretch — the photo column matches the glass card's height exactly */
-  align-items: stretch;
-}
-
-.photo {
-  /* DOM keeps the card first (mobile stacks card → photo); order flips
-     the pair visually so the photo leads the spread on desktop */
-  order: -1;
-  border-radius: var(--radius-card);
   overflow: hidden;
-  height: 100%;
 }
 
-@media (max-width: 900px) {
-  .row {
-    grid-template-columns: 1fr;
-  }
-  /* stacked layout — card first again, and the card no longer constrains
-     the photo's height, so fall back to a fixed portrait ratio */
-  .row .photo {
-    order: 0;
-    height: auto;
-    aspect-ratio: 4 / 5;
-  }
+/* stationary head — the label holds still top-left while the band moves
+   beneath it */
+.head {
+  padding: 0 var(--pad-x);
+  margin-bottom: clamp(20px, 3vh, 36px);
 }
 
-/* liquid-glass card — matches the Blog featured/rail cards visually so
-   the two chapters read as a pair */
-.card {
-  position: relative;
-  /* compact card — content-sized rather than a big slab. Section margin
-     handles the small dip into the video below. */
-  padding: clamp(28px, 4vh, 56px) clamp(24px, 3vw, 48px);
-  border-radius: var(--radius-card);
-  color: var(--maroon);
-  /* iOS 26 liquid-glass — more present than the previous frosted panel:
-     radial "light source" in the top-left corner, stronger blur pushing
-     the underlying colour into a diffuse wash, and a luminous top edge
-     that reads as glass catching light. */
-  background:
-    radial-gradient(
-      140% 100% at 0% 0%,
-      rgba(255, 255, 255, 0.18) 0%,
-      rgba(255, 255, 255, 0.06) 50%,
-      rgba(255, 255, 255, 0.12) 100%
-    );
-  border: 1px solid rgba(255, 255, 255, 0.12);
-  backdrop-filter: blur(38px) saturate(2);
-  -webkit-backdrop-filter: blur(38px) saturate(2);
-  box-shadow:
-    0 22px 60px -30px rgba(31, 0, 0, 0.28),
-    inset 0 1px 0 rgba(255, 255, 255, 0.35),
-    inset 0 -1px 0 rgba(255, 255, 255, 0.07);
-  display: grid;
-  grid-template-columns: repeat(12, minmax(0, 1fr));
-  column-gap: var(--grid-gutter);
-  row-gap: clamp(18px, 2.6vh, 32px);
+/* the whole band is one link into /join-us. The hairline closes the
+   chapter BELOW the scrolling teams, running the full viewport width to
+   match the ticker's edge-to-edge bleed. */
+.band {
+  display: block;
+  cursor: pointer;
+  padding-bottom: clamp(16px, 2.4vh, 28px);
+  border-bottom: 1px solid rgba(47, 0, 0, 0.1);
 }
 
-/* content is right-aligned inside the card, mirroring the photo now on
-   the left of the spread */
-.eyebrow {
-  grid-column: 1 / 13;
-  justify-self: end;
+.track {
+  display: flex;
+  width: max-content;
+  animation: careersScroll 30s linear infinite;
+  will-change: transform;
+}
+
+/* one half of the loop — spacing inside must equal the spacing the next
+   half continues with, so the seam is invisible */
+.seq {
   display: inline-flex;
   align-items: center;
-  gap: 0.7em;
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
+  gap: clamp(28px, 3.4vw, 64px);
+  padding-right: clamp(28px, 3.4vw, 64px);
+  white-space: nowrap;
+}
+
+/* "We're Hiring" — the italic serif inflection carrying the saffron
+   accent, echoing the hero's italic beats. Stationary in the head. */
+.hiring {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.5rem, 2.6vw, 2.6rem);
+  line-height: 1.1;
+  color: var(--saffron);
+}
+
+/* the teams — upright display serif, quiet maroon */
+.team {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.8rem, 3.4vw, 3.4rem);
+  line-height: 1.1;
+  letter-spacing: var(--tr-display);
   text-transform: uppercase;
   color: var(--maroon);
 }
-.eyebrow::before {
-  content: "";
-  display: block;
-  width: 6px;
-  height: 6px;
+
+.dot {
+  width: clamp(6px, 0.7vw, 10px);
+  height: clamp(6px, 0.7vw, 10px);
   border-radius: 50%;
   background: var(--saffron);
   flex: none;
+  opacity: 0.85;
 }
 
-.statement {
-  /* full card width — right-aligned lines run back toward the left edge
-     so the card doesn't carry a large blank column */
-  grid-column: 1 / 13;
-  text-align: right;
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: var(--t-h2);
-  line-height: var(--lh-heading);
-  letter-spacing: -0.012em;
-  color: var(--maroon);
+/* hover: the teams warm to saffron — a colour cue only, the marquee
+   keeps moving (pausing on hover reads as the animation breaking; see
+   the PressStrip note) */
+.team {
+  transition: color 0.3s ease;
 }
-
-.highlight {
-  font-family: inherit;
-  font-style: normal;
-  font-weight: inherit;
-  color: var(--saffron);
-  letter-spacing: inherit;
-}
-
-.body {
-  grid-column: 1 / 13;
-  justify-self: end;
-  text-align: right;
-  font-family: var(--font-sans);
-  font-size: var(--t-small);
-  line-height: var(--lh-body);
-  color: var(--maroon);
-  opacity: 0.78;
-  max-width: 52ch;
-}
-
-.cta {
-  grid-column: 5 / 13;
-  margin-top: 0.4rem;
-  justify-self: end;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.9em;
-  padding: 0.4em 0;
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  color: var(--maroon);
-  position: relative;
-  cursor: pointer;
-  transition: color 0.4s var(--ease-in-out);
-}
-.cta::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 1px;
-  background: currentColor;
-  transform: scaleX(0.28);
-  transform-origin: left center;
-  transition: transform 0.6s var(--ease-out);
-}
-.cta:hover::after,
-.cta:focus-visible::after {
-  transform: scaleX(1);
-}
-.cta:hover .ctaArrow,
-.cta:focus-visible .ctaArrow {
-  transform: translateX(6px);
-}
-.cta:hover,
-.cta:focus-visible {
-  color: var(--saffron);
-}
-.ctaLabel {
-  font-weight: 500;
-}
-.ctaArrow {
-  width: clamp(36px, 3.4vw, 52px);
-  height: 10px;
-  transition: transform 0.6s var(--ease-out);
-}
-
-@media (max-width: 900px) {
-  /* stacked card — no photo beside it, so content returns to the
-     default left-aligned reading direction */
-  .statement,
-  .body,
-  .cta,
-  .roles {
-    grid-column: 1 / -1;
-    text-align: left;
-    justify-self: start;
-  }
-  .roles {
-    justify-content: flex-start;
-  }
-  .eyebrow {
-    justify-self: start;
+@media (hover: hover) and (pointer: fine) {
+  .band:hover .team {
+    color: var(--saffron);
   }
 }
 
-.roles {
-  grid-column: 5 / 13;
-  display: flex;
-  flex-wrap: wrap;
-  justify-content: flex-end;
-  gap: 0.6rem;
+@keyframes careersScroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
 }
 
-.roles span {
-  padding: 0.55em 0.85em;
-  border: 1px solid rgba(47, 0, 0, 0.14);
-  border-radius: 999px;
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  color: var(--maroon);
-  background: rgba(255, 255, 255, 0.18);
+/* reduced motion: a still band — whatever fits the viewport reads as a
+   static "We're Hiring" strip, still fully clickable */
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    animation: none;
+  }
 }

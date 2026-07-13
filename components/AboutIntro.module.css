@@ -25,16 +25,22 @@
   overflow: hidden;
   background: var(--maroon);
   color: var(--cream);
-  border-radius: var(--radius-card);
-  padding: clamp(36px, 5vh, 72px) clamp(28px, 3.6vw, 60px);
+  /* flat editorial plate — sharp tile corners like the Discover grid, and
+     deliberately no drop shadow (sharp corners read print-flat; shadows
+     read elevated — the two don't mix) */
+  border-radius: var(--radius-tile);
+  padding: clamp(40px, 5.5vh, 80px) clamp(28px, 3.6vw, 60px);
+  /* poster composition — head rules the top, the statement owns the
+     middle, and the CTA + portrait anchor the bottom corners. The 1fr
+     middle row is what gives the card its height and lets the content
+     breathe apart. */
+  min-height: clamp(480px, 66vh, 720px);
   display: grid;
   grid-template-columns: repeat(12, minmax(0, 1fr));
+  grid-template-rows: auto 1fr auto;
   column-gap: var(--grid-gutter);
-  row-gap: clamp(20px, 3vh, 40px);
+  row-gap: clamp(24px, 3.5vh, 48px);
   align-items: start;
-  /* kept tighter than the section's bottom padding so the shadow fades to
-     nothing before the next section's opaque background begins */
-  box-shadow: 0 14px 32px -18px rgba(31, 0, 0, 0.45);
 }
 
 /* full-cover looping video sitting behind the card content — z-index 0 so
@@ -79,9 +85,26 @@
   z-index: 2;
 }
 
-/* head row — eyebrow with dot, echoing Discover's rhythm */
+/* head row — eyebrow left, quiet est. meta right, closed by a hairline
+   spanning the card like a printed chapter opener */
 .head {
   grid-column: 1 / 13;
+  grid-row: 1;
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  padding-bottom: clamp(14px, 2vh, 24px);
+  border-bottom: 1px solid rgba(248, 243, 234, 0.16);
+}
+
+.headMeta {
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--cream);
+  opacity: 0.55;
 }
 
 .eyebrow {
@@ -107,8 +130,9 @@
 
 /* left column: the big serif statement, now in cream against maroon */
 .statement {
-  grid-column: 1 / 8;
+  grid-column: 1 / 9;
   grid-row: 2;
+  align-self: start;
   font-family: var(--font-display);
   font-weight: 500;
   font-size: var(--t-h2);
@@ -122,19 +146,21 @@
    previous photo while the top layer's clip-path wipes the new photo in
    from top to bottom, then the base updates. */
 .anchorImage {
-  grid-column: 10 / 13;
-  grid-row: 2;
+  /* spans the full right edge of the poster: top edge on the statement's
+     first line, bottom edge on the CTA's baseline band — stretch across
+     rows 2-3 gives it exactly that run, no fixed aspect ratio */
+  grid-column: 9 / 13;
+  grid-row: 2 / 4;
   align-self: stretch;
   justify-self: end;
   position: relative;
   min-height: 0;
   margin: 0;
   width: 100%;
-  max-width: clamp(150px, 16vw, 220px);
+  max-width: clamp(200px, 22vw, 330px);
   overflow: hidden;
-  /* nested inside the rounded card → smaller concentric radius */
-  border-radius: var(--radius-media);
-  box-shadow: 0 24px 48px -32px rgba(0, 0, 0, 0.6);
+  /* flat tile frame — matches the card's own sharp corners */
+  border-radius: var(--radius-tile);
 }
 .anchorImgLayer {
   position: absolute;
@@ -164,9 +190,11 @@
 /* CTA — quiet cream text link with animated underline draw + arrow slide
    on hover. Uses the shared --ease-out token from globals. */
 .cta {
+  /* bottom-left corner, on the same baseline band as the portrait */
   grid-column: 1 / 8;
   grid-row: 3;
   justify-self: start;
+  align-self: end;
   display: inline-flex;
   align-items: center;
   gap: 0.9em;
@@ -217,6 +245,9 @@
 @media (max-width: 900px) {
   .card {
     padding: clamp(28px, 4vh, 48px) clamp(20px, 4vw, 36px);
+    /* stacked — content dictates the height, no poster spread */
+    min-height: 0;
+    grid-template-rows: none;
   }
   .statement,
   .anchorImage,

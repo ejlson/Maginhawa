@@ -134,7 +134,7 @@ export const RESTAURANTS: Restaurant[] = [
       "Bunso — 'the youngest' — is the newest member of the Maginhawa family. Full details, menu and location coming soon.",
     location: "London",
     image: "/images/bunso-placeholder.jpg",
-    logo: "/logo/maginhawa.png",
+    logo: "/logo/bunso.png",
     bookable: false,
     comingSoon: true,
   },

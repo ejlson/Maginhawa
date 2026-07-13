@@ -6,14 +6,27 @@
   overflow-x: clip;
 }
 
+/* saffron-dot eyebrow — same recipe as FAQ / Blog / CareersTeaser so the
+   chapter headers rhyme across the site (cream text over the video) */
 .eyebrow {
-  display: block;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7em;
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
-  color: var(--saffron);
+  color: var(--cream);
   margin-bottom: clamp(14px, 2vh, 22px);
+}
+.eyebrow::before {
+  content: "";
+  display: block;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--saffron);
+  flex: none;
 }
 
 .sectionTitle {
@@ -69,7 +82,28 @@
    adapted: an overflow-hidden clip with the word sliding up into view */
 .heroLineClip {
   display: block;
-  overflow: hidden;
+  /* clip vertically only (the words rise in from below); horizontal stays
+     visible so italic overhangs — GROUP's swashed P — never get shorn */
+  overflow-x: visible;
+  overflow-y: clip;
+}
+
+/* "Who is" — small italic serif kicker sitting on the title's shoulder.
+   Negative bottom margin swallows the display line's internal top leading
+   so the kicker reads as attached to MAGINHAWA, not floating above it. */
+.heroKicker {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-weight: 500;
+  font-size: clamp(1.2rem, 2.4vw, 2.2rem);
+  line-height: 1;
+  color: var(--cream);
+  mix-blend-mode: difference;
+  margin-left: 0.15em;
+  /* tuned at the glyph-ink level (canvas TextMetrics): -0.15 of the
+     display size gives the same visual gap above MAGINHAWA as GROUP
+     carries below it, so the title stack reads as one even column */
+  margin-bottom: calc(var(--hero-display-size) * -0.15);
 }
 
 .heroLineInner {
@@ -160,7 +194,12 @@
 .heroLineBottom {
   text-align: right;
   justify-self: end;
-  margin-top: -0.1em;
+  /* -0.044em seats GROUP's cap ink exactly on the lede's first line
+     (measured at the glyph level, not the box level) */
+  margin-top: -0.044em;
+  /* pulled off the right edge so the italic P's overhang clears the
+     viewport instead of being cut off */
+  padding-right: 0.14em;
   /* italic serif inflection on the second word — the reference's
      "About *Me*" pattern. Revert by deleting these two declarations. */
   font-family: var(--font-serif);
@@ -507,13 +546,26 @@
   width: 100%;
   max-width: 880px;
   padding: clamp(20px, 2.4vw, 40px);
-  /* slightly more opaque than the old cream-page value (0.55) — the card
-     now floats over video, so the maroon copy inside needs a steadier
-     light surface to stand on */
-  background: rgba(248, 243, 234, 0.72);
-  -webkit-backdrop-filter: blur(14px) saturate(1.1);
-  backdrop-filter: blur(14px) saturate(1.1);
-  border: 1px solid rgba(248, 243, 234, 0.25);
+  /* clear liquid glass — the CareersTeaser recipe: a radial "light source"
+     in the top-left corner, heavy blur pushing the video into a diffuse
+     wash, and a luminous top edge that reads as glass catching light.
+     Nearly transparent, so the copy inside is cream (the blur + the
+     backdrop scrim carry the legibility). */
+  background: radial-gradient(
+    140% 100% at 0% 0%,
+    rgba(255, 255, 255, 0.16) 0%,
+    rgba(255, 255, 255, 0.05) 50%,
+    rgba(255, 255, 255, 0.1) 100%
+  );
+  /* lighter frost — enough diffusion to seat the type, but the video's
+     shapes stay readable through the glass */
+  -webkit-backdrop-filter: blur(18px) saturate(1.6);
+  backdrop-filter: blur(18px) saturate(1.6);
+  border: 1px solid rgba(255, 255, 255, 0.14);
+  box-shadow:
+    0 22px 60px -30px rgba(31, 0, 0, 0.35),
+    inset 0 1px 0 rgba(255, 255, 255, 0.3),
+    inset 0 -1px 0 rgba(255, 255, 255, 0.06);
   border-radius: var(--radius-card);
 }
 
@@ -523,9 +575,11 @@
   gap: clamp(12px, 1.8vh, 22px);
 }
 
+/* no backdrop-filter support → the glass would be invisible; fall back to
+   a near-solid maroon panel so the cream copy still has a surface */
 @supports not (backdrop-filter: blur(1px)) {
   .storyContent {
-    background: var(--cream);
+    background: rgba(31, 0, 0, 0.88);
   }
 }
 
@@ -537,13 +591,27 @@
   color: var(--saffron);
 }
 
+/* neighbourhood tag riding the chapter number — quiet cream after a
+   middot so the meta line reads "Chapter 03 · Camden" */
+.storyMetaPlace {
+  color: var(--cream);
+  opacity: 0.6;
+}
+.storyMetaPlace::before {
+  content: "·";
+  margin: 0 0.6em;
+  color: var(--cream);
+  opacity: 0.5;
+}
+
 .storyTitle {
   font-family: var(--font-display);
   font-weight: 500;
   font-size: var(--t-display);
   line-height: var(--lh-display);
   letter-spacing: var(--tr-display);
-  color: var(--maroon);
+  /* cream on clear glass — the card barely tints the video now */
+  color: var(--cream);
   margin: 0;
   max-width: 11ch;
 }
@@ -553,8 +621,8 @@
   font-family: var(--font-sans);
   font-size: var(--t-body);
   line-height: var(--lh-body);
-  color: var(--maroon);
-  opacity: 0.86;
+  color: var(--cream);
+  opacity: 0.9;
   margin: 0;
   max-width: 58ch;
   padding-top: clamp(10px, 1.4vh, 18px);
@@ -579,6 +647,59 @@
   box-shadow:
     0 28px 70px -42px rgba(47, 0, 0, 0.55),
     0 1px 0 rgba(255, 255, 255, 0.5) inset;
+}
+
+/* ---- chapter layout variants — a varied editorial sequence ---- */
+
+/* portrait: text leads on the left, a tall image closes the spread */
+.storyPortrait {
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.72fr);
+}
+.storyPortrait .storyImageFrame {
+  order: 2;
+  aspect-ratio: 3 / 4;
+}
+
+/* wide: a panoramic image over the text — reserved for the bookend
+   moments (the 1987 founding, the 2026 Michelin listing) */
+.storyWide {
+  grid-template-columns: 1fr;
+  max-width: 980px;
+}
+.storyWide .storyImageFrame {
+  aspect-ratio: 21 / 9;
+}
+
+/* quiet link out to the chapter's restaurant — same thin arrow language
+   as the Awards rows */
+.storyLink {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8em;
+  margin-top: clamp(6px, 1vh, 12px);
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--cream);
+  opacity: 0.75;
+  transition:
+    opacity 0.3s ease,
+    color 0.3s ease;
+}
+.storyLink svg {
+  width: 22px;
+  height: 10px;
+  transition: transform 0.4s var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .storyLink:hover {
+    opacity: 1;
+    color: var(--saffron);
+  }
+  .storyLink:hover svg {
+    transform: translateX(5px);
+  }
 }
 
 .storyImage {
@@ -649,6 +770,11 @@
 /* ---- Press & Coverage table ---- */
 
 .coverage {
+  /* opaque cream sheet — slides up over the pinned video backdrop, so it
+     needs a solid background (the page's cream shows through nowhere
+     else in the scope) */
+  background: var(--cream);
+  color: var(--maroon);
   padding-block: var(--section-y) var(--section-y-lg);
   border-top: 1px solid var(--rule);
 }
@@ -704,12 +830,43 @@
   grid-template-columns:
     clamp(110px, 12vw, 170px)
     minmax(0, 1fr)
-    clamp(48px, 5vw, 72px);
+    clamp(48px, 5vw, 72px)
+    clamp(22px, 2vw, 30px);
   align-items: baseline;
   gap: clamp(16px, 2vw, 36px);
   padding-block: clamp(2px, 0.35vh, 5px);
   color: inherit;
   text-decoration: none;
+}
+
+/* thin arrow closing each row — quiet at rest, wakes on hover */
+.coverageArrow {
+  display: flex;
+  justify-content: flex-end;
+  align-self: center;
+  color: var(--maroon);
+  opacity: 0.4;
+  transition:
+    opacity 0.3s ease,
+    color 0.3s ease;
+}
+
+.coverageArrow svg {
+  width: 22px;
+  height: 10px;
+  transition: transform 0.4s var(--ease-out);
+}
+
+/* subtle by design: the arrow slides a few px and warms to saffron —
+   nothing else in the row moves */
+@media (hover: hover) and (pointer: fine) {
+  .coverageRow:hover .coverageArrow {
+    opacity: 1;
+    color: var(--saffron);
+  }
+  .coverageRow:hover .coverageArrow svg {
+    transform: translateX(5px);
+  }
 }
 
 .coverageRow + .coverageRow {
@@ -802,9 +959,21 @@
     max-width: 14ch;
   }
 
-  /* chapter cards stack: photo above text */
-  .storyContent {
+  /* chapter cards stack: photo above text — all layout variants collapse
+     to the same single-column composition */
+  .storyContent,
+  .storyPortrait,
+  .storyWide {
     grid-template-columns: 1fr;
+    max-width: 880px;
+  }
+  .storyPortrait .storyImageFrame {
+    order: 0;
+  }
+  /* tall/panoramic crops read wrong stacked — settle on one photo shape */
+  .storyPortrait .storyImageFrame,
+  .storyWide .storyImageFrame {
+    aspect-ratio: 4 / 3;
   }
 }
 
@@ -860,6 +1029,11 @@
 
   .coverageDate {
     text-align: left;
+  }
+
+  /* stacked rows — the arrow would sit as its own awkward line */
+  .coverageArrow {
+    display: none;
   }
 }
 

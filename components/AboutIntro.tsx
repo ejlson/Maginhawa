@@ -108,6 +108,7 @@ export default function AboutIntro() {
 
         <div className={styles.head}>
           <span className={styles.eyebrow}>About Us</span>
+          <span className={styles.headMeta}>Est. 1987 — London</span>
         </div>
 
         <h2 className={styles.statement}>

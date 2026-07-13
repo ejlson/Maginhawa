@@ -8,6 +8,7 @@ import Hero from "./Hero";
 import Discover from "./Discover";
 import PressStrip from "./PressStrip";
 import AboutIntro from "./AboutIntro";
+import NumbersStrip from "./NumbersStrip";
 import RestaurantLocations from "./RestaurantLocations";
 // import Timeline from "./Timeline";
 // Press section content now lives inside WhoWeAre (rotating quote + masthead
@@ -85,14 +86,19 @@ export default function Experience() {
           <Discover />
           <PressStrip />
           <AboutIntro />
+          {/* numbers strip — the group's story in editorial numerals,
+              bridging "who we are" into the coverage the Blog shows */}
+          <NumbersStrip />
           <Blog />
-          {/* Careers glass card sits right under News. Its negative
-              margin-bottom lets the card dip into the top of the video
-              below for a stacked layer effect. */}
+          {/* hiring ticker — stationary label + kinetic marquee band */}
           <CareersTeaser />
 
+          {/* outside the DarkZone: the video's opening card sits on the
+              cream page, then its settled plate hands off into the dark
+              Contact section below */}
+          <RestaurantLocations />
+
           <DarkZone>
-            <RestaurantLocations />
             <Contact />
             <FAQ />
             <Footer />

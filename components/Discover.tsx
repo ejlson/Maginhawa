@@ -37,7 +37,7 @@ const ITEMS: DiscoverItem[] = [
     slug: "bintang",
     name: "Bintang",
     tag: "Filipino Fusion Restaurant",
-    location: "93 Kentish Town Rd, London NW1",
+    location: "93 Kentish Town Rd, London NW1 8NY",
     image: "/images/bintang.jpg",
     logo: "/logo/bintang.png",
     blurb:
@@ -47,7 +47,7 @@ const ITEMS: DiscoverItem[] = [
     slug: "belly",
     name: "Belly",
     tag: "Modern Filipino Bistro",
-    location: "Camden, London",
+    location: "157 Kentish Town Rd, London NW1 8PD",
     image: "/images/belly.jpg",
     logo: "/logo/belly.png",
     // Belly is the group's Michelin Guide listing — the mark renders as part
@@ -60,7 +60,7 @@ const ITEMS: DiscoverItem[] = [
     slug: "mamasons",
     name: "Mamasons",
     tag: "London's First Filipino Ice Cream Parlor",
-    location: "Kentish Town · China Town",
+    location: "91 Kentish Town Rd · 32 Newport China Town",
     image: null,
     logo: "/logo/mamasons.png",
     blurb:
@@ -70,7 +70,7 @@ const ITEMS: DiscoverItem[] = [
     slug: "cafemama",
     name: "Café Mama & Sons",
     tag: "Filipino x Japanese Café",
-    location: "London",
+    location: "83 Kentish Town Rd, London NW1 8NY",
     image: "/images/cafemama.jpg",
     logo: "/logo/cafemama.png",
     menuPages: [
@@ -87,7 +87,7 @@ const ITEMS: DiscoverItem[] = [
     slug: "guanabana",
     name: "Guanabana",
     tag: "Caribbean Cuisine",
-    location: "85 Kentish Town Rd, London NW1",
+    location: "85 Kentish Town Rd, London NW1 8NY",
     image: "/images/guanabana.jpg",
     logo: "/logo/guanabana.png",
     blurb:
@@ -97,7 +97,7 @@ const ITEMS: DiscoverItem[] = [
     slug: "ramo",
     name: "Ramo Ramen",
     tag: "Filipino-Japanese Ramen",
-    location: "Kentish Town · Soho, London",
+    location: "28 Brewer St, Soho, London W1F 0SR",
     image: "/images/ramo.jpg",
     logo: "/logo/ramo.png",
     blurb:
@@ -107,7 +107,7 @@ const ITEMS: DiscoverItem[] = [
     slug: "hoodwood",
     name: "Hoodwood",
     tag: "Caribbean Takeaway",
-    location: "London",
+    location: "81 Kentish Town Rd, London NW1 8NY",
     image: "/images/hoowood.jpg",
     logo: "/logo/hoodwood.png",
     blurb:
@@ -119,9 +119,9 @@ const ITEMS: DiscoverItem[] = [
     slug: "bunso",
     name: "Bunso",
     tag: "The Youngest of the Family",
-    location: "London",
+    location: "1a Hawley Rd, London NW1 8RP",
     image: null,
-    logo: null,
+    logo: "/images/bunso.png",
     blurb:
       "Bunso — 'the youngest' — is the newest member of the Maginhawa family. Full details, menu and location coming soon.",
   },
