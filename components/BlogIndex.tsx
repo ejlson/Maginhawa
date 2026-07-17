@@ -141,7 +141,7 @@ function BlogIndexInner() {
         <div className="container">
           <header className={styles.head}>
             <Reveal as="span" className={styles.eyebrow}>
-              The Journal
+              The Blog
             </Reveal>
             <Reveal>
               <h1 className={styles.title}>

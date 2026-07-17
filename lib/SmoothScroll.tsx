@@ -29,18 +29,21 @@ export default function SmoothScroll({
       // pulled toward the target by `lerp` (0–1). With no duration-based
       // animation in the wheel path, momentum decays smoothly toward zero
       // each frame and never snaps to a halt. Lower values feel smoother
-      // but laggier; 0.055 leans toward glide for the editorial feel.
-      lerp: 0.055,
+      // but laggier; 0.04 leans hard into glide — the page coasts rather
+      // than tracks, matching the slower editorial pacing.
+      lerp: 0.04,
       smoothWheel: true,
-      // Slightly tamed so a single wheel notch doesn't punch the target
-      // position far ahead of where the user expects.
-      wheelMultiplier: 0.9,
-      touchMultiplier: 1.6,
+      // Tamed further so a single wheel notch moves the target position a
+      // shorter distance — combined with the low lerp, scrolling reads as
+      // deliberate page-turning rather than flicking.
+      wheelMultiplier: 0.72,
+      touchMultiplier: 1.3,
       // `easing` + `duration` are still consulted by `lenis.scrollTo()` for
       // programmatic jumps (anchor links, route transitions). Quintic
-      // ease-out so those jumps also coast in instead of snapping.
+      // ease-out so those jumps also coast in instead of snapping; the
+      // longer duration keeps them in step with the slower wheel feel.
       easing: (t) => 1 - Math.pow(1 - t, 5),
-      duration: 1.4,
+      duration: 1.8,
       // Native touch on mobile already glides and supports pull-to-refresh;
       // let the OS own that surface instead of hijacking it.
       syncTouch: false,

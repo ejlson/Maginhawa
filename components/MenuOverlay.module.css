@@ -14,6 +14,7 @@
   max-height: 92vh;
   background: var(--cream);
   border-radius: var(--radius-card);
+  corner-shape: squircle; /* Figma-style corner smoothing (superellipse); falls back to plain rounding */
   overflow: hidden;
   display: flex;
   flex-direction: column;

@@ -16,6 +16,7 @@ import RestaurantLocations from "./RestaurantLocations";
 // import Press from "./Press";
 import Blog from "./Blog";
 import CareersTeaser from "./CareersTeaser";
+import ReadyCta from "./ReadyCta";
 import Contact from "./Contact";
 import FAQ from "./FAQ";
 import Footer from "./Footer";
@@ -90,12 +91,14 @@ export default function Experience() {
               bridging "who we are" into the coverage the Blog shows */}
           <NumbersStrip />
           <Blog />
-          {/* hiring ticker — stationary label + kinetic marquee band */}
-          <CareersTeaser />
+          {/* open-roles index on the cream page, then the closing
+              invitation with the Join Us pill */}
+          {/* <CareersTeaser /> */}
+          <ReadyCta />
 
-          {/* outside the DarkZone: the video's opening card sits on the
-              cream page, then its settled plate hands off into the dark
-              Contact section below */}
+          {/* outside the DarkZone: the video opens full bleed on the cream
+              page, then its settled plate hands off into the dark Contact
+              section below */}
           <RestaurantLocations />
 
           <DarkZone>

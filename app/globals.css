@@ -95,13 +95,15 @@
   --section-y-sm: clamp(48px, 7vh, 112px);
   --section-y: clamp(96px, 12vh, 160px);
   --section-y-lg: clamp(120px, 16vh, 240px);
-  /* uniform air on either side of a hairline section rule — every section
-     that opens with a border-top uses this above AND below the line, so
-     the rules read as one consistent device across the page. Sized so a
-     full content→rule→content chapter break totals ~120-260px (the
-     editorial-magazine range; scales with viewport height like the
-     --section-y tiers). Comfortably clears the About card's 28px drop
-     shadow so it never touches a rule. */
+  /* home-page chapter gap — the uniform breath between every home section
+     (one owner per boundary). A step beyond --section-y-lg, per the
+     editorial-magazine rhythm of the home flow. */
+  --home-gap: clamp(160px, 22vh, 320px);
+  /* uniform air on either side of a hairline section rule — sections that
+     open with a border-top use this above AND below the line so the rules
+     read as one consistent device. NOTE: the home page has dropped section
+     rules entirely (uniform --section-y gaps, one owner per boundary);
+     the token remains for other routes that still draw rules. */
   --rule-gap: clamp(60px, 9vh, 132px);
 
   /* =========================================================================
@@ -407,4 +409,18 @@ html::-webkit-scrollbar {
   }
   /* respect reduced-motion users — drop the persistent backdrop blur */
   .scrollBlur { display: none; }
+}
+
+/* the glass cursor (CustomCursor.tsx) owns the pointer wherever it is
+   active — the explicit data-cursor zones plus any image/video under
+   the pointer (the component stamps html.glass-cursor while live).
+   Scoped to the audiences that actually get the follower: fine-pointer
+   devices with motion allowed. */
+@media (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  [data-cursor="glass"],
+  [data-cursor="glass"] *,
+  html.glass-cursor,
+  html.glass-cursor * {
+    cursor: none;
+  }
 }

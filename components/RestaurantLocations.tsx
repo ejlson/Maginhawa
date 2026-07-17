@@ -6,18 +6,18 @@ import {
   useScroll,
   useTransform,
 } from "framer-motion";
-import { Fragment, useEffect, useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./RestaurantLocations.module.css";
 import ViewAllButton from "./ViewAllButton";
 import VideoBackdrop from "./VideoBackdrop";
-import { RESTAURANTS } from "@/lib/restaurants";
 
 // a few restaurant clips cycle behind the View-All button
 const CLIPS = [
-  "/videos/bintang.mp4",
   "/videos/cafemama.mp4",
-  "/videos/ramo.mp4",
-  "/videos/mamasons.mp4",
+  // "/videos/ramo.mp4",
+  "belly-hero.mov",
+  "/videos/mamasons.mov",
+  "/videos/bintang.mov",
 ];
 
 export default function RestaurantLocations() {
@@ -33,52 +33,45 @@ export default function RestaurantLocations() {
   }, []);
 
   // Scrollytelling: the section is intentionally taller than the viewport,
-  // and the video sits inside a sticky viewport-height wrapper. Three-act
-  // arc, asymmetric: the video OPENS as a small horizontal card centred
-  // on the CREAM page (under the hiring ticker), EXPANDS to full screen
-  // as the user scrolls the pin, holds the scene, then SETTLES to the
-  // page container's width — matching the dark section's content — as it
-  // hands off into Contact.
+  // and the video sits inside a sticky viewport-height wrapper. Two-act
+  // arc: the video OPENS edge-to-edge straight off the Blog (that's also
+  // the pre-hydration paint), holds the scene while the pin scrolls, then
+  // SETTLES to the page container's width — matching the dark section's
+  // content — as it hands off into Contact.
   //
   // Pin range [start start → end end]: 0 at pin, 1 when the sticky releases.
   const { scrollYProgress } = useScroll({
     target: ref,
     offset: ["start start", "end end"],
   });
-  // two independent phases (entry and exit rest states differ, so one
-  // expand value can't describe both): --grow takes the card to full
-  // bleed over the first 40%; --settle brings full bleed down to the
-  // container plate from 62%, running nearly to the release so the plate
-  // never sits frozen and then lurches when normal scrolling resumes.
-  // Both phases are eased (strong in-out) so the growth starts gently
-  // and lands gently instead of tracking the scroll linearly.
+  // --settle 0→1 brings full bleed down to the container plate, running
+  // nearly to the release so the plate never sits frozen and then lurches
+  // when normal scrolling resumes. Eased (strong in-out) so the shrink
+  // starts gently and lands gently instead of tracking the scroll linearly.
   const phaseEase = cubicBezier(0.65, 0, 0.35, 1);
-  const grow = useTransform(scrollYProgress, [0.05, 0.42], [0, 1], {
-    ease: phaseEase,
-  });
-  const settle = useTransform(scrollYProgress, [0.62, 0.95], [0, 1], {
+  const settle = useTransform(scrollYProgress, [0.45, 0.92], [0, 1], {
     ease: phaseEase,
   });
   // the maroon backdrop switches on WHILE the video is still full-bleed
-  // (0.5–0.6, fully hidden behind the footage), so the instant the shrink
-  // starts the surround is already dark — no visible colour transition
-  const dark = useTransform(scrollYProgress, [0.5, 0.6], [0, 1]);
-  // Parallax: as the user scrolls through the pin range, the footage
-  // drifts upward inside its frame. Combined with the `scale(1.2)` on
-  // `.bg` in CSS, this gives ±10% of vertical travel without exposing the
-  // edges of the video. Depth without moving the pinned card itself.
-  const parallax = useTransform(scrollYProgress, [0, 1], [-8, 8]);
+  // (0.28–0.42, fully hidden behind the footage), so the instant the
+  // shrink starts the surround is already dark — no visible colour
+  // transition
+  const dark = useTransform(scrollYProgress, [0.28, 0.42], [0, 1]);
+  // Parallax on the APPROACH only: as the section scrolls into view the
+  // footage drifts upward inside its frame, and the drift completes the
+  // moment the video reaches full view (section top hits the viewport
+  // top — where the pin takes over). Combined with the `scale(1.2)` on
+  // `.bg` in CSS, the -10% start never exposes the video's edges.
+  const { scrollYProgress: approach } = useScroll({
+    target: ref,
+    offset: ["start end", "start start"],
+  });
+  const parallax = useTransform(approach, [0, 1], [-10, 0]);
 
   // Push the current phase values straight onto the element via
   // setProperty — writing a MotionValue into React's style prop as a CSS
   // custom property is fragile (types + prop-name diffing), so this
   // guarantees the CSS calc() picks up every frame.
-  useMotionValueEvent(grow, "change", (v) => {
-    ref.current?.style.setProperty("--grow", String(v));
-    // hover affordances only exist while the card is at rest
-    if (ref.current)
-      ref.current.dataset.state = v < 0.02 ? "card" : "grown";
-  });
   useMotionValueEvent(settle, "change", (v) => {
     ref.current?.style.setProperty("--settle", String(v));
   });
@@ -88,6 +81,11 @@ export default function RestaurantLocations() {
   useMotionValueEvent(parallax, "change", (v) => {
     ref.current?.style.setProperty("--parallax-y", `${v}%`);
   });
+  // the approach also drives the entry corners: the film arrives as a
+  // rounded plate and seals into full bleed exactly at full view
+  useMotionValueEvent(approach, "change", (v) => {
+    ref.current?.style.setProperty("--enter", String(v));
+  });
 
   return (
     <section
@@ -95,68 +93,17 @@ export default function RestaurantLocations() {
       className={styles.section}
       id="locations"
       data-nav-theme="blend"
-      data-state="card"
+      data-cursor="glass"
     >
       {/* sticky viewport-height wrapper — pins to the top of the viewport
           while the section scrolls past, so the video reads as one held
           "scene" that only starts shrinking once the user has committed */}
       <div className={styles.stage}>
-        {/* shadow echo — clip-path can't cast a shadow, so this element
-            tracks the card's rect beneath the reveal and carries the soft
-            lift for the opening card state */}
-        <div className={styles.cardShadow} aria-hidden />
-
         <div className={styles.reveal}>
           <div className={styles.bg}>
-            {/* dedicated hover-zoom layer — parallax lives on .bg, the
-                crossfade's inline transitions live on the videos, and the
-                editorial lean-in lives here, so none of them fight */}
-            <div className={styles.zoom}>
-              <VideoBackdrop src={CLIPS[clip]} className={styles.locVideo} />
-            </div>
+            <VideoBackdrop src={CLIPS[clip]} className={styles.locVideo} />
           </div>
           <div className={styles.locScrim} aria-hidden />
-
-          {/* restaurant wordmarks riding the top and bottom edges INSIDE
-              the video — inverted-difference treatment (the home hero
-              wordmark's effect), drifting in opposite directions and
-              fading out as the video grows. Inside .reveal so the card's
-              clip and stacking context contain both the marquee and its
-              blend. */}
-          <div
-            className={`${styles.logoRow} ${styles.logoRowTop}`}
-            aria-hidden
-          >
-            <div className={styles.logoTrack}>
-              {["a", "b"].map((half) => (
-                <span className={styles.logoSeq} key={half}>
-                  {RESTAURANTS.map((r) => (
-                    <Fragment key={r.slug}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={r.logo} alt="" draggable={false} />
-                    </Fragment>
-                  ))}
-                </span>
-              ))}
-            </div>
-          </div>
-          <div
-            className={`${styles.logoRow} ${styles.logoRowBottom}`}
-            aria-hidden
-          >
-            <div className={`${styles.logoTrack} ${styles.logoTrackReverse}`}>
-              {["a", "b"].map((half) => (
-                <span className={styles.logoSeq} key={half}>
-                  {RESTAURANTS.map((r) => (
-                    <Fragment key={r.slug}>
-                      {/* eslint-disable-next-line @next/next/no-img-element */}
-                      <img src={r.logo} alt="" draggable={false} />
-                    </Fragment>
-                  ))}
-                </span>
-              ))}
-            </div>
-          </div>
         </div>
 
         <div className={styles.cta}>

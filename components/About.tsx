@@ -225,7 +225,11 @@ export default function About() {
              legible against the footage. NB: .videoContent must not create
              a stacking context, or the difference-blend type couldn't see
              the video beneath it. */}
-        <div className={styles.videoScope} data-nav-theme="blend">
+        <div
+          className={styles.videoScope}
+          data-nav-theme="blend"
+          data-cursor="glass"
+        >
           <div className={styles.videoBackdrop} aria-hidden>
             <video
               className={styles.heroVideo}

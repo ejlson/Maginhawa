@@ -4,7 +4,7 @@
    as a sidebar to the accordion. No rule above — the section flows
    straight out of Contact on the shared maroon canvas. */
 .section {
-  /* top is zero — Contact's bottom padding owns that boundary */
+  /* top is zero — the Careers index's bottom padding owns that boundary */
   padding-block: 0 var(--section-y-sm);
   color: var(--cream);
 }

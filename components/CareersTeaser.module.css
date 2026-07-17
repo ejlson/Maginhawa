@@ -1,27 +1,59 @@
-/* Careers teaser — the Open-Roles Index. Sidebar statement in the golden
-   minor column, the live roles as hairline rows in the major. Same
-   thin-arrow row language as Awards & Recognition. */
+/* Careers chapter — a two-column editorial spread on the cream page:
+   the invitation left (heading + side lede, stats, two culture cards),
+   Chef Omar's philosophy photograph + the openings table right. Every
+   worded block shares its left/right edges with the imagery in its
+   column, so the whole spread reads as two clean rails. */
 .section {
   position: relative;
-  padding: var(--rule-gap) var(--pad-x) var(--rule-gap);
-  border-top: 1px solid rgba(47, 0, 0, 0.1);
+  /* top is zero — Blog's bottom padding owns that boundary; this bottom
+     owns the uniform home gap down to the Ready-to-join CTA */
+  padding: 0 var(--pad-x) var(--home-gap);
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 3vh, 32px);
+  background: var(--cream);
   color: var(--maroon);
 }
 
+/* the spread — one shared 2×2 grid so the rails sync at three lines:
+   heading top == photograph top (row 1), culture tops == openings top
+   (row 2), and culture bottoms == the table's closing rule (row 2 is
+   sized by the openings; the cards stretch to fill it). */
 .grid {
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.618fr);
-  gap: clamp(32px, 5vw, 96px);
-  align-items: start;
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.05fr);
+  grid-template-rows: auto auto;
+  column-gap: clamp(40px, 5vw, 96px);
+  row-gap: clamp(24px, 3.6vh, 44px);
+  align-items: stretch;
 }
 
-/* ---------- left: the frame ---------- */
-.side {
+.leadBlock {
+  grid-column: 1;
+  grid-row: 1;
   display: flex;
   flex-direction: column;
-  gap: clamp(16px, 2.4vh, 28px);
+  gap: clamp(24px, 3.6vh, 44px);
+  min-width: 0;
 }
 
+.philoWrap {
+  grid-column: 2;
+  grid-row: 1;
+  min-width: 0;
+  display: flex;
+}
+
+.openings {
+  grid-column: 2;
+  grid-row: 2;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 1.8vh, 20px);
+}
+
+/* ---------- shared eyebrow ---------- */
 .eyebrow {
   display: inline-flex;
   align-items: center;
@@ -41,76 +73,266 @@
   flex: none;
 }
 
-.statement {
+/* ---------- the invitation — heading with a side lede ---------- */
+.lead {
+  display: grid;
+  grid-template-columns: minmax(0, 1.7fr) minmax(0, 1fr);
+  gap: clamp(20px, 2.6vw, 48px);
+  align-items: start;
+}
+
+.heading {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: var(--t-h2);
-  line-height: var(--lh-heading);
-  letter-spacing: -0.012em;
-  max-width: 16ch;
+  font-size: clamp(1.9rem, 3.2vw, 3.2rem);
+  line-height: 1.12;
+  letter-spacing: var(--tr-display);
 }
 
-.highlight {
-  font-family: inherit;
-  font-style: normal;
-  font-weight: inherit;
+.lede {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
+  opacity: 0.7;
+  max-width: 26ch;
+  /* seats the lede's first line against the heading's cap-height */
+  padding-top: 0.4em;
+}
+
+/* hairline under the invitation — the column's full measure */
+.rule {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: rgba(47, 0, 0, 0.12);
+}
+
+/* ---------- the team in numbers ---------- */
+.stats {
+  margin: 0;
+  display: flex;
+  justify-content: space-between;
+  gap: clamp(16px, 2vw, 32px);
+}
+
+.stat {
+  display: flex;
+  flex-direction: column-reverse; /* dt/dd source order: value first */
+  gap: 8px;
+  min-width: 0;
+  flex: 1;
+}
+.stat + .stat {
+  border-left: 1px solid rgba(47, 0, 0, 0.12);
+  padding-left: clamp(16px, 2vw, 32px);
+}
+
+.statValue {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.8rem, 2.6vw, 2.8rem);
+  line-height: 1;
   color: var(--saffron);
 }
 
-.cta {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.8em;
-  margin-top: clamp(4px, 0.8vh, 10px);
+.statLabel {
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  opacity: 0.7;
+}
+
+/* ---------- culture cards — row 2 left, stretching to the openings
+   table's height so their bottoms land on its closing rule ---------- */
+.cultureRow {
+  grid-column: 1;
+  grid-row: 2;
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 1fr));
+  gap: var(--grid-gutter);
+  align-items: stretch;
+  min-width: 0;
+}
+
+.cultureWrap {
+  display: flex;
+  min-width: 0;
+}
+
+.cultureCard {
+  position: relative;
+  margin: 0;
+  width: 100%;
+  /* no aspect lock on desktop — the row's height (set by the openings
+     table) is the card's height */
+  min-height: clamp(220px, 26vh, 320px);
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  corner-shape: squircle; /* Figma-style corner smoothing (superellipse); falls back to plain rounding */
+  background: var(--placeholder);
+}
+
+.cultureCard img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+.cultureScrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    transparent 38%,
+    rgba(31, 0, 0, 0.5) 66%,
+    rgba(31, 0, 0, 0.88) 100%
+  );
+  pointer-events: none;
+}
+
+.cultureText {
+  position: absolute;
+  left: clamp(16px, 1.8vw, 26px);
+  right: clamp(16px, 1.8vw, 26px);
+  bottom: clamp(16px, 1.8vw, 26px);
+  display: flex;
+  flex-direction: column;
+  gap: 0.7em;
+  color: var(--cream);
+}
+
+.cultureLabel {
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  font-weight: 500;
+}
+
+.cultureCopy {
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
+  opacity: 0.92;
+}
+
+/* ---------- philosophy photograph ---------- */
+.philosophy {
+  position: relative;
+  margin: 0;
+  width: 100%;
+  /* preferred shape — stretches taller if the invitation column runs
+     longer, so row 1's two rails always share top and bottom edges */
+  aspect-ratio: 5 / 3;
+  min-height: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  corner-shape: squircle;
+  background: var(--placeholder);
+}
+
+.philosophy img {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* the quote sits right — the scrim deepens from that side */
+.philoScrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    270deg,
+    rgba(31, 0, 0, 0.68) 0%,
+    rgba(31, 0, 0, 0.34) 38%,
+    transparent 62%
+  );
+  pointer-events: none;
+}
+
+.philoText {
+  position: absolute;
+  top: 50%;
+  right: clamp(20px, 2.4vw, 40px);
+  translate: 0 -50%;
+  display: flex;
+  flex-direction: column;
+  align-items: flex-end;
+  gap: clamp(10px, 1.6vh, 18px);
+  text-align: right;
+  color: var(--cream);
+  max-width: 46%;
+}
+
+.philoLabel {
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
   opacity: 0.8;
-  transition:
-    opacity 0.3s ease,
-    color 0.3s ease;
 }
 
-.ctaLabel {
+.philoQuote {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.3rem, 1.9vw, 1.9rem);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tr-display);
+}
+
+/* the signature — the italic serif inflection */
+.philoSig {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: var(--t-lead);
+}
+
+/* ---------- openings ---------- */
+.openingsHead {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 1em;
+}
+
+.openingsLabel {
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
   font-weight: 500;
 }
 
-.ctaArrow {
-  width: clamp(26px, 2.4vw, 36px);
-  height: 10px;
-  transition: transform 0.4s var(--ease-out);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .cta:hover {
-    opacity: 1;
-    color: var(--saffron);
-  }
-  .cta:hover .ctaArrow {
-    transform: translateX(5px);
-  }
-}
-
-/* ---------- right: the roles ---------- */
 .roleList {
   list-style: none;
   margin: 0;
   padding: 0;
-  border-top: 1px solid rgba(47, 0, 0, 0.14);
+  border-top: 1px solid rgba(47, 0, 0, 0.12);
 }
 
 .roleList li {
-  border-bottom: 1px solid rgba(47, 0, 0, 0.14);
+  border-bottom: 1px solid rgba(47, 0, 0, 0.12);
 }
 
 .roleRow {
   display: grid;
-  grid-template-columns: minmax(0, 1.2fr) minmax(0, 1fr) auto;
+  grid-template-columns: minmax(0, 1.1fr) minmax(0, 1.2fr) auto;
   align-items: baseline;
-  gap: clamp(16px, 2vw, 36px);
-  padding-block: clamp(14px, 2vh, 22px);
+  gap: clamp(14px, 1.8vw, 32px);
+  /* tight rows — the table's height sets the culture cards', so it
+     stays compact */
+  padding-block: clamp(12px, 1.8vh, 20px);
   color: inherit;
   text-decoration: none;
 }
@@ -130,47 +352,138 @@
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
   opacity: 0.6;
-  text-align: right;
 }
 
-.roleArrow {
-  width: 22px;
-  height: 10px;
-  flex: none;
+.roleApply {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.7em;
   align-self: center;
-  opacity: 0.4;
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  font-weight: 500;
+  opacity: 0.5;
   transition:
-    transform 0.4s var(--ease-out),
     opacity 0.3s ease,
     color 0.3s ease;
+}
+.roleApply svg,
+.cta svg {
+  width: clamp(22px, 2vw, 30px);
+  height: 10px;
+  transition: transform 0.4s var(--ease-out);
 }
 
 @media (hover: hover) and (pointer: fine) {
   .roleRow:hover .roleTitle {
     color: var(--saffron);
   }
-  .roleRow:hover .roleArrow {
+  .roleRow:hover .roleApply {
     opacity: 1;
     color: var(--saffron);
+  }
+  .roleRow:hover .roleApply svg {
     transform: translateX(5px);
   }
 }
 
+/* See-All — the house underline-draw text link */
+.cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8em;
+  padding: 0.4em 0;
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--maroon);
+  transition: color 0.3s ease;
+}
+.cta::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0.28);
+  transform-origin: left center;
+  transition: transform 0.45s var(--ease-out);
+}
+.ctaLabel {
+  font-weight: 500;
+}
+.cta:hover,
+.cta:focus-visible {
+  color: var(--saffron);
+}
+.cta:hover::after,
+.cta:focus-visible::after {
+  transform: scaleX(1);
+}
+.cta:hover svg,
+.cta:focus-visible svg {
+  transform: translateX(5px);
+}
+
 /* ---------- responsive ---------- */
-@media (max-width: 900px) {
+@media (max-width: 1080px) {
   .grid {
+    grid-template-columns: 1fr;
+    grid-template-rows: none;
+  }
+  .leadBlock,
+  .philoWrap,
+  .cultureRow,
+  .openings {
+    grid-column: 1;
+    grid-row: auto;
+  }
+  /* stacked — the cards take their natural shape again */
+  .cultureCard {
+    aspect-ratio: 20 / 19;
+    min-height: 0;
+  }
+  .philosophy {
+    min-height: 0;
+  }
+}
+
+@media (max-width: 700px) {
+  .lead {
+    grid-template-columns: 1fr;
+  }
+  .lede {
+    padding-top: 0;
+  }
+  .stats {
+    flex-wrap: wrap;
+  }
+  .stat {
+    flex: 1 1 40%;
+  }
+  /* the wrap breaks the divider rhythm — drop the rules */
+  .stat + .stat {
+    border-left: none;
+    padding-left: 0;
+  }
+  .cultureRow {
     grid-template-columns: 1fr;
   }
   .roleRow {
     grid-template-columns: minmax(0, 1fr) auto;
+    row-gap: 6px;
   }
-  /* meta drops under the title on the stacked layout */
   .roleMeta {
     grid-column: 1;
     grid-row: 2;
-    text-align: left;
   }
-  .roleArrow {
+  .roleApply {
     grid-row: 1 / 3;
   }
 }

@@ -58,9 +58,7 @@ const RESTAURANTS = [
     name: "Bintang",
     tag: "Filipino Fusion Restaurant",
     location: "Camden, London",
-    video: "/videos/bintang.mp4",
-    // clip decodes a half-turn off → 180° lands it upright
-    rotate: 180,
+    video: "/videos/bintang.mov",
   },
   {
     name: "Belly",
@@ -72,13 +70,13 @@ const RESTAURANTS = [
     name: "Mamasons",
     tag: "Filipino Ice Cream Parlour",
     location: "Camden · Soho, London",
-    video: "/videos/mamasons.mp4",
+    video: "/videos/mamasons.mov",
   },
   {
     name: "Café Mama & Sons",
     tag: "Filipino x Japanese Café",
     location: "London",
-    video: "/videos/cafemama.mp4",
+    video: "/videos/hero-draft3.mp4",
   },
   {
     name: "Guanabana",
@@ -376,11 +374,7 @@ export default function RestaurantsShowcase() {
       <section className={styles.hero} data-nav-theme="blend">
         {/* full-bleed background; the active restaurant's clip crossfades in */}
         <div className={styles.bg} aria-hidden>
-          <VideoBackdrop
-            src={item.video}
-            rotate={item.rotate ?? 0}
-            className={styles.bgVideo}
-          />
+          <VideoBackdrop src={item.video} className={styles.bgVideo} />
           <div className={styles.scrim} />
         </div>
 

@@ -562,11 +562,11 @@ function Tile({
               </div>
             </div>
 
-            {/* bottom-left — blurb + location rise in from the bottom of
+            {/* bottom-left — location + blurb rise in from the bottom of
                 the expanded card */}
             <div className={styles.revealBlock}>
-              <p className={styles.blurb}>{item.blurb}</p>
               <span className={styles.location}>{item.location}</span>
+              <p className={styles.blurb}>{item.blurb}</p>
             </div>
 
             {/* bottom-right — actions, revealed with the expanded card.

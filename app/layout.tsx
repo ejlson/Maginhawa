@@ -2,6 +2,8 @@ import type { Metadata } from "next";
 import { Fraunces, Inter } from "next/font/google";
 import "./globals.css";
 import PageTransition from "@/components/PageTransition";
+import CustomCursor from "@/components/CustomCursor";
+import GlassFilters from "@/components/GlassFilters";
 import SmoothScroll from "@/lib/SmoothScroll";
 import { OrganizationJsonLd, WebSiteJsonLd } from "@/lib/jsonld";
 
@@ -103,6 +105,13 @@ export default function RootLayout({
         <SmoothScroll>
           <PageTransition>{children}</PageTransition>
         </SmoothScroll>
+        {/* liquid-glass SVG displacement filters — referenced by every
+            glass element via backdrop-filter: url(#lg-*) */}
+        <GlassFilters />
+        {/* glass lens cursor — lives at the root so every route's
+            data-cursor="glass" zone gets it (home hero, About card,
+            Locations film, the About page's pinned video) */}
+        <CustomCursor />
         {/* persistent depth-of-field band at the bottom of the viewport —
             content sitting in the lower portion of the screen always reads
             slightly defocused and resolves as it scrolls upward */}

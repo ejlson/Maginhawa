@@ -1,12 +1,13 @@
 /* Numbers strip — the group's story in editorial numerals between the
-   About plate and the Blog covers. Bolder composition: a saffron-dotted
-   small-caps label rides above each numeral, the numerals themselves run
-   huge along one shared baseline, first flush left and last flush right,
-   the row closed by a hairline underneath. Hairline rule + uniform
-   --rule-gap air above, matching every section rule on the page. */
+   About plate and the Blog. The figures run huge in the wordmark face
+   along one shared baseline, bare on the cream page, each carrying an
+   italic serif inflection (the About title's "Us" device); the
+   saffron-dotted caps label rides above. Top gap is the deliberate
+   exception to the uniform rhythm: a sliver keeps the numerals reading
+   as the About card's caption; the bottom owns the uniform gap down to
+   the next chapter. */
 .section {
-  padding: var(--rule-gap) var(--pad-x) var(--rule-gap);
-  border-top: 1px solid rgba(47, 0, 0, 0.1);
+  padding: clamp(14px, 2vh, 24px) var(--pad-x) var(--home-gap);
   background: var(--cream);
   color: var(--maroon);
 }
@@ -28,12 +29,29 @@
 
 .value {
   margin: 0;
-  font-family: var(--font-display);
-  font-weight: 500;
+  display: flex;
+  align-items: baseline;
+  gap: 0.18em;
+  /* the wordmark face — same voice as the hero and the About title */
+  font-family: var(--font-display-big);
+  font-weight: 400;
   font-size: clamp(3.2rem, 7vw, 7.5rem);
   line-height: 0.9;
   letter-spacing: var(--tr-display);
   font-variant-numeric: tabular-nums;
+}
+
+/* the italic serif inflection riding each figure's baseline — saffron,
+   small, Fraunces true italic (Contralto has no italic cut) */
+.suffix {
+  font-family: var(--font-serif);
+  font-style: italic;
+  font-size: 0.3em;
+  letter-spacing: 0;
+  color: var(--saffron);
+  /* the italic overhang breathes past the last glyph */
+  padding-right: 0.14em;
+  white-space: nowrap;
 }
 
 /* saffron-dot label — the site's shared eyebrow recipe */
@@ -67,5 +85,17 @@
   }
   .value {
     font-size: clamp(2.6rem, 11vw, 4rem);
+  }
+  /* the two-column cells run narrower than the longest labels — let them
+     wrap here instead of overflowing into the neighbouring column. The
+     saffron dot pins to the first line (flex-start + optical nudge) so a
+     wrapped label doesn't leave it floating between lines. Desktop keeps
+     nowrap so the baseline row never breaks. */
+  .label {
+    white-space: normal;
+    align-items: flex-start;
+  }
+  .label::before {
+    margin-top: 0.35em;
   }
 }

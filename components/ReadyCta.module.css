@@ -1,0 +1,157 @@
+/* Ready-to-join CTA — the closing invitation on the cream page:
+   two-line display heading (second line in the italic serif
+   inflection), one soft-recessed pill leading to /join-us. Generous
+   whitespace carries the moment. */
+.section {
+  /* top gap owned by the Careers index's bottom padding; this bottom
+     owns the gap down to the Locations film — opened up well beyond the
+     uniform rhythm so the invitation and the film don't crowd */
+  padding: 0 var(--pad-x) calc(var(--home-gap) * 2.1);
+  display: flex;
+  justify-content: center;
+  background: var(--cream);
+  color: var(--maroon);
+}
+
+.inner {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: clamp(32px, 5vh, 56px);
+  /* a breath of extra air so the invitation floats like a chapter of
+     its own */
+  padding-block: clamp(40px, 8vh, 96px) 0;
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--t-display);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tr-display);
+}
+
+/* the type-on run — a block wrapper inside the italic em that stages the
+   letter flaps in 3D. CSS perspective only reaches an element's DIRECT
+   children, so the vanishing point lives here (where the letter spans are
+   immediate kids) rather than on the em. 700px matches the Loader's
+   split-flap board. */
+.charRun {
+  display: block;
+  perspective: 700px;
+}
+
+/* one letter of the type-on — inline-block so it can transform, hinged at
+   its baseline (transform-origin 50% 100%) for the Loader's flap pop.
+   The inline-block boxes cost a whisper of italic kerning against the
+   plain string; accepted — verified by eye at display scale. */
+.titleChar {
+  display: inline-block;
+  transform-origin: 50% 100%;
+  will-change: transform, opacity;
+}
+
+/* the word gaps — real spans so each space holds a stagger beat;
+   white-space: pre stops the browser collapsing a space that's alone in
+   its own element */
+.titleSpace {
+  white-space: pre;
+}
+
+/* visually hidden but SR-readable — the un-split "starts with you." twin
+   of the aria-hidden letter run (About's .srOnly pattern) */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* "The next great service" in the light Fraunces cut — the About card's
+   thin-serif counterpoint device, here on the roman line */
+.titleLine {
+  display: block;
+  font-family: var(--font-serif);
+  font-weight: 300;
+}
+
+/* the second line in the site's italic serif inflection — Fraunces true
+   italic (the About title's "Us" device at sentence scale) */
+.titleItalic {
+  display: block;
+  font-family: var(--font-display);
+  font-style: italic;
+  color: var(--saffron);
+  font-weight: 500;
+  /* a breath past the full stop so the italic overhang isn't crowded by
+     the centred layout's edge */
+  padding-right: 0.1em;
+}
+
+/* the pill — the house light-theme glass: soft tint, inner recess that
+   relaxes on hover while the pill widens. Leads to the careers page. */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  border-radius: 999px;
+  padding: 0.68em 1.6em;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--t-h3);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tr-display);
+  color: var(--maroon);
+  /* cream fill so the pill reads unmistakably light; a hairline border
+     keeps its edge legible against the cream section, and the whisper-soft
+     insets carve the recess without darkening the fill */
+  background: var(--cream);
+  border: 1px solid rgba(47, 0, 0, 0.08);
+  box-shadow:
+    inset 0 0 0.45em rgba(47, 0, 0, 0.07),
+    inset 0 1px 2px rgba(47, 0, 0, 0.05);
+  white-space: nowrap;
+  text-decoration: none;
+  transition:
+    transform 0.16s cubic-bezier(0.23, 1, 0.32, 1),
+    padding 0.45s var(--ease-out),
+    box-shadow 0.45s var(--ease-out);
+}
+.pill:active {
+  transform: scale(0.97);
+}
+
+.pill:hover,
+.pill:focus-visible {
+  padding-inline: 2.15em;
+  /* the recess relaxes — proportionally lighter than the rest state */
+  box-shadow:
+    inset 0 0 0.15em rgba(47, 0, 0, 0.025),
+    inset 0 1px 1px rgba(47, 0, 0, 0.02);
+}
+.pill:focus-visible {
+  outline: 1.5px solid currentColor;
+  outline-offset: 3px;
+}
+
+.pillLabel {
+  display: inline-block;
+}
+
+.pillArrow {
+  width: 0.8em;
+  height: 0.8em;
+  display: block;
+  transition: transform 0.4s var(--ease-out);
+}
+.pill:hover .pillArrow,
+.pill:focus-visible .pillArrow {
+  transform: translateX(0.24em);
+}

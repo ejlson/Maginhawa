@@ -1,95 +1,66 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
-import { motion } from "framer-motion";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
 import styles from "./AboutIntro.module.css";
 import Reveal from "./Reveal";
 
-// Cycled through the heritage-image frame on the right of the card —
-// four kitchens from across the group, in the order they entered the family.
-const HERITAGE_IMAGES: { src: string; alt: string }[] = [
-  {
-    src: "/images/bintang.jpg",
-    alt: "Bintang, the original Maginhawa kitchen — Camden, 1987",
-  },
-  {
-    src: "/images/belly.jpg",
-    alt: "Belly, the group's Michelin-listed modern Filipino bistro",
-  },
-  {
-    src: "/images/cafemama.jpg",
-    alt: "Café Mama & Sons — Filipino × Japanese café",
-  },
-  {
-    src: "/images/ramo.jpg",
-    alt: "Ramo Ramen — Filipino × Japanese ramen counter",
-  },
-];
-
-const CYCLE_MS = 5000;
-
 /**
- * Portrait image frame on the right of the About Us card. Cycles through
- * the group's heritage kitchens with a clip-path wipe — the incoming photo
- * reveals top-to-bottom over the previous one, which sits underneath as a
- * base layer until the wipe lands, then updates to match. Same layered
- * technique the Discover gallery uses for its featured-tile morph.
+ * One masked title line — the Hero wordmark's rise-in, retold per line.
+ * The outer span clips (overflow: hidden), the inner motion span rises
+ * translateY(110%) → 0. The in-view trigger lives on the parent h2 (a
+ * fully clipped span never intersects, so whileInView here would never
+ * fire) — the lines inherit its variant switch via propagation. Reduced
+ * motion swaps the rise for a plain fade, mirroring Reveal's fallback.
  */
-function CyclingHeritageImage() {
-  const [active, setActive] = useState(0);
-  const [base, setBase] = useState(0);
-  const [seq, setSeq] = useState(0);
+function TitleLine({
+  children,
+  className,
+  delay = 0,
+}: {
+  children: React.ReactNode;
+  className?: string;
+  delay?: number;
+}) {
+  const shouldReduce = useReducedMotion();
 
-  useEffect(() => {
-    const t = window.setInterval(() => {
-      setActive((i) => (i + 1) % HERITAGE_IMAGES.length);
-      setSeq((s) => s + 1);
-    }, CYCLE_MS);
-    return () => window.clearInterval(t);
-  }, []);
+  const variants: Variants = shouldReduce
+    ? {
+        lineHidden: { opacity: 0 },
+        lineShown: {
+          opacity: 1,
+          transition: { duration: 0.4, ease: "easeOut", delay },
+        },
+      }
+    : {
+        lineHidden: { transform: "translateY(110%)" },
+        lineShown: {
+          transform: "translateY(0%)",
+          transition: { duration: 1, ease: [0.22, 1, 0.36, 1], delay },
+        },
+      };
 
   return (
-    <figure className={styles.anchorImage} aria-label={HERITAGE_IMAGES[active].alt}>
-      {/* base layer — previous image sitting underneath while the new one wipes over */}
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        className={styles.anchorImgLayer}
-        src={HERITAGE_IMAGES[base].src}
-        alt=""
-        draggable={false}
-      />
-      {/* top layer — clip-path wipe reveals the new image right-to-left */}
-      <motion.div
-        key={seq}
-        className={styles.anchorImgTopLayer}
-        initial={{ clipPath: "inset(0% 0% 0% 100%)" }}
-        animate={{ clipPath: "inset(0% 0% 0% 0%)" }}
-        transition={{ duration: 0.9, ease: [0.77, 0, 0.175, 1] }}
-        onAnimationComplete={() => setBase(active)}
-      >
-        {/* eslint-disable-next-line @next/next/no-img-element */}
-        <img
-          className={styles.anchorImgLayer}
-          src={HERITAGE_IMAGES[active].src}
-          alt=""
-          draggable={false}
-        />
-      </motion.div>
-    </figure>
+    <span className={`${styles.titleLine}${className ? ` ${className}` : ""}`}>
+      <motion.span className={styles.titleLineInner} variants={variants}>
+        {children}
+      </motion.span>
+    </span>
   );
 }
 
 /**
  * Editorial "who we are" chapter that follows the Press strip.
  *
- * All content sits inside a maroon horizontal card. Cream copy carries the
- * statement; a cycling portrait image on the right hints at the family of
- * kitchens; a quiet CTA links into the full About page.
+ * A one-screen maroon card composed on the golden ratio: the big
+ * "ABOUT US" display title rules the top-left (difference-blended over
+ * the video, each line rising in behind a mask like the Hero wordmark),
+ * a quiet est. meta sits top-right, and the statement copy + Read More
+ * CTA anchor the bottom band on the minor axis.
  */
 export default function AboutIntro() {
   return (
-    <section className={styles.section} data-nav-theme="dark">
+    <section className={styles.section} data-nav-theme="dark" data-cursor="glass">
       <Reveal className={styles.card}>
         {/* darkened video plays behind everything in the card, giving the
             maroon panel a subtle sense of motion; the scrim keeps the text
@@ -106,40 +77,58 @@ export default function AboutIntro() {
         />
         <div className={styles.cardScrim} aria-hidden />
 
-        <div className={styles.head}>
-          <span className={styles.eyebrow}>About Us</span>
-          <span className={styles.headMeta}>Est. 1987 — London</span>
-        </div>
-
-        <h2 className={styles.statement}>
-          <em className={styles.highlight}>Filipino at heart</em>, pan-Asian and
-          Caribbean by kitchen — a family of London restaurants that carries
-          deep culinary tradition with a distinctly{" "}
-          <em className={styles.highlight}>modern voice</em>.
-        </h2>
-
-        <CyclingHeritageImage />
-
-        <Link
-          href="/about"
-          className={styles.cta}
-          aria-label="Read about Maginhawa Group"
+        {/* the h2 owns the in-view trigger; the two masked lines pick the
+            variant switch up through framer's propagation */}
+        <motion.h2
+          className={styles.title}
+          initial="lineHidden"
+          whileInView="lineShown"
+          viewport={{ once: true, margin: "-12% 0px -12% 0px" }}
         >
-          <span className={styles.ctaLabel}>Read our story</span>
-          <svg
-            className={styles.ctaArrow}
-            viewBox="0 0 48 10"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden
+          <TitleLine>About</TitleLine>
+          <TitleLine className={styles.titleLineUs} delay={0.08}>
+            <em className={styles.titleItalic}>Us</em>
+          </TitleLine>
+        </motion.h2>
+
+        <span className={styles.headMeta}>Est. 1987 — London</span>
+
+        {/* bottom band — the statement copy sits directly left of the
+            Read More CTA, the pair clustered at the card's bottom right */}
+        <div className={styles.bottomBand}>
+          <div className={styles.copy}>
+            <p>
+              A family of London restaurants that carries deep culinary
+              tradition with a distinctly{" "}
+              <em className={styles.highlight}>modern voice</em>.
+            </p>
+            <p>
+              <em className={styles.highlight}>Filipino at heart</em>,
+              pan-Asian and Caribbean by kitchen.
+            </p>
+          </div>
+
+          <Link
+            href="/about"
+            className={styles.cta}
+            aria-label="Read about Maginhawa Group"
           >
-            <path d="M0 5 H42" />
-            <path d="M38 1 L42 5 L38 9" />
-          </svg>
-        </Link>
+            <span className={styles.ctaLabel}>Read More</span>
+            <svg
+              className={styles.ctaArrow}
+              viewBox="0 0 48 10"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden
+            >
+              <path d="M0 5 H42" />
+              <path d="M38 1 L42 5 L38 9" />
+            </svg>
+          </Link>
+        </div>
       </Reveal>
     </section>
   );

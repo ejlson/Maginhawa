@@ -1,15 +1,10 @@
-/* Quiet credentials row between Discover and AboutIntro. Tight top
-   padding so it flows off the gallery rather than sitting in isolation. */
+/* Quiet credentials row between Discover and AboutIntro. Symmetric block
+   padding — with both neighbours contributing zero, the strip owns the
+   uniform chapter gap (--section-y-lg) on each side, which also keeps it
+   optically centred between the gallery and the About card. */
 .section {
-  /* +10px on the top so the strip breathes further off the Discover
-     gallery above it */
-  /* top: a half-step of the chapter gap — the strip stays "related" to
-     the Discover gallery above (it credits what you just saw) without
-     hugging it. Bottom gap above the AboutIntro rule uses the shared
-     --rule-gap, trimmed 12px because the logo marquee's track breathes
-     ~12px of its own air (64px track vs 40px logos). */
-  padding: calc(var(--rule-gap) / 2) var(--pad-x)
-    calc(var(--rule-gap) - 12px);
+  padding-block: var(--home-gap);
+  padding-inline: var(--pad-x);
   display: flex;
   flex-direction: column;
   align-items: center;

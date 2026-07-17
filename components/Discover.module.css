@@ -198,7 +198,8 @@
   width: 100%;
   height: 100%;
   transform: translate(-50%, -50%);
-  border-radius: var(--radius-tile);
+  border-radius: var(--radius-card);
+  corner-shape: squircle; /* Figma-style corner smoothing (superellipse); falls back to plain rounding */
   box-shadow: 0 24px 48px -32px rgba(47, 0, 0, 0.35);
   transition:
     width 480ms cubic-bezier(0.77, 0, 0.175, 1),
@@ -218,6 +219,7 @@
   inset: 0;
   z-index: -1;
   border-radius: inherit;
+  corner-shape: squircle;
   box-shadow: 0 48px 96px -36px rgba(47, 0, 0, 0.6);
   opacity: 0;
   transition: opacity 480ms cubic-bezier(0.77, 0, 0.175, 1);
@@ -238,6 +240,7 @@
   inset: 0;
   overflow: hidden;
   border-radius: inherit;
+  corner-shape: squircle;
 }
 
 .photo {
@@ -256,6 +259,10 @@
   .tile:not(.tileActive):hover .scrim {
     opacity: 0.8;
     transition: opacity 250ms cubic-bezier(0.23, 1, 0.32, 1);
+  }
+  /* the mini description surfaces with the same hover affordance */
+  .tile:not(.tileActive):hover .tag {
+    opacity: 0.9;
   }
 }
 
@@ -298,6 +305,9 @@
 }
 
 /* ---------- top-right: mini description ---------- */
+/* Hidden at rest — it fades in on hover (hover-capable devices, below)
+   and in the expanded state, so resting tiles stay quiet. Opacity-only:
+   the tag never leaves the DOM. */
 .tag {
   position: absolute;
   top: var(--tile-pad);
@@ -310,14 +320,18 @@
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
   color: var(--cream);
-  opacity: 0.9;
-  transition: right 480ms cubic-bezier(0.77, 0, 0.175, 1);
+  opacity: 0;
+  transition:
+    right 480ms cubic-bezier(0.77, 0, 0.175, 1),
+    opacity 250ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
-/* make room for the ✕ button while the card is expanded */
+/* make room for the ✕ button while the card is expanded — the tag also
+   shows here so touch/keyboard users still get it when the card is open */
 .tileActive .tag {
   right: calc(var(--tile-pad) + 52px);
-  transition-duration: 600ms;
+  opacity: 0.9;
+  transition-duration: 600ms, 250ms;
 }
 
 /* ---------- top-right: expanded-state close button ---------- */
@@ -391,8 +405,11 @@
 
 /* wordmark/logo + optional credential badge — the badge (Michelin, on
    Belly) is part of the group, so it stays visible at rest and in the
-   expanded state and moves with the mark */
+   expanded state and moves with the mark. Only the mark sits in flow —
+   the badge hangs absolutely below it (see .badge) so a badged tile's
+   logo stays at the SAME vertical centre as the badge-less tiles. */
 .brandGroup {
+  position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -429,8 +446,16 @@
 }
 
 /* secondary badge (Michelin Guide) — a real <img> so the red-and-white
-   credential shows in its true colours */
+   credential shows in its true colours. Absolutely hung off the brand
+   group's bottom edge (out of flow) so it doesn't push the mark above
+   the tile's true centre; it still moves and scales with the group in
+   the expanded state. margin-top mirrors the group's flex gap. */
 .badge {
+  position: absolute;
+  top: 100%;
+  left: 50%;
+  transform: translateX(-50%);
+  margin-top: clamp(10px, 1.4vh, 16px);
   display: block;
   height: clamp(48px, 6vh, 68px);
   width: auto;

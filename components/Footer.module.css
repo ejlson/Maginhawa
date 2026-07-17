@@ -7,7 +7,8 @@
   /* full bleed minus pad-x — Contact / FAQ / ReviewUs above match this via
      the .zone :global(.container) override in DarkZone.module.css */
   padding: clamp(8px, 1vh, 16px) var(--pad-x) clamp(10px, 1.4vh, 16px);
-  border-top: 1px solid rgba(248, 243, 234, 0.28);
+  /* no rule above — the page's section boundaries are carried by spacing
+     alone (the home page's zero-section-rules system) */
 }
 
 .spacer {
@@ -85,6 +86,11 @@
 
 @media (max-width: 640px) {
   .leftCols {
-    gap: 14px 28px;
+    gap: 7px 14px;
   }
+}
+
+.developer {
+  font-family: var(--font-sans);
+  font-weight: 2000;
 }

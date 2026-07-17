@@ -53,19 +53,21 @@
   mix-blend-mode: difference;
 }
 
-/* the small italic-serif beat — the About page's "Who is" voice */
+/* the About card's caps-label copy voice */
 .heroFrameTagline {
   position: absolute;
   right: clamp(20px, 2.6vw, 48px);
   bottom: clamp(18px, 3vh, 40px);
   margin: 0;
-  max-width: 26ch;
+  max-width: 34ch;
   text-align: right;
-  font-family: var(--font-serif);
-  font-style: italic;
-  font-weight: 500;
-  font-size: clamp(1.1rem, 2vw, 1.9rem);
-  line-height: 1.25;
+  font-family: var(--font-sans);
+  font-style: normal;
+  font-weight: 400;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  line-height: var(--lh-body);
   color: var(--cream);
   mix-blend-mode: difference;
 }

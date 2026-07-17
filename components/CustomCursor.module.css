@@ -1,0 +1,54 @@
+/* Glass cursor — the glass is real refraction: backdrop-filter runs the
+   page behind the disc through the #lg-lens SVG displacement filter
+   (GlassFilters.tsx), so content bends at the rim instead of being
+   covered. Engines without displacement-through-backdrop-filter get the
+   plain dispersion glass from the first declaration. */
+.cursor {
+  position: fixed;
+  left: 0;
+  top: 0;
+  z-index: 200;
+  width: clamp(44px, 3.6vw, 58px);
+  aspect-ratio: 1;
+  /* centre the disc on the pointer — the `translate` property composes
+     with framer's transform-based x/y */
+  translate: -50% -50%;
+  display: grid;
+  place-items: center;
+  border-radius: 50%;
+  /* near-invisible tint; the refraction carries the glass */
+  background: rgba(248, 243, 234, 0.04);
+  -webkit-backdrop-filter: blur(1.5px) saturate(2) contrast(1.08);
+  backdrop-filter: blur(1.5px) saturate(2) contrast(1.08);
+  -webkit-backdrop-filter: url(#lg-lens) blur(1px) saturate(1.8);
+  backdrop-filter: url(#lg-lens) blur(1px) saturate(1.8);
+  /* no inset recess here — its rim line doubled up with the hollow
+     ring; the refraction alone draws the disc's edge */
+  color: var(--cream);
+  pointer-events: none;
+}
+
+/* the ring and the arrow share the disc's centre and crossfade by mode */
+.ring,
+.cursor svg {
+  grid-area: 1 / 1;
+}
+
+/* hollow circle — the resting zone mark */
+.ring {
+  display: block;
+  width: 34%;
+  aspect-ratio: 1;
+  border: 1.5px solid currentColor;
+  border-radius: 50%;
+}
+
+/* the small arrow — appears over links/buttons; the disc's 0.42 button
+   scale shrinks it further, so it reads small. Rotated to point where
+   the zones lead — up and out. */
+.cursor svg {
+  width: 58%;
+  height: 58%;
+  display: block;
+  rotate: -45deg;
+}
