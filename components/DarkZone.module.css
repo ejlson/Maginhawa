@@ -3,17 +3,15 @@
   z-index: 2;
   background: var(--maroon);
   color: var(--cream);
-  /* No top padding — the RestaurantLocations sticky video is the first
-     thing inside the zone and should butt directly against the Blog
-     section above it, so the user scrolls straight into full bleed
-     with no dark strip between the two. */
+  /* No top padding — the zone butts directly against the full-bleed
+     RestaurantLocations video above it, so the maroon Contact section
+     follows the footage with no dark strip between the two. */
   padding-top: 0;
   /* Footer owns its own bottom padding — keep this at zero so the maroon
      ends right below "By EJ" instead of trailing on. */
   padding-bottom: 0;
-  /* clip (not hidden) so the RestaurantLocations sticky video can still
-     pin to the viewport — overflow: hidden creates a scroll container
-     that breaks sticky behavior. */
+  /* clip (not hidden) — overflow: hidden creates a scroll container,
+     which would break any sticky descendants inside the zone. */
   overflow-x: clip;
 }
 

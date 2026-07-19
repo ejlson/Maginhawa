@@ -1,18 +1,20 @@
-/* Scrollytelling shell — taller than the viewport so the sticky video
-   stage can pin while the scene holds and then settles. Kept tight so
-   the video releases before Contact's wordmark enters the viewport. */
+/* Full-bleed video shell — taller than one viewport so the footage
+   rides full-bleed for a beat between sealing and settling, but still
+   scrolling past 1:1 the whole way (no pin — scroll is never held); the
+   settle plays during the departure itself as the block rides off
+   toward the maroon DarkZone below. */
 .section {
   position: relative;
   width: 100%;
-  /* pin room for the hold + settle arc (~60svh of scroll) */
-  height: 160svh;
+  height: 125svh;
   /* the section lives OUTSIDE the DarkZone: the video ARRIVES as a
      slightly inset, rounded plate that grows to edge-to-edge as it
-     seals (--enter 0→1 over the approach), holds, then --settle 0→1
-     brings full bleed down to the page container's inset so the settled
-     plate width matches the dark section's content. The two phases
-     never overlap, so their insets simply add. Defaults (--enter 1,
-     --settle 0) keep the pre-hydration paint at full bleed. */
+     seals (--enter 0→1 over the approach), rides full bleed, then
+     --settle 0→1 brings full bleed down to the page container's inset
+     as the section leaves the viewport — so the departing plate width
+     matches the dark section's content. The two phases never overlap,
+     so their insets simply add. Defaults (--enter 1, --settle 0) keep
+     the pre-hydration paint at full bleed. */
   --side-inset: calc(
     24px * (1 - var(--enter, 1)) + var(--pad-x) * var(--settle, 0)
   );
@@ -21,18 +23,19 @@
   );
 }
 
-/* pinned viewport-height stage — everything visual lives inside this
-   sticky wrapper so the video "holds" while the section body scrolls */
+/* the stage fills the section exactly; everything visual lives inside
+   it */
 .stage {
-  position: sticky;
-  top: 0;
-  height: 100svh;
+  position: relative;
+  height: 100%;
   overflow: hidden;
 }
 
 /* the dark surface behind the video — driven by --dark, which completes
-   while the footage is still full-bleed, so the shrink always reveals a
-   finished maroon ground (never a cream→maroon fade in progress) */
+   at the very start of the departure (while the footage is still
+   full-bleed), so the shrink always reveals a finished maroon ground
+   (never a cream→maroon fade in progress). It meets the maroon DarkZone
+   at the section's bottom edge, so the seam reads continuous. */
 .stage::before {
   content: "";
   position: absolute;

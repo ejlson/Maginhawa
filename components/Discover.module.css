@@ -154,8 +154,8 @@
    the engaged classes below); returns to rest are a slightly quicker 480ms
    from these base rules — all CSS transitions on inline values, so a
    collapse retargets cleanly mid-flight. The tile itself is a button-role
-   click target; its transform is owned by the framer magnet springs (no
-   CSS transform transition here, so the two never fight). */
+   click target; it never transforms at rest — the spatial move happens on
+   the .frame inside it. */
 .tile {
   position: relative;
   width: 100%;

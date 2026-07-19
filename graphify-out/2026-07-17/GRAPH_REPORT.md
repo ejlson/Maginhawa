@@ -1,16 +1,16 @@
 # Graph Report - Maginhawa  (2026-07-17)
 
 ## Corpus Check
-- 137 files · ~4,899,725 words
+- 137 files · ~4,899,806 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2264 nodes · 6071 edges · 130 communities (67 shown, 63 thin omitted)
-- Extraction: 81% EXTRACTED · 19% INFERRED · 0% AMBIGUOUS · INFERRED: 1159 edges (avg confidence: 0.6)
+- 2266 nodes · 6073 edges · 135 communities (71 shown, 64 thin omitted)
+- Extraction: 81% EXTRACTED · 19% INFERRED · 0% AMBIGUOUS · INFERRED: 1160 edges (avg confidence: 0.6)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `b67b106e`
+- Built from commit: `f57e65e5`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -109,6 +109,7 @@
 - s
 - s
 - s
+- Ke
 - s
 - s
 - s
@@ -129,6 +130,9 @@
 - s
 - s
 - s
+- s
+- ReadyCta.tsx
+- CustomCursor.tsx
 
 ## God Nodes (most connected - your core abstractions)
 1. `S()` - 132 edges
@@ -157,203 +161,211 @@
 ## Import Cycles
 - None detected.
 
-## Communities (130 total, 63 thin omitted)
+## Communities (135 total, 64 thin omitted)
 
 ### Community 0 - "user-account-core-06dbaa1bcfe1a542-min.en-US.js"
-Cohesion: 0.06
-Nodes (56): cM(), Ob(), Xb(), Xz(), b, a(), ae(), B() (+48 more)
+Cohesion: 0.13
+Nodes (21): ae(), B(), checkDeepLinking(), closeFrame(), H(), handleLocationChange(), he(), init() (+13 more)
 
 ### Community 1 - "common-dabb52f27fbf7211-min.en-US.js"
 Cohesion: 0.04
-Nodes (36): Ai(), ao(), au(), bh(), Cl(), dc(), ei(), Et() (+28 more)
+Nodes (48): Ai(), au(), bh(), Bo(), ca(), cg(), Cl(), da() (+40 more)
 
 ### Community 3 - "Zt"
-Cohesion: 0.06
-Nodes (52): bd(), cg(), ch(), dg(), du(), ec(), eg(), En() (+44 more)
+Cohesion: 0.08
+Nodes (48): ag(), bd(), Cf(), ds(), eg(), fc(), Ft(), gi() (+40 more)
 
 ### Community 5 - "b"
-Cohesion: 0.09
-Nodes (24): ae(), b(), ce(), ee(), he(), Je(), K(), ke() (+16 more)
+Cohesion: 0.13
+Nodes (21): ae(), ce(), ee(), he(), K(), ke(), le(), ne() (+13 more)
 
 ### Community 7 - "website.components.imageFluid.visitor.js"
 Cohesion: 0.06
 Nodes (27): 68114(), A(), ae, b(), ce(), D, E(), ee() (+19 more)
 
 ### Community 8 - "o"
-Cohesion: 0.08
-Nodes (7): a(), e(), f(), o(), _setClientType(), zc(), Zf()
+Cohesion: 0.07
+Nodes (12): a(), Bf(), e(), f(), Ff(), _formatError(), _getDiagnosticsData(), m() (+4 more)
 
 ### Community 10 - "c"
-Cohesion: 0.06
-Nodes (7): c(), emitChange(), exportAsync(), exportPublicMethods(), _formatError(), _getDiagnosticsData(), registerAsync()
+Cohesion: 0.05
+Nodes (14): bindAction(), bindActions(), bindListeners(), c(), emitChange(), exportAsync(), exportPublicMethods(), g() (+6 more)
 
 ### Community 12 - "extract-css-moment-js-vendor-a5cfdec1ae227f33-min.en-US.js"
-Cohesion: 0.05
-Nodes (15): B(), dp(), I2(), ib(), jb(), P2(), pb(), q() (+7 more)
+Cohesion: 0.04
+Nodes (19): B(), dp(), fM(), I2(), ib(), jb(), P2(), pb() (+11 more)
 
 ### Community 13 - "ho"
-Cohesion: 0.07
-Nodes (45): ad(), Al(), bc(), be(), co(), ed(), El(), Gd() (+37 more)
-
-### Community 14 - "d"
-Cohesion: 0.07
-Nodes (6): d(), "../../node_modules/.pnpm/nanoid@5.0.1/node_modules/nanoid/index.browser.js"(), u(), ve(), We(), Xt()
+Cohesion: 0.13
+Nodes (20): du(), ec(), Ge(), Gn(), Gr(), Kn(), mh(), Mr() (+12 more)
 
 ### Community 15 - "Ps"
-Cohesion: 0.17
-Nodes (29): An(), bn(), br(), cr(), Dn(), Ea(), fa(), Ga() (+21 more)
+Cohesion: 0.10
+Nodes (42): Aa(), An(), bn(), br(), cr(), Dn(), ei(), Et() (+34 more)
 
 ### Community 17 - "common-vendors-3cc69e7d149905b0-min.en-US.js"
-Cohesion: 0.11
-Nodes (22): q(), Wt(), B(), Be(), Ce(), e(), ee(), I() (+14 more)
+Cohesion: 0.10
+Nodes (29): Wt(), xe(), ye(), B(), Be(), Ce(), e(), ee() (+21 more)
 
 ### Community 18 - "website.components.code.visitor.js"
 Cohesion: 0.13
 Nodes (18): A(), B(), d(), E(), g(), j(), k(), m() (+10 more)
 
 ### Community 19 - "g"
-Cohesion: 0.17
-Nodes (14): d(), f(), g(), k(), l(), m, n(), O() (+6 more)
+Cohesion: 0.19
+Nodes (18): d(), k(), l(), m, n(), O(), p(), T() (+10 more)
 
 ### Community 21 - "J"
-Cohesion: 0.11
-Nodes (39): ac(), Cf(), da(), Do(), ds(), fc(), fg(), Fh() (+31 more)
+Cohesion: 0.10
+Nodes (34): cn(), co(), dg(), Dh(), Do(), ed(), fd(), Fh() (+26 more)
 
 ### Community 24 - "JoinUs.tsx"
-Cohesion: 0.10
-Nodes (12): PILLARS, MagneticButton(), NUMBERS, Reveal(), RevealProps, RevealText(), MARQUEE_BOTTOM, MARQUEE_TOP (+4 more)
+Cohesion: 0.12
+Nodes (11): PILLARS, MagneticButton(), NUMBERS, Reveal(), RevealProps, RevealText(), MARQUEE_BOTTOM, MARQUEE_TOP (+3 more)
 
 ### Community 25 - "package.json"
-Cohesion: 0.06
-Nodes (31): framer-motion, lenis, SmoothScroll(), next, dependencies, framer-motion, lenis, next (+23 more)
+Cohesion: 0.07
+Nodes (28): framer-motion, next, dependencies, framer-motion, next, react, react-dom, devDependencies (+20 more)
 
 ### Community 26 - "performance-a5ddb372171c82c4-min.en-US.js"
-Cohesion: 0.11
-Nodes (25): ee(), en(), et(), F(), fn(), g(), gn(), H() (+17 more)
+Cohesion: 0.12
+Nodes (23): ee(), F(), fn(), g(), gn(), H(), hn(), In() (+15 more)
 
 ### Community 27 - "I"
 Cohesion: 0.16
 Nodes (19): A(), B(), D(), E(), f(), g(), I, j() (+11 more)
 
 ### Community 28 - "u"
-Cohesion: 0.12
-Nodes (29): A0(), Ab(), Az(), bz(), c0(), cz(), d2(), db() (+21 more)
+Cohesion: 0.14
+Nodes (23): Az(), bz(), c0(), cz(), h2(), I0(), i1(), jz() (+15 more)
 
 ### Community 29 - "RestaurantsShowcase.tsx"
-Cohesion: 0.09
-Nodes (18): metadata, Placeholder(), CLIPS, RestaurantLocations(), LOGOS, LOOP, MID, NO_BOOKING (+10 more)
+Cohesion: 0.06
+Nodes (31): metadata, Blog(), ITEMS, Menu(), getNavTheme(), LINKS, Theme, IMAGES (+23 more)
 
 ### Community 30 - "Press.tsx"
-Cohesion: 0.13
-Nodes (20): generateMetadata(), RestaurantPage(), BOTTOM_ROW, charVariant(), INITIAL_IMAGE, markCharVariant(), Press(), TOP_ROW (+12 more)
+Cohesion: 0.11
+Nodes (23): generateMetadata(), RestaurantPage(), DiscoverItem, ExpandGeometry, ITEMS, Tile(), BOTTOM_ROW, charVariant() (+15 more)
 
 ### Community 31 - "BlogIndex.tsx"
 Cohesion: 0.09
-Nodes (13): metadata, jsonLd, metadata, BlogIndexInner(), OTHERS, PAGE_COUNT, postsForPage(), Contact() (+5 more)
+Nodes (16): jsonLd, metadata, metadata, COVERAGE_GROUPS, CoverageRow, OUTLET_PRIORITY, priorityOf(), STORY (+8 more)
 
 ### Community 32 - "C"
-Cohesion: 0.13
-Nodes (13): Bf(), bindAction(), bindActions(), bindListeners(), Ff(), g(), gf(), m() (+5 more)
+Cohesion: 0.21
+Nodes (6): b(), Je(), ue(), hM(), C(), Se()
 
 ### Community 33 - "compilerOptions"
 Cohesion: 0.07
 Nodes (26): dom, dom.iterable, esnext, next-env.d.ts, .next/types/**/*.ts, node_modules, **/*.ts, **/*.tsx (+18 more)
 
 ### Community 34 - "cd"
-Cohesion: 0.14
-Nodes (26): Aa(), bt(), bu(), cd(), ct(), Cu(), de(), Es() (+18 more)
+Cohesion: 0.12
+Nodes (19): b0(), Bp(), fz(), G1(), h1(), hz(), iz(), l() (+11 more)
 
 ### Community 35 - "Pt"
-Cohesion: 0.10
-Nodes (29): ah(), Bo(), cc(), cn(), Dh(), Fo(), Ft(), Hf() (+21 more)
+Cohesion: 0.12
+Nodes (25): ah(), Ar(), bc(), cc(), Eo(), eu(), Hf(), id() (+17 more)
 
 ### Community 36 - "b0"
-Cohesion: 0.09
-Nodes (25): b0(), B2(), Bp(), f1(), fz(), gz(), h1(), hz() (+17 more)
-
-### Community 37 - "$t"
-Cohesion: 0.11
-Nodes (4): kt(), Me(), mt(), $t()
+Cohesion: 0.10
+Nodes (33): bt(), bu(), cd(), ct(), dc(), de(), Ea(), Es() (+25 more)
 
 ### Community 38 - "Experience.tsx"
 Cohesion: 0.11
 Nodes (14): Experience(), HERO_INSETS, CLIPS, ALPHABET, FlipLetter(), holePath(), LETTERS, Loader() (+6 more)
 
 ### Community 40 - "site-bundle.a373588d45d1d167fb0291ea25487cbe.js"
-Cohesion: 0.17
-Nodes (15): a(), bindMethods(), c(), d(), h(), i(), l, off() (+7 more)
+Cohesion: 0.18
+Nodes (9): a(), c(), e(), h(), i(), o(), r(), s() (+1 more)
 
 ### Community 41 - "T"
-Cohesion: 0.34
-Nodes (19): A(), B(), c(), d(), E(), g(), h(), i() (+11 more)
-
-### Community 42 - "RestaurantDetail.tsx"
-Cohesion: 0.16
-Nodes (14): ITEMS, Menu(), getNavTheme(), LINKS, Nav(), Theme, IMAGES, Navigate (+6 more)
+Cohesion: 0.42
+Nodes (16): A(), B(), c(), d(), E(), g(), h(), i() (+8 more)
 
 ### Community 44 - "i"
 Cohesion: 0.08
-Nodes (27): Ar(), cs(), df(), Eo(), eu(), fn(), getStoreCurrency(), i() (+19 more)
-
-### Community 45 - "te"
-Cohesion: 0.15
-Nodes (10): xe(), ye(), ge(), j(), Le(), pull(), Q(), se() (+2 more)
+Nodes (26): ad(), cs(), dd(), df(), getStoreCurrency(), i(), il(), ir() (+18 more)
 
 ### Community 46 - "layout.tsx"
 Cohesion: 0.12
-Nodes (12): fraunces, inter, metadata, CustomCursor(), Mode, FILTERS, GlassFilters(), KEEP (+4 more)
+Nodes (14): fraunces, inter, metadata, FILTERS, GlassFilters(), KEEP, LENS_MAP, PILL_MAP (+6 more)
+
+### Community 47 - "zn"
+Cohesion: 0.15
+Nodes (17): af(), ch(), eh(), fr(), gh(), Gu(), ii(), jf() (+9 more)
 
 ### Community 48 - "Z"
-Cohesion: 0.17
-Nodes (18): A1(), d(), eb(), f(), fM(), g0(), H(), jz() (+10 more)
+Cohesion: 0.19
+Nodes (16): _0(), A1(), Ab(), d(), f(), g0(), H(), L2() (+8 more)
+
+### Community 49 - "h"
+Cohesion: 0.15
+Nodes (4): h(), Me(), mt(), "../../node_modules/.pnpm/nanoid@5.0.1/node_modules/nanoid/index.browser.js"()
+
+### Community 50 - "t"
+Cohesion: 0.11
+Nodes (5): b, f(), m, de(), ie()
 
 ### Community 51 - "ug"
-Cohesion: 0.13
-Nodes (20): af(), ca(), dd(), eh(), fr(), gh(), ii(), jr() (+12 more)
+Cohesion: 0.16
+Nodes (10): bindMethods(), d(), l, off(), on(), registerCallback(), removeCallback(), scroll() (+2 more)
 
 ### Community 52 - "j"
-Cohesion: 0.17
-Nodes (15): AM(), d0(), e2(), gb(), j(), k1(), L1(), mM() (+7 more)
+Cohesion: 0.19
+Nodes (15): A0(), cM(), d0(), eb(), f1(), f2(), j(), k1() (+7 more)
 
 ### Community 55 - "K0"
 Cohesion: 0.18
-Nodes (14): $2(), D1(), G1(), J0(), j2(), K0(), _M(), O2() (+6 more)
+Nodes (14): $2(), D1(), d2(), db(), J0(), j2(), K0(), _M() (+6 more)
+
+### Community 56 - "o"
+Cohesion: 0.13
+Nodes (7): jsonLd, metadata, Contact(), ITEMS, REVIEWABLE, reviewUrl(), ReviewUs()
 
 ### Community 57 - "ms"
 Cohesion: 0.15
 Nodes (7): ms(), s(), s(), s(), s(), s(), s()
 
+### Community 58 - "y"
+Cohesion: 0.10
+Nodes (5): f(), g(), H(), v(), y
+
 ### Community 59 - "About.tsx"
-Cohesion: 0.18
-Nodes (7): jsonLd, metadata, COVERAGE_GROUPS, CoverageRow, OUTLET_PRIORITY, priorityOf(), STORY
+Cohesion: 0.28
+Nodes (9): a(), d, E(), F(), getFirstName(), isUserAuthenticated(), n(), o() (+1 more)
 
 ### Community 60 - "CareersTeaser.tsx"
 Cohesion: 0.20
 Nodes (7): jsonLd, metadata, CareersTeaser(), CULTURE, SHOWN, JobOpening, JOBS
 
 ### Community 61 - ".constructor"
-Cohesion: 0.23
-Nodes (5): bt, Me(), st(), tt(), yt()
+Cohesion: 0.26
+Nodes (6): bt, Me(), Nt(), st(), tt(), yt()
+
+### Community 62 - "f"
+Cohesion: 0.29
+Nodes (7): B2(), gz(), O0(), s1(), U1(), vz(), Yz()
 
 ### Community 63 - "i"
-Cohesion: 0.22
-Nodes (11): _0(), b1(), E0(), G2(), H0(), i(), K(), O1() (+3 more)
+Cohesion: 0.14
+Nodes (17): AM(), b1(), E0(), e2(), G2(), gb(), H0(), i() (+9 more)
 
 ### Community 64 - "Blog.tsx"
-Cohesion: 0.24
+Cohesion: 0.32
 Nodes (4): POOL, BLOG, BlogEntry, NOTE: the old FEATURED_BLOG / TOP_THREE / REST slices were removed — the
 
 ### Community 65 - "Discover.tsx"
-Cohesion: 0.22
-Nodes (5): DiscoverItem, ExpandGeometry, ITEMS, Tile(), lenisRef
+Cohesion: 0.30
+Nodes (15): be(), ee(), g(), ge(), I(), k(), le(), R() (+7 more)
 
 ### Community 66 - "Agent Pipeline"
 Cohesion: 0.22
 Nodes (7): Agent 1 — Prompt Architect, Agent 2 — Builder, Agent 3 — Tester, Agent 4 — Reviewer, Agent Pipeline, graphify, Orchestration Rules
 
 ### Community 67 - "Er"
-Cohesion: 0.14
-Nodes (23): ag(), as(), ba(), Er(), hn(), Io(), jt(), kl() (+15 more)
+Cohesion: 0.12
+Nodes (36): ac(), Al(), ao(), as(), ba(), be(), Cu(), Er() (+28 more)
 
 ### Community 70 - "visitor-site-error-reporter-aa199afcf7c87a38-min.en-US.js"
 Cohesion: 0.38
@@ -363,20 +375,24 @@ Nodes (3): E(), u(), w()
 Cohesion: 0.33
 Nodes (6): ez(), lM(), nz(), pM(), s2(), t()
 
+### Community 132 - "ReadyCta.tsx"
+Cohesion: 0.33
+Nodes (3): charVariants, runVariants, spaceVariants
+
 ## Knowledge Gaps
-- **114 isolated node(s):** `jsonLd`, `metadata`, `metadata`, `jsonLd`, `metadata` (+109 more)
+- **117 isolated node(s):** `jsonLd`, `metadata`, `metadata`, `jsonLd`, `metadata` (+112 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **63 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **64 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `i()` connect `i` to `user-account-core-06dbaa1bcfe1a542-min.en-US.js`, `common-dabb52f27fbf7211-min.en-US.js`, `Zt`, `b`, `S`, `o`, `c`, `r`, `ho`, `d`, `Ps`, `p`, `common-vendors-3cc69e7d149905b0-min.en-US.js`, `g`, `J`, `RestaurantsShowcase.tsx`, `C`, `cd`, `n`, `h`, `ug`, `Er`?**
-  _High betweenness centrality (0.150) - this node is a cross-community bridge._
-- **Why does `RestaurantsShowcase()` connect `RestaurantsShowcase.tsx` to `RestaurantDetail.tsx`, `Press.tsx`?**
-  _High betweenness centrality (0.119) - this node is a cross-community bridge._
-- **Why does `b` connect `user-account-core-06dbaa1bcfe1a542-min.en-US.js` to `C`, `b`, `S`, `site-bundle.a373588d45d1d167fb0291ea25487cbe.js`, `2513.js`, `te`, `p`, `h`, `t`, `x`, `e`, `.constructor`, `f`?**
+- **Why does `i()` connect `i` to `common-dabb52f27fbf7211-min.en-US.js`, `Zt`, `b`, `S`, `o`, `c`, `r`, `ho`, `d`, `Ps`, `p`, `common-vendors-3cc69e7d149905b0-min.en-US.js`, `g`, `J`, `RestaurantsShowcase.tsx`, `C`, `Pt`, `b0`, `n`, `zn`, `h`, `Er`?**
+  _High betweenness centrality (0.148) - this node is a cross-community bridge._
+- **Why does `RestaurantsShowcase()` connect `RestaurantsShowcase.tsx` to `Press.tsx`?**
   _High betweenness centrality (0.087) - this node is a cross-community bridge._
+- **Why does `b` connect `t` to `user-account-core-06dbaa1bcfe1a542-min.en-US.js`, `Discover.tsx`, `C`, `b`, `S`, `site-bundle.a373588d45d1d167fb0291ea25487cbe.js`, `2513.js`, `p`, `common-vendors-3cc69e7d149905b0-min.en-US.js`, `h`, `ug`, `x`, `e`, `.constructor`?**
+  _High betweenness centrality (0.086) - this node is a cross-community bridge._
 - **Are the 31 inferred relationships involving `S()` (e.g. with `b()` and `.bootstrap()`) actually correct?**
   _`S()` has 31 INFERRED edges - model-reasoned connections that need verification._
 - **Are the 22 inferred relationships involving `r()` (e.g. with `a()` and `b()`) actually correct?**

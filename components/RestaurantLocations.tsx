@@ -15,7 +15,7 @@ import VideoBackdrop from "./VideoBackdrop";
 const CLIPS = [
   "/videos/cafemama.mp4",
   // "/videos/ramo.mp4",
-  "belly-hero.mov",
+  "/videos/belly-hero.mov",
   "/videos/mamasons.mov",
   "/videos/bintang.mov",
 ];
@@ -32,54 +32,61 @@ export default function RestaurantLocations() {
     return () => window.clearInterval(id);
   }, []);
 
-  // Scrollytelling: the section is intentionally taller than the viewport,
-  // and the video sits inside a sticky viewport-height wrapper. Two-act
-  // arc: the video OPENS edge-to-edge straight off the Blog (that's also
-  // the pre-hydration paint), holds the scene while the pin scrolls, then
-  // SETTLES to the page container's width — matching the dark section's
-  // content — as it hands off into Contact.
+  // Scroll choreography — the section itself is a plain 100svh block
+  // that scrolls past 1:1 the whole way (no pin — scroll is never
+  // held). Two acts, both riding normal continuous scrolling: entry
+  // seal + parallax on the approach, exit-driven settle on the
+  // departure.
   //
-  // Pin range [start start → end end]: 0 at pin, 1 when the sticky releases.
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: ["start start", "end end"],
-  });
-  // --settle 0→1 brings full bleed down to the container plate, running
-  // nearly to the release so the plate never sits frozen and then lurches
-  // when normal scrolling resumes. Eased (strong in-out) so the shrink
-  // starts gently and lands gently instead of tracking the scroll linearly.
-  const phaseEase = cubicBezier(0.65, 0, 0.35, 1);
-  const settle = useTransform(scrollYProgress, [0.45, 0.92], [0, 1], {
-    ease: phaseEase,
-  });
-  // the maroon backdrop switches on WHILE the video is still full-bleed
-  // (0.28–0.42, fully hidden behind the footage), so the instant the
-  // shrink starts the surround is already dark — no visible colour
-  // transition
-  const dark = useTransform(scrollYProgress, [0.28, 0.42], [0, 1]);
-  // Parallax on the APPROACH only: as the section scrolls into view the
+  // Parallax on the APPROACH: as the section scrolls into view the
   // footage drifts upward inside its frame, and the drift completes the
   // moment the video reaches full view (section top hits the viewport
-  // top — where the pin takes over). Combined with the `scale(1.2)` on
-  // `.bg` in CSS, the -10% start never exposes the video's edges.
+  // top). Combined with the `scale(1.2)` on `.bg` in CSS, the -10%
+  // start never exposes the video's edges.
   const { scrollYProgress: approach } = useScroll({
     target: ref,
     offset: ["start end", "start start"],
   });
   const parallax = useTransform(approach, [0, 1], [-10, 0]);
 
+  // SETTLE on the DEPARTURE: the shrink the old scrollytelling pin used
+  // to hold the screen for now plays as the section leaves the
+  // viewport. Exit range [end end → end start]: 0 while the section's
+  // bottom still sits at the viewport bottom (fully in view), 1 once it
+  // has scrolled fully off. Because the section is exactly 100svh, the
+  // shrink happens while the block translates up — the inset math is
+  // section-relative (unchanged), so the plate stays centred in the
+  // section as it departs.
+  const { scrollYProgress: exit } = useScroll({
+    target: ref,
+    offset: ["end end", "end start"],
+  });
+  // --settle 0→1 brings full bleed down to the container plate over the
+  // first ~40% of the departure, so the plate forms while the section
+  // is still mostly on screen and then simply rides off. Eased (strong
+  // in-out) so the shrink starts gently and lands gently instead of
+  // tracking the scroll linearly.
+  const settle = useTransform(exit, [0.02, 0.38], [0, 1], {
+    ease: cubicBezier(0.65, 0, 0.35, 1),
+  });
+  // the maroon ground switches on at the very top of the departure
+  // (0–0.03, still hidden behind the full-bleed footage), so the shrink
+  // only ever reveals a finished maroon surround — never a cream→maroon
+  // fade in progress
+  const dark = useTransform(exit, [0, 0.03], [0, 1]);
+
   // Push the current phase values straight onto the element via
   // setProperty — writing a MotionValue into React's style prop as a CSS
   // custom property is fragile (types + prop-name diffing), so this
   // guarantees the CSS calc() picks up every frame.
+  useMotionValueEvent(parallax, "change", (v) => {
+    ref.current?.style.setProperty("--parallax-y", `${v}%`);
+  });
   useMotionValueEvent(settle, "change", (v) => {
     ref.current?.style.setProperty("--settle", String(v));
   });
   useMotionValueEvent(dark, "change", (v) => {
     ref.current?.style.setProperty("--dark", String(v));
-  });
-  useMotionValueEvent(parallax, "change", (v) => {
-    ref.current?.style.setProperty("--parallax-y", `${v}%`);
   });
   // the approach also drives the entry corners: the film arrives as a
   // rounded plate and seals into full bleed exactly at full view
@@ -95,9 +102,9 @@ export default function RestaurantLocations() {
       data-nav-theme="blend"
       data-cursor="glass"
     >
-      {/* sticky viewport-height wrapper — pins to the top of the viewport
-          while the section scrolls past, so the video reads as one held
-          "scene" that only starts shrinking once the user has committed */}
+      {/* viewport-height stage — fills the section exactly; the video
+          scrolls past as one full-bleed scene (no pinning) and settles
+          into the container plate on its way out */}
       <div className={styles.stage}>
         <div className={styles.reveal}>
           <div className={styles.bg}>

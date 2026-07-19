@@ -2,12 +2,6 @@
 
 import Image from "next/image";
 import { useCallback, useEffect, useRef, useState } from "react";
-import {
-  motion,
-  useMotionValue,
-  useReducedMotion,
-  useSpring,
-} from "framer-motion";
 import styles from "./Discover.module.css";
 import MenuOverlay from "./MenuOverlay";
 import { getRestaurant } from "@/lib/restaurants";
@@ -180,8 +174,6 @@ export default function Discover() {
   // z-index until the return journey finishes, so the card never ducks
   // behind the grid mid-animation
   const [closing, setClosing] = useState<number | null>(null);
-  // hover-capable device? gates the magnetic drift (never the expansion)
-  const [fineHover, setFineHover] = useState(false);
   const gridRef = useRef<HTMLUListElement>(null);
   const tileRefs = useRef<(HTMLElement | null)[]>([]);
   const geomRef = useRef<ExpandGeometry | null>(null);
@@ -203,14 +195,6 @@ export default function Discover() {
     );
     observer.observe(el);
     return () => observer.disconnect();
-  }, []);
-
-  useEffect(() => {
-    const mq = window.matchMedia("(hover: hover) and (pointer: fine)");
-    const update = () => setFineHover(mq.matches);
-    update();
-    mq.addEventListener("change", update);
-    return () => mq.removeEventListener("change", update);
   }, []);
 
   const expanding = active !== null && geomRef.current !== null;
@@ -334,8 +318,6 @@ export default function Discover() {
             active={active === i}
             closing={closing === i}
             dimmed={expanding && active !== i}
-            // magnetic drift only on hover devices while nothing is expanded
-            magnetOn={fineHover && !expanding}
             frameStyle={frameStyleFor(i)}
             onToggle={() => toggle(i)}
             onOpenMenu={() => setOpenMenuSlug(it.slug)}
@@ -379,7 +361,6 @@ function Tile({
   active,
   closing,
   dimmed,
-  magnetOn,
   frameStyle,
   onToggle,
   onOpenMenu,
@@ -391,7 +372,6 @@ function Tile({
   active: boolean;
   closing: boolean;
   dimmed: boolean;
-  magnetOn: boolean;
   frameStyle?: React.CSSProperties;
   onToggle: () => void;
   onOpenMenu: () => void;
@@ -402,56 +382,16 @@ function Tile({
   // bookability comes from the canonical data, not the local display copy
   const bookable = getRestaurant(item.slug)?.bookable ?? false;
 
-  // ---- magnetic proximity drift (MagneticButton's spring feel, smaller) --
-  // The card leans a few px toward the cursor while it's over the tile;
-  // spring-smoothed, never 1:1. Off while any card is expanded and under
-  // reduced motion.
-  const reduceMotion = useReducedMotion();
-  const selfRef = useRef<HTMLElement | null>(null);
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const x = useSpring(mx, { stiffness: 170, damping: 13, mass: 0.3 });
-  const y = useSpring(my, { stiffness: 170, damping: 13, mass: 0.3 });
-  const magnetLive = magnetOn && !reduceMotion;
-
-  const onMagnetMove = (e: React.MouseEvent) => {
-    if (!magnetLive) return;
-    const r = selfRef.current?.getBoundingClientRect();
-    if (!r) return;
-    // ~±7px at the tile's edges — a subtle lean, not a chase
-    const pull = 7;
-    const ox = ((e.clientX - (r.left + r.width / 2)) / (r.width / 2)) * pull;
-    const oy = ((e.clientY - (r.top + r.height / 2)) / (r.height / 2)) * pull;
-    mx.set(Math.max(-pull, Math.min(pull, ox)));
-    my.set(Math.max(-pull, Math.min(pull, oy)));
-  };
-  const onMagnetLeave = () => {
-    mx.set(0);
-    my.set(0);
-  };
-
-  // release the drift the moment any card expands (or motion is reduced)
-  useEffect(() => {
-    if (!magnetLive) {
-      mx.set(0);
-      my.set(0);
-    }
-  }, [magnetLive, mx, my]);
-
   return (
     <li
       className={styles.cell}
       style={{ "--stagger": `${stagger}ms` } as React.CSSProperties}
     >
-      <motion.article
-        ref={(el) => {
-          selfRef.current = el;
-          tileRef(el);
-        }}
+      <article
+        ref={tileRef}
         className={`${styles.tile} ${active ? styles.tileActive : ""} ${
           closing ? styles.tileClosing : ""
         } ${dimmed ? styles.tileDimmed : ""}`}
-        style={{ x, y }}
         role="button"
         tabIndex={0}
         aria-expanded={active}
@@ -463,8 +403,6 @@ function Tile({
             onToggle();
           }
         }}
-        onMouseMove={onMagnetMove}
-        onMouseLeave={onMagnetLeave}
       >
         {/* the expanding frame — grows to 250% × 200% of the cell and lands
             centred (the flip-modal move). Width/height here is the
@@ -616,7 +554,7 @@ function Tile({
             </div>
           </div>
         </div>
-      </motion.article>
+      </article>
     </li>
   );
 }

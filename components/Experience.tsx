@@ -8,7 +8,6 @@ import Hero from "./Hero";
 import Discover from "./Discover";
 import PressStrip from "./PressStrip";
 import AboutIntro from "./AboutIntro";
-import NumbersStrip from "./NumbersStrip";
 import RestaurantLocations from "./RestaurantLocations";
 // import Timeline from "./Timeline";
 // Press section content now lives inside WhoWeAre (rotating quote + masthead
@@ -87,9 +86,6 @@ export default function Experience() {
           <Discover />
           <PressStrip />
           <AboutIntro />
-          {/* numbers strip — the group's story in editorial numerals,
-              bridging "who we are" into the coverage the Blog shows */}
-          <NumbersStrip />
           <Blog />
           {/* open-roles index on the cream page, then the closing
               invitation with the Join Us pill */}
@@ -97,8 +93,7 @@ export default function Experience() {
           <ReadyCta />
 
           {/* outside the DarkZone: the video opens full bleed on the cream
-              page, then its settled plate hands off into the dark Contact
-              section below */}
+              page and scrolls past into the dark Contact section below */}
           <RestaurantLocations />
 
           <DarkZone>
