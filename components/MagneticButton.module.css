@@ -92,6 +92,41 @@
   padding-inline: 1.9em;
 }
 
+/* extra-compact variant — label-scale type; min-height keeps the target
+   WCAG 2.5.8-sized despite the tight padding */
+.xsmall {
+  font-size: var(--t-label);
+  padding: 0.55em 1.3em;
+  min-height: 28px;
+}
+.xsmall:hover,
+.xsmall:focus-visible {
+  padding-inline: 1.7em;
+}
+
+/* solid variant — opaque maroon fill with a cream hairline riding the same
+   box-shadow slot the glass recess uses (no border). No backdrop blur:
+   nothing reads through a solid fill */
+.solid {
+  --btn-fg: var(--cream);
+  --glass-recess: inset 0 0 0 1px rgba(248, 243, 234, 0.22);
+  --glass-recess-soft: inset 0 0 0 1px rgba(248, 243, 234, 0.4);
+  background: var(--maroon-soft);
+  -webkit-backdrop-filter: none;
+  backdrop-filter: none;
+  /* + background-color so the hover lightening rides the house ease */
+  transition:
+    transform 0.16s cubic-bezier(0.23, 1, 0.32, 1),
+    padding 0.45s var(--ease-out),
+    box-shadow 0.45s var(--ease-out),
+    background-color 0.45s var(--ease-out);
+}
+.solid:hover,
+.solid:focus-visible {
+  /* one step lighter — hairline brightening handled by --glass-recess-soft */
+  background: color-mix(in srgb, var(--maroon-soft), var(--cream) 8%);
+}
+
 .label {
   display: inline-block;
   white-space: nowrap;

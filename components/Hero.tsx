@@ -1,7 +1,12 @@
 "use client";
 
-import { motion } from "framer-motion";
-import { useRef, useState } from "react";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+} from "framer-motion";
+import { useEffect, useRef, useState } from "react";
 import styles from "./Hero.module.css";
 
 // the kitchens take turns behind the wordmark — each clip plays through
@@ -13,6 +18,27 @@ const CLIPS = ["/videos/belly-hero.mov", "/videos/mamasons.mov"];
 export default function Hero({ started }: { started: boolean }) {
   const [clip, setClip] = useState(0);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
+
+  // the hero is pinned (position: sticky) while the cream page slides up
+  // over it — the recede itself is free. This adds the missing depth cue:
+  // over the first viewport of scroll the wordmark drifts down 60px, so
+  // the type falls behind at a different rate than the page above it.
+  // The drift lives on .titleWrap (the mask), NOT .titleInner — the inner
+  // span's transform belongs to the intro rise-in, and moving the mask
+  // with the glyph means nothing ever clips mid-drift; .hero's own
+  // overflow: hidden does the receding crop.
+  const reduce = useReducedMotion();
+  const { scrollY } = useScroll();
+  // viewport height in state so the transform range tracks real screens;
+  // 800 is only the SSR placeholder before the first client measure
+  const [vh, setVh] = useState(800);
+  useEffect(() => {
+    const measure = () => setVh(window.innerHeight);
+    measure();
+    window.addEventListener("resize", measure);
+    return () => window.removeEventListener("resize", measure);
+  }, []);
+  const y = useTransform(scrollY, [0, vh], [0, 60]);
 
   const advance = () => {
     const next = (clip + 1) % CLIPS.length;
@@ -50,7 +76,8 @@ export default function Hero({ started }: { started: boolean }) {
         ))}
       </div>
 
-      <div className={styles.titleWrap}>
+      {/* scroll parallax rides the wrap; reduced motion keeps it planted */}
+      <motion.div className={styles.titleWrap} style={reduce ? undefined : { y }}>
         <motion.span
           className={styles.titleInner}
           initial={{ transform: "translateY(110%)" }}
@@ -77,7 +104,7 @@ export default function Hero({ started }: { started: boolean }) {
             </text>
           </svg>
         </motion.span>
-      </div>
+      </motion.div>
     </section>
   );
 }

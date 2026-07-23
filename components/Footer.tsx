@@ -1,6 +1,7 @@
 "use client";
 
 import styles from "./Footer.module.css";
+import Reveal from "./Reveal";
 import { useRouteTransition } from "./PageTransition";
 import { RESTAURANTS } from "@/lib/restaurants";
 
@@ -120,34 +121,36 @@ export default function Footer() {
 
       <div className={styles.spacer} />
 
-      <svg
-        className={styles.wordmark}
-        viewBox="0 0 100 37"
-        preserveAspectRatio="xMidYMid meet"
-        role="img"
-        aria-label="Maginhawa"
-      >
-        <text
-          className={styles.wline}
-          x="0"
-          y="18"
-          fontSize="25"
-          textLength="100"
-          lengthAdjust="spacing"
+      <Reveal className={styles.wordmarkReveal} y={36}>
+        <svg
+          className={styles.wordmark}
+          viewBox="0 0 100 37"
+          preserveAspectRatio="xMidYMid meet"
+          role="img"
+          aria-label="Maginhawa"
         >
-          MAGIN
-        </text>
-        <text
-          className={styles.wline}
-          x="0"
-          y="36"
-          fontSize="25"
-          textLength="100"
-          lengthAdjust="spacing"
-        >
-          HAWA
-        </text>
-      </svg>
+          <text
+            className={styles.wline}
+            x="0"
+            y="18"
+            fontSize="25"
+            textLength="100"
+            lengthAdjust="spacing"
+          >
+            MAGIN
+          </text>
+          <text
+            className={styles.wline}
+            x="0"
+            y="36"
+            fontSize="25"
+            textLength="100"
+            lengthAdjust="spacing"
+          >
+            HAWA
+          </text>
+        </svg>
+      </Reveal>
 
       <div className={styles.bottomRow}>
         <span>© 2026 Maginhawa Group</span>

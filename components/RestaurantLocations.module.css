@@ -47,7 +47,7 @@
 /* clip container — fills the stage; the scroll-driven full-bleed→plate
    framing is done entirely with clip-path, which composites on the GPU.
    Radius scales with the phases: the film ENTERS as a generously
-   rounded plate (the About card's hero rounding) whose corners seal
+   rounded plate (the hero-plate rounding the About card used to carry) whose corners seal
    flat exactly at full view (--enter 0→1 over the approach), then
    settles at the flat media radius the surrounding plates use. The two
    phases never overlap, so their radii simply add. */

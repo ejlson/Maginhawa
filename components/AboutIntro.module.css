@@ -1,51 +1,78 @@
-/* Section is a cream frame around the maroon card. Neighbours own both
-   boundaries: the Press strip's symmetric padding centres itself above,
-   and NumbersStrip's --space-lg top padding sets the tight caption gap
-   below — so this section carries no block padding at all. */
+/* Section runs the maroon card edge to edge — no cream side frame.
+   Neighbours own both boundaries: the Press strip's symmetric padding
+   centres itself above, and NumbersStrip's --space-lg top padding sets
+   the caption gap below — so this section carries no padding at all.
+   position + z-index lift the whole section above the cream band that
+   follows, so the portrait's overhang paints ON TOP of it even if that
+   neighbour ever gains its own stacking context. No overflow clipping
+   here, ever — the overhang (and its parallax drift) must escape. */
 .section {
-  padding: 0 var(--pad-x);
+  position: relative;
+  z-index: 2;
+  padding: 0;
   background: var(--cream);
 }
 
 /* The card itself — deep maroon panel with a looping video behind cream
-   copy. The scrim + fallback maroon background keep the text legible even
-   before the video loads / at reduced motion. Composition sits on a
-   golden-ratio grid (1.618fr / 1fr both axes, same φ split as the Blog
-   wall): title top-left, est. meta top-right, statement copy + CTA
-   anchored on the bottom band at the φ intersection. */
+   copy, now a full-bleed viewport chapter (no rounding, no frame). The
+   scrim + fallback maroon background keep the text legible even before
+   the video loads / at reduced motion. Composition: title top-left, est.
+   meta top-right, statement copy + CTA on the minor column's vertical
+   centre (the near-even 1.03fr / 1fr split starts the minor column just
+   past the viewport's midline, ≈column 7 of the mockup's 12), and the
+   founder's portrait anchored bottom-left, STRADDLING the lower edge —
+   36% of its height hangs onto the cream band below. No overflow clip
+   here — cardVideoLayer clips its own footage, and the portrait's
+   overhang + parallax drift must not get sheared mid-glide. */
 .card {
   position: relative;
   isolation: isolate;
-  overflow: hidden;
   background: var(--maroon);
   color: var(--cream);
-  /* generously rounded hero-plate corners (the Zerocircle-reference
-     rounding); still no drop shadow (the plate sits in the page, not
-     above it) */
-  border-radius: clamp(24px, 2.2vw, 36px);
-  corner-shape: squircle; /* Figma-style corner smoothing (superellipse); falls back to plain rounding */
-  /* deep bottom padding floats the bottom-anchored copy + CTA well clear
-     of the card's lower edge */
+  /* symmetric block padding */
+  --about-pad-b: clamp(40px, 5.5vh, 80px);
+  /* the mockup's 12-column grid: 20px page margins, 20px gutters — one
+     column, and the left edge of column 2 (margin + col 1 + gutter),
+     where the portrait seats. 260px = 2 × 20 margin + 11 × 20 gutters. */
+  --about-col: calc((100vw - 260px) / 12);
+  --about-col2: calc(20px + var(--about-col) + 20px);
+  /* the portrait's footprint, and how much of it hangs past the card's
+     bottom edge — 36% of the 3:4 frame's height straddles the seam onto
+     the cream band below (the mockup's boundary-breaking device) */
+  --portrait-w: clamp(240px, 24vw, 420px);
+  --portrait-overhang: calc(var(--portrait-w) * 4 / 3 * 0.36);
   padding: clamp(40px, 5.5vh, 80px) clamp(28px, 3.6vw, 60px)
-    clamp(96px, 14vh, 180px);
-  /* a shave under the full viewport */
-  min-height: calc(100svh - 20px);
+    var(--about-pad-b);
+  /* the full viewport — the card IS the chapter now */
+  min-height: 100svh;
   display: grid;
-  grid-template-columns: 1.618fr 1fr;
-  grid-template-rows: 1.618fr 1fr;
+  grid-template-columns: 1.03fr 1fr;
+  grid-template-rows: auto 1fr;
   column-gap: var(--grid-gutter);
   row-gap: clamp(24px, 3.5vh, 48px);
 }
 
-/* full-cover looping video sitting behind the card content — z-index 0 so
-   scrim (1) and content (2+) layer above it */
-.cardVideo {
+/* the video's parallax layer — Parallax's .frame is position: relative /
+   width: 100%, so this wrapper owns the positioning and stacking the bare
+   video used to carry: z-index 0 keeps the whole assembly under the scrim
+   (1) and content (2+). overflow: hidden here is the ONLY clip on the
+   over-scaled drift now — the card itself no longer clips (the
+   portrait's parallax must glide unsheared). */
+.cardVideoLayer {
   position: absolute;
   inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
   z-index: 0;
+  overflow: hidden;
+  pointer-events: none;
+}
+
+/* the footage itself, now living inside Parallax's absolute .inner (whose
+   .inner > * rule grants it width/height 100%) — layering runs video →
+   Parallax inner → layer div → scrim → content. object-fit: cover is
+   mandatory here: Parallax's own cover rule targets img only, not video. */
+.cardVideo {
+  display: block;
+  object-fit: cover;
   /* pre-darken the raw footage a touch so the scrim doesn't have to do
      all the work; keeps blacks blacks and stops the cream copy from
      picking up highlight glare */
@@ -55,12 +82,13 @@
 }
 
 /* maroon-tinted scrim over the video for text contrast — corner-weighted
-   rather than a flat wash: two radial pools anchor the corners the type
+   rather than a flat wash: two radial pools anchor the regions the type
    actually occupies (top-left under the difference-blend title, ≈0.76
-   combined; bottom-right under the copy + CTA, ≈0.74) while the base
-   linear stays light through the middle (≈0.30) so the video breathes
-   between them. Top-right, under the quiet est. meta, is deliberately the
-   one lighter region (≈0.52). */
+   combined; MID-right under the copy + CTA, which now sits on the minor
+   column's vertical centre, ≈0.74) while the base linear stays light
+   through the middle (≈0.30) so the video breathes between them.
+   Top-right, under the quiet est. meta, is deliberately the one lighter
+   region (≈0.52). */
 .cardScrim {
   position: absolute;
   inset: 0;
@@ -73,7 +101,7 @@
       rgba(31, 0, 0, 0) 72%
     ),
     radial-gradient(
-      115% 90% at 100% 100%,
+      115% 90% at 100% 50%,
       rgba(31, 0, 0, 0.55) 0%,
       rgba(31, 0, 0, 0.3) 45%,
       rgba(31, 0, 0, 0) 72%
@@ -90,7 +118,8 @@
 /* everything else inside the card sits above the scrim */
 .card > .title,
 .card > .headMeta,
-.card > .bottomBand {
+.card > .midBand,
+.card > .portraitWrap {
   position: relative;
   z-index: 2;
 }
@@ -162,17 +191,50 @@
   opacity: 0.55;
 }
 
-/* bottom band spans both columns — the statement copy sits directly to
-   the LEFT of the Read More CTA, the pair clustered at the card's
-   bottom-right, both on the same baseline */
-.bottomBand {
-  grid-column: 1 / -1;
+/* mid band on the minor column — the statement copy sits directly to
+   the LEFT of the Read More CTA, the pair vertically centred against
+   the card's right edge, both on the same baseline */
+.midBand {
+  grid-column: 2;
   grid-row: 2;
-  align-self: end;
-  justify-self: end;
+  align-self: center;
+  justify-self: start;
   display: flex;
   align-items: flex-end;
   gap: clamp(28px, 4vw, 72px);
+}
+
+/* the founder's portrait — bottom-left on the major column, straddling
+   the boundary: the negative margin eats the whole bottom padding AND
+   pushes --portrait-overhang further, so 36% of the frame hangs past the
+   card onto the cream band below (the section's z-index keeps it painting
+   above that neighbour). The left margin walks the frame's edge onto
+   column 2 of the mockup grid — column-2 offset minus the card's own
+   inline padding, which the grid area already provides. */
+.portraitWrap {
+  grid-column: 1;
+  grid-row: 2;
+  align-self: end;
+  justify-self: start;
+  margin-left: calc(var(--about-col2) - clamp(28px, 3.6vw, 60px));
+  margin-bottom: calc(-1 * var(--about-pad-b) - var(--portrait-overhang));
+}
+
+/* the rounded 3:4 frame — lives INSIDE Parallax's motion wrapper so the
+   squircle clip travels with the whole-block drift instead of shearing
+   against it */
+.portraitFrame {
+  aspect-ratio: 3 / 4;
+  width: var(--portrait-w);
+  overflow: hidden;
+  border-radius: var(--radius-card);
+  corner-shape: squircle; /* Figma-style corner smoothing (superellipse); falls back to plain rounding */
+}
+.portraitFrame img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
 /* statement copy in the Read More CTA's caps-label voice so the title
@@ -259,38 +321,48 @@
 /* ---------- responsive ---------- */
 @media (max-width: 900px) {
   .card {
-    /* modest extra air below the stack — the deep desktop bottom gap is
-       a poster concern, not a mobile one */
-    padding: clamp(28px, 4vh, 48px) clamp(20px, 4vw, 36px)
-      clamp(48px, 7vh, 72px);
-    /* stacked — content dictates the height, no viewport-locked spread */
+    /* stacked — content dictates the height, no viewport-locked spread;
+       the bottom padding var stays honest so the portrait's overhang math
+       (−padding − overhang) keeps it straddling the lower edge. The
+       overhang itself shrinks to a modest 22% of the 60vw frame's height
+       so the numerals below aren't swallowed on small screens. Inline
+       padding flattens to the mockup grid's 20px page margin. */
+    --about-pad-b: clamp(48px, 7vh, 72px);
+    --portrait-overhang: calc(60vw * 4 / 3 * 0.22);
+    padding: clamp(28px, 4vh, 48px) 20px var(--about-pad-b);
     min-height: 0;
     grid-template-columns: 1fr;
     grid-template-rows: none;
     row-gap: clamp(20px, 3vh, 36px);
   }
+  /* stack order follows the DOM: title → est. meta → copy + CTA →
+     portrait (the overhang device carries straight over) */
   .title,
   .headMeta,
-  .bottomBand {
+  .midBand,
+  .portraitWrap {
     grid-column: 1;
     grid-row: auto;
     justify-self: start;
     align-self: auto;
   }
   /* the copy + CTA pair stacks vertically in the mobile flow */
-  .bottomBand {
+  .midBand {
     flex-direction: column;
     align-items: flex-start;
     gap: clamp(20px, 3vh, 36px);
   }
-  /* label-size caps read fine as a desktop aside but fall below the
-     legibility floor on a phone — lift the statement copy to small-body */
-  .copy p {
-    font-size: var(--t-small);
+  /* stacked, the mockup's column-2 seat makes no sense — the portrait
+     returns to the flat 20px margin the card padding already provides */
+  .portraitWrap {
+    margin-left: 0;
   }
-  /* stacked, the copy + CTA sit mid/low-LEFT — outside both corner pools.
+  .portraitFrame {
+    width: 60vw;
+  }
+  /* stacked, the copy + CTA sit mid/low-LEFT — outside both pools.
      Strengthen the base wash's lower half so the caps copy keeps at least
-     its old footing over bright frames; the corner radials stay put. */
+     its old footing over bright frames; the radial pools stay put. */
   .cardScrim {
     background:
       radial-gradient(
@@ -300,7 +372,7 @@
         rgba(31, 0, 0, 0) 72%
       ),
       radial-gradient(
-        115% 90% at 100% 100%,
+        115% 90% at 100% 50%,
         rgba(31, 0, 0, 0.55) 0%,
         rgba(31, 0, 0, 0.3) 45%,
         rgba(31, 0, 0, 0) 72%
