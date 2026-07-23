@@ -3,6 +3,7 @@
 import Link from "next/link";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import styles from "./AboutIntro.module.css";
+import Parallax from "./Parallax";
 import Reveal from "./Reveal";
 
 /**
@@ -52,29 +53,37 @@ function TitleLine({
 /**
  * Editorial "who we are" chapter that follows the Press strip.
  *
- * A one-screen maroon card composed on the golden ratio: the big
- * "ABOUT US" display title rules the top-left (difference-blended over
- * the video, each line rising in behind a mask like the Hero wordmark),
- * a quiet est. meta sits top-right, and the statement copy + Read More
- * CTA anchor the bottom band on the minor axis.
+ * A full-bleed, one-screen maroon card split near-evenly at the midline:
+ * the big "ABOUT US" display title rules the top-left (difference-blended
+ * over the video, each line rising in behind a mask like the Hero
+ * wordmark), a quiet est. meta sits top-right, the statement copy +
+ * Read More CTA hold the minor column's vertical centre (≈column 7 of
+ * the mockup's 12-column grid), and the founder's portrait anchors
+ * bottom-left on column 2 — drifting on its own parallax and straddling
+ * the card's lower edge onto the cream band below.
  */
 export default function AboutIntro() {
   return (
     <section className={styles.section} data-nav-theme="dark" data-cursor="glass">
       <Reveal className={styles.card}>
-        {/* darkened video plays behind everything in the card, giving the
-            maroon panel a subtle sense of motion; the scrim keeps the text
-            highly legible */}
-        <video
-          className={styles.cardVideo}
-          src="/videos/belly-hero.mov"
-          autoPlay
-          muted
-          loop
-          playsInline
-          preload="auto"
-          aria-hidden
-        />
+        {/* darkened video plays behind everything in the card — and, like
+            the Locations video, drifts vertically inside the clipped card as
+            the section scrolls through the viewport (Parallax's inset mode:
+            the frame stays put, the over-scaled footage pans within it, so
+            no edge is ever exposed); the scrim keeps the text highly legible */}
+        <div className={styles.cardVideoLayer} aria-hidden>
+          <Parallax inset fill speed={0.4}>
+            <video
+              className={styles.cardVideo}
+              src="/videos/belly-hero.mov"
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+            />
+          </Parallax>
+        </div>
         <div className={styles.cardScrim} aria-hidden />
 
         {/* the h2 owns the in-view trigger; the two masked lines pick the
@@ -93,9 +102,9 @@ export default function AboutIntro() {
 
         <span className={styles.headMeta}>Est. 1987 — London</span>
 
-        {/* bottom band — the statement copy sits directly left of the
-            Read More CTA, the pair clustered at the card's bottom right */}
-        <div className={styles.bottomBand}>
+        {/* mid band — the statement copy sits directly left of the
+            Read More CTA, the pair centred on the card's right half */}
+        <div className={styles.midBand}>
           <div className={styles.copy}>
             <p>
               A family of London restaurants that carries deep culinary
@@ -128,6 +137,25 @@ export default function AboutIntro() {
               <path d="M38 1 L42 5 L38 9" />
             </svg>
           </Link>
+        </div>
+
+        {/* the founder's portrait, bottom-left — default-mode Parallax
+            (no inset), so the WHOLE block drifts ±25px with scroll; the
+            rounded frame sits inside the motion wrapper so the squircle
+            clip travels with the drift. The wrapper's negative bottom
+            margin hangs it past the card onto the cream band below. */}
+        <div className={styles.portraitWrap}>
+          <Parallax speed={0.25}>
+            <div className={styles.portraitFrame}>
+              {/* eslint-disable-next-line @next/next/no-img-element */}
+              <img
+                src="/images/omarshah.jpeg"
+                alt="Chef Omar, founder of the Maginhawa Group"
+                loading="lazy"
+                draggable={false}
+              />
+            </div>
+          </Parallax>
         </div>
       </Reveal>
     </section>

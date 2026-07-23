@@ -15,7 +15,7 @@ import VideoBackdrop from "./VideoBackdrop";
 const CLIPS = [
   "/videos/cafemama.mp4",
   // "/videos/ramo.mp4",
-  "belly-hero.mov",
+  "/videos/belly-hero.mov",
   "/videos/mamasons.mov",
   "/videos/bintang.mov",
 ];

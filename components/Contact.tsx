@@ -62,7 +62,7 @@ export default function Contact() {
                 <input type="text" placeholder="Enter your description here" />
               </div>
               <div className={styles.submitRow}>
-                <MagneticButton label="Submit" type="submit" small />
+                <MagneticButton label="Submit" type="submit" variant="solid" size="xsmall" />
               </div>
             </form>
           </Reveal>

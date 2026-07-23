@@ -1,274 +1,205 @@
 "use client";
 
-import { useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { AnimatePresence, motion, useReducedMotion } from "framer-motion";
 import styles from "./Blog.module.css";
 import { BLOG, type BlogEntry } from "@/lib/blog";
 import Reveal from "./Reveal";
 
-// the carousel pages through the eight newest stories, one step at a time
+// the strip carries the eight newest stories end to end
 const POOL = BLOG.slice(0, 8);
-// one wide featured card + three portrait cards visible at once
-const WINDOW = 4;
 
-function NavArrow() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="1.5"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <path d="M4 12h15M13 6l6 6-6 6" />
-    </svg>
-  );
-}
-
-/* featured anatomy — cover photo, bottom scrim, date + headline + one-line
-   excerpt overlaid bottom-left, outlet chip bottom-right */
-function FeaturedCard({ post }: { post: BlogEntry }) {
+/* the one card anatomy, every breakpoint — a portrait plate with the
+   caption BELOW it on the cream (no overlay, no scrim, no chip): meta
+   line, two-line clamped title, decorative Read More (the whole card is
+   the link) */
+function StoryCard({ post }: { post: BlogEntry }) {
   return (
     <a
-      className={`${styles.plate} ${styles.featured}`}
+      className={styles.card}
       href={post.url}
       target="_blank"
       rel="noopener noreferrer"
     >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        className={styles.cover}
-        src={post.image}
-        alt=""
-        draggable={false}
-        loading="lazy"
-      />
-      <span className={styles.scrim} aria-hidden />
-      <span className={styles.featuredText}>
-        <span className={styles.overlayMeta}>{post.dateLabel}</span>
-        <h3 className={styles.featuredTitle}>{post.title}</h3>
-        <span className={styles.titleRule} aria-hidden />
-        <span className={styles.cardFoot}>
-          <span className={styles.footExcerpt}>{post.excerpt}</span>
-          <span className={styles.readMore}>
-            Read More
-            <svg
-              viewBox="0 0 32 10"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden
-            >
-              <path d="M0 5 H26" />
-              <path d="M22 1 L26 5 L22 9" />
-            </svg>
-          </span>
+      <div className={styles.plate}>
+        {/* eslint-disable-next-line @next/next/no-img-element */}
+        <img
+          className={styles.cover}
+          src={post.image}
+          alt=""
+          draggable={false}
+          loading="lazy"
+        />
+      </div>
+      <div className={styles.caption}>
+        <span className={styles.microLabel}>{post.dateLabel}</span>
+        <h3 className={styles.cardTitle}>{post.title}</h3>
+        <span className={styles.readMore}>
+          Read More
+          <svg
+            viewBox="0 0 32 10"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+          >
+            <path d="M0 5 H26" />
+            <path d="M22 1 L26 5 L22 9" />
+          </svg>
         </span>
-      </span>
-      <span className={styles.sourceChip}>{post.source}</span>
-    </a>
-  );
-}
-
-/* portrait anatomy — cover, scrim, saffron-dot outlet micro-label above a
-   clamped title */
-function PortraitCard({ post }: { post: BlogEntry }) {
-  return (
-    <a
-      className={`${styles.plate} ${styles.portrait}`}
-      href={post.url}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
-      {/* eslint-disable-next-line @next/next/no-img-element */}
-      <img
-        className={styles.cover}
-        src={post.image}
-        alt=""
-        draggable={false}
-        loading="lazy"
-      />
-      <span className={styles.scrim} aria-hidden />
-      <span className={styles.portraitText}>
-        <span className={styles.microLabel}>
-          {post.source} · {post.dateLabel}
-        </span>
-        <h3 className={styles.portraitTitle}>{post.title}</h3>
-        <span className={styles.titleRule} aria-hidden />
-        <span className={styles.cardFoot}>
-          <span className={styles.footExcerpt}>{post.excerpt}</span>
-          <span className={styles.readMore}>
-            Read More
-            <svg
-              viewBox="0 0 32 10"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden
-            >
-              <path d="M0 5 H26" />
-              <path d="M22 1 L26 5 L22 9" />
-            </svg>
-          </span>
-        </span>
-      </span>
+      </div>
     </a>
   );
 }
 
 /**
- * Blog chapter on the cream page — an editorial carousel: saffron-dot
- * eyebrow with a pale parenthetical standfirst at the far right (the
- * Discover head-row language), then one wide featured story and three
- * portrait stories; hovering any story expands it. Below, the carousel
- * controls ride the carousel edges and the blog CTA sits bottom-right.
- * rotate the window by one through the eight newest posts (wrap-around).
- * On mobile the row becomes a swipeable scroll-snap strip of all eight.
+ * Blog chapter on the cream page — one draggable portrait strip at every
+ * breakpoint: a spare head row of just the saffron-dot eyebrow with the
+ * position counter beside it (no display headline — the mockup lets the
+ * photography lead), then the eight newest stories in a scroll-snap strip
+ * (mouse-drag on desktop, native swipe on touch), and the blog CTA in the
+ * foot row. No arrows — the strip itself is the control.
  */
 export default function Blog() {
-  const [start, setStart] = useState(0);
-  // which way the last arrow press moved the window — the cards slide
-  // with the direction of travel (next slides in from the right,
-  // previous from the left)
-  const [dir, setDir] = useState(1);
-  // which slot holds the wide share — the last story hovered stays
-  // expanded (it does not snap back on mouse-leave)
-  const [expanded, setExpanded] = useState(0);
-  const reduce = useReducedMotion();
+  const stripRef = useRef<HTMLDivElement>(null);
+  // dragging is state (it drives the data-dragging attribute); everything
+  // sampled per pointer-move lives in refs so a drag never re-renders
+  const [dragging, setDragging] = useState(false);
+  const [index, setIndex] = useState(0);
+  const startX = useRef(0);
+  const startScrollLeft = useRef(0);
+  const travel = useRef(0);
+  const suppressClick = useRef(false);
   const n = POOL.length;
 
-  // per-layer slide + fade, staggered left→right; reduced motion swaps
-  // the travel for an instant switch
-  const slide = {
-    enter: ({ d }: { d: number; i: number }) =>
-      reduce ? { opacity: 0 } : { opacity: 0, x: 64 * d },
-    center: ({ i }: { d: number; i: number }) => ({
-      opacity: 1,
-      x: 0,
-      transition: reduce
-        ? { duration: 0 }
-        : {
-            duration: 0.55,
-            ease: [0.22, 1, 0.36, 1] as const,
-            delay: i * 0.06,
-          },
-    }),
-    exit: ({ d }: { d: number; i: number }) =>
-      reduce
-        ? { opacity: 0, transition: { duration: 0 } }
-        : {
-            opacity: 0,
-            x: -64 * d,
-            transition: { duration: 0.4, ease: [0.4, 0, 1, 1] as const },
-          },
+  // counter feed — a passive, rAF-throttled scroll listener maps
+  // scrollLeft to a card index (card width + gutter = one step); the
+  // step is re-measured on resize since the card width is vw-derived
+  useEffect(() => {
+    const strip = stripRef.current;
+    if (!strip) return;
+    let step = 0;
+    let raf = 0;
+    const measure = () => {
+      const first = strip.firstElementChild as HTMLElement | null;
+      if (!first) return;
+      const gutter = parseFloat(getComputedStyle(strip).columnGap) || 0;
+      step = first.offsetWidth + gutter;
+    };
+    const onScroll = () => {
+      if (raf) return;
+      raf = requestAnimationFrame(() => {
+        raf = 0;
+        if (step > 0) {
+          const i = Math.round(strip.scrollLeft / step);
+          setIndex(Math.min(Math.max(i, 0), n - 1));
+        }
+      });
+    };
+    measure();
+    strip.addEventListener("scroll", onScroll, { passive: true });
+    window.addEventListener("resize", measure);
+    return () => {
+      strip.removeEventListener("scroll", onScroll);
+      window.removeEventListener("resize", measure);
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [n]);
+
+  // mouse drag-to-scroll via pointer capture — touch keeps the native
+  // scroll physics, so only pointerType "mouse" enters the drag path
+  const onPointerDown = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (e.pointerType !== "mouse") return;
+    const strip = stripRef.current;
+    if (!strip) return;
+    startX.current = e.clientX;
+    startScrollLeft.current = strip.scrollLeft;
+    travel.current = 0;
+    strip.setPointerCapture(e.pointerId);
+    setDragging(true);
+  };
+
+  const onPointerMove = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragging) return;
+    const strip = stripRef.current;
+    if (!strip) return;
+    const dx = e.clientX - startX.current;
+    travel.current = Math.max(travel.current, Math.abs(dx));
+    strip.scrollLeft = startScrollLeft.current - dx;
+  };
+
+  const onPointerEnd = (e: React.PointerEvent<HTMLDivElement>) => {
+    if (!dragging) return;
+    const strip = stripRef.current;
+    if (strip?.hasPointerCapture(e.pointerId)) {
+      strip.releasePointerCapture(e.pointerId);
+    }
+    setDragging(false);
+    // a real drag must not fire the card link it happened to end over —
+    // flag the next click for suppression (6px separates click wobble
+    // from intent to drag)
+    if (travel.current > 6) suppressClick.current = true;
+  };
+
+  const onClickCapture = (e: React.MouseEvent<HTMLDivElement>) => {
+    if (suppressClick.current) {
+      e.preventDefault();
+      e.stopPropagation();
+      suppressClick.current = false;
+    }
   };
 
   return (
     <section className={styles.section} id="blog" data-nav-theme="light">
+      {/* spare head row — just the eyebrow with the position counter
+          beside it, seated on the binding grid's column 2 */}
       <div className={styles.head}>
-        <span className={styles.eyebrow}>Blog</span>
-        <span className={styles.hint}>
-          (Stories, reviews and press from across the Maginhawa family of
-          kitchens)
+        <span className={styles.headLeft}>
+          <span className={styles.eyebrow}>Blog</span>
+          {/* which story leads the strip — fed by the scroll listener;
+              the slash belongs to the pale total: "01/08" */}
+          <span className={styles.counter}>
+            {String(index + 1).padStart(2, "0")}
+            <span className={styles.counterTotal}>
+              {"/" + String(n).padStart(2, "0")}
+            </span>
+          </span>
         </span>
       </div>
 
-      <Reveal className={styles.carousel}>
-        {/* prev/next ride the carousel's edges, vertically centred over
-            the cards (hidden on mobile, where the strip swipes) */}
-        <button
-          type="button"
-          className={`${styles.navBtn} ${styles.navPrev} ${styles.navEdgeLeft}`}
-          aria-label="Previous posts"
-          onClick={() => {
-            setDir(-1);
-            setStart((s) => (s - 1 + n) % n);
-          }}
-        >
-          <NavArrow />
-        </button>
-        <button
-          type="button"
-          className={`${styles.navBtn} ${styles.navEdgeRight}`}
-          aria-label="Next posts"
-          onClick={() => {
-            setDir(1);
-            setStart((s) => (s + 1) % n);
-          }}
-        >
-          <NavArrow />
-        </button>
-
-        {/* desktop — 4 fixed slots; each swap crossfades in place, and the
-            hovered story expands via flex-grow */}
+      <Reveal>
+        {/* the strip — scroll-snap owns the resting positions, the
+            pointer handlers add mouse drag; data-dragging lifts the snap
+            (and the grab cursor) for the duration of a drag */}
         <div
-          className={styles.mediaRow}
-          role="group"
-          aria-label={`Latest stories, ${WINDOW} of ${n} shown`}
+          ref={stripRef}
+          className={styles.strip}
+          tabIndex={0}
+          role="region"
+          aria-label="Latest stories"
+          data-dragging={dragging || undefined}
+          onPointerDown={onPointerDown}
+          onPointerMove={onPointerMove}
+          onPointerUp={onPointerEnd}
+          onPointerCancel={onPointerEnd}
+          onClickCapture={onClickCapture}
         >
-          {Array.from({ length: WINDOW }, (_, i) => {
-            const post = POOL[(start + i) % n];
-            return (
-              <div
-                key={i}
-                className={styles.slot}
-                style={{ flexGrow: expanded === i ? 2.2 : 1 }}
-                onMouseEnter={() => setExpanded(i)}
-              >
-                <AnimatePresence initial={false} custom={{ d: dir, i }}>
-                  <motion.div
-                    key={post.slug}
-                    className={styles.slotLayer}
-                    custom={{ d: dir, i }}
-                    variants={slide}
-                    initial="enter"
-                    animate="center"
-                    exit="exit"
-                  >
-                    {i === 0 ? (
-                      <FeaturedCard post={post} />
-                    ) : (
-                      <PortraitCard post={post} />
-                    )}
-                  </motion.div>
-                </AnimatePresence>
-              </div>
-            );
-          })}
-        </div>
-
-        {/* mobile — all eight stories in a swipeable snap strip */}
-        <div className={styles.strip}>
-          {POOL.map((post, i) => (
-            <div
-              key={post.slug}
-              className={i === 0 ? styles.stripFeatured : styles.stripCard}
-            >
-              {i === 0 ? (
-                <FeaturedCard post={post} />
-              ) : (
-                <PortraitCard post={post} />
-              )}
-            </div>
+          {POOL.map((post) => (
+            <StoryCard key={post.slug} post={post} />
           ))}
         </div>
       </Reveal>
 
-      {/* foot row — the blog CTA, bottom-right */}
+      {/* foot row — the blog CTA holds the right edge */}
       <div className={styles.foot}>
         <Link
           href="/blog"
           className={styles.footCta}
-          aria-label="See more of our blogs"
+          aria-label="Read all stories"
         >
-          <span className={styles.ctaLabel}>Click to see more of our blogs</span>
+          <span className={styles.ctaLabel}>Read all stories</span>
           <svg
             className={styles.ctaArrow}
             viewBox="0 0 32 10"

@@ -31,20 +31,26 @@ export default function MagneticButton({
   arrow = true,
   small = false,
   theme = "dark",
+  variant = "glass",
+  size,
 }: {
   label: string;
   type?: "button" | "submit";
   onClick?: () => void;
   ariaLabel?: string;
   arrow?: boolean;
+  /** legacy alias for size="small" — explicit `size` wins */
   small?: boolean;
   theme?: "dark" | "light";
+  variant?: "glass" | "solid";
+  size?: "regular" | "small" | "xsmall";
 }) {
+  const resolvedSize = size ?? (small ? "small" : "regular");
   return (
     <button
       type={type}
       onClick={onClick}
-      className={`${styles.btn} ${small ? styles.small : ""} ${theme === "light" ? styles.light : ""}`}
+      className={`${styles.btn} ${resolvedSize === "small" ? styles.small : ""} ${resolvedSize === "xsmall" ? styles.xsmall : ""} ${variant === "solid" ? styles.solid : ""} ${theme === "light" ? styles.light : ""}`}
       aria-label={ariaLabel ?? label}
     >
       <span className={styles.label} aria-hidden>

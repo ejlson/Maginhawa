@@ -1,15 +1,26 @@
-/* Blog chapter — back on the cream page, laid out as an editorial
-   carousel: saffron-dot eyebrow with a pale parenthetical standfirst at
-   the far right (Discover's head-row language), one wide featured story
-   + three portraits (the hovered story expands), arrows riding the carousel edges and the blog CTA bottom-right. Captions sit ON the
-   photography over a bottom gradient scrim — the one section where type
-   and image share a frame. */
+/* Blog chapter — back on the cream page, laid out as one draggable
+   portrait strip at every breakpoint: a spare head row of just the
+   saffron-dot eyebrow with the position counter beside it (no display
+   headline — the photography leads), eight stories in a scroll-snap
+   strip (mouse drag on desktop, native swipe on touch), and the blog CTA
+   bottom-right. Captions sit BELOW the photography on the cream — no
+   overlays, no scrims, no arrows. Geometry rides the mockup's binding
+   grid (section-scoped, not global): 12 columns, 20px page margins, 20px
+   gutters; the head row and the first card seat on column 2. */
 .section {
   position: relative;
   isolation: isolate;
+  --blog-margin: 20px;
+  --blog-gutter: 20px;
+  --blog-col: calc(
+    (100vw - 2 * var(--blog-margin) - 11 * var(--blog-gutter)) / 12
+  );
+  /* left edge of column 2 — margin + col 1 + gutter */
+  --blog-col2: calc(var(--blog-margin) + var(--blog-col) + var(--blog-gutter));
   /* top gap is owned by NumbersStrip's bottom padding; this section owns
-     the uniform chapter gap (--section-y-lg) down to the Locations video */
-  padding: 0 var(--pad-x) var(--home-gap);
+     the uniform chapter gap (--section-y-lg) down to the Locations video.
+     No inline padding — the children carry the binding grid themselves. */
+  padding: 0 0 var(--home-gap);
   display: flex;
   flex-direction: column;
   gap: clamp(20px, 3vh, 32px);
@@ -17,12 +28,20 @@
   color: var(--maroon);
 }
 
-/* ---------- head row — eyebrow left, pale standfirst far right ---------- */
+/* ---------- head row — just the eyebrow + counter cluster, seated on
+   the binding grid's column 2 like the first card below it ---------- */
 .head {
   display: flex;
   align-items: center;
-  justify-content: space-between;
   gap: 1em;
+  margin-inline: var(--blog-col2) var(--blog-margin);
+}
+
+/* the left cluster — eyebrow and position counter side by side */
+.headLeft {
+  display: inline-flex;
+  align-items: center;
+  gap: clamp(16px, 2vw, 28px);
 }
 
 .eyebrow {
@@ -45,82 +64,76 @@
   flex: none;
 }
 
-/* pale parenthetical standfirst — same recipe as Discover's hover hint */
-.hint {
+/* position counter — which story leads the strip, set "01/08" with the
+   slash owned by the pale total; tabular digits so the figures don't
+   shimmy as they advance */
+.counter {
   font-family: var(--font-sans);
+  font-weight: 500;
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
   color: var(--maroon);
-  opacity: 0.4;
-  text-align: right;
+  font-variant-numeric: tabular-nums;
+}
+/* 0.6 is the floor here — 0.5 maroon on cream computes ≈3.5:1 and fails
+   the 4.5:1 small-text minimum */
+.counterTotal {
+  opacity: 0.6;
 }
 
-/* ---------- the carousel — arrows ride its edges, centred over the
-   cards (the reference's floating-controls read) ---------- */
-.carousel {
-  position: relative;
-}
-
-.navEdgeLeft,
-.navEdgeRight {
-  position: absolute;
-  top: 50%;
-  translate: 0 -50%;
-  z-index: 3;
-}
-.navEdgeLeft {
-  left: clamp(12px, 1.6vw, 28px);
-}
-.navEdgeRight {
-  right: clamp(12px, 1.6vw, 28px);
-}
-
-/* ---------- desktop media row — the hovered story expands ---------- */
-.mediaRow {
+/* ---------- the strip — full-bleed scroll-snap row; its own inline
+   padding seats the first card on the binding grid's column 2 (matching
+   the head row above), and scroll-padding keeps snapped cards on that
+   edge ---------- */
+.strip {
   display: flex;
-  gap: var(--grid-gutter);
-  height: clamp(360px, 52vh, 560px);
+  gap: var(--blog-gutter);
+  padding-inline: var(--blog-col2) var(--blog-margin);
+  overflow-x: auto;
+  -webkit-overflow-scrolling: touch;
+  scroll-snap-type: x proximity;
+  scroll-padding-left: var(--blog-col2);
+  scrollbar-width: none;
+}
+.strip::-webkit-scrollbar {
+  display: none;
+}
+.strip:focus-visible {
+  outline: 1.5px solid currentColor;
+  outline-offset: 3px;
+}
+/* while a mouse drag is live, snap would fight the hand — lift it, and
+   read as "held" (no text selection mid-drag either) */
+.strip[data-dragging] {
+  scroll-snap-type: none;
+  cursor: grabbing;
+  user-select: none;
+  -webkit-user-select: none;
 }
 
-/* fixed slot; incoming/outgoing layers stack inside it, so the row
-   never reflows during a carousel swap. flex-grow carries the
-   expansion — the component drives it (the last story hovered stays
-   expanded), this transition just makes the handover glide. */
-.slot {
-  position: relative;
-  flex: 1 1 0%;
-  min-width: 0;
-  /* clips the directional slide so travelling layers never cross the
-     gutter into a neighbouring slot */
+/* ---------- card anatomy — portrait plate, caption below on cream ---------- */
+.card {
+  flex: none;
+  scroll-snap-align: start;
+  /* exactly three binding-grid columns wide (plus their two interior
+     gutters) — the next card still peeks in as the drag affordance */
+  width: calc(3 * var(--blog-col) + 2 * var(--blog-gutter));
+  display: block;
+  text-decoration: none;
+  color: var(--maroon);
+}
+
+/* the photograph — rounded 8:11 plate, placeholder-backed while loading */
+.plate {
+  aspect-ratio: 8 / 11;
   overflow: hidden;
   border-radius: var(--radius-card);
   corner-shape: squircle; /* Figma-style corner smoothing (superellipse); falls back to plain rounding */
-  transition: flex-grow 1.15s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.slotLayer {
-  position: absolute;
-  inset: 0;
-}
-
-/* ---------- card anatomy ---------- */
-.plate {
-  position: relative;
-  display: block;
-  width: 100%;
-  height: 100%;
-  overflow: hidden;
-  border-radius: var(--radius-card);
-  corner-shape: squircle;
   background: var(--placeholder);
-  color: var(--cream);
-  text-decoration: none;
 }
 
 .cover {
-  position: absolute;
-  inset: 0;
   width: 100%;
   height: 100%;
   object-fit: cover;
@@ -128,50 +141,34 @@
   transition: transform 0.8s var(--ease-out);
 }
 
-/* bottom gradient scrim — carries the overlaid captions */
-.scrim {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    transparent 42%,
-    rgba(31, 0, 0, 0.45) 68%,
-    rgba(31, 0, 0, 0.85) 100%
-  );
-  pointer-events: none;
-}
-
-/* featured — date, two-line headline, one-line excerpt bottom-left */
-.featuredText {
-  position: absolute;
-  left: clamp(18px, 2vw, 28px);
-  right: clamp(18px, 2vw, 28px);
-  bottom: clamp(18px, 2vw, 28px);
+/* the caption stack under the plate */
+.caption {
   display: flex;
   flex-direction: column;
+  align-items: flex-start;
   gap: 0.55em;
-  /* the caption block owns the card's full lower band — Read More
-     right-aligns inside it (the chip lives top-right now) */
+  margin-top: clamp(12px, 1.4vw, 18px);
 }
 
-.overlayMeta {
+/* date meta line in the caps-label voice — 0.6 keeps the pale maroon
+   above the 4.5:1 small-text contrast floor on cream */
+.microLabel {
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
-  color: var(--cream);
-  opacity: 0.8;
+  color: var(--maroon);
+  opacity: 0.6;
 }
 
-.featuredTitle {
+.cardTitle {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: var(--t-h3);
+  font-size: var(--t-lead);
   line-height: var(--lh-heading);
   letter-spacing: var(--tr-display);
-  color: var(--cream);
-  max-width: 24ch;
+  color: var(--maroon);
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -179,41 +176,8 @@
   transition: color 0.3s ease;
 }
 
-/* the caption's bottom band — a one-line excerpt on the left, Read More
-   on the right, sharing one baseline row */
-.cardFoot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: clamp(12px, 1.6vw, 28px);
-  width: 100%;
-}
-
-.footExcerpt {
-  flex: 1;
-  min-width: 0;
-  text-align: left;
-  font-family: var(--font-sans);
-  font-size: var(--t-small);
-  line-height: var(--lh-body);
-  color: var(--cream);
-  opacity: 0.8;
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 1;
-  overflow: hidden;
-}
-
-/* hairline under every card title — spans the caption block */
-.titleRule {
-  display: block;
-  width: 100%;
-  height: 1px;
-  background: rgba(248, 243, 234, 0.32);
-}
-
-/* Read More affordance, bottom-right of every card's caption block —
-   decorative (the whole card is the link); the card's hover lights it */
+/* Read More affordance under every caption — decorative (the whole card
+   is the link); the card's hover lights it */
 .readMore {
   flex: none;
   display: inline-flex;
@@ -225,7 +189,7 @@
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
   font-weight: 500;
-  color: var(--cream);
+  color: var(--maroon);
   opacity: 0.85;
   transition:
     color 0.3s ease,
@@ -237,139 +201,35 @@
   transition: transform 0.4s var(--ease-out);
 }
 
-/* the outlet in a quiet dark chip — rides the featured plate's TOP
-   right (the bottom-right corner belongs to Read More) */
-.sourceChip {
-  position: absolute;
-  right: clamp(18px, 2vw, 28px);
-  top: clamp(18px, 2vw, 28px);
-  padding: 0.45em 0.9em;
-  border-radius: 999px;
-  background: rgba(18, 0, 0, 0.4);
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  color: var(--cream);
-  white-space: nowrap;
-}
-
-/* portrait — saffron-dot outlet micro-label above a clamped title */
-.portraitText {
-  position: absolute;
-  left: clamp(14px, 1.6vw, 22px);
-  right: clamp(14px, 1.6vw, 22px);
-  bottom: clamp(14px, 1.6vw, 22px);
-  display: flex;
-  flex-direction: column;
-  gap: 0.5em;
-}
-
-/* plain caps label — no chapter dot; that device belongs to section
-   eyebrows, not card metadata */
-.microLabel {
-  display: inline-flex;
-  align-items: center;
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  color: var(--cream);
-  opacity: 0.85;
-}
-
-.portraitTitle {
-  margin: 0;
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: var(--t-lead);
-  line-height: var(--lh-heading);
-  letter-spacing: var(--tr-display);
-  color: var(--cream);
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  overflow: hidden;
-  transition: color 0.3s ease;
-}
-
-/* ---------- hover — quiet zoom + saffron headline, no lift ---------- */
+/* ---------- hover — quiet zoom + saffron caption, no lift; the idle
+   grab cursor tells the mouse the strip drags ---------- */
 @media (hover: hover) and (pointer: fine) {
-  .plate:hover .cover {
+  .strip {
+    cursor: grab;
+  }
+  .card:hover .cover {
     transform: scale(1.03);
   }
-  .plate:hover .featuredTitle,
-  .plate:hover .portraitTitle {
+  .card:hover .cardTitle {
     color: var(--saffron);
   }
-  .plate:hover .readMore {
+  .card:hover .readMore {
     color: var(--saffron);
     opacity: 1;
   }
-  .plate:hover .readMore svg {
+  .card:hover .readMore svg {
     transform: translateX(5px);
   }
 }
 
-/* ---------- foot row — the blog CTA, bottom-right ---------- */
+/* ---------- foot row — the blog CTA holds the right edge, inset by the
+   binding grid's page margin (the section itself carries none) ---------- */
 .foot {
   display: flex;
   align-items: center;
   justify-content: space-between;
   gap: 24px;
-}
-
-/* prev/next — the house liquid-glass pills (the ViewAll recipe: clear
-   cream tint over the refraction chain, cream arrow, dark rim recess
-   that relaxes on hover) — they float over the card photography */
-.navBtn {
-  display: grid;
-  place-items: center;
-  height: clamp(40px, 3.4vw, 48px);
-  padding: 0 clamp(18px, 1.8vw, 26px);
-  border: none;
-  border-radius: 999px;
-  background: rgba(248, 243, 234, 0.08);
-  -webkit-backdrop-filter: blur(6px) saturate(1.9) contrast(1.05);
-  backdrop-filter: blur(6px) saturate(1.9) contrast(1.05);
-  /* liquid-glass refraction (Chromium) — displacement bends the backdrop
-     at the rim; other engines keep the declaration above */
-  -webkit-backdrop-filter: url(#lg-pill) blur(3px) saturate(1.9);
-  backdrop-filter: url(#lg-pill) blur(3px) saturate(1.9);
-  box-shadow:
-    inset 0 0 0.45em rgba(18, 0, 0, 0.22),
-    inset 0 1px 2px rgba(18, 0, 0, 0.18);
-  color: var(--cream);
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  transition: box-shadow 0.45s var(--ease-out);
-}
-.navBtn svg {
-  width: clamp(16px, 1.4vw, 20px);
-  height: clamp(16px, 1.4vw, 20px);
-  display: block;
-  transition: transform 0.4s var(--ease-out);
-}
-.navPrev svg {
-  transform: scaleX(-1);
-}
-.navBtn:hover,
-.navBtn:focus-visible {
-  box-shadow:
-    inset 0 0 0.45em rgba(18, 0, 0, 0.08),
-    inset 0 1px 2px rgba(18, 0, 0, 0.06);
-}
-.navBtn:hover svg,
-.navBtn:focus-visible svg {
-  transform: translateX(2px);
-}
-.navPrev:hover svg,
-.navPrev:focus-visible svg {
-  transform: scaleX(-1) translateX(2px);
-}
-.navBtn:focus-visible {
-  outline: 1.5px solid currentColor;
-  outline-offset: 3px;
+  padding-inline: var(--blog-margin);
 }
 
 /* blog CTA — maroon label with underline-draw + arrow slide, pinned to
@@ -424,73 +284,13 @@
   transform: translateX(5px);
 }
 
-/* ---------- mobile — swipeable snap strip of all eight ---------- */
-.strip {
-  display: none;
-}
-
+/* ---------- responsive — the column-2 seat collapses to the plain page
+   margin and the card takes a viewport fraction (~1.5 in view) ---------- */
 @media (max-width: 900px) {
-  .mediaRow,
-  .navEdgeLeft,
-  .navEdgeRight {
-    display: none;
+  .section {
+    --blog-col2: var(--blog-margin);
   }
-
-  /* the standfirst wraps under the eyebrow instead of fighting it */
-  .head {
-    flex-direction: column;
-    align-items: flex-start;
-    gap: 10px;
-  }
-  .hint {
-    text-align: left;
-  }
-
-  /* full-bleed snap strip; the section's inline padding becomes the
-     strip's own so the first card aligns with the content edge */
-  .strip {
-    display: flex;
-    gap: var(--grid-gutter);
-    height: clamp(320px, 48vh, 440px);
-    margin-inline: calc(-1 * var(--pad-x));
-    padding-inline: var(--pad-x);
-    overflow-x: auto;
-    scroll-snap-type: x mandatory;
-    -webkit-overflow-scrolling: touch;
-    scrollbar-width: none;
-  }
-  .strip::-webkit-scrollbar {
-    display: none;
-  }
-
-  .stripFeatured,
-  .stripCard {
-    position: relative;
-    flex: none;
-    height: 100%;
-    scroll-snap-align: start;
-  }
-  .stripFeatured {
-    width: 85vw;
-  }
-  .stripCard {
+  .card {
     width: 62vw;
-  }
-}
-
-@media (max-width: 480px) {
-  .stripFeatured {
-    width: 88vw;
-  }
-  .stripCard {
-    width: 74vw;
-  }
-
-  /* the chip cedes the corner on small screens */
-  .featuredText {
-    padding-right: 0;
-  }
-  .sourceChip {
-    display: none;
   }
 }

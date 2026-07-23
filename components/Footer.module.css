@@ -58,6 +58,13 @@
   opacity: 1;
 }
 
+/* Reveal wrapper — same flex box the svg used to occupy, so its width:100%
+   resolves against the identical width (no layout shift) */
+.wordmarkReveal {
+  flex: none;
+  width: 100%;
+}
+
 /* two-line wordmark, natural proportions (not squished), full bleed width */
 .wordmark {
   flex: none;
