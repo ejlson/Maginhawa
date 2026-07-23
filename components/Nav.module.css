@@ -119,8 +119,13 @@
 /* ---- hamburger button (3 lines -> X) — mobile only ---- */
 .burger {
   position: relative;
+  /* 22×13 icon padded out to a ≥44px hit area; the negative margins hand
+     the padding back so the lines sit exactly where they always did */
   width: 22px;
   height: 13px;
+  box-sizing: content-box;
+  padding: 16px 11px;
+  margin: -16px -11px;
   display: flex;
   flex-direction: column;
   align-items: flex-end;
@@ -128,7 +133,6 @@
   gap: 5px;
   background: none;
   border: none;
-  padding: 0;
   color: inherit;
   flex: none;
 }

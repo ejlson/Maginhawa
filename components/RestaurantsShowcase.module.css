@@ -2,6 +2,15 @@
   position: relative;
   background: var(--maroon);
   --row: clamp(46px, 6.5vh, 62px);
+  /* optical correction — Contralto's asymmetric vertical metrics (a tall
+     1.116em ascent against a 0.223em descent) push the baseline low inside
+     its grid-centred row, the same trait the About year-wheel corrects
+     with --story-num-nudge. Every name gets a small em-based lift until
+     the cap-height→baseline ink block sits equidistant from the two
+     hairlines (measured at the glyph level via canvas TextMetrics).
+     Em-based → identical for every name, no jitter between selections.
+     Tune this one value. */
+  --wheel-name-nudge: -0.095em;
 }
 
 /* the video showcase pins to the top; the maroon footer rises over it as you
@@ -325,8 +334,12 @@
     grid-auto-rows: auto;
     height: auto;
   }
+  /* in-flow (not absolute) so the aspect ratio actually sizes the card —
+     the overlay keeps anchoring to the .card box, whose height this sets */
   .cardImg {
-    flex: none;
+    position: static;
+    display: block;
+    width: 100%;
     aspect-ratio: 3 / 4;
   }
 }
@@ -377,7 +390,15 @@
   display: grid;
   place-items: center;
   width: 100%;
+  /* 22px visual row padded to a ≥36px touch target; negative margins give
+     the space back so the wheel column doesn't grow */
   height: 22px;
+  box-sizing: content-box;
+  padding-block: 8px;
+  margin-block: -8px;
+  /* paint above the adjacent scroller so the padded area actually taps */
+  position: relative;
+  z-index: 2;
   border: none;
   background: none;
   color: var(--cream);
@@ -454,6 +475,12 @@
   text-shadow: 0 1px 14px rgba(18, 0, 0, 0.5);
   white-space: nowrap;
   transform-origin: left center;
+  /* the between-hairlines seat — JS rewrites `transform` (scale) per frame,
+     so a translateY here would be clobbered; a relative `top` offset
+     survives, and it doesn't move offsetTop/offsetHeight, so the JS
+     centring/settle math stays honest */
+  position: relative;
+  top: var(--wheel-name-nudge);
   /* opacity/scale are driven per-frame in JS — no CSS transition (it would
      smear the continuous scroll updates) */
   /* names are buttons — don't let them select/blue-highlight on click */

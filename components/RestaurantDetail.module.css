@@ -3,7 +3,9 @@
   color: var(--maroon);
   min-height: 100vh;
   padding-top: clamp(80px, 10vh, 120px);
-  padding-bottom: var(--section-y);
+  /* no bottom padding — the DarkZone-wrapped footer is the page's last
+     child, and padding here would paint a stray cream band beneath it */
+  padding-bottom: 0;
 }
 
 /* ---- hero ---- */

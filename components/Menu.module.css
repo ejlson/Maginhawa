@@ -106,3 +106,19 @@
   overflow: hidden;
   position: relative;
 }
+
+/* touch: the preview pane is hover-driven, so it never updates — drop it
+   (and its rule) to hand the whole panel to the link list, and open the
+   item pitch up a touch for fingers */
+@media (hover: none), (pointer: coarse) {
+  .divider,
+  .thumb {
+    display: none;
+  }
+  .list {
+    gap: clamp(4px, 0.8vh, 8px);
+  }
+  .item {
+    padding-block: 0.18em;
+  }
+}

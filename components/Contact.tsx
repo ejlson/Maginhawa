@@ -1,6 +1,5 @@
 import styles from "./Contact.module.css";
 import Reveal from "./Reveal";
-import MagneticButton from "./MagneticButton";
 
 export default function Contact() {
   return (
@@ -62,7 +61,23 @@ export default function Contact() {
                 <input type="text" placeholder="Enter your description here" />
               </div>
               <div className={styles.submitRow}>
-                <MagneticButton label="Submit" type="submit" small />
+                {/* submit wears the ReadyCta "Join Us" pill — the one
+                    light moment on the maroon contact ground */}
+                <button type="submit" className={styles.submitPill}>
+                  <span className={styles.pillLabel}>Submit</span>
+                  <svg
+                    className={styles.pillArrow}
+                    viewBox="0 0 24 24"
+                    fill="none"
+                    stroke="currentColor"
+                    strokeWidth="1.5"
+                    strokeLinecap="round"
+                    strokeLinejoin="round"
+                    aria-hidden
+                  >
+                    <path d="M9 6l6 6-6 6" />
+                  </svg>
+                </button>
               </div>
             </form>
           </Reveal>

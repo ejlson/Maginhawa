@@ -31,6 +31,9 @@ const STORY: {
   place: string;
   slug?: string;
   layout: "wide" | "portrait" | "landscape";
+  /* no photography yet — render the wordmark on a maroon field instead
+     (the Discover tile's coming-soon treatment) */
+  wordmark?: boolean;
 }[] = [
   {
     year: "1987",
@@ -73,23 +76,23 @@ const STORY: {
     layout: "portrait",
   },
   {
-    year: "2022",
-    title: "Café Mama & Sons",
-    body: "A Filipino-Japanese café and bakery brings hand-crafted sandos and the award-winning Longanisa Breakfast Burger to the morning crowd.",
-    image: "/images/cafemama.jpg",
-    imageAlt: "Café Mama & Sons storefront",
-    place: "Kentish Town",
-    slug: "cafemama",
-    layout: "landscape",
-  },
-  {
-    year: "2024",
+    year: "2019",
     title: "Hoodwood",
     body: "A Caribbean takeaway opens with the Jacket Exchange — trade a winter coat, take a free jerk jacket potato.",
     image: "/images/hoowood.jpg",
     imageAlt: "Hoodwood, Kentish Town",
     place: "Kentish Town",
     slug: "hoodwood",
+    layout: "landscape",
+  },
+  {
+    year: "2025",
+    title: "Café Mama & Sons",
+    body: "A Filipino-Japanese café and bakery brings hand-crafted sandos and the award-winning Longanisa Breakfast Burger to the morning crowd.",
+    image: "/images/cafemama.jpg",
+    imageAlt: "Café Mama & Sons storefront",
+    place: "Kentish Town",
+    slug: "cafemama",
     layout: "portrait",
   },
   {
@@ -110,7 +113,18 @@ const STORY: {
     imageAlt: "Belly added to the Michelin Guide",
     place: "Kentish Town",
     slug: "belly",
+    layout: "portrait",
+  },
+  {
+    year: "2026",
+    title: "Bunso — coming soon",
+    body: "The youngest of the family: a Filipino-Japanese kissaten and listening jazz bar, opening in London in 2026.",
+    image: "/images/bunso.png",
+    imageAlt: "Bunso wordmark",
+    place: "London",
+    slug: "bunso",
     layout: "wide",
+    wordmark: true,
   },
 ];
 
@@ -120,7 +134,19 @@ type CoverageRow = {
   restaurants: string[];
   date: string;
   url: string;
+  // resolved hover-image path (bespoke press override, else the first
+  // credited restaurant's photo) — absent when only a missing placeholder
+  // would resolve, so the row simply skips the hover treatment
+  image?: string;
 };
+
+// hover-image guard — these restaurant `image` paths are placeholders that
+// don't exist under /public yet (Mamasons, Bunso). Rows resolving to them
+// get no hover image at all rather than a broken <img>.
+const MISSING_IMAGES = new Set([
+  "/images/mamasons-placeholder.jpg",
+  "/images/bunso-placeholder.jpg",
+]);
 
 const yearFromDate = (d: string) =>
   /\.(\d{2})$/.test(d) ? `20${d.slice(-2)}` : "";
@@ -129,12 +155,18 @@ const COVERAGE_GROUPS: { outlet: string; entries: CoverageRow[] }[] = (() => {
   const byOutlet = new Map<string, CoverageRow[]>();
 
   for (const p of PRESS) {
+    // bespoke press image first, else the first credited restaurant's
+    // canonical photo — dropped entirely when only a known-missing
+    // placeholder would resolve
+    const image = p.image ?? getRestaurant(p.restaurants[0])?.image;
+
     const row: CoverageRow = {
       outlet: p.outlet,
       feature: p.feature,
       restaurants: p.restaurants.map((s) => getRestaurant(s)?.name ?? s),
       date: yearFromDate(p.date),
       url: p.url,
+      image: image && !MISSING_IMAGES.has(image) ? image : undefined,
     };
 
     if (!byOutlet.has(p.outlet)) byOutlet.set(p.outlet, []);
@@ -254,7 +286,7 @@ export default function About() {
                   <span className={styles.heroLineClip}>
                     <motion.span
                       className={styles.heroLineInner}
-                      initial={reduceMotion ? false : { y: "110%" }}
+                      initial={reduceMotion ? false : { y: "120%" }}
                       animate={{ y: "0%" }}
                       transition={{
                         duration: 1,
@@ -271,7 +303,7 @@ export default function About() {
                   <span className={styles.heroLineClip}>
                     <motion.span
                       className={styles.heroLineInner}
-                      initial={reduceMotion ? false : { y: "110%" }}
+                      initial={reduceMotion ? false : { y: "120%" }}
                       animate={{ y: "0%" }}
                       transition={{
                         duration: 1,
@@ -292,7 +324,7 @@ export default function About() {
                       <span className={styles.heroLineClip}>
                         <motion.span
                           className={styles.heroLineInner}
-                          initial={reduceMotion ? false : { y: "110%" }}
+                          initial={reduceMotion ? false : { y: "120%" }}
                           animate={{ y: "0%" }}
                           transition={{
                             duration: 1,
@@ -315,7 +347,7 @@ export default function About() {
                     <span className={styles.heroLineClip}>
                       <motion.span
                         className={styles.heroLineInner}
-                        initial={reduceMotion ? false : { y: "110%" }}
+                        initial={reduceMotion ? false : { y: "120%" }}
                         animate={{ y: "0%" }}
                         transition={{
                           duration: 1,
@@ -443,7 +475,7 @@ export default function About() {
                     >
                       {STORY.map((story, index) => (
                         <span
-                          key={story.year}
+                          key={`${story.year}-${story.title}`}
                           className={`${styles.storyNumber} ${
                             index === activeStory ? styles.isActive : ""
                           }`}
@@ -464,7 +496,7 @@ export default function About() {
                 <div className={styles.storyProgress}>
                   {STORY.map((story, index) => (
                     <span
-                      key={story.year}
+                      key={`${story.year}-${story.title}`}
                       className={
                         index === activeStory ? styles.progressActive : ""
                       }
@@ -476,7 +508,7 @@ export default function About() {
               <ol className={styles.storyList}>
                 {STORY.map((s, index) => (
                   <li
-                    key={s.year}
+                    key={`${s.year}-${s.title}`}
                     ref={(el) => {
                       storyRefs.current[index] = el;
                     }}
@@ -500,7 +532,9 @@ export default function About() {
                         <img
                           src={s.image}
                           alt={s.imageAlt}
-                          className={styles.storyImage}
+                          className={`${styles.storyImage} ${
+                            s.wordmark ? styles.storyImageWordmark : ""
+                          }`}
                         />
                       </Reveal>
 
@@ -614,6 +648,21 @@ export default function About() {
                               <path d="M14 1 L18 5 L14 9" />
                             </svg>
                           </span>
+
+                          {/* hover preview — always mounted, absolutely
+                              positioned (see .coverageThumb) so it floats
+                              between the feature text and the arrow and can
+                              never reflow the row grid; decorative only */}
+                          {row.image && (
+                            <img
+                              className={styles.coverageThumb}
+                              src={row.image}
+                              alt=""
+                              aria-hidden
+                              loading="lazy"
+                              decoding="async"
+                            />
+                          )}
                         </a>
                       ))}
                     </div>

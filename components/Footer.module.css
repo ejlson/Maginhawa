@@ -90,7 +90,30 @@
   }
 }
 
+/* phones: four abreast is too cramped — settle into a roomy 2-up grid
+   (display: contents lifts the left columns into the same grid as the
+   contact column) and give the links finger-sized pitch */
+@media (max-width: 480px) {
+  .cols {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: clamp(18px, 4vw, 28px) 16px;
+  }
+  .leftCols {
+    display: contents;
+  }
+  .contactCol {
+    margin-left: 0;
+  }
+  .col a {
+    font-size: var(--t-body);
+  }
+  .col ul {
+    gap: 0.55em;
+  }
+}
+
 .developer {
   font-family: var(--font-sans);
-  font-weight: 2000;
+  font-weight: 200;
 }

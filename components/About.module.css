@@ -86,6 +86,15 @@
      visible so italic overhangs — GROUP's swashed P — never get shorn */
   overflow-x: visible;
   overflow-y: clip;
+  /* the display lines are set tight (line-height 0.86), so round bottoms —
+     G/O overshoot, italic descenders — spill below the line box and were
+     being shorn by the clip. Give the clip breathing room below (em-based,
+     so it scales with --hero-display-size) and swallow it again with a
+     matching negative margin, keeping the stack's optical rhythm intact.
+     NB: the hidden state in About.tsx starts at y:120% (not 110%) so no
+     ascender ink can peek through this extra window pre-reveal. */
+  padding-bottom: 0.12em;
+  margin-bottom: -0.12em;
 }
 
 /* "Who is" — small italic serif kicker sitting on the title's shoulder.
@@ -94,7 +103,10 @@
 .heroKicker {
   font-family: var(--font-serif);
   font-style: italic;
-  font-weight: 500;
+  /* hairline weight — Fraunces at its lightest reads as a pencil note on
+     the title's shoulder (the AboutIntro .titleItalic treatment) rather
+     than competing with MAGINHAWA's heft */
+  font-weight: 200;
   font-size: clamp(1.2rem, 2.4vw, 2.2rem);
   line-height: 1;
   color: var(--cream);
@@ -516,11 +528,14 @@
   align-items: center;
   padding-block: clamp(32px, 5vh, 64px);
   border-top: 1px solid rgba(248, 243, 234, 0.14);
-  opacity: 0.42;
-  transform: translateY(14px);
+  /* inactive chapters wait a touch dimmer and lower; activation rises them
+     on the house ease over a longer 0.6s travel, so the settle reads
+     editorial rather than snappy */
+  opacity: 0.5;
+  transform: translateY(24px);
   transition:
-    opacity 0.35s cubic-bezier(0.23, 1, 0.32, 1),
-    transform 0.35s cubic-bezier(0.23, 1, 0.32, 1);
+    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .storyItem:first-child {
@@ -532,6 +547,18 @@
   transform: translateY(0);
 }
 
+/* a whisper of scale on the glass card itself — NOT the li, whose
+   IntersectionObserver geometry must stay untouched — so the card breathes
+   up to full size as its chapter takes focus */
+.storyItem .storyContent {
+  transform: scale(0.985);
+  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.storyItemActive .storyContent {
+  transform: none;
+}
+
 .storyMobileYear {
   display: none;
 }
@@ -539,13 +566,19 @@
 /* glass card — each chapter's content sits on a translucent cream surface;
    photo column left, text right (stacks on mobile) */
 .storyContent {
+  /* golden-ratio interior — one knob: the column gap tracks the card
+     padding at 1/φ (0.618), so the card's internal rhythm carries the
+     same proportion as its column split below */
+  --card-pad: clamp(20px, 2.4vw, 40px);
+
   display: grid;
-  grid-template-columns: minmax(0, 0.9fr) minmax(0, 1.1fr);
-  gap: clamp(20px, 2.5vw, 44px);
+  /* photo : text at 1 : φ — text is the major partner of the spread */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1.618fr);
+  gap: calc(var(--card-pad) * 0.618);
   align-items: center;
   width: 100%;
   max-width: 880px;
-  padding: clamp(20px, 2.4vw, 40px);
+  padding: var(--card-pad);
   /* the house clear liquid glass (the CTAs' material): a whisper of
      cream tint over a light blur so the footage reads through vividly,
      no border, no light edges — just the tight recess hugging the rim.
@@ -635,7 +668,8 @@
 
 .storyImageFrame {
   width: 100%;
-  aspect-ratio: 4 / 3;
+  /* landscape golden rectangle — φ : 1 */
+  aspect-ratio: 1.618 / 1;
   overflow: hidden;
   background: var(--placeholder);
   border-radius: var(--radius-media);
@@ -647,13 +681,15 @@
 
 /* ---- chapter layout variants — a varied editorial sequence ---- */
 
-/* portrait: text leads on the left, a tall image closes the spread */
+/* portrait: text leads on the left, a tall image closes the spread —
+   text : photo at φ : 1, mirroring the landscape split */
 .storyPortrait {
-  grid-template-columns: minmax(0, 1.1fr) minmax(0, 0.72fr);
+  grid-template-columns: minmax(0, 1.618fr) minmax(0, 1fr);
 }
 .storyPortrait .storyImageFrame {
   order: 2;
-  aspect-ratio: 3 / 4;
+  /* the golden rectangle stood upright — 1 : φ */
+  aspect-ratio: 1 / 1.618;
 }
 
 /* wide: a panoramic image over the text — reserved for the bookend
@@ -663,7 +699,8 @@
   max-width: 980px;
 }
 .storyWide .storyImageFrame {
-  aspect-ratio: 21 / 9;
+  /* panoramic at φ² : 1 (≈2.618) — the golden family's widest member */
+  aspect-ratio: 2.618 / 1;
 }
 
 /* quiet link out to the chapter's restaurant — same thin arrow language
@@ -704,6 +741,43 @@
   object-fit: cover;
   display: block;
   filter: saturate(0.96) contrast(0.98);
+}
+
+/* restrained depth cue — scroll-driven engines only (Chromium): the photo
+   is oversized a touch and drifts a few percent inside its overflow-hidden
+   frame as the card crosses the viewport. The travel (±3.5%) stays inside
+   the 8% oversize, so no edge ever shows; it reads as depth, not motion.
+   Other engines (and reduced-motion readers) simply get the still crop. */
+@supports (animation-timeline: view()) {
+  @media (prefers-reduced-motion: no-preference) {
+    .storyImage {
+      scale: 1.08;
+      animation: storyParallax linear both;
+      animation-timeline: view();
+    }
+  }
+}
+
+/* coming-soon chapters ship no photography — the wordmark sits contained
+   on a maroon field (the Discover tile's treatment), and the parallax
+   drift is switched off so the mark stays seated. Declared after the
+   @supports block above so these overrides win in source order. */
+.storyImageWordmark {
+  object-fit: contain;
+  padding: clamp(24px, 16%, 88px);
+  background: var(--maroon);
+  filter: none;
+  scale: 1;
+  animation: none;
+}
+
+@keyframes storyParallax {
+  from {
+    translate: 0 -3.5%;
+  }
+  to {
+    translate: 0 3.5%;
+  }
 }
 
 /* progress dots — compact bar docked under the year wheel (the wheel
@@ -760,6 +834,13 @@
   .storyItem {
     transform: none;
     transition: opacity 0.2s ease;
+  }
+
+  /* the card's activation scale is motion — the item's opacity fade above
+     is the whole effect for reduced-motion readers */
+  .storyItem .storyContent {
+    transform: none;
+    transition: none;
   }
 }
 
@@ -822,6 +903,8 @@
 }
 
 .coverageRow {
+  /* anchor for the floating hover thumbnail */
+  position: relative;
   display: grid;
   grid-template-columns:
     clamp(110px, 12vw, 170px)
@@ -833,6 +916,61 @@
   padding-block: clamp(2px, 0.35vh, 5px);
   color: inherit;
   text-decoration: none;
+}
+
+/* floating hover thumbnail — the credited restaurant's photo, riding the
+   right end of the row between the feature text and the arrow column.
+   Absolutely positioned with fixed dimensions and opacity 0 at rest, so it
+   overhangs the hairlines (the editorial intent) without ever reflowing
+   the grid — zero layout shift. Hover-only chrome: it stays display:none
+   for touch/coarse pointers and the stacked ≤720px layout. */
+.coverageThumb {
+  display: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .coverageThumb {
+    display: block;
+    position: absolute;
+    /* seat the right edge against the arrow column: arrow track + one
+       column gap (same clamps as the row grid above) */
+    right: calc(clamp(22px, 2vw, 30px) + clamp(16px, 2vw, 36px));
+    /* vertically centred on the row — bias toward top: 40% if the date
+       column ever needs more clearance at 980–1280 widths */
+    top: 50%;
+    width: clamp(120px, 11vw, 180px);
+    aspect-ratio: 3 / 2;
+    object-fit: cover;
+    border-radius: var(--radius-media);
+    corner-shape: squircle; /* Figma-style corner smoothing (superellipse); falls back to plain rounding */
+    /* the story frames' soft editorial shadow */
+    box-shadow:
+      0 28px 70px -42px rgba(47, 0, 0, 0.55),
+      0 1px 0 rgba(255, 255, 255, 0.5) inset;
+    /* floats over neighbouring rows' hairlines, never catches the cursor */
+    z-index: 2;
+    pointer-events: none;
+    opacity: 0;
+    transform: translateY(-50%) scale(0.96);
+    transform-origin: right center;
+    transition:
+      opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
+      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  }
+
+  .coverageRow:hover .coverageThumb,
+  .coverageRow:focus-visible .coverageThumb {
+    opacity: 1;
+    transform: translateY(-50%) scale(1);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* no scale travel — the thumbnail simply appears */
+  .coverageThumb {
+    transition: none;
+    transform: translateY(-50%);
+  }
 }
 
 /* thin arrow closing each row — quiet at rest, wakes on hover */
@@ -940,6 +1078,12 @@
     transform: none;
   }
 
+  /* no activation states on mobile (every chapter is "on") — the card sits
+     at full size permanently */
+  .storyItem .storyContent {
+    transform: none;
+  }
+
   .storyMobileYear {
     display: block;
     margin-bottom: clamp(16px, 2.6vh, 28px);
@@ -966,10 +1110,11 @@
   .storyPortrait .storyImageFrame {
     order: 0;
   }
-  /* tall/panoramic crops read wrong stacked — settle on one photo shape */
+  /* tall/panoramic crops read wrong stacked — settle on the landscape
+     golden rectangle every card already speaks */
   .storyPortrait .storyImageFrame,
   .storyWide .storyImageFrame {
-    aspect-ratio: 4 / 3;
+    aspect-ratio: 1.618 / 1;
   }
 }
 
@@ -1000,9 +1145,20 @@
     gap: clamp(20px, 3vh, 32px);
   }
 
+  /* single column falls back to DOM order (lede before GROUP?), which would
+     wedge the lede inside the title — reorder so the stack reads
+     Who is / MAGINHAWA / GROUP?, lede after */
   .heroLineBottom {
+    order: 1;
     text-align: left;
     justify-self: start;
+    /* the -0.044em optical seat targeted the lede's first line — gone here */
+    margin-top: 0;
+  }
+
+  .heroAside {
+    order: 2;
+    margin-top: clamp(16px, 4vw, 28px);
   }
 }
 
@@ -1027,8 +1183,23 @@
     text-align: left;
   }
 
+  /* stacked rows have no shared baseline to protect — let the feature
+     line wrap instead of ellipsing away its second half */
+  .coverageFeature {
+    white-space: normal;
+    overflow: visible;
+    text-overflow: clip;
+  }
+
   /* stacked rows — the arrow would sit as its own awkward line */
   .coverageArrow {
+    display: none;
+  }
+
+  /* the floating thumbnail assumed the four-column row; a narrow window on
+     a fine-pointer machine still matches the hover media above, so assert
+     it away wherever the rows stack */
+  .coverageThumb {
     display: none;
   }
 }
@@ -1043,10 +1214,12 @@
   }
 }
 
+/* .storyItem is deliberately absent here — its reduced-motion treatment (the
+   0.2s opacity-only fade) is declared with the story styles above, and listing
+   it again would clobber that fade with a hard snap */
 @media (prefers-reduced-motion: reduce) {
   .storyNumberTrack,
   .storyNumber,
-  .storyItem,
   .storyProgress span {
     transition: none;
   }

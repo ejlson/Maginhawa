@@ -60,7 +60,7 @@ export default function Reveal({
       variants={variants}
       initial="hidden"
       whileInView="shown"
-      viewport={{ once, margin: "-12% 0px -12% 0px" }}
+      viewport={{ once, margin: "0px 0px -12% 0px" }}
     >
       {children}
     </Component>

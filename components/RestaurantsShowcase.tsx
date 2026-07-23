@@ -61,28 +61,16 @@ const RESTAURANTS = [
     video: "/videos/bintang.mov",
   },
   {
-    name: "Belly",
-    tag: "Modern Filipino Bistro",
-    location: "Camden, London",
-    video: "/videos/belly-hero.mov",
+    name: "Guanabana",
+    tag: "Caribbean Cuisine",
+    location: "Kentish Town, London",
+    video: "/videos/guanabana.mp4",
   },
   {
     name: "Mamasons",
     tag: "Filipino Ice Cream Parlour",
     location: "Camden · Soho, London",
     video: "/videos/mamasons.mov",
-  },
-  {
-    name: "Café Mama & Sons",
-    tag: "Filipino x Japanese Café",
-    location: "London",
-    video: "/videos/hero-draft3.mp4",
-  },
-  {
-    name: "Guanabana",
-    tag: "Caribbean Cuisine",
-    location: "Kentish Town, London",
-    video: "/videos/guanabana.mp4",
   },
   {
     name: "Ramo Ramen",
@@ -95,6 +83,18 @@ const RESTAURANTS = [
     tag: "Caribbean Takeaway",
     location: "London",
     video: "/videos/hero-draft3.mp4",
+  },
+  {
+    name: "Café Mama & Sons",
+    tag: "Filipino x Japanese Café",
+    location: "London",
+    video: "/videos/hero-draft3.mp4",
+  },
+  {
+    name: "Belly",
+    tag: "Modern Filipino Bistro",
+    location: "Camden, London",
+    video: "/videos/belly-hero.mov",
   },
   {
     // coming-soon — no photography, logo or clip yet; the card view renders
@@ -143,9 +143,19 @@ const COPIES = 11;
 const MID = Math.floor(COPIES / 2);
 
 // wheel feel — lower = slower. SENS scales raw wheel delta; EASE is the
-// fraction of the remaining distance covered each frame.
+// fraction of the remaining distance covered each frame. MIN_STEP floors the
+// eased step: scrollTop writes round to (device) pixels, so a sub-pixel step
+// would round to zero movement and stall the ease short of its target.
 const WHEEL_SENS = 0.22;
 const WHEEL_EASE = 0.06;
+const WHEEL_MIN_STEP = 0.75;
+
+// scrollTop writes land on device pixels — pre-round targets the same way so
+// the final snap lands exactly instead of parking a sub-pixel off
+const snapToDevice = (v: number) => {
+  const dpr = window.devicePixelRatio || 1;
+  return Math.round(v * dpr) / dpr;
+};
 const LOOP = Array.from({ length: COPIES * N }, (_, k) => ({
   ...RESTAURANTS[k % N],
   realIndex: k % N,
@@ -177,6 +187,12 @@ export default function RestaurantsShowcase() {
   const restaurant = slug ? getRestaurant(slug) : undefined;
   return restaurant?.bookingUrl;
 };
+  // the restaurant's own site for the Visit actions — entries without one
+  // fall back to the internal detail page
+  const getWebsite = (name: string) => {
+    const slug = SLUG_BY_NAME[name];
+    return slug ? getRestaurant(slug)?.website : undefined;
+  };
   const menuRestaurant = menuFor ? getRestaurant(menuFor) : undefined;
   const scrollerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -242,13 +258,15 @@ export default function RestaurantsShowcase() {
     }
     const cur = root.scrollTop;
     const diff = targetTop.current - cur;
-    if (Math.abs(diff) < 0.5) {
+    if (Math.abs(diff) < 1) {
+      // hard-snap — easing across the last pixel would round away on write
       root.scrollTop = targetTop.current;
       render();
       wheelRaf.current = 0;
       return;
     }
-    root.scrollTop = cur + diff * WHEEL_EASE;
+    const stepPx = Math.max(Math.abs(diff) * WHEEL_EASE, WHEEL_MIN_STEP);
+    root.scrollTop = cur + Math.sign(diff) * stepPx;
     const ch = copyH.current;
     if (ch) {
       const k = Math.round((root.scrollTop - MID * ch) / ch);
@@ -265,6 +283,16 @@ export default function RestaurantsShowcase() {
     if (!wheelRaf.current) wheelRaf.current = requestAnimationFrame(stepWheel);
   };
 
+  // centre of a row inside the scroll content, in fractional pixels — measured
+  // off the <li>, not the button: offsetTop/offsetHeight round to integers
+  // (parking the wheel off whenever --row is fractional, e.g. 58.5px at 768),
+  // and the button carries the optical --wheel-name-nudge which would skew the
+  // target off the geometric row centre
+  const rowCenter = (el: HTMLElement, rootTop: number, scrollTop: number) => {
+    const r = (el.parentElement as HTMLElement).getBoundingClientRect();
+    return r.top - rootTop + scrollTop + r.height / 2;
+  };
+
   // snap the target to the nearest name's centre (and recentre the copy)
   const settleNow = () => {
     const root = scrollerRef.current;
@@ -275,19 +303,21 @@ export default function RestaurantsShowcase() {
       root.scrollTop -= k * ch;
       targetTop.current -= k * ch;
     }
-    const center = root.scrollTop + root.clientHeight / 2;
+    const rootRect = root.getBoundingClientRect();
+    const top = root.scrollTop;
+    const center = top + rootRect.height / 2;
     let best = Infinity;
     let bestTop = targetTop.current;
     for (const el of itemRefs.current) {
       if (!el) continue;
-      const c = el.offsetTop + el.offsetHeight / 2;
+      const c = rowCenter(el, rootRect.top, top);
       const d = Math.abs(center - c);
       if (d < best) {
         best = d;
-        bestTop = c - root.clientHeight / 2;
+        bestTop = c - rootRect.height / 2;
       }
     }
-    targetTop.current = bestTop;
+    targetTop.current = snapToDevice(bestTop);
     startWheel();
   };
 
@@ -300,7 +330,9 @@ export default function RestaurantsShowcase() {
   const selectEl = (el: HTMLElement) => {
     const root = scrollerRef.current;
     if (!root) return;
-    targetTop.current = el.offsetTop + el.offsetHeight / 2 - root.clientHeight / 2;
+    const rootRect = root.getBoundingClientRect();
+    const c = rowCenter(el, rootRect.top, root.scrollTop);
+    targetTop.current = snapToDevice(c - rootRect.height / 2);
     startWheel();
   };
 
@@ -343,11 +375,15 @@ export default function RestaurantsShowcase() {
     const root = scrollerRef.current;
     if (!root) return;
     const measure = () => {
-      rowH.current = root.querySelector("li")?.offsetHeight ?? 0;
+      // rect height keeps fractional --row values (58.5px at 768) —
+      // offsetHeight rounds and would compute every target a little off
+      rowH.current =
+        root.querySelector("li")?.getBoundingClientRect().height ?? 0;
       copyH.current = rowH.current * N;
-      root.scrollTop = MID * copyH.current; // park on the middle copy
+      root.scrollTop = snapToDevice(MID * copyH.current); // park on the middle copy
       targetTop.current = root.scrollTop;
       render();
+      settleNow(); // seat the nearest row dead-centre from the first frame
     };
     measure();
     window.addEventListener("resize", measure);
@@ -431,17 +467,31 @@ export default function RestaurantsShowcase() {
             </div>
 
             <div className={styles.actions}>
-              <button
-                type="button"
-                className={`${styles.actBtn} ${styles.actBtnSolid}`}
-                onClick={() => {
-                  const slug = SLUG_BY_NAME[item.name];
-                  if (slug) navigate(`/restaurants/${slug}`);
-                }}
-              >
-                <span className={styles.actLabel}>Visit {item.name}</span>
-                <span aria-hidden>→</span>
-              </button>
+              {/* Visit → the restaurant's own site in a new tab; the
+                  internal detail page (footer-linked) is the fallback */}
+              {getWebsite(item.name) ? (
+                <a
+                  href={getWebsite(item.name)}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={`${styles.actBtn} ${styles.actBtnSolid}`}
+                >
+                  <span className={styles.actLabel}>Visit {item.name}</span>
+                  <span aria-hidden>→</span>
+                </a>
+              ) : (
+                <button
+                  type="button"
+                  className={`${styles.actBtn} ${styles.actBtnSolid}`}
+                  onClick={() => {
+                    const slug = SLUG_BY_NAME[item.name];
+                    if (slug) navigate(`/restaurants/${slug}`);
+                  }}
+                >
+                  <span className={styles.actLabel}>Visit {item.name}</span>
+                  <span aria-hidden>→</span>
+                </button>
+              )}
               {!NO_BOOKING.has(item.name) && getBookingUrl(item.name) && (
                 <a
                   href={getBookingUrl(item.name)}
@@ -518,16 +568,29 @@ export default function RestaurantsShowcase() {
                         Book a Table
                       </a>
                     )}
-                    <button
-                      type="button"
-                      className={`${styles.cardBtn} ${styles.cardBtnSolid}`}
-                      onClick={() => {
-                        const slug = SLUG_BY_NAME[r.name];
-                        if (slug) navigate(`/restaurants/${slug}`);
-                      }}
-                    >
-                      Visit
-                    </button>
+                    {/* Visit → the restaurant's own site in a new tab;
+                        internal detail page as the no-website fallback */}
+                    {getWebsite(r.name) ? (
+                      <a
+                        href={getWebsite(r.name)}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={`${styles.cardBtn} ${styles.cardBtnSolid}`}
+                      >
+                        Visit
+                      </a>
+                    ) : (
+                      <button
+                        type="button"
+                        className={`${styles.cardBtn} ${styles.cardBtnSolid}`}
+                        onClick={() => {
+                          const slug = SLUG_BY_NAME[r.name];
+                          if (slug) navigate(`/restaurants/${slug}`);
+                        }}
+                      >
+                        Visit
+                      </button>
+                    )}
                   </div>
                 </div>
               </article>

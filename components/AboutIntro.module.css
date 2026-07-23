@@ -283,6 +283,11 @@
     align-items: flex-start;
     gap: clamp(20px, 3vh, 36px);
   }
+  /* label-size caps read fine as a desktop aside but fall below the
+     legibility floor on a phone — lift the statement copy to small-body */
+  .copy p {
+    font-size: var(--t-small);
+  }
   /* stacked, the copy + CTA sit mid/low-LEFT — outside both corner pools.
      Strengthen the base wash's lower half so the caps copy keeps at least
      its old footing over bright frames; the corner radials stay put. */

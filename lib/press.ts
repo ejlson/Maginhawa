@@ -10,6 +10,11 @@ export type PressMention = {
   date: string; // dd.mm.yy as in the source tracker
   url: string;
   restaurants: string[]; // slugs
+  // Optional bespoke hover image for the Awards & Recognition rows on the
+  // About page. When absent, the row falls back to its first credited
+  // restaurant's canonical photo (see About.tsx, which also skips
+  // known-missing placeholder paths so a broken image can never render).
+  image?: string;
 };
 
 // Outlets shown in the "As Featured In" strip on the home page. These are the

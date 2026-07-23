@@ -13,6 +13,9 @@ export type Restaurant = {
   image: string;
   logo: string;
   url?: string;
+  // The restaurant's own public website — the Visit actions open this in a
+  // new tab; the internal detail pages stay reachable via the footer.
+  website?: string;
   bookable: boolean;
   bookingUrl?: string;
   priceRange?: string;
@@ -32,56 +35,6 @@ export type Restaurant = {
 
 export const RESTAURANTS: Restaurant[] = [
   {
-    slug: "belly",
-    name: "Belly",
-    tagline: "Modern Filipino Bistro",
-    cuisine: "Filipino · Bistro",
-    description:
-      "A Kentish Town bistro reading Filipino flavour through a French lens — featured in the Michelin Guide and reviewed by Giles Coren in The Times.",
-    location: "Kentish Town, London",
-    image: "/images/belly.jpg",
-    logo: "/logo/belly.png",
-    menuPages: [
-      "/menu/belly/food.png",
-      "/menu/belly/drinks-1.png",
-    ],
-    menuLabel: "February 2026",
-    bookable: true,
-    bookingUrl: "https://booking.resdiary.com/widget/Standard/BELLYBISTRO/65884",
-    priceRange: "££",
-  },
-  {
-    slug: "cafemama",
-    name: "Café Mama & Sons",
-    tagline: "Filipino × Japanese Café",
-    cuisine: "Café · Bakery",
-    description:
-      "A Filipino-Japanese café and bakery known for ube and matcha pastries — covered by BBC Good Food, Forbes and Time Out.",
-    location: "London",
-    image: "/images/cafemama.jpg",
-    logo: "/logo/cafemama.png",
-    bookable: false,
-    menuPages: [
-      "/menu/cafemama/page-1.png",
-      "/menu/cafemama/page-2.png",
-      "/menu/cafemama/page-3.png",
-      "/menu/cafemama/page-4.png",
-    ],
-    menuLabel: "February 2026",
-  },
-  {
-    slug: "mamasons",
-    name: "Mamasons",
-    tagline: "Filipino Ice Cream Parlour",
-    cuisine: "Ice Cream Parlour",
-    description:
-      "London's original Filipino ice-cream parlour — ube, queso, dirty ice-cream rolled in pandesal.",
-    location: "Camden · Soho, London",
-    image: "/images/mamasons-placeholder.jpg",
-    logo: "/logo/mamasons.png",
-    bookable: false,
-  },
-  {
     slug: "bintang",
     name: "Bintang",
     tagline: "Filipino Fusion Restaurant",
@@ -91,6 +44,7 @@ export const RESTAURANTS: Restaurant[] = [
     location: "Camden, London",
     image: "/images/bintang.jpg",
     logo: "/logo/bintang.png",
+    website: "https://www.bintangrestaurant.co.uk/",
     menuPages: [
       "/menu/bintang/bintang_menu-1.png",
       "/menu/bintang/bintang_menu-2.png",
@@ -110,9 +64,23 @@ export const RESTAURANTS: Restaurant[] = [
     location: "Kentish Town, London",
     image: "/images/guanabana.jpg",
     logo: "/logo/guanabana.png",
+    website: "https://www.guanabanarestaurant.com/",
     bookable: true,
     priceRange: "££",
     bookingUrl: "https://www.opentable.co.uk/guanabana-reservations-london?restref=79453&lang=en-GB&ot_source=Restaurant%20website",
+  },
+  {
+    slug: "mamasons",
+    name: "Mamasons",
+    tagline: "Filipino Ice Cream Parlour",
+    cuisine: "Ice Cream Parlour",
+    description:
+      "London's original Filipino ice-cream parlour — ube, queso, dirty ice-cream rolled in pandesal.",
+    location: "Camden · Soho, London",
+    image: "/images/mamasons-placeholder.jpg",
+    logo: "/logo/mamasons.png",
+    website: "http://dirtyicecream.co.uk/",
+    bookable: false,
   },
   {
     slug: "ramo",
@@ -124,6 +92,7 @@ export const RESTAURANTS: Restaurant[] = [
     location: "Kentish Town · Soho, London",
     image: "/images/ramo.jpg",
     logo: "/logo/ramo.png",
+    website: "https://www.ramoramen.com/",
     menuPages: [
       "/menu/ramo/lunch-1.png",
       "/menu/ramo/alacarte.png",
@@ -146,7 +115,48 @@ export const RESTAURANTS: Restaurant[] = [
     location: "London",
     image: "/images/hoowood.jpg",
     logo: "/logo/hoodwood.png",
+    website: "https://www.hoodwood.co.uk/",
     bookable: false,
+  },
+  {
+    slug: "cafemama",
+    name: "Café Mama & Sons",
+    tagline: "Filipino × Japanese Café",
+    cuisine: "Café · Bakery",
+    description:
+      "A Filipino-Japanese café and bakery known for ube and matcha pastries — covered by BBC Good Food, Forbes and Time Out.",
+    location: "London",
+    image: "/images/cafemama.jpg",
+    logo: "/logo/cafemama.png",
+    website: "https://www.cafemamasons.com/",
+    bookable: false,
+    menuPages: [
+      "/menu/cafemama/page-1.png",
+      "/menu/cafemama/page-2.png",
+      "/menu/cafemama/page-3.png",
+      "/menu/cafemama/page-4.png",
+    ],
+    menuLabel: "February 2026",
+  },
+  {
+    slug: "belly",
+    name: "Belly",
+    tagline: "Modern Filipino Bistro",
+    cuisine: "Filipino · Bistro",
+    description:
+      "A Kentish Town bistro reading Filipino flavour through a French lens — featured in the Michelin Guide and reviewed by Giles Coren in The Times.",
+    location: "Kentish Town, London",
+    image: "/images/belly.jpg",
+    logo: "/logo/belly.png",
+    website: "https://www.bellylondon.com/",
+    menuPages: [
+      "/menu/belly/food.png",
+      "/menu/belly/drinks-1.png",
+    ],
+    menuLabel: "February 2026",
+    bookable: true,
+    bookingUrl: "https://booking.resdiary.com/widget/Standard/BELLYBISTRO/65884",
+    priceRange: "££",
   },
   {
     slug: "bunso",
@@ -158,6 +168,7 @@ export const RESTAURANTS: Restaurant[] = [
     location: "London",
     image: "/images/bunso-placeholder.jpg",
     logo: "/logo/bunso.png",
+    website: "https://www.bybunso.com/",
     bookable: false,
     comingSoon: true,
   },

@@ -10,10 +10,10 @@ const EVENTS = [
   { year: "1987", name: "Bintang", img: "/images/bintang.jpg" },
   { year: "2007", name: "Guanabana", img: "/images/guanabana.jpg" },
   { year: "2017", name: "Mamasons", img: "" },
-  { year: "2018", name: "Hoodwood", img: "/images/hoowood.jpg" },
-  { year: "2019", name: "Ramo Ramen", img: "/images/ramo.jpg" },
-  { year: "2021", name: "Café Mama & Sons", img: "/images/cafemama.jpg" },
-  { year: "2023", name: "Belly", img: "/images/belly.jpg" },
+  { year: "2018", name: "Ramo Ramen", img: "/images/ramo.jpg" },
+  { year: "2019", name: "Hoodwood", img: "/images/hoowood.jpg" },
+  { year: "2025", name: "Café Mama & Sons", img: "/images/cafemama.jpg" },
+  { year: "2025", name: "Belly", img: "/images/belly.jpg" },
 ];
 
 export default function Timeline() {

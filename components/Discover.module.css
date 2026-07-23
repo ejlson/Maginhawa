@@ -540,6 +540,21 @@
   transition-delay: 180ms;
 }
 
+/* narrow screens: the corner-anchored blurb and actions share too little
+   width and collide — stack them instead, blurb above a full-width
+   actions row */
+@media (max-width: 700px) {
+  .revealBlock {
+    max-width: 100%;
+    right: var(--tile-pad);
+    /* seated above the actions row (~30px pills) plus a breath */
+    bottom: calc(var(--tile-pad) + 42px);
+  }
+  .actions {
+    left: var(--tile-pad);
+  }
+}
+
 .btn {
   font-family: var(--font-sans);
   font-size: var(--t-label);

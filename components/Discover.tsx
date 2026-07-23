@@ -44,23 +44,14 @@ const ITEMS: DiscoverItem[] = [
     bookingUrl: "https://www.opentable.co.uk/booking/restref/availability?lang=en-GB&correlationId=6b35518d-aef1-43a2-8dcc-ad4ef5dc8053&restRef=324126&otSource=Restaurant%20website",
   },
   {
-    slug: "belly",
-    name: "Belly",
-    tag: "Modern Filipino Bistro",
-    location: "157 Kentish Town Rd, London NW1 8PD",
-    image: "/images/belly.jpg",
-    logo: "/logo/belly.png",
-    menuPages: [
-      "/menu/belly/food.png",
-      "/menu/belly/drinks-1.png",
-    ],
-    menuLabel: "February 2026",
-    // Belly is the group's Michelin Guide listing — the mark renders as part
-    // of the centered brand group so it stays visible at rest AND expanded.
-    badge: "/logo/michelin-2026-round.png",
-    badgeLabel: "Michelin Selected Restaurant 2026",
-    blurb: "A modern Filipino bistro drawing on French technique.",
-    bookingUrl: "https://booking.resdiary.com/widget/Standard/BELLYBISTRO/65884",
+    slug: "guanabana",
+    name: "Guanabana",
+    tag: "Caribbean Cuisine",
+    location: "85 Kentish Town Rd, London NW1 8NY",
+    image: "/images/guanabana.jpg",
+    logo: "/logo/guanabana.png",
+    blurb: "Kentish Town's Caribbean and Latin American room, best known for its oak-smoked Island Roast — since 2007.",
+    bookingUrl: "https://www.opentable.co.uk/guanabana-reservations-london?restref=79453&lang=en-GB&ot_source=Restaurant%20website",
   },
   {
     slug: "mamasons",
@@ -71,33 +62,6 @@ const ITEMS: DiscoverItem[] = [
     logo: "/logo/mamasons.png",
     blurb:
       "London's first Filipino ice cream parlour — Manila-style dirty ice cream, scooped fresh across two sites.",
-  },
-  {
-    slug: "cafemama",
-    name: "Café Mama & Sons",
-    tag: "Filipino x Japanese Café",
-    location: "83 Kentish Town Rd, London NW1 8NY",
-    image: "/images/cafemama.jpg",
-    logo: "/logo/cafemama.png",
-    menuPages: [
-      "/menu/cafemama/page-1.png",
-      "/menu/cafemama/page-2.png",
-      "/menu/cafemama/page-3.png",
-      "/menu/cafemama/page-4.png",
-    ],
-    menuLabel: "February 2026",
-    blurb:
-      "Hand-crafted sandos, all-day pandesal breakfasts, homemade baked treats, and quality coffee — your daily escape from the ordinary.",
-  },
-  {
-    slug: "guanabana",
-    name: "Guanabana",
-    tag: "Caribbean Cuisine",
-    location: "85 Kentish Town Rd, London NW1 8NY",
-    image: "/images/guanabana.jpg",
-    logo: "/logo/guanabana.png",
-    blurb: "Kentish Town's Caribbean and Latin American room, best known for its oak-smoked Island Roast — since 2007.",
-    bookingUrl: "https://www.opentable.co.uk/guanabana-reservations-london?restref=79453&lang=en-GB&ot_source=Restaurant%20website",
   },
   {
     slug: "ramo",
@@ -126,6 +90,42 @@ const ITEMS: DiscoverItem[] = [
     logo: "/logo/hoodwood.png",
     blurb:
       "Oak-smoked jerk plates and handmade patties, fire-kissed over an open flame — Caribbean takeaway, done honestly.",
+  },
+  {
+    slug: "cafemama",
+    name: "Café Mama & Sons",
+    tag: "Filipino x Japanese Café",
+    location: "83 Kentish Town Rd, London NW1 8NY",
+    image: "/images/cafemama.jpg",
+    logo: "/logo/cafemama.png",
+    menuPages: [
+      "/menu/cafemama/page-1.png",
+      "/menu/cafemama/page-2.png",
+      "/menu/cafemama/page-3.png",
+      "/menu/cafemama/page-4.png",
+    ],
+    menuLabel: "February 2026",
+    blurb:
+      "Hand-crafted sandos, all-day pandesal breakfasts, homemade baked treats, and quality coffee — your daily escape from the ordinary.",
+  },
+  {
+    slug: "belly",
+    name: "Belly",
+    tag: "Modern Filipino Bistro",
+    location: "157 Kentish Town Rd, London NW1 8PD",
+    image: "/images/belly.jpg",
+    logo: "/logo/belly.png",
+    menuPages: [
+      "/menu/belly/food.png",
+      "/menu/belly/drinks-1.png",
+    ],
+    menuLabel: "February 2026",
+    // Belly is the group's Michelin Guide listing — the mark renders as part
+    // of the centered brand group so it stays visible at rest AND expanded.
+    badge: "/logo/michelin-2026-round.png",
+    badgeLabel: "Michelin Selected Restaurant 2026",
+    blurb: "A modern Filipino bistro drawing on French technique.",
+    bookingUrl: "https://booking.resdiary.com/widget/Standard/BELLYBISTRO/65884",
   },
   {
     // Coming-soon placeholder — no photography or mark yet, so the tile
@@ -381,6 +381,9 @@ function Tile({
   const canOpenMenu = !!(item.menuPages && item.menuPages.length > 0);
   // bookability comes from the canonical data, not the local display copy
   const bookable = getRestaurant(item.slug)?.bookable ?? false;
+  // Visit prefers the restaurant's own site (new tab); an entry without
+  // one falls back to the internal detail page
+  const website = getRestaurant(item.slug)?.website;
 
   return (
     <li
@@ -544,7 +547,9 @@ function Tile({
                 </a>
               ) : null}
               <a
-                href={`/restaurants/${item.slug}`}
+                href={website ?? `/restaurants/${item.slug}`}
+                target={website ? "_blank" : undefined}
+                rel={website ? "noopener noreferrer" : undefined}
                 className={styles.btn}
                 onClick={(e) => e.stopPropagation()}
                 aria-label={`Visit ${item.name}`}

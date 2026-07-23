@@ -34,20 +34,31 @@ export default function RestaurantLocations() {
 
   // Scroll choreography — the section itself is a plain 100svh block
   // that scrolls past 1:1 the whole way (no pin — scroll is never
-  // held). Two acts, both riding normal continuous scrolling: entry
-  // seal + parallax on the approach, exit-driven settle on the
-  // departure.
+  // held). Three scrubs, all riding normal continuous scrolling: entry
+  // seal on the approach, a full-traversal parallax on the footage, and
+  // the exit-driven settle on the departure.
   //
-  // Parallax on the APPROACH: as the section scrolls into view the
-  // footage drifts upward inside its frame, and the drift completes the
-  // moment the video reaches full view (section top hits the viewport
-  // top). Combined with the `scale(1.2)` on `.bg` in CSS, the -10%
-  // start never exposes the video's edges.
+  // The APPROACH drives the entry corners only (--enter below): the
+  // film arrives as a rounded plate and seals into full bleed exactly
+  // at full view (section top hits the viewport top).
   const { scrollYProgress: approach } = useScroll({
     target: ref,
     offset: ["start end", "start start"],
   });
-  const parallax = useTransform(approach, [0, 1], [-10, 0]);
+
+  // PARALLAX across the FULL TRAVERSAL: the footage drifts inside its
+  // overflow-hidden frame for the section's entire trip through the
+  // viewport — scrub-linked, so it runs in reverse the moment the user
+  // scrolls back up (classic parallax depth). [start end → end start]
+  // spans from the section's top entering at the viewport's bottom edge
+  // to its bottom leaving at the top; the ±8% sweep stays safely inside
+  // the `scale(1.2)` oversize on `.bg` even combined with the settle
+  // inset, so the video's edges never show.
+  const { scrollYProgress: traverse } = useScroll({
+    target: ref,
+    offset: ["start end", "end start"],
+  });
+  const parallax = useTransform(traverse, [0, 1], [-8, 8]);
 
   // SETTLE on the DEPARTURE: the shrink the old scrollytelling pin used
   // to hold the screen for now plays as the section leaves the
@@ -88,7 +99,7 @@ export default function RestaurantLocations() {
   useMotionValueEvent(dark, "change", (v) => {
     ref.current?.style.setProperty("--dark", String(v));
   });
-  // the approach also drives the entry corners: the film arrives as a
+  // the approach's sole job: the entry corners — the film arrives as a
   // rounded plate and seals into full bleed exactly at full view
   useMotionValueEvent(approach, "change", (v) => {
     ref.current?.style.setProperty("--enter", String(v));
