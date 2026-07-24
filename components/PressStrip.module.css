@@ -1,9 +1,11 @@
-/* Quiet credentials row between Discover and AboutIntro. Symmetric block
-   padding — with both neighbours contributing zero, the strip owns the
-   uniform chapter gap (--section-y-lg) on each side, which also keeps it
-   optically centred between the gallery and the About card. */
+/* Quiet credentials row between Discover and AboutIntro. The top gap is
+   pulled in tight so the mastheads sit close under the Discover grid (they
+   read as its credentials, not a separate chapter). The chapter gap below is
+   now owned by AboutIntro's margin-top (one owner per boundary), so the
+   inter-section rhythm stays uniform. */
 .section {
-  padding-block: var(--home-gap);
+  padding-top: clamp(36px, 5vh, 84px);
+  padding-bottom: 0;
   padding-inline: var(--pad-x);
   display: flex;
   flex-direction: column;

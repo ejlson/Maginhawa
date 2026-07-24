@@ -6,7 +6,7 @@ type RevealProps = {
   children: React.ReactNode;
   /** stagger delay in seconds (30–80ms between siblings feels right) */
   delay?: number;
-  /** initial vertical offset in px — defaults to 28 */
+  /** initial vertical offset in px — defaults to 28 (the shared home rise) */
   y?: number;
   className?: string;
   as?: "div" | "span" | "li" | "p" | "h2" | "section";
@@ -39,16 +39,18 @@ export default function Reveal({
         },
       }
     : {
-        hidden: { opacity: 0, y, filter: "blur(6px)" },
+        hidden: { opacity: 0, y, filter: "blur(8px)" },
         shown: {
           opacity: 1,
           y: 0,
           filter: "blur(0px)",
           transition: {
-            duration: 0.9,
-            // Emil's strong ease-out: fast to start, gentle to settle
-            ease: [0.23, 1, 0.32, 1],
-            delay,
+            // the rise settles on a gentle spring — smooth with a whisper of
+            // bounce (the Apple/Emil feel); opacity + blur ride a clean
+            // ease-out so the fade and de-blur never overshoot
+            y: { type: "spring", stiffness: 150, damping: 19, mass: 1, delay },
+            opacity: { duration: 0.7, ease: [0.23, 1, 0.32, 1], delay },
+            filter: { duration: 0.8, ease: [0.23, 1, 0.32, 1], delay },
           },
         },
       };
@@ -60,7 +62,7 @@ export default function Reveal({
       variants={variants}
       initial="hidden"
       whileInView="shown"
-      viewport={{ once, margin: "0px 0px -12% 0px" }}
+      viewport={{ once, margin: "0px 0px -16% 0px" }}
     >
       {children}
     </Component>

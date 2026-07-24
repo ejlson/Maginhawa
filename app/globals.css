@@ -66,6 +66,11 @@
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  /* smooth with a whisper of overshoot — the Apple/Emil "settle" for
+     interactive transforms (press, pill widen, card arrivals). The real
+     bounce lives in the framer springs (Reveal); this is the gentle CSS
+     echo, tuned subtle so it never reads as a rubber-band bounce. */
+  --ease-bounce: cubic-bezier(0.34, 1.16, 0.6, 1);
 
   /* corner-radius scale — two-tier system: radius follows elevation.
      Flat editorial photo frames stay near-square (print look); floating,
@@ -97,8 +102,9 @@
   --section-y-lg: clamp(120px, 16vh, 240px);
   /* home-page chapter gap — the uniform breath between every home section
      (one owner per boundary). A step beyond --section-y-lg, per the
-     editorial-magazine rhythm of the home flow. */
-  --home-gap: clamp(160px, 22vh, 320px);
+     editorial-magazine rhythm of the home flow. Tightened so the chapter
+     breaths read as one continuous scroll rather than stacked blocks. */
+  --home-gap: clamp(120px, 16vh, 240px);
   /* uniform air on either side of a hairline section rule — sections that
      open with a border-top use this above AND below the line so the rules
      read as one consistent device. NOTE: the home page has dropped section
@@ -153,6 +159,68 @@ body {
   overscroll-behavior: none;
   /* clip (not hidden) so position: sticky still works */
   overflow-x: clip;
+}
+
+/* Film grain across the WHOLE page — a fixed, tiling fractal-noise layer in
+   soft-light, so every cream section (and the footage) carries the same subtle
+   texture, not just the CTA. Static (no motion), pointer-events: none, and
+   below the nav/menu/loader/cursor so those stay crisp. */
+/* Consistent, subtle scroll parallax — one shared drift so the whole page
+   reads as a single depth field rather than flat panels. Pure CSS (scroll-
+   driven animations): it simply no-ops on engines without support, and is off
+   for reduced motion. Apply `home-parallax` to a self-contained element (a
+   heading / eyebrow / media wrapper — NOT anything with position:fixed or
+   scroll children, which a transformed ancestor would break). `home-parallax-slow`
+   is a gentler variant for larger blocks. */
+@media (prefers-reduced-motion: no-preference) {
+  @supports (animation-timeline: view()) {
+    .home-parallax,
+    .home-parallax-slow {
+      animation: home-parallax-drift linear both;
+      animation-timeline: view();
+      animation-range: cover 0% cover 100%;
+      will-change: transform;
+    }
+    .home-parallax-slow {
+      animation-name: home-parallax-drift-slow;
+    }
+  }
+}
+@keyframes home-parallax-drift {
+  from {
+    transform: translateY(28px);
+  }
+  to {
+    transform: translateY(-28px);
+  }
+}
+@keyframes home-parallax-drift-slow {
+  from {
+    transform: translateY(16px);
+  }
+  to {
+    transform: translateY(-16px);
+  }
+}
+
+/* Film grain across the cream page — a tiling fractal-noise layer in soft-light.
+   ABSOLUTE (not fixed) so it only covers .afterHero's box: the Hero sits BEFORE
+   .afterHero, so it gets NO grain. `background-attachment: fixed` still pins the
+   specks to the viewport so the grain stays in place (doesn't crawl). Low
+   z-index inside .afterHero so full-bleed film sections (RestaurantLocations,
+   DarkZone) paint OVER it; nav/menu/loader/cursor sit above .afterHero. */
+.afterHero::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 3;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='170' height='170'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='2' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 170px 170px;
+  background-attachment: fixed;
+  /* a touch darker / grittier over the cream */
+  opacity: 0.85;
+  mix-blend-mode: soft-light;
 }
 
 /* Lenis smooth scroll */

@@ -5,6 +5,16 @@
    toward the maroon DarkZone below. */
 .section {
   position: relative;
+  /* above the page grain (.afterHero::after, z-index 3) so no grain crawls on
+     the footage; DarkZone sits higher still so the film→DarkZone seam holds */
+  z-index: 4;
+  /* rise up over the CTA above and FULLY cover it: with the CTA section 200svh
+     (100svh of pin travel), a -100svh margin sets the film's top exactly at the
+     viewport bottom when the CTA is at rest (no peek), then — as the user
+     scrolls the 100svh the content is pinned — the film rises a whole viewport
+     and completely covers the held invitation just as the pin releases (it's a
+     later, opaque sibling, so it paints on top). */
+  margin-top: -100svh;
   width: 100%;
   height: 125svh;
   /* the section lives OUTSIDE the DarkZone: the video ARRIVES as a

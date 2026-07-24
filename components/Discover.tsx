@@ -191,7 +191,7 @@ export default function Discover() {
           observer.disconnect();
         }
       },
-      { threshold: 0.05, rootMargin: "0px 0px -10% 0px" },
+      { threshold: 0.05, rootMargin: "0px 0px -16% 0px" },
     );
     observer.observe(el);
     return () => observer.disconnect();
@@ -297,7 +297,7 @@ export default function Discover() {
 
   return (
     <section className={styles.section} id="restaurants" data-nav-theme="light">
-      <div className={styles.head}>
+      <div className={`${styles.head} home-parallax-slow`}>
         <span className={styles.eyebrow}>Discover All Our Restaurants</span>
         {/* pale interaction hint — click/tap works everywhere now */}
         <span className={styles.hint} aria-hidden>

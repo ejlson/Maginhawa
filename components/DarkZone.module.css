@@ -1,6 +1,8 @@
 .zone {
   position: relative;
-  z-index: 2;
+  /* above the Locations film (z-index 4) so the film→DarkZone seam holds, and
+     above the page grain (z-index 3) so no grain sits on the dark zone */
+  z-index: 5;
   background: var(--maroon);
   color: var(--cream);
   /* No top padding — the zone butts directly against the full-bleed

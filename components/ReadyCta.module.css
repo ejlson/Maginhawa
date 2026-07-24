@@ -1,157 +1,227 @@
-/* Ready-to-join CTA — the closing invitation on the cream page:
-   two-line display heading (second line in the italic serif
-   inflection), one soft-recessed pill leading to /join-us. Generous
-   whitespace carries the moment. */
+/* Ready-to-join CTA — a centred, all-caps small→big heading and one editorial
+   link, both in mix-blend-mode difference (the inverse text effect) over a
+   slowly roaming WebGL lava lamp. The section is taller than the viewport and
+   its content pins, so the invitation holds centred while the lava wanders
+   behind it and the Locations film slides up and fully covers it on exit. */
 .section {
-  /* top gap owned by the Careers index's bottom padding; this bottom
-     owns the gap down to the Locations film — opened up well beyond the
-     uniform rhythm so the invitation and the film don't crowd */
-  padding: 0 var(--pad-x) calc(var(--home-gap) * 2.1);
-  display: flex;
-  justify-content: center;
+  position: relative;
+  isolation: isolate;
+  /* one uniform chapter gap above (owns the Blog→CTA boundary) — same
+     --home-gap as every other section boundary, for a continuous rhythm */
+  margin-top: var(--home-gap);
+  /* clip horizontally (no page overflow) but let the mesh bleed vertically
+     into the Blog above (overflow: clip does not create a scroll container,
+     so it doesn't break the sticky child) */
+  overflow-x: clip;
+  overflow-y: visible;
+  /* taller than the viewport: the extra 100svh is the distance the content
+     pins for AND the room the Locations film needs to rise a FULL viewport up
+     and completely cover it (see RestaurantLocations' negative margin-top) */
+  height: 200svh;
+  /* cream, matching the page and the Blog above — no ground of its own, so
+     the lava melts into the neighbours with no edge */
   background: var(--cream);
   color: var(--maroon);
 }
 
+/* the pinned stage — sticks for the section's extra length so the text and
+   lava hold centred in the viewport while the page scrolls past */
+.pin {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* content sits dead-centre in the viewport at rest, so the cream above it
+     (from the Blog) and below it (before the Locations film rises) read equal */
+  padding: 0 var(--pad-x);
+}
+
+/* the WebGL mesh-gradient canvas — extends past the section top and bottom so
+   the colour field bleeds into the neighbours, then the mask fades it out at
+   both ends so it never starts or stops on a hard line */
+.mesh {
+  position: absolute;
+  /* canvas is a replaced element — top/bottom insets don't stretch it, so
+     size it explicitly: a touch taller than the pinned stage so it covers with
+     a small bleed. No mask: the shader's own ground is cream at the vertical
+     extremes (the blobs stay central), so the canvas edges are cream and melt
+     into the cream page with no seam — a mask here only put a fade edge in the
+     viewport (the "colour glitch"). */
+  top: -8vh;
+  left: 0;
+  width: 100%;
+  height: calc(100% + 16vh);
+  /* negative z so it paints behind the content but ABOVE the section's cream
+     ground, and — crucially — does NOT form a stacking context that would
+     isolate the heading's difference blend from these mesh pixels */
+  z-index: -1;
+  display: block;
+  pointer-events: none;
+  /* a soft, dreamy blur so the blobs read as diffuse hazy colour rather than
+     crisp shapes */
+  filter: blur(16px);
+  /* fallback field, shown only if WebGL is unavailable — maroon → saffron */
+  background:
+    radial-gradient(28% 32% at 42% 40%, rgba(120, 26, 22, 0.5), transparent 70%),
+    radial-gradient(24% 28% at 60% 48%, rgba(70, 8, 12, 0.46), transparent 70%),
+    radial-gradient(22% 26% at 50% 52%, rgba(178, 112, 38, 0.4), transparent 70%),
+    var(--cream);
+}
+
+/* CTA-only grain ON TOP of the page-wide grain — the css-tricks "grainy
+   gradient" recipe (fractalNoise, baseFrequency 0.65, 3 octaves) pushed STARK.
+   The article boosts contrast with a CSS `filter: contrast()/brightness()`, but
+   that would re-anchor our `background-attachment: fixed` to the element (grain
+   would crawl), so the same effect is baked into the SVG instead: desaturate to
+   kill the colour confetti, then a feComponentTransfer cranks the grey toward
+   black/white for crisp film grain. Downscaled (300px SVG → 150px) to stay
+   smooth; multiply keeps it as dark grain over the cream; fixed keeps it still. */
+.noise {
+  position: absolute;
+  top: -24vh;
+  left: 0;
+  width: 100%;
+  height: calc(100% + 48vh);
+  z-index: -1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='1.8' intercept='-0.4'/%3E%3CfeFuncG type='linear' slope='1.8' intercept='-0.4'/%3E%3CfeFuncB type='linear' slope='1.8' intercept='-0.4'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
+  background-size: 150px 150px;
+  background-attachment: fixed;
+  opacity: 0.4;
+  mix-blend-mode: multiply;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 22%,
+    #000 78%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    #000 22%,
+    #000 78%,
+    transparent 100%
+  );
+}
+
+/* position: relative + top is safe (z-index stays auto → NO stacking context,
+   so the heading's difference blend still reaches the mesh). `top` carries the
+   scroll parallax (set as --cta-parallax by MeshGradient) — the text + button
+   drift up with the lava as the Locations film rises. A transform here would
+   isolate the blend, so top is used instead. */
 .inner {
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
   gap: clamp(32px, 5vh, 56px);
-  /* a breath of extra air so the invitation floats like a chapter of
-     its own */
-  padding-block: clamp(40px, 8vh, 96px) 0;
+  position: relative;
+  top: var(--cta-parallax, 0px);
 }
 
 .title {
   margin: 0;
+  text-align: center;
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: var(--t-display);
   line-height: var(--lh-heading);
   letter-spacing: var(--tr-display);
+  text-transform: uppercase;
+  /* the inverse text effect (richardsancho.com): cream type in
+     mix-blend-mode difference inverts against the lava behind it — cool over
+     the warm goo, near-black over cream — so it always contrasts, no shadow */
+  color: var(--cream);
+  mix-blend-mode: difference;
 }
 
-/* the type-on run — a block wrapper inside the italic em that stages the
-   letter flaps in 3D. CSS perspective only reaches an element's DIRECT
-   children, so the vanishing point lives here (where the letter spans are
-   immediate kids) rather than on the em. 700px matches the Loader's
-   split-flap board. */
-.charRun {
-  display: block;
-  perspective: 700px;
-}
-
-/* one letter of the type-on — inline-block so it can transform, hinged at
-   its baseline (transform-origin 50% 100%) for the Loader's flap pop.
-   The inline-block boxes cost a whisper of italic kerning against the
-   plain string; accepted — verified by eye at display scale. */
-.titleChar {
-  display: inline-block;
-  transform-origin: 50% 100%;
-  will-change: transform, opacity;
-}
-
-/* the word gaps — real spans so each space holds a stagger beat;
-   white-space: pre stops the browser collapsing a space that's alone in
-   its own element */
-.titleSpace {
-  white-space: pre;
-}
-
-/* visually hidden but SR-readable — the un-split "starts with you." twin
-   of the aria-hidden letter run (About's .srOnly pattern) */
-.srOnly {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
-
-/* "The next great service" in the light Fraunces cut — the About card's
-   thin-serif counterpoint device, here on the roman line */
-.titleLine {
+/* small lead-in line — the lightest Fraunces cut, a touch dimmed and letter-
+   spaced so it reads as a fine, quiet eyebrow above the big line */
+.titleSmall {
   display: block;
   font-family: var(--font-serif);
-  font-weight: 300;
+  font-weight: 200;
+  font-size: var(--t-h3);
+  letter-spacing: 0.12em;
+  opacity: 0.82;
 }
 
-/* the second line in the site's italic serif inflection — Fraunces true
-   italic (the About title's "Us" device at sentence scale) */
-.titleItalic {
+/* the big statement line — large upright display, the focal point */
+.titleBig {
   display: block;
+  margin-top: 0.06em;
   font-family: var(--font-display);
-  font-style: italic;
-  color: var(--saffron);
+  /* the markup is an <em> (italic by default) — force upright per the brief */
+  font-style: normal;
   font-weight: 500;
-  /* a breath past the full stop so the italic overhang isn't crowded by
-     the centred layout's edge */
-  padding-right: 0.1em;
+  font-size: clamp(3.4rem, 11vw, 9rem);
+  line-height: 1;
 }
 
-/* the pill — the house light-theme glass: soft tint, inner recess that
-   relaxes on hover while the pill widens. Leads to the careers page. */
-.pill {
+/* the CTA — a clear, outlined pill: transparent interior (the lava shows
+   straight through), with a THIN border and THIN label, both riding
+   mix-blend-mode: difference so the outline and text invert against the lava
+   exactly like the heading. */
+.cta {
   display: inline-flex;
   align-items: center;
+  justify-content: center;
   gap: 0.5em;
   border-radius: 999px;
-  padding: 0.68em 1.6em;
+  padding: 0.9em 2em;
   font-family: var(--font-display);
-  font-weight: 500;
-  font-size: var(--t-h3);
-  line-height: var(--lh-heading);
-  letter-spacing: var(--tr-display);
-  color: var(--maroon);
-  /* cream fill so the pill reads unmistakably light; a hairline border
-     keeps its edge legible against the cream section, and the whisper-soft
-     insets carve the recess without darkening the fill */
-  background: var(--cream);
-  border: 1px solid rgba(47, 0, 0, 0.08);
-  box-shadow:
-    inset 0 0 0.45em rgba(47, 0, 0, 0.07),
-    inset 0 1px 2px rgba(47, 0, 0, 0.05);
-  white-space: nowrap;
+  font-weight: 300;
+  font-size: clamp(0.95rem, 1.1vw, 1.1rem);
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--cream);
+  border: 1px solid var(--cream);
+  mix-blend-mode: difference;
   text-decoration: none;
-  transition:
-    transform 0.16s cubic-bezier(0.23, 1, 0.32, 1),
-    padding 0.45s var(--ease-out),
-    box-shadow 0.45s var(--ease-out);
+  white-space: nowrap;
+  /* Emil: crisp ease-out, well under 300ms — only transform (cheap) animates */
+  transition: transform 180ms var(--ease-out);
 }
-.pill:active {
+/* Emil: gate hover behind a real pointer so a tap on touch doesn't stick the
+   hover state; keyboard focus gets the same lift on its own selector */
+@media (hover: hover) and (pointer: fine) {
+  .cta:hover {
+    transform: translateY(-2px);
+  }
+}
+.cta:focus-visible {
+  transform: translateY(-2px);
+  outline: 2px solid var(--cream);
+  outline-offset: 4px;
+}
+/* Emil: press feedback must be fast + subtle — scale(0.97), ~120ms */
+.cta:active {
   transform: scale(0.97);
+  transition-duration: 120ms;
 }
 
-.pill:hover,
-.pill:focus-visible {
-  padding-inline: 2.15em;
-  /* the recess relaxes — proportionally lighter than the rest state */
-  box-shadow:
-    inset 0 0 0.15em rgba(47, 0, 0, 0.025),
-    inset 0 1px 1px rgba(47, 0, 0, 0.02);
-}
-.pill:focus-visible {
-  outline: 1.5px solid currentColor;
-  outline-offset: 3px;
-}
-
-.pillLabel {
+.ctaLabel {
   display: inline-block;
+  /* letter-spacing adds a trailing gap after the last glyph, which shifts the
+     JOIN US + arrow bundle left of centre; cancel it so it sits dead-centre */
+  margin-inline-end: -0.16em;
 }
 
-.pillArrow {
-  width: 0.8em;
-  height: 0.8em;
+.ctaArrow {
+  width: 0.72em;
+  height: 0.72em;
   display: block;
-  transition: transform 0.4s var(--ease-out);
+  transition: transform 200ms var(--ease-out);
 }
-.pill:hover .pillArrow,
-.pill:focus-visible .pillArrow {
-  transform: translateX(0.24em);
+@media (hover: hover) and (pointer: fine) {
+  .cta:hover .ctaArrow {
+    transform: translateX(0.28em);
+  }
+}
+.cta:focus-visible .ctaArrow {
+  transform: translateX(0.28em);
 }

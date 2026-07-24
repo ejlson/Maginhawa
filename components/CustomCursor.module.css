@@ -3,11 +3,21 @@
    (GlassFilters.tsx), so content bends at the rim instead of being
    covered. Engines without displacement-through-backdrop-filter get the
    plain dispersion glass from the first declaration. */
-.cursor {
+/* full-viewport layer whose clip-path (set from JS) is the current zone's
+   rect — it crops the disc springing inside it so nothing shows past the
+   boundary. clip-path clips descendants, so the absolutely-placed disc is cut
+   at the zone edge. */
+.clip {
   position: fixed;
+  inset: 0;
+  z-index: 200;
+  pointer-events: none;
+}
+
+.cursor {
+  position: absolute;
   left: 0;
   top: 0;
-  z-index: 200;
   width: clamp(44px, 3.6vw, 58px);
   aspect-ratio: 1;
   /* centre the disc on the pointer — the `translate` property composes

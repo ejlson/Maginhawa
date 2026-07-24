@@ -72,7 +72,7 @@ export default function AboutIntro() {
             the frame stays put, the over-scaled footage pans within it, so
             no edge is ever exposed); the scrim keeps the text highly legible */}
         <div className={styles.cardVideoLayer} aria-hidden>
-          <Parallax inset fill speed={0.4}>
+          <Parallax inset fill speed={0.62}>
             <video
               className={styles.cardVideo}
               src="/videos/belly-hero.mov"
@@ -139,24 +139,6 @@ export default function AboutIntro() {
           </Link>
         </div>
 
-        {/* the founder's portrait, bottom-left — default-mode Parallax
-            (no inset), so the WHOLE block drifts ±25px with scroll; the
-            rounded frame sits inside the motion wrapper so the squircle
-            clip travels with the drift. The wrapper's negative bottom
-            margin hangs it past the card onto the cream band below. */}
-        <div className={styles.portraitWrap}>
-          <Parallax speed={0.25}>
-            <div className={styles.portraitFrame}>
-              {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img
-                src="/images/omarshah.jpeg"
-                alt="Chef Omar, founder of the Maginhawa Group"
-                loading="lazy"
-                draggable={false}
-              />
-            </div>
-          </Parallax>
-        </div>
       </Reveal>
     </section>
   );

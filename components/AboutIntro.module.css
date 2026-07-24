@@ -9,7 +9,11 @@
 .section {
   position: relative;
   z-index: 2;
-  padding: 0;
+  /* this section owns the chapter gap above it (one owner per boundary) so the
+     inter-section rhythm stays uniform through the page */
+  margin-top: var(--home-gap);
+  /* a 10px cream breath above and below the full-screen video card */
+  padding: 10px 0;
   background: var(--cream);
 }
 
@@ -20,10 +24,10 @@
    meta top-right, statement copy + CTA on the minor column's vertical
    centre (the near-even 1.03fr / 1fr split starts the minor column just
    past the viewport's midline, ≈column 7 of the mockup's 12), and the
-   founder's portrait anchored bottom-left, STRADDLING the lower edge —
-   36% of its height hangs onto the cream band below. No overflow clip
-   here — cardVideoLayer clips its own footage, and the portrait's
-   overhang + parallax drift must not get sheared mid-glide. */
+   founder's portrait seated high-left on column 2 (Blog-card sized),
+   within the section. No overflow clip here — cardVideoLayer clips its own
+   footage, and the portrait's parallax drift must not get sheared
+   mid-glide. */
 .card {
   position: relative;
   isolation: isolate;
@@ -36,15 +40,16 @@
      where the portrait seats. 260px = 2 × 20 margin + 11 × 20 gutters. */
   --about-col: calc((100vw - 260px) / 12);
   --about-col2: calc(20px + var(--about-col) + 20px);
-  /* the portrait's footprint, and how much of it hangs past the card's
-     bottom edge — 36% of the 3:4 frame's height straddles the seam onto
-     the cream band below (the mockup's boundary-breaking device) */
-  --portrait-w: clamp(240px, 24vw, 420px);
-  --portrait-overhang: calc(var(--portrait-w) * 4 / 3 * 0.36);
+  /* the portrait matches the first Blog card exactly — same column-2 left
+     edge (set below) and the same 3-column width (3 cols + 2 gutters) with
+     an 8:11 frame. A slim slice of its foot slips past the lower edge onto
+     the cream band below. */
+  --portrait-w: calc(3 * var(--about-col) + 40px);
+  --portrait-overhang: clamp(28px, 4.5vh, 60px);
   padding: clamp(40px, 5.5vh, 80px) clamp(28px, 3.6vw, 60px)
     var(--about-pad-b);
-  /* the full viewport — the card IS the chapter now */
-  min-height: 100svh;
+  /* taller than one screen — a big, immersive video field */
+  min-height: calc(118svh - 20px);
   display: grid;
   grid-template-columns: 1.03fr 1fr;
   grid-template-rows: auto 1fr;
@@ -204,13 +209,12 @@
   gap: clamp(28px, 4vw, 72px);
 }
 
-/* the founder's portrait — bottom-left on the major column, straddling
-   the boundary: the negative margin eats the whole bottom padding AND
-   pushes --portrait-overhang further, so 36% of the frame hangs past the
-   card onto the cream band below (the section's z-index keeps it painting
-   above that neighbour). The left margin walks the frame's edge onto
-   column 2 of the mockup grid — column-2 offset minus the card's own
-   inline padding, which the grid area already provides. */
+/* the founder's portrait — lower-left on the major column, anchored to the
+   bottom of the minor row and pushed a slim slice past the card's lower edge
+   (align-self: end + the negative margin below eats the bottom padding and
+   the overhang). The left margin walks the frame's edge onto column 2 of the
+   mockup grid — column-2 offset minus the card's own inline padding, which
+   the grid area already provides. */
 .portraitWrap {
   grid-column: 1;
   grid-row: 2;
@@ -220,11 +224,11 @@
   margin-bottom: calc(-1 * var(--about-pad-b) - var(--portrait-overhang));
 }
 
-/* the rounded 3:4 frame — lives INSIDE Parallax's motion wrapper so the
-   squircle clip travels with the whole-block drift instead of shearing
-   against it */
+/* the rounded 8:11 frame (matching a Blog card's plate) — lives INSIDE
+   Parallax's motion wrapper so the squircle clip travels with the
+   whole-block drift instead of shearing against it */
 .portraitFrame {
-  aspect-ratio: 3 / 4;
+  aspect-ratio: 8 / 11;
   width: var(--portrait-w);
   overflow: hidden;
   border-radius: var(--radius-card);
@@ -321,14 +325,9 @@
 /* ---------- responsive ---------- */
 @media (max-width: 900px) {
   .card {
-    /* stacked — content dictates the height, no viewport-locked spread;
-       the bottom padding var stays honest so the portrait's overhang math
-       (−padding − overhang) keeps it straddling the lower edge. The
-       overhang itself shrinks to a modest 22% of the 60vw frame's height
-       so the numerals below aren't swallowed on small screens. Inline
-       padding flattens to the mockup grid's 20px page margin. */
+    /* stacked — content dictates the height, no viewport-locked spread.
+       Inline padding flattens to the mockup grid's 20px page margin. */
     --about-pad-b: clamp(48px, 7vh, 72px);
-    --portrait-overhang: calc(60vw * 4 / 3 * 0.22);
     padding: clamp(28px, 4vh, 48px) 20px var(--about-pad-b);
     min-height: 0;
     grid-template-columns: 1fr;
@@ -358,7 +357,7 @@
     margin-left: 0;
   }
   .portraitFrame {
-    width: 60vw;
+    width: 62vw;
   }
   /* stacked, the copy + CTA sit mid/low-LEFT — outside both pools.
      Strengthen the base wash's lower half so the caps copy keeps at least

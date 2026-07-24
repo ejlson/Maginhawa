@@ -17,13 +17,15 @@
   );
   /* left edge of column 2 — margin + col 1 + gutter */
   --blog-col2: calc(var(--blog-margin) + var(--blog-col) + var(--blog-gutter));
-  /* top gap is owned by NumbersStrip's bottom padding; this section owns
-     the uniform chapter gap (--section-y-lg) down to the Locations video.
-     No inline padding — the children carry the binding grid themselves. */
-  padding: 0 0 var(--home-gap);
+  /* one owner per boundary: Blog owns the chapter gap above it, and the gap
+     below is owned by ReadyCta's margin-top — so every inter-section breath is
+     one uniform --home-gap (no additive stacking). */
+  margin-top: var(--home-gap);
+  padding: 0;
   display: flex;
   flex-direction: column;
-  gap: clamp(20px, 3vh, 32px);
+  /* tighter head → strip gap so the eyebrow sits close over the photography */
+  gap: clamp(8px, 1.2vh, 16px);
   background: var(--cream);
   color: var(--maroon);
 }
@@ -33,6 +35,7 @@
 .head {
   display: flex;
   align-items: center;
+  justify-content: space-between;
   gap: 1em;
   margin-inline: var(--blog-col2) var(--blog-margin);
 }
@@ -96,6 +99,12 @@
   scroll-padding-left: var(--blog-col2);
   scrollbar-width: none;
 }
+/* only a fine pointer gets the grab affordance (touch keeps native swipe) */
+@media (hover: hover) and (pointer: fine) {
+  .strip {
+    cursor: grab;
+  }
+}
 .strip::-webkit-scrollbar {
   display: none;
 }
@@ -103,10 +112,14 @@
   outline: 1.5px solid currentColor;
   outline-offset: 3px;
 }
-/* while a mouse drag is live, snap would fight the hand — lift it, and
-   read as "held" (no text selection mid-drag either) */
-.strip[data-dragging] {
+/* lift CSS scroll-snap for the whole mouse gesture — drag AND the coast after
+   release — so the browser's snap never fights the JS physics (which settles
+   onto a card itself). The grab cursor + no-select apply only while held. */
+.strip[data-dragging],
+.strip[data-gliding] {
   scroll-snap-type: none;
+}
+.strip[data-dragging] {
   cursor: grabbing;
   user-select: none;
   -webkit-user-select: none;
@@ -222,19 +235,9 @@
   }
 }
 
-/* ---------- foot row — the blog CTA holds the right edge, inset by the
-   binding grid's page margin (the section itself carries none) ---------- */
-.foot {
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 24px;
-  padding-inline: var(--blog-margin);
-}
-
-/* blog CTA — maroon label with underline-draw + arrow slide, pinned to
-   the foot row's right edge */
-.footCta {
+/* blog CTA — maroon label with underline-draw + arrow slide; rides the
+   head row's far-right edge, inline with the eyebrow, above the cards */
+.headCta {
   position: relative;
   display: inline-flex;
   align-items: center;
@@ -248,7 +251,7 @@
   color: var(--maroon);
   transition: color 0.3s ease;
 }
-.footCta::after {
+.headCta::after {
   content: "";
   position: absolute;
   left: 0;
@@ -271,16 +274,16 @@
   transition: transform 0.4s var(--ease-out);
 }
 
-.footCta:hover,
-.footCta:focus-visible {
+.headCta:hover,
+.headCta:focus-visible {
   color: var(--saffron);
 }
-.footCta:hover::after,
-.footCta:focus-visible::after {
+.headCta:hover::after,
+.headCta:focus-visible::after {
   transform: scaleX(1);
 }
-.footCta:hover .ctaArrow,
-.footCta:focus-visible .ctaArrow {
+.headCta:hover .ctaArrow,
+.headCta:focus-visible .ctaArrow {
   transform: translateX(5px);
 }
 
