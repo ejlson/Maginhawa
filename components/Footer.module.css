@@ -216,6 +216,9 @@
 
 .backToTop {
   justify-self: start;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
   background: none;
   border: none;
   color: inherit;
@@ -230,6 +233,19 @@
 .backToTop:hover,
 .backToTop:focus-visible {
   opacity: 1;
+}
+
+/* the arrow lifts on hover, echoing where the button takes you */
+.backArrow {
+  width: 1em;
+  height: 1em;
+  display: block;
+  flex: none;
+  transition: transform 0.4s var(--ease-out);
+}
+.backToTop:hover .backArrow,
+.backToTop:focus-visible .backArrow {
+  transform: translateY(-3px);
 }
 
 /* hairline between the two bands, full bleed across the footer */

@@ -117,6 +117,19 @@ export default function Footer() {
 
         <button type="button" className={styles.backToTop} onClick={scrollToTop}>
           Back to top
+          <svg
+            className={styles.backArrow}
+            viewBox="0 0 24 24"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.5"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+          >
+            <path d="M12 19V6" />
+            <path d="M6 11l6-6 6 6" />
+          </svg>
         </button>
 
         <div className={styles.cols}>

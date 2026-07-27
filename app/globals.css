@@ -122,9 +122,9 @@
                            need real air to read as separate chapters.
        --home-gap-chapter→ a deliberate hard break to a new subject. Used
                            sparingly; if everything is a chapter, nothing is. */
-  --home-gap-tight: clamp(96px, 12vh, 176px);
-  --home-gap: clamp(136px, 17vh, 240px);
-  --home-gap-chapter: clamp(176px, 22vh, 320px);
+  --home-gap-tight: clamp(128px, 16vh, 232px);
+  --home-gap: clamp(176px, 22vh, 312px);
+  --home-gap-chapter: clamp(224px, 28vh, 400px);
   /* uniform air on either side of a hairline section rule — sections that
      open with a border-top use this above AND below the line so the rules
      read as one consistent device. NOTE: the home page has dropped section

@@ -111,14 +111,17 @@
   object-fit: cover;
 }
 
-/* dark wash so the View-All button stays legible over the footage */
+/* Light wash over the footage. The gradient-noise layer above now carries
+   the contrast for the type, so this only takes the edge off the highlights —
+   at their old strengths the two together scrimmed the video to near-black
+   and there was no point having footage there at all. */
 .locScrim {
   position: absolute;
   inset: 0;
   z-index: 1;
   background:
-    radial-gradient(120% 100% at 50% 50%, rgba(18, 0, 0, 0.25), rgba(18, 0, 0, 0.62)),
-    linear-gradient(rgba(18, 0, 0, 0.35), rgba(18, 0, 0, 0.5));
+    radial-gradient(120% 100% at 50% 50%, rgba(18, 0, 0, 0.08), rgba(18, 0, 0, 0.28)),
+    linear-gradient(rgba(18, 0, 0, 0.12), rgba(18, 0, 0, 0.18));
 }
 
 /* the invitation — centred over the video, regardless of settle state */
@@ -139,40 +142,39 @@
    densest through the middle band where the type sits and fades out top and
    bottom. It sits above .locScrim but below the invitation, and gives the
    cream wordmark a textured ground to read against instead of clean video. */
-.grain {
+/* Contrast pad behind the invitation — a smooth maroon gradient, densest
+   through the middle band where the type sits and falling to nothing at the
+   edges so the footage still reads clean above and below it.
+   The noise texture that used to be blended in here has been removed; the
+   gradient stays because .locScrim alone was deliberately lightened when the
+   grain was carrying the contrast, and without either the cream type has
+   nothing to hold against the footage. */
+.typePad {
   position: absolute;
   inset: 0;
   z-index: 1;
   pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
-  background-size: 170px 170px;
-  opacity: 0.5;
-  mix-blend-mode: overlay;
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(0, 0, 0, 0.85) 34%,
-    rgba(0, 0, 0, 0.85) 66%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    rgba(0, 0, 0, 0.85) 34%,
-    rgba(0, 0, 0, 0.85) 66%,
-    transparent 100%
+  background: radial-gradient(
+    120% 62% at 50% 50%,
+    rgba(24, 0, 0, 0.62) 0%,
+    rgba(24, 0, 0, 0.34) 45%,
+    rgba(24, 0, 0, 0) 100%
   );
 }
 
 /* ---------- the invitation ---------- */
 
+/* No shared gap — the wordmark's SVG box carries ~11px of dead space above
+   its cap line and ~5px below its baseline, so a single flex gap produced
+   very different OPTICAL gaps above and below it. Each edge is set on its own
+   against the measured ink, not the box. */
 .invite {
   width: 100%;
   display: flex;
   flex-direction: column;
   align-items: center;
   text-align: center;
-  gap: clamp(18px, 3vh, 36px);
+  gap: 0;
   color: var(--cream);
 }
 
@@ -192,6 +194,10 @@
 .inviteWord {
   display: block;
   width: 100%;
+  /* The box carries ~11px of dead space above its cap line, so a NEGATIVE
+     margin is needed to close the optical gap further — this lands the
+     letters ~5px under the eyebrow. */
+  margin-top: -6px;
 }
 
 .inviteWordText {
@@ -203,6 +209,10 @@
 }
 
 .inviteCta {
+  /* the wordmark's box adds ~5px below its baseline, so this lands the pill
+     roughly 36px under the letters — deliberately more air than the eyebrow
+     above, since the eyebrow and wordmark read as one locked-up unit */
+  margin-top: clamp(24px, 3.5vh, 44px);
   display: inline-flex;
   align-items: center;
   justify-content: center;

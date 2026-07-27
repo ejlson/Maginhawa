@@ -122,8 +122,8 @@ export default function RestaurantLocations() {
             <VideoBackdrop src={CLIPS[clip]} className={styles.locVideo} />
           </div>
           <div className={styles.locScrim} aria-hidden />
-          {/* gradient noise, densest through the band the type occupies */}
-          <div className={styles.grain} aria-hidden />
+          {/* smooth contrast pad, densest through the band the type occupies */}
+          <div className={styles.typePad} aria-hidden />
         </div>
 
         {/* The closing invitation now lives ON the film. "Starts with you" is
