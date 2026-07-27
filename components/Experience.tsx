@@ -15,7 +15,6 @@ import RestaurantLocations from "./RestaurantLocations";
 // import Press from "./Press";
 import Blog from "./Blog";
 import CareersTeaser from "./CareersTeaser";
-import FAQ from "./FAQ";
 import Footer from "./Footer";
 import DarkZone from "./DarkZone";
 import type { HeroInsets } from "./types";
@@ -97,8 +96,9 @@ export default function Experience() {
           {/* No Contact block here any more — the enquiry form lives on
               /contact, and the footer's own invitation ("Got any questions?")
               carries the ask at the end of the page. */}
+          {/* FAQ lives on /contact (service-desk furniture, not an editorial
+              close) — the home page ends film → footer, confident and short */}
           <DarkZone>
-            <FAQ />
             <Footer />
           </DarkZone>
         </div>

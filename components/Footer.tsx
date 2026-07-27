@@ -105,6 +105,24 @@ export default function Footer() {
               </svg>
             </span>
           </Link>
+
+          {/* the direct line — papatom's closing move: for a relationship
+              business the most confident CTA is a bare address and number,
+              in plain sight rather than buried in the link columns */}
+          <div className={styles.inviteDirect}>
+            <a
+              className={styles.directLine}
+              href={`mailto:${CONTACT.email}`}
+            >
+              {CONTACT.email}
+            </a>
+            <a
+              className={styles.directLine}
+              href={`tel:${CONTACT.phone.replace(/\s/g, "")}`}
+            >
+              {CONTACT.phone}
+            </a>
+          </div>
         </div>
       </div>
 

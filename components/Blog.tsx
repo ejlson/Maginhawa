@@ -251,7 +251,9 @@ export default function Blog() {
         {/* blog CTA — rides the head row's far-right edge, inline with the
             eyebrow, above the cards */}
         <Link href="/blog" className={styles.headCta} aria-label="Read all stories">
-          <span className={styles.ctaLabel}>Read all stories</span>
+          {/* counted index link — same quiet-utility pattern as the Discover
+              head's "All restaurants (n)" */}
+          <span className={styles.ctaLabel}>All stories ({BLOG.length})</span>
           <svg
             className={styles.ctaArrow}
             viewBox="0 0 32 10"

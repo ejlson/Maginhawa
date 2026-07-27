@@ -37,10 +37,11 @@ const PRESS: {
 ];
 
 /**
- * Infinite "As Featured In" marquee. Sits between the Discover gallery and
- * the About Us statement — a quiet credential row before the group's own
- * story. Two identical lists slide left as a single track (translate3d
- * 0 → -50%) so the seam is invisible; the whole strip pauses on hover.
+ * STATIC "As Featured In" masthead row. Sits between the Discover gallery and
+ * the About Us statement — a quiet credential wall before the group's own
+ * story. Deliberately still: scrolling logo tickers read as ad-tech, while
+ * stillness says "this is simply true". The marks wrap into as many rows as
+ * they need, generously spaced.
  *
  * All marks except Michelin are grayscaled and multiply-blended so their
  * colours normalise to a uniform dark tone against the cream page.
@@ -53,35 +54,29 @@ export default function PressStrip() {
       data-nav-theme="light"
     >
       <span className={styles.label}>As Featured In</span>
-      <div className={styles.viewport}>
-        <div className={styles.track}>
-          {[0, 1].map((copy) => (
-            <ul key={copy} className={styles.list} aria-hidden={copy === 1}>
-              {PRESS.map((p) => (
-                <li
-                  key={`${copy}-${p.name}`}
-                  className={styles.item}
-                  style={
-                    p.sizeBoost
-                      ? ({ "--size-boost": p.sizeBoost } as React.CSSProperties)
-                      : undefined
-                  }
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    className={styles.logo}
-                    data-preserve-color={p.preserveColor ? "" : undefined}
-                    src={p.logo}
-                    alt={p.name}
-                    loading="lazy"
-                    draggable={false}
-                  />
-                </li>
-              ))}
-            </ul>
-          ))}
-        </div>
-      </div>
+      <ul className={styles.list}>
+        {PRESS.map((p) => (
+          <li
+            key={p.name}
+            className={styles.item}
+            style={
+              p.sizeBoost
+                ? ({ "--size-boost": p.sizeBoost } as React.CSSProperties)
+                : undefined
+            }
+          >
+            {/* eslint-disable-next-line @next/next/no-img-element */}
+            <img
+              className={styles.logo}
+              data-preserve-color={p.preserveColor ? "" : undefined}
+              src={p.logo}
+              alt={p.name}
+              loading="lazy"
+              draggable={false}
+            />
+          </li>
+        ))}
+      </ul>
     </section>
   );
 }

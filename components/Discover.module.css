@@ -51,16 +51,54 @@
   flex: none;
 }
 
-/* pale interaction hint, right-aligned where the old carousel controls
-   sat. Click/tap works on every device, so it shows everywhere. */
-.hint {
+/* quiet counted index link, right-aligned — same underline-draw + arrow
+   grammar as the Blog head's CTA, so every section head speaks one link
+   language */
+.headCta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  gap: 0.8em;
+  padding: 0.4em 0;
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
   color: var(--maroon);
-  opacity: 0.4;
-  text-align: right;
+  white-space: nowrap;
+  transition: color 0.3s ease;
+}
+.headCta::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: 1px;
+  background: currentColor;
+  transform: scaleX(0.28);
+  transform-origin: left center;
+  transition: transform 0.45s var(--ease-out);
+}
+.headCtaLabel {
+  font-weight: 500;
+}
+.headCtaArrow {
+  width: clamp(26px, 2.4vw, 36px);
+  height: 10px;
+  transition: transform 0.4s var(--ease-out);
+}
+.headCta:hover,
+.headCta:focus-visible {
+  color: var(--saffron);
+}
+.headCta:hover::after,
+.headCta:focus-visible::after {
+  transform: scaleX(1);
+}
+.headCta:hover .headCtaArrow,
+.headCta:focus-visible .headCtaArrow {
+  transform: translateX(5px);
 }
 
 /* ---------- grid ---------- */
@@ -110,7 +148,8 @@
    observer flips .gridIn on the <ul> and disconnects. The entrance lives on
    the cell so it never fights the hover styles on the tile inside. */
 .cell {
-  aspect-ratio: 1 / 1;
+  /* the SQUARE now lives on the tile (the caption below it needs the cell
+     to grow); the cell is just the entrance-animation + flow wrapper */
   opacity: 0;
   /* the shared home rise: same distance + strong ease-out as <Reveal>, so
      every section enters in one motion language */
@@ -178,7 +217,9 @@
 .tile {
   position: relative;
   width: 100%;
-  height: 100%;
+  /* the plate keeps its square here (moved off .cell so the caption can
+     extend the cell downward without squashing the photo) */
+  aspect-ratio: 1 / 1;
   z-index: 1;
   opacity: 1;
   cursor: pointer;
@@ -280,10 +321,6 @@
     opacity: 0.8;
     transition: opacity 250ms cubic-bezier(0.23, 1, 0.32, 1);
   }
-  /* the mini description surfaces with the same hover affordance */
-  .tile:not(.tileActive):hover .tag {
-    opacity: 0.9;
-  }
 }
 
 .tileActive .photo {
@@ -338,34 +375,84 @@
   transition-duration: 600ms;
 }
 
-/* ---------- top-right: mini description ---------- */
-/* Hidden at rest — it fades in on hover (hover-capable devices, below)
-   and in the expanded state, so resting tiles stay quiet. Opacity-only:
-   the tag never leaves the DOM. */
-.tag {
-  position: absolute;
-  top: var(--tile-pad);
-  right: var(--tile-pad);
-  z-index: 2;
-  max-width: 55%;
-  text-align: right;
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  color: var(--cream);
-  opacity: 0;
-  transition:
-    right 480ms cubic-bezier(0.77, 0, 0.175, 1),
-    opacity 250ms cubic-bezier(0.23, 1, 0.32, 1);
+/* ---------- caption below the plate ---------- */
+/* The site-wide card grammar (matches the Blog cards): semibold name,
+   regular one-liner, then the pills row. Sits on the cream under the
+   photo — the plate itself stays clean, no overlay copy at rest. */
+.cellCaption {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 0.3em;
+  margin-top: clamp(12px, 1.4vw, 16px);
 }
 
-/* make room for the ✕ button while the card is expanded — the tag also
-   shows here so touch/keyboard users still get it when the card is open */
-.tileActive .tag {
-  right: calc(var(--tile-pad) + 52px);
-  opacity: 0.9;
-  transition-duration: 600ms, 250ms;
+.cellName {
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: var(--t-small);
+  line-height: var(--lh-snug);
+  color: var(--maroon);
+}
+
+.cellTagline {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--t-small);
+  line-height: var(--lh-snug);
+  color: var(--maroon);
+  opacity: 0.7;
+}
+
+.pillRow {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  margin-top: 0.6em;
+}
+
+/* neighbourhood pill — the Blog byline pill's exact recipe */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45em 0.9em;
+  border-radius: 999px;
+  background: rgba(47, 0, 0, 0.07);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--t-label);
+  line-height: 1;
+  color: var(--maroon);
+}
+
+/* Book pill — the one FILLED pill on the page: booking is the visitor's
+   number-one job, so it earns the strongest (still quiet) affordance */
+.pillBook {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45em 0.9em;
+  border-radius: 999px;
+  background: var(--maroon);
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--t-label);
+  line-height: 1;
+  color: var(--cream);
+  text-decoration: none;
+  transition: transform 180ms var(--ease-out);
+}
+@media (hover: hover) and (pointer: fine) {
+  .pillBook:hover {
+    transform: translateY(-1px);
+  }
+}
+.pillBook:focus-visible {
+  outline: 2px solid var(--maroon);
+  outline-offset: 2px;
+}
+.pillBook:active {
+  transform: scale(0.96);
+  transition-duration: 120ms;
 }
 
 /* ---------- top-right: expanded-state close button ---------- */
@@ -673,9 +760,6 @@
   .close {
     transform: none;
     transition: opacity 0.2s ease;
-  }
-  .tag {
-    transition: none;
   }
   .scrim {
     transition: opacity 0.2s ease;

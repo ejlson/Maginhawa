@@ -1,6 +1,7 @@
 "use client";
 
 import Image from "next/image";
+import Link from "next/link";
 import { useCallback, useEffect, useRef, useState } from "react";
 import styles from "./Discover.module.css";
 import MenuOverlay from "./MenuOverlay";
@@ -299,10 +300,26 @@ export default function Discover() {
     <section className={styles.section} id="restaurants" data-nav-theme="light">
       <div className={styles.head}>
         <span className={styles.eyebrow}>Discover All Our Restaurants</span>
-        {/* pale interaction hint — click/tap works everywhere now */}
-        <span className={styles.hint} aria-hidden>
-          Click to learn more
-        </span>
+        {/* quiet counted index link — the papatom "→ Alle Leistungen (6)"
+            pattern, matching the Blog head's CTA grammar */}
+        <Link href="/restaurants" className={styles.headCta}>
+          <span className={styles.headCtaLabel}>
+            All restaurants ({ITEMS.length})
+          </span>
+          <svg
+            className={styles.headCtaArrow}
+            viewBox="0 0 32 10"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            aria-hidden
+          >
+            <path d="M0 5 H26" />
+            <path d="M22 1 L26 5 L22 9" />
+          </svg>
+        </Link>
       </div>
 
       <ul
@@ -384,6 +401,10 @@ function Tile({
   // Visit prefers the restaurant's own site (new tab); an entry without
   // one falls back to the internal detail page
   const website = getRestaurant(item.slug)?.website;
+  // neighbourhood pill copy — the canonical location minus the ", London"
+  // every entry shares ("Camden, London" → "Camden"; plain "London" stays)
+  const neighbourhood = getRestaurant(item.slug)
+    ?.location.replace(/,\s*London$/, "");
 
   return (
     <li
@@ -443,9 +464,6 @@ function Tile({
             {/* legibility scrim — present at rest, deepens in the expanded
                 state via opacity only */}
             <div className={styles.scrim} aria-hidden />
-
-            {/* top-right — mini description */}
-            <span className={styles.tag}>{item.tag}</span>
 
             {/* top-right — explicit close affordance, visible only while
                 the card is expanded. stopPropagation keeps the click from
@@ -560,6 +578,31 @@ function Tile({
           </div>
         </div>
       </article>
+
+      {/* caption BELOW the plate — the site-wide card grammar (matches the
+          Blog cards): semibold name, regular one-liner, then the pills row —
+          neighbourhood, plus a direct Book link when the venue takes
+          reservations, so booking is one click from the first scroll. */}
+      <div className={styles.cellCaption}>
+        <span className={styles.cellName}>{item.name}</span>
+        <span className={styles.cellTagline}>{item.tag}</span>
+        <span className={styles.pillRow}>
+          {neighbourhood ? (
+            <span className={styles.pill}>{neighbourhood}</span>
+          ) : null}
+          {bookable && item.bookingUrl ? (
+            <a
+              href={item.bookingUrl}
+              target="_blank"
+              rel="noopener noreferrer"
+              className={styles.pillBook}
+              aria-label={`Book at ${item.name}`}
+            >
+              Book
+            </a>
+          ) : null}
+        </span>
+      </div>
     </li>
   );
 }
