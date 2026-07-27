@@ -13,6 +13,15 @@
   gap: clamp(14px, 2vh, 22px);
 }
 
+/* the marquee runs INSIDE the restaurant grid's width — same middle-10
+   column seat Discover uses at the 4-up breakpoint — so the logos fade
+   out exactly where the grid above them ends, not at the viewport edge */
+@media (min-width: 981px) {
+  .section {
+    padding-inline: var(--grid-col2);
+  }
+}
+
 .label {
   align-self: center;
   font-family: var(--font-sans);

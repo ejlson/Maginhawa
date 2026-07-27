@@ -1,16 +1,16 @@
 # Graph Report - Maginhawa  (2026-07-27)
 
 ## Corpus Check
-- 142 files · ~4,904,954 words
+- 142 files · ~4,904,924 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 2281 nodes · 6082 edges · 136 communities (71 shown, 65 thin omitted)
+- 2281 nodes · 6081 edges · 132 communities (67 shown, 65 thin omitted)
 - Extraction: 81% EXTRACTED · 19% INFERRED · 0% AMBIGUOUS · INFERRED: 1162 edges (avg confidence: 0.6)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `4126df5c`
+- Built from commit: `59a00a71`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -128,10 +128,6 @@
 - s
 - CustomCursor.tsx
 - s
-- zn
-- S
-- Rn
-- t
 - s
 
 ## God Nodes (most connected - your core abstractions)
@@ -150,18 +146,18 @@
 - `s()` --indirect_call--> `ms()`  [INFERRED]
   scripts/console.mjs → public/menu/belly/wine_files/common-dabb52f27fbf7211-min.en-US.js
 - `s()` --indirect_call--> `ms()`  [INFERRED]
+  scripts/find404.mjs → public/menu/belly/wine_files/common-dabb52f27fbf7211-min.en-US.js
+- `s()` --indirect_call--> `ms()`  [INFERRED]
   scripts/fontcheck.mjs → public/menu/belly/wine_files/common-dabb52f27fbf7211-min.en-US.js
 - `s()` --indirect_call--> `ms()`  [INFERRED]
   scripts/scan.mjs → public/menu/belly/wine_files/common-dabb52f27fbf7211-min.en-US.js
 - `s()` --indirect_call--> `ms()`  [INFERRED]
   scripts/shoot-all.mjs → public/menu/belly/wine_files/common-dabb52f27fbf7211-min.en-US.js
-- `s()` --indirect_call--> `ms()`  [INFERRED]
-  scripts/shoot-btns.mjs → public/menu/belly/wine_files/common-dabb52f27fbf7211-min.en-US.js
 
 ## Import Cycles
 - None detected.
 
-## Communities (136 total, 65 thin omitted)
+## Communities (132 total, 65 thin omitted)
 
 ### Community 0 - "user-account-core-06dbaa1bcfe1a542-min.en-US.js"
 Cohesion: 0.07
@@ -169,7 +165,7 @@ Nodes (49): a(), ae(), B(), be(), checkDeepLinking(), closeFrame(), d, E() (+41 
 
 ### Community 1 - "common-dabb52f27fbf7211-min.en-US.js"
 Cohesion: 0.04
-Nodes (40): Ai(), ao(), au(), Bo(), da(), dc(), ei(), Et() (+32 more)
+Nodes (49): Ai(), ao(), au(), bh(), Bo(), da(), dc(), dd() (+41 more)
 
 ### Community 5 - "b"
 Cohesion: 0.11
@@ -189,19 +185,19 @@ Nodes (7): c(), emitChange(), exportAsync(), exportPublicMethods(), _formatError
 
 ### Community 12 - "extract-css-moment-js-vendor-a5cfdec1ae227f33-min.en-US.js"
 Cohesion: 0.04
-Nodes (16): B(), dp(), hM(), I2(), ib(), Ob(), pb(), q() (+8 more)
+Nodes (22): B(), dp(), ez(), hM(), I2(), ib(), lM(), nz() (+14 more)
 
 ### Community 13 - "ho"
-Cohesion: 0.06
-Nodes (38): af(), ca(), du(), ec(), eh(), fr(), getStoreCurrency(), gg() (+30 more)
+Cohesion: 0.08
+Nodes (26): ca(), cs(), df(), Es(), getStoreCurrency(), gh(), i(), Ia() (+18 more)
 
 ### Community 14 - "d"
 Cohesion: 0.06
 Nodes (14): Bf(), bindAction(), bindActions(), bindListeners(), d(), Ff(), g(), gf() (+6 more)
 
 ### Community 15 - "Ps"
-Cohesion: 0.14
-Nodes (34): Aa(), An(), bn(), br(), cr(), Cu(), Dn(), Ea() (+26 more)
+Cohesion: 0.12
+Nodes (40): Aa(), An(), bn(), br(), bu(), cr(), Cu(), Dn() (+32 more)
 
 ### Community 17 - "common-vendors-3cc69e7d149905b0-min.en-US.js"
 Cohesion: 0.12
@@ -216,12 +212,12 @@ Cohesion: 0.16
 Nodes (15): d(), f(), g(), H(), k(), l(), m, n() (+7 more)
 
 ### Community 21 - "J"
-Cohesion: 0.10
-Nodes (43): ac(), dd(), Do(), ed(), fc(), fg(), Fh(), Fu() (+35 more)
+Cohesion: 0.11
+Nodes (41): ac(), Do(), ed(), fd(), fg(), Fh(), Fu(), Gd() (+33 more)
 
 ### Community 24 - "JoinUs.tsx"
-Cohesion: 0.11
-Nodes (31): ag(), Al(), be(), Cf(), El(), Ft(), Gd(), gs() (+23 more)
+Cohesion: 0.13
+Nodes (24): ag(), Al(), be(), El(), Ft(), ho(), Io(), jt() (+16 more)
 
 ### Community 25 - "package.json"
 Cohesion: 0.07
@@ -236,8 +232,8 @@ Cohesion: 0.16
 Nodes (19): A(), B(), D(), E(), f(), g(), I, j() (+11 more)
 
 ### Community 28 - "u"
-Cohesion: 0.16
-Nodes (17): A0(), Ab(), c0(), cz(), d(), f2(), h2(), kz() (+9 more)
+Cohesion: 0.12
+Nodes (29): A0(), Ab(), Az(), bz(), c0(), cz(), d2(), db() (+21 more)
 
 ### Community 29 - "RestaurantsShowcase.tsx"
 Cohesion: 0.08
@@ -264,8 +260,8 @@ Cohesion: 0.10
 Nodes (21): b0(), Bp(), f1(), fz(), h1(), hz(), iz(), jb() (+13 more)
 
 ### Community 35 - "Pt"
-Cohesion: 0.08
-Nodes (35): MeshGradient(), Ar(), bc(), bh(), cn(), Dh(), Eo(), eu() (+27 more)
+Cohesion: 0.07
+Nodes (46): MeshGradient(), ad(), af(), ah(), Ar(), bc(), cc(), Cf() (+38 more)
 
 ### Community 37 - "$t"
 Cohesion: 0.25
@@ -284,19 +280,19 @@ Cohesion: 0.11
 Nodes (4): kt(), Me(), mt(), $t()
 
 ### Community 44 - "i"
-Cohesion: 0.15
-Nodes (23): bt(), bu(), cd(), ct(), de(), Es(), fn(), Hi() (+15 more)
+Cohesion: 0.17
+Nodes (20): bt(), cd(), ct(), de(), fn(), Hi(), jn(), ln() (+12 more)
 
 ### Community 46 - "layout.tsx"
 Cohesion: 0.12
 Nodes (13): hanken, metadata, Experience(), FILTERS, GlassFilters(), KEEP, LENS_MAP, PILL_MAP (+5 more)
 
 ### Community 48 - "Z"
-Cohesion: 0.23
-Nodes (13): A1(), eb(), f(), fM(), g0(), H(), M0(), m1() (+5 more)
+Cohesion: 0.12
+Nodes (25): _0(), A1(), d(), E0(), eb(), f(), fM(), g0() (+17 more)
 
 ### Community 49 - "La"
-Cohesion: 0.10
+Cohesion: 0.09
 Nodes (20): jsonLd, metadata, ContactPage(), DarkZone(), HERO_INSETS, ITEMS, Menu(), getNavTheme() (+12 more)
 
 ### Community 50 - "t"
@@ -332,16 +328,16 @@ Cohesion: 0.15
 Nodes (9): metadata, POOL, BlogIndexInner(), OTHERS, PAGE_COUNT, postsForPage(), BLOG, BlogEntry (+1 more)
 
 ### Community 65 - "i"
-Cohesion: 0.32
-Nodes (8): cM(), d0(), j(), k1(), L1(), mM(), R0(), W2()
+Cohesion: 0.13
+Nodes (20): AM(), b1(), cM(), d0(), e2(), G2(), gb(), i() (+12 more)
 
 ### Community 66 - "Agent Pipeline"
 Cohesion: 0.22
 Nodes (7): Agent 1 — Prompt Architect, Agent 2 — Builder, Agent 3 — Tester, Agent 4 — Reviewer, Agent Pipeline, graphify, Orchestration Rules
 
 ### Community 68 - "Ie"
-Cohesion: 0.08
-Nodes (38): bd(), cg(), ch(), dg(), eg(), En(), Fs(), gi() (+30 more)
+Cohesion: 0.09
+Nodes (39): bd(), cg(), ch(), dg(), eg(), En(), Fs(), gi() (+31 more)
 
 ### Community 70 - "visitor-site-error-reporter-aa199afcf7c87a38-min.en-US.js"
 Cohesion: 0.38
@@ -352,28 +348,12 @@ Cohesion: 0.29
 Nodes (7): B2(), gz(), O0(), s1(), U1(), vz(), Yz()
 
 ### Community 89 - "s"
-Cohesion: 0.15
-Nodes (21): AM(), Az(), bz(), d2(), db(), gb(), I0(), i1() (+13 more)
+Cohesion: 0.16
+Nodes (15): du(), ec(), Ge(), Gr(), kg(), ko(), mh(), No() (+7 more)
 
 ### Community 90 - "s"
-Cohesion: 0.18
-Nodes (13): as(), ba(), Cl(), co(), Er(), hn(), Lr(), Ni() (+5 more)
-
-### Community 131 - "zn"
-Cohesion: 0.14
-Nodes (19): ah(), cc(), cs(), df(), ds(), Hf(), id(), kd() (+11 more)
-
-### Community 132 - "S"
-Cohesion: 0.15
-Nodes (15): _0(), b1(), E0(), e2(), G2(), H0(), i(), jz() (+7 more)
-
-### Community 133 - "Rn"
-Cohesion: 0.21
-Nodes (14): ad(), hd(), ic(), li(), oc(), Oi(), ol(), Pi() (+6 more)
-
-### Community 134 - "t"
-Cohesion: 0.33
-Nodes (6): ez(), lM(), nz(), pM(), s2(), t()
+Cohesion: 0.10
+Nodes (28): as(), ba(), Cl(), co(), Er(), fr(), gg(), hn() (+20 more)
 
 ## Knowledge Gaps
 - **125 isolated node(s):** `jsonLd`, `metadata`, `metadata`, `jsonLd`, `metadata` (+120 more)
@@ -383,7 +363,7 @@ Nodes (6): ez(), lM(), nz(), pM(), s2(), t()
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
-- **Why does `i()` connect `ho` to `user-account-core-06dbaa1bcfe1a542-min.en-US.js`, `common-dabb52f27fbf7211-min.en-US.js`, `zn`, `Rn`, `b`, `S`, `o`, `c`, `r`, `d`, `Ps`, `p`, `g`, `J`, `JoinUs.tsx`, `RestaurantsShowcase.tsx`, `Pt`, `$t`, `n`, `i`, `h`, `CareersTeaser.tsx`, `Ie`, `s`?**
+- **Why does `i()` connect `ho` to `user-account-core-06dbaa1bcfe1a542-min.en-US.js`, `common-dabb52f27fbf7211-min.en-US.js`, `b`, `S`, `o`, `c`, `r`, `d`, `Ps`, `p`, `g`, `J`, `JoinUs.tsx`, `RestaurantsShowcase.tsx`, `Pt`, `$t`, `n`, `i`, `h`, `CareersTeaser.tsx`, `Ie`, `s`, `s`?**
   _High betweenness centrality (0.154) - this node is a cross-community bridge._
 - **Why does `RestaurantsShowcase()` connect `RestaurantsShowcase.tsx` to `La`, `Press.tsx`?**
   _High betweenness centrality (0.115) - this node is a cross-community bridge._

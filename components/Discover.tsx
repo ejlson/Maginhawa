@@ -465,29 +465,6 @@ function Tile({
                 state via opacity only */}
             <div className={styles.scrim} aria-hidden />
 
-            {/* bottom-left ON the plate — neighbourhood + Book pills. They
-                fade out in the expanded state (the card's own action row
-                takes over); the Book link stops propagation so it never
-                toggles the tile. */}
-            <span className={styles.platePills}>
-              {neighbourhood ? (
-                <span className={styles.pill}>{neighbourhood}</span>
-              ) : null}
-              {bookable && item.bookingUrl ? (
-                <a
-                  href={item.bookingUrl}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.pillBook}
-                  onClick={(e) => e.stopPropagation()}
-                  tabIndex={active ? -1 : 0}
-                  aria-label={`Book at ${item.name}`}
-                >
-                  Book
-                </a>
-              ) : null}
-            </span>
-
             {/* top-right — explicit close affordance, visible only while
                 the card is expanded. stopPropagation keeps the click from
                 re-toggling through the tile; onToggle collapses because the
@@ -603,10 +580,28 @@ function Tile({
       </article>
 
       {/* caption BELOW the plate — the site-wide card grammar (matches the
-          Blog cards): semibold name, regular one-liner. The pills live ON
-          the plate itself (bottom-left). */}
+          Blog cards): head row with the semibold name and the pills inline
+          (neighbourhood + Book), then the regular one-liner underneath */}
       <div className={styles.cellCaption}>
-        <span className={styles.cellName}>{item.name}</span>
+        <span className={styles.cellHeadRow}>
+          <span className={styles.cellName}>{item.name}</span>
+          <span className={styles.pillRow}>
+            {neighbourhood ? (
+              <span className={styles.pill}>{neighbourhood}</span>
+            ) : null}
+            {bookable && item.bookingUrl ? (
+              <a
+                href={item.bookingUrl}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={styles.pillBook}
+                aria-label={`Book at ${item.name}`}
+              >
+                Book
+              </a>
+            ) : null}
+          </span>
+        </span>
         <span className={styles.cellTagline}>{item.tag}</span>
       </div>
     </li>

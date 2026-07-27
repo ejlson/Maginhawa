@@ -259,8 +259,8 @@
   width: 100%;
   height: 100%;
   transform: translate(-50%, -50%);
-  /* photography is square (see --radius-tile) — a rounded photo is what
-     makes an editorial grid read as an app screen */
+  /* gently rounded — --radius-tile is deliberately small (8px) so the
+     grid reads as an editorial spread, not an app screen */
   border-radius: var(--radius-tile);
   box-shadow: 0 24px 48px -32px rgba(47, 0, 0, 0.35);
   transition:
@@ -405,31 +405,31 @@
   opacity: 0.7;
 }
 
-/* pills ON the plate — bottom-left over the scrimmed photo. They fade out
-   with the expanded state (the card's own action row takes over). */
-.platePills {
-  position: absolute;
-  left: var(--tile-pad);
-  bottom: var(--tile-pad);
-  z-index: 2;
+/* head row of the caption — name on the left, the pills inline on the
+   right, sharing the name's baseline band */
+.cellHeadRow {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8em;
+}
+
+.pillRow {
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  opacity: 1;
-  transition: opacity 250ms cubic-bezier(0.23, 1, 0.32, 1);
-}
-.tileActive .platePills {
-  opacity: 0;
-  pointer-events: none;
+  flex: none;
 }
 
-/* neighbourhood pill — solid cream so it reads on any footage */
+/* neighbourhood pill — the Blog byline pill's recipe (a faint maroon tint;
+   a solid cream pill would vanish on the cream ground down here) */
 .pill {
   display: inline-flex;
   align-items: center;
   padding: 0.45em 0.9em;
   border-radius: 999px;
-  background: var(--cream);
+  background: rgba(47, 0, 0, 0.07);
   font-family: var(--font-sans);
   font-weight: 500;
   font-size: var(--t-label);
@@ -437,28 +437,30 @@
   color: var(--maroon);
 }
 
-/* Book pill — the one FILLED pill on the page: booking is the visitor's
-   number-one job, so it earns the strongest (still quiet) affordance.
-   The cream border keeps its edge crisp over dark footage, where a bare
-   maroon fill would melt into the scrimmed photo. */
+/* Book pill — outlined, no fill: a quiet grey hairline ring (maroon at low
+   alpha reads as a warm grey on the cream) distinguishes the ACTION from
+   the tinted neighbourhood tag beside it without shouting */
 .pillBook {
   display: inline-flex;
   align-items: center;
   padding: 0.45em 0.9em;
   border-radius: 999px;
-  background: var(--maroon);
-  border: 1px solid var(--cream);
+  background: transparent;
+  border: 1px solid rgba(47, 0, 0, 0.3);
   font-family: var(--font-sans);
   font-weight: 500;
   font-size: var(--t-label);
   line-height: 1;
-  color: var(--cream);
+  color: var(--maroon);
   text-decoration: none;
-  transition: transform 180ms var(--ease-out);
+  transition:
+    transform 180ms var(--ease-out),
+    border-color 180ms var(--ease-out);
 }
 @media (hover: hover) and (pointer: fine) {
   .pillBook:hover {
     transform: translateY(-1px);
+    border-color: var(--maroon);
   }
 }
 .pillBook:focus-visible {

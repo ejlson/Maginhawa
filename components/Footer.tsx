@@ -86,7 +86,7 @@ export default function Footer() {
         </p>
 
         <div className={styles.invite}>
-          <h2 className={styles.inviteTitle}>Got any questions? Contact us</h2>
+          <h2 className={styles.inviteTitle}>Got any questions? Contact us.</h2>
           {/* One pill — label and arrow share a single cream capsule; hover
               widens the pill and deepens its recess (see Footer.module.css) */}
           <Link href="/contact" className={styles.inviteCta}>
@@ -109,7 +109,7 @@ export default function Footer() {
           {/* the direct line — papatom's closing move: for a relationship
               business the most confident CTA is a bare address and number,
               in plain sight rather than buried in the link columns */}
-          <div className={styles.inviteDirect}>
+          {/* <div className={styles.inviteDirect}>
             <a
               className={styles.directLine}
               href={`mailto:${CONTACT.email}`}
@@ -122,7 +122,7 @@ export default function Footer() {
             >
               {CONTACT.phone}
             </a>
-          </div>
+          </div> */}
         </div>
       </div>
 

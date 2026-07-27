@@ -97,7 +97,7 @@
      (Discover tiles, Blog plates, the About card). --radius-card is the
      larger rounding on pressable/floating UI panels. Pills stay 999px, dots
      50%, and animated radii (Hero) keep their own tokens. */
-  --radius-tile: 14px;  /* photography + editorial frames */
+  --radius-tile: 8px; /* photography + editorial frames — a quiet edge-soften, not an app-card curve */
   --radius-card: 16px;  /* pressable/floating UI panels — NOT photos */
   --radius-media: 10px; /* media nested inside a rounded UI panel */
 

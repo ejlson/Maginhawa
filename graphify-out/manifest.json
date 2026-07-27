@@ -45,8 +45,8 @@
     "semantic_hash": ""
   },
   "components/AboutIntro.tsx": {
-    "mtime": 1785167121.0825129,
-    "ast_hash": "661a94992b34addeb958d05bd044afe4",
+    "mtime": 1785167658.318184,
+    "ast_hash": "34ad33bf1be8139676c38b04b6ca0368",
     "semantic_hash": ""
   },
   "components/Blog.tsx": {
@@ -85,8 +85,8 @@
     "semantic_hash": ""
   },
   "components/Discover.tsx": {
-    "mtime": 1785166925.8040328,
-    "ast_hash": "e648ec139dc7642a508ea4e4d7ac02b0",
+    "mtime": 1785167551.917174,
+    "ast_hash": "06088ced94827dc5becb51df5e90550c",
     "semantic_hash": ""
   },
   "components/Experience.tsx": {
@@ -100,8 +100,8 @@
     "semantic_hash": ""
   },
   "components/Footer.tsx": {
-    "mtime": 1785166423.3221223,
-    "ast_hash": "ea65cc807f2c7844d9f38818205d67ba",
+    "mtime": 1785167615.469916,
+    "ast_hash": "0bacd699619680c32bd30791c58fc544",
     "semantic_hash": ""
   },
   "components/GlassFilters.tsx": {

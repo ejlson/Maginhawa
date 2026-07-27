@@ -138,9 +138,10 @@
   color: var(--maroon);
 }
 
-/* the photograph — a 3:4 plate with the site's soft tile rounding,
-   placeholder-backed while loading. Taller than 4:5 so the photography
-   leads, but still gentler than the old 8:11 poster wall. */
+/* the photograph — a 3:4 plate on the shared gentle tile rounding (8px,
+   matching the Discover plates), placeholder-backed while loading. Taller
+   than 4:5 so the photography leads, but still gentler than the old 8:11
+   poster wall. */
 .plate {
   aspect-ratio: 3 / 4;
   overflow: hidden;
