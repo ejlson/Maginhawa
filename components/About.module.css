@@ -199,6 +199,9 @@
 }
 
 .heroLineTop {
+  /* MAGINHAWA is a brand-wordmark moment — it keeps the Contralto voice
+     (big optical cut), same as the home hero and footer wordmarks */
+  font-family: var(--font-display-big);
   text-align: left;
   margin-left: -0.02em;
 }
@@ -212,10 +215,12 @@
   /* pulled off the right edge so the italic P's overhang clears the
      viewport instead of being cut off */
   padding-right: 0.14em;
-  /* italic serif inflection on the second word — the reference's
-     "About *Me*" pattern. Revert by deleting these two declarations. */
+  /* italic inflection on the second word — the reference's "About *Me*"
+     pattern, now set THIN: a hairline grotesk italic against MAGINHAWA's
+     solid Contralto, so the two words contrast in voice AND weight. */
   font-family: var(--font-serif);
   font-style: italic;
+  font-weight: 200;
 }
 
 .heroBottomRow {
@@ -527,7 +532,7 @@
   display: flex;
   align-items: center;
   padding-block: clamp(32px, 5vh, 64px);
-  border-top: 1px solid rgba(248, 243, 234, 0.14);
+  border-top: 1px solid rgba(250, 247, 241, 0.14);
   /* inactive chapters wait a touch dimmer and lower; activation rises them
      on the house ease over a longer 0.6s travel, so the settle reads
      editorial rather than snappy */
@@ -583,7 +588,7 @@
      cream tint over a light blur so the footage reads through vividly,
      no border, no light edges — just the tight recess hugging the rim.
      The backdrop scrim carries the copy's legibility. */
-  background: rgba(248, 243, 234, 0.08);
+  background: rgba(250, 247, 241, 0.08);
   -webkit-backdrop-filter: blur(6px) saturate(1.9) contrast(1.05);
   backdrop-filter: blur(6px) saturate(1.9) contrast(1.05);
   /* liquid-glass refraction (Chromium) — displacement bends the backdrop
@@ -798,7 +803,7 @@
   left: 0;
   right: 0;
   height: 1px;
-  background: rgba(248, 243, 234, 0.24);
+  background: rgba(250, 247, 241, 0.24);
 }
 
 .storyProgress span {
@@ -807,8 +812,8 @@
   width: 11px;
   height: 11px;
   border-radius: 50%;
-  background: rgba(248, 243, 234, 0.28);
-  border: 1px solid rgba(248, 243, 234, 0.45);
+  background: rgba(250, 247, 241, 0.28);
+  border: 1px solid rgba(250, 247, 241, 0.45);
   transition:
     transform 0.25s ease,
     background 0.25s ease,

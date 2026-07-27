@@ -61,7 +61,6 @@
   "59": "s",
   "60": "CareersTeaser.tsx",
   "61": ".constructor",
-  "62": "f",
   "63": "Product",
   "64": "Blog.tsx",
   "65": "i",
@@ -74,7 +73,6 @@
   "72": "t",
   "73": "y",
   "74": "image-effect-parallax.js",
-  "75": "Parallax.tsx",
   "76": "cldr-resource-pack-553be5b17e9a9bde-min.en-US.js",
   "77": "image-effect-film-grain.js",
   "78": "image-effect-liquid.js",
@@ -129,6 +127,5 @@
   "127": "CustomCursor.tsx",
   "128": "s",
   "129": "ReadyCta.tsx",
-  "130": "website.components.imageFluid.shared.constants.js",
-  "131": "s"
+  "130": "website.components.imageFluid.shared.constants.js"
 }

@@ -297,7 +297,7 @@ export default function Discover() {
 
   return (
     <section className={styles.section} id="restaurants" data-nav-theme="light">
-      <div className={`${styles.head} home-parallax-slow`}>
+      <div className={styles.head}>
         <span className={styles.eyebrow}>Discover All Our Restaurants</span>
         {/* pale interaction hint — click/tap works everywhere now */}
         <span className={styles.hint} aria-hidden>

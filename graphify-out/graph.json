@@ -87,8 +87,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_contact_page",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "page.tsx"
     },
     {
@@ -98,8 +98,8 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "app_contact_page_jsonld",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "jsonld"
     },
     {
@@ -109,8 +109,8 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "app_contact_page_metadata",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "metadata"
     },
     {
@@ -120,8 +120,8 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "app_contact_page_page",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "page()"
     },
     {
@@ -480,7 +480,7 @@
       "label": "Blog()",
       "file_type": "code",
       "source_file": "components/Blog.tsx",
-      "source_location": "L66",
+      "source_location": "L52",
       "_origin": "ast",
       "id": "components_blog_blog",
       "community": 29,
@@ -659,8 +659,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_contactpage",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "contactpage.tsx"
     },
     {
@@ -670,8 +670,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "components_contactpage_contactpage",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "contactpage()"
     },
     {
@@ -714,8 +714,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_darkzone",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "darkzone.tsx"
     },
     {
@@ -725,8 +725,8 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "components_darkzone_darkzone",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "darkzone()"
     },
     {
@@ -802,8 +802,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_experience",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "experience.tsx"
     },
     {
@@ -813,8 +813,8 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "components_experience_hero_insets",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "hero_insets"
     },
     {
@@ -1253,8 +1253,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_menu",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "menu.tsx"
     },
     {
@@ -1264,8 +1264,8 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "components_menu_items",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "items"
     },
     {
@@ -1275,8 +1275,8 @@
       "source_location": "L19",
       "_origin": "ast",
       "id": "components_menu_menu",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "menu()"
     },
     {
@@ -1330,8 +1330,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_nav",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "nav.tsx"
     },
     {
@@ -1341,8 +1341,8 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "components_nav_theme",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "theme"
     },
     {
@@ -1352,8 +1352,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "components_nav_getnavtheme",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "getnavtheme()"
     },
     {
@@ -1363,8 +1363,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "components_nav_links",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "links"
     },
     {
@@ -1374,8 +1374,8 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "components_nav_nav",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "nav()"
     },
     {
@@ -1429,8 +1429,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_pagetransition",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "pagetransition.tsx"
     },
     {
@@ -1440,8 +1440,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "components_pagetransition_images",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "images"
     },
     {
@@ -1451,8 +1451,8 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "components_pagetransition_wipes",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "wipes"
     },
     {
@@ -1462,8 +1462,8 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "components_pagetransition_navigate",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "navigate"
     },
     {
@@ -1473,8 +1473,8 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "components_pagetransition_transitionctx",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "transitionctx"
     },
     {
@@ -1484,8 +1484,8 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "components_pagetransition_useroutetransition",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "useroutetransition()"
     },
     {
@@ -1495,8 +1495,8 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "components_pagetransition_phase",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "phase"
     },
     {
@@ -1506,8 +1506,8 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "components_pagetransition_pagetransition",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "pagetransition()"
     },
     {
@@ -1638,8 +1638,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_pressstrip",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "pressstrip.tsx"
     },
     {
@@ -1649,8 +1649,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "components_pressstrip_press",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "press"
     },
     {
@@ -1660,8 +1660,8 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "components_pressstrip_pressstrip",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "pressstrip()"
     },
     {
@@ -1693,8 +1693,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_restaurantdetail",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "restaurantdetail.tsx"
     },
     {
@@ -1704,8 +1704,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "components_restaurantdetail_restaurantdetail",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "restaurantdetail()"
     },
     {
@@ -2100,8 +2100,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_viewallbutton",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "viewallbutton.tsx"
     },
     {
@@ -2111,8 +2111,8 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "components_viewallbutton_arrow",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "arrow()"
     },
     {
@@ -2122,8 +2122,8 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "components_viewallbutton_viewallbutton",
-      "community": 56,
-      "community_name": "o",
+      "community": 49,
+      "community_name": "La",
       "norm_label": "viewallbutton()"
     },
     {
@@ -5521,8 +5521,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_d",
-      "community": 5,
-      "community_name": "b",
+      "community": 14,
+      "community_name": "d",
       "norm_label": "d()"
     },
     {
@@ -5785,8 +5785,8 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_tr",
-      "community": 1,
-      "community_name": "common-dabb52f27fbf7211-min.en-US.js",
+      "community": 13,
+      "community_name": "ho",
       "norm_label": "tr()"
     },
     {
@@ -5972,8 +5972,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_z",
-      "community": 5,
-      "community_name": "b",
+      "community": 14,
+      "community_name": "d",
       "norm_label": "z()"
     },
     {
@@ -6071,8 +6071,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_se",
-      "community": 90,
-      "community_name": "s",
+      "community": 68,
+      "community_name": "Ie",
       "norm_label": "se()"
     },
     {
@@ -6115,8 +6115,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_ot",
-      "community": 52,
-      "community_name": "j",
+      "community": 68,
+      "community_name": "Ie",
       "norm_label": "ot()"
     },
     {
@@ -6181,8 +6181,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_no",
-      "community": 52,
-      "community_name": "j",
+      "community": 68,
+      "community_name": "Ie",
       "norm_label": "no()"
     },
     {
@@ -6269,8 +6269,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_wu",
-      "community": 52,
-      "community_name": "j",
+      "community": 68,
+      "community_name": "Ie",
       "norm_label": "wu()"
     },
     {
@@ -6302,8 +6302,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_ko",
-      "community": 52,
-      "community_name": "j",
+      "community": 68,
+      "community_name": "Ie",
       "norm_label": "ko()"
     },
     {
@@ -6445,8 +6445,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_lu",
-      "community": 35,
-      "community_name": "Pt",
+      "community": 90,
+      "community_name": "s",
       "norm_label": "lu()"
     },
     {
@@ -6478,8 +6478,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_xi",
-      "community": 52,
-      "community_name": "j",
+      "community": 68,
+      "community_name": "Ie",
       "norm_label": "xi()"
     },
     {
@@ -6588,8 +6588,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_cl",
-      "community": 90,
-      "community_name": "s",
+      "community": 13,
+      "community_name": "ho",
       "norm_label": "cl()"
     },
     {
@@ -6874,8 +6874,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_co",
-      "community": 90,
-      "community_name": "s",
+      "community": 13,
+      "community_name": "ho",
       "norm_label": "co()"
     },
     {
@@ -7017,8 +7017,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_gr",
-      "community": 52,
-      "community_name": "j",
+      "community": 68,
+      "community_name": "Ie",
       "norm_label": "gr()"
     },
     {
@@ -7215,8 +7215,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_yc",
-      "community": 13,
-      "community_name": "ho",
+      "community": 35,
+      "community_name": "Pt",
       "norm_label": "yc()"
     },
     {
@@ -7281,8 +7281,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_ia",
-      "community": 13,
-      "community_name": "ho",
+      "community": 90,
+      "community_name": "s",
       "norm_label": "ia()"
     },
     {
@@ -7567,8 +7567,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_yu",
-      "community": 52,
-      "community_name": "j",
+      "community": 68,
+      "community_name": "Ie",
       "norm_label": "yu()"
     },
     {
@@ -7578,8 +7578,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_ec",
-      "community": 52,
-      "community_name": "j",
+      "community": 68,
+      "community_name": "Ie",
       "norm_label": "ec()"
     },
     {
@@ -7710,8 +7710,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_dd",
-      "community": 1,
-      "community_name": "common-dabb52f27fbf7211-min.en-US.js",
+      "community": 13,
+      "community_name": "ho",
       "norm_label": "dd()"
     },
     {
@@ -7853,8 +7853,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_sc",
-      "community": 13,
-      "community_name": "ho",
+      "community": 24,
+      "community_name": "JoinUs.tsx",
       "norm_label": "sc()"
     },
     {
@@ -8007,8 +8007,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_fc",
-      "community": 35,
-      "community_name": "Pt",
+      "community": 90,
+      "community_name": "s",
       "norm_label": "fc()"
     },
     {
@@ -8062,8 +8062,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_la",
-      "community": 13,
-      "community_name": "ho",
+      "community": 90,
+      "community_name": "s",
       "norm_label": "la()"
     },
     {
@@ -8084,8 +8084,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_ll",
-      "community": 13,
-      "community_name": "ho",
+      "community": 24,
+      "community_name": "JoinUs.tsx",
       "norm_label": "ll()"
     },
     {
@@ -8095,8 +8095,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_du",
-      "community": 52,
-      "community_name": "j",
+      "community": 68,
+      "community_name": "Ie",
       "norm_label": "du()"
     },
     {
@@ -8161,8 +8161,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_xa",
-      "community": 1,
-      "community_name": "common-dabb52f27fbf7211-min.en-US.js",
+      "community": 13,
+      "community_name": "ho",
       "norm_label": "xa()"
     },
     {
@@ -8469,8 +8469,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_af",
-      "community": 35,
-      "community_name": "Pt",
+      "community": 90,
+      "community_name": "s",
       "norm_label": "af()"
     },
     {
@@ -8535,8 +8535,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_pn",
-      "community": 90,
-      "community_name": "s",
+      "community": 24,
+      "community_name": "JoinUs.tsx",
       "norm_label": "pn()"
     },
     {
@@ -8557,8 +8557,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_lt",
-      "community": 90,
-      "community_name": "s",
+      "community": 68,
+      "community_name": "Ie",
       "norm_label": "lt()"
     },
     {
@@ -8656,8 +8656,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_ri",
-      "community": 35,
-      "community_name": "Pt",
+      "community": 90,
+      "community_name": "s",
       "norm_label": "ri()"
     },
     {
@@ -8689,8 +8689,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_qf",
-      "community": 13,
-      "community_name": "ho",
+      "community": 90,
+      "community_name": "s",
       "norm_label": "qf()"
     },
     {
@@ -8766,8 +8766,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_eh",
-      "community": 35,
-      "community_name": "Pt",
+      "community": 90,
+      "community_name": "s",
       "norm_label": "eh()"
     },
     {
@@ -8854,8 +8854,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_oh",
-      "community": 35,
-      "community_name": "Pt",
+      "community": 90,
+      "community_name": "s",
       "norm_label": "oh()"
     },
     {
@@ -8865,8 +8865,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_cf",
-      "community": 35,
-      "community_name": "Pt",
+      "community": 90,
+      "community_name": "s",
       "norm_label": "cf()"
     },
     {
@@ -8942,8 +8942,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_mh",
-      "community": 52,
-      "community_name": "j",
+      "community": 68,
+      "community_name": "Ie",
       "norm_label": "mh()"
     },
     {
@@ -8997,8 +8997,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_ii",
-      "community": 35,
-      "community_name": "Pt",
+      "community": 90,
+      "community_name": "s",
       "norm_label": "ii()"
     },
     {
@@ -9118,8 +9118,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_pf",
-      "community": 90,
-      "community_name": "s",
+      "community": 68,
+      "community_name": "Ie",
       "norm_label": "pf()"
     },
     {
@@ -9415,8 +9415,8 @@
       "source_location": "L32",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_kg",
-      "community": 52,
-      "community_name": "j",
+      "community": 68,
+      "community_name": "Ie",
       "norm_label": "kg()"
     },
     {
@@ -9668,8 +9668,8 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_sa",
-      "community": 90,
-      "community_name": "s",
+      "community": 13,
+      "community_name": "ho",
       "norm_label": "sa()"
     },
     {
@@ -9701,8 +9701,8 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_pi",
-      "community": 13,
-      "community_name": "ho",
+      "community": 24,
+      "community_name": "JoinUs.tsx",
       "norm_label": "pi()"
     },
     {
@@ -9723,8 +9723,8 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_ni",
-      "community": 90,
-      "community_name": "s",
+      "community": 13,
+      "community_name": "ho",
       "norm_label": "ni()"
     },
     {
@@ -9745,8 +9745,8 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_ge",
-      "community": 52,
-      "community_name": "j",
+      "community": 68,
+      "community_name": "Ie",
       "norm_label": "ge()"
     },
     {
@@ -9756,8 +9756,8 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_un",
-      "community": 52,
-      "community_name": "j",
+      "community": 68,
+      "community_name": "Ie",
       "norm_label": "un()"
     },
     {
@@ -9888,8 +9888,8 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_c_dispatch",
-      "community": 14,
-      "community_name": "d",
+      "community": 37,
+      "community_name": "$t",
       "norm_label": ".dispatch()"
     },
     {
@@ -10075,8 +10075,8 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_d_emitchange",
-      "community": 5,
-      "community_name": "b",
+      "community": 14,
+      "community_name": "d",
       "norm_label": ".emitchange()"
     },
     {
@@ -10086,8 +10086,8 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_d_listen",
-      "community": 5,
-      "community_name": "b",
+      "community": 14,
+      "community_name": "d",
       "norm_label": ".listen()"
     },
     {
@@ -10097,8 +10097,8 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_d_unlisten",
-      "community": 5,
-      "community_name": "b",
+      "community": 14,
+      "community_name": "d",
       "norm_label": ".unlisten()"
     },
     {
@@ -10262,8 +10262,8 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_r_createanimationtriggers",
-      "community": 14,
-      "community_name": "d",
+      "community": 11,
+      "community_name": "r",
       "norm_label": ".createanimationtriggers()"
     },
     {
@@ -10273,8 +10273,8 @@
       "source_location": "L63",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_r_destroyanimationtriggers",
-      "community": 14,
-      "community_name": "d",
+      "community": 11,
+      "community_name": "r",
       "norm_label": ".destroyanimationtriggers()"
     },
     {
@@ -10350,8 +10350,8 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_i_destroy",
-      "community": 90,
-      "community_name": "s",
+      "community": 13,
+      "community_name": "ho",
       "norm_label": ".destroy()"
     },
     {
@@ -10460,8 +10460,8 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_d_onsetsize",
-      "community": 5,
-      "community_name": "b",
+      "community": 14,
+      "community_name": "d",
       "norm_label": ".onsetsize()"
     },
     {
@@ -10581,8 +10581,8 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_z_onsetsize",
-      "community": 5,
-      "community_name": "b",
+      "community": 14,
+      "community_name": "d",
       "norm_label": ".onsetsize()"
     },
     {
@@ -11219,8 +11219,8 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_s_getformkey",
-      "community": 11,
-      "community_name": "r",
+      "community": 6,
+      "community_name": "S",
       "norm_label": ".getformkey()"
     },
     {
@@ -11329,8 +11329,8 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_s_sanitizehidden",
-      "community": 5,
-      "community_name": "b",
+      "community": 14,
+      "community_name": "d",
       "norm_label": ".sanitizehidden()"
     },
     {
@@ -11670,8 +11670,8 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_r_post",
-      "community": 11,
-      "community_name": "r",
+      "community": 5,
+      "community_name": "b",
       "norm_label": ".post()"
     },
     {
@@ -11692,8 +11692,8 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_r_delete",
-      "community": 90,
-      "community_name": "s",
+      "community": 13,
+      "community_name": "ho",
       "norm_label": ".delete()"
     },
     {
@@ -12066,8 +12066,8 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_c_fetch",
-      "community": 39,
-      "community_name": "n",
+      "community": 10,
+      "community_name": "c",
       "norm_label": ".fetch()"
     },
     {
@@ -12077,8 +12077,8 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_c_fetchtranslations",
-      "community": 39,
-      "community_name": "n",
+      "community": 10,
+      "community_name": "c",
       "norm_label": ".fetchtranslations()"
     },
     {
@@ -12440,8 +12440,8 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_r_loadcssavoidingiframecors",
-      "community": 39,
-      "community_name": "n",
+      "community": 14,
+      "community_name": "d",
       "norm_label": ".loadcssavoidingiframecors()"
     },
     {
@@ -12451,8 +12451,8 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_d_isloaded",
-      "community": 5,
-      "community_name": "b",
+      "community": 14,
+      "community_name": "d",
       "norm_label": ".isloaded()"
     },
     {
@@ -12473,8 +12473,8 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_d_load",
-      "community": 39,
-      "community_name": "n",
+      "community": 14,
+      "community_name": "d",
       "norm_label": ".load()"
     },
     {
@@ -12528,8 +12528,8 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_p_load",
-      "community": 14,
-      "community_name": "d",
+      "community": 11,
+      "community_name": "r",
       "norm_label": ".load()"
     },
     {
@@ -12627,8 +12627,8 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_d_sdkkey",
-      "community": 5,
-      "community_name": "b",
+      "community": 14,
+      "community_name": "d",
       "norm_label": ".sdkkey()"
     },
     {
@@ -12638,8 +12638,8 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_d_options",
-      "community": 5,
-      "community_name": "b",
+      "community": 14,
+      "community_name": "d",
       "norm_label": ".options()"
     },
     {
@@ -12649,8 +12649,8 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_d_errorboundary",
-      "community": 5,
-      "community_name": "b",
+      "community": 14,
+      "community_name": "d",
       "norm_label": ".errorboundary()"
     },
     {
@@ -12660,8 +12660,8 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_d_values",
-      "community": 5,
-      "community_name": "b",
+      "community": 14,
+      "community_name": "d",
       "norm_label": ".values()"
     },
     {
@@ -12682,8 +12682,8 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_d_getsession",
-      "community": 5,
-      "community_name": "b",
+      "community": 14,
+      "community_name": "d",
       "norm_label": ".getsession()"
     },
     {
@@ -12693,8 +12693,8 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_d_stableid",
-      "community": 39,
-      "community_name": "n",
+      "community": 10,
+      "community_name": "c",
       "norm_label": ".stableid()"
     },
     {
@@ -12704,8 +12704,8 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_d_sdkinstanceid",
-      "community": 5,
-      "community_name": "b",
+      "community": 14,
+      "community_name": "d",
       "norm_label": ".sdkinstanceid()"
     },
     {
@@ -12715,8 +12715,8 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_d_tocontext",
-      "community": 5,
-      "community_name": "b",
+      "community": 14,
+      "community_name": "d",
       "norm_label": ".tocontext()"
     },
     {
@@ -12847,8 +12847,8 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_p_get",
-      "community": 39,
-      "community_name": "n",
+      "community": 10,
+      "community_name": "c",
       "norm_label": ".get()"
     },
     {
@@ -12858,8 +12858,8 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_p_add",
-      "community": 5,
-      "community_name": "b",
+      "community": 14,
+      "community_name": "d",
       "norm_label": ".add()"
     },
     {
@@ -12880,8 +12880,8 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_formaterror",
-      "community": 39,
-      "community_name": "n",
+      "community": 10,
+      "community_name": "c",
       "norm_label": "_formaterror()"
     },
     {
@@ -12891,8 +12891,8 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_getdiagnosticsdata",
-      "community": 39,
-      "community_name": "n",
+      "community": 10,
+      "community_name": "c",
       "norm_label": "_getdiagnosticsdata()"
     },
     {
@@ -13804,8 +13804,8 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_r_getpopulatedurl",
-      "community": 11,
-      "community_name": "r",
+      "community": 5,
+      "community_name": "b",
       "norm_label": "._getpopulatedurl()"
     },
     {
@@ -13815,8 +13815,8 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_r_tryencodebody",
-      "community": 11,
-      "community_name": "r",
+      "community": 5,
+      "community_name": "b",
       "norm_label": "._tryencodebody()"
     },
     {
@@ -13826,8 +13826,8 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_r_trytocompressbody",
-      "community": 11,
-      "community_name": "r",
+      "community": 5,
+      "community_name": "b",
       "norm_label": "._trytocompressbody()"
     },
     {
@@ -14101,8 +14101,8 @@
       "source_location": "L75",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_dabb52f27fbf7211_min_en_us_r_geturl",
-      "community": 11,
-      "community_name": "r",
+      "community": 5,
+      "community_name": "b",
       "norm_label": ".geturl()"
     },
     {
@@ -16565,8 +16565,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_vendors_stable_0017be0b952a78db_min_en_us",
-      "community": 49,
-      "community_name": "La",
+      "community": 62,
+      "community_name": "common-vendors-stable-0017be0b952a78db-min.en-US.js",
       "norm_label": "common-vendors-stable-0017be0b952a78db-min.en-us.js"
     },
     {
@@ -16576,8 +16576,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_vendors_stable_0017be0b952a78db_min_en_us_o",
-      "community": 49,
-      "community_name": "La",
+      "community": 62,
+      "community_name": "common-vendors-stable-0017be0b952a78db-min.en-US.js",
       "norm_label": "o()"
     },
     {
@@ -16587,8 +16587,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_vendors_stable_0017be0b952a78db_min_en_us_n",
-      "community": 49,
-      "community_name": "La",
+      "community": 62,
+      "community_name": "common-vendors-stable-0017be0b952a78db-min.en-US.js",
       "norm_label": "n()"
     },
     {
@@ -16598,8 +16598,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_vendors_stable_0017be0b952a78db_min_en_us_p",
-      "community": 49,
-      "community_name": "La",
+      "community": 62,
+      "community_name": "common-vendors-stable-0017be0b952a78db-min.en-US.js",
       "norm_label": "p()"
     },
     {
@@ -16609,8 +16609,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_vendors_stable_0017be0b952a78db_min_en_us_g",
-      "community": 49,
-      "community_name": "La",
+      "community": 62,
+      "community_name": "common-vendors-stable-0017be0b952a78db-min.en-US.js",
       "norm_label": "g()"
     },
     {
@@ -16620,8 +16620,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_vendors_stable_0017be0b952a78db_min_en_us_a",
-      "community": 49,
-      "community_name": "La",
+      "community": 62,
+      "community_name": "common-vendors-stable-0017be0b952a78db-min.en-US.js",
       "norm_label": "a()"
     },
     {
@@ -16631,8 +16631,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_vendors_stable_0017be0b952a78db_min_en_us_v",
-      "community": 49,
-      "community_name": "La",
+      "community": 62,
+      "community_name": "common-vendors-stable-0017be0b952a78db-min.en-US.js",
       "norm_label": "v()"
     },
     {
@@ -16642,8 +16642,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_vendors_stable_0017be0b952a78db_min_en_us_t",
-      "community": 49,
-      "community_name": "La",
+      "community": 62,
+      "community_name": "common-vendors-stable-0017be0b952a78db-min.en-US.js",
       "norm_label": "t()"
     },
     {
@@ -16653,8 +16653,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_vendors_stable_0017be0b952a78db_min_en_us_u",
-      "community": 49,
-      "community_name": "La",
+      "community": 62,
+      "community_name": "common-vendors-stable-0017be0b952a78db-min.en-US.js",
       "norm_label": "u()"
     },
     {
@@ -16664,8 +16664,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_vendors_stable_0017be0b952a78db_min_en_us_r",
-      "community": 49,
-      "community_name": "La",
+      "community": 62,
+      "community_name": "common-vendors-stable-0017be0b952a78db-min.en-US.js",
       "norm_label": "r()"
     },
     {
@@ -16675,8 +16675,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_vendors_stable_0017be0b952a78db_min_en_us_e",
-      "community": 49,
-      "community_name": "La",
+      "community": 62,
+      "community_name": "common-vendors-stable-0017be0b952a78db-min.en-US.js",
       "norm_label": "e()"
     },
     {
@@ -16686,8 +16686,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_vendors_stable_0017be0b952a78db_min_en_us_l",
-      "community": 49,
-      "community_name": "La",
+      "community": 62,
+      "community_name": "common-vendors-stable-0017be0b952a78db-min.en-US.js",
       "norm_label": "l()"
     },
     {
@@ -16697,8 +16697,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_vendors_stable_0017be0b952a78db_min_en_us_m",
-      "community": 49,
-      "community_name": "La",
+      "community": 62,
+      "community_name": "common-vendors-stable-0017be0b952a78db-min.en-US.js",
       "norm_label": "m()"
     },
     {
@@ -16708,8 +16708,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_vendors_stable_0017be0b952a78db_min_en_us_i",
-      "community": 49,
-      "community_name": "La",
+      "community": 62,
+      "community_name": "common-vendors-stable-0017be0b952a78db-min.en-US.js",
       "norm_label": "i()"
     },
     {
@@ -16719,8 +16719,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_vendors_stable_0017be0b952a78db_min_en_us_h",
-      "community": 49,
-      "community_name": "La",
+      "community": 62,
+      "community_name": "common-vendors-stable-0017be0b952a78db-min.en-US.js",
       "norm_label": "h()"
     },
     {
@@ -16730,8 +16730,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_vendors_stable_0017be0b952a78db_min_en_us_s",
-      "community": 49,
-      "community_name": "La",
+      "community": 62,
+      "community_name": "common-vendors-stable-0017be0b952a78db-min.en-US.js",
       "norm_label": "s()"
     },
     {
@@ -16741,8 +16741,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_vendors_stable_0017be0b952a78db_min_en_us_c",
-      "community": 49,
-      "community_name": "La",
+      "community": 62,
+      "community_name": "common-vendors-stable-0017be0b952a78db-min.en-US.js",
       "norm_label": "c()"
     },
     {
@@ -16752,8 +16752,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_vendors_stable_0017be0b952a78db_min_en_us_t_fire",
-      "community": 49,
-      "community_name": "La",
+      "community": 62,
+      "community_name": "common-vendors-stable-0017be0b952a78db-min.en-US.js",
       "norm_label": ".fire()"
     },
     {
@@ -16763,8 +16763,8 @@
       "source_location": "L8",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_vendors_stable_0017be0b952a78db_min_en_us_d",
-      "community": 49,
-      "community_name": "La",
+      "community": 62,
+      "community_name": "common-vendors-stable-0017be0b952a78db-min.en-US.js",
       "norm_label": "d()"
     },
     {
@@ -16774,8 +16774,8 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_common_vendors_stable_0017be0b952a78db_min_en_us_b",
-      "community": 49,
-      "community_name": "La",
+      "community": 62,
+      "community_name": "common-vendors-stable-0017be0b952a78db-min.en-US.js",
       "norm_label": "b()"
     },
     {
@@ -17192,8 +17192,8 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_extract_css_moment_js_vendor_a5cfdec1ae227f33_min_en_us_o0",
-      "community": 62,
-      "community_name": "f",
+      "community": 75,
+      "community_name": "U1",
       "norm_label": "o0()"
     },
     {
@@ -18094,8 +18094,8 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_extract_css_moment_js_vendor_a5cfdec1ae227f33_min_en_us_u1",
-      "community": 62,
-      "community_name": "f",
+      "community": 75,
+      "community_name": "U1",
       "norm_label": "u1()"
     },
     {
@@ -18193,8 +18193,8 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_extract_css_moment_js_vendor_a5cfdec1ae227f33_min_en_us_b2",
-      "community": 62,
-      "community_name": "f",
+      "community": 75,
+      "community_name": "U1",
       "norm_label": "b2()"
     },
     {
@@ -18204,8 +18204,8 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_extract_css_moment_js_vendor_a5cfdec1ae227f33_min_en_us_gz",
-      "community": 62,
-      "community_name": "f",
+      "community": 75,
+      "community_name": "U1",
       "norm_label": "gz()"
     },
     {
@@ -18248,8 +18248,8 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_extract_css_moment_js_vendor_a5cfdec1ae227f33_min_en_us_vz",
-      "community": 62,
-      "community_name": "f",
+      "community": 75,
+      "community_name": "U1",
       "norm_label": "vz()"
     },
     {
@@ -18259,8 +18259,8 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_extract_css_moment_js_vendor_a5cfdec1ae227f33_min_en_us_yz",
-      "community": 62,
-      "community_name": "f",
+      "community": 75,
+      "community_name": "U1",
       "norm_label": "yz()"
     },
     {
@@ -18281,8 +18281,8 @@
       "source_location": "L46",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_extract_css_moment_js_vendor_a5cfdec1ae227f33_min_en_us_s1",
-      "community": 62,
-      "community_name": "f",
+      "community": 75,
+      "community_name": "U1",
       "norm_label": "s1()"
     },
     {
@@ -19194,8 +19194,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_performance_a5ddb372171c82c4_min_en_us_et",
-      "community": 52,
-      "community_name": "j",
+      "community": 68,
+      "community_name": "Ie",
       "norm_label": "et()"
     },
     {
@@ -19238,8 +19238,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_performance_a5ddb372171c82c4_min_en_us_en",
-      "community": 52,
-      "community_name": "j",
+      "community": 68,
+      "community_name": "Ie",
       "norm_label": "en()"
     },
     {
@@ -19403,8 +19403,8 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_site_bundle_a373588d45d1d167fb0291ea25487cbe_e",
-      "community": 40,
-      "community_name": "site-bundle.a373588d45d1d167fb0291ea25487cbe.js",
+      "community": 51,
+      "community_name": "ug",
       "norm_label": "e()"
     },
     {
@@ -19414,8 +19414,8 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_site_bundle_a373588d45d1d167fb0291ea25487cbe_i",
-      "community": 40,
-      "community_name": "site-bundle.a373588d45d1d167fb0291ea25487cbe.js",
+      "community": 51,
+      "community_name": "ug",
       "norm_label": "i()"
     },
     {
@@ -19425,8 +19425,8 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_site_bundle_a373588d45d1d167fb0291ea25487cbe_a",
-      "community": 40,
-      "community_name": "site-bundle.a373588d45d1d167fb0291ea25487cbe.js",
+      "community": 51,
+      "community_name": "ug",
       "norm_label": "a()"
     },
     {
@@ -19436,8 +19436,8 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_site_bundle_a373588d45d1d167fb0291ea25487cbe_s",
-      "community": 40,
-      "community_name": "site-bundle.a373588d45d1d167fb0291ea25487cbe.js",
+      "community": 51,
+      "community_name": "ug",
       "norm_label": "s()"
     },
     {
@@ -19469,8 +19469,8 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_site_bundle_a373588d45d1d167fb0291ea25487cbe_c",
-      "community": 40,
-      "community_name": "site-bundle.a373588d45d1d167fb0291ea25487cbe.js",
+      "community": 51,
+      "community_name": "ug",
       "norm_label": "c()"
     },
     {
@@ -19810,8 +19810,8 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_site_bundle_a373588d45d1d167fb0291ea25487cbe_y",
-      "community": 51,
-      "community_name": "ug",
+      "community": 52,
+      "community_name": "j",
       "norm_label": "y"
     },
     {
@@ -19821,8 +19821,8 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_site_bundle_a373588d45d1d167fb0291ea25487cbe_y_constructor",
-      "community": 51,
-      "community_name": "ug",
+      "community": 52,
+      "community_name": "j",
       "norm_label": ".constructor()"
     },
     {
@@ -19832,8 +19832,8 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_site_bundle_a373588d45d1d167fb0291ea25487cbe_y_destroy",
-      "community": 51,
-      "community_name": "ug",
+      "community": 52,
+      "community_name": "j",
       "norm_label": ".destroy()"
     },
     {
@@ -19843,8 +19843,8 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_site_bundle_a373588d45d1d167fb0291ea25487cbe_y_bootstrap",
-      "community": 51,
-      "community_name": "ug",
+      "community": 52,
+      "community_name": "j",
       "norm_label": ".bootstrap()"
     },
     {
@@ -19854,8 +19854,8 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_site_bundle_a373588d45d1d167fb0291ea25487cbe_y_elementwillchange",
-      "community": 51,
-      "community_name": "ug",
+      "community": 52,
+      "community_name": "j",
       "norm_label": ".elementwillchange()"
     },
     {
@@ -19865,8 +19865,8 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_site_bundle_a373588d45d1d167fb0291ea25487cbe_y_elementdidchange",
-      "community": 51,
-      "community_name": "ug",
+      "community": 52,
+      "community_name": "j",
       "norm_label": ".elementdidchange()"
     },
     {
@@ -20404,8 +20404,8 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_site_bundle_a373588d45d1d167fb0291ea25487cbe_x_updateheadertheme",
-      "community": 40,
-      "community_name": "site-bundle.a373588d45d1d167fb0291ea25487cbe.js",
+      "community": 51,
+      "community_name": "ug",
       "norm_label": ".updateheadertheme()"
     },
     {
@@ -20514,8 +20514,8 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_site_bundle_a373588d45d1d167fb0291ea25487cbe_l",
-      "community": 51,
-      "community_name": "ug",
+      "community": 56,
+      "community_name": "o",
       "norm_label": "l"
     },
     {
@@ -20525,8 +20525,8 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_site_bundle_a373588d45d1d167fb0291ea25487cbe_l_constructor",
-      "community": 51,
-      "community_name": "ug",
+      "community": 56,
+      "community_name": "o",
       "norm_label": ".constructor()"
     },
     {
@@ -20536,8 +20536,8 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_site_bundle_a373588d45d1d167fb0291ea25487cbe_l_updatepaddingforheader",
-      "community": 51,
-      "community_name": "ug",
+      "community": 56,
+      "community_name": "o",
       "norm_label": ".updatepaddingforheader()"
     },
     {
@@ -20547,8 +20547,8 @@
       "source_location": "L2",
       "_origin": "ast",
       "id": "public_menu_belly_wine_files_site_bundle_a373588d45d1d167fb0291ea25487cbe_l_loadbackgroundimage",
-      "community": 51,
-      "community_name": "ug",
+      "community": 56,
+      "community_name": "o",
       "norm_label": ".loadbackgroundimage()"
     },
     {
@@ -23451,8 +23451,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scripts_find404",
-      "community": 57,
-      "community_name": "ms",
+      "community": 89,
+      "community_name": "s",
       "norm_label": "find404.mjs"
     },
     {
@@ -23462,8 +23462,8 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "scripts_find404_s",
-      "community": 57,
-      "community_name": "ms",
+      "community": 89,
+      "community_name": "s",
       "norm_label": "s()"
     },
     {
@@ -23473,8 +23473,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scripts_fontcheck",
-      "community": 89,
-      "community_name": "s",
+      "community": 57,
+      "community_name": "ms",
       "norm_label": "fontcheck.mjs"
     },
     {
@@ -23484,8 +23484,8 @@
       "source_location": "L3",
       "_origin": "ast",
       "id": "scripts_fontcheck_s",
-      "community": 89,
-      "community_name": "s",
+      "community": 57,
+      "community_name": "ms",
       "norm_label": "s()"
     },
     {
@@ -26006,7 +26006,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/Blog.tsx",
-      "source_location": "L66",
+      "source_location": "L52",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_blog",
@@ -26113,7 +26113,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "components/Blog.tsx",
-      "source_location": "L119",
+      "source_location": "L105",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_blog_blog",
@@ -26125,7 +26125,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "components/Blog.tsx",
-      "source_location": "L118",
+      "source_location": "L104",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_blog_blog",
@@ -95986,5 +95986,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "777317646442186b72c7c0d3a9a7a79813b7ded8"
+  "built_at_commit": "01098685ef0ecac8cf6cb3239b8bc2dae2f681a3"
 }

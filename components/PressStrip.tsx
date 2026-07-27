@@ -52,7 +52,7 @@ export default function PressStrip() {
       aria-label="As featured in"
       data-nav-theme="light"
     >
-      <span className={`${styles.label} home-parallax-slow`}>As Featured In</span>
+      <span className={styles.label}>As Featured In</span>
       <div className={styles.viewport}>
         <div className={styles.track}>
           {[0, 1].map((copy) => (

@@ -7,7 +7,10 @@
    for the current domain. */
 
 :root {
-  --cream: #f8f3ea;
+  /* warm paper — lifted from the old parchment cream (#f8f3ea): lighter and
+     much less yellow, so the photography and the quiet grotesk sit clean on
+     it while the ground still reads warm next to a true gallery white */
+  --cream: #faf7f1;
   --maroon: #2f0000;
   --maroon-soft: #3a0a0a;
   --placeholder: #e2dfd9;
@@ -187,44 +190,6 @@ body {
   overscroll-behavior: none;
   /* clip (not hidden) so position: sticky still works */
   overflow-x: clip;
-}
-
-/* Consistent, subtle scroll parallax — one shared drift so the whole page
-   reads as a single depth field rather than flat panels. Pure CSS (scroll-
-   driven animations): it simply no-ops on engines without support, and is off
-   for reduced motion. Apply `home-parallax` to a self-contained element (a
-   heading / eyebrow / media wrapper — NOT anything with position:fixed or
-   scroll children, which a transformed ancestor would break). `home-parallax-slow`
-   is a gentler variant for larger blocks. */
-@media (prefers-reduced-motion: no-preference) {
-  @supports (animation-timeline: view()) {
-    .home-parallax,
-    .home-parallax-slow {
-      animation: home-parallax-drift linear both;
-      animation-timeline: view();
-      animation-range: cover 0% cover 100%;
-      will-change: transform;
-    }
-    .home-parallax-slow {
-      animation-name: home-parallax-drift-slow;
-    }
-  }
-}
-@keyframes home-parallax-drift {
-  from {
-    transform: translateY(28px);
-  }
-  to {
-    transform: translateY(-28px);
-  }
-}
-@keyframes home-parallax-drift-slow {
-  from {
-    transform: translateY(16px);
-  }
-  to {
-    transform: translateY(-16px);
-  }
 }
 
 /* Lenis smooth scroll */

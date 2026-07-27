@@ -9,10 +9,10 @@ import Reveal from "./Reveal";
 // the strip carries the eight newest stories end to end
 const POOL = BLOG.slice(0, 8);
 
-/* the one card anatomy, every breakpoint — a portrait plate with the
-   caption BELOW it on the cream (no overlay, no scrim, no chip): meta
-   line, two-line clamped title, decorative Read More (the whole card is
-   the link) */
+/* the one card anatomy, every breakpoint — a 3:4 plate with the caption
+   BELOW it on the cream (no overlay, no scrim): quiet date line, regular-
+   weight title, then WHO WROTE IT (outlet / restaurant) as the pill tag.
+   No Read More affordance — the whole card is the link. */
 function StoryCard({ post }: { post: BlogEntry }) {
   return (
     <a
@@ -33,30 +33,16 @@ function StoryCard({ post }: { post: BlogEntry }) {
         />
       </div>
       <div className={styles.caption}>
-        <span className={styles.microLabel}>{post.dateLabel}</span>
+        <span className={styles.date}>{post.dateLabel}</span>
         <h3 className={styles.cardTitle}>{post.title}</h3>
-        <span className={styles.readMore}>
-          Read More
-          <svg
-            viewBox="0 0 32 10"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden
-          >
-            <path d="M0 5 H26" />
-            <path d="M22 1 L26 5 L22 9" />
-          </svg>
-        </span>
+        <span className={styles.tag}>{post.source}</span>
       </div>
     </a>
   );
 }
 
 /**
- * Blog chapter on the cream page — one draggable portrait strip at every
+ * Blog chapter on the cream page — one draggable card strip at every
  * breakpoint: a spare head row of just the saffron-dot eyebrow with the
  * position counter beside it (no display headline — the mockup lets the
  * photography lead), then the eight newest stories in a scroll-snap strip
@@ -249,7 +235,7 @@ export default function Blog() {
     <section className={styles.section} id="blog" data-nav-theme="light">
       {/* spare head row — just the eyebrow with the position counter
           beside it, seated on the binding grid's column 2 */}
-      <div className={`${styles.head} home-parallax-slow`}>
+      <div className={styles.head}>
         <span className={styles.headLeft}>
           <span className={styles.eyebrow}>Blog</span>
           {/* which story leads the strip — fed by the scroll listener;

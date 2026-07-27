@@ -114,7 +114,7 @@ void main() {
   // the button pool (it must stay solid behind the label)
   mass = max(mass * smoothstep(0.5, 0.28, abs(p.y)), smoothstep(0.5, 0.92, btnPool));
 
-  vec3 cream = vec3(0.972, 0.953, 0.918);
+  vec3 cream = vec3(0.980, 0.969, 0.945); // --cream #faf7f1 — must match the page ground exactly (any drift shows as an edge line)
   vec3 col = mix(cream, gooCol, mass);
 
   // glossy shine on the lava blobs

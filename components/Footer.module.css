@@ -220,7 +220,7 @@
 .rule {
   flex: none;
   height: 1px;
-  background: rgba(248, 243, 234, 0.22);
+  background: rgba(250, 247, 241, 0.22);
   margin-bottom: clamp(24px, 3.5vh, 44px);
 }
 

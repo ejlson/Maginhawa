@@ -1,12 +1,13 @@
-/* Blog chapter — back on the cream page, laid out as one draggable
-   portrait strip at every breakpoint: a spare head row of just the
-   saffron-dot eyebrow with the position counter beside it (no display
-   headline — the photography leads), eight stories in a scroll-snap
-   strip (mouse drag on desktop, native swipe on touch), and the blog CTA
-   bottom-right. Captions sit BELOW the photography on the cream — no
-   overlays, no scrims, no arrows. Geometry rides the mockup's binding
-   grid (section-scoped, not global): 12 columns, 20px page margins, 20px
-   gutters; the head row and the first card seat on column 2. */
+/* Blog chapter — back on the cream page, laid out as one draggable card
+   strip at every breakpoint: a spare head row of just the saffron-dot
+   eyebrow with the position counter beside it (no display headline — the
+   photography leads), eight stories in a scroll-snap strip (mouse drag on
+   desktop, native swipe on touch), and the blog CTA in the head row.
+   Captions sit BELOW the photography on the cream — quiet date, regular
+   title, byline pill; no overlays, no scrims, no arrows.
+   Geometry rides the mockup's binding grid (section-scoped, not global):
+   12 columns, 20px page margins, 20px gutters; the head row and the first
+   card seat on column 2. */
 .section {
   position: relative;
   isolation: isolate;
@@ -137,10 +138,11 @@
   color: var(--maroon);
 }
 
-/* the photograph — square-cornered 8:11 plate, placeholder-backed while
-   loading. Square per --radius-tile: printed photography has no radius. */
+/* the photograph — a 3:4 plate with the site's soft tile rounding,
+   placeholder-backed while loading. Taller than 4:5 so the photography
+   leads, but still gentler than the old 8:11 poster wall. */
 .plate {
-  aspect-ratio: 8 / 11;
+  aspect-ratio: 3 / 4;
   overflow: hidden;
   border-radius: var(--radius-tile);
   background: var(--placeholder);
@@ -154,33 +156,41 @@
   transition: transform 0.8s var(--ease-out);
 }
 
-/* the caption stack under the plate */
+/* the caption stack under the plate — QUIET: sentence case, no tracking,
+   no caps. Everything runs on the site's global type tokens (--t-*, --lh-*)
+   so the captions read in the same voice as the rest of the page. Gestalt
+   spacing: date + title sit tight as one text block (internal gap), the
+   pill hangs clearly below them (external gap ≈ 2× internal). */
 .caption {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: 0.55em;
-  margin-top: clamp(12px, 1.4vw, 18px);
+  gap: 0.4em;
+  margin-top: clamp(18px, 2vw, 26px);
 }
 
-/* date meta line in the caps-label voice — 0.6 keeps the pale maroon
-   above the 4.5:1 small-text contrast floor on cream */
-.microLabel {
+/* the date line — quiet meta over the title; 0.65 maroon on cream still
+   clears the 4.5:1 small-text contrast floor comfortably */
+.date {
   font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
+  font-weight: 500;
+  font-size: var(--t-small);
+  line-height: var(--lh-snug);
   color: var(--maroon);
-  opacity: 0.6;
+  opacity: 0.65;
 }
 
 .cardTitle {
   margin: 0;
-  font-family: var(--font-display);
-  font-weight: 500;
+  font-family: var(--font-sans);
+  /* regular weight, clearly larger than the meta line — hierarchy carried
+     by the global scale (--t-lead over --t-small), not by ad-hoc sizes */
+  font-weight: 400;
   font-size: var(--t-lead);
+  /* heading leading, not body leading — two wrapped lines read as one
+     title, not a paragraph */
   line-height: var(--lh-heading);
-  letter-spacing: var(--tr-display);
+  letter-spacing: 0;
   color: var(--maroon);
   display: -webkit-box;
   -webkit-box-orient: vertical;
@@ -189,29 +199,21 @@
   transition: color 0.3s ease;
 }
 
-/* Read More affordance under every caption — decorative (the whole card
-   is the link); the card's hover lights it */
-.readMore {
-  flex: none;
+/* the byline pill — WHO WROTE IT (outlet / restaurant): maroon text on a
+   faint maroon tint of the cream, the reference's grey tag in our palette.
+   Full-opacity text keeps the small size over the 4.5:1 contrast floor. */
+.tag {
+  margin-top: 0.8em;
   display: inline-flex;
   align-items: center;
-  gap: 0.7em;
-  white-space: nowrap;
+  padding: 0.45em 0.9em;
+  border-radius: 999px;
+  background: rgba(47, 0, 0, 0.07);
   font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
   font-weight: 500;
+  font-size: var(--t-label);
+  line-height: 1;
   color: var(--maroon);
-  opacity: 0.85;
-  transition:
-    color 0.3s ease,
-    opacity 0.3s ease;
-}
-.readMore svg {
-  width: clamp(22px, 2vw, 30px);
-  height: 10px;
-  transition: transform 0.4s var(--ease-out);
 }
 
 /* ---------- hover — quiet zoom + saffron caption, no lift; the idle
@@ -225,13 +227,6 @@
   }
   .card:hover .cardTitle {
     color: var(--saffron);
-  }
-  .card:hover .readMore {
-    color: var(--saffron);
-    opacity: 1;
-  }
-  .card:hover .readMore svg {
-    transform: translateX(5px);
   }
 }
 

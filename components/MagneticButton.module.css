@@ -5,7 +5,7 @@
      murk over bright footage). No light edge, no border.
      --glass-recess relaxes on hover. */
   --btn-fg: var(--cream);
-  --glass-bg: rgba(248, 243, 234, 0.08);
+  --glass-bg: rgba(250, 247, 241, 0.08);
   --glass-recess:
     inset 0 0 0.45em rgba(18, 0, 0, 0.22),
     inset 0 1px 2px rgba(18, 0, 0, 0.18);
@@ -109,8 +109,8 @@
    nothing reads through a solid fill */
 .solid {
   --btn-fg: var(--cream);
-  --glass-recess: inset 0 0 0 1px rgba(248, 243, 234, 0.22);
-  --glass-recess-soft: inset 0 0 0 1px rgba(248, 243, 234, 0.4);
+  --glass-recess: inset 0 0 0 1px rgba(250, 247, 241, 0.22);
+  --glass-recess-soft: inset 0 0 0 1px rgba(250, 247, 241, 0.4);
   background: var(--maroon-soft);
   -webkit-backdrop-filter: none;
   backdrop-filter: none;

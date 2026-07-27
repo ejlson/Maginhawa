@@ -199,7 +199,7 @@
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   padding: 0.45em 0.85em;
-  border: 1px solid rgba(248, 243, 234, 0.55);
+  border: 1px solid rgba(250, 247, 241, 0.55);
   border-radius: 999px;
   background: none;
   color: var(--cream);
@@ -235,7 +235,7 @@
   display: flex;
   gap: 4px;
   padding: 4px;
-  border: 1px solid rgba(248, 243, 234, 0.28);
+  border: 1px solid rgba(250, 247, 241, 0.28);
   border-radius: 999px;
   background: rgba(18, 0, 0, 0.42);
   -webkit-backdrop-filter: blur(8px);
@@ -249,7 +249,7 @@
   width: 34px;
   height: 34px;
   border-radius: 999px;
-  background: rgba(248, 243, 234, 0.18);
+  background: rgba(250, 247, 241, 0.18);
 }
 .viewToggle button {
   position: relative;
@@ -381,8 +381,8 @@
   top: 50%;
   height: var(--row);
   transform: translateY(-50%);
-  border-top: 1px solid rgba(248, 243, 234, 0.28);
-  border-bottom: 1px solid rgba(248, 243, 234, 0.28);
+  border-top: 1px solid rgba(250, 247, 241, 0.28);
+  border-bottom: 1px solid rgba(250, 247, 241, 0.28);
   pointer-events: none;
 }
 .step {
@@ -488,7 +488,7 @@
   -webkit-tap-highlight-color: transparent;
 }
 .name:focus-visible {
-  outline: 1px solid rgba(248, 243, 234, 0.6);
+  outline: 1px solid rgba(250, 247, 241, 0.6);
   outline-offset: 4px;
 }
 .nameActive {
@@ -508,7 +508,7 @@
   align-items: center;
   gap: 0.5em;
   padding: 0.6em 1.3em;
-  border: 1px solid rgba(248, 243, 234, 0.5);
+  border: 1px solid rgba(250, 247, 241, 0.5);
   border-radius: 999px;
   background: none;
   color: var(--cream);

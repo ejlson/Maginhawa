@@ -71,8 +71,8 @@
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: 0;
-  border-top: 1px solid rgba(248, 243, 234, 0.22);
-  border-left: 1px solid rgba(248, 243, 234, 0.22);
+  border-top: 1px solid rgba(250, 247, 241, 0.22);
+  border-left: 1px solid rgba(250, 247, 241, 0.22);
 }
 
 .item {
@@ -82,8 +82,8 @@
   gap: clamp(14px, 2vh, 22px);
   padding: clamp(14px, 1.8vh, 20px) clamp(16px, 2vw, 24px);
   min-height: clamp(108px, 14vh, 140px);
-  border-right: 1px solid rgba(248, 243, 234, 0.22);
-  border-bottom: 1px solid rgba(248, 243, 234, 0.22);
+  border-right: 1px solid rgba(250, 247, 241, 0.22);
+  border-bottom: 1px solid rgba(250, 247, 241, 0.22);
   text-decoration: none;
   color: inherit;
   transition: background-color 0.32s ease, padding 0.32s ease;
