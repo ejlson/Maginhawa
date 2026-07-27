@@ -3,33 +3,281 @@
   display: flex;
   flex-direction: column;
   color: var(--cream);
+  /* Exactly one screen: the invitation, the rails, the wordmark and the
+     credit row all have to land inside a single viewport. `.top` takes the
+     slack (flex: 1) so the two rails stretch to equal height — that is what
+     makes "Got any questions" sit level with "Explore" and "Back to top"
+     level with the columns. */
   min-height: 100svh;
   /* full bleed minus pad-x — Contact / FAQ / ReviewUs above match this via
      the .zone :global(.container) override in DarkZone.module.css */
-  padding: clamp(8px, 1vh, 16px) var(--pad-x) clamp(10px, 1.4vh, 16px);
+  padding: clamp(24px, 4vh, 56px) var(--pad-x) clamp(10px, 1.4vh, 16px);
   /* no rule above — the page's section boundaries are carried by spacing
      alone (the home page's zero-section-rules system) */
 }
 
-.spacer {
-  flex: 1;
-  min-height: clamp(16px, 4vh, 60px);
+/* ---------- the two rails ---------- */
+
+/* Both bands run on ONE shared column set, so the blurb sits directly over
+   "Back to top" and the invitation sits directly over the columns. The three
+   tracks are the mockup's proportions: mark ~33%, middle ~30%, right ~37%. */
+.top,
+.links {
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(24px, 4vh, 40px);
 }
+
+.links {
+  flex: none;
+}
+
+@media (min-width: 861px) {
+  .top,
+  .links {
+    grid-template-columns: 33fr 30fr 37fr;
+    column-gap: clamp(24px, 3vw, 56px);
+    align-items: start;
+  }
+}
+
+/* The top band absorbs the footer's slack. Its three cells align to their
+   TOPS, so the mark and the blurb sit level with the first line of "Got any
+   questions" rather than dropping to the hairline. */
+.top {
+  flex: 1;
+  min-height: 0;
+  padding-bottom: clamp(28px, 4vh, 56px);
+  align-items: start;
+}
+
+/* ---------- top band ---------- */
+
+/* no align-self here — it inherits the band's `align-items: end` so the mark
+   settles down by the hairline with the blurb and the invitation */
+.markLink {
+  display: block;
+  width: clamp(34px, 3vw, 44px);
+}
+
+.mark {
+  display: block;
+  width: 100%;
+  aspect-ratio: 1;
+  background: var(--cream);
+  -webkit-mask: url("/logo/maginhawa.png") center / contain no-repeat;
+  mask: url("/logo/maginhawa.png") center / contain no-repeat;
+}
+
+.brandName {
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  line-height: 1;
+}
+
+.blurb {
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
+  opacity: 0.6;
+  max-width: 30ch;
+}
+
+.invite {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(20px, 3vh, 34px);
+}
+
+.inviteTitle {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--t-h2);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tr-display);
+  max-width: 18ch;
+}
+
+/* Two cream pieces — the label pill and a round arrow button beside it.
+   `align-items: stretch` lets the circle take its height from the pill, and
+   aspect-ratio turns that into its width, so the two always match without
+   either being hard-coded. */
+.inviteCta {
+  display: inline-flex;
+  align-items: stretch;
+  gap: 8px;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  /* shares the site's button size token with the ReadyCta and Contact pills;
+     it keeps its own sans/sentence-case identity, but not its own scale */
+  font-size: var(--t-button);
+  line-height: 1;
+  white-space: nowrap;
+}
+
+.ctaMain,
+.ctaArrow {
+  color: var(--maroon);
+  background: var(--cream);
+  /* the recess is present at rest but fully transparent, so only the colour
+     animates — a shadow that appears from `none` pops instead of easing */
+  box-shadow: inset 0 2px 14px rgba(47, 0, 0, 0);
+  /* 999px rather than 50% on the circle so the radius can interpolate to 0
+     on the facing edges when the two halves join */
+  border-radius: 999px;
+  transition:
+    box-shadow 320ms var(--ease-out),
+    border-radius 320ms var(--ease-out),
+    transform 320ms var(--ease-out);
+}
+
+.ctaMain {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.95em 1.9em;
+}
+
+/* Sized explicitly rather than by aspect-ratio: as a `flex: none` item its
+   width resolves from content (the icon), so aspect-ratio never got a
+   definite side to work from and the circle rendered as an ellipse.
+   2.9em is the pill's own height — 0.95em padding twice plus a 1em line. */
+.ctaArrow {
+  display: grid;
+  place-items: center;
+  width: 2.9em;
+  height: 2.9em;
+  flex: none;
+}
+.ctaArrow svg {
+  width: 1.15em;
+  height: 1.15em;
+  display: block;
+  transition: transform 0.4s var(--ease-out);
+}
+
+/* HOVER: the two halves join into a single pill — the arrow slides left to
+   close the 8px gap (transform, so nothing relayouts) while the two facing
+   edges lose their rounding, leaving one continuous capsule. The recess
+   deepens on both at the same time so they read as one surface. */
+@media (hover: hover) and (pointer: fine) {
+  .inviteCta:hover .ctaMain,
+  .inviteCta:hover .ctaArrow {
+    box-shadow: inset 0 2px 14px rgba(47, 0, 0, 0.34);
+  }
+  .inviteCta:hover .ctaMain {
+    border-start-end-radius: 0;
+    border-end-end-radius: 0;
+  }
+  .inviteCta:hover .ctaArrow {
+    border-start-start-radius: 0;
+    border-end-start-radius: 0;
+    transform: translateX(-8px);
+  }
+  .inviteCta:hover .ctaArrow svg {
+    transform: translateX(2px);
+  }
+}
+
+/* keyboard focus gets the same joined state */
+.inviteCta:focus-visible {
+  outline: 2px solid var(--cream);
+  outline-offset: 4px;
+  border-radius: 999px;
+}
+.inviteCta:focus-visible .ctaMain,
+.inviteCta:focus-visible .ctaArrow {
+  box-shadow: inset 0 2px 14px rgba(47, 0, 0, 0.34);
+}
+.inviteCta:focus-visible .ctaMain {
+  border-start-end-radius: 0;
+  border-end-end-radius: 0;
+}
+.inviteCta:focus-visible .ctaArrow {
+  border-start-start-radius: 0;
+  border-end-start-radius: 0;
+  transform: translateX(-8px);
+}
+
+/* press feedback on the whole group, so it doesn't fight the arrow's slide */
+.inviteCta:active {
+  transform: scale(0.98);
+  transition: transform 120ms var(--ease-out);
+}
+
+/* ---------- links band ---------- */
+
+.brandName {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
+}
+
+.backToTop {
+  justify-self: start;
+  background: none;
+  border: none;
+  color: inherit;
+  padding: 0;
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
+  opacity: 0.72;
+  white-space: nowrap;
+  transition: opacity 0.3s ease;
+}
+.backToTop:hover,
+.backToTop:focus-visible {
+  opacity: 1;
+}
+
+/* hairline between the two bands, full bleed across the footer */
+.rule {
+  flex: none;
+  height: 1px;
+  background: rgba(248, 243, 234, 0.22);
+  margin-bottom: clamp(24px, 3.5vh, 44px);
+}
+
+/* ---------- wayfinding columns ---------- */
 
 .cols {
-  flex: none;
-  display: flex;
-  align-items: flex-start;
+  display: grid;
+  grid-template-columns: 1fr;
+  gap: clamp(24px, 3vh, 40px) clamp(24px, 4vw, 72px);
 }
 
-.leftCols {
-  display: flex;
-  gap: clamp(18px, 4vw, 72px);
-  flex-wrap: wrap;
+@media (min-width: 641px) {
+  .cols {
+    /* three columns only now — Explore, Contact Us, Follow us */
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+  }
 }
 
-.contactCol {
-  margin-left: auto;
+/* social entries with no confirmed profile URL — plain text, not a link */
+.socialPending {
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
+  opacity: 0.4;
+}
+
+/* office hours lines inside the contact column — text, not links */
+.hours {
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
+  opacity: 0.55;
+}
+/* the first hours line steps away from the phone number; the second sits
+   tight under the first */
+.hours {
+  margin-top: 0.35em;
+}
+.hours + .hours {
+  margin-top: 0;
 }
 
 .col h4 {
@@ -59,13 +307,18 @@
 }
 
 /* Reveal wrapper — same flex box the svg used to occupy, so its width:100%
-   resolves against the identical width (no layout shift) */
+   resolves against the identical width (no layout shift).
+   `margin-top: auto` drops the wordmark to the bottom of the footer: going
+   from two lines to one halved its height, which left it floating mid-panel
+   with the slack piled underneath. Now the slack sits ABOVE it and the
+   wordmark seats on the baseline of the page, just over the credit row. */
 .wordmarkReveal {
   flex: none;
   width: 100%;
+  margin-top: auto;
 }
 
-/* two-line wordmark, natural proportions (not squished), full bleed width */
+/* single-line wordmark, natural proportions (not squished), full bleed width */
 .wordmark {
   flex: none;
   width: 100%;
@@ -76,7 +329,8 @@
   font-family: var(--font-display-big);
   font-weight: 500;
   text-transform: uppercase;
-  /* no letter-spacing here — it fights textLength and offsets the 2nd line */
+  /* no letter-spacing here — the SVG's textLength owns the letterfit, and a
+     CSS value on top of it would be counted twice */
   fill: var(--cream);
 }
 
@@ -88,29 +342,23 @@
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   opacity: 0.7;
-  padding-top: 0.7em;
+  /* No negative margin any more. The gap above this row used to be empty
+     space INSIDE the wordmark's SVG box: getBBox reports the font's descender
+     metric, but "MAGINHAWA" is all caps with no descenders, so ~5 of the
+     viewBox's 26 units were blank. Pulling the row up with a negative margin
+     pushed the wordmark's box past the footer's content bottom, which is what
+     let the cream page background show through under the dark zone.
+     Cropping the viewBox to 22 units fixes the gap at the source. */
+  padding-top: clamp(6px, 0.8vh, 12px);
 }
 
+/* Phones: the three columns go 2-up rather than one long stack, and the
+   links take a finger-sized pitch. The footer keeps min-height (not height),
+   so it can still grow past the viewport here if it needs to. */
 @media (max-width: 640px) {
-  .leftCols {
-    gap: 7px 14px;
-  }
-}
-
-/* phones: four abreast is too cramped — settle into a roomy 2-up grid
-   (display: contents lifts the left columns into the same grid as the
-   contact column) and give the links finger-sized pitch */
-@media (max-width: 480px) {
   .cols {
-    display: grid;
     grid-template-columns: 1fr 1fr;
     gap: clamp(18px, 4vw, 28px) 16px;
-  }
-  .leftCols {
-    display: contents;
-  }
-  .contactCol {
-    margin-left: 0;
   }
   .col a {
     font-size: var(--t-body);

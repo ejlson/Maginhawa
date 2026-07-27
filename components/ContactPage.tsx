@@ -41,7 +41,7 @@ export default function ContactPage() {
 
       <main>
         <DarkZone>
-          <Contact />
+          <Contact standalone />
           <FAQ />
           <ReviewUs />
           <Footer />

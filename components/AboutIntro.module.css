@@ -9,13 +9,33 @@
 .section {
   position: relative;
   z-index: 2;
-  /* this section owns the chapter gap above it (one owner per boundary) so the
-     inter-section rhythm stays uniform through the page */
-  margin-top: var(--home-gap);
-  /* a 10px cream breath above and below the full-screen video card */
-  padding: 10px 0;
+  /* owns the PressStrip→About boundary. Tight tier: the card below is a
+     full-bleed maroon block, so the colour change does the separating —
+     a full chapter gap here only opened a band of empty cream. */
+  margin-top: var(--home-gap-tight);
+  padding: 0;
   background: var(--cream);
+
+  /* The card is no longer full-bleed: it lines up EXACTLY with the Discover
+     grid above it, so the two sections share one left and right edge and the
+     page reads as a single column of content rather than alternating between
+     inset grid and edge-to-edge slab. Same 12-column maths Discover uses
+     (20px margins + 20px gutters, content in the middle 10 columns) — see
+     Discover.module.css. */
+  --about-margin: 20px;
+  --about-gutter: 20px;
+  --about-col: calc(
+    (100vw - 2 * var(--about-margin) - 11 * var(--about-gutter)) / 12
+  );
+  --about-inset: calc(
+    var(--about-margin) + var(--about-col) + var(--about-gutter)
+  );
+  padding-inline: var(--pad-x);
 }
+
+/* The card now runs the FULL page width (just the page margin either side)
+   rather than sitting inset in the middle 10 columns like the Discover grid.
+   It is the page's one big immersive field, so it earns the extra width. */
 
 /* The card itself — deep maroon panel with a looping video behind cream
    copy, now a full-bleed viewport chapter (no rounding, no frame). The
@@ -46,14 +66,24 @@
      the cream band below. */
   --portrait-w: calc(3 * var(--about-col) + 40px);
   --portrait-overhang: clamp(28px, 4.5vh, 60px);
-  padding: clamp(40px, 5.5vh, 80px) clamp(28px, 3.6vw, 60px)
+  padding: clamp(36px, 4.5vh, 64px) clamp(28px, 3.6vw, 60px)
     var(--about-pad-b);
-  /* taller than one screen — a big, immersive video field */
-  min-height: calc(118svh - 20px);
+  /* a taller field — still inside one screen so the card reads in a single
+     view, but with more room for the footage to breathe around the type */
+  min-height: min(92svh, 920px);
+  /* rounded, matching the photography tier — squircle so the corners are
+     smoothed (superellipse) rather than a plain circular arc */
+  border-radius: var(--radius-tile);
+  corner-shape: squircle;
+  overflow: hidden;
+
+  /* GOLDEN SECTION — the card splits 0.618 : 1 (φ). The est. meta holds the
+     minor track; the title and statement stack down the major track, so the
+     content column begins on the card's golden section. */
   display: grid;
-  grid-template-columns: 1.03fr 1fr;
+  grid-template-columns: 0.618fr 1fr;
   grid-template-rows: auto 1fr;
-  column-gap: var(--grid-gutter);
+  column-gap: clamp(24px, 3vw, 56px);
   row-gap: clamp(24px, 3.5vh, 48px);
 }
 
@@ -111,11 +141,15 @@
       rgba(31, 0, 0, 0.3) 45%,
       rgba(31, 0, 0, 0) 72%
     ),
+    /* the two radial layers above already darken the corners the type sits
+       in, so this full-frame layer only needs to take the edge off the
+       highlights — it was laying 0.30 across the middle of the footage,
+       which is the same flat-wash problem the Discover tiles had */
     linear-gradient(
       180deg,
-      rgba(31, 0, 0, 0.46) 0%,
-      rgba(31, 0, 0, 0.3) 50%,
-      rgba(31, 0, 0, 0.42) 100%
+      rgba(31, 0, 0, 0.34) 0%,
+      rgba(31, 0, 0, 0.12) 50%,
+      rgba(31, 0, 0, 0.3) 100%
     );
   pointer-events: none;
 }
@@ -123,7 +157,7 @@
 /* everything else inside the card sits above the scrim */
 .card > .title,
 .card > .headMeta,
-.card > .midBand,
+.card > .body,
 .card > .portraitWrap {
   position: relative;
   z-index: 2;
@@ -133,11 +167,14 @@
    ruling the card's major quadrant. Difference blend inverts the type
    against bright video regions (the Hero wordmark's treatment) — the
    card's isolation: isolate keeps the blend inside the plate. */
+/* the title holds the major (right) track, set as two stacked lines and
+   pushed flush to the card's right edge */
 .title {
-  grid-column: 1;
+  grid-column: 2;
   grid-row: 1;
   align-self: start;
-  justify-self: start;
+  justify-self: end;
+  text-align: right;
   margin: 0;
   font-family: var(--font-display-big);
   font-weight: 400;
@@ -160,9 +197,8 @@
   will-change: transform;
 }
 
-/* "US" pulls up into "ABOUT" — halves the optical gap --lh-display
-   leaves between the two short lines (the About hero's negative-margin
-   seating trick, tuned by eye here) */
+/* "Us" pulls up into "About" — halves the optical gap --lh-display leaves
+   between the two short stacked lines */
 .titleLineUs {
   margin-top: -0.16em;
 }
@@ -183,11 +219,14 @@
 }
 
 /* quiet est. meta riding the card's top-right corner */
+/* left column, level with the title's first line */
 .headMeta {
-  grid-column: 2;
+  grid-column: 1;
   grid-row: 1;
-  justify-self: end;
+  justify-self: start;
   align-self: start;
+  /* nudges the small caps onto the title's cap line rather than its box top */
+  margin-top: 0.5em;
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
@@ -196,17 +235,24 @@
   opacity: 0.55;
 }
 
-/* mid band on the minor column — the statement copy sits directly to
-   the LEFT of the Read More CTA, the pair vertically centred against
-   the card's right edge, both on the same baseline */
-.midBand {
+/* The statement column on the minor (golden) track, with the CTA stacked
+   directly beneath it so the sentence and its action read as one block.
+   Sits toward the lower half of the card, mirroring the reference's
+   copy-below-title composition. */
+/* directly beneath the title in the same (right) column, so the statement
+   reads as the title's own sub-copy rather than a separate block */
+/* directly beneath the title and sharing its right edge, so the two read as
+   one right-aligned block */
+.body {
   grid-column: 2;
   grid-row: 2;
-  align-self: center;
-  justify-self: start;
+  align-self: start;
+  justify-self: end;
   display: flex;
+  flex-direction: column;
   align-items: flex-end;
-  gap: clamp(28px, 4vw, 72px);
+  text-align: right;
+  gap: clamp(18px, 2.4vh, 32px);
 }
 
 /* the founder's portrait — lower-left on the major column, anchored to the
@@ -231,8 +277,7 @@
   aspect-ratio: 8 / 11;
   width: var(--portrait-w);
   overflow: hidden;
-  border-radius: var(--radius-card);
-  corner-shape: squircle; /* Figma-style corner smoothing (superellipse); falls back to plain rounding */
+  border-radius: var(--radius-tile);
 }
 .portraitFrame img {
   display: block;
@@ -246,17 +291,25 @@
 .copy {
   flex: none;
 }
+/* The group's positioning statement — the most important sentence on the
+   home page, so it is set to be READ, not to be a texture.
+   It was 12px all-caps with label tracking: uppercase destroys word-shape
+   recognition, and at that size over moving footage it was the least legible
+   copy on the site. Now lead-sized sentence case on the body leading, at a
+   ~46ch measure so it still lands as a tight 3–4 line column. */
 .copy p {
   margin: 0;
-  /* uppercase runs wide — 38ch lands the block as a clean 3–4 line column */
+  /* the reference sets its body copy small and tight against a huge title —
+     the size contrast is what makes the composition read as editorial */
   max-width: 38ch;
   font-family: var(--font-sans);
   font-weight: 400;
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
+  font-size: var(--t-small);
   line-height: var(--lh-body);
   color: var(--cream);
+  /* the copy sits over video — a soft shadow holds it legible without
+     needing to darken the whole frame behind it */
+  text-shadow: 0 1px 18px rgba(31, 0, 0, 0.55);
 }
 .copy p + p {
   margin-top: var(--para-gap);
@@ -305,10 +358,6 @@
 .cta:focus-visible::after {
   transform: scaleX(1);
 }
-.cta:hover .ctaArrow,
-.cta:focus-visible .ctaArrow {
-  transform: translateX(6px);
-}
 .cta:hover,
 .cta:focus-visible {
   color: var(--saffron);
@@ -316,10 +365,16 @@
 .ctaLabel {
   font-weight: 500;
 }
-.ctaArrow {
-  width: clamp(36px, 3.4vw, 52px);
-  height: 10px;
+/* a small chevron, per the reference's "Our vision ›" — the long editorial
+   arrow was too heavy beside body copy set this small */
+.ctaChevron {
+  width: 0.85em;
+  height: 0.85em;
   transition: transform 0.45s var(--ease-out);
+}
+.cta:hover .ctaChevron,
+.cta:focus-visible .ctaChevron {
+  transform: translateX(4px);
 }
 
 /* ---------- responsive ---------- */
@@ -338,7 +393,7 @@
      portrait (the overhang device carries straight over) */
   .title,
   .headMeta,
-  .midBand,
+  .body,
   .portraitWrap {
     grid-column: 1;
     grid-row: auto;
@@ -346,7 +401,7 @@
     align-self: auto;
   }
   /* the copy + CTA pair stacks vertically in the mobile flow */
-  .midBand {
+  .body {
     flex-direction: column;
     align-items: flex-start;
     gap: clamp(20px, 3vh, 36px);

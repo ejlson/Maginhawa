@@ -107,8 +107,7 @@
   position: relative;
   min-height: 0;
   overflow: hidden;
-  border-radius: var(--radius-card);
-  corner-shape: squircle; /* Figma-style corner smoothing (superellipse); falls back to plain rounding */
+  border-radius: var(--radius-tile);
 }
 
 .cardImg {

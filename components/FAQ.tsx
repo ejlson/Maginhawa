@@ -43,10 +43,23 @@ const ITEMS: { q: string; a: string }[] = [
   },
 ];
 
-function Chevron() {
+/**
+ * Plus that becomes a minus. The horizontal bar is fixed; the vertical bar
+ * rotates a quarter-turn onto it and fades as the row opens, so the two
+ * states cross-fade rather than swapping glyphs.
+ */
+function PlusMinus() {
   return (
-    <svg viewBox="0 0 16 16" fill="none" stroke="currentColor" strokeWidth="1.5" strokeLinecap="round" strokeLinejoin="round" aria-hidden>
-      <path d="M3 6l5 5 5-5" />
+    <svg
+      viewBox="0 0 16 16"
+      fill="none"
+      stroke="currentColor"
+      strokeWidth="1.25"
+      strokeLinecap="round"
+      aria-hidden
+    >
+      <path d="M2 8h12" />
+      <path className={styles.iconBar} d="M8 2v12" />
     </svg>
   );
 }
@@ -70,20 +83,24 @@ export default function FAQ() {
         type="application/ld+json"
         dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
       />
-      <div className="container">
+      {/* Two columns: the heading holds the left rail and the questions run
+          down the right — the accordion is the content, the heading is the
+          frame. Previously the head spanned the full width and the list sat
+          underneath it, so a wide screen gave every question a ~1400px rule
+          to travel along. */}
+      <div className={`container ${styles.layout}`}>
         <div className={styles.head}>
           <div className={styles.headTop}>
             <Reveal as="span" className={styles.eyebrow}>
               FAQ
             </Reveal>
             <Reveal>
-              <h2 className={styles.title}>Anything we missed?</h2>
+              <h2 className={styles.title}>Your questions, our answers</h2>
             </Reveal>
           </div>
           <Reveal delay={0.08} className={styles.asideWrap}>
-            <p className={styles.aside} aria-hidden>
-              (A few of the questions that come up most — can&apos;t find
-              what you&apos;re after? Drop us a note in the form above)
+            <p className={styles.aside}>
+              Can&apos;t find what you&apos;re after? Get in touch.
             </p>
           </Reveal>
         </div>
@@ -102,7 +119,7 @@ export default function FAQ() {
                 >
                   <span className={styles.question}>{it.q}</span>
                   <span className={`${styles.chev} ${isOpen ? styles.chevOpen : ""}`} aria-hidden>
-                    <Chevron />
+                    <PlusMinus />
                   </span>
                 </button>
                 <motion.div

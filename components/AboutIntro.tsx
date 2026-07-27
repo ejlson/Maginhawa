@@ -4,7 +4,6 @@ import Link from "next/link";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import styles from "./AboutIntro.module.css";
 import Parallax from "./Parallax";
-import Reveal from "./Reveal";
 
 /**
  * One masked title line — the Hero wordmark's rise-in, retold per line.
@@ -65,7 +64,7 @@ function TitleLine({
 export default function AboutIntro() {
   return (
     <section className={styles.section} data-nav-theme="dark" data-cursor="glass">
-      <Reveal className={styles.card}>
+      <div className={styles.card}>
         {/* darkened video plays behind everything in the card — and, like
             the Locations video, drifts vertically inside the clipped card as
             the section scrolls through the viewport (Parallax's inset mode:
@@ -86,8 +85,10 @@ export default function AboutIntro() {
         </div>
         <div className={styles.cardScrim} aria-hidden />
 
-        {/* the h2 owns the in-view trigger; the two masked lines pick the
-            variant switch up through framer's propagation */}
+        {/* the est. meta holds the left column, level with the title's first
+            line; the title and the copy stack down the right column */}
+        <span className={styles.headMeta}>Est. 1987 — London</span>
+
         <motion.h2
           className={styles.title}
           initial="lineHidden"
@@ -100,18 +101,14 @@ export default function AboutIntro() {
           </TitleLine>
         </motion.h2>
 
-        <span className={styles.headMeta}>Est. 1987 — London</span>
-
-        {/* mid band — the statement copy sits directly left of the
-            Read More CTA, the pair centred on the card's right half */}
-        <div className={styles.midBand}>
+        {/* the statement column sits on the golden section of the card, with
+            the CTA directly beneath it */}
+        <div className={styles.body}>
           <div className={styles.copy}>
             <p>
               A family of London restaurants that carries deep culinary
               tradition with a distinctly{" "}
-              <em className={styles.highlight}>modern voice</em>.
-            </p>
-            <p>
+              <em className={styles.highlight}>modern voice</em> —{" "}
               <em className={styles.highlight}>Filipino at heart</em>,
               pan-Asian and Caribbean by kitchen.
             </p>
@@ -122,24 +119,23 @@ export default function AboutIntro() {
             className={styles.cta}
             aria-label="Read about Maginhawa Group"
           >
-            <span className={styles.ctaLabel}>Read More</span>
+            <span className={styles.ctaLabel}>Our story</span>
             <svg
-              className={styles.ctaArrow}
-              viewBox="0 0 48 10"
+              className={styles.ctaChevron}
+              viewBox="0 0 24 24"
               fill="none"
               stroke="currentColor"
-              strokeWidth="1"
+              strokeWidth="1.4"
               strokeLinecap="round"
               strokeLinejoin="round"
               aria-hidden
             >
-              <path d="M0 5 H42" />
-              <path d="M38 1 L42 5 L38 9" />
+              <path d="M9 6l6 6-6 6" />
             </svg>
           </Link>
         </div>
 
-      </Reveal>
+      </div>
     </section>
   );
 }

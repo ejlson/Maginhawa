@@ -301,7 +301,7 @@ export default function Discover() {
         <span className={styles.eyebrow}>Discover All Our Restaurants</span>
         {/* pale interaction hint — click/tap works everywhere now */}
         <span className={styles.hint} aria-hidden>
-          (Click to learn more)
+          Click to learn more
         </span>
       </div>
 

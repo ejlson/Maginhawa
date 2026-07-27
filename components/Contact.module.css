@@ -8,8 +8,16 @@
   /* DarkZone owns the chapter-tier top; this bottom is the related gap
      before the FAQ accordion */
   padding-top: 0;
-  /* owns the boundary down to the FAQ (whose top padding is zero) */
-  padding-bottom: var(--section-y);
+}
+
+/* On /contact this section is the FIRST thing on the page, so the zero top
+   padding above ran the "CONTACT US" wordmark straight under the fixed nav
+   and the two collided. On the home page it correctly has none — it butts
+   up against the Locations film. */
+.sectionTop {
+  padding-top: clamp(88px, 13vh, 172px);
+  /* the FAQ below owns that boundary via its own top padding */
+  padding-bottom: 0;
 }
 
 .wordmark {
@@ -45,7 +53,7 @@
 
 /* shared small-caps label for both the info block and the form fields */
 .label,
-.field label {
+.fieldLabel {
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
@@ -54,17 +62,39 @@
   margin-bottom: 0.8em;
 }
 
+/* the label is a block in its own right so the field below always starts on
+   a new line (it used to rely on the flex column alone) */
+.fieldLabel {
+  display: block;
+}
+
 .info p {
   font-family: var(--font-sans);
   font-size: var(--t-body);
   line-height: var(--lh-heading);
 }
 
+/* phone / email / index links — underlined on the maroon ground so they read
+   as links without needing a colour the palette doesn't have */
+.infoLink {
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+  text-decoration-color: rgba(248, 243, 234, 0.35);
+  transition: text-decoration-color 0.3s var(--ease-out);
+}
+
+.infoLink:hover,
+.infoLink:focus-visible {
+  text-decoration-color: var(--cream);
+}
+
+
 .form {
   display: flex;
   flex-direction: column;
   gap: clamp(10px, 1.8vh, 18px);
 }
+
 
 .row {
   display: grid;
@@ -80,7 +110,8 @@
   min-width: 0;
 }
 
-.field input {
+.field input,
+.field textarea {
   width: 100%;
   min-width: 0;
   background: transparent;
@@ -89,19 +120,29 @@
   color: var(--cream);
   font-family: var(--font-sans);
   font-size: var(--t-body);
-  line-height: var(--lh-heading);
+  line-height: var(--lh-body);
   padding: 0.45em 0;
   outline: none;
   transition: border-color 0.3s ease;
 }
 
-.field input::placeholder {
+/* the message box keeps the same hairline-underline treatment as the single
+   line inputs — only taller, and resizable vertically so a long enquiry
+   doesn't scroll inside four lines */
+.field textarea {
+  resize: vertical;
+  min-height: 5.5em;
+}
+
+.field input::placeholder,
+.field textarea::placeholder {
   font-family: var(--font-sans);
   font-size: var(--t-small);
   color: rgba(248, 243, 234, 0.45);
 }
 
-.field input:focus {
+.field input:focus,
+.field textarea:focus {
   border-color: var(--cream);
 }
 
@@ -114,46 +155,58 @@
    border, whisper-soft inner recess that relaxes on hover while the pill
    widens. On the maroon contact ground the cream fill reads as the
    section's single light moment. */
+/* Submit — the ReadyCta "Join Us" pill's proportions and typography, so the
+   site has ONE pill recipe rather than two. It previously ran at --t-h3
+   (~26px) in sentence case with a heavy inset recess, which made it the
+   loudest control anywhere on the site and read as a different design
+   language from every other button.
+   It keeps a solid cream fill (unlike ReadyCta's outline) because it is a
+   form's primary action and needs to out-rank the fields above it. */
 .submitPill {
   display: inline-flex;
   align-items: center;
-  gap: 0.5em;
+  gap: 0.7em;
   border-radius: 999px;
-  padding: 0.68em 1.6em;
+  padding: 0.9em 2em;
   font-family: var(--font-display);
-  font-weight: 500;
-  font-size: var(--t-h3);
-  line-height: var(--lh-heading);
-  letter-spacing: var(--tr-display);
-  color: var(--maroon);
-  background: var(--cream);
-  border: 1px solid rgba(47, 0, 0, 0.08);
-  box-shadow:
-    inset 0 0 0.45em rgba(47, 0, 0, 0.07),
-    inset 0 1px 2px rgba(47, 0, 0, 0.05);
+  font-weight: 300;
+  font-size: var(--t-button);
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  /* hollow at rest, fills on hover — the outline state matches the ReadyCta
+     "Join Us" pill, so both pills on the site share one resting look */
+  color: var(--cream);
+  background: transparent;
+  border: 1px solid var(--cream);
   white-space: nowrap;
   cursor: pointer;
+  /* colour + transform only — the old version animated padding on hover,
+     which relayouts the button (and its row) on every frame */
   transition:
-    transform 0.16s cubic-bezier(0.23, 1, 0.32, 1),
-    padding 0.45s var(--ease-out),
-    box-shadow 0.45s var(--ease-out);
+    background-color 220ms var(--ease-out),
+    color 220ms var(--ease-out),
+    transform 180ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .submitPill:hover {
+    background: var(--cream);
+    color: var(--maroon);
+    transform: translateY(-2px);
+  }
 }
 .submitPill:active {
   transform: scale(0.97);
 }
-
-.submitPill:hover,
 .submitPill:focus-visible {
-  padding-inline: 2.15em;
-  /* the recess relaxes — proportionally lighter than the rest state */
-  box-shadow:
-    inset 0 0 0.15em rgba(47, 0, 0, 0.025),
-    inset 0 1px 1px rgba(47, 0, 0, 0.02);
-}
-.submitPill:focus-visible {
-  /* cream ring, not ReadyCta's currentColor — a maroon outline would
-     vanish against this section's maroon ground */
-  outline: 1.5px solid var(--cream);
+  /* keyboard focus gets the same fill as hover, so the two states match */
+  background: var(--cream);
+  color: var(--maroon);
+  transform: translateY(-2px);
+  /* cream ring — a maroon outline would vanish against this section's
+     maroon ground */
+  outline: 2px solid var(--cream);
   outline-offset: 3px;
 }
 

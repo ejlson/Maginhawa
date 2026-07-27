@@ -2,7 +2,6 @@
 
 import Link from "next/link";
 import styles from "./ReadyCta.module.css";
-import MeshGradient from "./MeshGradient";
 
 /**
  * Ready-to-join CTA — a full-breath cream moment over a slowly roaming WebGL
@@ -23,7 +22,10 @@ export default function ReadyCta() {
       aria-label="Join the Maginhawa family"
     >
       <div className={styles.pin}>
-        <MeshGradient className={styles.mesh} />
+        {/* The WebGL lava-lamp mesh is gone — it sat directly behind the
+            eyebrow and made it hard to read, and the roaming colour field was
+            the least editorial moment on the page. The grain stays so the
+            cream still has some tooth. */}
         <div className={styles.noise} aria-hidden />
 
         <div className={styles.inner}>

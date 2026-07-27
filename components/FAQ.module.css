@@ -4,33 +4,50 @@
    as a sidebar to the accordion. No rule above — the section flows
    straight out of Contact on the shared maroon canvas. */
 .section {
-  /* top is zero — the Careers index's bottom padding owns that boundary */
-  padding-block: 0 var(--section-y-sm);
+  /* The FAQ owns its own top gap now. On the home page it is the FIRST block
+     in the DarkZone (the Contact section that used to sit above it is gone),
+     so a zero top ran it straight into the Locations film; on /contact the
+     Contact block above has had its bottom padding zeroed to match, keeping
+     one owner per boundary. */
+  padding-block: var(--section-y) var(--section-y-sm);
   color: var(--cream);
 }
 
-/* Two-column layout — head reads as a left-hand column ("this is the FAQ
-   chapter"), accordion reads as the right-hand main content. Ratio favours
-   the list (1 : 1.6) since the list is the point; head is the frame. */
-.head {
+/* The section's two columns: heading rail left, accordion right. Ratio
+   favours the list (1 : 1.7) since the list is the point; the head is the
+   frame. Below 860px it collapses to a single column, head then list. */
+.layout {
   display: grid;
-  grid-template-columns: 1fr 1.6fr;
-  column-gap: clamp(28px, 5vw, 80px);
-  row-gap: clamp(18px, 2.4vh, 32px);
-  align-items: start;
-  margin-bottom: clamp(28px, 4vh, 48px);
+  grid-template-columns: 1fr;
+  gap: clamp(28px, 4vh, 48px);
 }
 
-/* Left column of the head: eyebrow + title stacked as a sidebar. */
+@media (min-width: 861px) {
+  .layout {
+    grid-template-columns: 1fr 1.7fr;
+    column-gap: clamp(40px, 6vw, 112px);
+    align-items: start;
+  }
+}
+
+/* the heading rail — eyebrow, title and the "get in touch" line stacked */
+.head {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2vh, 22px);
+}
+
+/* deliberately NOT sticky — the rail sits at the top of the section and
+   stays put while the list scrolls past it */
+
 .headTop {
   display: flex;
   flex-direction: column;
   gap: clamp(12px, 1.8vh, 18px);
 }
 
-/* Right column: intro paragraph. */
 .asideWrap {
-  align-self: end;
+  margin-top: clamp(4px, 1vh, 12px);
 }
 
 /* Saffron-dot eyebrow — same recipe used on Blog and CareersTeaser so the
@@ -68,16 +85,15 @@
 
 /* pale interaction hint — the Discover "(Click to learn more)" recipe,
    cream on the dark canvas, far right of the head */
+/* In the left rail this reads as a caption under the title, so it is set
+   left-aligned in sentence case. Right-aligned all-caps at 0.4 opacity made
+   sense when it floated opposite the heading; here it just fought the rail. */
 .aside {
   font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  line-height: var(--lh-snug);
-  opacity: 0.4;
-  text-align: right;
-  justify-self: end;
-  max-width: 44ch;
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
+  opacity: 0.55;
+  max-width: 32ch;
 }
 
 @media (max-width: 760px) {
@@ -103,6 +119,9 @@
 }
 
 .row {
+  /* how far the two ends draw inward on hover */
+  --faq-indent: clamp(6px, 1vw, 14px);
+
   width: 100%;
   display: flex;
   align-items: center;
@@ -114,41 +133,76 @@
   padding: clamp(16px, 2.2vh, 24px) 0;
   cursor: pointer;
   text-align: left;
-  transition: padding 0.3s var(--ease-out);
 }
 
 .row:hover,
 .row:focus-visible {
-  padding-inline: clamp(6px, 1vw, 14px);
   outline: none;
 }
 
-.question {
-  font-family: var(--font-display-sm);
-  font-weight: 500;
-  font-size: var(--t-h3);
-  letter-spacing: -0.005em;
-  line-height: var(--lh-heading);
+/* The hover indent used to animate the row's padding-inline, which relayouts
+   the row (and re-wraps its text) on every frame. Translating the two ends
+   toward each other is visually identical and runs on the compositor. */
+.row:hover .question,
+.row:focus-visible .question {
+  transform: translateX(var(--faq-indent));
 }
 
+.row:hover .chev,
+.row:focus-visible .chev {
+  --chev-shift: calc(-1 * var(--faq-indent));
+}
+
+/* The questions are a LIST, not a stack of headings. Set in the sans at
+   body size they stay quiet and scannable, and the big display serif in the
+   left rail keeps sole ownership of the section's voice — the two used to
+   compete, both being Contralto at display sizes. */
+.question {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--t-body);
+  letter-spacing: 0;
+  line-height: var(--lh-snug);
+  transition: transform 0.3s var(--ease-out);
+}
+
+/* only the hover shift lives on the wrapper now — the open state is drawn
+   by the icon's own vertical bar, so the two never fight over `transform` */
 .chev {
+  --chev-shift: 0px;
+
   flex: none;
-  width: 22px;
-  height: 22px;
+  width: 20px;
+  height: 20px;
   display: grid;
   place-items: center;
+  transform: translateX(var(--chev-shift));
   transition: transform 0.36s var(--ease-out);
-  opacity: 0.7;
+  opacity: 0.65;
 }
 
 .chev svg {
   width: 14px;
   height: 14px;
+  overflow: visible;
+}
+
+/* the plus's vertical bar swings onto the horizontal one and fades, so the
+   glyph reads as a minus once the row is open */
+.iconBar {
+  transform-origin: 50% 50%;
+  transition:
+    transform 0.36s var(--ease-out),
+    opacity 0.28s var(--ease-out);
 }
 
 .chevOpen {
-  transform: rotate(180deg);
   opacity: 1;
+}
+
+.chevOpen .iconBar {
+  transform: rotate(90deg);
+  opacity: 0;
 }
 
 .answer {

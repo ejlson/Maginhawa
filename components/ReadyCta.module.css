@@ -6,8 +6,9 @@
 .section {
   position: relative;
   isolation: isolate;
-  /* one uniform chapter gap above (owns the Blog→CTA boundary) — same
-     --home-gap as every other section boundary, for a continuous rhythm */
+  /* owns the Blog→CTA boundary. Default tier: both sides share the cream
+     ground, so this gap is the only thing separating them and has to carry
+     real air (unlike the boundaries either side of the full-bleed card). */
   margin-top: var(--home-gap);
   /* clip horizontally (no page overflow) but let the mesh bleed vertically
      into the Blog above (overflow: clip does not create a scroll container,
@@ -130,11 +131,11 @@
   line-height: var(--lh-heading);
   letter-spacing: var(--tr-display);
   text-transform: uppercase;
-  /* the inverse text effect (richardsancho.com): cream type in
-     mix-blend-mode difference inverts against the lava behind it — cool over
-     the warm goo, near-black over cream — so it always contrasts, no shadow */
-  color: var(--cream);
-  mix-blend-mode: difference;
+  /* Plain maroon on cream. The old cream-in-difference-blend trick existed to
+     invert the type against the roaming lava; with the mesh removed there is
+     nothing to invert against, and difference over cream would have rendered
+     the type as its near-black inverse rather than a palette colour. */
+  color: var(--maroon);
 }
 
 /* small lead-in line — the lightest Fraunces cut, a touch dimmed and letter-
@@ -160,10 +161,8 @@
   line-height: 1;
 }
 
-/* the CTA — a clear, outlined pill: transparent interior (the lava shows
-   straight through), with a THIN border and THIN label, both riding
-   mix-blend-mode: difference so the outline and text invert against the lava
-   exactly like the heading. */
+/* the CTA — an outlined pill in maroon on the cream ground. The difference
+   blend went with the lava it was inverting against. */
 .cta {
   display: inline-flex;
   align-items: center;
@@ -173,14 +172,13 @@
   padding: 0.9em 2em;
   font-family: var(--font-display);
   font-weight: 300;
-  font-size: clamp(0.95rem, 1.1vw, 1.1rem);
+  font-size: var(--t-button);
   line-height: 1;
   letter-spacing: 0.16em;
   text-transform: uppercase;
   background: transparent;
-  color: var(--cream);
-  border: 1px solid var(--cream);
-  mix-blend-mode: difference;
+  color: var(--maroon);
+  border: 1px solid var(--maroon);
   text-decoration: none;
   white-space: nowrap;
   /* Emil: crisp ease-out, well under 300ms — only transform (cheap) animates */

@@ -15,8 +15,6 @@ import RestaurantLocations from "./RestaurantLocations";
 // import Press from "./Press";
 import Blog from "./Blog";
 import CareersTeaser from "./CareersTeaser";
-import ReadyCta from "./ReadyCta";
-import Contact from "./Contact";
 import FAQ from "./FAQ";
 import Footer from "./Footer";
 import DarkZone from "./DarkZone";
@@ -90,14 +88,16 @@ export default function Experience() {
           {/* open-roles index on the cream page, then the closing
               invitation with the Join Us pill */}
           {/* <CareersTeaser /> */}
-          <ReadyCta />
 
-          {/* outside the DarkZone: the video opens full bleed on the cream
-              page and scrolls past into the dark Contact section below */}
+          {/* The careers invitation now lives ON the Locations film rather
+              than in its own 200svh pinned section above it — which also
+              retires the film's -100svh rise-and-cover coupling. */}
           <RestaurantLocations />
 
+          {/* No Contact block here any more — the enquiry form lives on
+              /contact, and the footer's own invitation ("Got any questions?")
+              carries the ask at the end of the page. */}
           <DarkZone>
-            <Contact />
             <FAQ />
             <Footer />
           </DarkZone>

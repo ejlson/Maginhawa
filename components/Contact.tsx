@@ -1,12 +1,31 @@
 import styles from "./Contact.module.css";
 import Reveal from "./Reveal";
+import { CONTACT } from "@/lib/contact";
 
-export default function Contact() {
+type ContactProps = {
+  /**
+   * True on /contact, where this section is the FIRST thing on the page and
+   * needs top padding to clear the fixed nav — without it the "CONTACT US"
+   * wordmark renders straight under the nav links and the two collide.
+   * The home page leaves this off: there the section deliberately butts
+   * straight up against the Locations film above it.
+   */
+  standalone?: boolean;
+};
+
+export default function Contact({ standalone = false }: ContactProps) {
   return (
-    <section className={styles.section} id="contact-us">
+    <section
+      className={`${styles.section}${standalone ? ` ${styles.sectionTop}` : ""}`}
+      id="contact-us"
+    >
       <div className="container">
         <Reveal className={styles.wordmark} as="h2">
-          {/* SVG wordmark stretched to fill the full page width */}
+          {/* Full-width wordmark. lengthAdjust is "spacing", NOT
+              "spacingAndGlyphs" — the latter stretches the letterforms
+              themselves, which visibly widened Contralto's strokes. font-size
+              17 sets "CONTACT US" close to the 100-unit box on its own, so
+              only the letterfit is adjusted (matches the footer wordmark). */}
           <svg
             className={styles.wordSvg}
             viewBox="0 0 100 16"
@@ -20,7 +39,7 @@ export default function Contact() {
               y="13.4"
               fontSize="17"
               textLength="100"
-              lengthAdjust="spacingAndGlyphs"
+              lengthAdjust="spacing"
             >
               CONTACT US
             </text>
@@ -30,13 +49,22 @@ export default function Contact() {
         <div className={styles.grid}>
           <div className={`${styles.info} measure`}>
             <Reveal>
-              <div className={styles.label}>Location</div>
-              <p>+44 01234 5678</p>
+              <div className={styles.label}>Enquiries</div>
+              <p>
+                <a className={styles.infoLink} href={`tel:${CONTACT.phone.replace(/\s/g, "")}`}>
+                  {CONTACT.phone}
+                </a>
+              </p>
+              <p>
+                <a className={styles.infoLink} href={`mailto:${CONTACT.email}`}>
+                  {CONTACT.email}
+                </a>
+              </p>
             </Reveal>
             <Reveal delay={0.08}>
               <div className={styles.label}>Opening Times</div>
-              <p>Mon – Sun</p>
-              <p>09:00 – 17:00</p>
+              <p>{CONTACT.officeHours.days}</p>
+              <p>{CONTACT.officeHours.time}</p>
             </Reveal>
           </div>
 
@@ -46,19 +74,52 @@ export default function Contact() {
               onSubmit={(e) => e.preventDefault()}
             >
               <div className={styles.field}>
-                <label>Name</label>
+                <span className={styles.fieldLabel}>Name</span>
                 <div className={styles.row}>
-                  <input type="text" placeholder="First Name" />
-                  <input type="text" placeholder="Last Name" />
+                  <label className="sr-only" htmlFor="contact-first">
+                    First name
+                  </label>
+                  <input
+                    id="contact-first"
+                    name="firstName"
+                    type="text"
+                    autoComplete="given-name"
+                    placeholder="First name"
+                  />
+                  <label className="sr-only" htmlFor="contact-last">
+                    Last name
+                  </label>
+                  <input
+                    id="contact-last"
+                    name="lastName"
+                    type="text"
+                    autoComplete="family-name"
+                    placeholder="Last name"
+                  />
                 </div>
               </div>
               <div className={styles.field}>
-                <label>Email</label>
-                <input type="email" placeholder="Enter your email here" />
+                <label className={styles.fieldLabel} htmlFor="contact-email">
+                  Email
+                </label>
+                <input
+                  id="contact-email"
+                  name="email"
+                  type="email"
+                  autoComplete="email"
+                  placeholder="you@example.com"
+                />
               </div>
               <div className={styles.field}>
-                <label>Description</label>
-                <input type="text" placeholder="Enter your description here" />
+                <label className={styles.fieldLabel} htmlFor="contact-message">
+                  Message
+                </label>
+                <textarea
+                  id="contact-message"
+                  name="message"
+                  rows={4}
+                  placeholder="Tell us a little about your enquiry"
+                />
               </div>
               <div className={styles.submitRow}>
                 {/* submit wears the ReadyCta "Join Us" pill — the one

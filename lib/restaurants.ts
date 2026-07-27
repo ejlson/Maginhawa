@@ -177,6 +177,7 @@ export const RESTAURANTS: Restaurant[] = [
 export const getRestaurant = (slug: string) =>
   RESTAURANTS.find((r) => r.slug === slug);
 
+
 // map the showcase's display name → canonical slug, since the carousel uses
 // "Café Mama & Sons" / "Ramo Ramen" etc. as keys
 export const SLUG_BY_NAME: Record<string, string> = {

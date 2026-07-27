@@ -171,8 +171,7 @@
      table) is the card's height */
   min-height: clamp(220px, 26vh, 320px);
   overflow: hidden;
-  border-radius: var(--radius-card);
-  corner-shape: squircle; /* Figma-style corner smoothing (superellipse); falls back to plain rounding */
+  border-radius: var(--radius-tile);
   background: var(--placeholder);
 }
 
@@ -233,8 +232,7 @@
   aspect-ratio: 5 / 3;
   min-height: 100%;
   overflow: hidden;
-  border-radius: var(--radius-card);
-  corner-shape: squircle;
+  border-radius: var(--radius-tile);
   background: var(--placeholder);
 }
 

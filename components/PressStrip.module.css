@@ -24,22 +24,25 @@
   text-align: center;
 }
 
-/* soft edge fade so the loop doesn't hard-clip at the container edges */
+/* Soft edge fade so the loop doesn't hard-clip at the container edges.
+   The ramp has to be WIDER than a masthead (up to 240px) or a wordmark
+   sits half-faded and still legible, which reads as a broken crop rather
+   than a fade — 14% ≈ 200px at 1440, so a logo is well gone by the edge. */
 .viewport {
   width: 100%;
   overflow: hidden;
   -webkit-mask-image: linear-gradient(
     to right,
     transparent 0,
-    #000 6%,
-    #000 94%,
+    #000 14%,
+    #000 86%,
     transparent 100%
   );
   mask-image: linear-gradient(
     to right,
     transparent 0,
-    #000 6%,
-    #000 94%,
+    #000 14%,
+    #000 86%,
     transparent 100%
   );
 }

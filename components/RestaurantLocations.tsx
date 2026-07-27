@@ -7,8 +7,8 @@ import {
   useTransform,
 } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import styles from "./RestaurantLocations.module.css";
-import ViewAllButton from "./ViewAllButton";
 import VideoBackdrop from "./VideoBackdrop";
 
 // a few restaurant clips cycle behind the View-All button
@@ -122,10 +122,60 @@ export default function RestaurantLocations() {
             <VideoBackdrop src={CLIPS[clip]} className={styles.locVideo} />
           </div>
           <div className={styles.locScrim} aria-hidden />
+          {/* gradient noise, densest through the band the type occupies */}
+          <div className={styles.grain} aria-hidden />
         </div>
 
+        {/* The closing invitation now lives ON the film. "Starts with you" is
+            an SVG wordmark stretched edge to edge with textLength — the same
+            treatment as the footer's MAGINHAWA — so it reads as a full-bleed
+            typographic moment rather than a centred heading. */}
         <div className={styles.cta}>
-          <ViewAllButton />
+          <div className={styles.invite}>
+            <span className={styles.inviteEyebrow}>The next great service</span>
+
+            {/* Measured, not copied from the footer: "STARTS WITH YOU" is 15
+                characters, so at the footer's font-size 19 it sets 137.95
+                units wide — textLength would have crushed it by 2.7 units per
+                gap and overlapped the letters. At 13.4 the natural width is
+                ~97, so textLength only OPENS the fit (+0.22/gap). Cap height
+                is 15.05 above the baseline and 3 below, so baseline 15.4 in a
+                19-unit box clears both ends. */}
+            <svg
+              className={styles.inviteWord}
+              viewBox="0 0 100 19"
+              preserveAspectRatio="xMidYMid meet"
+              role="img"
+              aria-label="Starts with you"
+            >
+              <text
+                className={styles.inviteWordText}
+                x="0"
+                y="15.4"
+                fontSize="13.4"
+                textLength="100"
+                lengthAdjust="spacing"
+              >
+                STARTS WITH YOU
+              </text>
+            </svg>
+
+            <Link href="/join-us" className={styles.inviteCta}>
+              <span className={styles.inviteCtaLabel}>Join Us</span>
+              <svg
+                className={styles.inviteCtaArrow}
+                viewBox="0 0 24 24"
+                fill="none"
+                stroke="currentColor"
+                strokeWidth="1.2"
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                aria-hidden
+              >
+                <path d="M9 6l6 6-6 6" />
+              </svg>
+            </Link>
+          </div>
         </div>
       </div>
     </section>

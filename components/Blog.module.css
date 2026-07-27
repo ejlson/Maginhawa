@@ -17,10 +17,10 @@
   );
   /* left edge of column 2 — margin + col 1 + gutter */
   --blog-col2: calc(var(--blog-margin) + var(--blog-col) + var(--blog-gutter));
-  /* one owner per boundary: Blog owns the chapter gap above it, and the gap
-     below is owned by ReadyCta's margin-top — so every inter-section breath is
-     one uniform --home-gap (no additive stacking). */
-  margin-top: var(--home-gap);
+  /* one owner per boundary: Blog owns the gap above it, ReadyCta owns the one
+     below. Tight tier — the full-bleed About card sits directly above, so its
+     edge already reads as the break. */
+  margin-top: var(--home-gap-tight);
   padding: 0;
   display: flex;
   flex-direction: column;
@@ -137,12 +137,12 @@
   color: var(--maroon);
 }
 
-/* the photograph — rounded 8:11 plate, placeholder-backed while loading */
+/* the photograph — square-cornered 8:11 plate, placeholder-backed while
+   loading. Square per --radius-tile: printed photography has no radius. */
 .plate {
   aspect-ratio: 8 / 11;
   overflow: hidden;
-  border-radius: var(--radius-card);
-  corner-shape: squircle; /* Figma-style corner smoothing (superellipse); falls back to plain rounding */
+  border-radius: var(--radius-tile);
   background: var(--placeholder);
 }
 

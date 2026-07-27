@@ -8,13 +8,10 @@
   /* above the page grain (.afterHero::after, z-index 3) so no grain crawls on
      the footage; DarkZone sits higher still so the film→DarkZone seam holds */
   z-index: 4;
-  /* rise up over the CTA above and FULLY cover it: with the CTA section 200svh
-     (100svh of pin travel), a -100svh margin sets the film's top exactly at the
-     viewport bottom when the CTA is at rest (no peek), then — as the user
-     scrolls the 100svh the content is pinned — the film rises a whole viewport
-     and completely covers the held invitation just as the pin releases (it's a
-     later, opaque sibling, so it paints on top). */
-  margin-top: -100svh;
+  /* No negative pull-up any more. The film used to rise a full viewport to
+     cover the pinned ReadyCta section above it; that invitation now lives
+     inside this film, so the section simply owns the page gap above it. */
+  margin-top: var(--home-gap);
   width: 100%;
   height: 125svh;
   /* the section lives OUTSIDE the DarkZone: the video ARRIVES as a
@@ -124,7 +121,7 @@
     linear-gradient(rgba(18, 0, 0, 0.35), rgba(18, 0, 0, 0.5));
 }
 
-/* the View-All button — centred over the video, regardless of settle state */
+/* the invitation — centred over the video, regardless of settle state */
 .cta {
   position: absolute;
   inset: 0;
@@ -132,7 +129,126 @@
   display: grid;
   place-items: center;
   pointer-events: none;
+  padding-inline: var(--pad-x);
 }
 .cta > * {
   pointer-events: auto;
+}
+
+/* GRADIENT NOISE over the footage — a fractal-noise field masked so it is
+   densest through the middle band where the type sits and fades out top and
+   bottom. It sits above .locScrim but below the invitation, and gives the
+   cream wordmark a textured ground to read against instead of clean video. */
+.grain {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  pointer-events: none;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.7' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 170px 170px;
+  opacity: 0.5;
+  mix-blend-mode: overlay;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.85) 34%,
+    rgba(0, 0, 0, 0.85) 66%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    transparent 0%,
+    rgba(0, 0, 0, 0.85) 34%,
+    rgba(0, 0, 0, 0.85) 66%,
+    transparent 100%
+  );
+}
+
+/* ---------- the invitation ---------- */
+
+.invite {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  text-align: center;
+  gap: clamp(18px, 3vh, 36px);
+  color: var(--cream);
+}
+
+.inviteEyebrow {
+  font-family: var(--font-serif);
+  font-weight: 200;
+  font-size: var(--t-h3);
+  letter-spacing: 0.12em;
+  text-transform: uppercase;
+  opacity: 0.9;
+}
+
+/* the full-bleed stretched wordmark — same recipe as the footer's MAGINHAWA:
+   font-size chosen so the natural set width lands just under the 100-unit
+   box, leaving textLength to open the letterfit slightly rather than crush
+   it, and lengthAdjust="spacing" so the letterforms are never distorted. */
+.inviteWord {
+  display: block;
+  width: 100%;
+}
+
+.inviteWordText {
+  font-family: var(--font-display-big);
+  font-weight: 500;
+  letter-spacing: var(--tr-display);
+  text-transform: uppercase;
+  fill: var(--cream);
+}
+
+.inviteCta {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.5em;
+  border-radius: 999px;
+  padding: 0.9em 2em;
+  font-family: var(--font-display);
+  font-weight: 300;
+  font-size: var(--t-button);
+  line-height: 1;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  background: transparent;
+  color: var(--cream);
+  border: 1px solid var(--cream);
+  white-space: nowrap;
+  transition:
+    background-color 220ms var(--ease-out),
+    color 220ms var(--ease-out),
+    transform 180ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .inviteCta:hover {
+    background: var(--cream);
+    color: var(--maroon);
+    transform: translateY(-2px);
+  }
+}
+.inviteCta:focus-visible {
+  background: var(--cream);
+  color: var(--maroon);
+  outline: 2px solid var(--cream);
+  outline-offset: 3px;
+}
+.inviteCta:active {
+  transform: scale(0.97);
+}
+
+.inviteCtaArrow {
+  width: 0.8em;
+  height: 0.8em;
+  display: block;
+  transition: transform 0.4s var(--ease-out);
+}
+.inviteCta:hover .inviteCtaArrow,
+.inviteCta:focus-visible .inviteCtaArrow {
+  transform: translateX(0.24em);
 }
