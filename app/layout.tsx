@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Fraunces, Inter } from "next/font/google";
+import { Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 import PageTransition from "@/components/PageTransition";
 import CustomCursor from "@/components/CustomCursor";
@@ -7,20 +7,14 @@ import GlassFilters from "@/components/GlassFilters";
 import SmoothScroll from "@/lib/SmoothScroll";
 import { OrganizationJsonLd, WebSiteJsonLd } from "@/lib/jsonld";
 
-const fraunces = Fraunces({
+/* The site's single text family — a warm humanist grotesk. Variable (wght
+   100–900), so one file covers every weight in use, from the 200 eyebrows to
+   the 500 headings; true italics for the emphasis spots Fraunces used to
+   carry. Contralto (Adobe Fonts, below) survives only at wordmark scale. */
+const hanken = Hanken_Grotesk({
   subsets: ["latin"],
-  // true italics — serif emphasis (--font-serif + font-style: italic)
-  // renders real Fraunces italic glyphs, not a browser-slanted oblique
   style: ["normal", "italic"],
-  axes: ["opsz"],
-  variable: "--font-fraunces",
-  display: "swap",
-});
-
-const inter = Inter({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-inter",
+  variable: "--font-hanken",
   display: "swap",
 });
 
@@ -93,7 +87,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en-GB" className={`${fraunces.variable} ${inter.variable}`}>
+    <html lang="en-GB" className={hanken.variable}>
       <head>
         <link rel="stylesheet" href="https://use.typekit.net/pev2vne.css" />
         <OrganizationJsonLd />

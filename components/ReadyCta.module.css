@@ -101,7 +101,7 @@
   color: var(--maroon);
 }
 
-/* small lead-in line — the lightest Fraunces cut, a touch dimmed and letter-
+/* small lead-in line — the lightest grotesk cut, a touch dimmed and letter-
    spaced so it reads as a fine, quiet eyebrow above the big line */
 .titleSmall {
   display: block;
@@ -112,11 +112,13 @@
   opacity: 0.82;
 }
 
-/* the big statement line — large upright display, the focal point */
+/* the big statement line — large upright display, the focal point. Wordmark
+   scale, so it stays in the brand's Contralto voice (big optical cut), same
+   as the home page's STARTS WITH YOU. */
 .titleBig {
   display: block;
   margin-top: 0.06em;
-  font-family: var(--font-display);
+  font-family: var(--font-display-big);
   /* the markup is an <em> (italic by default) — force upright per the brief */
   font-style: normal;
   font-weight: 500;

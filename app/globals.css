@@ -3,8 +3,8 @@
    =========================================================== */
 
 /* Contralto (Adobe Fonts / Typekit kit pev2vne) — loaded via <link> in the
-   document head. Family "contralto-medium"; falls back to Fraunces if the
-   kit isn't authorised for the current domain. */
+   document head. Falls back to a system serif if the kit isn't authorised
+   for the current domain. */
 
 :root {
   --cream: #f8f3ea;
@@ -19,17 +19,25 @@
      pairs warm-on-warm with the maroon and lifts off the cream. */
   --saffron: #c97e3f;
 
-  --font-display: "contralto-medium", var(--font-fraunces), "Times New Roman", serif;
-  --font-serif: var(--font-fraunces), Georgia, serif;
-  --font-sans: var(--font-inter), -apple-system, "Helvetica Neue", Arial, sans-serif;
+  /* TWO-FAMILY SYSTEM. Hanken Grotesk (variable, via next/font) is the
+     site's single text voice — headings, body, buttons, labels, eyebrows.
+     Contralto (Adobe Fonts) survives ONLY at brand-wordmark scale, through
+     --font-display-big. The rule: if it isn't a stretched MAGINHAWA-style
+     wordmark moment, it's the grotesk. */
+  --font-sans: var(--font-hanken), -apple-system, "Helvetica Neue", Arial, sans-serif;
 
-  /* Contralto is an OPTICAL-SIZE family — use the cut that matches the size
-     band (big for huge display, xsmall for caps/labels). The Maginhawa
-     wordmark stays contralto. Fraunces carries readable editorial copy; Inter
-     handles UI, meta and buttons. */
-  --font-display-big: "contralto-big", "contralto-medium", var(--font-fraunces), serif;
-  --font-display-sm: "contralto-small", "contralto-medium", var(--font-fraunces), serif;
-  --font-display-xs: "contralto-xsmall", "contralto-small", var(--font-fraunces), serif;
+  /* Legacy names from the old three-family (Contralto/Fraunces/Inter)
+     system — kept as ALIASES so the swap is one token-level change instead
+     of a 60-file edit. All of them resolve to the grotesk now; keep using
+     the alias that matches the ROLE so a future re-pairing stays cheap. */
+  --font-display: var(--font-sans);
+  --font-serif: var(--font-sans);
+  --font-display-sm: var(--font-sans);
+  --font-display-xs: var(--font-sans);
+
+  /* the one surviving Contralto stack — big optical cut for the huge
+     edge-to-edge wordmarks (hero / footer / loader / STARTS WITH YOU) */
+  --font-display-big: "contralto-big", "contralto-medium", "Times New Roman", serif;
 
   /* fluid type scale (~Perfect Fourth, 1.333) — clamp(min, fluid, max) */
   --t-hero: clamp(3.4rem, 13vw, 13rem); /* giant Maginhawa wordmark   */
@@ -369,9 +377,10 @@ html::-webkit-scrollbar {
   opacity: 0.75;
 }
 
-/* Giant edge-to-edge display wordmark used across the site */
+/* Giant edge-to-edge display wordmark used across the site — wordmark scale,
+   so it keeps the brand's Contralto voice (big optical cut) */
 .wordmark {
-  font-family: var(--font-display);
+  font-family: var(--font-display-big);
   font-weight: 400;
   line-height: 0.82;
   letter-spacing: -0.01em;
