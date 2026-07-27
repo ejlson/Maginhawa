@@ -24,21 +24,45 @@
   text-align: center;
 }
 
-/* STATIC masthead wall — the marks wrap into rows, centred, generously
-   spaced. No marquee: proof reads truer when it stands still, and the row
-   costs zero motion. Capped width so the wall sets as a composed block
-   rather than a loose full-bleed scatter. */
+/* Soft edge fade so the loop doesn't hard-clip at the container edges —
+   the marks fade in and out as they cross the content width. The ramp has
+   to be WIDER than a masthead (up to 240px) or a wordmark sits half-faded
+   and still legible, which reads as a broken crop rather than a fade —
+   14% ≈ 200px at 1440, so a logo is well gone by the edge. */
+.viewport {
+  width: 100%;
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 14%,
+    #000 86%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    to right,
+    transparent 0,
+    #000 14%,
+    #000 86%,
+    transparent 100%
+  );
+}
+
+.track {
+  display: flex;
+  width: max-content;
+  animation: pressScroll 42s linear infinite;
+  will-change: transform;
+}
+
 .list {
   list-style: none;
   padding: 0;
   margin: 0;
-  max-width: 72rem;
   display: flex;
-  flex-wrap: wrap;
   align-items: center;
-  justify-content: center;
-  column-gap: clamp(36px, 4.5vw, 72px);
-  row-gap: clamp(20px, 2.6vh, 32px);
+  gap: clamp(44px, 5vw, 88px);
+  padding-right: clamp(44px, 5vw, 88px);
 }
 
 .item {
@@ -48,11 +72,9 @@
   /* fixed cell height so uneven logo aspect ratios still align on a common
      baseline. Width is auto so wide wordmarks aren't squeezed. Items can
      boost their height via `--size-boost` (used for very compact wordmarks
-     like The Independent that would otherwise disappear in the strip).
-     Slightly smaller than the old marquee cell: fourteen static marks at
-     60px read as a billboard, not a credential. */
+     like The Independent that would otherwise disappear in the strip). */
   --size-boost: 1;
-  height: calc(clamp(28px, 3.6vh, 42px) * var(--size-boost));
+  height: calc(clamp(36px, 4.5vh, 54px) * var(--size-boost));
 }
 
 /* real <img> tag (not a mask) — some source PNGs have baked-in white
@@ -84,5 +106,20 @@
   mix-blend-mode: normal;
   filter: none;
   opacity: 1;
+}
+
+@keyframes pressScroll {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    animation: none;
+  }
 }
 

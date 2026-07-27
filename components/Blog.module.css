@@ -11,13 +11,13 @@
 .section {
   position: relative;
   isolation: isolate;
-  --blog-margin: 20px;
-  --blog-gutter: 20px;
-  --blog-col: calc(
-    (100vw - 2 * var(--blog-margin) - 11 * var(--blog-gutter)) / 12
-  );
-  /* left edge of column 2 — margin + col 1 + gutter */
-  --blog-col2: calc(var(--blog-margin) + var(--blog-col) + var(--blog-gutter));
+  /* seated on the GLOBAL 12-column grid (globals.css) — same margin, gutter
+     and column-2 seat as Discover and the other cream chapters. The local
+     names survive as aliases only. */
+  --blog-margin: var(--grid-margin);
+  --blog-gutter: var(--grid-gutter);
+  --blog-col: var(--grid-col);
+  --blog-col2: var(--grid-col2);
   /* one owner per boundary: Blog owns the gap above it, ReadyCta owns the one
      below. Tight tier — the full-bleed About card sits directly above, so its
      edge already reads as the break. */

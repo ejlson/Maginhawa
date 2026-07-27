@@ -3,7 +3,6 @@
 import Link from "next/link";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import styles from "./AboutIntro.module.css";
-import Parallax from "./Parallax";
 
 /**
  * One masked title line — the Hero wordmark's rise-in, retold per line.
@@ -52,39 +51,18 @@ function TitleLine({
 /**
  * Editorial "who we are" chapter that follows the Press strip.
  *
- * A full-bleed, one-screen maroon card split near-evenly at the midline:
- * the big "ABOUT US" display title rules the top-left (difference-blended
- * over the video, each line rising in behind a mask like the Hero
- * wordmark), a quiet est. meta sits top-right, the statement copy +
- * Read More CTA hold the minor column's vertical centre (≈column 7 of
- * the mockup's 12-column grid), and the founder's portrait anchors
- * bottom-left on column 2 — drifting on its own parallax and straddling
- * the card's lower edge onto the cream band below.
+ * An OPEN typographic statement on the cream — the maroon video card is
+ * gone: the homepage already bookends with film (hero above, Locations
+ * below), and the About moment lands harder as pure type on the page's
+ * own ground. Composition keeps the golden split: quiet est. meta on the
+ * minor track, the big "ABOUT US" display title ruling the major track
+ * (each line rising in behind a mask like the Hero wordmark), statement
+ * copy + Our story CTA stacked under the title's right edge.
  */
 export default function AboutIntro() {
   return (
-    <section className={styles.section} data-nav-theme="dark" data-cursor="glass">
+    <section className={styles.section} data-nav-theme="light">
       <div className={styles.card}>
-        {/* darkened video plays behind everything in the card — and, like
-            the Locations video, drifts vertically inside the clipped card as
-            the section scrolls through the viewport (Parallax's inset mode:
-            the frame stays put, the over-scaled footage pans within it, so
-            no edge is ever exposed); the scrim keeps the text highly legible */}
-        <div className={styles.cardVideoLayer} aria-hidden>
-          <Parallax inset fill speed={0.62}>
-            <video
-              className={styles.cardVideo}
-              src="/videos/belly-hero.mov"
-              autoPlay
-              muted
-              loop
-              playsInline
-              preload="auto"
-            />
-          </Parallax>
-        </div>
-        <div className={styles.cardScrim} aria-hidden />
-
         {/* the est. meta holds the left column, level with the title's first
             line; the title and the copy stack down the right column */}
         <span className={styles.headMeta}>Est. 1987 — London</span>

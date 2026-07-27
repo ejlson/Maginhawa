@@ -1,85 +1,33 @@
-/* Section runs the maroon card edge to edge — no cream side frame.
-   Neighbours own both boundaries: the Press strip's symmetric padding
-   centres itself above, and NumbersStrip's --space-lg top padding sets
-   the caption gap below — so this section carries no padding at all.
-   position + z-index lift the whole section above the cream band that
-   follows, so the portrait's overhang paints ON TOP of it even if that
-   neighbour ever gains its own stacking context. No overflow clipping
-   here, ever — the overhang (and its parallax drift) must escape. */
+/* OPEN "who we are" statement on the cream — the maroon video card is
+   dissolved. Reasoning: the homepage bookends with film (hero above, the
+   Locations film below); a third cinematic slab here competed with both and
+   broke the continuous cream field. Pure type on the page's own ground
+   lets the Locations film land as the single mid-page immersive moment.
+   The section seats on the GLOBAL 12-column grid: the est. meta + statement
+   hang from column 2 (--grid-col2), same as the Discover and Blog heads. */
 .section {
   position: relative;
-  z-index: 2;
-  /* owns the PressStrip→About boundary. Tight tier: the card below is a
-     full-bleed maroon block, so the colour change does the separating —
-     a full chapter gap here only opened a band of empty cream. */
-  margin-top: var(--home-gap-tight);
+  /* cream-on-cream now — no colour change to do the separating, so this
+     boundary needs the full chapter gap, not the tight tier */
+  margin-top: var(--home-gap);
   padding: 0;
   background: var(--cream);
-
-  /* The card is no longer full-bleed: it lines up EXACTLY with the Discover
-     grid above it, so the two sections share one left and right edge and the
-     page reads as a single column of content rather than alternating between
-     inset grid and edge-to-edge slab. Same 12-column maths Discover uses
-     (20px margins + 20px gutters, content in the middle 10 columns) — see
-     Discover.module.css. */
-  --about-margin: 20px;
-  --about-gutter: 20px;
-  --about-col: calc(
-    (100vw - 2 * var(--about-margin) - 11 * var(--about-gutter)) / 12
-  );
-  --about-inset: calc(
-    var(--about-margin) + var(--about-col) + var(--about-gutter)
-  );
+  color: var(--maroon);
   padding-inline: var(--pad-x);
 }
 
-/* The card now runs the FULL page width (just the page margin either side)
-   rather than sitting inset in the middle 10 columns like the Discover grid.
-   It is the page's one big immersive field, so it earns the extra width. */
+@media (min-width: 981px) {
+  .section {
+    /* the column-2 seat — one left edge shared with Discover and Blog */
+    padding-inline: var(--grid-col2) var(--grid-margin);
+  }
+}
 
-/* The card itself — deep maroon panel with a looping video behind cream
-   copy, now a full-bleed viewport chapter (no rounding, no frame). The
-   scrim + fallback maroon background keep the text legible even before
-   the video loads / at reduced motion. Composition: title top-left, est.
-   meta top-right, statement copy + CTA on the minor column's vertical
-   centre (the near-even 1.03fr / 1fr split starts the minor column just
-   past the viewport's midline, ≈column 7 of the mockup's 12), and the
-   founder's portrait seated high-left on column 2 (Blog-card sized),
-   within the section. No overflow clip here — cardVideoLayer clips its own
-   footage, and the portrait's parallax drift must not get sheared
-   mid-glide. */
+/* the statement field — keeps the card's golden split (0.618 : 1) as pure
+   layout: est. meta on the minor track, title + copy ruling the major one.
+   No background, no clip, no minimum height — the type is the event. */
 .card {
   position: relative;
-  isolation: isolate;
-  background: var(--maroon);
-  color: var(--cream);
-  /* symmetric block padding */
-  --about-pad-b: clamp(40px, 5.5vh, 80px);
-  /* the mockup's 12-column grid: 20px page margins, 20px gutters — one
-     column, and the left edge of column 2 (margin + col 1 + gutter),
-     where the portrait seats. 260px = 2 × 20 margin + 11 × 20 gutters. */
-  --about-col: calc((100vw - 260px) / 12);
-  --about-col2: calc(20px + var(--about-col) + 20px);
-  /* the portrait matches the first Blog card exactly — same column-2 left
-     edge (set below) and the same 3-column width (3 cols + 2 gutters) with
-     an 8:11 frame. A slim slice of its foot slips past the lower edge onto
-     the cream band below. */
-  --portrait-w: calc(3 * var(--about-col) + 40px);
-  --portrait-overhang: clamp(28px, 4.5vh, 60px);
-  padding: clamp(36px, 4.5vh, 64px) clamp(28px, 3.6vw, 60px)
-    var(--about-pad-b);
-  /* a taller field — still inside one screen so the card reads in a single
-     view, but with more room for the footage to breathe around the type */
-  min-height: min(92svh, 920px);
-  /* rounded, matching the photography tier — squircle so the corners are
-     smoothed (superellipse) rather than a plain circular arc */
-  border-radius: var(--radius-tile);
-  corner-shape: squircle;
-  overflow: hidden;
-
-  /* GOLDEN SECTION — the card splits 0.618 : 1 (φ). The est. meta holds the
-     minor track; the title and statement stack down the major track, so the
-     content column begins on the card's golden section. */
   display: grid;
   grid-template-columns: 0.618fr 1fr;
   grid-template-rows: auto 1fr;
@@ -87,88 +35,10 @@
   row-gap: clamp(24px, 3.5vh, 48px);
 }
 
-/* the video's parallax layer — Parallax's .frame is position: relative /
-   width: 100%, so this wrapper owns the positioning and stacking the bare
-   video used to carry: z-index 0 keeps the whole assembly under the scrim
-   (1) and content (2+). overflow: hidden here is the ONLY clip on the
-   over-scaled drift now — the card itself no longer clips (the
-   portrait's parallax must glide unsheared). */
-.cardVideoLayer {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  overflow: hidden;
-  pointer-events: none;
-}
-
-/* the footage itself, now living inside Parallax's absolute .inner (whose
-   .inner > * rule grants it width/height 100%) — layering runs video →
-   Parallax inner → layer div → scrim → content. object-fit: cover is
-   mandatory here: Parallax's own cover rule targets img only, not video. */
-.cardVideo {
-  display: block;
-  object-fit: cover;
-  /* pre-darken the raw footage a touch so the scrim doesn't have to do
-     all the work; keeps blacks blacks and stops the cream copy from
-     picking up highlight glare */
-  filter: brightness(0.78) saturate(0.95);
-  pointer-events: none;
-  user-select: none;
-}
-
-/* maroon-tinted scrim over the video for text contrast — corner-weighted
-   rather than a flat wash: two radial pools anchor the regions the type
-   actually occupies (top-left under the difference-blend title, ≈0.76
-   combined; MID-right under the copy + CTA, which now sits on the minor
-   column's vertical centre, ≈0.74) while the base linear stays light
-   through the middle (≈0.30) so the video breathes between them.
-   Top-right, under the quiet est. meta, is deliberately the one lighter
-   region (≈0.52). */
-.cardScrim {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  background:
-    radial-gradient(
-      120% 95% at 0% 0%,
-      rgba(31, 0, 0, 0.55) 0%,
-      rgba(31, 0, 0, 0.3) 45%,
-      rgba(31, 0, 0, 0) 72%
-    ),
-    radial-gradient(
-      115% 90% at 100% 50%,
-      rgba(31, 0, 0, 0.55) 0%,
-      rgba(31, 0, 0, 0.3) 45%,
-      rgba(31, 0, 0, 0) 72%
-    ),
-    /* the two radial layers above already darken the corners the type sits
-       in, so this full-frame layer only needs to take the edge off the
-       highlights — it was laying 0.30 across the middle of the footage,
-       which is the same flat-wash problem the Discover tiles had */
-    linear-gradient(
-      180deg,
-      rgba(31, 0, 0, 0.34) 0%,
-      rgba(31, 0, 0, 0.12) 50%,
-      rgba(31, 0, 0, 0.3) 100%
-    );
-  pointer-events: none;
-}
-
-/* everything else inside the card sits above the scrim */
-.card > .title,
-.card > .headMeta,
-.card > .body,
-.card > .portraitWrap {
-  position: relative;
-  z-index: 2;
-}
-
-/* the display title — hero-scale "ABOUT / US" in the wordmark face,
-   ruling the card's major quadrant. Difference blend inverts the type
-   against bright video regions (the Hero wordmark's treatment) — the
-   card's isolation: isolate keeps the blend inside the plate. */
-/* the title holds the major (right) track, set as two stacked lines and
-   pushed flush to the card's right edge */
+/* the display title — hero-scale "ABOUT / US" in the wordmark face, ruling
+   the major (right) track, flush to the content column's right edge. Plain
+   maroon on cream: the difference blend went with the video it inverted
+   against. */
 .title {
   grid-column: 2;
   grid-row: 1;
@@ -182,8 +52,7 @@
   line-height: var(--lh-display);
   letter-spacing: var(--tr-display);
   text-transform: uppercase;
-  color: var(--cream);
-  mix-blend-mode: difference;
+  color: var(--maroon);
 }
 
 /* per-line mask for the rise-in reveal — the inner span animates
@@ -203,14 +72,14 @@
   margin-top: -0.16em;
 }
 
-/* italic serif inflection on the second word — the About-page hero's
+/* italic inflection on the second word — the About-page hero's
    "Maginhawa *Group*" pattern (Contralto has no italic cut, so the word
-   switches to Fraunces' true italic) */
+   switches to the grotesk's true italic, set hairline-thin) */
 .titleItalic {
   font-family: var(--font-serif);
   font-style: italic;
-  /* an extra-light cut of the Fraunces variable axis — the italic "Us"
-     reads as a thin calligraphic counterpoint to ABOUT's full-weight caps */
+  /* thin calligraphic counterpoint to ABOUT's full-weight caps — matches
+     the About page hero's GROUP? treatment */
   font-weight: 200;
   /* clears the italic S's overhang so it isn't cut by the line's
      clipping wrapper — same trick as the About hero's bottom line;
@@ -218,8 +87,7 @@
   padding-right: 0.14em;
 }
 
-/* quiet est. meta riding the card's top-right corner */
-/* left column, level with the title's first line */
+/* quiet est. meta on the minor track, level with the title's first line */
 .headMeta {
   grid-column: 1;
   grid-row: 1;
@@ -231,18 +99,12 @@
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
-  color: var(--cream);
-  opacity: 0.55;
+  color: var(--maroon);
+  opacity: 0.6;
 }
 
-/* The statement column on the minor (golden) track, with the CTA stacked
-   directly beneath it so the sentence and its action read as one block.
-   Sits toward the lower half of the card, mirroring the reference's
-   copy-below-title composition. */
-/* directly beneath the title in the same (right) column, so the statement
-   reads as the title's own sub-copy rather than a separate block */
-/* directly beneath the title and sharing its right edge, so the two read as
-   one right-aligned block */
+/* The statement column directly beneath the title, sharing its right edge,
+   so the two read as one right-aligned block. */
 .body {
   grid-column: 2;
   grid-row: 2;
@@ -255,68 +117,27 @@
   gap: clamp(18px, 2.4vh, 32px);
 }
 
-/* the founder's portrait — lower-left on the major column, anchored to the
-   bottom of the minor row and pushed a slim slice past the card's lower edge
-   (align-self: end + the negative margin below eats the bottom padding and
-   the overhang). The left margin walks the frame's edge onto column 2 of the
-   mockup grid — column-2 offset minus the card's own inline padding, which
-   the grid area already provides. */
-.portraitWrap {
-  grid-column: 1;
-  grid-row: 2;
-  align-self: end;
-  justify-self: start;
-  margin-left: calc(var(--about-col2) - clamp(28px, 3.6vw, 60px));
-  margin-bottom: calc(-1 * var(--about-pad-b) - var(--portrait-overhang));
-}
-
-/* the rounded 8:11 frame (matching a Blog card's plate) — lives INSIDE
-   Parallax's motion wrapper so the squircle clip travels with the
-   whole-block drift instead of shearing against it */
-.portraitFrame {
-  aspect-ratio: 8 / 11;
-  width: var(--portrait-w);
-  overflow: hidden;
-  border-radius: var(--radius-tile);
-}
-.portraitFrame img {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* statement copy in the Read More CTA's caps-label voice so the title
-   clearly rules the card */
 .copy {
   flex: none;
 }
 /* The group's positioning statement — the most important sentence on the
-   home page, so it is set to be READ, not to be a texture.
-   It was 12px all-caps with label tracking: uppercase destroys word-shape
-   recognition, and at that size over moving footage it was the least legible
-   copy on the site. Now lead-sized sentence case on the body leading, at a
-   ~46ch measure so it still lands as a tight 3–4 line column. */
+   home page. On clean cream it no longer fights moving footage, so it can
+   sit at lead size on a tight measure and simply be read. */
 .copy p {
   margin: 0;
-  /* the reference sets its body copy small and tight against a huge title —
-     the size contrast is what makes the composition read as editorial */
   max-width: 38ch;
   font-family: var(--font-sans);
   font-weight: 400;
-  font-size: var(--t-small);
-  line-height: var(--lh-body);
-  color: var(--cream);
-  /* the copy sits over video — a soft shadow holds it legible without
-     needing to darken the whole frame behind it */
-  text-shadow: 0 1px 18px rgba(31, 0, 0, 0.55);
+  font-size: var(--t-lead);
+  line-height: var(--lh-snug);
+  color: var(--maroon);
 }
 .copy p + p {
   margin-top: var(--para-gap);
 }
 
-/* highlighted phrases — same weight as the copy, saffron colour to carry
-   the emphasis against the dark card */
+/* highlighted phrases — same weight as the copy, saffron colour carries
+   the emphasis against the cream */
 .highlight {
   font-family: inherit;
   font-style: normal;
@@ -325,8 +146,8 @@
   letter-spacing: inherit;
 }
 
-/* CTA — quiet cream text link with animated underline draw + arrow slide
-   on hover. Uses the shared --ease-out token from globals. */
+/* CTA — quiet maroon text link with animated underline draw + chevron
+   slide on hover. Uses the shared --ease-out token from globals. */
 .cta {
   flex: none;
   display: inline-flex;
@@ -337,7 +158,7 @@
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
-  color: var(--cream);
+  color: var(--maroon);
   position: relative;
   cursor: pointer;
   transition: color 0.3s ease;
@@ -380,62 +201,27 @@
 /* ---------- responsive ---------- */
 @media (max-width: 900px) {
   .card {
-    /* stacked — content dictates the height, no viewport-locked spread.
-       Inline padding flattens to the mockup grid's 20px page margin. */
-    --about-pad-b: clamp(48px, 7vh, 72px);
-    padding: clamp(28px, 4vh, 48px) 20px var(--about-pad-b);
-    min-height: 0;
     grid-template-columns: 1fr;
     grid-template-rows: none;
     row-gap: clamp(20px, 3vh, 36px);
   }
-  /* stack order follows the DOM: title → est. meta → copy + CTA →
-     portrait (the overhang device carries straight over) */
+  /* stack order follows the DOM: est. meta → title → copy + CTA; the
+     right-aligned desktop composition flattens to a simple left rag */
   .title,
   .headMeta,
-  .body,
-  .portraitWrap {
+  .body {
     grid-column: 1;
     grid-row: auto;
     justify-self: start;
     align-self: auto;
   }
-  /* the copy + CTA pair stacks vertically in the mobile flow */
+  .title {
+    text-align: left;
+  }
   .body {
     flex-direction: column;
     align-items: flex-start;
+    text-align: left;
     gap: clamp(20px, 3vh, 36px);
-  }
-  /* stacked, the mockup's column-2 seat makes no sense — the portrait
-     returns to the flat 20px margin the card padding already provides */
-  .portraitWrap {
-    margin-left: 0;
-  }
-  .portraitFrame {
-    width: 62vw;
-  }
-  /* stacked, the copy + CTA sit mid/low-LEFT — outside both pools.
-     Strengthen the base wash's lower half so the caps copy keeps at least
-     its old footing over bright frames; the radial pools stay put. */
-  .cardScrim {
-    background:
-      radial-gradient(
-        120% 95% at 0% 0%,
-        rgba(31, 0, 0, 0.55) 0%,
-        rgba(31, 0, 0, 0.3) 45%,
-        rgba(31, 0, 0, 0) 72%
-      ),
-      radial-gradient(
-        115% 90% at 100% 50%,
-        rgba(31, 0, 0, 0.55) 0%,
-        rgba(31, 0, 0, 0.3) 45%,
-        rgba(31, 0, 0, 0) 72%
-      ),
-      linear-gradient(
-        180deg,
-        rgba(31, 0, 0, 0.46) 0%,
-        rgba(31, 0, 0, 0.34) 50%,
-        rgba(31, 0, 0, 0.55) 100%
-      );
   }
 }

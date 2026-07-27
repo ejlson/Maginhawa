@@ -6,12 +6,13 @@
      (one column of air dropped each side) for a calmer, more editorial
      measure; below it, the inset relaxes back to the page margin so the
      narrower grids aren't squeezed. */
-  --disc-margin: 20px;
-  --disc-gutter: 20px;
-  --disc-col: calc(
-    (100vw - 2 * var(--disc-margin) - 11 * var(--disc-gutter)) / 12
-  );
-  --disc-inset: calc(var(--disc-margin) + var(--disc-col) + var(--disc-gutter));
+  /* seated on the GLOBAL 12-column grid (globals.css) — the same margin,
+     gutter and column-2 seat the Blog and every other cream chapter hang
+     from. The local names survive as aliases only. */
+  --disc-margin: var(--grid-margin);
+  --disc-gutter: var(--grid-gutter);
+  --disc-col: var(--grid-col);
+  --disc-inset: var(--grid-col2);
   /* zero bottom padding — the air between the grid and the As Featured In
      strip is that strip's own top padding (clamp(22px, 2.7vh, 34px)), and
      the head→grid gap here uses the same value, so the grid sits with
@@ -217,9 +218,10 @@
 .tile {
   position: relative;
   width: 100%;
-  /* the plate keeps its square here (moved off .cell so the caption can
-     extend the cell downward without squashing the photo) */
-  aspect-ratio: 1 / 1;
+  /* PORTRAIT plate (was square) — the gentle 4:5 keeps the four-up row
+     photography-led and rhymes with the Blog's portrait cards, so the two
+     grids read as one family */
+  aspect-ratio: 4 / 5;
   z-index: 1;
   opacity: 1;
   cursor: pointer;
@@ -404,20 +406,31 @@
   opacity: 0.7;
 }
 
-.pillRow {
+/* pills ON the plate — bottom-left over the scrimmed photo. They fade out
+   with the expanded state (the card's own action row takes over). */
+.platePills {
+  position: absolute;
+  left: var(--tile-pad);
+  bottom: var(--tile-pad);
+  z-index: 2;
   display: inline-flex;
   align-items: center;
   gap: 6px;
-  margin-top: 0.6em;
+  opacity: 1;
+  transition: opacity 250ms cubic-bezier(0.23, 1, 0.32, 1);
+}
+.tileActive .platePills {
+  opacity: 0;
+  pointer-events: none;
 }
 
-/* neighbourhood pill — the Blog byline pill's exact recipe */
+/* neighbourhood pill — solid cream so it reads on any footage */
 .pill {
   display: inline-flex;
   align-items: center;
   padding: 0.45em 0.9em;
   border-radius: 999px;
-  background: rgba(47, 0, 0, 0.07);
+  background: var(--cream);
   font-family: var(--font-sans);
   font-weight: 500;
   font-size: var(--t-label);

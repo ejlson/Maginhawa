@@ -165,6 +165,15 @@
   /* `--pad-x` is kept for legacy callers; it now mirrors --grid-margin so
      anything still using the older token stays aligned with the new grid. */
   --pad-x: var(--grid-margin);
+  /* one computed column, and the left edge of column 2 — THE content seat.
+     Every cream chapter (Discover, About, Blog) hangs its head and first
+     column from --grid-col2, so the page reads as one bound column system
+     rather than per-section geometry. Full-bleed film moments are the only
+     things that ignore it. */
+  --grid-col: calc(
+    (100vw - 2 * var(--grid-margin) - 11 * var(--grid-gutter)) / 12
+  );
+  --grid-col2: calc(var(--grid-margin) + var(--grid-col) + var(--grid-gutter));
   --maxw: 1440px;
 }
 

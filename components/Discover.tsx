@@ -41,7 +41,7 @@ const ITEMS: DiscoverItem[] = [
       "/menu/bintang/bintang_menu-2.png",
     ],
     menuLabel: "February 2026",
-    blurb: "A Camden staple since 1987 — Chef Omar's family kitchen, blending Malay, Indonesian, Japanese, Vietnamese and Filipino cooking.",
+    blurb: "A Kentish Town staple since 1987 — Chef Omar's family kitchen, blending Malay, Indonesian, Japanese, Vietnamese and Filipino cooking.",
     bookingUrl: "https://www.opentable.co.uk/booking/restref/availability?lang=en-GB&correlationId=6b35518d-aef1-43a2-8dcc-ad4ef5dc8053&restRef=324126&otSource=Restaurant%20website",
   },
   {
@@ -465,6 +465,29 @@ function Tile({
                 state via opacity only */}
             <div className={styles.scrim} aria-hidden />
 
+            {/* bottom-left ON the plate — neighbourhood + Book pills. They
+                fade out in the expanded state (the card's own action row
+                takes over); the Book link stops propagation so it never
+                toggles the tile. */}
+            <span className={styles.platePills}>
+              {neighbourhood ? (
+                <span className={styles.pill}>{neighbourhood}</span>
+              ) : null}
+              {bookable && item.bookingUrl ? (
+                <a
+                  href={item.bookingUrl}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className={styles.pillBook}
+                  onClick={(e) => e.stopPropagation()}
+                  tabIndex={active ? -1 : 0}
+                  aria-label={`Book at ${item.name}`}
+                >
+                  Book
+                </a>
+              ) : null}
+            </span>
+
             {/* top-right — explicit close affordance, visible only while
                 the card is expanded. stopPropagation keeps the click from
                 re-toggling through the tile; onToggle collapses because the
@@ -580,28 +603,11 @@ function Tile({
       </article>
 
       {/* caption BELOW the plate — the site-wide card grammar (matches the
-          Blog cards): semibold name, regular one-liner, then the pills row —
-          neighbourhood, plus a direct Book link when the venue takes
-          reservations, so booking is one click from the first scroll. */}
+          Blog cards): semibold name, regular one-liner. The pills live ON
+          the plate itself (bottom-left). */}
       <div className={styles.cellCaption}>
         <span className={styles.cellName}>{item.name}</span>
         <span className={styles.cellTagline}>{item.tag}</span>
-        <span className={styles.pillRow}>
-          {neighbourhood ? (
-            <span className={styles.pill}>{neighbourhood}</span>
-          ) : null}
-          {bookable && item.bookingUrl ? (
-            <a
-              href={item.bookingUrl}
-              target="_blank"
-              rel="noopener noreferrer"
-              className={styles.pillBook}
-              aria-label={`Book at ${item.name}`}
-            >
-              Book
-            </a>
-          ) : null}
-        </span>
       </div>
     </li>
   );

@@ -40,8 +40,8 @@ export const RESTAURANTS: Restaurant[] = [
     tagline: "Filipino Fusion Restaurant",
     cuisine: "Filipino · Fusion",
     description:
-      "A Camden mainstay pairing Filipino classics with a fusion kitchen — long-standing favourite of the Maginhawa family.",
-    location: "Camden, London",
+      "A Kentish Town mainstay pairing Filipino classics with a fusion kitchen — long-standing favourite of the Maginhawa family.",
+    location: "Kentish Town, London",
     image: "/images/bintang.jpg",
     logo: "/logo/bintang.png",
     website: "https://www.bintangrestaurant.co.uk/",
@@ -76,7 +76,7 @@ export const RESTAURANTS: Restaurant[] = [
     cuisine: "Ice Cream Parlour",
     description:
       "London's original Filipino ice-cream parlour — ube, queso, dirty ice-cream rolled in pandesal.",
-    location: "Camden · Soho, London",
+    location: "Kentish Town · Soho, London",
     image: "/images/mamasons-placeholder.jpg",
     logo: "/logo/mamasons.png",
     website: "http://dirtyicecream.co.uk/",
@@ -88,8 +88,8 @@ export const RESTAURANTS: Restaurant[] = [
     tagline: "Filipino-Japanese Ramen",
     cuisine: "Ramen · Filipino",
     description:
-      "Filipino-Japanese ramen in Kentish Town and Soho — a tight bowl-led menu with deep, layered broths.",
-    location: "Kentish Town · Soho, London",
+      "Filipino-Japanese ramen in Soho — a tight bowl-led menu with deep, layered broths.",
+    location: "Soho, London",
     image: "/images/ramo.jpg",
     logo: "/logo/ramo.png",
     website: "https://www.ramoramen.com/",
@@ -112,7 +112,7 @@ export const RESTAURANTS: Restaurant[] = [
     cuisine: "Caribbean · Takeaway",
     description:
       "Caribbean takeaway with pies named among London's best by City AM during British Pie Week.",
-    location: "London",
+    location: "Kentish Town, London",
     image: "/images/hoowood.jpg",
     logo: "/logo/hoodwood.png",
     website: "https://www.hoodwood.co.uk/",
@@ -125,7 +125,7 @@ export const RESTAURANTS: Restaurant[] = [
     cuisine: "Café · Bakery",
     description:
       "A Filipino-Japanese café and bakery known for ube and matcha pastries — covered by BBC Good Food, Forbes and Time Out.",
-    location: "London",
+    location: "Kentish Town, London",
     image: "/images/cafemama.jpg",
     logo: "/logo/cafemama.png",
     website: "https://www.cafemamasons.com/",
@@ -165,7 +165,7 @@ export const RESTAURANTS: Restaurant[] = [
     cuisine: "Filipino",
     description:
       "Bunso — 'the youngest' — is the newest member of the Maginhawa family. Full details, menu and location coming soon.",
-    location: "London",
+    location: "Kentish Town, London",
     image: "/images/bunso-placeholder.jpg",
     logo: "/logo/bunso.png",
     website: "https://www.bybunso.com/",
