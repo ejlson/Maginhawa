@@ -99,14 +99,13 @@
   max-width: 18ch;
 }
 
-/* Two cream pieces — the label pill and a round arrow button beside it.
-   `align-items: stretch` lets the circle take its height from the pill, and
-   aspect-ratio turns that into its width, so the two always match without
-   either being hard-coded. */
+/* ONE cream pill — the label and arrow share a single capsule. On hover the
+   pill widens (padding-inline grows around the content) and its inner recess
+   deepens slightly, so the whole surface reads as one control settling in. */
 .inviteCta {
   display: inline-flex;
-  align-items: stretch;
-  gap: 8px;
+  align-items: center;
+  gap: 0.6em;
   font-family: var(--font-sans);
   font-weight: 500;
   /* shares the site's button size token with the ReadyCta and Contact pills;
@@ -114,39 +113,29 @@
   font-size: var(--t-button);
   line-height: 1;
   white-space: nowrap;
-}
-
-.ctaMain,
-.ctaArrow {
   color: var(--maroon);
   background: var(--cream);
-  /* the recess is present at rest but fully transparent, so only the colour
-     animates — a shadow that appears from `none` pops instead of easing */
-  box-shadow: inset 0 2px 14px rgba(47, 0, 0, 0);
-  /* 999px rather than 50% on the circle so the radius can interpolate to 0
-     on the facing edges when the two halves join */
   border-radius: 999px;
+  padding: 0.95em 1.9em;
+  /* the recess is present (faintly) at rest, so hover only DEEPENS it — a
+     shadow that appears from nothing pops instead of easing */
+  box-shadow: inset 0 2px 12px rgba(47, 0, 0, 0.14);
+  /* padding is a layout animation, but the pill is an inline island (nothing
+     depends on its width), so the grow stays cheap and self-contained */
   transition:
+    padding 320ms var(--ease-out),
     box-shadow 320ms var(--ease-out),
-    border-radius 320ms var(--ease-out),
     transform 320ms var(--ease-out);
 }
 
 .ctaMain {
   display: inline-flex;
   align-items: center;
-  padding: 0.95em 1.9em;
 }
 
-/* Sized explicitly rather than by aspect-ratio: as a `flex: none` item its
-   width resolves from content (the icon), so aspect-ratio never got a
-   definite side to work from and the circle rendered as an ellipse.
-   2.9em is the pill's own height — 0.95em padding twice plus a 1em line. */
 .ctaArrow {
   display: grid;
   place-items: center;
-  width: 2.9em;
-  height: 2.9em;
   flex: none;
 }
 .ctaArrow svg {
@@ -156,50 +145,29 @@
   transition: transform 0.4s var(--ease-out);
 }
 
-/* HOVER: the two halves join into a single pill — the arrow slides left to
-   close the 8px gap (transform, so nothing relayouts) while the two facing
-   edges lose their rounding, leaving one continuous capsule. The recess
-   deepens on both at the same time so they read as one surface. */
+/* HOVER: the pill breathes out — wider stance, slightly deeper recess */
 @media (hover: hover) and (pointer: fine) {
-  .inviteCta:hover .ctaMain,
-  .inviteCta:hover .ctaArrow {
-    box-shadow: inset 0 2px 14px rgba(47, 0, 0, 0.34);
-  }
-  .inviteCta:hover .ctaMain {
-    border-start-end-radius: 0;
-    border-end-end-radius: 0;
-  }
-  .inviteCta:hover .ctaArrow {
-    border-start-start-radius: 0;
-    border-end-start-radius: 0;
-    transform: translateX(-8px);
+  .inviteCta:hover {
+    padding-inline: 2.6em;
+    box-shadow: inset 0 3px 16px rgba(47, 0, 0, 0.3);
   }
   .inviteCta:hover .ctaArrow svg {
     transform: translateX(2px);
   }
 }
 
-/* keyboard focus gets the same joined state */
+/* keyboard focus gets the same widened state */
 .inviteCta:focus-visible {
   outline: 2px solid var(--cream);
   outline-offset: 4px;
-  border-radius: 999px;
+  padding-inline: 2.6em;
+  box-shadow: inset 0 3px 16px rgba(47, 0, 0, 0.3);
 }
-.inviteCta:focus-visible .ctaMain,
-.inviteCta:focus-visible .ctaArrow {
-  box-shadow: inset 0 2px 14px rgba(47, 0, 0, 0.34);
-}
-.inviteCta:focus-visible .ctaMain {
-  border-start-end-radius: 0;
-  border-end-end-radius: 0;
-}
-.inviteCta:focus-visible .ctaArrow {
-  border-start-start-radius: 0;
-  border-end-start-radius: 0;
-  transform: translateX(-8px);
+.inviteCta:focus-visible .ctaArrow svg {
+  transform: translateX(2px);
 }
 
-/* press feedback on the whole group, so it doesn't fight the arrow's slide */
+/* press feedback — fast, subtle */
 .inviteCta:active {
   transform: scale(0.98);
   transition: transform 120ms var(--ease-out);

@@ -5,8 +5,8 @@
    toward the maroon DarkZone below. */
 .section {
   position: relative;
-  /* above the page grain (.afterHero::after, z-index 3) so no grain crawls on
-     the footage; DarkZone sits higher still so the film→DarkZone seam holds */
+  /* stacked above the cream sections; DarkZone sits higher still so the
+     film→DarkZone seam holds */
   z-index: 4;
   /* No negative pull-up any more. The film used to rise a full viewport to
      cover the pinned ReadyCta section above it; that invitation now lives
@@ -111,20 +111,25 @@
   object-fit: cover;
 }
 
-/* Light wash over the footage. The gradient-noise layer above now carries
-   the contrast for the type, so this only takes the edge off the highlights —
-   at their old strengths the two together scrimmed the video to near-black
-   and there was no point having footage there at all. */
+/* Dark wash over the footage. Deliberately heavier than a highlight-tamer:
+   the invitation inverts against the footage (difference blend), and a darker
+   ground keeps the inverted cream type bright and steady — while the footage
+   still moves visibly underneath rather than being scrimmed to black. */
 .locScrim {
   position: absolute;
   inset: 0;
   z-index: 1;
   background:
-    radial-gradient(120% 100% at 50% 50%, rgba(18, 0, 0, 0.08), rgba(18, 0, 0, 0.28)),
-    linear-gradient(rgba(18, 0, 0, 0.12), rgba(18, 0, 0, 0.18));
+    radial-gradient(120% 100% at 50% 50%, rgba(18, 0, 0, 0.26), rgba(18, 0, 0, 0.5)),
+    linear-gradient(rgba(18, 0, 0, 0.24), rgba(18, 0, 0, 0.3));
 }
 
-/* the invitation — centred over the video, regardless of settle state */
+/* the invitation — centred over the video, regardless of settle state.
+   mix-blend-mode: difference is the SAME inverse-text treatment as the hero's
+   MAGINHAWA wordmark: the cream lockup inverts against whatever footage passes
+   beneath it. It must live HERE (not on .invite) — .cta's z-index makes it a
+   stacking context, so a blend on any child would only see .cta's transparent
+   backdrop and no-op; on .cta itself the blend reaches the video + scrim. */
 .cta {
   position: absolute;
   inset: 0;
@@ -133,33 +138,10 @@
   place-items: center;
   pointer-events: none;
   padding-inline: var(--pad-x);
+  mix-blend-mode: difference;
 }
 .cta > * {
   pointer-events: auto;
-}
-
-/* GRADIENT NOISE over the footage — a fractal-noise field masked so it is
-   densest through the middle band where the type sits and fades out top and
-   bottom. It sits above .locScrim but below the invitation, and gives the
-   cream wordmark a textured ground to read against instead of clean video. */
-/* Contrast pad behind the invitation — a smooth maroon gradient, densest
-   through the middle band where the type sits and falling to nothing at the
-   edges so the footage still reads clean above and below it.
-   The noise texture that used to be blended in here has been removed; the
-   gradient stays because .locScrim alone was deliberately lightened when the
-   grain was carrying the contrast, and without either the cream type has
-   nothing to hold against the footage. */
-.typePad {
-  position: absolute;
-  inset: 0;
-  z-index: 1;
-  pointer-events: none;
-  background: radial-gradient(
-    120% 62% at 50% 50%,
-    rgba(24, 0, 0, 0.62) 0%,
-    rgba(24, 0, 0, 0.34) 45%,
-    rgba(24, 0, 0, 0) 100%
-  );
 }
 
 /* ---------- the invitation ---------- */
@@ -194,10 +176,14 @@
 .inviteWord {
   display: block;
   width: 100%;
-  /* The box carries ~11px of dead space above its cap line, so a NEGATIVE
-     margin is needed to close the optical gap further — this lands the
-     letters ~5px under the eyebrow. */
-  margin-top: -6px;
+  /* The SVG box's dead space above the cap line is in viewBox units, so it
+     SCALES with the viewport (~6% of the width) — a fixed -6px barely dented
+     it on desktop. A percentage margin resolves against the container width,
+     so it cancels the same proportion of dead space at every size, landing
+     the caps a tight, constant-feeling beat under the eyebrow (internal gap
+     well under the button's external gap below, so eyebrow + wordmark read
+     as one locked-up unit). */
+  margin-top: -5.4%;
 }
 
 .inviteWordText {
@@ -235,16 +221,14 @@
     transform 180ms var(--ease-out);
 }
 
+/* under the difference blend a cream FILL would invert into mud, so hover
+   keeps the pill transparent and leans on the lift + arrow shift instead */
 @media (hover: hover) and (pointer: fine) {
   .inviteCta:hover {
-    background: var(--cream);
-    color: var(--maroon);
     transform: translateY(-2px);
   }
 }
 .inviteCta:focus-visible {
-  background: var(--cream);
-  color: var(--maroon);
   outline: 2px solid var(--cream);
   outline-offset: 3px;
 }

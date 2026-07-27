@@ -1,7 +1,6 @@
 .zone {
   position: relative;
-  /* above the Locations film (z-index 4) so the film→DarkZone seam holds, and
-     above the page grain (z-index 3) so no grain sits on the dark zone */
+  /* above the Locations film (z-index 4) so the film→DarkZone seam holds */
   z-index: 5;
   background: var(--maroon);
   color: var(--cream);

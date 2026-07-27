@@ -87,9 +87,8 @@ export default function Footer() {
 
         <div className={styles.invite}>
           <h2 className={styles.inviteTitle}>Got any questions? Contact us</h2>
-          {/* One link, two visual parts — a pill and a round arrow button.
-              Kept as a single <Link> rather than two, so it isn't two
-              controls pointing at the same destination. */}
+          {/* One pill — label and arrow share a single cream capsule; hover
+              widens the pill and deepens its recess (see Footer.module.css) */}
           <Link href="/contact" className={styles.inviteCta}>
             <span className={styles.ctaMain}>Get in touch</span>
             <span className={styles.ctaArrow} aria-hidden>

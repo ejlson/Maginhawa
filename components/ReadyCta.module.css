@@ -71,43 +71,6 @@
     var(--cream);
 }
 
-/* CTA-only grain ON TOP of the page-wide grain — the css-tricks "grainy
-   gradient" recipe (fractalNoise, baseFrequency 0.65, 3 octaves) pushed STARK.
-   The article boosts contrast with a CSS `filter: contrast()/brightness()`, but
-   that would re-anchor our `background-attachment: fixed` to the element (grain
-   would crawl), so the same effect is baked into the SVG instead: desaturate to
-   kill the colour confetti, then a feComponentTransfer cranks the grey toward
-   black/white for crisp film grain. Downscaled (300px SVG → 150px) to stay
-   smooth; multiply keeps it as dark grain over the cream; fixed keeps it still. */
-.noise {
-  position: absolute;
-  top: -24vh;
-  left: 0;
-  width: 100%;
-  height: calc(100% + 48vh);
-  z-index: -1;
-  pointer-events: none;
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='300' height='300'%3E%3Cfilter id='g'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.65' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3CfeComponentTransfer%3E%3CfeFuncR type='linear' slope='1.8' intercept='-0.4'/%3E%3CfeFuncG type='linear' slope='1.8' intercept='-0.4'/%3E%3CfeFuncB type='linear' slope='1.8' intercept='-0.4'/%3E%3C/feComponentTransfer%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23g)'/%3E%3C/svg%3E");
-  background-size: 150px 150px;
-  background-attachment: fixed;
-  opacity: 0.4;
-  mix-blend-mode: multiply;
-  -webkit-mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    #000 22%,
-    #000 78%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    to bottom,
-    transparent 0%,
-    #000 22%,
-    #000 78%,
-    transparent 100%
-  );
-}
-
 /* position: relative + top is safe (z-index stays auto → NO stacking context,
    so the heading's difference blend still reaches the mesh). `top` carries the
    scroll parallax (set as --cta-parallax by MeshGradient) — the text + button

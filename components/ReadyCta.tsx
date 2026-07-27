@@ -24,10 +24,7 @@ export default function ReadyCta() {
       <div className={styles.pin}>
         {/* The WebGL lava-lamp mesh is gone — it sat directly behind the
             eyebrow and made it hard to read, and the roaming colour field was
-            the least editorial moment on the page. The grain stays so the
-            cream still has some tooth. */}
-        <div className={styles.noise} aria-hidden />
-
+            the least editorial moment on the page. */}
         <div className={styles.inner}>
           <h2 className={styles.title}>
             <span className={styles.titleSmall}>The next great service</span>
