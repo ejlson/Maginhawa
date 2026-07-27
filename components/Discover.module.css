@@ -218,10 +218,9 @@
 .tile {
   position: relative;
   width: 100%;
-  /* PORTRAIT plate (was square) — the gentle 4:5 keeps the four-up row
-     photography-led and rhymes with the Blog's portrait cards, so the two
-     grids read as one family */
-  aspect-ratio: 4 / 5;
+  /* LANDSCAPE plate — short and wide (3:2), so the four-up row reads as a
+     calm filmstrip of rooms and façades rather than a poster wall */
+  aspect-ratio: 3 / 2;
   z-index: 1;
   opacity: 1;
   cursor: pointer;
@@ -439,13 +438,16 @@
 }
 
 /* Book pill — the one FILLED pill on the page: booking is the visitor's
-   number-one job, so it earns the strongest (still quiet) affordance */
+   number-one job, so it earns the strongest (still quiet) affordance.
+   The cream border keeps its edge crisp over dark footage, where a bare
+   maroon fill would melt into the scrimmed photo. */
 .pillBook {
   display: inline-flex;
   align-items: center;
   padding: 0.45em 0.9em;
   border-radius: 999px;
   background: var(--maroon);
+  border: 1px solid var(--cream);
   font-family: var(--font-sans);
   font-weight: 500;
   font-size: var(--t-label);
