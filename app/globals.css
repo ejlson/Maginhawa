@@ -38,6 +38,14 @@
   --font-display-sm: var(--font-sans);
   --font-display-xs: var(--font-sans);
 
+  /* the UI-CHROME voice (Telescope grammar): mono caps for labels, pills,
+     counters and indicators only — never editorial copy. Pairs with a
+     tighter +0.03em tracking than the sans labels carried
+     (--tr-label-mono below). */
+  --font-mono: var(--font-dm-mono), ui-monospace, "SFMono-Regular", Menlo,
+    Consolas, monospace;
+  --tr-label-mono: 0.03em;
+
   /* the one surviving Contralto stack — big optical cut for the huge
      edge-to-edge wordmarks (hero / footer / loader / STARTS WITH YOU) */
   --font-display-big: "contralto-big", "contralto-medium", "Times New Roman", serif;
@@ -133,9 +141,9 @@
                            need real air to read as separate chapters.
        --home-gap-chapter→ a deliberate hard break to a new subject. Used
                            sparingly; if everything is a chapter, nothing is. */
-  --home-gap-tight: clamp(128px, 16vh, 232px);
-  --home-gap: clamp(176px, 22vh, 312px);
-  --home-gap-chapter: clamp(224px, 28vh, 400px);
+  --home-gap-tight: clamp(168px, 22vh, 312px);
+  --home-gap: clamp(232px, 30vh, 420px);
+  --home-gap-chapter: clamp(288px, 38vh, 540px);
   /* uniform air on either side of a hairline section rule — sections that
      open with a border-top use this above AND below the line so the rules
      read as one consistent device. NOTE: the home page has dropped section
@@ -146,22 +154,23 @@
   /* =========================================================================
      LAYOUT GRID — single source of truth for horizontal rhythm.
 
-     The site uses a 12-column grid. Page margin and gutter both START at
-     15 px on small viewports and scale up modestly on larger screens for
-     editorial breathing room. Every component that lays out content across
-     columns should use these tokens (and ideally the `.grid12` utility)
-     instead of defining its own grid in CSS modules.
+     The site uses a 12-column grid. The gutter is a FIXED 12 px at every
+     viewport; the page margin starts at 16 px on small viewports and scales
+     up to 40 px on larger screens for editorial breathing room. Every
+     component that lays out content across columns should use these tokens
+     (and ideally the `.grid12` utility) instead of defining its own grid in
+     CSS modules.
 
      Column width (computed by the browser at runtime):
        col = (container_w − 2·pad-x − 11·gutter) / 12
 
      At a 1440 px viewport with the values below this resolves to
-     col ≈ 99 px, gutter ≈ 23 px, page margin ≈ 32 px — matching the
+     col ≈ 102 px, gutter = 12 px, page margin ≈ 40 px — matching the
      spacing the rest of the design tokens are tuned against.
      ========================================================================= */
   --grid-cols: 12;
-  --grid-gutter: 15px;
-  --grid-margin: clamp(15px, 1.6vw, 32px);
+  --grid-gutter: 12px;
+  --grid-margin: clamp(16px, 2.8vw, 40px);
   /* `--pad-x` is kept for legacy callers; it now mirrors --grid-margin so
      anything still using the older token stays aligned with the new grid. */
   --pad-x: var(--grid-margin);
@@ -199,6 +208,24 @@ body {
   overscroll-behavior: none;
   /* clip (not hidden) so position: sticky still works */
   overflow-x: clip;
+}
+
+/* PAPER GRAIN — a fixed, static fractal-noise wash over the whole page so
+   the cream reads as stock, not as a flat hex value. One compositor layer,
+   never animated, never repainted; multiply keeps it a texture (it darkens
+   micro-speckles) rather than a grey film. Sits above every chapter and
+   below nothing that matters — the nav, modals and films all gain the same
+   print feel. */
+body::after {
+  content: "";
+  position: fixed;
+  inset: 0;
+  z-index: 2000;
+  pointer-events: none;
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
+  background-size: 240px 240px;
 }
 
 /* Lenis smooth scroll */
@@ -336,7 +363,8 @@ html::-webkit-scrollbar {
   border-right: 1px solid rgba(220, 38, 127, 0.18);
 }
 
-/* cream layer that scrolls up over the pinned (sticky) hero — parallax */
+/* the cream page following the hero — ordinary flow (the hero is no
+   longer pinned; no parallax between it and Our Restaurants) */
 .afterHero {
   position: relative;
   z-index: 1;

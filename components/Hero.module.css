@@ -1,4 +1,8 @@
 .hero {
+  /* PINNED under the page: the hero holds the viewport while the cream
+     chapters (.afterHero, z-index above) scroll up and COVER it — the
+     curtain parallax. Native sticky scroll: no JS, no rAF, nothing to
+     drop frames. */
   position: sticky;
   top: 0;
   width: 100%;
@@ -61,5 +65,31 @@
   text-transform: uppercase;
   letter-spacing: var(--tr-display);
   fill: var(--cream);
+}
+
+/* ---------- the SCROLL indicator ---------- */
+/* mono-caps chrome (Telescope grammar) riding the hero's right edge just
+   ABOVE the wordmark — the 17vw offset tracks the wordmark's width-scaled
+   height so the two never collide. Cream over the dimmed footage; no
+   motion of its own once landed. */
+.scrollHint {
+  position: absolute;
+  right: var(--pad-x);
+  bottom: calc(clamp(2px, 0.8vh, 14px) + 17vw);
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label-mono);
+  text-transform: uppercase;
+  color: var(--cream);
+  pointer-events: none;
+}
+
+.scrollHint svg {
+  width: 0.85em;
+  height: 0.85em;
 }
 

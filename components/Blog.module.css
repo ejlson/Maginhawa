@@ -1,13 +1,13 @@
-/* Blog chapter — back on the cream page, laid out as one draggable card
-   strip at every breakpoint: a spare head row of just the saffron-dot
-   eyebrow with the position counter beside it (no display headline — the
-   photography leads), eight stories in a scroll-snap strip (mouse drag on
-   desktop, native swipe on touch), and the blog CTA in the head row.
-   Captions sit BELOW the photography on the cream — quiet date, regular
-   title, byline pill; no overlays, no scrims, no arrows.
-   Geometry rides the mockup's binding grid (section-scoped, not global):
-   12 columns, 20px page margins, 20px gutters; the head row and the first
-   card seat on column 2. */
+/* Blog chapter — one draggable card strip at every breakpoint: a head row
+   with the "Blog." display heading (same grammar as "Our Restaurants."),
+   the position counter floating small at its right, and the Read More CTA
+   on the far edge; eight stories in a scroll-snap strip (mouse drag on
+   desktop, native swipe on touch) that BLEEDS off the right viewport edge
+   — the fourth card crops there by design. Captions sit BELOW the
+   photography on the cream — quiet date, regular title, a Read More
+   affordance; no overlays, no scrims, no arrows.
+   Geometry: the head row and the first card seat on the binding grid's
+   column 2; the strip's right edge is free. */
 .section {
   position: relative;
   isolation: isolate;
@@ -25,57 +25,56 @@
   padding: 0;
   display: flex;
   flex-direction: column;
-  /* tighter head → strip gap so the eyebrow sits close over the photography */
-  gap: clamp(8px, 1.2vh, 16px);
+  /* head → strip gap on the Discover head's rhythm — the display heading
+     needs the same air over the photography */
+  gap: clamp(22px, 2.7vh, 34px);
   background: var(--cream);
   color: var(--maroon);
+  /* the strip's entrance slides in from past the right viewport edge —
+     clip the x-axis so the off-screen start never widens the page. clip
+     (not hidden) keeps the y-axis visible and never creates a scroll
+     container. */
+  overflow-x: clip;
 }
 
-/* ---------- head row — just the eyebrow + counter cluster, seated on
-   the binding grid's column 2 like the first card below it ---------- */
+/* ---------- head row — display heading + counter cluster on the left,
+   the Read More CTA at the far edge sharing its baseline band ---------- */
+
 .head {
   display: flex;
-  align-items: center;
+  align-items: flex-end;
   justify-content: space-between;
   gap: 1em;
   margin-inline: var(--blog-col2) var(--blog-margin);
 }
 
-/* the left cluster — eyebrow and position counter side by side */
+/* the left cluster — the heading with the counter floating at its right,
+   roughly on the display line's baseline */
 .headLeft {
   display: inline-flex;
-  align-items: center;
+  align-items: baseline;
   gap: clamp(16px, 2vw, 28px);
 }
 
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.7em;
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
+/* the display heading — the same grammar as "Our Restaurants." */
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(3rem, 7.2vw, 6.75rem);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
   color: var(--maroon);
-}
-.eyebrow::before {
-  content: "";
-  display: block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--saffron);
-  flex: none;
 }
 
 /* position counter — which story leads the strip, set "01/08" with the
    slash owned by the pale total; tabular digits so the figures don't
    shimmy as they advance */
 .counter {
-  font-family: var(--font-sans);
-  font-weight: 500;
+  font-family: var(--font-mono);
+  font-weight: 400;
   font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
+  letter-spacing: var(--tr-label-mono);
   text-transform: uppercase;
   color: var(--maroon);
   font-variant-numeric: tabular-nums;
@@ -86,14 +85,14 @@
   opacity: 0.6;
 }
 
-/* ---------- the strip — full-bleed scroll-snap row; its own inline
-   padding seats the first card on the binding grid's column 2 (matching
-   the head row above), and scroll-padding keeps snapped cards on that
-   edge ---------- */
+/* ---------- the strip — scroll-snap row seated on the binding grid's
+   column 2 at its left (matching the head row above; scroll-padding keeps
+   snapped cards on that edge) and FREE at its right — cards bleed off the
+   viewport edge, the fourth cropping there by design ---------- */
 .strip {
   display: flex;
   gap: var(--blog-gutter);
-  padding-inline: var(--blog-col2) var(--blog-margin);
+  padding-inline: var(--blog-col2) 0;
   overflow-x: auto;
   -webkit-overflow-scrolling: touch;
   scroll-snap-type: x proximity;
@@ -130,9 +129,9 @@
 .card {
   flex: none;
   scroll-snap-align: start;
-  /* exactly three binding-grid columns wide (plus their two interior
-     gutters) — the next card still peeks in as the drag affordance */
-  width: calc(3 * var(--blog-col) + 2 * var(--blog-gutter));
+  /* sized so ~3.5 cards fill the lane from the column-2 seat to the right
+     viewport edge — the fourth card crops there as the drag affordance */
+  width: calc((100vw - var(--blog-col2) - 3 * var(--blog-gutter)) / 3.5);
   display: block;
   text-decoration: none;
   color: var(--maroon);
@@ -145,7 +144,9 @@
 .plate {
   aspect-ratio: 3 / 4;
   overflow: hidden;
-  border-radius: var(--radius-tile);
+  /* the sharp editorial 2px cut — same radius as the Discover plates and
+     the manifesto prints, one corner language across the page */
+  border-radius: 2px;
   background: var(--placeholder);
 }
 
@@ -154,14 +155,16 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.8s var(--ease-out);
+  /* the same restrained Apple-style zoom as the Discover plates — slow,
+     interruptible, no bounce */
+  transition: transform 700ms var(--ease-drawer);
 }
 
 /* the caption stack under the plate — QUIET: sentence case, no tracking,
    no caps. Everything runs on the site's global type tokens (--t-*, --lh-*)
    so the captions read in the same voice as the rest of the page. Gestalt
    spacing: date + title sit tight as one text block (internal gap), the
-   pill hangs clearly below them (external gap ≈ 2× internal). */
+   Read More affordance hangs clearly below them (external gap ≈ 2× internal). */
 .caption {
   display: flex;
   flex-direction: column;
@@ -200,21 +203,29 @@
   transition: color 0.3s ease;
 }
 
-/* the byline pill — WHO WROTE IT (outlet / restaurant): maroon text on a
-   faint maroon tint of the cream, the reference's grey tag in our palette.
-   Full-opacity text keeps the small size over the 4.5:1 contrast floor. */
-.tag {
+/* the Read More affordance — the Discover viewLink's quiet underline
+   grammar. A styled span, NOT an anchor: the whole card is the link, and
+   nesting anchors is invalid. */
+.readMore {
   margin-top: 0.8em;
   display: inline-flex;
   align-items: center;
-  padding: 0.45em 0.9em;
-  border-radius: 999px;
-  background: rgba(47, 0, 0, 0.07);
+  gap: 0.6em;
   font-family: var(--font-sans);
   font-weight: 500;
-  font-size: var(--t-label);
-  line-height: 1;
+  font-size: var(--t-small);
+  line-height: var(--lh-snug);
   color: var(--maroon);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color 200ms ease;
+}
+
+.readMoreArrow {
+  width: clamp(20px, 1.8vw, 28px);
+  height: 10px;
+  transition: transform 0.4s var(--ease-out);
 }
 
 /* ---------- hover — quiet zoom + saffron caption, no lift; the idle
@@ -224,10 +235,16 @@
     cursor: grab;
   }
   .card:hover .cover {
-    transform: scale(1.03);
+    transform: scale(1.04);
   }
   .card:hover .cardTitle {
     color: var(--saffron);
+  }
+  .card:hover .readMore {
+    color: var(--saffron);
+  }
+  .card:hover .readMoreArrow {
+    transform: translateX(4px);
   }
 }
 
@@ -240,9 +257,9 @@
   gap: 0.8em;
   margin-left: auto;
   padding: 0.4em 0;
-  font-family: var(--font-sans);
+  font-family: var(--font-mono);
   font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
+  letter-spacing: var(--tr-label-mono);
   text-transform: uppercase;
   color: var(--maroon);
   transition: color 0.3s ease;
@@ -291,5 +308,18 @@
   }
   .card {
     width: 62vw;
+  }
+}
+
+/* ---------- reduced motion — no zoom, no arrow slide; colour-only
+   hovers survive ---------- */
+@media (prefers-reduced-motion: reduce) {
+  .cover {
+    transform: none !important;
+    transition: none;
+  }
+  .readMoreArrow {
+    transform: none !important;
+    transition: none;
   }
 }

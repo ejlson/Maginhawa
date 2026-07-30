@@ -1,0 +1,46 @@
+/* Chapter furniture: hairline rule, saffron index, small-caps runner.
+   Spans whatever seat its parent gives it (full chapter width in
+   Discover/Blog, the minor text column in About). */
+.mark {
+  width: 100%;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.4vh, 14px);
+}
+
+/* the rule draws in from the left (transform-only) */
+.rule {
+  display: block;
+  height: 1px;
+  width: 100%;
+  background: rgba(47, 0, 0, 0.18);
+  transform-origin: left center;
+  will-change: transform;
+}
+
+.row {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1em;
+}
+
+/* the index is the page's ONE deliberate saffron moment — everywhere else
+   saffron only lives in hovers */
+.index {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  color: var(--saffron);
+}
+
+.label {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--maroon);
+  opacity: 0.55;
+}

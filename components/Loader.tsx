@@ -18,7 +18,8 @@ const SMOOTH = [0.62, 0, 0.2, 1] as const;
 const FLIP_TICK = 46; // base ms per alphabet step (varied per letter)
 const MIN_TIME = 2600; // minimum loading time on screen (ms)
 const MIN_TIME_REPEAT = 150; // tiny floor on repeat visits / reduced motion
-const SETTLE_CAP = 2400; // max wait after ready for the slowest flap to land
+const SETTLE_CAP = 1600; // max wait after ready for the slowest flap to land
+const VIDEO_WAIT = 1000; // max ms to keep polling for the hero <video> to mount
 const HARD_CAP = 8000; // never hang longer than this waiting on assets
 // Absolute backstop for the whole intro. Must exceed the longest *legitimate*
 // completion (assets force-ready at HARD_CAP → up to SETTLE_CAP to stage 1 →
@@ -48,17 +49,19 @@ function holePath(vp: Vp, rect: Rect): string {
   const y2 = y + h;
   // Outer rectangle + inner rounded rect. The inner path always uses 4 arcs; at
   // r=0 they collapse to a sharp rect but the command structure is unchanged.
+  // Sweep flag 1 on a clockwise subpath = CONVEX corner arcs — ordinary
+  // rounded corners (sweep 0 bulged them inward).
   const d =
     `M0,0 H${W} V${H} H0 Z ` +
     `M${x + r},${y} ` +
     `H${x2 - r} ` +
-    `A${r},${r} 0 0 0 ${x2},${y + r} ` +
+    `A${r},${r} 0 0 1 ${x2},${y + r} ` +
     `V${y2 - r} ` +
-    `A${r},${r} 0 0 0 ${x2 - r},${y2} ` +
+    `A${r},${r} 0 0 1 ${x2 - r},${y2} ` +
     `H${x + r} ` +
-    `A${r},${r} 0 0 0 ${x},${y2 - r} ` +
+    `A${r},${r} 0 0 1 ${x},${y2 - r} ` +
     `V${y + r} ` +
-    `A${r},${r} 0 0 0 ${x + r},${y} ` +
+    `A${r},${r} 0 0 1 ${x + r},${y} ` +
     `Z`;
   return `path(evenodd, "${d}")`;
 }
@@ -249,13 +252,29 @@ export default function Loader({
     (document.fonts?.ready ?? Promise.resolve()).then(done);
 
     pending += 1;
-    const v = document.querySelector("video");
-    if (v && v.readyState >= 3) done();
-    else if (v) {
-      const h = () => done();
-      v.addEventListener("canplay", h, { once: true });
-      cleanups.push(() => v.removeEventListener("canplay", h));
-    } else done();
+    // the hero <video> may not have mounted yet when this effect runs —
+    // poll a short window before concluding there is none
+    const searchStart = performance.now();
+    let raf = 0;
+    const findVideo = () => {
+      const v = document.querySelector("video");
+      if (v) {
+        if (v.readyState >= 3) done();
+        else {
+          const h = () => done();
+          v.addEventListener("canplay", h, { once: true });
+          cleanups.push(() => v.removeEventListener("canplay", h));
+        }
+        return;
+      }
+      if (performance.now() - searchStart < VIDEO_WAIT) {
+        raf = requestAnimationFrame(findVideo);
+      } else {
+        done();
+      }
+    };
+    raf = requestAnimationFrame(findVideo);
+    cleanups.push(() => cancelAnimationFrame(raf));
 
     const cap = setTimeout(() => {
       assetsDone = true;
@@ -325,7 +344,9 @@ export default function Loader({
             className={styles.bar}
             style={{ transform: `scaleX(${progress / 100})` }}
           />
-          <span className={styles.count}>{Math.round(progress)}</span>
+          <span className={styles.count}>
+          {Math.min(100, Math.round(progress))}
+        </span>
         </motion.div>
       </div>
     );
@@ -477,7 +498,9 @@ export default function Loader({
           className={styles.bar}
           style={{ transform: `scaleX(${progress / 100})` }}
         />
-        <span className={styles.count}>{Math.round(progress)}</span>
+        <span className={styles.count}>
+          {Math.min(100, Math.round(progress))}
+        </span>
       </motion.div>
     </div>
   );

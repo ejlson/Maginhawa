@@ -1,198 +1,303 @@
-/* "Who we are" as a split-screen magazine spread (the Verta / Hypebeast
-   reference): LEFT a tall photograph carrying a short display line, RIGHT
-   the statement panel — positioning sentence at display scale, an inset
-   portrait beside a narrow column of body copy, and the Our story link.
-   The maroon video card this replaced competed with the page's two film
-   bookends (hero above, Locations below); a photographic spread keeps the
-   middle of the page print-like. Seated on the global grid's middle-10
-   columns, same as the Discover grid above it. */
+/* "About Us" as the page's MAROON chapter — cream type on the deep ground.
+   The component scrubs the background cream → maroon as the section
+   scrolls in (this stylesheet's static maroon is the resting/reduced-
+   motion state). The film owns the golden major segment down the section's
+   full height, and at full view keeps a small EVEN breath of ground
+   between itself and the screen's top, bottom and left edges (the
+   section's own padding = the page margin on all three sides). RIGHT: the
+   display heading + story ranged right on the minor segment, the founder's
+   name line above his 4:5 portrait, the Learn More link left of the
+   portrait with bottoms aligned. All media square-cornered; the film's
+   entrance (in the component) is the section's only staged move. */
 .section {
   position: relative;
-  /* cream-on-cream boundary — needs the full chapter gap */
-  margin-top: var(--home-gap);
-  padding: 0 var(--pad-x);
-  background: var(--cream);
-  color: var(--maroon);
+  /* the widest boundary on the page — the collection needs clear air
+     before the ground turns maroon (1.5× the standard chapter gap). The
+     margin collapses through the MaroonZone wrapper, so the gap itself
+     stays cream and the maroon begins exactly at this edge. */
+  margin-top: calc(var(--home-gap) * 1.5);
+  /* the maroon ground lives on the surrounding MaroonZone wrapper (shared
+     with As Seen In and the interlude) — this section stays transparent */
+  background: none;
+  color: var(--cream);
+  padding: var(--grid-margin);
 }
 
 @media (min-width: 981px) {
   .section {
-    /* the shared middle-10 seat (left edge of column 2, both sides) */
-    padding-inline: var(--grid-col2);
+    /* the full-viewport seat — the grid stretches to fill it, so the film
+       runs top-padding to bottom-padding */
+    min-height: 100svh;
+    display: flex;
+    flex-direction: column;
+    /* the film's breath: a TIGHT, even 20px on the screen-hugging sides
+       (left, top, bottom). The RIGHT side keeps the page margin, so the
+       text column's right edge stays seated on the global grid and aligns
+       with every other chapter. */
+    --about-breath: 12px;
+    padding: var(--about-breath) var(--grid-margin) var(--about-breath)
+      var(--about-breath);
   }
 }
 
-/* the spread — two "pages" side by side, one tall field */
-.spread {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: clamp(20px, 2.5vw, 40px);
+/* ---------- the grid ---------- */
+/* Stacked flow below the desktop breakpoint; the GLOBAL 12-column grid at
+   ≥981px (the section padding is the page margin, so column 1 in here is
+   column 1 of the page). */
+.grid {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(20px, 3vh, 40px);
 }
 
-@media (min-width: 901px) {
-  .spread {
-    /* photo page slightly narrower than the text page, like the reference */
-    grid-template-columns: 0.92fr 1.08fr;
-    align-items: stretch;
-    min-height: min(86svh, 880px);
+@media (min-width: 981px) {
+  .grid {
+    flex: 1;
+    min-height: 0;
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    /* head band / flexible air / lower band — the film spans all three
+       rows; the founder stack + link share row 3 */
+    grid-template-rows: auto minmax(0, 1fr) auto;
+    column-gap: var(--grid-gutter);
+    row-gap: clamp(20px, 3vh, 40px);
   }
 }
 
-/* ---------- left page: the photograph ---------- */
-
-.photoPanel {
+/* ---------- left: the kitchen film ---------- */
+.mediaFrame {
   position: relative;
-}
-
-/* the frame owns the clip + rounding; fills the panel's full height on
-   desktop, holds a portrait ratio when stacked */
-.photoFrame {
-  position: relative;
-  height: 100%;
-  min-height: 420px;
   overflow: hidden;
-  border-radius: var(--radius-tile);
+  /* sharp corners — all media in the chapter is square-cut */
+  border-radius: 0;
   background: var(--placeholder);
+  aspect-ratio: 16 / 9;
 }
-@media (max-width: 900px) {
-  .photoFrame {
-    height: auto;
-    aspect-ratio: 4 / 5;
+
+@media (min-width: 981px) {
+  .mediaFrame {
+    /* GOLDEN-RATIO split: the film takes the major segment — 7 of the 12
+       tracks (58.3%, the nearest column seat to φ's 61.8%) — and runs the
+       grid's full height, so its outer edges sit exactly one page margin
+       from the screen's top, bottom and left. */
+    grid-column: 1 / 8;
+    grid-row: 1 / -1;
+    aspect-ratio: auto;
     min-height: 0;
   }
 }
 
-.photo {
+/* the film (and its reduced-motion poster stand-in) both cover the frame */
+.media {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
   object-fit: cover;
 }
 
-/* soft top wash so the cream display line reads on any frame — quiet,
-   corner-weighted like the Locations scrim, never a flat darkening */
-.photoScrim {
+.mediaPoster {
+  object-fit: cover;
+}
+
+/* bottom-up legibility scrim behind the wordmark block — the Discover
+   scrim family's recipe, confined to the film's lower band so the footage
+   keeps its full strength everywhere the type isn't */
+.mediaScrim {
   position: absolute;
   inset: 0;
   background: linear-gradient(
     180deg,
-    rgba(31, 0, 0, 0.44) 0%,
-    rgba(31, 0, 0, 0.12) 38%,
-    rgba(31, 0, 0, 0) 60%,
-    rgba(31, 0, 0, 0.28) 100%
+    rgba(47, 0, 0, 0) 46%,
+    rgba(47, 0, 0, 0.2) 66%,
+    rgba(47, 0, 0, 0.72) 100%
   );
   pointer-events: none;
 }
 
-/* the display line riding the photo's top-left — sentence case, grotesk,
-   the reference's "Photography that breathes." move */
-.photoLine {
+/* ---------- on-film wordmark + dictionary definition ---------- */
+/* "Maginhawa" in the display face riding the film's lower-left corner —
+   the one cream passage in the chapter, carried by the scrim */
+.wordmarkBlock {
   position: absolute;
-  top: clamp(20px, 2.6vw, 40px);
-  left: clamp(20px, 2.6vw, 40px);
-  right: clamp(20px, 2.6vw, 40px);
-  margin: 0;
-  font-family: var(--font-sans);
-  font-weight: 500;
-  font-size: clamp(1.6rem, 2.6vw, 2.6rem);
-  line-height: 1.15;
-  letter-spacing: -0.01em;
-  color: var(--cream);
-}
-
-/* quiet est. meta anchoring the photo's lower-left corner */
-.photoMeta {
-  position: absolute;
-  left: clamp(20px, 2.6vw, 40px);
-  bottom: clamp(18px, 2.2vw, 32px);
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  color: var(--cream);
-  opacity: 0.85;
-}
-
-/* ---------- right page: the statement panel ---------- */
-
-.panel {
+  left: clamp(20px, 2.4vw, 44px);
+  right: clamp(20px, 2.4vw, 44px);
+  bottom: clamp(20px, 3vh, 44px);
   display: flex;
   flex-direction: column;
-  justify-content: space-between;
-  gap: clamp(32px, 5vh, 64px);
-  /* a little inner air so the panel's text doesn't kiss the photo page */
-  padding-block: clamp(4px, 1vh, 12px);
+  gap: clamp(6px, 1vh, 12px);
+  max-width: 44ch;
 }
 
-/* the positioning sentence at display scale — the most important sentence
-   on the home page, set to be READ. The first-line indent is the
-   reference's editorial detail. */
-.statement {
+.wordmark {
   margin: 0;
-  max-width: 24ch;
-  text-indent: 2.2em;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(2.4rem, 4vw, 4.5rem);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
+  color: var(--cream);
+}
+
+/* the entry line — pronunciation, part of speech, language: quiet and
+   lowercase, the way a dictionary sets it */
+.defMeta {
+  margin: 0;
   font-family: var(--font-sans);
   font-weight: 400;
-  font-size: clamp(1.5rem, 2.5vw, 2.5rem);
-  line-height: 1.3;
-  letter-spacing: -0.01em;
-  color: var(--maroon);
+  font-size: var(--t-small);
+  font-style: italic;
+  line-height: var(--lh-snug);
+  color: var(--cream);
+  opacity: 0.65;
 }
 
-/* highlighted phrases — saffron carries the emphasis, weight stays even */
-.highlight {
-  font-family: inherit;
-  font-style: normal;
-  font-weight: inherit;
-  color: var(--saffron);
-  letter-spacing: inherit;
-}
-
-/* lower band of the panel: inset portrait + the copy column beside it */
-.panelBody {
-  display: grid;
-  grid-template-columns: 1fr;
-  gap: clamp(20px, 2.5vw, 36px);
-  align-items: end;
-}
-@media (min-width: 641px) {
-  .panelBody {
-    grid-template-columns: 0.75fr 1fr;
-  }
-}
-
-.inset {
-  position: relative;
-  aspect-ratio: 4 / 5;
-  overflow: hidden;
-  border-radius: var(--radius-tile);
-  background: var(--placeholder);
-}
-.insetImg {
-  object-fit: cover;
-}
-
-/* the body copy — small, quiet, on the site's body leading; the CTA closes
-   the column */
-.paras {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 1em;
-}
-.paras p {
+.defBody {
   margin: 0;
-  max-width: 42ch;
+  max-width: 40ch;
   font-family: var(--font-sans);
   font-weight: 400;
   font-size: var(--t-small);
   line-height: var(--lh-body);
-  color: var(--maroon);
+  color: var(--cream);
+  opacity: 0.88;
+}
+
+/* ---------- top-right: heading + story ---------- */
+.headBlock {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(16px, 2vh, 24px);
+}
+
+@media (min-width: 981px) {
+  .headBlock {
+    /* the minor golden segment (tracks 9–12), ENDING flush at column 12's
+       right edge */
+    grid-column: 9 / 13;
+    grid-row: 1;
+    align-items: flex-end;
+    text-align: right;
+  }
+}
+
+/* same display grammar as the Discover title — cream on the maroon */
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(3rem, 7.2vw, 6.75rem);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
+  color: var(--cream);
+}
+
+.body {
+  margin: 0;
+  /* fills the minor segment's measure — no ch cap */
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
+  color: var(--cream);
   opacity: 0.85;
 }
 
-/* CTA — quiet maroon text link with animated underline draw + chevron
-   slide on hover. Uses the shared --ease-out token from globals. */
+/* ---------- lower-right band: name line + portrait ---------- */
+/* one stack seated in the chapter's bottom-right corner, right-edge-aligned
+   with the heading block above — its own row 3 cell, so it can never ride
+   over the paragraphs */
+.founderBlock {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.4vh, 16px);
+}
+
+@media (min-width: 981px) {
+  .founderBlock {
+    /* two columns (11–12) — a small portrait mark, right edge shared with
+       the heading block */
+    grid-column: 11 / 13;
+    grid-row: 3;
+    align-self: end;
+  }
+}
+
+/* the name line rides directly above the portrait, sharing its width —
+   name flush to the portrait's left edge, alias at its right end */
+.founderRow {
+  margin: 0;
+  display: flex;
+  /* the alias shares the NAME'S LAST LINE — with the two-column measure the
+     name wraps ("Omar / Shah.") and the small mark must sit on the bottom
+     line's baseline, not the first's */
+  align-items: flex-end;
+  align-items: last baseline;
+  justify-content: space-between;
+  gap: 0.8em;
+}
+
+.founderName {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.6rem, 3vw, 2.6rem);
+  line-height: 1.1;
+  letter-spacing: var(--tr-display);
+  color: var(--cream);
+}
+
+.founderAka {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--t-small);
+  letter-spacing: normal;
+  color: var(--cream);
+  opacity: 0.6;
+  white-space: nowrap;
+}
+
+/* the portrait beneath the name — a true PORTRAIT crop (4:5, taller than
+   wide), sharp corners, fills the stack */
+.portraitFrame {
+  position: relative;
+  width: min(50vw, 240px);
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: 0;
+  background: var(--placeholder);
+}
+
+@media (min-width: 981px) {
+  .portraitFrame {
+    width: 100%;
+  }
+}
+
+.portraitImg {
+  object-fit: cover;
+}
+
+/* ---------- bottom band: the Learn More link ---------- */
+.ctaCell {
+  display: flex;
+}
+
+@media (min-width: 981px) {
+  .ctaCell {
+    /* bottom band, LEFT-aligned to the text column's start (track 9 — the
+       same line the "About Us." block opens on), bottoms aligned with the
+       portrait via the shared align-self: end row seat */
+    grid-column: 9 / 11;
+    grid-row: 3;
+    align-self: end;
+    justify-content: flex-start;
+  }
+}
+
+/* the shared underline-draw grammar on the maroon ground — rest cream,
+   hover saffron, the 1px rule rides currentColor */
 .cta {
   flex: none;
-  margin-top: 0.4em;
   display: inline-flex;
   align-items: center;
   gap: 0.9em;
@@ -201,9 +306,10 @@
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
-  color: var(--maroon);
+  color: var(--cream);
   position: relative;
   cursor: pointer;
+  white-space: nowrap;
   transition: color 0.3s ease;
 }
 .cta::after {

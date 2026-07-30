@@ -2,104 +2,148 @@
 
 import Image from "next/image";
 import Link from "next/link";
+import { motion, useReducedMotion } from "framer-motion";
 import styles from "./AboutIntro.module.css";
 import Reveal from "./Reveal";
 
+// the hero's primary kitchen clip (CLIPS[0] in Hero.tsx) — reused here as a
+// single looping backdrop, no cycling. The team photograph doubles as the
+// poster frame and as the static stand-in under reduced motion.
+const ABOUT_CLIP = "/videos/belly-hero.mov";
+const ABOUT_POSTER = "/images/careers-team.jpg";
+
 /**
- * Editorial "who we are" chapter that follows the Press strip.
+ * "About Us" chapter — a CLEAR chapter on the shared cream ground: maroon
+ * type, no card, no scroll morph. The one piece of theatre is the FILM's
+ * entrance — it settles in from a softened clip as the section scrolls
+ * into view, then sits still.
  *
- * A split-screen magazine spread (the Verta / Hypebeast reference):
- * LEFT — a tall photograph carrying a short display line and the est.
- * meta; RIGHT — the statement panel: the group's positioning sentence at
- * display scale, then an inset portrait beside a narrow column of body
- * copy, closing with the Our story link. Square corners throughout —
- * printed photography has no radius. Seated on the global grid's
- * middle-10 columns, same as the Discover grid above it.
+ * At full view the film keeps a small, EVEN breath of cream between itself
+ * and the screen's top, bottom and left edges (the page margin on all
+ * three sides — the section's own padding). Everything seats on the GLOBAL
+ * 12-column grid: film on the golden major segment (columns 1–7, full
+ * height), display heading + story ranged right on the minor (9–12), the
+ * founder's name above his 4:5 portrait (11–12), the Learn More link left
+ * of the portrait with their bottoms aligned. The "Maginhawa" wordmark and
+ * its dictionary definition ride the film's lower-left corner in cream
+ * over a legibility scrim.
  */
 export default function AboutIntro() {
+  // reduced motion: no film entrance and no autoplaying video — the poster
+  // photograph stands in, statically
+  const reduce = useReducedMotion();
+
+  // the maroon ground itself lives on the surrounding MaroonZone wrapper
+  // (shared with As Seen In and the interlude) — this section is
+  // transparent and just wears the cream type
   return (
-    <section className={styles.section} data-nav-theme="light">
-      <div className={styles.spread}>
-        {/* left page — full-height photography with the brand line over it */}
-        <Reveal className={styles.photoPanel}>
-          <div className={styles.photoFrame}>
+    <section id="about" className={styles.section} data-nav-theme="dark">
+      <div className={styles.grid}>
+        {/* left — the kitchen film on the golden major segment. Its
+            entrance is the section's only staged move: a softened clip
+            opens while the frame rises and fades in, one-shot. */}
+        <motion.div
+          className={styles.mediaFrame}
+          initial={
+            reduce
+              ? false
+              : { clipPath: "inset(12% 8% 12% 8%)", opacity: 0, y: 48 }
+          }
+          whileInView={
+            reduce
+              ? undefined
+              : { clipPath: "inset(0% 0% 0% 0%)", opacity: 1, y: 0 }
+          }
+          viewport={{ once: true, amount: 0.3 }}
+          transition={{ duration: 1.1, ease: [0.23, 1, 0.32, 1] }}
+        >
+          {reduce ? (
             <Image
-              className={styles.photo}
-              src="/images/careers-team.jpg"
+              className={styles.mediaPoster}
+              src={ABOUT_POSTER}
               alt="The Maginhawa family at work"
               fill
-              sizes="(max-width: 900px) 100vw, 42vw"
+              sizes="(max-width: 980px) 100vw, 58vw"
             />
-            {/* soft top scrim so the cream display line reads on any frame */}
-            <div className={styles.photoScrim} aria-hidden />
-            <h2 className={styles.photoLine}>
-              Made with heritage,
-              <br />
-              served with heart.
-            </h2>
-            <span className={styles.photoMeta}>Est. 1987 — London</span>
+          ) : (
+            <video
+              className={styles.media}
+              src={ABOUT_CLIP}
+              poster={ABOUT_POSTER}
+              autoPlay
+              muted
+              loop
+              playsInline
+              preload="auto"
+              aria-label="Inside the Maginhawa kitchens"
+            />
+          )}
+          <div className={styles.mediaScrim} aria-hidden />
+          <div className={styles.wordmarkBlock}>
+            <p className={styles.wordmark}>Maginhawa</p>
+            <p className={styles.defMeta}>ma·gin·ha·wa — adjective · Tagalog</p>
+            <p className={styles.defBody}>
+              Comfortable; at ease. The brief for everything we do: food
+              with deep roots, rooms that feel like home, and service that
+              treats every guest as family.
+            </p>
+          </div>
+        </motion.div>
+
+        {/* top-right, ending flush at column 12's right edge — the display
+            heading and the story, ranged right in maroon */}
+        <Reveal delay={0.08} className={styles.headBlock}>
+          <h2 className={styles.title}>About Us.</h2>
+          <p className={styles.body}>
+            Maginhawa began in 1987 as Chef Omar&apos;s family kitchen on
+            Kentish Town Road. Nearly four decades on, the same family runs
+            seven distinct dining rooms across London — each with its own
+            voice, all serving from the same heart.
+          </p>
+        </Reveal>
+
+        {/* lower-right band — the founder's name line riding directly
+            above his portrait: name at the left edge, alias sharing the
+            name's last line */}
+        <Reveal delay={0.14} className={styles.founderBlock}>
+          <p className={styles.founderRow}>
+            <span className={styles.founderName}>Omar Shah.</span>
+            <span className={styles.founderAka}>(a.k.a. Bossman)</span>
+          </p>
+          <div className={styles.portraitFrame}>
+            <Image
+              className={styles.portraitImg}
+              src="/images/omarshah.jpeg"
+              alt="Chef Omar Shah, founder of the Maginhawa Group"
+              fill
+              sizes="(max-width: 980px) 90vw, 20vw"
+            />
           </div>
         </Reveal>
 
-        {/* right page — the statement panel */}
-        <div className={styles.panel}>
-          <Reveal delay={0.08}>
-            <p className={styles.statement}>
-              A family of London restaurants that carries deep culinary
-              tradition with a distinctly{" "}
-              <em className={styles.highlight}>modern voice</em> —{" "}
-              <em className={styles.highlight}>Filipino at heart</em>,
-              pan-Asian and Caribbean by kitchen.
-            </p>
-          </Reveal>
-
-          <Reveal delay={0.14} className={styles.panelBody}>
-            <div className={styles.inset}>
-              <Image
-                className={styles.insetImg}
-                src="/images/omarshah.jpeg"
-                alt="Chef Omar Shah, founder of the Maginhawa Group"
-                fill
-                sizes="(max-width: 900px) 60vw, 20vw"
-              />
-            </div>
-
-            <div className={styles.paras}>
-              <p>
-                Maginhawa began in 1987 as Chef Omar&apos;s family kitchen on
-                Kentish Town Road. Nearly four decades on, the same family
-                runs seven distinct dining rooms across London — each with
-                its own voice, all serving from the same heart.
-              </p>
-              <p>
-                The name means &ldquo;comfortable&rdquo; in Tagalog, and it
-                is the brief for everything we do: food with deep roots,
-                rooms that feel like home, and service that treats every
-                guest as family.
-              </p>
-
-              <Link
-                href="/about"
-                className={styles.cta}
-                aria-label="Read about Maginhawa Group"
-              >
-                <span className={styles.ctaLabel}>Our story</span>
-                <svg
-                  className={styles.ctaChevron}
-                  viewBox="0 0 24 24"
-                  fill="none"
-                  stroke="currentColor"
-                  strokeWidth="1.4"
-                  strokeLinecap="round"
-                  strokeLinejoin="round"
-                  aria-hidden
-                >
-                  <path d="M9 6l6 6-6 6" />
-                </svg>
-              </Link>
-            </div>
-          </Reveal>
-        </div>
+        {/* directly left of the portrait, bottoms aligned — the quiet link
+            into the full story */}
+        <Reveal delay={0.2} className={styles.ctaCell}>
+          <Link
+            href="/about"
+            className={styles.cta}
+            aria-label="Learn more about Maginhawa Group"
+          >
+            <span className={styles.ctaLabel}>Learn More</span>
+            <svg
+              className={styles.ctaChevron}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.4"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden
+            >
+              <path d="M9 6l6 6-6 6" />
+            </svg>
+          </Link>
+        </Reveal>
       </div>
     </section>
   );

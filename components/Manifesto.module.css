@@ -1,0 +1,118 @@
+/* The manifesto — the positioning statement seated directly under the hero.
+   The display line rides the BOTTOM-LEFT across 8 of the page's 12 columns;
+   the sans support sentence sits on the right with its last line on the
+   statement's bottom edge (shared align-self: end row seat). Maroon on the
+   cream ground, type only — no eyebrow, no media, no rules. */
+.section {
+  background: var(--cream);
+  color: var(--maroon);
+  /* the first cream sheet that rides up OVER the pinned hero — a tight
+     top pad so the statement arrives early in the cover, seated on the
+     page margin like every other chapter */
+  padding: clamp(28px, 4.5vh, 64px) var(--pad-x) clamp(48px, 8vh, 120px);
+}
+
+/* stacked flow below the breakpoint; the page's 12-column grid above it */
+.inner {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(18px, 2.6vh, 32px);
+}
+
+@media (min-width: 981px) {
+  .inner {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--grid-gutter);
+    /* one shared row — the support's first line tops out level with the
+       statement's first line */
+    align-items: start;
+  }
+}
+
+/* ---------- the statement ---------- */
+/* display voice, a step below the section titles — a spoken line, not a
+   heading */
+.statement {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(2.2rem, 5vw, 4.75rem);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
+  color: var(--maroon);
+}
+
+@media (min-width: 981px) {
+  .statement {
+    grid-column: 1 / 9;
+    grid-row: 1;
+  }
+}
+
+/* the split-text line boxes: each word rises inside its own clip. The mask
+   is display: inline-block so it sits in the normal ragged flow; the word
+   inside carries the transform. */
+.wordMask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  /* natural word spacing between adjacent masks */
+  margin-right: 0.24em;
+  /* the display face sits on a 0.92 line-height, so the raw line box is
+     SHORTER than the glyphs — pad the clip window out (and pull the same
+     amount back with negative margins) so ascenders and the "p"/"g"
+     descenders never get shaved at rest */
+  padding-block: 0.14em;
+  margin-block: -0.14em;
+}
+
+.wordMask:last-child {
+  margin-right: 0;
+}
+
+.word {
+  display: inline-block;
+  will-change: transform;
+}
+
+/* the inline photograph riding the sentence (image-in-headline) — sized
+   to the cap band of the surrounding display line, bottom on the text
+   baseline, cut at the pasteboard's sharp 2px print radius (deliberately
+   NOT the 16px interactive-plate rounding — prints aren't buttons) */
+.inlineImg {
+  display: inline-block;
+  height: 0.72em;
+  width: 1.55em;
+  object-fit: cover;
+  border-radius: 2px;
+  vertical-align: baseline;
+}
+
+/* ---------- support line ---------- */
+.support {
+  margin: 0;
+  max-width: 34ch;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
+  color: var(--maroon);
+  opacity: 0.8;
+}
+
+@media (min-width: 981px) {
+  .support {
+    /* right side of the measure, TOP aligned with the statement via the
+       grid's align-items: start. Right-ranged (the Discover caption's
+       grammar) so every line's right edge sits on the page margin, not
+       just the longest one. The negative nudge counters the sans line
+       box's half-leading, seating its cap line ON the statement's cap
+       line (the display face's 0.92 line box has almost none). */
+    grid-column: 10 / 13;
+    grid-row: 1;
+    justify-self: end;
+    text-align: right;
+    margin-top: -0.2em;
+  }
+}

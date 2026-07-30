@@ -1,115 +1,174 @@
 .section {
   display: flex;
   flex-direction: column;
-  /* the mockup's 12-column grid: 20px page margins + 20px gutters. At the
-     4-up desktop breakpoint the head + grid sit in the MIDDLE 10 columns
-     (one column of air dropped each side) for a calmer, more editorial
-     measure; below it, the inset relaxes back to the page margin so the
-     narrower grids aren't squeezed. */
-  /* seated on the GLOBAL 12-column grid (globals.css) — the same margin,
-     gutter and column-2 seat the Blog and every other cream chapter hang
-     from. The local names survive as aliases only. */
-  --disc-margin: var(--grid-margin);
-  --disc-gutter: var(--grid-gutter);
-  --disc-col: var(--grid-col);
-  --disc-inset: var(--grid-col2);
-  /* zero bottom padding — the air between the grid and the As Featured In
-     strip is that strip's own top padding (clamp(22px, 2.7vh, 34px)), and
-     the head→grid gap here uses the same value, so the grid sits with
-     EQUAL, tighter spacing above and below */
+  /* zero bottom padding — the air between the grid and the As Seen In
+     strip is that strip's own top padding, and the head→grid gap here uses
+     the same value, so the grid sits with EQUAL, tighter spacing above
+     and below */
   padding: clamp(52px, 8vh, 132px) var(--pad-x) 0;
   gap: clamp(22px, 2.7vh, 34px);
+  /* the view-switch choreography slides cells in from PAST the viewport
+     edges (±110vw) — clip the x-axis so off-screen tiles never widen the
+     page. clip (not hidden) keeps the y-axis genuinely visible and never
+     creates a scroll container. */
+  overflow-x: clip;
 }
 
-/* ---------- head row: eyebrow + hover hint ---------- */
-.head {
+@media (min-width: 981px) {
+  .section {
+    /* the shared middle-10 seat (left edge of column 2, both sides) —
+       the head's internal 12-column rows below are relative to this
+       inset span, so their column seats hold */
+    padding-inline: var(--grid-col2);
+  }
+}
+
+/* ---------- the assembly stage ---------- */
+/* the pasteboard that opens the chapter: a full viewport with the
+   one-line title centred and the prints scattered in the whitespace —
+   the moment the sequence ends the section collapses to its settled
+   height and the layoutId FLIPs carry everything to its seat */
+.sectionIntro {
+  min-height: 100svh;
+  justify-content: center;
+}
+
+.stage {
+  position: relative;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: 1em;
+  justify-content: center;
+  min-height: 82svh;
 }
 
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.7em;
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  color: var(--maroon);
+/* one scattered print — raw photograph on the paper, sharp 2px corners,
+   UPRIGHT (no tilt), never large; no border, no caption, no shadow */
+.stagePrint {
+  position: absolute;
 }
 
-/* small saffron dot that marks the chapter — matches the AboutIntro
-   eyebrow so both sections share the same "sectioned" editorial rhythm */
-.eyebrow::before {
-  content: "";
+.stagePrint img {
   display: block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--saffron);
+  width: 100%;
+  height: auto;
+  border-radius: 2px;
+  user-select: none;
+}
+
+/* the prints only exist on the desktop pasteboard — stacked small screens
+   go straight to the title */
+@media (max-width: 980px) {
+  .stagePrint {
+    display: none;
+  }
+}
+
+/* the title with the deck opening between its two words — one nowrap line,
+   a size below the settled head title so the whole composition fits */
+.introTitle {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  gap: 0.28em;
+  white-space: nowrap;
+  font-size: clamp(1.5rem, 4.6vw, 4.4rem);
+}
+
+/* the deck's seat in the sentence — width is animated by the component,
+   the plates inside fill it */
+.introStack {
+  position: relative;
+  display: inline-block;
   flex: none;
 }
 
-/* quiet counted index link, right-aligned — same underline-draw + arrow
-   grammar as the Blog head's CTA, so every section head speaks one link
-   language */
-.headCta {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.8em;
-  padding: 0.4em 0;
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  color: var(--maroon);
-  white-space: nowrap;
-  transition: color 0.3s ease;
-}
-.headCta::after {
-  content: "";
+.introPlate {
   position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 1px;
-  background: currentColor;
-  transform: scaleX(0.28);
-  transform-origin: left center;
-  transition: transform 0.45s var(--ease-out);
+  inset: 0;
+  overflow: hidden;
+  background: var(--placeholder);
 }
-.headCtaLabel {
+
+.introPlate img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  user-select: none;
+}
+
+.introFallback {
+  position: absolute;
+  inset: 0;
+  background: var(--maroon);
+}
+
+/* ---------- head: 12-column editorial row ---------- */
+/* Below the 4-up breakpoint the head stacks left-aligned (heading, then
+   caption); at ≥981px it seats on the inset span's 12-column grid —
+   heading across columns 1–6, caption right-ranged in columns 10–12,
+   pulled down to the heading's baseline band. */
+.head {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(14px, 2vh, 22px);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
   font-weight: 500;
+  font-size: clamp(3rem, 7.2vw, 6.75rem);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
+  color: var(--maroon);
 }
-.headCtaArrow {
-  width: clamp(26px, 2.4vw, 36px);
-  height: 10px;
-  transition: transform 0.4s var(--ease-out);
+
+/* the explicit two-line break ("Our" / "Restaurants.") only renders at the
+   grid breakpoint — stacked heads let the text wrap naturally */
+.titleBreak {
+  display: none;
 }
-.headCta:hover,
-.headCta:focus-visible {
-  color: var(--saffron);
+
+.caption {
+  margin: 0;
+  max-width: 28ch;
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  line-height: var(--lh-snug);
+  color: var(--maroon);
+  opacity: 0.75;
 }
-.headCta:hover::after,
-.headCta:focus-visible::after {
-  transform: scaleX(1);
-}
-.headCta:hover .headCtaArrow,
-.headCta:focus-visible .headCtaArrow {
-  transform: translateX(5px);
+
+@media (min-width: 981px) {
+  .head {
+    display: grid;
+    grid-template-columns: repeat(12, minmax(0, 1fr));
+    column-gap: var(--grid-gutter);
+    /* one shared band: the heading is the tallest thing in the row, and
+       the caption + toggle both seat their bottoms on its bottom line */
+    align-items: end;
+  }
+  .title {
+    grid-column: 1 / 7;
+  }
+  .titleBreak {
+    display: block;
+  }
+  .caption {
+    /* BETWEEN the heading and the switch, bottom on the heading's line */
+    grid-column: 8 / 12;
+    justify-self: end;
+    text-align: right;
+  }
 }
 
 /* ---------- grid ---------- */
-/* The resting container spans the full --pad-x content width, so its edges
-   align with the About Us card below — the two blocks read as one column.
-   Column counts (4 / 3 / 2 / 1 at 980 / 700 / 460) and gap keep the
-   /restaurants card-grid rhythm. The container never changes size on
-   hover — the expansion happens inside its box; the full-viewport fixed
-   backdrop (below) owns the dimming, so no clipping/isolation is needed
-   here any more. */
+/* Column counts (4 / 3 / 2 / 1 at 980 / 700 / 460) and gap keep the
+   /restaurants card-grid rhythm. Every plate holds its landscape crop at
+   all times, so rows are stable — the hover interaction lives INSIDE the
+   plate's clip (see .tileMedia). */
 .grid {
   list-style: none;
   margin: 0;
@@ -119,236 +178,185 @@
   gap: clamp(10px, 1.2vw, 20px);
 }
 
+/* multi-column grids take a roomier row gap than the column gap — the
+   caption block under each plate needs clear air before the next row of
+   photography starts */
 @media (min-width: 461px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
+    column-gap: clamp(10px, 1.2vw, 20px);
+    row-gap: clamp(28px, 3vw, 44px);
   }
 }
 
 @media (min-width: 701px) {
   .grid {
     grid-template-columns: repeat(3, 1fr);
+    column-gap: clamp(10px, 1.2vw, 20px);
+    row-gap: clamp(28px, 3vw, 44px);
   }
 }
 
 @media (min-width: 981px) {
-  .section {
-    /* the head + grid sit in the middle 10 of the 12 columns */
-    padding-inline: var(--disc-inset);
-  }
   .grid {
     grid-template-columns: repeat(4, 1fr);
-    /* the 12-col grid's 20px gutter between the four tiles */
-    gap: var(--disc-gutter);
+    /* the global 12-col grid's gutter between the four tiles */
+    column-gap: var(--grid-gutter);
+    row-gap: clamp(28px, 3vw, 44px);
   }
 }
 
-/* ---------- entrance reveal ---------- */
-/* Tiles settle into view once the grid scrolls in — opacity + a small rise,
-   staggered per tile via an inline --stagger custom property. One-shot: the
-   observer flips .gridIn on the <ul> and disconnects. The entrance lives on
-   the cell so it never fights the hover styles on the tile inside. */
+/* ---------- STRIP mode: the continuous horizontal reel ---------- */
+/* PORTRAIT plates in one row that scrolls sideways and bleeds off the
+   right viewport edge (the left edge keeps the chapter seat, so the reel
+   reads as running off the page). The wheel drives a slow lerped glide
+   (see the component) — cinema-reel drift, not stepped scrolling; mice
+   can also grab-drag; touch keeps native momentum. No snap (it would
+   fight the glide) and no visible scrollbar. */
+.gridStrip {
+  display: flex;
+  gap: var(--grid-gutter);
+  overflow-x: auto;
+  scrollbar-width: none;
+  -webkit-overflow-scrolling: touch;
+  cursor: grab;
+  /* bleed past the section's padding to BOTH viewport edges — the reel's
+     resting cards still seat on the grid (the padding puts them back), but
+     scrolled cards now run all the way to the screen's left edge before
+     they clip, instead of cutting off mid-page at the section inset */
+  margin-inline: calc(-1 * var(--pad-x));
+  padding-inline: var(--pad-x);
+}
+
+.gridStrip::-webkit-scrollbar {
+  display: none;
+}
+
+.gridStrip:active {
+  cursor: grabbing;
+}
+
+@media (min-width: 981px) {
+  .gridStrip {
+    margin-inline: calc(-1 * var(--grid-col2));
+    padding-inline: var(--grid-col2);
+  }
+}
+
+.gridStrip .cell {
+  flex: none;
+  width: clamp(240px, 23vw, 360px);
+}
+
+/* the reel's plates stand PORTRAIT (3:4) — the films and stills cover-crop
+   into the taller frame */
+.gridStrip .tileMedia {
+  padding-top: 133.333%;
+}
+
+/* ---------- entrance / view-switch choreography ---------- */
+/* All cell motion (scroll-in entrance AND the grid ⟷ reel switch) is
+   Framer-driven now — see cellVariants in the component. The cell carries
+   NO css transform transition of its own, so the directional slides never
+   fight a competing rule. */
 .cell {
-  /* the SQUARE now lives on the tile (the caption below it needs the cell
-     to grow); the cell is just the entrance-animation + flow wrapper */
-  opacity: 0;
-  /* the shared home rise: same distance + strong ease-out as <Reveal>, so
-     every section enters in one motion language */
-  transform: translateY(24px);
-  transition:
-    opacity 0.7s cubic-bezier(0.23, 1, 0.32, 1),
-    transform 0.7s cubic-bezier(0.23, 1, 0.32, 1);
-  transition-delay: var(--stagger, 0ms);
+  min-width: 0;
 }
 
-.gridIn .cell {
-  opacity: 1;
-  transform: none;
-}
+/* ---------- tile: the fixed plate with an inner zoom ---------- */
+/* Height via the padding-top percentage technique: the box is height 0 and
+   its padding-top sets the aspect — 66.667% = landscape 3:2, ALWAYS. The
+   plate never grows; hover/focus of the whole cell zooms the media inside
+   the clip instead: the photo (or, on photo-less tiles, the centred mark)
+   swells to 1.045 on the iOS drawer curve — slow, interruptible, no
+   bounce, transform-only.
 
-/* ---------- backdrop ---------- */
-/* Darkens the ENTIRE viewport behind the expanded card — a fixed layer
-   above all page content (hero, press strip) but below the active tile and
-   the nav. Opacity-only fade, in sync with the frame expansion. Fixed
-   positioning needs no transformed ancestor — the grid and section carry
-   none. Scrolling is locked while it shows (see the component). */
-.backdrop {
-  position: fixed;
-  inset: 0;
-  z-index: 60;
-  background: rgba(47, 0, 0, 0.5);
-  opacity: 0;
-  transition: opacity 480ms cubic-bezier(0.77, 0, 0.175, 1);
-  pointer-events: none;
-}
-
-/* while shown, the backdrop is also the click-away collapse target */
-.backdropOn {
-  opacity: 1;
-  transition-duration: 600ms;
-  pointer-events: auto;
-  cursor: pointer;
-}
-
-/* pale close hint riding the backdrop's own fade — pinned near the bottom
-   centre of the viewport, decorative only (the card's ✕ is the control) */
-.backdropHint {
-  position: absolute;
-  left: 50%;
-  bottom: clamp(20px, 4vh, 40px);
-  transform: translateX(-50%);
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  color: var(--cream);
-  opacity: 0.6;
-  white-space: nowrap;
-  pointer-events: none;
-}
-
-/* ---------- tile ---------- */
-/* The click choreography is a spatial morph (GSAP flip-modal feel), so it
-   takes the strong ease-in-out curve. Engaged states run at 600ms (set on
-   the engaged classes below); returns to rest are a slightly quicker 480ms
-   from these base rules — all CSS transitions on inline values, so a
-   collapse retargets cleanly mid-flight. The tile itself is a button-role
-   click target; it never transforms at rest — the spatial move happens on
-   the .frame inside it. */
-.tile {
+   Triggering on the <li> (not the plate) means hovering the caption below
+   engages the same state — one cell, one response. */
+.tileMedia {
   position: relative;
   width: 100%;
-  /* LANDSCAPE plate — short and wide (3:2), so the four-up row reads as a
-     calm filmstrip of rooms and façades rather than a poster wall */
-  aspect-ratio: 3 / 2;
-  z-index: 1;
-  opacity: 1;
-  cursor: pointer;
-  transition: opacity 480ms cubic-bezier(0.77, 0, 0.175, 1);
+  height: 0;
+  padding-top: 66.667%;
+  /* clipping (and the 16px radius) lives on .mediaGrow inside — this box
+     only holds the layout seat, so the grower can reach past its bottom */
+  overflow: visible;
 }
 
-.tile:focus-visible {
-  outline: 2px solid var(--maroon);
-  outline-offset: 4px;
-}
-
-/* the engaged tile rises above the fixed full-viewport backdrop (z 60);
-   a collapsing tile HOLDS that elevation until its return animation ends,
-   so the card never ducks behind the grid mid-flight */
-.tileActive,
-.tileClosing {
-  z-index: 61;
-}
-
-/* siblings recede a touch further beneath the backdrop for depth */
-.tileDimmed {
-  opacity: 0.75;
-  transition-duration: 600ms;
-}
-
-/* the expanding frame — centred in the cell at rest; the component grows
-   it to 250% × 200% of the cell and lands its centre exactly on the grid's
-   centre via measured inline styles. Width/height here is the deliberate
-   exception to the transform-only rule (a non-uniform scale would distort
-   the photo and logo); it's an absolutely-positioned box, so growing it
-   never reflows the grid. */
-.frame {
+/* the GROWER — pinned to the plate's top, it clips all the media and gets
+   slightly taller on hover: the bottom edge reaches down over the caption
+   gap while the layout box above never changes, so NOTHING below moves.
+   (An absolute child's height only lays out this one element — no page
+   reflow — and the 400ms one-shot keeps the cost invisible.) */
+.mediaGrow {
   position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 100%;
+  top: 0;
+  left: 0;
+  right: 0;
   height: 100%;
-  transform: translate(-50%, -50%);
-  /* gently rounded — --radius-tile is deliberately small (8px) so the
-     grid reads as an editorial spread, not an app screen */
-  border-radius: var(--radius-tile);
-  box-shadow: 0 24px 48px -32px rgba(47, 0, 0, 0.35);
-  transition:
-    width 480ms cubic-bezier(0.77, 0, 0.175, 1),
-    height 480ms cubic-bezier(0.77, 0, 0.175, 1),
-    transform 480ms cubic-bezier(0.77, 0, 0.175, 1);
-}
-
-.tileActive .frame {
-  transition-duration: 600ms;
-}
-
-/* deeper expanded-state shadow, pre-rendered on a pseudo-element so only
-   its opacity animates — never the box-shadow itself */
-.frame::after {
-  content: "";
-  position: absolute;
-  inset: 0;
-  z-index: -1;
-  border-radius: inherit;
-  corner-shape: squircle;
-  box-shadow: 0 48px 96px -36px rgba(47, 0, 0, 0.6);
-  opacity: 0;
-  transition: opacity 480ms cubic-bezier(0.77, 0, 0.175, 1);
-  pointer-events: none;
-}
-
-.tileActive .frame::after {
-  opacity: 1;
-  transition-duration: 600ms;
-}
-
-/* clips the photo + content to the frame's rounded box; everything inside
-   re-lays-out with the frame as it grows */
-.clip {
-  --tile-pad: clamp(14px, 1.6vw, 24px);
-
-  position: absolute;
-  inset: 0;
   overflow: hidden;
-  border-radius: inherit;
-  corner-shape: squircle;
+  /* the sharp editorial 2px cut (Telescope grammar) */
+  border-radius: 2px;
+  background: var(--placeholder);
+  transition: height 400ms var(--ease-drawer);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cell:hover .mediaGrow {
+    height: calc(100% + 10px);
+  }
+}
+
+.cell:focus-within .mediaGrow {
+  height: calc(100% + 10px);
 }
 
 .photo {
   object-fit: cover;
   transform: scale(1);
-  transition: transform 480ms cubic-bezier(0.77, 0, 0.175, 1);
+  transition: transform 700ms var(--ease-drawer);
 }
 
-/* light pre-click affordance — a restrained zoom so resting cards feel
-   alive under the cursor (hover-capable devices only) */
+/* pointer zoom — hover-capable, fine-pointer devices only. Touch gets a
+   static plate with plain links. The scrim deepens a touch alongside
+   (opacity-only) so the zoom reads as depth, not just growth. */
 @media (hover: hover) and (pointer: fine) {
-  .tile:not(.tileActive):hover .photo {
+  .cell:hover .photo {
     transform: scale(1.03);
-    transition: transform 250ms cubic-bezier(0.23, 1, 0.32, 1);
   }
-  .tile:not(.tileActive):hover .scrim {
-    opacity: 0.8;
-    transition: opacity 250ms cubic-bezier(0.23, 1, 0.32, 1);
+  .cell:hover .fallback ~ .center .brandGroup {
+    transform: scale(1.03);
+  }
+  .cell:hover .scrim {
+    opacity: 1;
   }
 }
 
-.tileActive .photo {
-  transform: scale(1.05);
-  transition-duration: 600ms;
+/* keyboard parity — tabbing to the caption's links produces the identical
+   zoom. Lives OUTSIDE the hover media query so keyboards on touch hybrids
+   still get it. */
+.cell:focus-within .photo {
+  transform: scale(1.03);
+}
+.cell:focus-within .fallback ~ .center .brandGroup {
+  transform: scale(1.03);
+}
+.cell:focus-within .scrim {
+  opacity: 1;
 }
 
 /* photo-less tiles (Mamasons, Bunso) — deep maroon field so the centered
-   cream mark / wordmark carries the tile; the scrim still deepens in the
-   expanded state so the interaction reads the same as the photo tiles */
+   cream mark / wordmark carries the tile */
 .fallback {
-  width: 100%;
-  height: 100%;
+  position: absolute;
+  inset: 0;
   background: var(--maroon);
 }
 
-/* Maroon-toned legibility scrim, applied WHERE THE TYPE IS rather than as a
-   flat wash over the whole frame. The previous version laid ~0.34 maroon
-   across the tile's whole midsection, which is where the photograph actually
-   lives — every restaurant ended up the same muddy wine tone and the
-   photography stopped doing any work.
-   Two layers instead:
-     · a soft radial pad behind the centred logo (the only thing that truly
-       needs contrast at rest), falling off to nothing well before the edges;
-     · slim top/bottom gradients for the tag and the expanded-state actions.
-   The photo's midtones and highlights now read at close to full strength
-   while the cream mark keeps roughly the same contrast it had before. */
+/* Maroon-toned legibility scrim behind the centred mark — a soft radial
+   pad where the cream logo sits, plus slim top/bottom gradients, so the
+   photo's midtones read at close to full strength. Static: the expanded
+   state (and its deepening) is gone. */
 .scrim {
   position: absolute;
   inset: 0;
@@ -367,163 +375,65 @@
       rgba(47, 0, 0, 0.66) 100%
     );
   opacity: 0.9;
-  transition: opacity 480ms cubic-bezier(0.77, 0, 0.175, 1);
+  pointer-events: none;
+  /* deepens a touch on hover/focus — opacity-only, same clock as the zoom */
+  transition: opacity 700ms var(--ease-drawer);
+}
+
+/* ---------- hover film ---------- */
+/* the clip sits between the still and the scrim (DOM order — no z juggling)
+   and fades in once it's playing; pausing fades it back to the still */
+.hoverClip {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  opacity: 0;
+  transition: opacity 500ms var(--ease-drawer);
   pointer-events: none;
 }
 
-.tileActive .scrim {
+.hoverClipOn {
   opacity: 1;
-  transition-duration: 600ms;
 }
 
-/* ---------- caption below the plate ---------- */
-/* The site-wide card grammar (matches the Blog cards): semibold name,
-   regular one-liner, then the pills row. Sits on the cream under the
-   photo — the plate itself stays clean, no overlay copy at rest. */
-.cellCaption {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.3em;
-  margin-top: clamp(12px, 1.4vw, 16px);
-}
-
-.cellName {
-  font-family: var(--font-sans);
-  font-weight: 600;
-  font-size: var(--t-small);
-  line-height: var(--lh-snug);
-  color: var(--maroon);
-}
-
-.cellTagline {
+/* ---------- hover blurb: the story ON the plate ---------- */
+/* Cream copy seated in the plate's bottom-left, hidden at rest — it rises
+   in over the deepening scrim while the photo zooms, all on the same
+   drawer clock so the three moves read as ONE response. Hover furniture:
+   only hover-capable fine pointers (and keyboards, below) ever see it;
+   touch reads the story in the expansion. */
+.hoverBlurb {
+  position: absolute;
+  left: clamp(14px, 1.8vw, 24px);
+  right: clamp(14px, 1.8vw, 24px);
+  bottom: clamp(12px, 1.6vw, 20px);
+  z-index: 3;
   font-family: var(--font-sans);
   font-weight: 400;
-  font-size: var(--t-small);
+  font-size: var(--t-label);
   line-height: var(--lh-snug);
-  color: var(--maroon);
-  opacity: 0.7;
-}
-
-/* head row of the caption — name on the left, the pills inline on the
-   right, sharing the name's baseline band */
-.cellHeadRow {
-  width: 100%;
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.8em;
-}
-
-.pillRow {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  flex: none;
-}
-
-/* neighbourhood pill — the Blog byline pill's recipe (a faint maroon tint;
-   a solid cream pill would vanish on the cream ground down here) */
-.pill {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.45em 0.9em;
-  border-radius: 999px;
-  background: rgba(47, 0, 0, 0.07);
-  font-family: var(--font-sans);
-  font-weight: 500;
-  font-size: var(--t-label);
-  line-height: 1;
-  color: var(--maroon);
-}
-
-/* Book pill — outlined, no fill: a quiet grey hairline ring (maroon at low
-   alpha reads as a warm grey on the cream) distinguishes the ACTION from
-   the tinted neighbourhood tag beside it without shouting */
-.pillBook {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.45em 0.9em;
-  border-radius: 999px;
-  background: transparent;
-  border: 1px solid rgba(47, 0, 0, 0.3);
-  font-family: var(--font-sans);
-  font-weight: 500;
-  font-size: var(--t-label);
-  line-height: 1;
-  color: var(--maroon);
-  text-decoration: none;
-  transition:
-    transform 180ms var(--ease-out),
-    border-color 180ms var(--ease-out);
-}
-@media (hover: hover) and (pointer: fine) {
-  .pillBook:hover {
-    transform: translateY(-1px);
-    border-color: var(--maroon);
-  }
-}
-.pillBook:focus-visible {
-  outline: 2px solid var(--maroon);
-  outline-offset: 2px;
-}
-.pillBook:active {
-  transform: scale(0.96);
-  transition-duration: 120ms;
-}
-
-/* ---------- top-right: expanded-state close button ---------- */
-/* Explicit close affordance — cream ✕ on translucent maroon, ~40px hit
-   target. Fades/rises in with the same curve as the reveal block and
-   actions; opacity + pointer-events (never visibility) with tabIndex
-   managed in the component so it's only focusable while expanded. */
-.close {
-  position: absolute;
-  top: var(--tile-pad);
-  right: var(--tile-pad);
-  z-index: 3;
-  width: 40px;
-  height: 40px;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  border: 1px solid rgba(255, 253, 245, 0.35);
-  border-radius: 50%;
-  background: rgba(47, 0, 0, 0.55);
   color: var(--cream);
-  cursor: pointer;
+  text-align: left;
   opacity: 0;
-  transform: translateY(8px);
-  pointer-events: none;
+  transform: translateY(10px);
   transition:
-    opacity 400ms cubic-bezier(0.23, 1, 0.32, 1),
-    transform 400ms cubic-bezier(0.23, 1, 0.32, 1),
-    background-color 0.25s cubic-bezier(0.23, 1, 0.32, 1);
-  transition-delay: 0ms;
-}
-
-.close svg {
-  width: 14px;
-  height: 14px;
-  display: block;
-}
-
-.tileActive .close {
-  opacity: 1;
-  transform: none;
-  pointer-events: auto;
-  transition-delay: 180ms;
+    opacity 700ms var(--ease-drawer),
+    transform 700ms var(--ease-drawer);
+  pointer-events: none;
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .close:hover {
-    background: rgba(47, 0, 0, 0.8);
+  .cell:hover .hoverBlurb {
+    opacity: 1;
+    transform: translateY(0);
   }
 }
 
-.close:focus-visible {
-  outline: 2px solid var(--cream);
-  outline-offset: 2px;
+.cell:focus-within .hoverBlurb {
+  opacity: 1;
+  transform: translateY(0);
 }
 
 /* ---------- center: brand group ---------- */
@@ -541,11 +451,8 @@
   pointer-events: none;
 }
 
-/* wordmark/logo + optional credential badge — the badge (Michelin, on
-   Belly) is part of the group, so it stays visible at rest and in the
-   expanded state and moves with the mark. Only the mark sits in flow —
-   the badge hangs absolutely below it (see .badge) so a badged tile's
-   logo stays at the SAME vertical centre as the badge-less tiles. */
+/* the wordmark/logo commanding the plate (the Michelin credential now
+   lives down in the caption line, so the photography stays clean) */
 .brandGroup {
   position: relative;
   display: flex;
@@ -553,17 +460,20 @@
   align-items: center;
   gap: clamp(10px, 1.4vh, 16px);
   /* stretch to the tile's width — the logo mask below is %-sized, and a
-     content-sized flex parent would give it a circular (collapsed-to-zero)
-     percentage basis. This is what made the Mamasons/Bunso expanded card
-     render as an empty field. */
+     content-sized flex parent would give it a collapsed-to-zero
+     percentage basis */
   align-self: stretch;
+  /* photo-less tiles (Mamasons, Bunso) have no photo to zoom, so the mark
+     itself carries the hover response — the `.fallback ~ .center` selector
+     scopes the scale to those tiles only */
+  transform: scale(1);
+  transition: transform 700ms var(--ease-drawer);
 }
 
 /* white-mask technique — same --ov-logo-url pattern as the old carousel's
    ovLogo/previewLogo, cream fill for legibility over the scrim. Sized to
-   command the square: the width tracks the tile, the height cap keeps
-   squat marks from ballooning. Because it's %-based, the mark also grows
-   with the frame in the expanded state — part of the flip-modal feel. */
+   command the plate: the width tracks the tile, the height cap keeps
+   squat marks from ballooning. */
 .logo {
   display: block;
   width: 68%;
@@ -583,202 +493,493 @@
   color: var(--cream);
 }
 
-/* secondary badge (Michelin Guide) — a real image element so the red-and-white
-   credential shows in its true colours. Absolutely hung off the brand
-   group's bottom edge (out of flow) so it doesn't push the mark above
-   the tile's true centre; it still moves and scales with the group in
-   the expanded state. margin-top mirrors the group's flex gap. */
-.badge {
-  position: absolute;
-  top: 100%;
-  left: 50%;
-  transform: translateX(-50%);
-  margin-top: clamp(10px, 1.4vh, 16px);
-  display: block;
-  height: clamp(48px, 6vh, 68px);
-  width: auto;
-  max-width: 70%;
-  object-fit: contain;
-  user-select: none;
-  filter: drop-shadow(0 8px 18px rgba(47, 0, 0, 0.4));
-}
-
-/* ---------- bottom-left: hover reveal ---------- */
-/* Blurb + location rise in from the bottom-left of the expanded card.
-   Asymmetric delay: 140ms behind the frame on enter so the expansion
-   leads and the text follows; immediate on exit. Reveals keep the
-   ease-out curve (they're an enter, not a morph). */
-.revealBlock {
-  position: absolute;
-  left: var(--tile-pad);
-  bottom: var(--tile-pad);
-  z-index: 2;
+/* ---------- caption below the plate ---------- */
+/* ONE quiet line — the plate's logo already names the place, so the cream
+   under it carries only cuisine · neighbourhood (plus Belly's small inline
+   Michelin mark) with the Book pill as the row's single action. */
+.cellCaption {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  text-align: left;
-  gap: clamp(6px, 1vh, 10px);
-  max-width: min(34ch, 60%);
-  opacity: 0;
-  transform: translateY(18px);
-  transition:
-    opacity 400ms cubic-bezier(0.23, 1, 0.32, 1),
-    transform 400ms cubic-bezier(0.23, 1, 0.32, 1);
-  transition-delay: 0ms;
+  margin-top: clamp(12px, 1.4vw, 16px);
+}
+
+.cellLine {
+  width: 100%;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 0.8em;
+}
+
+.cellTag {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--t-small);
+  line-height: var(--lh-snug);
+  color: var(--maroon);
+  opacity: 0.7;
+}
+
+/* the Michelin credential as a STICKER on the plate's top-right corner —
+   pressed on at a slight tilt, the way a guide sticker rides a
+   restaurant's window */
+.stickerBadge {
+  position: absolute;
+  top: clamp(10px, 1.4vw, 18px);
+  right: clamp(10px, 1.4vw, 18px);
+  z-index: 3;
+  height: clamp(44px, 4.5vw, 64px);
+  width: auto;
+  transform: rotate(8deg);
+  /* flat by design (Telescope) — the tilt alone sells the sticker */
+  user-select: none;
   pointer-events: none;
 }
 
-.tileActive .revealBlock {
-  opacity: 1;
-  transform: none;
-  transition-delay: 140ms;
-}
-
-.blurb {
-  margin: 0;
+/* quiet underlined text link into the detail page — a real 1px underline
+   (not the CTA's draw), colour-only hover. Never `transition: all`. */
+.viewLink {
+  margin-top: 0.35em;
   font-family: var(--font-sans);
+  font-weight: 500;
   font-size: var(--t-small);
   line-height: var(--lh-snug);
-  color: var(--cream);
+  color: var(--maroon);
+  text-decoration: underline;
+  text-decoration-thickness: 1px;
+  text-underline-offset: 3px;
+  transition: color 200ms ease;
 }
-
-.location {
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
+.viewLink:hover,
+.viewLink:focus-visible {
   color: var(--saffron);
 }
 
-/* ---------- bottom-right: actions ---------- */
-/* Hidden at rest on every device now that tap/click expands; they rise in
-   with the reveal block, trailing it by 40ms. opacity + pointer-events
-   (never visibility) so they stay tabbable and can't be clicked while
-   invisible. */
-.actions {
-  position: absolute;
-  right: var(--tile-pad);
-  bottom: var(--tile-pad);
-  z-index: 3;
-  display: flex;
-  gap: 8px;
-  opacity: 0;
-  transform: translateY(8px);
-  pointer-events: none;
-  transition:
-    opacity 400ms cubic-bezier(0.23, 1, 0.32, 1),
-    transform 400ms cubic-bezier(0.23, 1, 0.32, 1);
-  transition-delay: 0ms;
-}
-
-.tileActive .actions {
-  opacity: 1;
-  transform: none;
-  pointer-events: auto;
-  transition-delay: 180ms;
-}
-
-/* narrow screens: the corner-anchored blurb and actions share too little
-   width and collide — stack them instead, blurb above a full-width
-   actions row */
-@media (max-width: 700px) {
-  .revealBlock {
-    max-width: 100%;
-    right: var(--tile-pad);
-    /* seated above the actions row (~30px pills) plus a breath */
-    bottom: calc(var(--tile-pad) + 42px);
-  }
-  .actions {
-    left: var(--tile-pad);
-  }
-}
-
-.btn {
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  color: var(--cream);
-  background: transparent;
-  border: 1px solid var(--cream);
-  border-radius: 999px;
-  padding: 0.55em 1.15em;
-  cursor: pointer;
-  text-decoration: none;
+.pillRow {
   display: inline-flex;
   align-items: center;
+  gap: 6px;
+  flex: none;
+}
+
+/* neighbourhood pill — the Blog byline pill's recipe (a faint maroon tint;
+   a solid cream pill would vanish on the cream ground down here) */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45em 0.9em;
+  border-radius: 999px;
+  background: rgba(47, 0, 0, 0.07);
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label-mono);
   line-height: 1;
+  color: var(--maroon);
+}
+
+/* Book pill — rests as a hairline OUTLINE, and on hover/focus fills solid
+   maroon with cream text: the fill is the reward state, the swell rides the
+   drawer curve, press snaps down quick. Same radius/size/type as the
+   neighbourhood pill beside it. Specific properties only — never `all`. */
+.pillBook {
+  display: inline-flex;
+  align-items: center;
+  padding: 0.45em 0.9em;
+  border-radius: 999px;
+  /* rests OUTLINED — a quiet maroon hairline ring; the solid fill is the
+     hover state's reward, not the resting one */
+  background: transparent;
+  border: 1px solid rgba(47, 0, 0, 0.3);
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label-mono);
+  line-height: 1;
+  color: var(--maroon);
+  text-decoration: none;
   transition:
-    background-color 0.25s cubic-bezier(0.23, 1, 0.32, 1),
-    color 0.25s cubic-bezier(0.23, 1, 0.32, 1),
-    transform 0.12s cubic-bezier(0.23, 1, 0.32, 1);
+    background-color 400ms var(--ease-drawer),
+    border-color 400ms var(--ease-drawer),
+    transform 400ms var(--ease-drawer),
+    color 400ms var(--ease-drawer);
+}
+@media (hover: hover) and (pointer: fine) {
+  .pillBook:hover {
+    /* hover fills the ring solid — maroon plate, cream label */
+    background-color: var(--maroon);
+    border-color: var(--maroon);
+    color: var(--cream);
+    transform: scale(1.03);
+  }
+}
+/* keyboard gets the same filled reward as hover */
+.pillBook:focus-visible {
+  background-color: var(--maroon);
+  border-color: var(--maroon);
+  color: var(--cream);
+}
+.pillBook:focus-visible {
+  outline: 2px solid var(--maroon);
+  outline-offset: 2px;
+}
+.pillBook:active {
+  transform: scale(0.97);
+  transition-duration: 120ms;
+}
+
+/* ---------- the GRID ⟷ STRIP view toggle ---------- */
+/* seated under the caption in the head's far columns */
+.toggleSeat {
+  display: flex;
+}
+
+@media (min-width: 981px) {
+  .toggleSeat {
+    /* the far edge of the band, bottom on the heading's line */
+    grid-column: 12 / 13;
+    justify-self: end;
+    align-self: end;
+  }
+}
+
+/* the segmented pill — hairline ring that firms up on hover */
+.viewToggle {
+  display: inline-flex;
+  align-items: center;
+  gap: 2px;
+  padding: 3px;
+  border: 1px solid rgba(47, 0, 0, 0.25);
+  border-radius: 999px;
+  transition: border-color 300ms ease;
+}
+
+.viewToggle:hover {
+  border-color: rgba(47, 0, 0, 0.55);
+}
+
+/* one option — the sliding maroon thumb (layoutId) renders behind the
+   icon + label; the resting option tints on hover and presses down */
+.toggleOpt {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  padding: 0.55em 0.8em;
+  margin: 0;
+  border: 0;
+  border-radius: 999px;
+  background: none;
+  cursor: pointer;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label-mono);
+  text-transform: uppercase;
+  color: var(--maroon);
+  transition:
+    color 300ms ease,
+    background-color 300ms ease,
+    transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .btn:hover {
-    background: var(--cream);
-    color: var(--maroon);
-  }
-  .btnSolid:hover {
-    background: var(--saffron);
-    border-color: var(--saffron);
-    color: var(--cream);
+  .toggleOpt:not(.toggleOptOn):hover {
+    background-color: rgba(47, 0, 0, 0.07);
   }
 }
 
-.btn:active {
-  transform: scale(0.97);
+.toggleOpt:active {
+  transform: scale(0.95);
 }
 
-.btn:focus-visible {
+.toggleOpt:focus-visible {
   outline: 2px solid var(--maroon);
   outline-offset: 2px;
 }
 
-.btnSolid {
+.toggleOptOn {
+  color: var(--cream);
+}
+
+.toggleThumb {
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: var(--maroon);
+}
+
+.toggleIcon {
+  position: relative;
+  z-index: 1;
+  width: 1.05em;
+  height: 1.05em;
+  fill: currentColor;
+}
+
+/* ---------- the plate as a pressable ---------- */
+/* Bare button wrapper around the tile plate — the whole photo is the hit
+   area for the App Store expansion. Press feedback lives on the WRAPPER
+   (not the layoutId element inside), so the scale-down never fights the
+   morph's own transform. */
+.plateHit {
+  display: block;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-align: inherit;
+  /* the hover lift rides the drawer clock with the inner zoom; the press
+     override below snaps quick */
+  transition: transform 400ms var(--ease-drawer);
+}
+
+/* the plate LIFTS a touch while the photo zooms inside it — transform-only,
+   so the grid's rows never reflow */
+@media (hover: hover) and (pointer: fine) {
+  .cell:hover .plateHit {
+    transform: scale(1.01);
+  }
+}
+.cell:focus-within .plateHit {
+  transform: scale(1.01);
+}
+
+.plateHit:active {
+  transform: scale(0.985);
+  transition-duration: 120ms;
+}
+
+.plateHit:focus-visible {
+  outline: 2px solid var(--maroon);
+  outline-offset: 3px;
+}
+
+/* ---------- the App Store expansion ---------- */
+/* Fixed stage PORTALED to <body> (never inside .afterHero's z-index: 1
+   context, which would trap it under the fixed nav) — z 200 clears the
+   nav's 80 outright. The media plate morphs from the tile's rectangle
+   into this centred seat. */
+.expandRoot {
+  position: fixed;
+  inset: 0;
+  z-index: 200;
+  display: grid;
+  place-items: center;
+  padding: clamp(16px, 3vw, 48px);
+}
+
+/* deep maroon dim — the room lights dropping, not a grey veil */
+.expandBackdrop {
+  position: absolute;
+  inset: 0;
+  background: rgba(24, 0, 0, 0.5);
+}
+
+/* the detail "card" is a TRANSPARENT column: the media plate above, the
+   cream body sheet below — the tile's own plate-and-caption grammar at
+   full size. Only the plate morphs; the sheet fades up under it. */
+.expandCard {
+  position: relative;
+  display: flex;
+  flex-direction: column;
+  width: min(720px, 100%);
+  max-height: calc(100svh - clamp(32px, 6vw, 96px));
+  overflow: hidden auto;
+  color: var(--maroon);
+  /* scrollable on short viewports but never SHOWS a scrollbar — a track
+     riding the card's edge would break the App Store illusion */
+  scrollbar-width: none;
+}
+
+.expandCard::-webkit-scrollbar {
+  display: none;
+}
+
+/* the media plate keeps the tiles' 3:2 crop AND radius, so the morph is a
+   pure scale-and-travel of the SAME object — no distortion, no crop
+   change, no corner animation */
+.expandMedia {
+  position: relative;
+  flex: none;
+  width: 100%;
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  background: var(--placeholder);
+  /* rides ABOVE the body sheet's tucked-under top edge, so the pair reads
+     as one continuous card */
+  z-index: 1;
+}
+
+/* close control riding the media's top-right corner — cream chip, maroon
+   glyph, press snaps down */
+.expandClose {
+  position: absolute;
+  top: clamp(12px, 1.6vw, 20px);
+  right: clamp(12px, 1.6vw, 20px);
+  z-index: 3;
+  display: grid;
+  place-items: center;
+  width: 36px;
+  height: 36px;
+  padding: 0;
+  border: 0;
+  border-radius: 999px;
   background: var(--cream);
+  color: var(--maroon);
+  cursor: pointer;
+  transition:
+    transform 160ms cubic-bezier(0.23, 1, 0.32, 1),
+    background-color 200ms ease;
+}
+.expandClose svg {
+  width: 14px;
+  height: 14px;
+}
+.expandClose:hover {
+  background: #fff;
+}
+.expandClose:active {
+  transform: scale(0.92);
+}
+.expandClose:focus-visible {
+  outline: 2px solid var(--cream);
+  outline-offset: 2px;
+}
+
+/* ---------- card body ---------- */
+/* the cream sheet TUCKED UNDER the plate's bottom edge — its top 16px hide
+   behind the media (same cream shows through the plate's rounded bottom
+   corners), so the two elements read as ONE card while only the plate
+   morphs */
+.expandBody {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(10px, 1.6vh, 16px);
+  margin-top: -16px;
+  padding: calc(clamp(20px, 3vw, 32px) + 16px) clamp(20px, 3vw, 32px)
+    clamp(20px, 3vw, 32px);
+  background: var(--cream);
+  border-radius: 2px;
+  /* flat by design (Telescope) — the maroon backdrop dim already
+     separates the card from the page */
+}
+
+.expandHeadRow {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1em;
+  flex-wrap: wrap;
+}
+
+.expandName {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(1.6rem, 2.6vw, 2.2rem);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
   color: var(--maroon);
 }
 
+.expandTag {
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label-mono);
+  text-transform: uppercase;
+  color: var(--maroon);
+  opacity: 0.6;
+}
+
+.expandBlurb {
+  margin: 0;
+  max-width: 56ch;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
+  color: var(--maroon);
+  opacity: 0.85;
+}
+
+/* the Michelin credential inside the expansion — mark + full label */
+.expandCredential {
+  margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: var(--t-small);
+  line-height: var(--lh-snug);
+  color: var(--maroon);
+}
+
+.expandCredentialMark {
+  display: block;
+  height: 28px;
+  width: auto;
+  user-select: none;
+}
+
+.expandLocation {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--t-small);
+  line-height: var(--lh-snug);
+  color: var(--maroon);
+  opacity: 0.6;
+}
+
+.expandActions {
+  display: flex;
+  align-items: center;
+  gap: clamp(14px, 2vw, 22px);
+  margin-top: clamp(4px, 1vh, 10px);
+}
+
 /* ---------- reduced motion ---------- */
-/* Opacity-only: keep the backdrop fade, scrim deepen, sibling dim and the
-   reveal / button fades; drop the frame expansion, photo zoom and every
-   translate. The !important overrides beat the inline expansion styles set
-   from the component. */
+/* No zoom (transforms pinned), no entrance translate — colour/opacity-only
+   hovers survive. */
 @media (prefers-reduced-motion: reduce) {
-  .cell {
+  .plateHit,
+  .plateHit:active,
+  .cell:hover .plateHit,
+  .cell:focus-within .plateHit {
     transform: none;
-    transition: opacity 0.4s ease;
-  }
-  .tile {
-    transition: opacity 0.2s ease;
-  }
-  .backdrop {
-    transition: opacity 0.2s ease;
-  }
-  .frame {
-    width: 100% !important;
-    height: 100% !important;
-    transform: translate(-50%, -50%) !important;
     transition: none;
   }
-  .photo {
+  .photo,
+  .brandGroup {
     transform: none !important;
     transition: none;
   }
-  .revealBlock {
+  /* the blurb still appears, but by fade alone — no rise */
+  .hoverBlurb {
     transform: none;
-    transition: opacity 0.2s ease;
+    transition: opacity 300ms ease;
   }
-  .actions {
+  /* no bottom growth */
+  .mediaGrow,
+  .cell:hover .mediaGrow,
+  .cell:focus-within .mediaGrow {
+    height: 100%;
+    transition: none;
+  }
+  /* the Book pill keeps its colour shift only — no swell, no press scale */
+  .pillBook,
+  .pillBook:hover,
+  .pillBook:active {
     transform: none;
-    transition: opacity 0.2s ease;
-  }
-  .close {
-    transform: none;
-    transition: opacity 0.2s ease;
-  }
-  .scrim {
-    transition: opacity 0.2s ease;
+    transition:
+      background-color 200ms ease,
+      border-color 200ms ease,
+      color 200ms ease;
   }
 }

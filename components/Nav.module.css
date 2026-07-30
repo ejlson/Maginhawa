@@ -79,10 +79,11 @@
 .link {
   position: relative;
   display: inline-block;
-  font-family: var(--font-display-xs);
+  /* mono chrome voice — the Telescope UI-label grammar */
+  font-family: var(--font-mono);
   font-weight: 500;
   font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
+  letter-spacing: var(--tr-label-mono);
   text-transform: uppercase;
   color: inherit;
   padding: 6px 0;

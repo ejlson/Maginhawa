@@ -5,8 +5,11 @@ import Loader from "./Loader";
 import Nav from "./Nav";
 import Menu from "./Menu";
 import Hero from "./Hero";
+import Manifesto from "./Manifesto";
 import Discover from "./Discover";
-import PressStrip from "./PressStrip";
+import MaroonZone from "./MaroonZone";
+import Interlude from "./Interlude";
+import PressWall from "./PressWall";
 import AboutIntro from "./AboutIntro";
 import RestaurantLocations from "./RestaurantLocations";
 // import Timeline from "./Timeline";
@@ -80,9 +83,18 @@ export default function Experience() {
         <Hero started={started} />
 
         <div className="afterHero">
+          {/* the positioning statement — what Maginhawa IS, before any
+              product: the first thing the reader meets past the hero */}
+          <Manifesto />
           <Discover />
-          <PressStrip />
-          <AboutIntro />
+          {/* ONE maroon band under the story, the press credential and the
+              photo beat — the ground scrubs cream → maroon as it arrives
+              and ends after the interlude */}
+          <MaroonZone>
+            <AboutIntro />
+            <PressWall />
+            <Interlude />
+          </MaroonZone>
           <Blog />
           {/* open-roles index on the cream page, then the closing
               invitation with the Join Us pill */}

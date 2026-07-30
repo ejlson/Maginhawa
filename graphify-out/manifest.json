@@ -20,8 +20,8 @@
     "semantic_hash": ""
   },
   "app/layout.tsx": {
-    "mtime": 1785163854.309248,
-    "ast_hash": "306a8a6e2750b28729119b1376222c1a",
+    "mtime": 1785424753.2514741,
+    "ast_hash": "62405ef69941f72e754c0c6021305288",
     "semantic_hash": ""
   },
   "app/page.tsx": {
@@ -45,13 +45,13 @@
     "semantic_hash": ""
   },
   "components/AboutIntro.tsx": {
-    "mtime": 1785167658.318184,
-    "ast_hash": "34ad33bf1be8139676c38b04b6ca0368",
+    "mtime": 1785424217.9503386,
+    "ast_hash": "449f305fb2e1baf1c1f5e373768e13ab",
     "semantic_hash": ""
   },
   "components/Blog.tsx": {
-    "mtime": 1785166403.096791,
-    "ast_hash": "7c88f1560cdef1053164629df73da9af",
+    "mtime": 1785425547.35219,
+    "ast_hash": "9c934b6f8f0eacca1ea3a6ff72a8ba91",
     "semantic_hash": ""
   },
   "components/BlogIndex.tsx": {
@@ -85,13 +85,13 @@
     "semantic_hash": ""
   },
   "components/Discover.tsx": {
-    "mtime": 1785167551.917174,
-    "ast_hash": "06088ced94827dc5becb51df5e90550c",
+    "mtime": 1785426302.60142,
+    "ast_hash": "60f4087f40970aebebb05fa832752126",
     "semantic_hash": ""
   },
   "components/Experience.tsx": {
-    "mtime": 1785166151.6336467,
-    "ast_hash": "6f9bd9696e9b060cfa722b1530e2f737",
+    "mtime": 1785424209.439651,
+    "ast_hash": "e8a53a838d458f8f82362b8904579ae4",
     "semantic_hash": ""
   },
   "components/FAQ.tsx": {
@@ -110,8 +110,8 @@
     "semantic_hash": ""
   },
   "components/Hero.tsx": {
-    "mtime": 1784820531.2517376,
-    "ast_hash": "4fcd4129a7c3bc7e7a6c8a4d269a80b9",
+    "mtime": 1785424811.8869133,
+    "ast_hash": "790cbb279d0f76a416e0dc5cdc422057",
     "semantic_hash": ""
   },
   "components/JoinUs.tsx": {
@@ -120,8 +120,8 @@
     "semantic_hash": ""
   },
   "components/Loader.tsx": {
-    "mtime": 1782140127.1365836,
-    "ast_hash": "837434c67ccc79822ae4b71742b2b791",
+    "mtime": 1785359525.165667,
+    "ast_hash": "6615f71ba78d2aca27c6e20d3539680f",
     "semantic_hash": ""
   },
   "components/MagneticButton.tsx": {
@@ -155,8 +155,8 @@
     "semantic_hash": ""
   },
   "components/PageTransition.tsx": {
-    "mtime": 1783956225.7363467,
-    "ast_hash": "4fda357fec284fcd254aef513943da25",
+    "mtime": 1785338147.0852084,
+    "ast_hash": "5060143e9efa1484eecd99f17c86c0e0",
     "semantic_hash": ""
   },
   "components/Parallax.tsx": {
@@ -172,11 +172,6 @@
   "components/Press.tsx": {
     "mtime": 1782140127.1392398,
     "ast_hash": "a02e8146b2e3830bb3feb0dfc41ad867",
-    "semantic_hash": ""
-  },
-  "components/PressStrip.tsx": {
-    "mtime": 1785167011.6187708,
-    "ast_hash": "83a665d952440626a8ed8b1b3b908c03",
     "semantic_hash": ""
   },
   "components/ReadyCta.tsx": {
@@ -265,8 +260,8 @@
     "semantic_hash": ""
   },
   "lib/press.ts": {
-    "mtime": 1784539754.2064667,
-    "ast_hash": "24f61a3350a31a90386b3d9abe3e70ae",
+    "mtime": 1785420843.352938,
+    "ast_hash": "a056fcfb720ce5bb24d1a55b6cd27b1f",
     "semantic_hash": ""
   },
   "lib/restaurants.ts": {
@@ -285,7 +280,7 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1781694812.7055187,
+    "mtime": 1785401432.304748,
     "ast_hash": "a4519bef6dc4d93ef1178a8be22c6799",
     "semantic_hash": ""
   },
@@ -1360,8 +1355,8 @@
     "semantic_hash": ""
   },
   ".impeccable/config.json": {
-    "mtime": 1784826784.5501535,
-    "ast_hash": "12b3b024f79ba9835d074c4a7d445680",
+    "mtime": 1785342391.032557,
+    "ast_hash": "7b5347dc974bd45660a879c09c6758dd",
     "semantic_hash": ""
   },
   "components/MeshGradient.tsx": {
@@ -1372,6 +1367,36 @@
   "lib/contact.ts": {
     "mtime": 1785097103.1402144,
     "ast_hash": "540de55f9550d25cacd0e51a27760148",
+    "semantic_hash": ""
+  },
+  "components/PressWall.tsx": {
+    "mtime": 1785424229.0808375,
+    "ast_hash": "2c9ff09ccdbf72287e57bc9477e9f16a",
+    "semantic_hash": ""
+  },
+  "components/Manifesto.tsx": {
+    "mtime": 1785426221.7142658,
+    "ast_hash": "cbcb035b838a0d61c7ed20a878f0c85e",
+    "semantic_hash": ""
+  },
+  "components/ChapterMark.tsx": {
+    "mtime": 1785405511.0523384,
+    "ast_hash": "48fe4069dc07dd9f53fdf6b2b2b45d56",
+    "semantic_hash": ""
+  },
+  "components/Interlude.tsx": {
+    "mtime": 1785424896.6905882,
+    "ast_hash": "c62a0eaee70eaf822a0f87f9165ed640",
+    "semantic_hash": ""
+  },
+  "assets/menu/cafe_mama/wall-panel-40-2017-Corona.pdf": {
+    "mtime": 1785411324.8883593,
+    "ast_hash": "9762ea4f33b6dd52225a4c8c5487707a",
+    "semantic_hash": ""
+  },
+  "components/MaroonZone.tsx": {
+    "mtime": 1785424198.7770605,
+    "ast_hash": "7da546d0ba0661864169954cb34b1c03",
     "semantic_hash": ""
   }
 }

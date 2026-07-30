@@ -1,0 +1,47 @@
+/* Full-bleed photo interlude — a wordless beat between the press strip and
+   the journal. The section clips; the media inside is taller than the
+   frame so the parallax drift never shows an edge. */
+.section {
+  position: relative;
+  overflow: hidden;
+  height: clamp(380px, 68vh, 760px);
+  margin-top: var(--home-gap-tight);
+}
+
+.media {
+  position: absolute;
+  /* 8% taller than the frame top and bottom — the drift's travel room */
+  inset: -8% 0;
+  will-change: transform;
+}
+
+.img {
+  object-fit: cover;
+}
+
+/* soft maroon veil between the footage and the line — legibility without
+   a heavy scrim; the photograph stays the section */
+.veil {
+  position: absolute;
+  inset: 0;
+  background: rgba(47, 0, 0, 0.32);
+  pointer-events: none;
+}
+
+/* the ONE overlaid display line — centred in the frame, cream, holding
+   still while the photograph drifts beneath it */
+.line {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  margin: 0;
+  padding-inline: var(--pad-x);
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: clamp(2rem, 4.2vw, 3.8rem);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
+  text-align: center;
+  color: var(--cream);
+}

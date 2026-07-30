@@ -8,6 +8,15 @@
         "value": "cubic-bezier(0.34, 1.16, 0.6, 1)",
         "createdAt": "2026-07-23T17:13:04.549Z",
         "reason": "User explicitly requested slightly-bouncy Apple/Emil-style motion; subtle overshoot on --ease-bounce is intentional (real bounce comes from framer springs)"
+      },
+      {
+        "rule": "layout-transition",
+        "value": "*",
+        "files": [
+          "components/Discover.module.css"
+        ],
+        "createdAt": "2026-07-29T16:26:31.030Z",
+        "reason": "User-specified hover-grow: tile must grow in flow and push the row below down; transform cannot reflow siblings. padding-top is the deliberate animated property, hover/pointer-gated, disabled under reduced motion."
       }
     ]
   }

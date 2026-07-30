@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import { Hanken_Grotesk } from "next/font/google";
+import { DM_Mono, Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 import PageTransition from "@/components/PageTransition";
 import CustomCursor from "@/components/CustomCursor";
@@ -15,6 +15,16 @@ const hanken = Hanken_Grotesk({
   subsets: ["latin"],
   style: ["normal", "italic"],
   variable: "--font-hanken",
+  display: "swap",
+});
+
+/* The UI-chrome voice (Telescope grammar): one mono face, caps, reserved
+   for labels, pills, counters and indicators — the only typographic
+   texture outside the Hanken system. Editorial copy never uses it. */
+const dmMono = DM_Mono({
+  subsets: ["latin"],
+  weight: ["400", "500"],
+  variable: "--font-dm-mono",
   display: "swap",
 });
 
@@ -87,7 +97,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en-GB" className={hanken.variable}>
+    <html lang="en-GB" className={`${hanken.variable} ${dmMono.variable}`}>
       <head>
         <link rel="stylesheet" href="https://use.typekit.net/pev2vne.css" />
         <OrganizationJsonLd />

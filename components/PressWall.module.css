@@ -1,0 +1,83 @@
+/* "As Seen In" — the centred label over the full masthead set in justified
+   rows: each hand-set row of 4–5 logos stretches edge to edge of the
+   chapter's inset span, so the stack reads as one set block. Sits INSIDE
+   the MaroonZone band after the About story — transparent ground, cream
+   type, light-on-dark marks. */
+.section {
+  padding: clamp(52px, 8vh, 132px) var(--pad-x) 0;
+  background: none;
+  color: var(--cream);
+}
+
+@media (min-width: 981px) {
+  .section {
+    /* the shared middle-10 seat — flush with the neighbouring chapters */
+    padding-inline: var(--grid-col2);
+  }
+}
+
+/* ---------- the centred label ---------- */
+.label {
+  margin: 0 0 clamp(26px, 4vh, 44px);
+  font-family: var(--font-mono);
+  font-weight: 400;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label-mono);
+  text-transform: uppercase;
+  color: var(--cream);
+  text-align: center;
+}
+
+/* ---------- the masthead rows ---------- */
+.rows {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(22px, 3.4vh, 40px);
+}
+
+/* one row of 4–5 marks — justified across the FULL span; the outer seats
+   kiss the chapter's edges, the inner seats spread evenly between */
+.logoRow {
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: clamp(16px, 2.5vw, 48px);
+}
+
+/* below the desktop breakpoint the justified rows would squeeze five marks
+   into a phone's width — let them wrap and centre instead */
+@media (max-width: 700px) {
+  .logoRow {
+    flex-wrap: wrap;
+    justify-content: center;
+    row-gap: 18px;
+  }
+}
+
+/* Fixed cell height (base × per-seat multiplier) so uneven aspect ratios
+   still share a visual weight; width auto so wide wordmarks aren't
+   squeezed. */
+.logoSeat {
+  flex: none;
+  height: calc(clamp(18px, 2vw, 36px) * var(--s, 1));
+}
+
+/* real image elements (not masks), flipped for the MAROON ground:
+   grayscale(1) normalises every colour, invert(1) turns the dark
+   letterforms light (and any baked-in white ground dark), and
+   `mix-blend-mode: screen` drops those darkened grounds into the maroon —
+   so every mark reads as a quiet light monochrome on the band. */
+.logo {
+  height: 100%;
+  width: auto;
+  max-width: clamp(140px, 15vw, 240px);
+  object-fit: contain;
+  display: block;
+  opacity: 0.85;
+  mix-blend-mode: screen;
+  filter: grayscale(1) invert(1);
+  user-select: none;
+}

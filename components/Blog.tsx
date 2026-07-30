@@ -2,17 +2,20 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
+import { motion, useInView, useReducedMotion } from "framer-motion";
 import styles from "./Blog.module.css";
 import { BLOG, type BlogEntry } from "@/lib/blog";
-import Reveal from "./Reveal";
 
-// the strip carries the eight newest stories end to end
-const POOL = BLOG.slice(0, 8);
+// shared enter curve — the same ease the Discover reel slides in on
+const EASE = [0.22, 1, 0.36, 1] as const;
+
+// the strip carries the twelve newest stories end to end
+const POOL = BLOG.slice(0, 12);
 
 /* the one card anatomy, every breakpoint — a 3:4 plate with the caption
    BELOW it on the cream (no overlay, no scrim): quiet date line, regular-
-   weight title, then WHO WROTE IT (outlet / restaurant) as the pill tag.
-   No Read More affordance — the whole card is the link. */
+   weight title, then a "Read More" affordance. The WHOLE card stays the
+   link — the affordance is a styled span, never a nested anchor. */
 function StoryCard({ post }: { post: BlogEntry }) {
   return (
     <a
@@ -35,7 +38,21 @@ function StoryCard({ post }: { post: BlogEntry }) {
       <div className={styles.caption}>
         <span className={styles.date}>{post.dateLabel}</span>
         <h3 className={styles.cardTitle}>{post.title}</h3>
-        <span className={styles.tag}>{post.source}</span>
+        <span className={styles.readMore} aria-hidden>
+          Read More
+          <svg
+            className={styles.readMoreArrow}
+            viewBox="0 0 32 10"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M0 5 H26" />
+            <path d="M22 1 L26 5 L22 9" />
+          </svg>
+        </span>
       </div>
     </a>
   );
@@ -43,14 +60,21 @@ function StoryCard({ post }: { post: BlogEntry }) {
 
 /**
  * Blog chapter on the cream page — one draggable card strip at every
- * breakpoint: a spare head row of just the saffron-dot eyebrow with the
- * position counter beside it (no display headline — the mockup lets the
- * photography lead), then the eight newest stories in a scroll-snap strip
- * (mouse-drag on desktop, native swipe on touch), and the blog CTA in the
- * foot row. No arrows — the strip itself is the control.
+ * breakpoint: a head row with the "Blog." display heading (the same
+ * grammar as "Our Restaurants."), the position counter floating small at
+ * its right, and the Read More CTA on the far edge; then the eight newest
+ * stories in a scroll-snap strip (mouse-drag on desktop, native swipe on
+ * touch) that bleeds off the right viewport edge. No arrows — the strip
+ * itself is the control.
  */
 export default function Blog() {
   const stripRef = useRef<HTMLDivElement>(null);
+  const reduce = useReducedMotion();
+  // the entrance observer watches the UNTRANSFORMED section — the strip
+  // wrapper itself starts 110vw off screen, so an observer on the wrapper
+  // would never see it intersect and the strip would stay invisible
+  const sectionRef = useRef<HTMLElement>(null);
+  const stripInView = useInView(sectionRef, { once: true, amount: 0.1 });
   // dragging = pointer held; gliding = coasting after release. Both drive
   // data-attrs that lift scroll-snap for the gesture; dragging also sets the
   // grabbing cursor. All the per-frame physics live in refs (no re-renders).
@@ -232,12 +256,17 @@ export default function Blog() {
   };
 
   return (
-    <section className={styles.section} id="blog" data-nav-theme="light">
-      {/* spare head row — just the eyebrow with the position counter
-          beside it, seated on the binding grid's column 2 */}
+    <section
+      ref={sectionRef}
+      className={styles.section}
+      id="blog"
+      data-nav-theme="light"
+    >
+      {/* head row — the display heading with the position counter floating
+          small at its right, seated on the binding grid's column 2 */}
       <div className={styles.head}>
         <span className={styles.headLeft}>
-          <span className={styles.eyebrow}>Blog</span>
+          <h2 className={styles.title}>Blog.</h2>
           {/* which story leads the strip — fed by the scroll listener;
               the slash belongs to the pale total: "01/08" */}
           <span className={styles.counter}>
@@ -248,12 +277,10 @@ export default function Blog() {
           </span>
         </span>
 
-        {/* blog CTA — rides the head row's far-right edge, inline with the
-            eyebrow, above the cards */}
+        {/* blog CTA — rides the head row's far-right edge, sharing the
+            heading's baseline band, above the cards */}
         <Link href="/blog" className={styles.headCta} aria-label="Read all stories">
-          {/* counted index link — same quiet-utility pattern as the Discover
-              head's "All restaurants (n)" */}
-          <span className={styles.ctaLabel}>All stories ({BLOG.length})</span>
+          <span className={styles.ctaLabel}>Read More</span>
           <svg
             className={styles.ctaArrow}
             viewBox="0 0 32 10"
@@ -270,7 +297,27 @@ export default function Blog() {
         </Link>
       </div>
 
-      <Reveal>
+      {/* the same off-screen entrance as the Discover reel: the whole
+          strip draws in from past the right viewport edge as ONE rigid
+          unit (the section clips the x-axis so the page never widens).
+          Reduced motion swaps the travel for a plain fade. */}
+      <motion.div
+        initial={
+          reduce
+            ? { opacity: 0 }
+            : { opacity: 1, transform: "translateX(110vw)" }
+        }
+        animate={
+          stripInView
+            ? { opacity: 1, transform: "translateX(0vw)" }
+            : undefined
+        }
+        transition={
+          reduce
+            ? { duration: 0.4, ease: "easeOut" }
+            : { duration: 0.8, ease: EASE }
+        }
+      >
         {/* the strip — scroll-snap owns the resting positions, the
             pointer handlers add mouse drag; data-dragging lifts the snap
             (and the grab cursor) for the duration of a drag */}
@@ -293,7 +340,7 @@ export default function Blog() {
             <StoryCard key={post.slug} post={post} />
           ))}
         </div>
-      </Reveal>
+      </motion.div>
 
     </section>
   );

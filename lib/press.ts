@@ -17,26 +17,32 @@ export type PressMention = {
   image?: string;
 };
 
-// Outlets shown in the "As Featured In" strip on the home page. These are the
+// Outlets shown in the "As Seen In" wall on the home page. These are the
 // recognisable mastheads — each shouts credibility on its own.
-// `logo` is an optional path to a real outlet logo file (drop the file at
-// `/public/logos/press/<slug>.svg` and add the path here). When absent, the
-// outlet's name renders as a wordmark fallback.
-export const FEATURED_OUTLETS: { name: string; tier?: "headline"; logo?: string }[] = [
-  { name: "The Sunday Times", tier: "headline", logo: "/press%20logo/thesundaytimes.svg" },
-  { name: "Michelin Guide", tier: "headline", logo: "/press%20logo/michelin.svg" },
-  { name: "The Guardian", logo: "/press%20logo/theguardian.svg" },
-  { name: "The Independent", logo: "/press%20logo/theindependent.svg" },
-  { name: "BBC Good Food", logo: "/press%20logo/bbcgoodfood.svg" },
-  { name: "Time Out", logo: "/press%20logo/timeout.svg" },
-  { name: "Forbes", logo: "/press%20logo/forbes.svg" },
-  { name: "Evening Standard", logo: "/press%20logo/eveningstandard.svg" },
-  { name: "The Week", logo: "/press%20logo/theweek.svg" },
-  { name: "Metro", logo: "/press%20logo/metro.svg" },
-  { name: "Country & Townhouse", logo: "/press%20logo/country&townhouse.svg" },
-  { name: "The Infatuation", logo: "/press%20logo/infatuation.svg" },
-  { name: "Hypebeast", logo: "/press%20logo/hypebeast.svg" },
-  { name: "That's Up", logo: "/press%20logo/thatsup.svg" },
+// `logo` points at the real SVG marks in `/public/press-logo/`. `scale` is
+// an optional per-outlet size multiplier for renderers with a common cell
+// height — very compact wordmarks (The Independent's "i") disappear at the
+// default size without it.
+export const FEATURED_OUTLETS: {
+  name: string;
+  tier?: "headline";
+  logo?: string;
+  scale?: number;
+}[] = [
+  { name: "The Sunday Times", tier: "headline", logo: "/press-logo/thesundaytimes.svg" },
+  { name: "Michelin Guide", tier: "headline", logo: "/press-logo/michelin.svg" },
+  { name: "The Guardian", logo: "/press-logo/theguardian.svg" },
+  { name: "The Independent", logo: "/press-logo/theindependent.svg", scale: 1.6 },
+  { name: "BBC Good Food", logo: "/press-logo/bbcgoodfood.svg" },
+  { name: "Time Out", logo: "/press-logo/timeout.svg" },
+  { name: "Forbes", logo: "/press-logo/forbes.svg" },
+  { name: "Evening Standard", logo: "/press-logo/eveningstandard.svg" },
+  { name: "The Week", logo: "/press-logo/theweek.svg" },
+  { name: "Metro", logo: "/press-logo/metro.svg" },
+  { name: "Country & Townhouse", logo: "/press-logo/country-townhouse.svg" },
+  { name: "The Infatuation", logo: "/press-logo/infatuation.svg" },
+  { name: "Hypebeast", logo: "/press-logo/hypebeast.svg" },
+  { name: "That's Up", logo: "/press-logo/thatsup.svg" },
 ];
 
 // Standout pull-quotes for the headline strip (rotates beneath the logos).
@@ -70,6 +76,67 @@ export const HIGHLIGHT_QUOTES: { quote: string; source: string; restaurant?: str
     quote: "Named among London's eleven best pies.",
     source: "City AM",
     restaurant: "hoodwood",
+  },
+];
+
+// The home page "In the Press" INDEX — stacked hairline rows like a
+// magazine's citations page: outlet, year, one-line quote, link. A curated
+// cut of PRESS (the strongest, most recognisable citations), ordered for
+// rhythm rather than strict chronology. Years marked with a trailing "?"
+// in the tracker are best guesses pending confirmation.
+export const PRESS_INDEX: {
+  outlet: string;
+  year: string;
+  quote: string;
+  url: string;
+}[] = [
+  {
+    outlet: "The Times",
+    year: "2025",
+    quote: "Giles Coren reviews Belly — Filipino flavour through a French bistro lens.",
+    url: "https://www.thetimes.com/life-style/food-drink/article/giles-coren-belly-restaurant-review-rvt2qpzs2",
+  },
+  {
+    outlet: "Michelin Guide",
+    year: "2026",
+    quote: "Belly, added to the Michelin Guide for Greater London.",
+    url: "https://guide.michelin.com/tw/en/greater-london/london/restaurant/belly",
+  },
+  {
+    outlet: "Time Out",
+    year: "2025",
+    quote: "Among the five best new London restaurants of 2025.",
+    url: "https://www.timeout.com/london/news/the-5-best-new-london-restaurants-that-opened-in-2025-121825",
+  },
+  {
+    outlet: "BBC Good Food",
+    year: "2025",
+    quote: "Café Mama & Sons, named among London's best bakeries.",
+    url: "https://www.bbcgoodfood.com/travel/best-bakeries-in-london",
+  },
+  {
+    outlet: "London on The Inside",
+    year: "2025",
+    quote: "A French bistro serving Filipino flavour bombs.",
+    url: "https://londontheinside.com/belly-review-the-french-bistro-serving-filipino-flavour-bombs/",
+  },
+  {
+    outlet: "The Week",
+    year: "2025",
+    quote: "Listed among the best restaurants in London.",
+    url: "https://theweek.com/culture-life/food-drink/the-best-restaurants-in-london",
+  },
+  {
+    outlet: "City AM",
+    year: "2026",
+    quote: "Hoodwood — among London's eleven best pies.",
+    url: "https://www.cityam.com/the-11-best-pies-in-london-to-eat-during-british-pie-week/",
+  },
+  {
+    outlet: "Forbes",
+    year: "2026",
+    quote: "Where to eat and drink in London this Valentine's Day.",
+    url: "https://www.forbes.com/sites/rachel-dube/2026/02/11/left-it-late-where-to-eat-and-drink-in-london-for-valentines-day-2026/",
   },
 ];
 

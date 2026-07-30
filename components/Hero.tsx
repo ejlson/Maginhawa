@@ -19,18 +19,12 @@ export default function Hero({ started }: { started: boolean }) {
   const [clip, setClip] = useState(0);
   const videoRefs = useRef<(HTMLVideoElement | null)[]>([]);
 
-  // the hero is pinned (position: sticky) while the cream page slides up
-  // over it — the recede itself is free. This adds the missing depth cue:
-  // over the first viewport of scroll the wordmark drifts down 60px, so
-  // the type falls behind at a different rate than the page above it.
-  // The drift lives on .titleWrap (the mask), NOT .titleInner — the inner
-  // span's transform belongs to the intro rise-in, and moving the mask
-  // with the glyph means nothing ever clips mid-drift; .hero's own
-  // overflow: hidden does the receding crop.
+  // depth for the cover parallax: as the cream sheet rides up over the
+  // pinned hero at 1×, the wordmark drifts up at a fraction of that —
+  // scroll-linked transform on one element, clamped to the first viewport
+  // of travel. Reduced motion pins it.
   const reduce = useReducedMotion();
   const { scrollY } = useScroll();
-  // viewport height in state so the transform range tracks real screens;
-  // 800 is only the SSR placeholder before the first client measure
   const [vh, setVh] = useState(800);
   useEffect(() => {
     const measure = () => setVh(window.innerHeight);
@@ -38,7 +32,9 @@ export default function Hero({ started }: { started: boolean }) {
     window.addEventListener("resize", measure);
     return () => window.removeEventListener("resize", measure);
   }, []);
-  const y = useTransform(scrollY, [0, vh], [0, 60]);
+  const titleY = useTransform(scrollY, [0, vh], [0, -vh * 0.18], {
+    clamp: true,
+  });
 
   const advance = () => {
     const next = (clip + 1) % CLIPS.length;
@@ -76,8 +72,10 @@ export default function Hero({ started }: { started: boolean }) {
         ))}
       </div>
 
-      {/* scroll parallax rides the wrap; reduced motion keeps it planted */}
-      <motion.div className={styles.titleWrap} style={reduce ? undefined : { y }}>
+      <motion.div
+        className={styles.titleWrap}
+        style={reduce ? undefined : { y: titleY }}
+      >
         <motion.span
           className={styles.titleInner}
           initial={{ transform: "translateY(110%)" }}
@@ -104,6 +102,29 @@ export default function Hero({ started }: { started: boolean }) {
             </text>
           </svg>
         </motion.span>
+      </motion.div>
+
+      {/* the SCROLL indicator — mono-caps chrome seated above the
+          wordmark's right end, arriving a beat after it. Static once
+          landed: the label is a signpost, not an animation. */}
+      <motion.div
+        className={styles.scrollHint}
+        initial={{ opacity: 0 }}
+        animate={{ opacity: started ? 0.85 : 0 }}
+        transition={{ duration: 0.8, ease: "easeOut", delay: 1.3 }}
+        aria-hidden
+      >
+        <span>Scroll</span>
+        <svg
+          viewBox="0 0 12 12"
+          fill="none"
+          stroke="currentColor"
+          strokeWidth="1.2"
+          strokeLinecap="round"
+          strokeLinejoin="round"
+        >
+          <path d="M2.5 4.5 L6 8 L9.5 4.5" />
+        </svg>
       </motion.div>
     </section>
   );
