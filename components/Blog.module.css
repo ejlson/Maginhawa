@@ -18,11 +18,23 @@
   --blog-gutter: var(--grid-gutter);
   --blog-col: var(--grid-col);
   --blog-col2: var(--grid-col2);
-  /* one owner per boundary: Blog owns the gap above it, ReadyCta owns the one
-     below. Tight tier — the full-bleed About card sits directly above, so its
-     edge already reads as the break. */
-  margin-top: var(--home-gap-tight);
-  padding: 0;
+  /* THE SHEET THAT COVERS THE INTERLUDE. The photograph above is pinned and
+     this section scrolls up over it, so the boundary is no longer a gap to
+     be owned — it is this sheet's own top edge crossing the picture. A
+     margin here would have shown as a maroon strip climbing the screen
+     ahead of the journal; the air the heading needs is INSIDE the cream
+     instead. Stacked above the pinned band (which sits at z-index 0 in the
+     shared .pinScope). */
+  z-index: 1;
+  margin-top: 0;
+  padding: clamp(64px, 9vh, 132px) 0 0;
+  /* A SHEET THAT COVERS A SCREEN HAS TO BE A SCREEN. The pinned photograph
+     is held by its containing block, which ends at THIS section's bottom —
+     so a journal shorter than the viewport runs the pin out before its own
+     top edge has finished crossing, and the photograph starts scrolling
+     again with a strip of itself still showing. At 782px it was releasing
+     118px early. Measured: probe-journal.mjs, PIN. */
+  min-height: 100svh;
   display: flex;
   flex-direction: column;
   /* head → strip gap on the Discover head's rhythm — the display heading
@@ -129,9 +141,14 @@
 .card {
   flex: none;
   scroll-snap-align: start;
-  /* sized so ~3.5 cards fill the lane from the column-2 seat to the right
-     viewport edge — the fourth card crops there as the drag affordance */
-  width: calc((100vw - var(--blog-col2) - 3 * var(--blog-gutter)) / 3.5);
+  /* THE SAME PLATE AS THE RESTAURANT REEL. Both strips run 3:4 plates on
+     the same gutter from the same column-2 seat, so the only thing that
+     could make them read as different systems was the width — this used to
+     be a "3.5 cards fill the lane" fraction (≈357px at 1440) against
+     Discover's fixed clamp (≈331px). Sharing the literal rule, rather than
+     two rules that happen to land close, is what keeps them identical at
+     every width. See .gridStrip .cell in Discover.module.css. */
+  width: clamp(240px, 23vw, 360px);
   display: block;
   text-decoration: none;
   color: var(--maroon);
@@ -148,17 +165,6 @@
      the manifesto prints, one corner language across the page */
   border-radius: 2px;
   background: var(--placeholder);
-}
-
-/* the first card's plate while the interlude's photograph is still on its
-   way into it: the seat stands empty and waiting. Not a placeholder grey —
-   the reader can see the picture descending onto it, so the plate reads as
-   the space being kept rather than as an image that failed. */
-.plate[data-holding] {
-  background: color-mix(in srgb, var(--maroon) 6%, transparent);
-}
-.plate[data-holding] .cover {
-  opacity: 0;
 }
 
 .cover {
@@ -317,9 +323,8 @@
   .section {
     --blog-col2: var(--blog-margin);
   }
-  .card {
-    width: 62vw;
-  }
+  /* the card width is NOT overridden here — the reel's clamp already
+     bottoms out at 240px on a narrow screen, and matching it is the point */
 }
 
 /* ---------- reduced motion — no zoom, no arrow slide; colour-only

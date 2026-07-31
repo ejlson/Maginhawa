@@ -189,7 +189,20 @@
     (100vw - 2 * var(--grid-margin) - 11 * var(--grid-gutter)) / 12
   );
   --grid-col2: calc(var(--grid-margin) + var(--grid-col) + var(--grid-gutter));
+  /* THE FILM FRAME. The breath of ground a full-height photograph keeps
+     between itself and the screen edges — the About film's frame and the
+     interlude's are meant to be the SAME frame, so the measurement lives
+     here once instead of being re-typed in two stylesheets that then drift.
+     On a narrow screen it is simply the page margin; on desktop it tightens
+     to a hairline so the photograph carries the chapter. */
+  --film-breath: var(--grid-margin);
   --maxw: 1440px;
+}
+
+@media (min-width: 981px) {
+  :root {
+    --film-breath: 12px;
+  }
 }
 
 * {
@@ -375,6 +388,23 @@ html::-webkit-scrollbar {
   position: relative;
   z-index: 1;
   background: var(--cream);
+}
+
+/* THE JOURNAL'S ENTRANCE — the scope a `position: sticky` interlude is
+   pinned inside.
+   The photograph sticks to the top of the window and the Blog sheet scrolls
+   up over it, so the scope has to be an ancestor that OUTLIVES the pinned
+   element: sticky is bounded by its containing block, and while the
+   interlude sat as the last child of the maroon zone that block ended at
+   its own bottom edge — zero travel, no pin. Wrapping the interlude and the
+   journal together is what gives the pin something to hold through.
+   `flow-root` so the interlude's top margin is contained and reads as this
+   box's maroon rather than collapsing out into the cream page above; the
+   ground is maroon for exactly that strip, and the journal covers the rest. */
+.pinScope {
+  position: relative;
+  display: flow-root;
+  background: var(--maroon);
 }
 
 .eyebrow {

@@ -11,14 +11,14 @@
    entrance (in the component) is the section's only staged move. */
 .section {
   position: relative;
-  /* The air above the chapter, and it is MAROON air: the zone contains
-     this margin (flow-root) rather than letting it collapse out, so this
-     is the distance from the band's top edge down to the film and the
-     heading. Deliberately tight — the band arrives by climbing over the
-     chapter before it, and a deep gap meant a screenful of empty ground
-     crossing the window ahead of anything worth reading. The chapter
-     should be legible almost as soon as its ground is. */
-  margin-top: clamp(28px, 4.5vh, 64px);
+  /* NO air above the chapter beyond its own padding. The band arrives by
+     climbing over the chapter before it, so every pixel between the maroon's
+     top edge and the first thing worth reading is empty ground crossing the
+     window — and the film's breath below and to its left is only 12px, so
+     any margin here also made the frame visibly uneven at the top. The
+     padding IS the gap now: one even breath on all three screen-hugging
+     sides, which is what the comment above always claimed. */
+  margin-top: 0;
   /* the maroon ground lives on the surrounding MaroonZone wrapper (shared
      with As Seen In and the interlude) — this section stays transparent */
   background: none;
@@ -33,13 +33,13 @@
     min-height: 100svh;
     display: flex;
     flex-direction: column;
-    /* the film's breath: a TIGHT, even 20px on the screen-hugging sides
-       (left, top, bottom). The RIGHT side keeps the page margin, so the
-       text column's right edge stays seated on the global grid and aligns
-       with every other chapter. */
-    --about-breath: 12px;
-    padding: var(--about-breath) var(--grid-margin) var(--about-breath)
-      var(--about-breath);
+    /* the film's breath: a TIGHT, even hairline on the screen-hugging sides
+       (left, top, bottom) — the shared --film-breath, so this frame and the
+       interlude's are the same frame. The RIGHT side keeps the page margin,
+       so the text column's right edge stays seated on the global grid and
+       aligns with every other chapter. */
+    padding: var(--film-breath) var(--grid-margin) var(--film-breath)
+      var(--film-breath);
   }
 }
 

@@ -94,14 +94,23 @@ export default function Experience() {
           <ChapterPin>
             <Discover />
           </ChapterPin>
-          {/* ONE maroon band under the story, the press credential and the
-              photo beat — it is its own ground, and its own arrival */}
+          {/* ONE maroon band under the story and the press credential — it
+              is its own ground, and its own arrival */}
           <MaroonZone>
             <AboutIntro />
             <PressWall />
-            <Interlude />
           </MaroonZone>
-          <Blog />
+          {/* The second chapter change, and the same grammar as the first:
+              the photograph HOLDS on its screen (plain sticky) and the
+              journal's cream sheet climbs over it. They have to share a
+              wrapper — sticky is bounded by its containing block, so the
+              scope is what gives the pin something to be held through. The
+              interlude carries its own maroon now that it has left the zone
+              above; .pinScope's ground covers the strip between them. */}
+          <div className="pinScope">
+            <Interlude />
+            <Blog />
+          </div>
           {/* open-roles index on the cream page, then the closing
               invitation with the Join Us pill */}
           {/* <CareersTeaser /> */}

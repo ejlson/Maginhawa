@@ -142,5 +142,9 @@
   "140": "U1",
   "141": "t",
   "142": "probe-field.mjs",
-  "143": "Parallax.tsx"
+  "143": "Parallax.tsx",
+  "144": "probe-hover-entrance.mjs",
+  "145": "probe-manifesto.mjs",
+  "146": "probe-stage.mjs",
+  "147": "shoot-pin.mjs"
 }

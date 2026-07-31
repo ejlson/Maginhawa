@@ -27,3 +27,4 @@ skills-lock.json
 
 # raw camera masters — 616MB of originals that the public/ exports come from
 /media-src
+/.next-old

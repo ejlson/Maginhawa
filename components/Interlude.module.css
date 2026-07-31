@@ -1,26 +1,48 @@
-/* Full-bleed photo interlude — a wordless beat between the press strip and
-   the journal, and the journal's entrance: the photograph shrinks out of
-   this band and lands as the first card in the reel below. The section
-   clips; the media fills it exactly (see the component on why the old
-   parallax drift had to go). */
+/* The photo interlude — a full-screen photograph in a maroon frame, PINNED
+   while the journal scrolls up over it.
+
+   `position: sticky` is bounded by the element's CONTAINING BLOCK, so the
+   pin only exists because the section now sits inside `.pinScope`
+   (globals.css) alongside the Blog sheet. As the last child of the maroon
+   zone its containing block ended at its own bottom edge and it had nothing
+   to be held through.
+
+   The section is the FRAME and the picture is inset into it, so what shows
+   around the photograph is this band's own maroon — the same --film-breath
+   the About film keeps against the screen edges, so the two full-height
+   photographs on the page wear the same frame. */
 .section {
-  position: relative;
+  position: sticky;
+  top: 0;
+  /* under the journal that covers it — both are positioned, so document
+     order would decide anyway; saying it out loud keeps it decided */
+  z-index: 0;
+  height: 100svh;
   overflow: hidden;
-  height: clamp(380px, 68vh, 760px);
-  margin-top: var(--home-gap-tight);
+  background: var(--maroon);
+  /* the gap up to the masthead marquee. It was --home-gap-tight (a third of
+     a screen), sized for a band that scrolled past; a beat that HOLDS wants
+     to arrive promptly instead. Contained by .pinScope's flow-root, so this
+     strip is maroon and continuous with the zone above it. */
+  margin-top: clamp(56px, 8vh, 110px);
 }
 
+/* the picture, inset by the frame */
 .media {
   position: absolute;
-  inset: 0;
+  inset: var(--film-breath);
+  overflow: hidden;
+  /* square-cut, like every other full-height film in the page */
+  border-radius: 0;
+  background: var(--placeholder);
 }
 
 .img {
   object-fit: cover;
 }
 
-/* soft maroon veil between the footage and the line — legibility without
-   a heavy scrim; the photograph stays the section */
+/* soft maroon veil between the photograph and the line — legibility
+   without a heavy scrim; it rides INSIDE the frame with the picture */
 .veil {
   position: absolute;
   inset: 0;
@@ -28,8 +50,9 @@
   pointer-events: none;
 }
 
-/* the ONE overlaid display line — centred in the frame, cream, holding
-   still while the photograph is still here */
+/* the ONE overlaid display line — centred in the section (not the frame:
+   the 12px difference is invisible and centring on the band keeps the line
+   on the screen's true middle while the section is pinned there) */
 .lineWrap {
   position: absolute;
   inset: 0;
@@ -37,7 +60,6 @@
   place-items: center;
   padding-inline: var(--pad-x);
   pointer-events: none;
-  will-change: transform, opacity;
 }
 
 .line {
@@ -49,55 +71,4 @@
   letter-spacing: var(--tr-display);
   text-align: center;
   color: var(--cream);
-}
-
-/* Once the flying copy exists, the band's own photograph and veil step
-   aside in the SAME commit that mounts it — two copies of one picture is
-   the one thing this transition must never show. What is left is maroon on
-   the maroon zone's maroon: an empty band, invisible. */
-.section[data-flying] .media,
-.section[data-flying] .veil {
-  opacity: 0;
-}
-
-/* ---------- the flying photograph (portalled to the body) ---------- */
-/* Fixed to the viewport and positioned from measured rects each frame.
-   Left/top/width/height rather than a transform on purpose: a uniform
-   scale would stretch a full-bleed landscape into a 3:4 portrait plate,
-   whereas an animated frame over `object-fit: cover` RE-CROPS — the picture
-   closes in on its subject the way a picture editor would crop it down for
-   the page. It is one out-of-flow element in its own layer, so the layout
-   it costs is its own and nothing else reflows. */
-.flyer {
-  position: fixed;
-  z-index: 50; /* over the page, under the nav (80) and the menu (74) */
-  overflow: hidden;
-  pointer-events: none;
-  will-change: left, top, width, height;
-  contain: paint;
-}
-
-/* the two pictures are stacked, both cropping to the same live frame, so
-   the dissolve between them never changes composition — only subject */
-.flyerImg {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  display: block;
-}
-
-.flyerVeil {
-  position: absolute;
-  inset: 0;
-  background: rgba(47, 0, 0, 0.32);
-}
-
-/* reduced motion: no flight, and the band keeps its picture */
-@media (prefers-reduced-motion: reduce) {
-  .section[data-flying] .media,
-  .section[data-flying] .veil {
-    opacity: 1;
-  }
 }

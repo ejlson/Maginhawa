@@ -10,6 +10,15 @@
      top pad so the statement arrives early in the cover, seated on the
      page margin like every other chapter */
   padding: clamp(28px, 4.5vh, 64px) var(--pad-x) clamp(48px, 8vh, 120px);
+  /* The rule that closes the statement — a hairline running the full width
+     of the screen, not the measure. It sits on the section's border box, so
+     it clears the page margin on both sides and reads as the sheet's own
+     bottom edge rather than as an underline belonging to the sentence.
+     A flat, OPAQUE warm grey — not the maroon, and not a tinted alpha. An
+     alpha rule takes its value from whatever passes beneath it, and full
+     maroon at full width read as the page being divided rather than as
+     this sheet ending. */
+  border-bottom: 1px solid #cec7bb;
 }
 
 /* stacked flow below the breakpoint; the page's 12-column grid above it */

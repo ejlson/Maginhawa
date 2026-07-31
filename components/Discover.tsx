@@ -336,20 +336,30 @@ const HEAD_AIR = 28;
 // Prints are free to OVERLAP: 2 sits on the corner of 1, and 4 on the
 // corner of 3. That is what stops the frame reading as a tidy border and
 // makes it read as photographs laid out on a desk.
+// CLOSER AND BIGGER. The bands used to sit against the screen's own edges
+// with a third of the height empty between them and the line, so the title
+// read as alone on the page with a border round it rather than as a line
+// laid down among photographs. Every print is ~22% larger and each band has
+// moved in towards the centre until its inner edge is just clear of the
+// title's box: the top band's bottoms now land at 18–34% (they were at
+// 6–22%) and the bottom band's tops at 60–66% (they were 63–75%). The
+// clear box itself is unchanged — nothing is seated inside x 26–74%,
+// y 36–64%, which is what the title and the opened deck occupy — so the
+// prints crowd the line without ever touching it.
 const STAGE_PRINTS = [
   // ---- top band ----
-  { src: "/blog/DSCF3035-web.jpg", left: "4%", top: "7%", w: 138, ar: 1, drift: 22, depth: 780, speed: 1 },
-  { src: "/blog/DSCF3015-web.jpg", left: "11%", top: "1%", w: 104, ar: 1.5, drift: -14, depth: 900, speed: 1.28 },
-  { src: "/blog/DSCF2995-web.jpg", left: "36%", top: "5%", w: 172, ar: 1.45, drift: 16, depth: 700, speed: 0.86 },
-  { src: "/blog/DSC07056-web.jpg", left: "47%", top: "13%", w: 94, ar: 1, drift: -18, depth: 840, speed: 1.12 },
-  { src: "/blog/DSCF2296-web.jpg", left: "74%", top: "3%", w: 120, ar: 0.67, drift: 12, depth: 760, speed: 0.94 },
-  // ---- flanks: the title's own height, hard against the screen edges ----
-  { src: "/blog/DSC07722-web.jpg", left: "1%", top: "33%", w: 98, ar: 0.72, drift: 14, depth: 660, speed: 0.8 },
-  { src: "/blog/DSCF3052-web.jpg", left: "87%", top: "27%", w: 132, ar: 1, drift: -16, depth: 920, speed: 1.34 },
+  { src: "/blog/DSCF3035-web.jpg", left: "4%", top: "15%", w: 168, ar: 1, drift: 22, depth: 780, speed: 1 },
+  { src: "/blog/DSCF3015-web.jpg", left: "11%", top: "9%", w: 127, ar: 1.5, drift: -14, depth: 900, speed: 1.28 },
+  { src: "/blog/DSCF2995-web.jpg", left: "36%", top: "13%", w: 210, ar: 1.45, drift: 16, depth: 700, speed: 0.86 },
+  { src: "/blog/DSC07056-web.jpg", left: "47%", top: "21%", w: 115, ar: 1, drift: -18, depth: 840, speed: 1.12 },
+  { src: "/blog/DSCF2296-web.jpg", left: "74%", top: "11%", w: 146, ar: 0.67, drift: 12, depth: 760, speed: 0.94 },
+  // ---- flanks: the title's own height, drawn in off the screen edges ----
+  { src: "/blog/DSC07722-web.jpg", left: "3%", top: "32%", w: 120, ar: 0.72, drift: 14, depth: 660, speed: 0.8 },
+  { src: "/blog/DSCF3052-web.jpg", left: "84%", top: "28%", w: 161, ar: 1, drift: -16, depth: 920, speed: 1.34 },
   // ---- bottom band ----
-  { src: "/blog/DSCF2472-web.jpg", left: "5%", top: "63%", w: 158, ar: 1.35, drift: 18, depth: 820, speed: 1.06 },
-  { src: "/blog/DSCF2298-web.jpg", left: "57%", top: "75%", w: 182, ar: 1.5, drift: 20, depth: 860, speed: 1.16 },
-  { src: "/blog/DSC07739-web.jpg", left: "79%", top: "64%", w: 96, ar: 0.67, drift: -12, depth: 720, speed: 0.9 },
+  { src: "/blog/DSCF2472-web.jpg", left: "5%", top: "60%", w: 193, ar: 1.35, drift: 18, depth: 820, speed: 1.06 },
+  { src: "/blog/DSCF2298-web.jpg", left: "57%", top: "66%", w: 222, ar: 1.5, drift: 20, depth: 860, speed: 1.16 },
+  { src: "/blog/DSC07739-web.jpg", left: "76%", top: "62%", w: 117, ar: 0.67, drift: -12, depth: 720, speed: 0.9 },
 ];
 
 const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
@@ -1471,6 +1481,16 @@ export default function Discover() {
             mode === "strip" ? styles.gridStrip : ""
           }`}
           aria-label="Our restaurants"
+          /* IN STRIP MODE THIS BOX SCROLLS, and every plate inside it
+             carries a `layoutId` for the expansion morph. Layout projection
+             measures a plate in viewport coordinates and re-applies the
+             difference as a transform — but it has no idea this ancestor
+             has its own scrollLeft unless it is told, so any re-measure
+             taken while the reel was scrolled came back short by exactly
+             that scroll and the plate was thrown that far off screen (and
+             scaled, since the delta carries scale too). `layoutScroll` is
+             what makes projection read the offset. */
+          layoutScroll
           // the seats are invisible until the plates land on them — nothing
           // there is pressable yet, and the page is held still anyway
           style={stageUp ? { pointerEvents: "none" } : undefined}
@@ -1610,43 +1630,50 @@ function Tile({
   const neighbourhood = getRestaurant(item.slug)
     ?.location.replace(/,\s*London$/, "");
 
-  // HOVER FILM: the plate's clip mounts on the FIRST hover (so eight videos
-  // never load up front — preload="none" and no element until needed) and
-  // stays mounted after, so re-hovers resume instantly. Fine-pointer,
-  // full-motion surfaces only: touch and reduced-motion keep the still.
+  /* HOVER FILM.
+     NOTHING HERE MAY RE-RENDER THIS TILE. The plate carries a `layoutId`,
+     so every render of this component is a layout re-measure — and a
+     re-measure taken mid-hover, inside a reel that is scrolled sideways, is
+     what was throwing the photograph off screen. The film is therefore
+     driven entirely through the DOM: no state, no render, no projection.
+
+     The element is present from mount but EMPTY — `preload="none"` and no
+     `src` at all, so eight clips (25MB on Belly's alone) cost nothing until
+     a pointer actually asks for one. The source is attached on first hover.
+
+     It is revealed on `playing` and not a moment before: with nothing
+     buffered the element has nothing to draw when the pointer arrives, and
+     fading it in on hover alone crossfaded the photograph into an empty box
+     for as long as the fetch took — which read as the picture vanishing
+     under the cursor. A clip that never loads simply never appears. */
   const [canHover, setCanHover] = useState(false);
   useEffect(() => {
     setCanHover(window.matchMedia("(hover: hover) and (pointer: fine)").matches);
   }, []);
-  const [clipMounted, setClipMounted] = useState(false);
-  const [clipOn, setClipOn] = useState(false);
-  /* Has this clip ever actually produced a frame? `preload="none"` means
-     the element has NOTHING to draw at the moment the pointer arrives, so
-     fading it in on hover alone crossfaded the photograph into an empty
-     black box for however long the fetch took — 2.5MB on the smallest tile
-     and 25MB on Belly's, which read as the picture vanishing under the
-     cursor. The film is revealed on `playing` and not a moment before; a
-     clip that never loads simply never appears, and the still stays. */
-  const [clipLive, setClipLive] = useState(false);
   const clipRef = useRef<HTMLVideoElement>(null);
+  // is the pointer STILL on the tile? `playing` can arrive long after the
+  // pointer has left, and a film that fades up over an unhovered plate is
+  // worse than one that never plays
+  const wantClip = useRef(false);
 
   const filmable = Boolean(item.clip) && canHover && !reduce;
   const onEnter = () => {
-    if (!filmable) return;
-    setClipMounted(true);
-    setClipOn(true);
-  };
-  const onLeave = () => setClipOn(false);
-
-  useEffect(() => {
     const v = clipRef.current;
+    if (!filmable || !v) return;
+    wantClip.current = true;
+    if (!v.src) v.src = item.clip!;
+    void v.play().catch(() => {});
+  };
+  const onLeave = () => {
+    const v = clipRef.current;
+    wantClip.current = false;
     if (!v) return;
-    if (clipOn) {
-      void v.play().catch(() => {});
-    } else {
-      v.pause();
-    }
-  }, [clipOn, clipMounted]);
+    v.classList.remove(styles.hoverClipOn);
+    v.pause();
+  };
+  const onClipPlaying = () => {
+    if (wantClip.current) clipRef.current?.classList.add(styles.hoverClipOn);
+  };
 
   return (
     <motion.li
@@ -1700,19 +1727,18 @@ function Tile({
             // the centered cream mark / wordmark carries the tile
             <div className={styles.fallback} aria-hidden />
           )}
-          {/* the hover film — fades in over the still while playing */}
-          {clipMounted && item.clip ? (
+          {/* the hover film — empty until a pointer asks for it, then faded
+              in once it is genuinely playing. Both are done on the element
+              itself; see the handlers above for why this must not render. */}
+          {filmable ? (
             <video
               ref={clipRef}
-              className={`${styles.hoverClip} ${
-                clipOn && clipLive ? styles.hoverClipOn : ""
-              }`}
-              src={item.clip}
+              className={styles.hoverClip}
               muted
               loop
               playsInline
               preload="none"
-              onPlaying={() => setClipLive(true)}
+              onPlaying={onClipPlaying}
             />
           ) : null}
           {/* legibility scrim behind the centred mark — resting state only.

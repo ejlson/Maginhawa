@@ -467,11 +467,14 @@
   overflow: visible;
 }
 
-/* the GROWER — pinned to the plate's top, it clips all the media and gets
-   slightly taller on hover: the bottom edge reaches down over the caption
-   gap while the layout box above never changes, so NOTHING below moves.
-   (An absolute child's height only lays out this one element — no page
-   reflow — and the 400ms one-shot keeps the cost invisible.) */
+/* THE CLIP. Pinned to the plate's top, it holds all the media.
+
+   It used to also GROW 10px taller on hover, reaching down over the caption
+   gap. That is a LAYOUT property changing under the pointer on a box that
+   carries a `layoutId`, which is the one kind of hover response this tile
+   cannot afford — and it made the plate visibly change shape rather than
+   just zoom. The hover is now purely a contained zoom: the photograph
+   swells a little INSIDE a clip that never moves and never resizes. */
 .mediaGrow {
   position: absolute;
   top: 0;
@@ -482,17 +485,6 @@
   /* the sharp editorial 2px cut (Telescope grammar) */
   border-radius: 2px;
   background: var(--placeholder);
-  transition: height 400ms var(--ease-drawer);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .cell:hover .mediaGrow {
-    height: calc(100% + 10px);
-  }
-}
-
-.cell:focus-within .mediaGrow {
-  height: calc(100% + 10px);
 }
 
 .photo {
@@ -1269,13 +1261,6 @@
   .hoverBlurb {
     transform: none;
     transition: opacity 300ms ease;
-  }
-  /* no bottom growth */
-  .mediaGrow,
-  .cell:hover .mediaGrow,
-  .cell:focus-within .mediaGrow {
-    height: 100%;
-    transition: none;
   }
   /* the Book pill keeps its colour shift only — no swell, no press scale */
   .pillBook,

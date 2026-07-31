@@ -85,8 +85,8 @@
     "semantic_hash": ""
   },
   "components/Discover.tsx": {
-    "mtime": 1785512860.7911158,
-    "ast_hash": "2ffc43d296df3528b1be5d73c33f19b7",
+    "mtime": 1785515044.3415585,
+    "ast_hash": "83f87feae72492d529d2e03e8597c0ec",
     "semantic_hash": ""
   },
   "components/Experience.tsx": {
@@ -270,13 +270,13 @@
     "semantic_hash": ""
   },
   "next-env.d.ts": {
-    "mtime": 1781694735.6070063,
-    "ast_hash": "ba64ff7d54714a8f64db89b1003207d8",
+    "mtime": 1785514521.8023074,
+    "ast_hash": "4c04b8c7a9b95663f961f6631fded343",
     "semantic_hash": ""
   },
   "next.config.mjs": {
-    "mtime": 1782909548.163217,
-    "ast_hash": "6f905d6df38ab99c2d8f8fcbcf0b69e2",
+    "mtime": 1785514486.235326,
+    "ast_hash": "58a586ab719762e33bebffc50b9c8b3e",
     "semantic_hash": ""
   },
   "package.json": {
@@ -670,8 +670,8 @@
     "semantic_hash": ""
   },
   "tsconfig.json": {
-    "mtime": 1781694136.6181142,
-    "ast_hash": "a8c16ccc1bface29fa141e42f2de1f02",
+    "mtime": 1785514521.8009367,
+    "ast_hash": "dc4abd82951839554657d85ec1d1dd71",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -1555,18 +1555,33 @@
     "semantic_hash": ""
   },
   "components/ChapterPin.tsx": {
-    "mtime": 1785513246.209623,
-    "ast_hash": "864c77bf89add1c5e6b6a295f5b688f4",
+    "mtime": 1785515028.4956307,
+    "ast_hash": "8e05138de600708db05debf596fdc4fc",
     "semantic_hash": ""
   },
   "scripts/probe-pin.mjs": {
-    "mtime": 1785513364.0592673,
-    "ast_hash": "0959dae1d06a089e734c791143a31c94",
+    "mtime": 1785515753.1510172,
+    "ast_hash": "02ec7ef6ffea84af63355900032841ff",
     "semantic_hash": ""
   },
   "scripts/shoot-pin.mjs": {
     "mtime": 1785513514.5352254,
     "ast_hash": "0c44b74e47b7a708400c6e319c235247",
+    "semantic_hash": ""
+  },
+  "lib/chapter.ts": {
+    "mtime": 1785514975.9604278,
+    "ast_hash": "cbea3198f3b53ddd0e0edb99fce3f111",
+    "semantic_hash": ""
+  },
+  "scripts/probe-hover.mjs": {
+    "mtime": 1785515772.6849713,
+    "ast_hash": "dcb8fbb9fbe5e44c6fe1fedf0b3a585a",
+    "semantic_hash": ""
+  },
+  "scripts/probe-stage.mjs": {
+    "mtime": 1785515113.8442404,
+    "ast_hash": "f5dd2ed59ae84b370d893346849690f2",
     "semantic_hash": ""
   }
 }
