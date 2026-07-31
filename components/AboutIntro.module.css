@@ -11,11 +11,14 @@
    entrance (in the component) is the section's only staged move. */
 .section {
   position: relative;
-  /* the widest boundary on the page — the collection needs clear air
-     before the ground turns maroon (1.5× the standard chapter gap). The
-     margin collapses through the MaroonZone wrapper, so the gap itself
-     stays cream and the maroon begins exactly at this edge. */
-  margin-top: calc(var(--home-gap) * 1.5);
+  /* The air above the chapter, and it is MAROON air: the zone contains
+     this margin (flow-root) rather than letting it collapse out, so this
+     is the distance from the band's top edge down to the film and the
+     heading. Deliberately tight — the band arrives by climbing over the
+     chapter before it, and a deep gap meant a screenful of empty ground
+     crossing the window ahead of anything worth reading. The chapter
+     should be legible almost as soon as its ground is. */
+  margin-top: clamp(28px, 4.5vh, 64px);
   /* the maroon ground lives on the surrounding MaroonZone wrapper (shared
      with As Seen In and the interlude) — this section stays transparent */
   background: none;
@@ -210,7 +213,8 @@
 .founderBlock {
   display: flex;
   flex-direction: column;
-  gap: clamp(10px, 1.4vh, 16px);
+  align-items: flex-end;
+  gap: clamp(8px, 1vh, 12px);
 }
 
 @media (min-width: 981px) {
@@ -223,18 +227,22 @@
   }
 }
 
+/* NAME, then alias, then portrait — one right-ranged stack sharing the
+   portrait's right edge, with the same gap between every pair so the three
+   read as one credit block. (The name and the alias used to sit on opposite
+   ends of a justified row above the picture, which left the name floating
+   away from the thing it names.) */
 /* the name line rides directly above the portrait, sharing its width —
    name flush to the portrait's left edge, alias at its right end */
 .founderRow {
   margin: 0;
   display: flex;
-  /* the alias shares the NAME'S LAST LINE — with the two-column measure the
-     name wraps ("Omar / Shah.") and the small mark must sit on the bottom
-     line's baseline, not the first's */
+  flex-direction: column;
   align-items: flex-end;
-  align-items: last baseline;
-  justify-content: space-between;
-  gap: 0.8em;
+  text-align: right;
+  /* the SAME gap the block uses below, so name → alias → portrait are
+     evenly spaced rather than two different distances */
+  gap: clamp(8px, 1vh, 12px);
 }
 
 .founderName {
@@ -343,4 +351,61 @@
 .cta:hover .ctaChevron,
 .cta:focus-visible .ctaChevron {
   transform: translateX(4px);
+}
+
+
+/* ---------- parallax cells ---------- */
+/* The grid seat and the drift live here; the Reveal inside owns its own
+   entrance rise. Two boxes, because one element cannot have its `y` driven
+   by a scroll MotionValue and animated by a variant at the same time. */
+.headCell,
+.founderCell {
+  min-width: 0;
+}
+
+@media (min-width: 981px) {
+  .headCell {
+    grid-column: 9 / 13;
+    grid-row: 1;
+  }
+  .founderCell {
+    grid-column: 10 / 13;
+    grid-row: 3;
+    align-self: end;
+  }
+  /* the seats now belong to the cells above — the blocks just flow inside */
+  .headBlock,
+  .founderBlock {
+    grid-column: auto;
+    grid-row: auto;
+  }
+
+  /* THE LINK, lifted. It used to sit in row 3 beside a 4:5 portrait, and
+     between them they pushed the bottom band past a 100svh screen — so the
+     one call to action in the chapter was reliably below the fold. It now
+     sits directly under the story it belongs to, which also closes the
+     large empty middle the right-hand column had: title, paragraph, link,
+     one block. */
+  .ctaCell {
+    grid-column: 9 / 13;
+    grid-row: 2;
+    align-self: start;
+    justify-self: end;
+  }
+}
+
+/* The founder credit is a BYLINE, not a feature — a modest portrait with
+   the name above it, sized so the bottom band and the link both fit on one
+   screen. Capping the height (rather than the column width) keeps the 4:5
+   crop while letting the chapter breathe. */
+@media (min-width: 981px) {
+  .portraitFrame {
+    /* the WIDTH has to be the definite one. Constraining the height and
+       leaving `width: auto` against an aspect-ratio gave the box no
+       definite axis at all and it collapsed to 0x0 — the portrait
+       disappeared entirely. */
+    width: clamp(112px, 11vw, 176px);
+    aspect-ratio: 4 / 5;
+    margin-left: auto;
+  }
 }

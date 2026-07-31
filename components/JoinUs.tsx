@@ -133,7 +133,7 @@ export default function JoinUs() {
           <Reveal className={styles.heroFrame}>
             <video
               className={styles.heroFrameVideo}
-              src="/videos/belly-hero.mov"
+              src="/videos/belly-hero.mp4"
               autoPlay
               muted
               loop

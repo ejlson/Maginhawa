@@ -35,15 +35,24 @@
 }
 
 /* Giant wordmark stretched edge-to-edge across the bottom of the hero */
-.titleWrap {
+/* the hero's floor block: scroll cue, then the wordmark. One positioned
+   box so the two keep their spacing at every viewport and the cover
+   parallax moves them as a pair. */
+.titleStack {
   position: absolute;
   left: var(--pad-x);
   right: var(--pad-x);
-  bottom: clamp(2px, 0.8vh, 14px);
+  bottom: clamp(18px, 2.6vh, 34px);
+  pointer-events: none;
+  will-change: transform;
+}
+
+.titleWrap {
   margin: 0;
   color: var(--cream);
   mix-blend-mode: difference;
-  pointer-events: none;
+  /* the wordmark rises out of this clip — it must stay tight to the type,
+     which is why the cue sits OUTSIDE it rather than in the same box */
   overflow: hidden;
 }
 
@@ -68,15 +77,17 @@
 }
 
 /* ---------- the SCROLL indicator ---------- */
-/* mono-caps chrome (Telescope grammar) riding the hero's right edge just
-   ABOVE the wordmark — the 17vw offset tracks the wordmark's width-scaled
-   height so the two never collide. Cream over the dimmed footage; no
-   motion of its own once landed. */
+/* mono-caps chrome (Telescope grammar) seated UNDERNEATH the wordmark and
+   centred on it — the cue reads as the next step in the page rather than as
+   a label pinned to a corner, and it points down into the space it is
+   asking you to go. Cream over the dimmed footage; no motion of its own
+   once landed. */
 .scrollHint {
-  position: absolute;
-  right: var(--pad-x);
-  bottom: calc(clamp(2px, 0.8vh, 14px) + 17vw);
-  display: inline-flex;
+  /* in flow, directly above the wordmark — the air between them is the
+     wordmark's own optical breathing room, not a fixed gap */
+  margin-bottom: clamp(12px, 1.6vh, 22px);
+  display: flex;
+  justify-content: center;
   align-items: center;
   gap: 0.55em;
   font-family: var(--font-mono);

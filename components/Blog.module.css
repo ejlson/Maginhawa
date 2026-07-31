@@ -150,6 +150,17 @@
   background: var(--placeholder);
 }
 
+/* the first card's plate while the interlude's photograph is still on its
+   way into it: the seat stands empty and waiting. Not a placeholder grey —
+   the reader can see the picture descending onto it, so the plate reads as
+   the space being kept rather than as an image that failed. */
+.plate[data-holding] {
+  background: color-mix(in srgb, var(--maroon) 6%, transparent);
+}
+.plate[data-holding] .cover {
+  opacity: 0;
+}
+
 .cover {
   width: 100%;
   height: 100%;

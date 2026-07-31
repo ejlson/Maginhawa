@@ -13,7 +13,7 @@ import styles from "./Hero.module.css";
 // to its end, then the next one starts on a clean hard cut. BOTH videos
 // stay mounted and preloaded the whole time; the swap only flips
 // visibility, so there's no loading gap or flash between clips.
-const CLIPS = ["/videos/belly-hero.mov", "/videos/mamasons.mov"];
+const CLIPS = ["/videos/belly-hero.mp4", "/videos/mamasons-hero.mp4"];
 
 export default function Hero({ started }: { started: boolean }) {
   const [clip, setClip] = useState(0);
@@ -72,10 +72,38 @@ export default function Hero({ started }: { started: boolean }) {
         ))}
       </div>
 
+      {/* The cue and the wordmark are ONE block seated on the floor of the
+          hero, cue on top — so the reader meets the instruction first and
+          the name second, and the cover parallax carries them together
+          rather than sliding one over the other. */}
       <motion.div
-        className={styles.titleWrap}
+        className={styles.titleStack}
         style={reduce ? undefined : { y: titleY }}
       >
+        {/* the SCROLL indicator — mono-caps chrome above the wordmark,
+            arriving a beat after it. Static once landed: the label is a
+            signpost, not an animation. */}
+        <motion.div
+          className={styles.scrollHint}
+          initial={{ opacity: 0 }}
+          animate={{ opacity: started ? 0.85 : 0 }}
+          transition={{ duration: 0.8, ease: "easeOut", delay: 1.3 }}
+          aria-hidden
+        >
+          <span>Scroll</span>
+          <svg
+            viewBox="0 0 12 12"
+            fill="none"
+            stroke="currentColor"
+            strokeWidth="1.2"
+            strokeLinecap="round"
+            strokeLinejoin="round"
+          >
+            <path d="M2.5 4.5 L6 8 L9.5 4.5" />
+          </svg>
+        </motion.div>
+
+        <div className={styles.titleWrap}>
         <motion.span
           className={styles.titleInner}
           initial={{ transform: "translateY(110%)" }}
@@ -102,29 +130,7 @@ export default function Hero({ started }: { started: boolean }) {
             </text>
           </svg>
         </motion.span>
-      </motion.div>
-
-      {/* the SCROLL indicator — mono-caps chrome seated above the
-          wordmark's right end, arriving a beat after it. Static once
-          landed: the label is a signpost, not an animation. */}
-      <motion.div
-        className={styles.scrollHint}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: started ? 0.85 : 0 }}
-        transition={{ duration: 0.8, ease: "easeOut", delay: 1.3 }}
-        aria-hidden
-      >
-        <span>Scroll</span>
-        <svg
-          viewBox="0 0 12 12"
-          fill="none"
-          stroke="currentColor"
-          strokeWidth="1.2"
-          strokeLinecap="round"
-          strokeLinejoin="round"
-        >
-          <path d="M2.5 4.5 L6 8 L9.5 4.5" />
-        </svg>
+        </div>
       </motion.div>
     </section>
   );

@@ -83,51 +83,96 @@ export default function CustomCursor() {
       return { mode: el?.closest?.("a, button") ? "button" : "zone", bound };
     };
 
-    // crop the disc to `bound`'s rect (as insets from the viewport edges, so it
-    // stays fixed to the zone while the disc springs through it); match the
-    // element's corner radius so rounded cards/films crop on their curve
-    const clipTo = (bound: Element | null) => {
-      const node = clipRef.current;
-      if (!node) return;
-      if (!bound) {
-        node.style.clipPath = "none";
-        return;
+    /* ONE resolve per animation frame, reads first, writes last.
+
+       This used to run per EVENT: a trackpad emits mousemove at ~120Hz, and
+       Lenis's long coast (lerp 0.032) turns one wheel notch into seconds of
+       scroll events, so the block below was executing several times per
+       frame, site-wide, on every route. Worse, it interleaved reads and
+       writes — elementsFromPoint and getBoundingClientRect, then a
+       classList.toggle on <html>, then getComputedStyle again — and that
+       toggle invalidates style for the WHOLE document, so every read after
+       it had to recompute from scratch. Measured cost: ~47% of frames over
+       32ms while scrolling a plain section with no animation in it.
+
+       Now the events do nothing but record the pointer and ask for a frame.
+       Inside the frame every read happens before every write, and each
+       write is skipped unless its value actually changed — the class toggle
+       and the React state in particular now fire only when the cursor
+       genuinely crosses between zones, not on every sample. */
+    let raf = 0;
+    let queued = false;
+    let lastMode: Mode = "off";
+    let lastClip = "";
+    let lastGlass = false;
+
+    const frame = () => {
+      raf = 0;
+      queued = false;
+      const { x: px, y: py } = pos.current;
+
+      // ---- reads ----
+      const { mode, bound } = resolve(px, py, document.elementFromPoint(px, py));
+      let clip = "none";
+      if (mode !== "off" && bound) {
+        // insets from the viewport edges, so the crop stays fixed to the
+        // zone while the disc springs through it; the element's own corner
+        // radius makes rounded cards/films crop on their curve
+        const r = bound.getBoundingClientRect();
+        const radius =
+          parseFloat(getComputedStyle(bound).borderTopLeftRadius) || 0;
+        clip =
+          `inset(${Math.max(0, r.top)}px ${Math.max(0, window.innerWidth - r.right)}px` +
+          ` ${Math.max(0, window.innerHeight - r.bottom)}px ${Math.max(0, r.left)}px` +
+          ` round ${radius}px)`;
       }
-      const r = bound.getBoundingClientRect();
-      const top = Math.max(0, r.top);
-      const right = Math.max(0, window.innerWidth - r.right);
-      const bottom = Math.max(0, window.innerHeight - r.bottom);
-      const left = Math.max(0, r.left);
-      const radius = parseFloat(getComputedStyle(bound).borderTopLeftRadius) || 0;
-      node.style.clipPath = `inset(${top}px ${right}px ${bottom}px ${left}px round ${radius}px)`;
+
+      // ---- writes, each only if it changed ----
+      const glass = mode !== "off";
+      if (glass !== lastGlass) {
+        // the native cursor hides wherever the glass one is active — media
+        // lives everywhere, so this can't be a static CSS rule
+        document.documentElement.classList.toggle("glass-cursor", glass);
+        lastGlass = glass;
+      }
+      if (clip !== lastClip) {
+        if (clipRef.current) clipRef.current.style.clipPath = clip;
+        lastClip = clip;
+      }
+      if (mode !== lastMode) {
+        lastMode = mode;
+        setMode(mode);
+      }
     };
 
-    const apply = ({ mode, bound }: { mode: Mode; bound: Element | null }) => {
-      setMode(mode);
-      // the native cursor hides wherever the glass one is active —
-      // media lives everywhere, so this can't be a static CSS rule
-      document.documentElement.classList.toggle("glass-cursor", mode !== "off");
-      clipTo(mode === "off" ? null : bound);
+    const schedule = () => {
+      if (queued) return;
+      queued = true;
+      raf = requestAnimationFrame(frame);
     };
 
     const onMove = (e: MouseEvent) => {
       pos.current = { x: e.clientX, y: e.clientY };
+      // the disc itself still tracks at full pointer rate — these are
+      // MotionValues feeding a spring, so they cost no layout and no render
       mx.set(e.clientX);
       my.set(e.clientY);
-      apply(resolve(e.clientX, e.clientY, e.target as Element | null));
+      schedule();
     };
-    // content scrolls under a stationary pointer — re-resolve from the
-    // last known coordinates
-    const onScroll = () => {
-      const { x: px, y: py } = pos.current;
-      apply(resolve(px, py, document.elementFromPoint(px, py)));
+    // content scrolls under a stationary pointer — re-resolve from the last
+    // known coordinates
+    const onScroll = () => schedule();
+    // parked off-screen, so the next frame resolves to "off" on its own
+    const onLeave = () => {
+      pos.current = { x: -200, y: -200 };
+      schedule();
     };
-    const onLeave = () => apply({ mode: "off", bound: null });
 
     window.addEventListener("mousemove", onMove, { passive: true });
     window.addEventListener("scroll", onScroll, { passive: true });
     document.documentElement.addEventListener("mouseleave", onLeave);
     return () => {
+      cancelAnimationFrame(raf);
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("scroll", onScroll);
       document.documentElement.removeEventListener("mouseleave", onLeave);

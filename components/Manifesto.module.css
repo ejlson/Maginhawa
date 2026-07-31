@@ -76,17 +76,44 @@
   will-change: transform;
 }
 
+/* the accent on the words that carry the claim — see KEY_WORDS in the
+   component for why this is the ink and not the raw saffron */
+.key {
+  color: var(--saffron-ink);
+}
+
+/* The print's SLOT — the box that opens and pushes the words aside. Its
+   width and its word-spacing margin are BOTH animated (a closed slot that
+   kept its margin would still reserve a gap in the sentence), so the
+   stylesheet must not set the margin here. */
+.imgMask {
+  overflow: hidden;
+  white-space: nowrap;
+  margin-right: 0;
+  will-change: width;
+}
+
+/* One locked line. Making each line its own block is what stops a word
+   leaving its line as the slots open, and what fixes the headline's height
+   — see useLockedLines in the component. */
+.line {
+  display: block;
+}
+
 /* the inline photograph riding the sentence (image-in-headline) — sized
    to the cap band of the surrounding display line, bottom on the text
    baseline, cut at the pasteboard's sharp 2px print radius (deliberately
-   NOT the 16px interactive-plate rounding — prints aren't buttons) */
+   NOT the 16px interactive-plate rounding — prints aren't buttons). The
+   WIDTH is per-print (set inline — it is what makes one upright and the
+   next landscape); the height is shared, so they sit on one optical band. */
 .inlineImg {
   display: inline-block;
-  height: 0.72em;
-  width: 1.55em;
+  height: 0.86em;
+  width: 100%;
   object-fit: cover;
   border-radius: 2px;
-  vertical-align: baseline;
+  vertical-align: bottom;
+  max-width: none;
 }
 
 /* ---------- support line ---------- */

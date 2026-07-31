@@ -21,3 +21,9 @@
 .agents/
 .claude/
 skills-lock.json
+
+# probe builds (see distDir in next.config.mjs)
+/.next-prod
+
+# raw camera masters — 616MB of originals that the public/ exports come from
+/media-src

@@ -13,11 +13,11 @@ import VideoBackdrop from "./VideoBackdrop";
 
 // a few restaurant clips cycle behind the View-All button
 const CLIPS = [
-  "/videos/cafemama.mp4",
-  // "/videos/ramo.mp4",
-  "/videos/belly-hero.mov",
-  "/videos/mamasons.mov",
-  "/videos/bintang.mov",
+  "/videos/hero-cafemama.mp4",
+  // "/videos/hero-ramo.mp4",
+  "/videos/belly-hero.mp4",
+  "/videos/mamasons-hero.mp4",
+  "/videos/bintang-hero.mp4",
 ];
 
 export default function RestaurantLocations() {

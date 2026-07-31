@@ -26,6 +26,8 @@
   text-transform: uppercase;
   color: var(--cream);
   text-align: center;
+  /* a quiet signpost — the mastheads are the content here, not this */
+  opacity: 0.45;
 }
 
 /* ---------- the masthead rows ---------- */
@@ -35,41 +37,85 @@
   gap: clamp(22px, 3.4vh, 40px);
 }
 
-/* one row of 4–5 marks — justified across the FULL span; the outer seats
-   kiss the chapter's edges, the inner seats spread evenly between */
-.logoRow {
+/* ---------- the drifting lanes ---------- */
+/* Each row scrolls CONTINUOUSLY, and fades at both ends: a mask takes the
+   lane to transparent over the outer 10%, so mastheads dissolve in as they
+   arrive and dissolve out as they leave rather than being chopped off by an
+   edge. The lane bleeds to both viewport edges so there is nowhere for a
+   hard cut to show. */
+.lane {
+  position: relative;
+  margin-inline: calc(-1 * var(--pad-x));
+  overflow: hidden;
+  -webkit-mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000 10%,
+    #000 90%,
+    transparent 100%
+  );
+  mask-image: linear-gradient(
+    90deg,
+    transparent 0%,
+    #000 10%,
+    #000 90%,
+    transparent 100%
+  );
+}
+
+@media (min-width: 981px) {
+  .lane {
+    margin-inline: calc(-1 * var(--grid-col2));
+  }
+}
+
+/* The track carries the row twice and travels exactly -50%, so the wrap is
+   seamless. translate3d only — the whole lane is one composited layer and
+   costs no paint per frame. */
+.track {
   list-style: none;
   margin: 0;
   padding: 0;
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: clamp(16px, 2.5vw, 48px);
+  width: max-content;
+  gap: clamp(28px, 4vw, 72px);
+  padding-right: clamp(28px, 4vw, 72px);
+  /* one long, slow pass — a credential drifting past, not a ticker */
+  animation: pressDrift 72s linear infinite;
+  will-change: transform;
 }
 
-/* below the desktop breakpoint the justified rows would squeeze five marks
-   into a phone's width — let them wrap and centre instead */
-@media (max-width: 700px) {
-  .logoRow {
-    flex-wrap: wrap;
-    justify-content: center;
-    row-gap: 18px;
+/* alternate rows run the other way, so the wall drifts rather than marches */
+.trackBack {
+  animation-direction: reverse;
+}
+
+/* The lane does NOT pause on hover. It is a credential drifting past, not
+   a menu — and it sits in the middle of a scrolling page, so the cursor
+   lands on it constantly without being aimed there. A line that stops
+   dead every time the pointer crosses it reads as a bug, not a courtesy. */
+
+@keyframes pressDrift {
+  from {
+    transform: translate3d(0, 0, 0);
+  }
+  to {
+    transform: translate3d(-50%, 0, 0);
   }
 }
 
-/* Fixed cell height (base × per-seat multiplier) so uneven aspect ratios
-   still share a visual weight; width auto so wide wordmarks aren't
-   squeezed. */
 .logoSeat {
   flex: none;
   height: calc(clamp(18px, 2vw, 36px) * var(--s, 1));
 }
 
-/* real image elements (not masks), flipped for the MAROON ground:
-   grayscale(1) normalises every colour, invert(1) turns the dark
-   letterforms light (and any baked-in white ground dark), and
-   `mix-blend-mode: screen` drops those darkened grounds into the maroon —
-   so every mark reads as a quiet light monochrome on the band. */
+/* Real image elements (not masks), flipped for the MAROON ground:
+   grayscale(1) normalises every colour and invert(1) turns the dark
+   letterforms light. No `mix-blend-mode` — on a solid maroon ground it made
+   almost no visible difference, and a blended child stops the parent's
+   paint being cached, which on a lane that moves every frame is a cost paid
+   continuously for nothing. */
 .logo {
   height: 100%;
   width: auto;
@@ -77,7 +123,14 @@
   object-fit: contain;
   display: block;
   opacity: 0.85;
-  mix-blend-mode: screen;
   filter: grayscale(1) invert(1);
   user-select: none;
+}
+
+/* Reduced motion: the wall holds still. The rows keep their doubled markup
+   (harmless — it simply overflows behind the mask) but never travel. */
+@media (prefers-reduced-motion: reduce) {
+  .track {
+    animation: none;
+  }
 }

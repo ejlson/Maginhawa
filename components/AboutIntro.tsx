@@ -3,13 +3,15 @@
 import Image from "next/image";
 import Link from "next/link";
 import { motion, useReducedMotion } from "framer-motion";
+import { useRef } from "react";
 import styles from "./AboutIntro.module.css";
 import Reveal from "./Reveal";
+import SplitWords from "./SplitWords";
 
 // the hero's primary kitchen clip (CLIPS[0] in Hero.tsx) — reused here as a
 // single looping backdrop, no cycling. The team photograph doubles as the
 // poster frame and as the static stand-in under reduced motion.
-const ABOUT_CLIP = "/videos/belly-hero.mov";
+const ABOUT_CLIP = "/videos/belly-hero.mp4";
 const ABOUT_POSTER = "/images/careers-team.jpg";
 
 /**
@@ -32,12 +34,27 @@ export default function AboutIntro() {
   // reduced motion: no film entrance and no autoplaying video — the poster
   // photograph stands in, statically
   const reduce = useReducedMotion();
+  const ref = useRef<HTMLElement>(null);
+
+  /* NO PARALLAX HERE ANY MORE — not on the film, not on the heading, not on
+     the founder's column. It was written to give the chapter depth against a
+     ground that was changing underneath it, and that ground has gone: the
+     whole band now arrives as one plane climbing over the restaurant grid
+     (see MaroonZone). Layering a second, slower motion inside a chapter that
+     is already moving as a sheet gave the reader two different speeds to
+     track in the same moment, which is the thing that read as unsettled.
+     One movement per chapter. */
 
   // the maroon ground itself lives on the surrounding MaroonZone wrapper
   // (shared with As Seen In and the interlude) — this section is
   // transparent and just wears the cream type
   return (
-    <section id="about" className={styles.section} data-nav-theme="dark">
+    <section
+      id="about"
+      ref={ref}
+      className={styles.section}
+      data-nav-theme="dark"
+    >
       <div className={styles.grid}>
         {/* left — the kitchen film on the golden major segment. Its
             entrance is the section's only staged move: a softened clip
@@ -79,32 +96,67 @@ export default function AboutIntro() {
             />
           )}
           <div className={styles.mediaScrim} aria-hidden />
+          {/* the definition builds out of its own word masks — the same
+              grammar the statement under the hero speaks, so the two
+              moments on the page sound alike. The headword leads, the
+              gloss and the body follow it in. */}
           <div className={styles.wordmarkBlock}>
-            <p className={styles.wordmark}>Maginhawa</p>
-            <p className={styles.defMeta}>ma·gin·ha·wa — adjective · Tagalog</p>
-            <p className={styles.defBody}>
-              Comfortable; at ease. The brief for everything we do: food
-              with deep roots, rooms that feel like home, and service that
-              treats every guest as family.
-            </p>
+            <SplitWords
+              as="p"
+              className={styles.wordmark}
+              text="Maginhawa"
+              amount={0.4}
+              duration={0.85}
+            />
+            <SplitWords
+              as="p"
+              className={styles.defMeta}
+              text="ma·gin·ha·wa — adjective · Tagalog"
+              amount={0.4}
+              delay={0.18}
+              stagger={0.03}
+              duration={0.6}
+            />
+            <SplitWords
+              as="p"
+              className={styles.defBody}
+              text="Comfortable; at ease. The brief for everything we do: food with deep roots, rooms that feel like home, and service that treats every guest as family."
+              amount={0.4}
+              delay={0.3}
+              stagger={0.018}
+              duration={0.6}
+            />
           </div>
         </motion.div>
 
         {/* top-right, ending flush at column 12's right edge — the display
             heading and the story, ranged right in maroon */}
+        <div className={styles.headCell}>
         <Reveal delay={0.08} className={styles.headBlock}>
           <h2 className={styles.title}>About Us.</h2>
           <p className={styles.body}>
             Maginhawa began in 1987 as Chef Omar&apos;s family kitchen on
-            Kentish Town Road. Nearly four decades on, the same family runs
-            seven distinct dining rooms across London — each with its own
-            voice, all serving from the same heart.
+            Kentish Town Road — one room, one stove, and a menu built from
+            what the family cooked at home. Nearly four decades on, the same
+            family runs seven distinct dining rooms across London: a Filipino
+            fusion table, a Caribbean kitchen, London&apos;s first Filipino
+            ice cream parlour, a Filipino-Japanese ramen counter in Soho, and
+            a Michelin-listed bistro back where it started.
+            <br />
+            <br />
+            Each has its own voice, its own room and its own regulars. What
+            they share is a way of working: recipes carried down rather than
+            researched, produce bought the way a household buys it, and a
+            welcome that treats every guest as family — which is what
+            maginhawa has meant all along.
           </p>
         </Reveal>
+        </div>
 
         {/* lower-right band — the founder's name line riding directly
             above his portrait: name at the left edge, alias sharing the
             name's last line */}
+        <div className={styles.founderCell}>
         <Reveal delay={0.14} className={styles.founderBlock}>
           <p className={styles.founderRow}>
             <span className={styles.founderName}>Omar Shah.</span>
@@ -120,6 +172,7 @@ export default function AboutIntro() {
             />
           </div>
         </Reveal>
+        </div>
 
         {/* directly left of the portrait, bottoms aligned — the quiet link
             into the full story */}

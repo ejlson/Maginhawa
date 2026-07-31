@@ -49,6 +49,10 @@ export default function SmoothScroll({
       syncTouch: false,
     });
     lenisRef.current = lenis;
+    // handle for the puppeteer capture scripts, which have to drive scroll
+    // through Lenis — a raw window.scrollTo is pulled straight back to
+    // Lenis's own target on the next frame
+    (window as unknown as { __lenis?: Lenis }).__lenis = lenis;
 
     let frame = 0;
     const raf = (time: number) => {

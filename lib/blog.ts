@@ -76,7 +76,9 @@ export const BLOG: BlogEntry[] = [
       "Olive Magazine includes Belly in its rolling round-up of the best new restaurants in London — Filipino flavour read through a French bistro lens.",
     source: "Olive Magazine",
     url: "https://www.olivemagazine.com/restaurants/london/best-new-restaurants-in-london/",
-    image: "/blog/DSC07056-web.jpg",
+    // a Belly story wearing a Belly photograph. It is also the image the
+    // interlude above the journal flies down into this card — see Interlude.
+    image: "/images/belly.jpg",
     restaurant: "belly",
     category: "feature",
     kind: "press",

@@ -7,6 +7,7 @@ import Menu from "./Menu";
 import Hero from "./Hero";
 import Manifesto from "./Manifesto";
 import Discover from "./Discover";
+import ChapterPin from "./ChapterPin";
 import MaroonZone from "./MaroonZone";
 import Interlude from "./Interlude";
 import PressWall from "./PressWall";
@@ -86,10 +87,15 @@ export default function Experience() {
           {/* the positioning statement — what Maginhawa IS, before any
               product: the first thing the reader meets past the hero */}
           <Manifesto />
-          <Discover />
+          {/* The chapter change: "Our Restaurants." is HELD on its last
+              screen, lifting a few vh, while the maroon About band climbs
+              over it. No extra height and no curtain — the runway is just
+              the viewport the band's top edge takes to cross the screen. */}
+          <ChapterPin>
+            <Discover />
+          </ChapterPin>
           {/* ONE maroon band under the story, the press credential and the
-              photo beat — the ground scrubs cream → maroon as it arrives
-              and ends after the interlude */}
+              photo beat — it is its own ground, and its own arrival */}
           <MaroonZone>
             <AboutIntro />
             <PressWall />

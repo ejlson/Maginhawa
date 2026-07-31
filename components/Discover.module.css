@@ -1,11 +1,18 @@
 .section {
   display: flex;
   flex-direction: column;
+  /* the assembly stage is an OVERLAY on this box — it must not disturb the
+     settled layout underneath it, which is what the flight measures */
+  position: relative;
   /* zero bottom padding — the air between the grid and the As Seen In
      strip is that strip's own top padding, and the head→grid gap here uses
      the same value, so the grid sits with EQUAL, tighter spacing above
      and below */
-  padding: clamp(52px, 8vh, 132px) var(--pad-x) 0;
+  /* The top gap is generous on purpose: it sets the chapter apart from the
+     statement above it, and it is what makes the section roughly a
+     viewport tall — so when the assembly stage parks it mid-screen, the
+     title and its pasteboard are genuinely the only things in view. */
+  padding: clamp(64px, 13vh, 184px) var(--pad-x) 0;
   gap: clamp(22px, 2.7vh, 34px);
   /* the view-switch choreography slides cells in from PAST the viewport
      edges (±110vw) — clip the x-axis so off-screen tiles never widen the
@@ -24,35 +31,113 @@
 }
 
 /* ---------- the assembly stage ---------- */
-/* the pasteboard that opens the chapter: a full viewport with the
-   one-line title centred and the prints scattered in the whitespace —
-   the moment the sequence ends the section collapses to its settled
-   height and the layoutId FLIPs carry everything to its seat */
-.sectionIntro {
-  min-height: 100svh;
-  justify-content: center;
+/* The pasteboard that opens the chapter: the one-line title with the
+   prints scattered around it, laid OVER the settled section rather than
+   in place of it. The section keeps its final height throughout — the
+   grid underneath is already at its resting size with its plates simply
+   held invisible, so the deck's flight measures real seats, the document
+   never reflows, and the scroll position the flight was measured against
+   still means the same thing when the plates arrive. */
+.stage {
+  position: absolute;
+  inset: 0;
+  z-index: 4;
+  /* nothing on the stage is pressable; the grid beneath is muted from the
+     component while the plates are still in the air */
+  pointer-events: none;
 }
 
-.stage {
-  position: relative;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 82svh;
+/* The veil: cream paper reaching 60vh past the section on both sides, so
+   whatever viewport it meets, the chapter is the only thing on screen
+   while the sequence plays. It also CLIPS the pasteboard: prints run to
+   several times their size on the way past the camera, and this keeps that
+   growth from spilling into the sections above and below. */
+.stageVeil {
+  position: absolute;
+  left: 50%;
+  width: 100vw;
+  transform: translateX(-50%);
+  top: -60vh;
+  bottom: -60vh;
+  overflow: clip;
+}
+
+.stageVeilPaper {
+  position: absolute;
+  inset: 0;
+  background: var(--cream);
+}
+
+/* The depth field is inset back to EXACTLY the section's own box (the
+   veil's 60vh margins, removed), for two reasons: the prints below are
+   seated in percentages of it, and its centre is the vanishing point every
+   print radiates from. The glide parks that centre at the middle of the
+   screen. `perspective` here and nowhere else means all fifteen share one
+   camera; perspective-origin is left at its default 50% 50%. */
+.stageField {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 60vh;
+  bottom: 60vh;
+  perspective: 1100px;
 }
 
 /* one scattered print — raw photograph on the paper, sharp 2px corners,
-   UPRIGHT (no tilt), never large; no border, no caption, no shadow */
+   UPRIGHT (no tilt), free to overlap its neighbours; no border, no
+   caption, no shadow */
 .stagePrint {
   position: absolute;
+  transform-style: preserve-3d;
 }
 
-.stagePrint img {
+/* The layer stack: the seat carries scroll parallax, this box carries the
+   run past the camera, and the IMG floats on its own slow oscillation —
+   three motions, three owners, zero conflicts. No preserve-3d here: the
+   image below is flat, and the seat above already keeps this box's
+   translateZ in the field's 3D space. */
+.stagePrintDepth {
+  transform-origin: 50% 50%;
+}
+
+/* Cropped to the seat's own aspect — the source photography is nearly all
+   2:3, so the variety of shape is cut here rather than found. The seat's
+   width/height attributes carry the crop, `height: auto` resolves the box
+   from them, and object-fit fills it. */
+.stagePrintImg {
   display: block;
   width: 100%;
   height: auto;
+  object-fit: cover;
   border-radius: 2px;
   user-select: none;
+  animation: printFloat 7s ease-in-out infinite alternate;
+}
+
+.stagePrint:nth-child(2n) img {
+  animation-duration: 9s;
+  animation-delay: -3s;
+}
+
+.stagePrint:nth-child(3n) img {
+  animation-duration: 8s;
+  animation-delay: -5s;
+}
+
+@keyframes printFloat {
+  from {
+    transform: translateY(-5px);
+  }
+  to {
+    transform: translateY(5px);
+  }
+}
+
+/* the title rides ABOVE the pasteboard — prints may overlap each other,
+   never the words */
+.introTitle {
+  position: relative;
+  z-index: 2;
 }
 
 /* the prints only exist on the desktop pasteboard — stacked small screens
@@ -61,6 +146,31 @@
   .stagePrint {
     display: none;
   }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .stagePrint img {
+    animation: none;
+  }
+}
+
+/* The centred composition — title and deck share one anchor, seated on
+   the PLATE BLOCK's own centre (passed in as `top` by the component) so
+   the deck opens exactly where the grid will form and every plate flies
+   the shortest honest distance to its seat. */
+.stageCenter {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  /* above the veil and its pasteboard — prints may overlap each other, and
+     may pass right over the line on their way out, but the line itself is
+     never clipped by the veil's box */
+  z-index: 1;
 }
 
 /* the title with the deck opening between its two words — one nowrap line,
@@ -74,22 +184,50 @@
   font-size: clamp(1.5rem, 4.6vw, 4.4rem);
 }
 
-/* the deck's seat in the sentence — width is animated by the component,
-   the plates inside fill it */
-.introStack {
-  position: relative;
+/* Each word is a CLIP that carries the split transform, with the word
+   itself climbing out of it — the manifesto's word-mask grammar at display
+   size. The padding/negative-margin pair holds the clip edge off the
+   display face's overshoot and the full stop's tail, so the line is never
+   shaved. Splitting the two transforms across two elements is what keeps
+   the horizontal part and the vertical build from overwriting each other. */
+.introWord {
   display: inline-block;
-  flex: none;
+  overflow: hidden;
+  padding-block: 0.14em;
+  margin-block: -0.14em;
+  will-change: transform;
 }
 
+.introRise {
+  display: inline-block;
+  will-change: transform;
+}
+
+/* the deck's seat — CSS-centred behind the words; the words spring apart
+   symmetrically to reveal it, so the composition can never drift
+   off-centre */
+.deckSeat {
+  position: absolute;
+  left: 50%;
+  top: 50%;
+  transform: translate(-50%, -50%);
+  z-index: 1;
+}
+
+/* One deck plate. It carries the whole flight — a translate and a uniform
+   scale onto its grid tile's exact rectangle — so it is promoted for the
+   duration and composited rather than repainted. */
 .introPlate {
   position: absolute;
   inset: 0;
   overflow: hidden;
   background: var(--placeholder);
+  will-change: transform;
+  backface-visibility: hidden;
 }
 
-.introPlate img {
+.introPlate img,
+.introPlateImg {
   display: block;
   width: 100%;
   height: 100%;
@@ -125,10 +263,56 @@
   color: var(--maroon);
 }
 
-/* the explicit two-line break ("Our" / "Restaurants.") only renders at the
-   grid breakpoint — stacked heads let the text wrap naturally */
-.titleBreak {
-  display: none;
+/* Each line of the heading is a CLIP it climbs out of — the manifesto's
+   word-mask grammar at display size. The padding/negative-margin pair holds
+   the clip edge off the display face's overshoot and the full stop's tail,
+   so the line is never shaved.
+
+   Inline-block below the grid breakpoint so "Our Restaurants." still wraps
+   as one natural line of text; block at ≥981px, which is what used to be
+   the explicit <br>. */
+.titleLine {
+  display: inline-block;
+  overflow: hidden;
+  padding-block: 0.1em;
+  margin-block: -0.1em;
+  vertical-align: bottom;
+}
+
+/* NAMING THE CHAPTER. "Restaurants." warms from maroon to saffron once
+   everything else in the chapter has stopped moving — the chapter signing
+   its own name last.
+
+   `--saffron-ink` rather than `--saffron`: the display saffron is ~3.0:1
+   on cream, which is the large-text floor with nothing spare, and this is
+   the one word on the page carrying the section's name. The ink shade
+   holds 5.7:1 and reads as the same colour at this size.
+
+   A transition on `color`, not a framer animation: it is one property on
+   one word, changed once, and keeping it in CSS means the value stays a
+   token instead of a hex literal duplicated into the component. The delay
+   is the beat after the last plate settles; the curve commits quickly and
+   then eases off, the way a hand does. */
+.titleRise {
+  display: inline-block;
+  will-change: transform;
+  transition: color 0.8s cubic-bezier(0.4, 0.05, 0.2, 1) 0.3s;
+}
+
+.titleRise[data-lit="on"] {
+  color: var(--saffron-ink);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .titleRise {
+    transition: none;
+  }
+}
+
+@media (min-width: 981px) {
+  .titleLine {
+    display: block;
+  }
 }
 
 .caption {
@@ -152,9 +336,6 @@
   }
   .title {
     grid-column: 1 / 7;
-  }
-  .titleBreak {
-    display: block;
   }
   .caption {
     /* BETWEEN the heading and the switch, bottom on the heading's line */
@@ -261,6 +442,9 @@
    fight a competing rule. */
 .cell {
   min-width: 0;
+  /* the caption row below asks how wide THIS TILE is, not how wide the
+     window is — see .cellLine */
+  container-type: inline-size;
 }
 
 /* ---------- tile: the fixed plate with an inner zoom ---------- */
@@ -504,21 +688,77 @@
   margin-top: clamp(12px, 1.4vw, 16px);
 }
 
+/* BASELINE, not centre. The cuisine line wraps to two lines on most tiles
+   and stays one line on others; centring the pills against that box parked
+   them halfway down the block on the wrappers and level on the rest, so no
+   two tiles in a row agreed. Seating them on the FIRST BASELINE puts every
+   pill on the same optical line as the first line of description, whatever
+   the copy below it does. */
+/* The pills are not compressible — "Kentish Town" plus "Book" is ~178px,
+   which on a 274px tile (a 1440-wide window) left the description nine
+   characters a line and five lines deep.
+
+   So the caption row is stacked by default and only goes side-by-side once
+   the TILE is wide enough to hold both properly. A container query, not a
+   viewport one: the same window gives four columns on the home grid and one
+   on a phone, so viewport width says nothing about how much room a caption
+   actually has. And because the threshold is the tile's width rather than
+   the pill row's content, every tile in a row makes the same choice —
+   letting each decide for itself (plain flex-wrap) put pills beside the
+   description on the tiles without a Book pill and underneath on the ones
+   with it, in the same row. */
 .cellLine {
   width: 100%;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: 0.8em;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+}
+
+@container (min-width: 360px) {
+  .cellLine {
+    flex-direction: row;
+    /* BASELINE, not centre: the description wraps to two lines on some
+       tiles and one on others, and centring against that box parked the
+       pills halfway down the block on the wrappers and level on the rest,
+       so no two tiles agreed. Seating them on the FIRST BASELINE puts every
+       pill on the same optical line as the first line of description,
+       whatever the copy below it does. */
+    align-items: baseline;
+    justify-content: space-between;
+    gap: 0.8em;
+  }
 }
 
 .cellTag {
+  min-width: 0;
   font-family: var(--font-sans);
   font-weight: 400;
   font-size: var(--t-small);
   line-height: var(--lh-snug);
   color: var(--maroon);
   opacity: 0.7;
+}
+
+/* the caption's split-text clips — the Manifesto's word-mask grammar at
+   caption scale: each word rises out of its own overflow-hidden box. The
+   padding/negative-margin pair protects descenders from the clip edge. */
+.capMask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  margin-right: 0.28em;
+  padding-block: 0.18em;
+  margin-block: -0.18em;
+}
+
+.capMask:last-child {
+  margin-right: 0;
+}
+
+.capWord {
+  display: inline-block;
+  will-change: transform;
 }
 
 /* the Michelin credential as a STICKER on the plate's top-right corner —
@@ -529,12 +769,22 @@
   top: clamp(10px, 1.4vw, 18px);
   right: clamp(10px, 1.4vw, 18px);
   z-index: 3;
+  display: block;
   height: clamp(44px, 4.5vw, 64px);
-  width: auto;
+  /* the mark is square, and stating the box here (rather than letting a
+     bare img's intrinsic size decide) is what lets it be served at 128px
+     instead of decoded at its native 2965² */
+  aspect-ratio: 1;
   transform: rotate(8deg);
   /* flat by design (Telescope) — the tilt alone sells the sticker */
   user-select: none;
   pointer-events: none;
+}
+
+.stickerBadge img {
+  display: block;
+  width: 100%;
+  height: 100%;
 }
 
 /* quiet underlined text link into the detail page — a real 1px underline
@@ -563,40 +813,48 @@
   flex: none;
 }
 
-/* neighbourhood pill — the Blog byline pill's recipe (a faint maroon tint;
-   a solid cream pill would vanish on the cream ground down here) */
-.pill {
+/* ONE pill geometry, shared. The two pills used to differ by exactly the
+   2px of Book's border — enough that a filled chip and an outlined chip
+   sitting 6px apart never quite lined up. An explicit height plus a
+   transparent ring on the filled one makes them identical boxes, so the
+   pair reads as a set. `nowrap` keeps "Kentish Town · Soho" on its line
+   instead of folding the pill into two rows on a narrow tile. */
+.pill,
+.pillBook {
   display: inline-flex;
   align-items: center;
-  padding: 0.45em 0.9em;
+  justify-content: center;
+  min-height: 26px;
+  padding: 0 0.85em;
   border-radius: 999px;
-  background: rgba(47, 0, 0, 0.07);
+  border: 1px solid transparent;
   font-family: var(--font-mono);
-  font-weight: 400;
   font-size: var(--t-label);
   letter-spacing: var(--tr-label-mono);
   line-height: 1;
-  color: var(--maroon);
+  white-space: nowrap;
+}
+
+/* Neighbourhood pill — a neutral grey chip. It is a label, not an action,
+   and the saffron it used to carry is the page's one accent: spending it
+   here meant the tag out-shouted the Book pill sitting right beside it.
+   Grey lets the accent belong to the thing you can actually press. */
+.pill {
+  background: rgba(47, 0, 0, 0.06);
+  font-weight: 500;
+  color: rgba(47, 0, 0, 0.62);
 }
 
 /* Book pill — rests as a hairline OUTLINE, and on hover/focus fills solid
    maroon with cream text: the fill is the reward state, the swell rides the
-   drawer curve, press snaps down quick. Same radius/size/type as the
-   neighbourhood pill beside it. Specific properties only — never `all`. */
+   drawer curve, press snaps down quick. The ring is firmer than it was
+   (0.42): this is the only pressable thing in the caption row, and at 0.3
+   it read as quieter than the label next to it. Specific properties only —
+   never `all`. */
 .pillBook {
-  display: inline-flex;
-  align-items: center;
-  padding: 0.45em 0.9em;
-  border-radius: 999px;
-  /* rests OUTLINED — a quiet maroon hairline ring; the solid fill is the
-     hover state's reward, not the resting one */
   background: transparent;
-  border: 1px solid rgba(47, 0, 0, 0.3);
-  font-family: var(--font-mono);
-  font-weight: 400;
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label-mono);
-  line-height: 1;
+  border-color: rgba(47, 0, 0, 0.42);
+  font-weight: 500;
   color: var(--maroon);
   text-decoration: none;
   transition:
@@ -605,20 +863,23 @@
     transform 400ms var(--ease-drawer),
     color 400ms var(--ease-drawer);
 }
+/* Hover fills the ring SAFFRON — the page's one accent, spent on the one
+   thing in the caption row you can act on. The label goes maroon, not
+   cream: cream on saffron measures 3.0:1, which fails AA at this size,
+   while maroon on saffron is 5.8:1. */
 @media (hover: hover) and (pointer: fine) {
   .pillBook:hover {
-    /* hover fills the ring solid — maroon plate, cream label */
-    background-color: var(--maroon);
-    border-color: var(--maroon);
-    color: var(--cream);
+    background-color: var(--saffron);
+    border-color: var(--saffron);
+    color: var(--maroon);
     transform: scale(1.03);
   }
 }
 /* keyboard gets the same filled reward as hover */
 .pillBook:focus-visible {
-  background-color: var(--maroon);
-  border-color: var(--maroon);
-  color: var(--cream);
+  background-color: var(--saffron);
+  border-color: var(--saffron);
+  color: var(--maroon);
 }
 .pillBook:focus-visible {
   outline: 2px solid var(--maroon);
@@ -644,19 +905,27 @@
   }
 }
 
-/* the segmented pill — hairline ring that firms up on hover */
+/* The segmented pill. It now reads as a TRACK the thumb runs in rather
+   than as two buttons in a ring: a faint maroon wash fills the group, and
+   the border relaxes to a hairline because the fill is already doing the
+   containing. Without the wash the maroon thumb appeared to float on the
+   cream with nothing to slide along. */
 .viewToggle {
   display: inline-flex;
   align-items: center;
   gap: 2px;
   padding: 3px;
-  border: 1px solid rgba(47, 0, 0, 0.25);
+  background: rgba(47, 0, 0, 0.05);
+  border: 1px solid rgba(47, 0, 0, 0.12);
   border-radius: 999px;
-  transition: border-color 300ms ease;
+  transition:
+    border-color 300ms ease,
+    background-color 300ms ease;
 }
 
 .viewToggle:hover {
-  border-color: rgba(47, 0, 0, 0.55);
+  background: rgba(47, 0, 0, 0.08);
+  border-color: rgba(47, 0, 0, 0.24);
 }
 
 /* one option — the sliding maroon thumb (layoutId) renders behind the
@@ -684,10 +953,41 @@
     transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
 }
 
+/* THE GHOST THUMB. Hovering the resting option swells a soft maroon pill
+   into the seat the real thumb would slide into — the control shows you
+   where it is about to go before you commit. It scales up from 0.82 on the
+   drawer curve rather than fading a background colour in, so the preview
+   has the same weight of movement as the thumb it is previewing, and it
+   costs transform + opacity instead of a repaint. */
+.toggleOpt::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  border-radius: 999px;
+  background: rgba(47, 0, 0, 0.09);
+  opacity: 0;
+  transform: scale(0.82);
+  pointer-events: none;
+  transition:
+    opacity 260ms var(--ease-drawer),
+    transform 260ms var(--ease-drawer);
+}
+
 @media (hover: hover) and (pointer: fine) {
-  .toggleOpt:not(.toggleOptOn):hover {
-    background-color: rgba(47, 0, 0, 0.07);
+  .toggleOpt:not(.toggleOptOn):hover::before {
+    opacity: 1;
+    transform: scale(1);
   }
+  /* the glyph leans in with it */
+  .toggleOpt:not(.toggleOptOn):hover .toggleIcon {
+    transform: scale(1.14);
+  }
+}
+
+/* keyboard parity — tabbing to the resting option previews it too */
+.toggleOpt:not(.toggleOptOn):focus-visible::before {
+  opacity: 1;
+  transform: scale(1);
 }
 
 .toggleOpt:active {
@@ -713,9 +1013,14 @@
 .toggleIcon {
   position: relative;
   z-index: 1;
-  width: 1.05em;
-  height: 1.05em;
+  width: 1.15em;
+  height: 1.15em;
   fill: currentColor;
+  /* the glyph crossfades cream⟷maroon as the thumb passes under it, on the
+     thumb's own clock — not a beat behind it — and leans in with the ghost */
+  transition:
+    fill 220ms var(--ease-drawer),
+    transform 260ms var(--ease-drawer);
 }
 
 /* ---------- the plate as a pressable ---------- */
@@ -923,7 +1228,7 @@
 .expandCredentialMark {
   display: block;
   height: 28px;
-  width: auto;
+  width: 28px;
   user-select: none;
 }
 

@@ -99,9 +99,12 @@
   max-width: 18ch;
 }
 
-/* ONE cream pill — the label and arrow share a single capsule. On hover the
-   pill widens (padding-inline grows around the content) and its inner recess
-   deepens slightly, so the whole surface reads as one control settling in. */
+/* ONE cream pill — the label and arrow share a single capsule. The pill
+   never changes SIZE: hovering and pressing only deepen the recess cut into
+   its surface, so the control reads as being pushed further in rather than
+   growing. (It used to widen its padding on hover and scale down on press —
+   two different size changes on one object, and the widening was a layout
+   animation besides.) */
 .inviteCta {
   display: inline-flex;
   align-items: center;
@@ -120,12 +123,8 @@
   /* the recess is present (faintly) at rest, so hover only DEEPENS it — a
      shadow that appears from nothing pops instead of easing */
   box-shadow: inset 0 2px 12px rgba(47, 0, 0, 0.14);
-  /* padding is a layout animation, but the pill is an inline island (nothing
-     depends on its width), so the grow stays cheap and self-contained */
-  transition:
-    padding 320ms var(--ease-out),
-    box-shadow 320ms var(--ease-out),
-    transform 320ms var(--ease-out);
+  /* the recess is the ONLY thing that moves — no layout, no transform */
+  transition: box-shadow 320ms var(--ease-out);
 }
 
 .ctaMain {
@@ -148,8 +147,7 @@
 /* HOVER: the pill breathes out — wider stance, slightly deeper recess */
 @media (hover: hover) and (pointer: fine) {
   .inviteCta:hover {
-    padding-inline: 2.6em;
-    box-shadow: inset 0 3px 16px rgba(47, 0, 0, 0.3);
+    box-shadow: inset 0 4px 18px rgba(47, 0, 0, 0.3);
   }
   .inviteCta:hover .ctaArrow svg {
     transform: translateX(2px);
@@ -160,17 +158,17 @@
 .inviteCta:focus-visible {
   outline: 2px solid var(--cream);
   outline-offset: 4px;
-  padding-inline: 2.6em;
-  box-shadow: inset 0 3px 16px rgba(47, 0, 0, 0.3);
+  box-shadow: inset 0 4px 18px rgba(47, 0, 0, 0.3);
 }
 .inviteCta:focus-visible .ctaArrow svg {
   transform: translateX(2px);
 }
 
-/* press feedback — fast, subtle */
+/* press feedback — the recess goes deeper still, and quickly: the surface
+   is being pushed in under the finger */
 .inviteCta:active {
-  transform: scale(0.98);
-  transition: transform 120ms var(--ease-out);
+  box-shadow: inset 0 6px 24px rgba(47, 0, 0, 0.45);
+  transition: box-shadow 120ms var(--ease-out);
 }
 
 /* the direct line — bare email + phone under the pill, set at lead size so

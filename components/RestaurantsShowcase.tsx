@@ -58,7 +58,7 @@ const RESTAURANTS = [
     name: "Bintang",
     tag: "Filipino Fusion Restaurant",
     location: "Camden, London",
-    video: "/videos/bintang.mov",
+    video: "/videos/bintang-hero.mp4",
   },
   {
     name: "Guanabana",
@@ -70,31 +70,31 @@ const RESTAURANTS = [
     name: "Mamasons",
     tag: "Filipino Ice Cream Parlour",
     location: "Camden · Soho, London",
-    video: "/videos/mamasons.mov",
+    video: "/videos/mamasons-hero.mp4",
   },
   {
     name: "Ramo Ramen",
     tag: "Filipino-Japanese Ramen",
     location: "Kentish Town · Soho",
-    video: "/videos/ramo.mp4",
+    video: "/videos/hero-ramo.mp4",
   },
   {
     name: "Hoodwood",
     tag: "Caribbean Takeaway",
     location: "London",
-    video: "/videos/hero-draft3.mp4",
+    video: "/videos/hero-draft3-1080.mp4",
   },
   {
     name: "Café Mama & Sons",
     tag: "Filipino x Japanese Café",
     location: "London",
-    video: "/videos/hero-draft3.mp4",
+    video: "/videos/hero-draft3-1080.mp4",
   },
   {
     name: "Belly",
     tag: "Modern Filipino Bistro",
     location: "Camden, London",
-    video: "/videos/belly-hero.mov",
+    video: "/videos/belly-hero.mp4",
   },
   {
     // coming-soon — no photography, logo or clip yet; the card view renders
@@ -103,7 +103,7 @@ const RESTAURANTS = [
     name: "Bunso",
     tag: "Filipino-Japanese Kissaten Listening Jazz Bar",
     location: "London",
-    video: "/videos/forpilot1.mov",
+    video: "/videos/forpilot1.mp4",
   },
 ];
 

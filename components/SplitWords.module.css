@@ -1,0 +1,27 @@
+/* One word's clip window. inline-block so the words sit in the normal
+   ragged flow and wrap like ordinary text; the word inside carries the
+   transform.
+
+   The padding/negative-margin pair matters: display faces here sit on a
+   line-height below 1, so the raw line box is SHORTER than the glyphs, and
+   a bare `overflow: hidden` shaves ascenders and the tails of p/g/y at
+   rest. Padding the window out and pulling the same amount back with
+   negative margins widens the clip without moving the text. */
+.mask {
+  display: inline-block;
+  overflow: hidden;
+  vertical-align: bottom;
+  /* natural word spacing between adjacent masks */
+  margin-right: 0.24em;
+  padding-block: 0.14em;
+  margin-block: -0.14em;
+}
+
+.mask:last-child {
+  margin-right: 0;
+}
+
+.word {
+  display: inline-block;
+  will-change: transform;
+}

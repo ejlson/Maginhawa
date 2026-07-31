@@ -22,6 +22,12 @@
      pairs warm-on-warm with the maroon and lifts off the cream. */
   --saffron: #c97e3f;
 
+  /* the same hue burnt down for SMALL TEXT on the cream. #c97e3f computes
+     ≈3.0:1 against the cream — fine for large display glyphs and 1px
+     rules, below the 4.5:1 floor for label-sized copy. This deep cut
+     clears 5:1 while still reading unmistakably as the saffron accent. */
+  --saffron-ink: #8f5220;
+
   /* TWO-FAMILY SYSTEM. Hanken Grotesk (variable, via next/font) is the
      site's single text voice — headings, body, buttons, labels, eyebrows.
      Contralto (Adobe Fonts) survives ONLY at brand-wordmark scale, through

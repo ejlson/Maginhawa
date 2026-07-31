@@ -2,9 +2,16 @@
 
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import {
+  motion,
+  useInView,
+  useMotionValue,
+  useReducedMotion,
+  useTransform,
+} from "framer-motion";
 import styles from "./Blog.module.css";
 import { BLOG, type BlogEntry } from "@/lib/blog";
+import { registerLanding } from "@/lib/handoff";
 
 // shared enter curve — the same ease the Discover reel slides in on
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -16,7 +23,18 @@ const POOL = BLOG.slice(0, 12);
    BELOW it on the cream (no overlay, no scrim): quiet date line, regular-
    weight title, then a "Read More" affordance. The WHOLE card stays the
    link — the affordance is a styled span, never a nested anchor. */
-function StoryCard({ post }: { post: BlogEntry }) {
+function StoryCard({
+  post,
+  plateRef,
+  holding,
+}: {
+  post: BlogEntry;
+  /** the first card publishes its plate — it is the interlude's landing site */
+  plateRef?: React.Ref<HTMLDivElement>;
+  /** the photograph that belongs here is still flying in; hold the cover
+      back so the page never shows two copies of the same picture */
+  holding?: boolean;
+}) {
   return (
     <a
       className={styles.card}
@@ -25,7 +43,11 @@ function StoryCard({ post }: { post: BlogEntry }) {
       rel="noopener noreferrer"
       draggable={false}
     >
-      <div className={styles.plate}>
+      <div
+        className={styles.plate}
+        ref={plateRef}
+        data-holding={holding || undefined}
+      >
         {/* eslint-disable-next-line @next/next/no-img-element */}
         <img
           className={styles.cover}
@@ -75,6 +97,52 @@ export default function Blog() {
   // would never see it intersect and the strip would stay invisible
   const sectionRef = useRef<HTMLElement>(null);
   const stripInView = useInView(sectionRef, { once: true, amount: 0.1 });
+
+  /* THE INTERLUDE'S LANDING SITE.
+     When the photo interlude above is morphing, IT owns the reel's
+     entrance: the strip draws in from the right on the same clock that is
+     shrinking the photograph, so the reel is seated well before the picture
+     touches down and there is no race between two independent timings.
+     Without a morph (another page, reduced motion) the strip keeps its own
+     viewport-triggered spring. */
+  const shellRef = useRef<HTMLDivElement>(null);
+  const plateRef = useRef<HTMLDivElement>(null);
+  const [morph, setMorph] = useState(false);
+  const [holding, setHolding] = useState(false);
+  const handoff = useMotionValue(0);
+
+  useEffect(
+    () =>
+      registerLanding({
+        seat: () => {
+          const plate = plateRef.current;
+          const shell = shellRef.current;
+          if (!plate || !shell) return null;
+          const r = plate.getBoundingClientRect();
+          /* Hand back where the card WILL sit, not where it is. The strip
+             is still sliding in while the photograph is flying, and a
+             target that is itself moving would drag the flight path
+             sideways and then let it swing back. Undoing the shell's own
+             translation is what keeps the flight a clean single arc. */
+          const m = new DOMMatrixReadOnly(getComputedStyle(shell).transform);
+          return new DOMRect(r.left - m.m41, r.top - m.m42, r.width, r.height);
+        },
+        onMorph: setMorph,
+        onFlying: setHolding,
+        push: (v) => handoff.set(v),
+      }),
+    [handoff],
+  );
+
+  // seated by 0.86 — the last stretch of the flight happens over a reel
+  // that has already stopped moving
+  const morphOffset = useTransform(handoff, [0.22, 0.86], [110, 0], {
+    clamp: true,
+  });
+  const morphTransform = useTransform(
+    morphOffset,
+    (v) => `translateX(${v}vw)`,
+  );
   // dragging = pointer held; gliding = coasting after release. Both drive
   // data-attrs that lift scroll-snap for the gesture; dragging also sets the
   // grabbing cursor. All the per-frame physics live in refs (no re-renders).
@@ -255,6 +323,37 @@ export default function Blog() {
     }
   };
 
+  /* the strip — scroll-snap owns the resting positions, the pointer
+     handlers add mouse drag; data-dragging lifts the snap (and the grab
+     cursor) for the duration of a drag. Written once and placed by
+     whichever entrance is driving, so the two paths can never drift apart. */
+  const strip = (
+    <div
+      ref={stripRef}
+      className={styles.strip}
+      tabIndex={0}
+      role="region"
+      aria-label="Latest stories"
+      data-dragging={dragging || undefined}
+      data-gliding={gliding || undefined}
+      onPointerDown={onPointerDown}
+      onPointerMove={onPointerMove}
+      onPointerUp={onPointerEnd}
+      onPointerCancel={onPointerEnd}
+      onDragStart={(e) => e.preventDefault()}
+      onClickCapture={onClickCapture}
+    >
+      {POOL.map((post, i) => (
+        <StoryCard
+          key={post.slug}
+          post={post}
+          plateRef={i === 0 ? plateRef : undefined}
+          holding={i === 0 && holding}
+        />
+      ))}
+    </div>
+  );
+
   return (
     <section
       ref={sectionRef}
@@ -300,8 +399,15 @@ export default function Blog() {
       {/* the same off-screen entrance as the Discover reel: the whole
           strip draws in from past the right viewport edge as ONE rigid
           unit (the section clips the x-axis so the page never widens).
-          Reduced motion swaps the travel for a plain fade. */}
+          Under a morph the travel is scrubbed on the interlude's clock
+          instead; reduced motion swaps it for a plain fade. */}
+      {morph ? (
+        <motion.div ref={shellRef} style={{ transform: morphTransform }}>
+          {strip}
+        </motion.div>
+      ) : (
       <motion.div
+        ref={shellRef}
         initial={
           reduce
             ? { opacity: 0 }
@@ -312,35 +418,21 @@ export default function Blog() {
             ? { opacity: 1, transform: "translateX(0vw)" }
             : undefined
         }
+        // A long, critically damped spring. 110vw covered in 0.8s was a
+        // whip — the strip crossed a viewport and a half per second and
+        // arrived before the eye could follow it. This carries the weight
+        // the travel implies: it decelerates continuously into place and
+        // stops. No overshoot — twelve cards rebounding together reads as
+        // the row wobbling, not as momentum.
         transition={
           reduce
             ? { duration: 0.4, ease: "easeOut" }
-            : { duration: 0.8, ease: EASE }
+            : { type: "spring", duration: 1.65, bounce: 0 }
         }
       >
-        {/* the strip — scroll-snap owns the resting positions, the
-            pointer handlers add mouse drag; data-dragging lifts the snap
-            (and the grab cursor) for the duration of a drag */}
-        <div
-          ref={stripRef}
-          className={styles.strip}
-          tabIndex={0}
-          role="region"
-          aria-label="Latest stories"
-          data-dragging={dragging || undefined}
-          data-gliding={gliding || undefined}
-          onPointerDown={onPointerDown}
-          onPointerMove={onPointerMove}
-          onPointerUp={onPointerEnd}
-          onPointerCancel={onPointerEnd}
-          onDragStart={(e) => e.preventDefault()}
-          onClickCapture={onClickCapture}
-        >
-          {POOL.map((post) => (
-            <StoryCard key={post.slug} post={post} />
-          ))}
-        </div>
+        {strip}
       </motion.div>
+      )}
 
     </section>
   );

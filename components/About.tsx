@@ -265,7 +265,7 @@ export default function About() {
           <div className={styles.videoBackdrop} aria-hidden>
             <video
               className={styles.heroVideo}
-              src="/videos/belly-hero.mov"
+              src="/videos/belly-hero.mp4"
               poster="/images/belly.jpg"
               muted
               loop

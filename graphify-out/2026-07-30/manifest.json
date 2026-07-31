@@ -85,8 +85,8 @@
     "semantic_hash": ""
   },
   "components/Discover.tsx": {
-    "mtime": 1785425720.9241202,
-    "ast_hash": "cb93274e30a5dcb1f7d6e7494d526d4e",
+    "mtime": 1785442233.7561407,
+    "ast_hash": "ab355d42c0345f121860d58240798f0c",
     "semantic_hash": ""
   },
   "components/Experience.tsx": {
@@ -1375,8 +1375,8 @@
     "semantic_hash": ""
   },
   "components/Manifesto.tsx": {
-    "mtime": 1785425587.9834824,
-    "ast_hash": "168b1acb0ab1e53da90d616b34552c92",
+    "mtime": 1785426221.7142658,
+    "ast_hash": "cbcb035b838a0d61c7ed20a878f0c85e",
     "semantic_hash": ""
   },
   "components/ChapterMark.tsx": {

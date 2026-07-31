@@ -1,0 +1,24 @@
+/* The dark chapter band, and the page's chapter-change.
+
+   Its own top edge is what climbs over the held restaurant grid: the ground
+   is opaque and the stacking order puts it above the chapter before it, and
+   that is the whole mechanism. No curtain, no second element, nothing to
+   keep in sync — the thing arriving is the chapter itself.
+
+   The band's END is a plain hard edge where the element stops; the cream
+   journal below carries its own ground.
+
+   `flow-root` matters. Without it the About section's top margin COLLAPSES
+   out through this box, so the maroon started 400-odd pixels below where
+   the chapter does — and with the grid held still underneath, that gap
+   showed as a band of cream sliding down the screen ahead of the maroon.
+   Containing the margin puts the edge exactly on the chapter boundary and
+   turns that gap into the air above the heading, which is where it was
+   always meant to read. */
+.zone {
+  display: flow-root;
+  position: relative;
+  /* above the chapter it covers */
+  z-index: 2;
+  background: var(--maroon);
+}
