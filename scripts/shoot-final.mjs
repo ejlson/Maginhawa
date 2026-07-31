@@ -10,7 +10,7 @@ await (await p.$('button[aria-label="Open menu"]')).click(); await s(800);
 await p.screenshot({path:`${OUT}/fin_menu.png`});
 // close it (slides back out)
 await (await p.$('button[aria-label="Close menu"]')).click(); await s(800);
-// restaurant locations fullscreen — section index 2
+// reservations film fullscreen — section index 2
 await p.evaluate(()=>document.querySelectorAll('section')[2].scrollIntoView());await s(900);
-await p.screenshot({path:`${OUT}/fin_locations.png`});
+await p.screenshot({path:`${OUT}/fin_book.png`});
 await b.close();console.log("done");

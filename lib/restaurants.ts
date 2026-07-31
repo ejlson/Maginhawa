@@ -9,6 +9,10 @@ export type Restaurant = {
   cuisine: string;
   description: string;
   location: string;
+  // The postal address in parts — `location` is the editorial shorthand
+  // ("Kentish Town, London"), this is the line you could post to. Populated
+  // only for the venues that take bookings, since the Reservations index is
+  // the one surface that has to tell a reader where to turn up.
   addresses?: { street: string; locality: string; postcode: string }[];
   image: string;
   logo: string;
@@ -42,6 +46,11 @@ export const RESTAURANTS: Restaurant[] = [
     description:
       "A Kentish Town mainstay pairing Filipino classics with a fusion kitchen — long-standing favourite of the Maginhawa family.",
     location: "Kentish Town, London",
+    // split from the string Discover's index already carried — derived, not
+    // sourced afresh, so the two can be diffed against each other
+    addresses: [
+      { street: "93 Kentish Town Rd", locality: "London", postcode: "NW1 8NY" },
+    ],
     image: "/images/bintang.jpg",
     logo: "/logo/bintang.png",
     website: "https://www.bintangrestaurant.co.uk/",
@@ -62,6 +71,9 @@ export const RESTAURANTS: Restaurant[] = [
     description:
       "Kentish Town's neighbourhood Caribbean kitchen — bold, generous, and unmistakably London.",
     location: "Kentish Town, London",
+    addresses: [
+      { street: "85 Kentish Town Rd", locality: "London", postcode: "NW1 8NY" },
+    ],
     image: "/images/guanabana.jpg",
     logo: "/logo/guanabana.png",
     website: "https://www.guanabanarestaurant.com/",
@@ -90,6 +102,9 @@ export const RESTAURANTS: Restaurant[] = [
     description:
       "Filipino-Japanese ramen in Soho — a tight bowl-led menu with deep, layered broths.",
     location: "Soho, London",
+    addresses: [
+      { street: "28 Brewer St", locality: "Soho, London", postcode: "W1F 0SR" },
+    ],
     image: "/images/ramo.jpg",
     logo: "/logo/ramo.png",
     website: "https://www.ramoramen.com/",
@@ -146,6 +161,9 @@ export const RESTAURANTS: Restaurant[] = [
     description:
       "A Kentish Town bistro reading Filipino flavour through a French lens — featured in the Michelin Guide and reviewed by Giles Coren in The Times.",
     location: "Kentish Town, London",
+    addresses: [
+      { street: "157 Kentish Town Rd", locality: "London", postcode: "NW1 8PD" },
+    ],
     image: "/images/belly.jpg",
     logo: "/logo/belly.png",
     website: "https://www.bellylondon.com/",

@@ -92,6 +92,22 @@
   /* comfortable measure for long-form copy */
   --measure: 62ch;
 
+  /* the secondary/ranged-copy measure. 60ch = 74 real characters in Hanken
+     Grotesk (1ch = the "0" advance = 0.56em; the average prose character in
+     running copy is 0.4537em), for --t-small copy set ragged. Distinct from
+     --measure, which is the long-form 16px reading measure. */
+  --measure-tight: 60ch;
+
+  /* the golden ratio, named so the hard-coded 1.618/0.618 values in
+     About.module.css can be deduped and so the About chapter's proportional
+     comments are checkable. CAVEAT: a measure is a CONSTANT (a function of
+     font-size), not a proportion of a container — do not divide a text
+     column by phi. (Measured: 100%/phi caps the About story at 59
+     characters at 1920 but only 44 at 1440 and 30 at 981, i.e. it regresses
+     every viewport at or below 1440.) */
+  --phi: 1.618;
+  --phi-inv: 0.618;
+
   /* custom easing curves — stronger than the CSS keywords so animations
      have deliberate weight. `--ease-out` for entrances/press feedback,
      `--ease-in-out` for on-screen movement/morphs, `--ease-drawer` for

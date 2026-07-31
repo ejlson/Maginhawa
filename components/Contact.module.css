@@ -1,5 +1,5 @@
 .section {
-  /* No negative pull-up: Contact starts right where the RestaurantLocations
+  /* No negative pull-up: Contact starts right where the Reservations
      section ends, so the "Contact Us" title never rises into the pinned
      video's viewport range and can't be overlapped by the shrunken card. */
   margin-top: 0;

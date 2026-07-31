@@ -8,8 +8,31 @@ import Menu from "./Menu";
 import { useRouteTransition } from "./PageTransition";
 import VideoBackdrop from "./VideoBackdrop";
 import Placeholder from "./Placeholder";
-import { SLUG_BY_NAME, getRestaurant } from "@/lib/restaurants";
+// ALIASED, and it has to be: this file declares its own `RESTAURANTS` below
+// (L70) — the carousel's ordered list with its per-venue video and display
+// overrides. Importing the canonical array under the same name is a
+// module-scope redeclaration that fails at runtime with "Cannot access
+// 'RESTAURANTS' before initialization", not at build time.
+import {
+  RESTAURANTS as CANONICAL,
+  SLUG_BY_NAME,
+  getRestaurant,
+} from "@/lib/restaurants";
 import MenuOverlay from "./MenuOverlay";
+
+// The venues you can simply turn up to. DERIVED, never typed out: booking
+// policy already lives in lib/restaurants.ts, and this page has only just
+// finished deleting the last hardcoded copy of it (the old NO_BOOKING set).
+// `comingSoon` is excluded on purpose — Bunso is `bookable: false` because it
+// has not opened, which is not a walk-in policy, and telling a reader to walk
+// into it would be a lie. ReviewUs.tsx:11 draws the same distinction.
+const WALK_IN = CANONICAL.filter((r) => !r.bookable && !r.comingSoon);
+
+// "A, B and C" — an editorial list, not a comma-joined array dump.
+function nameList(names: string[]) {
+  if (names.length < 2) return names.join("");
+  return `${names.slice(0, -1).join(", ")} and ${names[names.length - 1]}`;
+}
 
 // scroll-wheel view: stacked lines with the centre one highlighted
 function WheelIcon() {
@@ -109,10 +132,6 @@ const RESTAURANTS = [
 
 const N = RESTAURANTS.length;
 
-// takeaway / café / ice-cream spots that don't take table bookings —
-// Bunso hasn't opened yet, so no bookings there either
-const NO_BOOKING = new Set(["Hoodwood", "Café Mama & Sons", "Mamasons", "Bunso"]);
-
 // restaurant marks
 const LOGOS: Record<string, string> = {
   Bintang: "/logo/bintang.png",
@@ -182,11 +201,17 @@ export default function RestaurantsShowcase() {
     const r = slug ? getRestaurant(slug) : undefined;
     return !!(r?.menuPages && r.menuPages.length > 0);
   };
+  // A Book action exists exactly when lib/restaurants.ts says the venue takes
+  // bookings AND gives somewhere to send them. Both halves are checked here so
+  // callers have ONE thing to test. This replaced a hand-maintained set of
+  // display names that restated `bookable: false` verbatim — with the
+  // Reservations index now reading the same field, a second restatement was a
+  // copy waiting to drift.
   const getBookingUrl = (name: string) => {
-  const slug = SLUG_BY_NAME[name];
-  const restaurant = slug ? getRestaurant(slug) : undefined;
-  return restaurant?.bookingUrl;
-};
+    const slug = SLUG_BY_NAME[name];
+    const restaurant = slug ? getRestaurant(slug) : undefined;
+    return restaurant?.bookable ? restaurant.bookingUrl : undefined;
+  };
   // the restaurant's own site for the Visit actions — entries without one
   // fall back to the internal detail page
   const getWebsite = (name: string) => {
@@ -279,6 +304,16 @@ export default function RestaurantsShowcase() {
     wheelRaf.current = requestAnimationFrame(stepWheel);
   };
 
+  /* `wheelRaf` doubles as the "a loop is already running" latch, so anything
+     that cancels the frame WITHOUT clearing the ref wedges the wheel shut
+     forever: every later startWheel() sees a truthy id and declines to
+     schedule. The measure effect's cleanup cancelled but did not clear,
+     which under React's double-invoked mount (reactStrictMode) strands the
+     very first frame settleNow() schedules — measured as a completely dead
+     wheel on /restaurants when the route is reached by an in-app nav (the
+     stylesheet is already warm, so the first measure succeeds and schedules;
+     on a cold direct load it measures 0 and never schedules, which is why
+     the bug looked intermittent). Cleanup now clears both ids. */
   const startWheel = () => {
     if (!wheelRaf.current) wheelRaf.current = requestAnimationFrame(stepWheel);
   };
@@ -391,6 +426,9 @@ export default function RestaurantsShowcase() {
       window.removeEventListener("resize", measure);
       if (raf.current) cancelAnimationFrame(raf.current);
       if (wheelRaf.current) cancelAnimationFrame(wheelRaf.current);
+      // clear, don't just cancel — both ids are "is a loop running?" latches
+      raf.current = 0;
+      wheelRaf.current = 0;
       clearTimeout(settle.current);
     };
     // eslint-disable-next-line react-hooks/exhaustive-deps
@@ -492,7 +530,7 @@ export default function RestaurantsShowcase() {
                   <span aria-hidden>→</span>
                 </button>
               )}
-              {!NO_BOOKING.has(item.name) && getBookingUrl(item.name) && (
+              {getBookingUrl(item.name) && (
                 <a
                   href={getBookingUrl(item.name)}
                   target="_blank"
@@ -515,8 +553,22 @@ export default function RestaurantsShowcase() {
           </div>
         </div>
 
-        {/* card-list view — photo grid on a clean cream surface */}
-        <div className={styles.cards} data-hidden={view !== "cards"}>
+        {/* Card-list view — photo grid on a clean cream surface.
+
+            `data-lenis-prevent`: below 980px this box becomes its own
+            scroller (see the media query in the stylesheet), and Lenis
+            preventDefaults the wheel for the whole document — so the notch
+            never reached the grid and the bottom rows were simply
+            unreachable. Measured at 900x800: 489px of cards below the fold,
+            0px of travel. The attribute tells Lenis to skip any wheel whose
+            composed path passes through here and let the browser scroll this
+            element natively. Harmless above the breakpoint, where the grid
+            fits the screen and there is nothing to scroll. */}
+        <div
+          className={styles.cards}
+          data-hidden={view !== "cards"}
+          data-lenis-prevent
+        >
           <div className={styles.cardsGrid}>
             {RESTAURANTS.map((r) => (
               <article key={r.name} className={styles.card}>
@@ -558,7 +610,7 @@ export default function RestaurantsShowcase() {
                         Menu
                       </button>
                     )}
-                    {!NO_BOOKING.has(r.name) && getBookingUrl(r.name) && (
+                    {getBookingUrl(r.name) && (
                       <a
                         href={getBookingUrl(r.name)}
                         target="_blank"
@@ -625,6 +677,14 @@ export default function RestaurantsShowcase() {
             <GridIcon />
           </button>
         </div>
+
+        {/* Walk-in note — the toggle's mirror image on the right-hand end of
+            the same optical line. The homepage now sends everyone here to
+            "choose a restaurant", so the three that need no choosing have to
+            say so at the point of choice rather than back on the film. */}
+        <p className={styles.walkIn}>
+          No booking needed at {nameList(WALK_IN.map((r) => r.name))}.
+        </p>
       </section>
 
       <MenuOverlay

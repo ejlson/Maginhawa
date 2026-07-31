@@ -12,7 +12,7 @@ import MaroonZone from "./MaroonZone";
 import Interlude from "./Interlude";
 import PressWall from "./PressWall";
 import AboutIntro from "./AboutIntro";
-import RestaurantLocations from "./RestaurantLocations";
+import Reservations from "./Reservations";
 // import Timeline from "./Timeline";
 // Press section content now lives inside WhoWeAre (rotating quote + masthead
 // marquee sit alongside the "About us" press image).
@@ -111,14 +111,17 @@ export default function Experience() {
             <Interlude />
             <Blog />
           </div>
-          {/* open-roles index on the cream page, then the closing
-              invitation with the Join Us pill */}
+          {/* open-roles index on the cream page — retired; hiring lives in
+              the footer's Careers link, which is where someone looking for a
+              job would go anyway */}
           {/* <CareersTeaser /> */}
 
-          {/* The careers invitation now lives ON the Locations film rather
+          {/* The page closes on the booking index, set ON the film rather
               than in its own 200svh pinned section above it — which also
-              retires the film's -100svh rise-and-cover coupling. */}
-          <RestaurantLocations />
+              retires the film's -100svh rise-and-cover coupling. Discover
+              browses all eight venues; this one transacts the four that take
+              reservations. */}
+          <Reservations />
 
           {/* No Contact block here any more — the enquiry form lives on
               /contact, and the footer's own invitation ("Got any questions?")

@@ -134,22 +134,24 @@ export default function AboutIntro() {
         <div className={styles.headCell}>
         <Reveal delay={0.08} className={styles.headBlock}>
           <h2 className={styles.title}>About Us.</h2>
-          <p className={styles.body}>
-            Maginhawa began in 1987 as Chef Omar&apos;s family kitchen on
-            Kentish Town Road — one room, one stove, and a menu built from
-            what the family cooked at home. Nearly four decades on, the same
-            family runs seven distinct dining rooms across London: a Filipino
-            fusion table, a Caribbean kitchen, London&apos;s first Filipino
-            ice cream parlour, a Filipino-Japanese ramen counter in Soho, and
-            a Michelin-listed bistro back where it started.
-            <br />
-            <br />
-            Each has its own voice, its own room and its own regulars. What
-            they share is a way of working: recipes carried down rather than
-            researched, produce bought the way a household buys it, and a
-            welcome that treats every guest as family — which is what
-            maginhawa has meant all along.
-          </p>
+          <div className={styles.story}>
+            <p className={styles.body}>
+              Maginhawa began in 1987 as Chef Omar&apos;s family kitchen on
+              Kentish Town Road — one room, one stove, and a menu built from
+              what the family cooked at home. Nearly four decades on, the
+              same family runs seven distinct dining rooms across London: a
+              Filipino fusion table, a Caribbean kitchen, London&apos;s first
+              Filipino ice cream parlour, a Filipino-Japanese ramen counter
+              in Soho, and a Michelin-listed bistro back where it started.
+            </p>
+            <p className={styles.body}>
+              Each has its own voice, its own room and its own regulars.
+              What they share is a way of working: recipes carried down
+              rather than researched, produce bought the way a household
+              buys it, and a welcome that treats every guest as family —
+              which is what maginhawa has meant all along.
+            </p>
+          </div>
         </Reveal>
         </div>
 

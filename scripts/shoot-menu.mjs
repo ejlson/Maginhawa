@@ -19,9 +19,9 @@ await p.mouse.click(1410,28);await s(900);
 await p.evaluate(()=>window.scrollTo(0,window.innerHeight*1.2));await s(400);
 await p.evaluate(()=>window.scrollBy(0,300));await s(700);
 await p.screenshot({path:`${OUT}/mn_light.png`});
-// restaurant locations fullscreen — scroll so it fills viewport
+// reservations film fullscreen — scroll so it fills viewport
 await p.evaluate(()=>{const el=document.querySelectorAll('section')[2]; el&&el.scrollIntoView();});await s(900);
-await p.screenshot({path:`${OUT}/mn_locations.png`});
+await p.screenshot({path:`${OUT}/mn_book.png`});
 // dark section (contact): scroll near bottom
 await p.evaluate(()=>window.scrollTo(0,document.body.scrollHeight*0.82));await s(400);
 await p.evaluate(()=>window.scrollBy(0,200));await s(700);

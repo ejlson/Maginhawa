@@ -27,7 +27,21 @@
      shared .pinScope). */
   z-index: 1;
   margin-top: 0;
-  padding: clamp(64px, 9vh, 132px) 0 0;
+  /* EVENLY FRAMED, because the sheet is taller than its contents.
+     `min-height` below forces a full screen for the pin's sake, and the
+     journal only fills part of it — so the surplus used to pile up entirely
+     under the last card and then the page added --home-gap on top of it.
+     Measured at 1920x1080: 97px of air above the heading against 556px
+     below the strip. The padding is now a MINIMUM breath on both edges and
+     `justify-content: center` splits whatever is left over equally, so the
+     journal sits centred in its own sheet and the two gaps match by
+     construction at every viewport instead of by a tuned number.
+     The film below drops its own --home-gap to suit (see
+     Reservations.module.css): this sheet's bottom breath IS the gap
+     to the film now, which is the only way the two can be equal — the
+     surplus alone already exceeds the top padding. */
+  padding: clamp(64px, 9vh, 132px) 0;
+  justify-content: center;
   /* A SHEET THAT COVERS A SCREEN HAS TO BE A SCREEN. The pinned photograph
      is held by its containing block, which ends at THIS section's bottom —
      so a journal shorter than the viewport runs the pin out before its own

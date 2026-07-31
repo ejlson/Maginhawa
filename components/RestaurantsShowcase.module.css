@@ -284,6 +284,59 @@
   transition: transform 0.35s var(--ease-out);
 }
 
+/* ---- walk-in note, bottom-RIGHT ----
+
+   The toggle's mirror image: the same clamp() insets on the opposite edge,
+   so the two sit on one optical line across the foot of the hero.
+
+   It borrows the toggle's plaque grammar — 999px, hairline, blur — but at a
+   DEEPER wash, and that number is measured rather than matched. In card view
+   .cards lays a full cream sheet under this corner (it is z-index 3, this is
+   5), and the toggle's rgba(18,0,0,0.42) over #faf7f1 composites to 152/255,
+   where cream type returns 2.7:1. At 0.68 the same corner lands at 88/255 →
+   6.6:1 on the cream sheet, and ~12:1 over the brightest frame the footage
+   can throw in wheel view. Stroked icons could live at 0.42; a sentence
+   cannot.
+
+   pointer-events: none is load-bearing, not tidiness. Below 980px .cards is
+   its own scroll box and carries data-lenis-prevent, which Lenis resolves
+   from the wheel event's composed path. A plaque floating over that box and
+   taking hits would become the target, the path would miss .cards, and the
+   notch would scroll the PAGE instead of the grid — precisely the regression
+   that attribute was added to fix. */
+.walkIn {
+  position: absolute;
+  right: clamp(20px, 5vw, 60px);
+  bottom: clamp(18px, 4vh, 40px);
+  z-index: 5;
+  pointer-events: none;
+  /* sentence case, so --t-small rather than --t-label (globals.css:74-76) */
+  max-width: min(34ch, 46vw);
+  padding: 0.5em 1.1em;
+  border: 1px solid rgba(250, 247, 241, 0.28);
+  border-radius: 999px;
+  background: rgba(18, 0, 0, 0.68);
+  -webkit-backdrop-filter: blur(8px);
+  backdrop-filter: blur(8px);
+  font-size: var(--t-small);
+  line-height: var(--lh-snug);
+  text-align: right;
+  /* two short lines rather than one long one and an orphan */
+  text-wrap: balance;
+  color: var(--cream);
+}
+
+/* On a phone the 46vw cap is ~179px, so the sentence runs to four lines and a
+   999px radius turns the plaque into a blob — the curve eats the first and
+   last line's ends. Widening it instead is not available: at 390px the note
+   would come within 4px of the view toggle. So the radius relaxes to the flat
+   media radius the rest of the site's tiles use and it reads as a card. */
+@media (max-width: 700px) {
+  .walkIn {
+    border-radius: var(--radius-media);
+  }
+}
+
 @media (hover: hover) and (pointer: fine) {
   .viewToggle button:hover {
     opacity: 0.9;

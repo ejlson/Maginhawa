@@ -589,21 +589,24 @@ export default function About() {
                 opaque cream sheet (layered pinning: the video stays pinned
                 beneath while this section slides up to cover it, and only
                 releases underneath once hidden). The content inside is
-                deliberately static — the slide-over entrance is the whole
-                effect, and internal drift made the title feel detached
-                from its own table. */}
+                static — the slide-over entrance IS the effect. The eyebrow
+                and the rows used to carry their own scroll reveals on top
+                of it; two entrances stacked on one arrival read as a stall,
+                and the rows re-animating under a sheet that had already
+                delivered them made the table feel detached from its own
+                title. Plain elements, no Reveal. */}
             <section className={styles.coverage} data-nav-theme="light">
               <div className="container">
               <div className={styles.coverageHead}>
-                <Reveal as="span" className={styles.coverageEyebrow}>
+                <span className={styles.coverageEyebrow}>
                   <span className={styles.coverageDot} aria-hidden /> Awards
                   &amp; Recognition
-                </Reveal>
+                </span>
               </div>
 
             <ol className={styles.coverageList}>
-              {COVERAGE_GROUPS.map((group, gi) => (
-                <Reveal as="li" key={group.outlet} delay={(gi % 4) * 0.04}>
+              {COVERAGE_GROUPS.map((group) => (
+                <li key={group.outlet}>
                   <div className={styles.coverageGroup}>
                     <div className={styles.coverageOutlet}>{group.outlet}</div>
 
@@ -667,7 +670,7 @@ export default function About() {
                       ))}
                     </div>
                   </div>
-                </Reveal>
+                </li>
               ))}
             </ol>
               </div>

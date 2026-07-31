@@ -16,8 +16,8 @@
   overflow-x: clip;
   overflow-y: visible;
   /* taller than the viewport: the extra 100svh is the distance the content
-     pins for AND the room the Locations film needs to rise a FULL viewport up
-     and completely cover it (see RestaurantLocations' negative margin-top) */
+     pins for AND the room the Reservations film needs to rise a FULL viewport
+     up and completely cover it (see Reservations' negative margin-top) */
   height: 200svh;
   /* cream, matching the page and the Blog above — no ground of its own, so
      the lava melts into the neighbours with no edge */

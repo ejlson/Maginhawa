@@ -195,15 +195,41 @@
   color: var(--cream);
 }
 
+/* the two paragraphs' shared column. font-size is LOAD-BEARING here, not
+   decorative — --para-gap (0.9em) and .story's own max-width (in ch) both
+   need to resolve against --t-small, not the inherited 16px. Without it the
+   gap is 14.4px instead of 12.6px and the cap (once it lands, below) is
+   537.6px (85 chars) instead of 470.4px (74 chars). */
+.story {
+  display: flex;
+  flex-direction: column;
+  font-size: var(--t-small);
+  gap: var(--para-gap);
+}
+
+@media (min-width: 981px) and (min-height: 780px) {
+  .story {
+    /* the cap adds ~2 lines at >=1600px wide, which on viewports at or
+       below ~730px tall tips the grid into overflow — hence the height
+       gate. Below it, the paragraphs fill the cell as they do today.
+       align-items: flex-end keeps both paragraphs flush to the cell's
+       right edge, matching .headBlock's align-items: flex-end above. */
+    max-width: var(--measure-tight);
+    align-items: flex-end;
+  }
+}
+
 .body {
   margin: 0;
-  /* fills the minor segment's measure — no ch cap */
+  /* the ch/em cap lives on .story (see above) so it resolves at 14px
+     (--t-small), not the inherited 16px — this rule just sets the type. */
   font-family: var(--font-sans);
   font-weight: 400;
   font-size: var(--t-small);
   line-height: var(--lh-body);
   color: var(--cream);
   opacity: 0.85;
+  text-wrap: pretty;
 }
 
 /* ---------- lower-right band: name line + portrait ---------- */
@@ -383,9 +409,10 @@
   /* THE LINK, lifted. It used to sit in row 3 beside a 4:5 portrait, and
      between them they pushed the bottom band past a 100svh screen — so the
      one call to action in the chapter was reliably below the fold. It now
-     sits directly under the story it belongs to, which also closes the
-     large empty middle the right-hand column had: title, paragraph, link,
-     one block. */
+     sits directly under the story it belongs to. This does NOT close the
+     large empty middle the right-hand column had — it only moved the void
+     down a row. What closes it is the founder band's weight in row 3;
+     row 2's 1fr carries the deliberate remainder. */
   .ctaCell {
     grid-column: 9 / 13;
     grid-row: 2;
@@ -407,5 +434,26 @@
     width: clamp(112px, 11vw, 176px);
     aspect-ratio: 4 / 5;
     margin-left: auto;
+  }
+}
+
+/* Taller viewports can afford a bigger byline — the block above is now the
+   short-viewport fallback. .founderCell is 3 tracks wide: its width
+   C = 3*col + 24 (two gutters of 12px). Two tracks (the portrait's own
+   width) = 2*col + 12 = 2(C-24)/3 + 12 = 2C/3 - 4, i.e. calc(200% / 3 - 4px)
+   against the CELL's own percentage — not var(--grid-col). That token is
+   computed from 100vw with SYMMETRIC margins and does not match this
+   section's asymmetric 12px/--grid-margin padding (off by 2.33px per column
+   at 1920), so plugging it in here would be wrong by construction. This
+   form is exact at every viewport and independent of --grid-col.
+   calc(30svh - 20px) is the height ceiling that stops a width-driven
+   portrait from eating a short screen — it's inert at 1080 (304 > 301.33
+   seat) and inert at 900 (250 > 248 at 1600), and only binds wide-and-short
+   (1920x900 -> 250px). min() of two WIDTH terms is still a definite width;
+   do not "simplify" this to max-height + width:auto — see the comment
+   above on why that collapses the box to 0x0. */
+@media (min-width: 981px) and (min-height: 860px) {
+  .portraitFrame {
+    width: min(calc(200% / 3 - 4px), calc(30svh - 20px));
   }
 }

@@ -179,6 +179,13 @@ const ITEMS: DiscoverItem[] = [
 // shared enter curve for the head's staged rise
 const EASE = [0.22, 1, 0.36, 1] as const;
 
+/* The title's two resting states, as variants so the CLIP can own the
+   observer while the word inside it owns the motion — see the <h2>. */
+const TITLE_RISE = {
+  parked: { transform: "translateY(115%)" },
+  raised: { transform: "translateY(0%)" },
+};
+
 // the assembly intro plays ONCE per session — client navigations back to
 // the home page go straight to the settled section
 let discoverIntroPlayed = false;
@@ -603,11 +610,19 @@ export default function Discover() {
   // holding whatever it last drove, which is how a skipped intro used to
   // strand the heading off screen a viewport and a half to the left.
   const [introOwned] = useState(() => !discoverIntroPlayed);
-  // The chapter settled WITHOUT the sequence playing — the viewport is too
-  // narrow for it, the reader scrolled straight past, or they drove the
-  // toggle mid-flight. Same resting targets, reached instantly rather than
-  // performed: an entrance they already missed shouldn't play late.
-  const [snapped, setSnapped] = useState(false);
+  /* The chapter settled WITHOUT the sequence playing — the viewport is too
+     narrow for it, the reader scrolled straight past, or they drove the
+     toggle mid-flight. Same resting targets, reached instantly rather than
+     performed: an entrance they already missed shouldn't play late.
+
+     Seeded from the SAME fact `step` is (line above), and for the same
+     reason. `discoverIntroPlayed` is a module global that survives a route
+     change, so a reader returning to the homepage re-mounts this chapter at
+     STEP.DONE — but `snapped` used to reset to false, leaving the plates,
+     the head and the captions on their perform-the-entrance transitions for
+     an entrance that can no longer run. That is what left the returning
+     reader with the title in its intro seat and the deck off centre. */
+  const [snapped, setSnapped] = useState(() => discoverIntroPlayed);
   // set the instant the sequence arms — the veil starts closing during the
   // glide, a beat before the first step fires
   const [armed, setArmed] = useState(false);
@@ -810,12 +825,23 @@ export default function Discover() {
     if (reduce && step < STEP.DONE) settle();
   }, [reduce, step, settle]);
 
-  // pending cues are dropped if the section unmounts mid-sequence — and the
-  // page must never be left locked behind it
+  /* Pending cues are dropped if the section unmounts mid-sequence — and the
+     page must never be left locked behind it.
+
+     BOTH owners of the hold have to be released here, not just the overflow.
+     `lenisRef` is a module singleton that outlives this route: navigating away
+     mid-chapter clears the STEP.DONE timer that would have called `start()`,
+     so a Lenis stopped at arm time (see the arming effect) stays stopped for
+     the rest of the session — on every other page too. Measured: leaving the
+     homepage while the chapter was running left `lenis.isStopped === true` on
+     /restaurants. The expansion modal below already pairs its stop with a
+     start in cleanup; this is the same contract. `start()` on a Lenis that was
+     never stopped is a no-op, so the unconditional call is safe. */
   useEffect(
     () => () => {
       timers.current.forEach(clearTimeout);
       unlockPage();
+      lenisRef.current?.start();
     },
     [unlockPage],
   );
@@ -1112,6 +1138,10 @@ export default function Discover() {
   // the head's furniture flies in from the edges while the intro owns the
   // section; ordinary visits keep the quiet scroll-in rise
   const fromAssembly = intro;
+  /* The title's OTHER path: no assembly to wait on, so an observer raises
+     the two lines as they arrive. Reduced motion takes neither path — it
+     renders the title already standing. See the <h2> below. */
+  const ordinaryTitle = !reduce && !fromAssembly;
   // a skipped sequence lands on the same targets with no travel
   const spring = (duration: number, bounce: number, delay = 0) =>
     snapped
@@ -1339,21 +1369,47 @@ export default function Discover() {
             Driven by `animate`, never `whileInView` on the intro path: the
             step machine is the clock there, and an observer would be racing
             it. Ordinary visits keep the observer. */}
+        {/* THE OBSERVER GOES ON THE CLIP, NOT ON THE THING BEING CLIPPED.
+            `.titleLine` is `overflow: hidden` and the word starts parked a
+            full 115% below it, so the word's VISIBLE rect is empty — and an
+            IntersectionObserver intersects its target against the clip rect
+            of every ancestor, not just the viewport. A `whileInView` on the
+            word therefore reports a 0 ratio forever and `amount: 0.5` can
+            never be met: the observer path could not raise the title at all.
+            It went unnoticed because a first visit never uses it — the
+            assembly owns the title through `capsOn` below. The reader who
+            met it was the one coming BACK to the homepage, where
+            `discoverIntroPlayed` skips the assembly and this is the only
+            path left. Measured: `translateY(109.7px)`, i.e. still parked,
+            with the line sitting whole in a 900px viewport.
+            The line box is unclipped, so observing it works; the word rides
+            the parent's variant. */}
         <h2 className={styles.title}>
           {["Our", "Restaurants."].map((line, i) => (
-            <span className={styles.titleLine} key={line}>
+            <motion.span
+              className={styles.titleLine}
+              key={line}
+              initial={ordinaryTitle ? "parked" : false}
+              whileInView={ordinaryTitle ? "raised" : undefined}
+              viewport={{ once: true, amount: 0.5 }}
+              // the ordinary path has no step machine to wait for, so the
+              // same observer that raises the line also lights it
+              onViewportEnter={
+                i === 1 && ordinaryTitle ? () => setLit(true) : undefined
+              }
+            >
               <motion.span
                 className={styles.titleRise}
                 // "Restaurants." turns saffron once the chapter is finished
                 data-lit={i === 1 && lit ? "on" : undefined}
-                // the ordinary path has no step machine to wait for, so the
-                // same observer that raises the line also lights it
-                onViewportEnter={
-                  i === 1 && !fromAssembly ? () => setLit(true) : undefined
+                variants={ordinaryTitle ? TITLE_RISE : undefined}
+                initial={
+                  reduce || ordinaryTitle
+                    ? undefined
+                    : { transform: "translateY(115%)" }
                 }
-                initial={reduce ? false : { transform: "translateY(115%)" }}
                 animate={
-                  reduce || !fromAssembly
+                  reduce || ordinaryTitle
                     ? undefined
                     : {
                         transform: capsOn
@@ -1361,12 +1417,6 @@ export default function Discover() {
                           : "translateY(115%)",
                       }
                 }
-                whileInView={
-                  reduce || fromAssembly
-                    ? undefined
-                    : { transform: "translateY(0%)" }
-                }
-                viewport={{ once: true, amount: 0.5 }}
                 transition={
                   snapped
                     ? { duration: 0 }
@@ -1375,7 +1425,7 @@ export default function Discover() {
               >
                 {line}
               </motion.span>
-            </span>
+            </motion.span>
           ))}
         </h2>
         {/* The standfirst BUILDS word by word rather than sliding in — the

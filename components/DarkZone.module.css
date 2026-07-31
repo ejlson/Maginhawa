@@ -1,11 +1,11 @@
 .zone {
   position: relative;
-  /* above the Locations film (z-index 4) so the film→DarkZone seam holds */
+  /* above the Reservations film (z-index 4) so the film→DarkZone seam holds */
   z-index: 5;
   background: var(--maroon);
   color: var(--cream);
   /* No top padding — the zone butts directly against the full-bleed
-     RestaurantLocations video above it, so the maroon Contact section
+     Reservations video above it, so the maroon Contact section
      follows the footage with no dark strip between the two. */
   padding-top: 0;
   /* Footer owns its own bottom padding — keep this at zero so the maroon

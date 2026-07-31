@@ -1,0 +1,313 @@
+/* Full-bleed video shell — taller than one viewport so the footage
+   rides full-bleed for a beat between sealing and settling, but still
+   scrolling past 1:1 the whole way (no pin — scroll is never held); the
+   settle plays during the departure itself as the block rides off
+   toward the maroon DarkZone below. */
+.section {
+  position: relative;
+  /* stacked above the cream sections; DarkZone sits higher still so the
+     film→DarkZone seam holds */
+  z-index: 4;
+  /* No negative pull-up any more. The film used to rise a full viewport to
+     cover the pinned ReadyCta section above it; the close now lives inside
+     this film, so the section simply owns the page gap above it. */
+  /* No page gap of its own. The journal above is a full-screen cream sheet
+     that centres its contents, so it already carries a matched breath on its
+     bottom edge — adding --home-gap (324px at 1920x1080) on top of that is
+     what made the run of dead cream between the two. The sheet's own bottom
+     breath is the gap now, and it equals the breath above its heading. */
+  margin-top: 0;
+  width: 100%;
+  /* a quarter-screen longer than the viewport: the extra 25svh is the beat
+     the footage holds at full bleed between sealing and settling */
+  height: 125svh;
+  /* the section lives OUTSIDE the DarkZone: the video ARRIVES as a
+     slightly inset, rounded plate that grows to edge-to-edge as it
+     seals (--enter 0→1 over the approach), rides full bleed, then
+     --settle 0→1 brings full bleed down to the page container's inset
+     as the section leaves the viewport — so the departing plate width
+     matches the dark section's content. The two phases never overlap,
+     so their insets simply add. Defaults (--enter 1, --settle 0) keep
+     the pre-hydration paint at full bleed. */
+  --side-inset: calc(
+    24px * (1 - var(--enter, 1)) + var(--pad-x) * var(--settle, 0)
+  );
+  --top-inset: calc(
+    24px * (1 - var(--enter, 1)) + var(--pad-x) * var(--settle, 0)
+  );
+}
+
+/* the stage fills the section exactly; everything visual lives inside
+   it */
+.stage {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+}
+
+/* the dark surface behind the video — driven by --dark, which completes
+   at the very start of the departure (while the footage is still
+   full-bleed), so the shrink always reveals a finished maroon ground
+   (never a cream→maroon fade in progress). It meets the maroon DarkZone
+   at the section's bottom edge, so the seam reads continuous. */
+.stage::before {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background: var(--maroon);
+  opacity: var(--dark, 0);
+}
+
+/* clip container — fills the stage; the scroll-driven full-bleed→plate
+   framing is done entirely with clip-path, which composites on the GPU.
+   Radius scales with the phases: the film ENTERS as a generously
+   rounded plate (the hero-plate rounding the About card used to carry) whose corners seal
+   flat exactly at full view (--enter 0→1 over the approach), then
+   settles at the flat media radius the surrounding plates use. The two
+   phases never overlap, so their radii simply add. */
+.reveal {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+  clip-path: inset(
+    var(--top-inset) var(--side-inset) var(--top-inset) var(--side-inset)
+      round
+      calc(
+        clamp(24px, 2.2vw, 36px) * (1 - var(--enter, 1)) +
+          var(--radius-media) * var(--settle, 0)
+      )
+  );
+  will-change: clip-path;
+}
+
+/* reduced motion: skip the morph entirely — the video stays at full
+   bleed with square corners, and --settle is pinned so no inset math
+   can move it (--dark still fades the static ground behind it) */
+@media (prefers-reduced-motion: reduce) {
+  .section {
+    --settle: 0 !important;
+  }
+  .reveal {
+    clip-path: inset(0 round 0);
+  }
+}
+
+.bg {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  /* Parallax layer: scaled up so the scroll-driven translate never exposes
+     the video's edges. `--parallax-y` is set from JS (see Reservations.tsx)
+     and swings between ±4% — half the original ±8%, since the foreground is
+     type to be read rather than one stretched wordmark. The narrower sweep
+     leaves MORE headroom inside the scale(1.2) oversize, not less. */
+  transform: translateY(var(--parallax-y, 0%)) scale(1.2);
+  transform-origin: center;
+  will-change: transform;
+}
+
+.bg > div {
+  height: 100%;
+  border: none;
+}
+
+.locVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+}
+
+/* Dark wash over the footage — and now the ONLY thing standing between the
+   footage and WCAG 1.4.3, since the copy no longer inverts through a
+   difference blend.
+   Measured, not eyeballed: cream (#faf7f1) has relative luminance 0.932, so
+   4.5:1 needs a backdrop at or below 0.168 — a mid-grey of 114/255. Against
+   the worst case the footage can produce (a blown-white frame) an
+   rgba(18,0,0,a) wash composites to 255 − 237a, which clears 114 only from
+   a = 0.60 upward. The two layers below multiply to 0.66 at the centre and
+   0.83 at the corners, so even a white frame lands at ~98/255 → 5.7:1, and
+   the type never depends on which frame happens to be showing. */
+.locScrim {
+  position: absolute;
+  inset: 0;
+  z-index: 1;
+  background:
+    radial-gradient(120% 100% at 50% 50%, rgba(18, 0, 0, 0.52), rgba(18, 0, 0, 0.72)),
+    linear-gradient(rgba(18, 0, 0, 0.3), rgba(18, 0, 0, 0.38));
+}
+
+/* The invitation — set on the film, regardless of settle state.
+   NO mix-blend-mode. Under `difference` every glyph's contrast was a
+   function of whichever frame sat behind it, which is unmeasurable and so
+   unpassable; it also forbids a filled hover, which the button needs in
+   order to read as a button (the old stylesheet admitted as much).
+   The z-index STAYS: it is what lifts this above .locScrim (z-index 1).
+   Removing it along with the blend would drop the copy behind the wash. */
+.cta {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: grid;
+  /* DEAD CENTRE, both axes, in the SECTION — which is 125svh, not one
+     viewport, and that is what the vertical centring buys.
+
+     The block's centre sits 62.5svh from the section's top. At the seal
+     (section top on viewport top, --enter 1) that reads 12.5svh BELOW the
+     viewport's centre line; over the 25svh the footage then holds at full
+     bleed it rides up to 12.5svh above it. So it crosses the viewport's own
+     centre at exactly the midpoint of the full-bleed beat — the one moment
+     the film is sealed, unshrunk and uninterrupted.
+
+     Horizontally this deliberately does NOT take the --grid-col2 seat every
+     other chapter head hangs from. That seat exists to bind a heading to the
+     list or grid beneath it; there is no list here, and a two-element
+     invitation left-hung on a full-bleed film reads as a caption rather than
+     a close. */
+  align-content: center;
+  justify-items: center;
+  pointer-events: none;
+  padding-inline: var(--pad-x);
+}
+/* the overlay covers the whole stage and must not eat the cursor, but its
+   children must stay pressable. `auto` inherits, so one restored child
+   covers an arbitrarily deep tree beneath it — a SECOND top-level child
+   would still need this rule to match it. */
+.cta > * {
+  pointer-events: auto;
+}
+
+/* ---------- the invitation ---------- */
+
+.book {
+  width: 100%;
+  /* the heading and the pill share one centre line */
+  text-align: center;
+  color: var(--cream);
+}
+
+/* the display heading — same grammar as "Our Restaurants." and "Blog.", one
+   line, normal flow. Deliberately NOT the stretched-SVG treatment the
+   footer's MAGINHAWA carries twelve hundred pixels below: firing that device
+   twice inside ~1.5 screens is what stopped it meaning anything. Off the
+   stretch means off Contralto too — --font-display-big is reserved for
+   wordmark moments (globals.css), and everything else is the grotesk. */
+.title {
+  /* nothing above it now — the heading opens the block */
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--t-display);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
+  color: var(--cream);
+}
+
+/* ---------- the one action ----------
+
+   .magnetHost is the layout box and the MEASURING box: it is never
+   transformed, so its border rect stays the button's REST position however
+   far the pill has drifted. Reservations.tsx measures the pointer offset
+   from this element, not from the pill, or the magnet becomes its own input
+   and walks away from the cursor.
+
+   The gap: at 1440x900 this resolves to 36px against the heading's 73.6px
+   line box (--t-display caps at 5rem, --lh-display 0.92) — about half a
+   display line, where the old four-row index took a full one. The index
+   opened a second movement and needed the air; a single action is the same
+   sentence's verb. The 28px floor is not arbitrary either: the magnet's
+   vertical ceiling is half the pill's height, ~23px at every breakpoint
+   (the pill bottoms out near 46px), so a fully-pulled button still clears
+   the heading's descender band. */
+.magnetHost {
+  display: block;
+  /* shrink-wrapped to the pill, so the measured rect is the button's and not
+     the column's — which then needs auto margins to sit on the block's centre
+     line, since a fit-content box does not inherit text-align */
+  width: fit-content;
+  margin: clamp(28px, 4vh, 48px) auto 0;
+}
+
+/* the spring lives here — transform only, never left/top/margin, so the
+   drift composites on the GPU and costs no layout */
+.magnet {
+  display: flex;
+  will-change: transform;
+}
+
+/* The closing action. Same pill grammar as the site's other UI chrome —
+   mono caps, 999px radius, a whisper of fill at rest and a solid cream fill
+   on hover — at --t-button rather than --t-label, because this is the one
+   button on the page's last frame rather than one of four in a list. */
+.action {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.9em;
+  border-radius: 999px;
+  padding: 1em 2.1em;
+  font-family: var(--font-mono);
+  font-size: var(--t-button);
+  line-height: 1;
+  letter-spacing: var(--tr-label-mono);
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--cream);
+  /* 6% fill: enough that the pill has a body before the cursor arrives,
+     light enough that the cream label still clears 5:1 on it */
+  background: rgba(250, 247, 241, 0.06);
+  border: 1px solid rgba(250, 247, 241, 0.55);
+  transition:
+    background-color 220ms var(--ease-out),
+    border-color 220ms var(--ease-out),
+    color 220ms var(--ease-out);
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .action:hover {
+    background: var(--cream);
+    border-color: var(--cream);
+    color: var(--maroon);
+  }
+  /* the arrow leads on hover; no translate on .action itself, which would
+     fight the magnet's transform for the same property */
+  .action:hover .actionArrow {
+    transform: translateX(5px);
+  }
+}
+
+.action:focus-visible {
+  outline: 2px solid var(--cream);
+  outline-offset: 3px;
+}
+.action:active {
+  background: rgba(250, 247, 241, 0.18);
+}
+
+.actionLabel {
+  font-weight: 500;
+}
+
+.actionArrow {
+  width: clamp(26px, 2.4vw, 36px);
+  height: 10px;
+  flex: none;
+  transition: transform 0.4s var(--ease-out);
+}
+
+/* ---------- small screens ----------
+
+   No auto-height override any more. The four-row index genuinely did not fit
+   a 375px viewport, so the section used to grow with its content — at the
+   cost of a `.stage { height: 100% }` against an auto parent, which needed
+   .cta pulled back into normal flow to stop the stage collapsing to zero and
+   taking the film with it.
+
+   Two elements measure ~110px stacked at 375px (heading 35 at the 2.4rem
+   floor, gap 28, pill 46) inside 125svh = 834px. There is nothing
+   left to overflow, so the fixed height comes back everywhere — which also
+   keeps --settle's departure distance identical at every breakpoint instead
+   of stretching with the content. Below 981px the base .cta rule's
+   `padding-inline: var(--pad-x)` is already the plain page margin, so there
+   is nothing left for a small-screen block to say. */
