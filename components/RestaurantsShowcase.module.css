@@ -107,7 +107,17 @@
   position: relative;
   min-height: 0;
   overflow: hidden;
-  border-radius: var(--radius-tile);
+  /* 2px, not --radius-tile's 8px — the house corner language for a
+     PHOTOGRAPH, which these are. The Discover plates on the home page, the
+     manifesto prints, the About story deck and the blog cards all sit on the
+     same sharp editorial 2px cut; these tiles were the outlier at 8, which
+     read as an app card rather than a print.
+
+     Written locally rather than by moving --radius-tile: that token is shared
+     with other callers and is documented as "a quiet edge-soften" for
+     editorial frames generally. Changing it here would silently re-cut
+     everything else using it, which is not what was asked for. */
+  border-radius: 2px;
 }
 
 .cardImg {

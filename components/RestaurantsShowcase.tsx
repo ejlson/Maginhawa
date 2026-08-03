@@ -132,7 +132,6 @@ const RESTAURANTS = [
 
 const N = RESTAURANTS.length;
 
-// restaurant marks
 const LOGOS: Record<string, string> = {
   Bintang: "/logo/bintang.png",
   Belly: "/logo/belly.png",
@@ -144,10 +143,9 @@ const LOGOS: Record<string, string> = {
   Bunso: "/logo/bunso.png",
 };
 
-// card photography (Mamasons has none → placeholder)
 const PHOTOS: Record<string, string> = {
   Bintang: "/images/bintang.jpg",
-  Belly: "/images/belly.jpg",
+  Belly: "/images/belly3.jpg",
   "Café Mama & Sons": "/images/cafemama.jpg",
   Guanabana: "/images/guanabana.jpg",
   "Ramo Ramen": "/images/ramo.jpg",

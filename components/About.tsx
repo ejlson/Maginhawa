@@ -226,11 +226,18 @@ type CoverageRow = {
   image?: string;
 };
 
-// hover-image guard — these restaurant `image` paths are placeholders that
-// don't exist under /public yet (Mamasons, Bunso). Rows resolving to them
-// get no hover image at all rather than a broken <img>.
+// hover-image guard — this restaurant `image` path is a placeholder that
+// does not exist under /public. Rows resolving to it get no hover image at
+// all rather than a broken <img>.
+//
+// Mamasons has come off this list: lib/restaurants.ts pointed at
+// `/images/mamasons-placeholder.jpg`, which was never added, so the grid tile
+// on /restaurants was blank and this guard was quietly covering for it on
+// /about. It now uses the same photograph Discover shows on the home page, so
+// there is a real file behind it and nothing to suppress. Bunso genuinely has
+// no photograph yet — Discover renders it as a maroon field with the wordmark
+// (image: null) rather than a picture — so it stays.
 const MISSING_IMAGES = new Set([
-  "/images/mamasons-placeholder.jpg",
   "/images/bunso-placeholder.jpg",
 ]);
 

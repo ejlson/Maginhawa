@@ -43,6 +43,10 @@ type DiscoverItem = {
   est?: number;
   // short muted clip that plays inside the plate on hover
   clip?: string;
+  /** `object-position` for this tile's photograph, when centring it crops
+   *  something that has to survive. Only the tiles that need it carry one —
+   *  everything else stays on the browser's own 50% 50%. */
+  focal?: string;
 };
 
 const ITEMS: DiscoverItem[] = [
@@ -89,13 +93,19 @@ const ITEMS: DiscoverItem[] = [
     priceRange: "£",
     est: 2017,
     clip: "/videos/tile-mamasons.mp4",
+    /* The shopfront is 4032x6048 (2:3) and the tile is 3:2, so `cover` scales
+       to width and crops 3360px of height — 1680px off the top at the default
+       50%. The MAMASONS fascia sits at y 1620-2240 in the source, so that cut
+       landed 60px INTO the top of the sign. 40% starts the window at 1344 and
+       leaves ~280px of air above the banner. */
+    focal: "50% 40%",
   },
   {
     slug: "ramo",
     name: "Ramo Ramen",
     tag: "Filipino-Japanese Ramen",
     location: "28 Brewer St, Soho, London W1F 0SR",
-    image: "/images/ramo.jpg",
+    image: "/images/ramoramen.JPG",
     logo: "/logo/ramo.png",
     menuPages: [
       "/menu/ramo/lunch-1.png",
@@ -146,7 +156,7 @@ const ITEMS: DiscoverItem[] = [
     name: "Belly",
     tag: "Modern Filipino Bistro",
     location: "157 Kentish Town Rd, London NW1 8PD",
-    image: "/images/belly.jpg",
+    image: "/images/belly3.jpg",
     logo: "/logo/belly.png",
     menuPages: [
       "/menu/belly/food.png",
@@ -422,18 +432,18 @@ const HEAD_AIR = 28;
 // prints crowd the line without ever touching it.
 const STAGE_PRINTS = [
   // ---- top band ----
-  { src: "/blog/DSCF3035-web.jpg", left: "4%", top: "15%", w: 168, ar: 1, drift: 22, depth: 780, speed: 1 },
-  { src: "/blog/DSCF3015-web.jpg", left: "11%", top: "9%", w: 127, ar: 1.5, drift: -14, depth: 900, speed: 1.28 },
-  { src: "/blog/DSCF2995-web.jpg", left: "36%", top: "13%", w: 210, ar: 1.45, drift: 16, depth: 700, speed: 0.86 },
-  { src: "/blog/DSC07056-web.jpg", left: "47%", top: "21%", w: 115, ar: 1, drift: -18, depth: 840, speed: 1.12 },
-  { src: "/blog/DSCF2296-web.jpg", left: "74%", top: "11%", w: 146, ar: 0.67, drift: 12, depth: 760, speed: 0.94 },
+  { src: "/images/ourrestaurants/print-01-web.jpg", left: "4%", top: "15%", w: 168, ar: 1, drift: 22, depth: 780, speed: 1 },
+  { src: "/images/ourrestaurants/print-02-web.jpg", left: "11%", top: "9%", w: 127, ar: 1.5, drift: -14, depth: 900, speed: 1.28 },
+  { src: "/images/ourrestaurants/print-03-web.jpg", left: "36%", top: "13%", w: 210, ar: 1.45, drift: 16, depth: 700, speed: 0.86 },
+  { src: "/images/ourrestaurants/print-04-web.jpg", left: "47%", top: "21%", w: 115, ar: 1, drift: -18, depth: 840, speed: 1.12 },
+  { src: "/images/ourrestaurants/print-05-web.jpg", left: "74%", top: "11%", w: 146, ar: 0.67, drift: 12, depth: 760, speed: 0.94 },
   // ---- flanks: the title's own height, drawn in off the screen edges ----
-  { src: "/blog/DSC07722-web.jpg", left: "3%", top: "32%", w: 120, ar: 0.72, drift: 14, depth: 660, speed: 0.8 },
-  { src: "/blog/DSCF3052-web.jpg", left: "84%", top: "28%", w: 161, ar: 1, drift: -16, depth: 920, speed: 1.34 },
+  { src: "/images/ourrestaurants/print-06-web.jpg", left: "3%", top: "32%", w: 120, ar: 0.72, drift: 14, depth: 660, speed: 0.8 },
+  { src: "/images/ourrestaurants/print-07-web.jpg", left: "84%", top: "28%", w: 161, ar: 1, drift: -16, depth: 920, speed: 1.34 },
   // ---- bottom band ----
-  { src: "/blog/DSCF2472-web.jpg", left: "5%", top: "60%", w: 193, ar: 1.35, drift: 18, depth: 820, speed: 1.06 },
-  { src: "/blog/DSCF2298-web.jpg", left: "57%", top: "66%", w: 222, ar: 1.5, drift: 20, depth: 860, speed: 1.16 },
-  { src: "/blog/DSC07739-web.jpg", left: "76%", top: "62%", w: 117, ar: 0.67, drift: -12, depth: 720, speed: 0.9 },
+  { src: "/images/ourrestaurants/print-08-web.jpg", left: "5%", top: "60%", w: 193, ar: 1.35, drift: 18, depth: 820, speed: 1.06 },
+  { src: "/images/ourrestaurants/print-09-web.jpg", left: "57%", top: "66%", w: 222, ar: 1.5, drift: 20, depth: 860, speed: 1.16 },
+  { src: "/images/ourrestaurants/print-10-web.jpg", left: "76%", top: "62%", w: 117, ar: 0.67, drift: -12, depth: 720, speed: 0.9 },
 ];
 
 const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
@@ -2001,6 +2011,7 @@ function Tile({
           {item.image ? (
             <Image
               className={styles.photo}
+              style={item.focal ? { objectPosition: item.focal } : undefined}
               src={item.image}
               alt=""
               fill
@@ -2283,6 +2294,7 @@ function ExpandedCard({
           {item.image ? (
             <Image
               className={styles.photo}
+              style={item.focal ? { objectPosition: item.focal } : undefined}
               src={item.image}
               alt=""
               fill

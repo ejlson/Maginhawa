@@ -215,7 +215,12 @@ export default function Reservations() {
         <div className={styles.cta}>
           <div className={styles.book}>
             <LondonClock />
-            <h2 className={styles.title}>Pull up a chair.</h2>
+            {/* A QUESTION, and that is what makes the button an answer.
+                "Pull up a chair." was a second invitation stacked on the one
+                the pill already makes; "Where will you start?" is resolved by
+                "Choose a restaurant" directly beneath it, so the lockup asks
+                and answers instead of inviting twice. */}
+            <h2 className={styles.title}>Where will you start?</h2>
             {/* ON the centre line, deliberately — NOT splayed into the bottom
                 corners the way the reference CTA does it. That reference can
                 afford corners because its wash is uniform; ours is a centred
@@ -238,19 +243,57 @@ export default function Reservations() {
                 stop after the first claim gives the line a natural place to
                 turn.
 
-                Every claim here is checkable against lib/restaurants.ts:
-                eight entries, of which Bunso (L181) carries
-                `comingSoon: true` (L191) — so seven trading and an eighth
-                on the way; every `location` is a London one (L48, 73, 91,
-                104, 130, 143, 163, 186); and the four cuisines named are
+                THREE THINGS CAME OUT OF THIS LINE, each for its own reason.
+
+                "across London" went because the clock directly above already
+                says IN LONDON, and the heading is now a question about WHICH
+                OF OURS. Naming the city twice in a four-element stack answered
+                a question nobody asked at the expense of the one that was. The
+                claim is still true and still made — once, by the element whose
+                whole job is to make it.
+
+                "Seven kitchens" went because the Interlude, two sections up
+                this same page, is the line "One family, seven kitchens." A
+                support line opening on the same two words read as an echo of a
+                heading the reader had just passed. "Rooms" is the site's own
+                other word for them — the About intro runs "seven distinct
+                dining rooms" — so it is a synonym the page already owns rather
+                than a new coinage.
+
+                THE EIGHTH WENT BY INSTRUCTION, not by argument: no forthcoming
+                opening is to be mentioned here. Bunso is still surfaced on the
+                page — the Discover grid and /restaurants both carry it as a
+                coming-soon card — so nothing is being hidden; this line simply
+                no longer previews it. If it is ever to be announced again, the
+                claim is `comingSoon: true` on Bunso (lib/restaurants.ts L191).
+
+                IT IS NO LONGER AN INVENTORY. The line used to list the four
+                cuisines, which answered "where will you start?" by handing the
+                reader the menu. This answers it by saying why the choice is
+                worth making at all — three short sentences that widen and then
+                close: seven of them, each unlike the others, all the same
+                family. The turn from "different" to "one" is the whole line.
+
+                What that costs is the cuisine names, which were this block's
+                most concrete claim; what it buys is a line that reads as the
+                group's voice rather than as a specification. If the concrete
+                version is ever wanted back, it was: "Filipino, Caribbean,
+                ramen, ice cream." — all four checkable at lib/restaurants.ts
+                L45/101/160/183, L70/127, L101 and L88.
+
+                "Seven rooms" is still the checkable one and still true: seven
+                trading, with Bunso (L181) carrying `comingSoon: true` (L191)
+                and deliberately not counted here. Every `location` is a London
+                one (L48, 73, 91, 104, 130, 143, 163, 186), which is what lets
+                the clock above carry the city alone. For reference the four
+                cuisines are
                 Bintang/Ramo/Belly/Bunso "Filipino" (L45, 101, 160, 183),
                 Guanabana/Hoodwood "Caribbean" (L70, 127), Ramo "Ramen"
                 (L101) and Mamasons "Ice Cream Parlour" (L88). No founding
                 year, no covers count, no award — the Michelin line is
                 already carried five times higher up this page. */}
             <p className={styles.support}>
-              Seven places across London. Filipino, Caribbean, ramen, ice cream
-              — with an eighth on the way.
+              Seven rooms. Different worlds. One table.
             </p>
             <MagneticCta />
           </div>

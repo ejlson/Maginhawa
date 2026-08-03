@@ -89,7 +89,7 @@ export const RESTAURANTS: Restaurant[] = [
     description:
       "London's original Filipino ice-cream parlour — ube, queso, dirty ice-cream rolled in pandesal.",
     location: "Kentish Town · Soho, London",
-    image: "/images/mamasons-placeholder.jpg",
+    image: "/images/mamasons.jpg",
     logo: "/logo/mamasons.png",
     website: "http://dirtyicecream.co.uk/",
     bookable: false,
@@ -105,7 +105,7 @@ export const RESTAURANTS: Restaurant[] = [
     addresses: [
       { street: "28 Brewer St", locality: "Soho, London", postcode: "W1F 0SR" },
     ],
-    image: "/images/ramo.jpg",
+    image: "/images/ramoramen.JPG",
     logo: "/logo/ramo.png",
     website: "https://www.ramoramen.com/",
     menuPages: [
@@ -164,7 +164,7 @@ export const RESTAURANTS: Restaurant[] = [
     addresses: [
       { street: "157 Kentish Town Rd", locality: "London", postcode: "NW1 8PD" },
     ],
-    image: "/images/belly.jpg",
+    image: "/images/belly3.jpg",
     logo: "/logo/belly.png",
     website: "https://www.bellylondon.com/",
     menuPages: [

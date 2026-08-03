@@ -36,17 +36,18 @@ const PARTS: StatementPart[] = [
   "A",
   "vibrant",
   "Filipino",
-  { img: "/blog/DSC07739-web.jpg", w: 0.62, enter: "drop" }, // upright
+  { img: "/images/manifesto/group-web.jpg", w: 1.5, enter: "drop" }, // upright
   "and",
   "pan-Asian",
   "collective",
   "of",
-  "restaurants,",
-  "cafés",
-  { img: "/blog/DSCF2296-web.jpg", w: 0.86, enter: "slide" }, // square
+  "restaurants",
+  { img: "/images/manifesto/belly-web.jpg", w: 1, enter: "rise" }, // square
+  ", cafés",
+  { img: "/images/manifesto/cafemama-web.jpg", w: 0.86, enter: "slide" }, // square
   "and",
   "parlours",
-  { img: "/blog/DSCF3052-web.jpg", w: 1.5, enter: "rise" }, // landscape
+  { img: "/images/manifesto/mamasons-web.jpg", w: 1.5, enter: "rise" }, // landscape
   "in",
   "the",
   "heart",
@@ -79,8 +80,24 @@ const SUPPORT =
    This replaces a whileInView timeline of staggered springs. The springs
    are gone entirely — a scrubbed value must be a pure function of scroll or
    it fights the wheel on the way back up. */
-const SCRUB_START = "center center";
-const SCRUB_END = "center 0.18";
+/* BOTH ENDS MOVED TOGETHER, which is the difference between "earlier" and
+   "slower". The offsets are `targetPoint containerPoint`, and the container
+   point runs 0 at the top of the viewport to 1 at the bottom — so a LARGER
+   number is lower on screen, and therefore sooner as the reader comes down
+   the page.
+
+   The start was `center center`: nothing happened until a line's centre had
+   climbed all the way to the middle of the screen, which is late — the line
+   is fully in view and has been sitting there closed for a third of a screen
+   by then. It now opens at 0.68, roughly a fifth of a viewport earlier.
+
+   The end moves by the SAME 0.18 rather than staying put. Holding it would
+   have stretched each line's range from 0.32 of a screen to 0.50 and made the
+   whole sentence set more slowly under the same hand — a different change
+   from the one asked for. Shifted together, the travel is identical and only
+   the onset moves. */
+const SCRUB_START = "center 0.68";
+const SCRUB_END = "center 0.36";
 
 /** how much of a line's range one part takes to complete */
 const PART_SPAN = 0.55;
@@ -152,14 +169,47 @@ function ScrubPrint({
 }) {
   const [from, to] = at;
   const span = to - from;
-  const width = useTransform(p, at, ["0em", `${part.w}em`], {
+  /* QUANTISED, AND THAT IS THE WHOLE FIX FOR THE SCROLL STALL.
+
+     `width` and `marginRight` are LAYOUT properties and they are the point —
+     the slot has to physically open in the text flow so the sentence makes
+     room for the photograph rather than the photograph appearing on top of
+     it. That cannot become a transform without losing the effect.
+
+     What it can stop being is CONTINUOUS. Driven straight off the scrub these
+     produced a new sub-pixel value every frame, and every one of them
+     reflowed the paragraph — which re-lays-out every word mask in the
+     sentence, the same masks the scrub is writing transforms to on that frame.
+     Profiled over the section at 1440: worst frame 530.3ms, seven frames past
+     50ms. (The Discover section next door, which drives only transforms and
+     opacity, measured zero frames past 32ms over the same sweep.)
+
+     A layout only happens when the value actually CHANGES, so rounding to a
+     step the eye cannot resolve cuts the reflow count by roughly the ratio of
+     the step to a pixel. 0.04em is ~2.6px at this display size — invisible on
+     a growing edge mid-scroll, and it takes the paragraph from reflowing every
+     frame to reflowing about twenty times across the whole open.
+
+     The margin is quantised on its own, finer scale: it only ever travels
+     0.24em, so it needs a smaller step to stay smooth, and it is one value
+     for the whole run rather than per-print. */
+  const QUANTUM = 0.04;
+  const widthEm = useTransform(p, at, [0, part.w], {
     clamp: true,
     ease: SCRUB_EASE,
   });
-  const marginRight = useTransform(p, at, ["0em", "0.24em"], {
+  const width = useTransform(
+    widthEm,
+    (v) => `${Math.round(v / QUANTUM) * QUANTUM}em`,
+  );
+  const marginEm = useTransform(p, at, [0, 0.24], {
     clamp: true,
     ease: SCRUB_EASE,
   });
+  const marginRight = useTransform(
+    marginEm,
+    (v) => `${Math.round(v / 0.02) * 0.02}em`,
+  );
   // the print is already making room before it becomes visible, rather than
   // appearing and then shoving
   const opacity = useTransform(p, [from + span * 0.2, from + span * 0.6], [0, 1], {

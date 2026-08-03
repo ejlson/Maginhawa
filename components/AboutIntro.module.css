@@ -309,6 +309,19 @@
 
 .portraitImg {
   object-fit: cover;
+  /* TOP-ANCHORED, because the default centred it and took his scalp off.
+     omar.jpg is 4000x6000 (2:3) in a 4:5 frame, so `cover` scales to width
+     and 1000px of height is cropped — at the default `50%` that is 500px off
+     the top, and the crown of his head sits only ~225px down the source. It
+     was inside the cut.
+
+     `0%` rather than a middling value: 225px is ALL the air the photograph
+     has above him, so anything above 0% starts eating into the head again.
+     It reads as a tight crop because the source is tightly shot, not because
+     the frame is wrong. If it wants more room over his head the fix is a
+     taller frame (the source is 2:3 and would crop nothing at that ratio) or
+     a differently framed photograph — not this number. */
+  object-position: 50% 0%;
 }
 
 /* ---------- bottom band: the Learn More link ---------- */

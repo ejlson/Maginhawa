@@ -10,7 +10,30 @@ import { BLOG, type BlogEntry } from "@/lib/blog";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 // the strip carries the twelve newest stories end to end
-const POOL = BLOG.slice(0, 12);
+/* THE HOME STRIP IS A CHOSEN EIGHT, not the newest twelve.
+
+   It used to be `BLOG.slice(0, 12)` — whatever happened to sit at the top of
+   the feed. These eight are picked, each with its own commissioned still, and
+   the order is the order they are listed in. `/blog` is untouched and still
+   shows the full feed; this is the shop window, not the archive.
+
+   Looked up by slug rather than spliced by index so that adding an entry to
+   lib/blog.ts cannot silently change what the home page shows, and a slug
+   that stops existing drops out loudly (filter(Boolean)) instead of shifting
+   every card along by one. */
+const HOME_SLUGS = [
+  "olive-best-new-restaurants",
+  "the-sauce-cny",
+  "forbes-valentines",
+  "my-london-valentines",
+  "observer-filipino-pastries",
+  "ham-and-high-michelin",
+  "msn-valentine-croissants",
+  "time-out-michelin-january",
+] as const;
+const POOL = HOME_SLUGS.map((s) => BLOG.find((b) => b.slug === s)).filter(
+  (b): b is BlogEntry => Boolean(b),
+);
 
 /* the one card anatomy, every breakpoint — a 3:4 plate with the caption
    BELOW it on the cream (no overlay, no scrim): quiet date line, regular-
@@ -209,8 +232,31 @@ export default function Blog() {
     lastT.current = e.timeStamp;
     vel.current = 0;
     travel.current = 0;
+    /* CLEAR THE SUPPRESSION LATCH HERE, at the start of the gesture that
+       could earn it — not only when a click arrives to consume it.
+
+       onPointerEnd raises `suppressClick` after a real drag so the card the
+       finger happened to stop over does not open, and onClickCapture lowers
+       it again when it eats that click. But a drag does not reliably PRODUCE
+       a click: the strip takes pointer capture, so the release can land with
+       no click synthesised on the anchor at all. When that happened the flag
+       stayed raised, and the next honest tap on a card — a whole separate
+       gesture — was the one that got eaten. The symptom was that the blog
+       links worked until you dragged the strip once, and never again.
+
+       Resetting it on pointerdown bounds the flag's life to exactly one
+       gesture, which is all it was ever meant to cover. */
+    suppressClick.current = false;
     draggingRef.current = true;
-    strip.setPointerCapture(e.pointerId);
+    /* NO CAPTURE HERE — this is why the cards were dead links.
+       setPointerCapture retargets the whole gesture at the strip, and a
+       `click` is dispatched to the capture target rather than to the element
+       under the pointer. Taking it on pointerdown meant EVERY press was
+       captured, including a plain click on a card, so the click never
+       reached the <a> and the browser never followed the href. Capture is
+       claimed in onPointerMove instead, once the travel proves the gesture
+       is a drag — the same arm-then-claim contract the restaurants wheel
+       runs (see the drag block in RestaurantsShowcase.tsx). */
     setDragging(true);
     setGliding(false);
     runLoop();
@@ -222,6 +268,14 @@ export default function Blog() {
     if (!strip) return;
     const dx = e.clientX - startX.current;
     travel.current = Math.max(travel.current, Math.abs(dx));
+    /* CLAIM THE POINTER ONLY ONCE THIS IS A DRAG. Past the same 6px that
+       decides suppression, the gesture is no longer a click and capture is
+       safe — it keeps tracking if the finger leaves the strip. Below it the
+       pointer is left alone, so a plain press still produces a real `click`
+       on the <a> and the link opens. */
+    if (travel.current > 6 && !strip.hasPointerCapture(e.pointerId)) {
+      strip.setPointerCapture(e.pointerId);
+    }
     const max = Math.max(0, strip.scrollWidth - strip.clientWidth);
     let t = startScroll.current - dx;
     // rubber-band past the ends (damping, not a wall)

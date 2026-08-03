@@ -140,10 +140,22 @@ const WORD_STAGGER = 0.06;
 const WORD_DURATION = 0.75;
 const HEAD_DELAY = 0.12;
 const HERO_WORDS = HERO_LINES.join(" ").split(/\s+/).length;
-// the last word starts at HEAD_DELAY + (n-1) * stagger and takes
-// WORD_DURATION; the split begins a beat BEFORE it has fully settled, so the
-// two motions overlap rather than queue — a strict hand-off reads as a pause
-const SPLIT_AT = HEAD_DELAY + (HERO_WORDS - 1) * WORD_STAGGER + WORD_DURATION * 0.55;
+/* THE READING BEAT. The split used to start at WORD_DURATION * 0.55 — before
+   the last word had even settled — so the couplet was being pulled apart
+   while the reader was still assembling it. The overlap was deliberate (a
+   strict hand-off reads as a pause) but it was the wrong thing to optimise:
+   this is the line the whole page is named for, and it has to be READ before
+   it becomes a mechanism.
+
+   So the words are now allowed to land in full, and then held. 1.1s is a
+   comfortable beat on a five-word line — long enough to finish it and register
+   it, short enough that the page does not feel stalled. The split still opens
+   from a settled couplet rather than from a moving one, which is what makes
+   the parting read as a second gesture instead of a continuation. */
+const HERO_HOLD = 1.1;
+// the last word starts at HEAD_DELAY + (n-1) * stagger and takes WORD_DURATION
+const SPLIT_AT =
+  HEAD_DELAY + (HERO_WORDS - 1) * WORD_STAGGER + WORD_DURATION + HERO_HOLD;
 /* Critically damped, and slow. Apple's guidance is `bounce: 0` for anything
    that is not carrying a gesture's momentum: nothing here was thrown, so
    overshoot on a 230px push would read as the photograph bouncing off the
@@ -393,6 +405,22 @@ const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 /** The union of a line's word-mask boxes — the real ink boundary. See
  *  SPLIT_AIR: SplitWords pads its clip window past the line box, so the line
  *  box is the wrong rectangle to keep a photograph out of. */
+/* How far the display face's glyphs actually overflow their line box, per
+   side, in em. These lines run `line-height: 0.98`, so the box is optimistic
+   and the ink stands proud of it — measured at ~0.14em each side at this size.
+
+   THIS IS NOT THE MASK'S PADDING, and conflating the two is a bug this file
+   has already been bitten by. SplitWords pads its clip window to stop
+   `overflow: hidden` shaving descenders, and that padding is sized for the
+   worst glyph in any caller (the saffron ITALIC 'f' and 'y', which needed it
+   widened to 0.30em). Using the padded box as the ink box tied this hero's
+   seam to a number that exists for a different reason: when the clip padding
+   went 0.14em -> 0.30em, the two lines stopped meeting at p = 0 and sat
+   0.32em apart instead — a visible gap in the closed couplet, from a change
+   made three components away. The seam now depends on the type's own
+   overshoot and nothing else. */
+const INK_OVERSHOOT_EM = 0.14;
+
 function inkBox(el: HTMLElement | null) {
   if (!el) return null;
   const masks = el.querySelectorAll<HTMLElement>('[class*="mask"]');
@@ -404,8 +432,14 @@ function inkBox(el: HTMLElement | null) {
   let bottom = -Infinity;
   masks.forEach((m) => {
     const r = m.getBoundingClientRect();
-    if (r.top < top) top = r.top;
-    if (r.bottom > bottom) bottom = r.bottom;
+    const cs = getComputedStyle(m);
+    const fs = parseFloat(cs.fontSize) || 0;
+    /* peel the clip padding back off and re-add only the real overshoot, so
+       the result is the glyph boundary however the clip window is tuned */
+    const t = r.top + parseFloat(cs.paddingTop || "0") - INK_OVERSHOOT_EM * fs;
+    const b = r.bottom - parseFloat(cs.paddingBottom || "0") + INK_OVERSHOOT_EM * fs;
+    if (t < top) top = t;
+    if (b > bottom) bottom = b;
   });
   return { top, bottom };
 }

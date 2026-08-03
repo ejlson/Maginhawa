@@ -3,16 +3,25 @@
 import Image from "next/image";
 import { motion, useReducedMotion } from "framer-motion";
 import styles from "./Interlude.module.css";
-import { BLOG } from "@/lib/blog";
 
 // the site's shared enter curve
 const EASE = [0.22, 1, 0.36, 1] as const;
 
-/* ONE picture, and it is the leading story's own cover — the band and the
-   first card in the reel below show the same photograph on purpose, so the
-   journal arrives already introduced. POOL[0] in Blog is BLOG[0]; keep them
-   in step. */
-const HERO_ENTRY = BLOG[0];
+/* THIS BAND OWNS ITS PICTURE. It used to be `BLOG[0].image` — the leading
+   story's own cover, so the band and the first card in the reel below showed
+   the same photograph and the journal "arrived already introduced".
+
+   That coupling is gone twice over. The home strip is no longer the top of
+   the feed (it is a chosen eight, by slug — see HOME_SLUGS in Blog.tsx), so
+   `BLOG[0]` had stopped being the card underneath it; and this photograph is
+   now chosen for this band rather than inherited. Borrowing an image across
+   components on the strength of an index is exactly how a change to the blog
+   feed silently repaints an unrelated section, which is what would have
+   happened here.
+
+   The source is 5656x3771 / 21MB and this paints full-bleed behind a veil;
+   2400px is generous for that at 1.1MB. */
+const INTERLUDE_IMAGE = "/images/interlude-web.jpg";
 
 /**
  * The photography interlude — a full-screen photograph in a maroon frame
@@ -42,8 +51,8 @@ export default function Interlude() {
       <div className={styles.media}>
         <Image
           className={styles.img}
-          src={HERO_ENTRY.image}
-          alt="Diners at Belly's window table"
+          src={INTERLUDE_IMAGE}
+          alt="A dining room laid up for service — linen-topped tables and bentwood chairs beside a window onto the street"
           fill
           sizes="100vw"
         />

@@ -55,7 +55,22 @@
 
 @media (min-width: 981px) {
   .statement {
-    grid-column: 1 / 9;
+    /* 1 / 10, not 1 / 9 — ONE column bought to save a line. At eight columns
+       the measure ran out immediately after "of" and dropped "London." onto a
+       fifth line on its own: a one-word widow carrying the accent colour and
+       the full stop, which read as an orphaned line rather than a close.
+
+       The ninth column is free. The support paragraph opposite is capped at
+       34ch and sits in the last three columns, so nothing was using the space
+       this takes — measured at 1440 the statement ended at ~907px of a 1440
+       viewport with the support text starting past 1180.
+
+       The wrap is FROZEN by useLockedLines (each line becomes its own block so
+       a word cannot leave its line as the photo slots open), so this changes
+       what gets locked, not just how it flows. Re-check the line count if the
+       copy or the print widths change — the breaks are a measured result, not
+       a hand-set one. */
+    grid-column: 1 / 10;
     grid-row: 1;
   }
 }
