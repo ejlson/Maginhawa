@@ -79,13 +79,14 @@ export default function Experience() {
         <Hero started={started} />
 
         <div className="afterHero">
-          {/* The chapter change: "Our Restaurants." is HELD on its last
-              screen, lifting a few vh, while the sheet below climbs over it.
-              No extra height and no curtain — the runway is just the
-              viewport that sheet's top edge takes to cross the screen. */}
-          <ChapterPin>
-            <Discover />
-          </ChapterPin>
+          {/* NOT PINNED. The restaurants chapter used to be held on its last
+              screen while the sheet below climbed over it — but the sheet
+              below is now the statement, and covering the grid with it
+              buried the rooms the reader had just been shown. The grid
+              simply scrolls away, and the statement follows it as its own
+              section. The chapter change moved one section down: it is the
+              statement that gets held now, under the maroon About band. */}
+          <Discover />
           {/* The positioning statement — what Maginhawa IS. It used to open
               the page directly under the hero; it now answers the rooms
               rather than introducing them.

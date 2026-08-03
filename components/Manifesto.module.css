@@ -77,6 +77,18 @@
   }
 }
 
+/* the group's name in Contralto, the display face — the rest of the line
+   stays in the sans label voice, so the name reads as the proper noun it
+   is rather than the label being set twice. Sized up a touch and its
+   tracking dropped, because the display face runs small and tight against
+   the sans at a shared size. */
+.kickerName {
+  font-family: var(--font-display);
+  font-size: 1.28em;
+  letter-spacing: 0;
+  text-transform: none;
+}
+
 /* ---------- the statement ---------- */
 /* display voice, a step below the section titles — a spoken line, not a
    heading */

@@ -377,7 +377,9 @@ export default function Manifesto() {
             from a grid of restaurants needs a beat to know the register has
             changed from what we serve to who we are. Set as a plain label,
             NOT the saffron-dot chapter mark that was retired site-wide. */}
-        <p className={styles.kicker}>Who are we?</p>
+        <p className={styles.kicker}>
+          Who is <span className={styles.kickerName}>Maginhawa Group</span>?
+        </p>
         {reduce || lines === null ? (
           flat
         ) : (
