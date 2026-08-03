@@ -2919,7 +2919,7 @@ export default function About() {
 
                 <Reveal className={styles.chefImage} delay={0.06}>
                   <Image
-                    src="/images/omarshah.jpeg"
+                    src="/images/omar.jpg"
                     alt="Omar Shah, founder of the Maginhawa Group"
                     width={678}
                     height={452}

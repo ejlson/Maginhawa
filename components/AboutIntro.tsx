@@ -167,7 +167,7 @@ export default function AboutIntro() {
           <div className={styles.portraitFrame}>
             <Image
               className={styles.portraitImg}
-              src="/images/omarshah.jpeg"
+              src="/images/omar.jpg"
               alt="Chef Omar Shah, founder of the Maginhawa Group"
               fill
               sizes="(max-width: 980px) 90vw, 20vw"
