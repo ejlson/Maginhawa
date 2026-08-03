@@ -1710,7 +1710,7 @@ export default function Discover() {
         <SplitWords
           as="p"
           className={styles.caption}
-          text="Ranging from Filipino Ice-Cream Parlours to Caribbean Inspired Smokehouse."
+          text="Explore our family of restaurants and stores, where tradition is served with a modern twist."
           amount={0.5}
           stagger={0.03}
           duration={0.65}

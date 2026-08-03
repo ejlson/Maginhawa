@@ -47,7 +47,13 @@
   margin: 0;
   font-family: var(--font-display);
   font-weight: var(--w-regular);
-  font-size: clamp(2.2rem, 5vw, 4.75rem);
+  /* LARGER. The statement no longer shares its row with a support
+     paragraph, so it has the full measure to itself and can be set at the
+     weight the page's other chapter openings carry.
+     NOTE: the wrap is FROZEN by useLockedLines, so a size change changes
+     what gets locked — the line count is a measured result. Re-check it if
+     this moves again. */
+  font-size: clamp(2.4rem, 5.35vw, 5.2rem);
   line-height: var(--lh-display);
   letter-spacing: var(--tr-display);
   color: var(--maroon);
@@ -70,7 +76,12 @@
        what gets locked, not just how it flows. Re-check the line count if the
        copy or the print widths change — the breaks are a measured result, not
        a hand-set one. */
-    grid-column: 1 / 10;
+    /* THE FULL MEASURE. This was 1 / 10, holding columns 10–13 clear for a
+       support paragraph that no longer exists — and at the larger size the
+       statement had gone back to five lines at 1440 and below, which is the
+       wrap that put "London." on a line of its own and was fixed once
+       already. Taking the freed columns puts it back to four everywhere. */
+    grid-column: 1 / 13;
     grid-row: 1;
   }
 }

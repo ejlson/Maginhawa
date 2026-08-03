@@ -64,8 +64,13 @@ const PARTS: StatementPart[] = [
 const KEY_WORDS = new Set(["Filipino", "pan-Asian", "London."]);
 
 const STATEMENT = PARTS.filter((p) => typeof p === "string").join(" ");
-const SUPPORT =
-  "Explore our family of restaurants and stores, where tradition is served with a modern twist.";
+
+/* NO SUPPORT LINE. "Explore our family of restaurants and stores, where
+   tradition is served with a modern twist." used to sit opposite the
+   statement here. It now introduces the rooms themselves, under the Our
+   Restaurants title (see Discover) — which is where an invitation to
+   explore them belongs, and it was doing nothing beside a statement that
+   already says what the group is. The statement holds the measure alone. */
 
 /* ============================ THE SCRUB ============================
    THE READER'S HAND SETS THE SENTENCE, ONE LINE AT A TIME.
@@ -375,18 +380,6 @@ export default function Manifesto() {
           </h2>
         )}
 
-        <motion.p
-          className={styles.support}
-          initial={reduce ? false : { opacity: 0, transform: "translateY(24px)" }}
-          whileInView={
-            // settles at the stylesheet's resting 0.8, not full white-hot 1
-            reduce ? undefined : { opacity: 0.8, transform: "translateY(0px)" }
-          }
-          viewport={{ once: true, amount: 0.6 }}
-          transition={{ duration: 0.8, ease: EASE, delay: 0.55 }}
-        >
-          {SUPPORT}
-        </motion.p>
       </div>
     </section>
   );

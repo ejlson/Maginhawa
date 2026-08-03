@@ -79,16 +79,18 @@ export default function Experience() {
         <Hero started={started} />
 
         <div className="afterHero">
-          {/* the positioning statement — what Maginhawa IS, before any
-              product: the first thing the reader meets past the hero */}
-          <Manifesto />
           {/* The chapter change: "Our Restaurants." is HELD on its last
-              screen, lifting a few vh, while the maroon About band climbs
-              over it. No extra height and no curtain — the runway is just
-              the viewport the band's top edge takes to cross the screen. */}
+              screen, lifting a few vh, while the sheet below climbs over it.
+              No extra height and no curtain — the runway is just the
+              viewport that sheet's top edge takes to cross the screen. */}
           <ChapterPin>
             <Discover />
           </ChapterPin>
+          {/* the positioning statement — what Maginhawa IS. It used to open
+              the page directly under the hero; it now answers the rooms
+              rather than introducing them, arriving once the reader has
+              seen what the group actually is. */}
+          <Manifesto />
           {/* ONE maroon band under the story and the press credential — it
               is its own ground, and its own arrival */}
           <MaroonZone>
