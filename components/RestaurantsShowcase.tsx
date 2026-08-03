@@ -152,6 +152,7 @@ const PHOTOS: Record<string, string> = {
   Guanabana: "/images/guanabana.jpg",
   "Ramo Ramen": "/images/ramo.jpg",
   Hoodwood: "/images/hoowood.jpg",
+  Mamasons: "/images/mamasons.jpg",
 };
 
 // many stacked copies → an endless loop. We don't touch scrollTop mid-scroll

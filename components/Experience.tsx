@@ -13,12 +13,7 @@ import Interlude from "./Interlude";
 import PressWall from "./PressWall";
 import AboutIntro from "./AboutIntro";
 import Reservations from "./Reservations";
-// import Timeline from "./Timeline";
-// Press section content now lives inside WhoWeAre (rotating quote + masthead
-// marquee sit alongside the "About us" press image).
-// import Press from "./Press";
 import Blog from "./Blog";
-import CareersTeaser from "./CareersTeaser";
 import Footer from "./Footer";
 import DarkZone from "./DarkZone";
 import type { HeroInsets } from "./types";
@@ -111,10 +106,9 @@ export default function Experience() {
             <Interlude />
             <Blog />
           </div>
-          {/* open-roles index on the cream page — retired; hiring lives in
-              the footer's Careers link, which is where someone looking for a
-              job would go anyway */}
-          {/* <CareersTeaser /> */}
+          {/* No open-roles index on the cream page: hiring lives behind the
+              footer's Careers link, which is where someone looking for a job
+              would go anyway. */}
 
           {/* The page closes on the booking index, set ON the film rather
               than in its own 200svh pinned section above it — which also

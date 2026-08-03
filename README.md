@@ -105,7 +105,6 @@ line. Nothing is lost — fix the line and it recovers.
 | About page story timeline | [components/About.tsx](components/About.tsx) | `CHAPTERS` (L68) |
 | Careers page headline & values | [components/JoinUs.tsx](components/JoinUs.tsx) | `PILLARS` (L24), `HERO_LINES` (L110) |
 | Home page opening statement | [components/Manifesto.tsx](components/Manifesto.tsx) | `PARTS` (L35) |
-| The "1987 / 7 kitchens / 38 years" figures | [components/NumbersStrip.tsx](components/NumbersStrip.tsx) | `NUMBERS` (L14) |
 | Top navigation links | [components/Nav.tsx](components/Nav.tsx) | `LINKS` (L15) |
 | Full-screen menu links | [components/Menu.tsx](components/Menu.tsx) | `ITEMS` (L10) |
 | Footer links | [components/Footer.tsx](components/Footer.tsx) | `EXPLORE` (L18) |
@@ -486,15 +485,14 @@ means the layout may look slightly different after a copy edit.
 ## 10. Home page copy
 
 The home page is assembled in [components/Experience.tsx](components/Experience.tsx),
-which is where sections are switched on and off. Sections wrapped in `{/* ... */}`
-are disabled — the careers teaser currently is.
+which is where sections are switched on and off — it renders the page top to
+bottom, so reading it tells you the running order.
 
 | Section | File | Constant |
 | --- | --- | --- |
 | Hero background videos | [components/Hero.tsx](components/Hero.tsx) | `CLIPS` (L16) |
 | The opening statement | [components/Manifesto.tsx](components/Manifesto.tsx) | `PARTS` (L35) |
 | Restaurant tiles | [components/Discover.tsx](components/Discover.tsx) | `ITEMS` (L48) |
-| The figures strip | [components/NumbersStrip.tsx](components/NumbersStrip.tsx) | `NUMBERS` (L14) |
 | Booking section video | [components/Reservations.tsx](components/Reservations.tsx) | `CLIP` (L23) |
 
 ### The opening statement
@@ -519,14 +517,6 @@ included. `SUPPORT` (L66) is the sentence underneath.
 
 Three photographs is a deliberate maximum — one per line. More turns the sentence
 into a contact sheet.
-
-### The figures
-
-```ts
-{ value: 1987, suffix: "est.", label: "Established in Kentish Town" },
-```
-
-`value` must be a number with no quotes — it counts up on screen.
 
 ---
 

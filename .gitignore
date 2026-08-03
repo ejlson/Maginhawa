@@ -22,9 +22,10 @@
 .claude/
 skills-lock.json
 
-# probe builds (see distDir in next.config.mjs)
-/.next-prod
+# probe builds (see distDir in next.config.mjs). The glob is deliberate: every
+# NEXT_DIST_DIR a probe run invents is a 120-200MB build output, and eight of
+# them once sat untracked-but-unignored, adding ~1.2GB of noise to git status.
+/.next-*
 
 # raw camera masters — 616MB of originals that the public/ exports come from
 /media-src
-/.next-old

@@ -624,6 +624,20 @@
 }
 
 /* ---------- center: brand group ---------- */
+/* THE LOGO LIFTS OUT OF THE BLURB'S WAY ON HOVER. The blurb is absolutely
+   seated at the tile's BOTTOM and its height is content-driven — RAMO's runs
+   four lines where most run two — while the mark is centred in `inset: 0`.
+   The two never negotiate, so on the long tiles the copy climbed straight
+   through the wordmark.
+
+   Lifting `.center` rather than the mark itself keeps the whole brand group
+   (mark + any wordmark under it) together as one object, and a PERCENTAGE
+   lift is of this element's own height, which is the tile's — so it scales
+   with the tile instead of needing a breakpoint.
+
+   The 700ms drawer clock is the one the photo zoom, the scrim and the blurb
+   already share, so this reads as part of the same single response rather
+   than a fourth thing happening. */
 .center {
   position: absolute;
   inset: 0;
@@ -636,6 +650,23 @@
   padding: 10%;
   text-align: center;
   pointer-events: none;
+  transform: translateY(0);
+  transition: transform 700ms var(--ease-drawer);
+}
+
+/* Sized off the tallest blurb rather than the average: at --t-label on
+   --lh-snug a four-line blurb plus its bottom inset stands ~90px up a ~260px
+   tile, which puts its top edge inside the centred mark's lower half. 12% of
+   the tile clears that with air left over, and on the two-line tiles it reads
+   as the mark simply rising to meet the hover. */
+@media (hover: hover) and (pointer: fine) {
+  .cell:hover .center {
+    transform: translateY(-12%);
+  }
+}
+
+.cell:focus-within .center {
+  transform: translateY(-12%);
 }
 
 /* the wordmark/logo commanding the plate (the Michelin credential now

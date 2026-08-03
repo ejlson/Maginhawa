@@ -333,9 +333,19 @@
   bottom: clamp(18px, 4vh, 40px);
   z-index: 5;
   pointer-events: none;
-  /* sentence case, so --t-small rather than --t-label (globals.css:74-76) */
   max-width: min(34ch, 46vw);
-  font-size: var(--t-small);
+  /* --t-label (13px), not --t-small (14px). The old comment reserved
+     --t-label for all-caps and set this a step up because the note is
+     sentence case; that rule is about TRACKING, not size, and this line is
+     the quietest thing on the page — a standing footnote, not copy anyone is
+     sent here to read. It carries no letter-spacing, so nothing about the
+     caps convention applies. */
+  font-size: var(--t-label);
+  /* Helvetica's real Light, not a synthesised thin: the family ships a
+     genuine 300 (verified in Helvetica.ttc — Regular/Bold/Oblique/Bold
+     Oblique/Light/Light Oblique), so this renders as a drawn weight rather
+     than a smeared 400. Only 500 has nothing to resolve to. */
+  font-weight: var(--w-hairline);
   line-height: var(--lh-snug);
   text-align: right;
   /* two short lines rather than one long one and an orphan */
