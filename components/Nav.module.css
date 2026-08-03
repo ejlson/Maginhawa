@@ -79,11 +79,72 @@
 .link {
   position: relative;
   display: inline-block;
-  /* mono chrome voice — the Telescope UI-label grammar */
-  font-family: var(--font-mono);
-  font-weight: 500;
+  /* HELVETICA, IN CAPS — see --font-ui in globals.css. Since the type
+     collapse this is simply the site's face; the token stays because the
+     navbar is FURNITURE and would follow --font-ui rather than the prose
+     voice if the two ever part again.
+
+     WEIGHT 400, DELIBERATELY, AND NOT BECAUSE NOTHING LIGHTER EXISTS.
+     The ask was a lighter navbar, and the honest answer is split by platform.
+     macOS and iOS ship Helvetica Light (usWeightClass 300) inside
+     Helvetica.ttc, so `font-weight: var(--w-hairline)` would give Apple
+     readers a genuinely thinner, genuinely DRAWN navbar — no synthesis, and
+     the About page's kicker uses exactly that token for exactly that reason.
+     Arial and Liberation Sans have no Light, so Windows and Linux would keep
+     Regular.
+
+     It is 400 here anyway, on two grounds. The navbar is the one control
+     present on every route and every viewport, and a control that is
+     visibly thinner on half the audience's machines is a worse outcome than
+     one that is consistently Regular. And 13px caps in Helvetica Light,
+     riding a difference blend over photography, is the exact combination the
+     contrast numbers below are already unhappy about — thinning the strokes
+     is the last thing that situation needs.
+
+     If the platform split is acceptable, this is a ONE-TOKEN change:
+     font-weight: var(--w-hairline). Read the contrast note first.
+
+     TRACKING 0.11em, up from --tr-label's 0.07em, AND THAT IS THE WHOLE
+     CHANGE. The perceived weight of a line of caps is its ink density, so
+     opening the letters lightens the line without touching a stroke.
+     Measured (scripts/probe-type-navfinal.mjs, INK DENSITY): mean ink per
+     pixel of the text band falls from 0.1551 to 0.1464, a 5.6% lighter line,
+     for 22.9px of extra width. The 821px breakpoint — the last width that
+     shows inline links at all — has it: the set measures 481.6px with 262.9px
+     of free lane to the logo, every link still one line, zero page overflow.
+
+     OPACITY STAYS AT 0.85, and this is the interesting part. Dropping it to
+     0.78 was tried, because colour is the other classical lever and it does
+     work: at 0.78 the line measures 9.4% lighter instead of 5.6%. It was
+     reverted because it is not free. The bar runs `mix-blend-mode:
+     difference`, so the links' contrast is |backdrop − cream| and alpha
+     scales it directly. Measured against a FROZEN background (paused video —
+     the first attempt measured the film moving between exposures and
+     produced nonsense, including a higher opacity reading lower contrast):
+
+                        0.07em/.85   0.11em/.78   0.11em/.85
+       /blog                 9.62         7.56         9.41
+       /contact              9.96         8.48         9.98
+       /join-us              9.62         7.56         9.41
+       /restaurants/belly    9.62         7.56         9.41
+
+     Tracking alone is contrast-NEUTRAL. The opacity step costs about two
+     points of ratio everywhere, to buy under four points of lightness. On a
+     control that already sits near the floor over photography (see below),
+     that is the wrong trade.
+
+     WHAT IS NOT FIXED HERE, because it predates this change and is not a
+     type problem: over photography the difference blend puts at least one of
+     the five links on a patch whose luminance is near the cream's, and there
+     |backdrop − cream| collapses. The SAME frozen-background run measures
+     the worst link at 1.05:1 on the home hero, 2.33:1 on /about and 2.26:1
+     on /restaurants — at the OLD setting, before any of this. The floor for
+     13px text is 4.5:1. That is a real accessibility defect in the blend
+     itself and it wants a scrim or a theme swap, not a tracking value. */
+  font-family: var(--font-ui);
+  font-weight: var(--w-regular);
   font-size: var(--t-label);
-  letter-spacing: var(--tr-label-mono);
+  letter-spacing: 0.11em;
   text-transform: uppercase;
   color: inherit;
   padding: 6px 0;

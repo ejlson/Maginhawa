@@ -10,12 +10,18 @@
      Contact block above has had its bottom padding zeroed to match, keeping
      one owner per boundary. */
   padding-block: var(--section-y) var(--section-y-sm);
+  /* --section-y already clears the fixed nav on a scroll approach; this is
+     for #faq hash landings, which skip the approach entirely */
+  scroll-margin-top: var(--rail-nav-clear);
   color: var(--cream);
 }
 
-/* The section's two columns: heading rail left, accordion right. Ratio
-   favours the list (1 : 1.7) since the list is the point; the head is the
-   frame. Below 860px it collapses to a single column, head then list. */
+/* The section's two columns: heading rail left, accordion right. The ratio
+   used to be a bespoke 1 : 1.7, which put the list's left edge at 598 — a
+   number shared with nothing else on the page. It now runs on the shared
+   dark-zone rail: the head takes the first track, the accordion the other
+   two, so the list starts at 503, level with the Footer's middle rail.
+   Below 860px it collapses to a single column, head then list. */
 .layout {
   display: grid;
   grid-template-columns: 1fr;
@@ -24,9 +30,12 @@
 
 @media (min-width: 861px) {
   .layout {
-    grid-template-columns: 1fr 1.7fr;
-    column-gap: clamp(40px, 6vw, 112px);
+    grid-template-columns: var(--rail);
+    column-gap: var(--rail-gap);
     align-items: start;
+  }
+  .list {
+    grid-column: span 2;
   }
 }
 
@@ -48,29 +57,6 @@
 
 .asideWrap {
   margin-top: clamp(4px, 1vh, 12px);
-}
-
-/* Saffron-dot eyebrow — same recipe used on Blog and CareersTeaser so the
-   section headers rhyme across the site. Cream text sits on maroon here
-   instead of maroon on cream. */
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.7em;
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  color: var(--cream);
-}
-.eyebrow::before {
-  content: "";
-  display: block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--saffron);
-  flex: none;
 }
 
 .title {
@@ -135,9 +121,19 @@
   text-align: left;
 }
 
-.row:hover,
-.row:focus-visible {
+.row:hover {
   outline: none;
+}
+
+/* Keyboard focus used to be `outline: none` alongside hover, which left the
+   only cue a 6–14px sideways nudge of the question text — findable if you
+   already knew where the caret was, invisible if you did not. It gets the
+   same cream ring the Contact submit uses; a maroon one would vanish into
+   this section's ground. Hover keeps no ring: a pointer knows where it is. */
+.row:focus-visible {
+  outline: 2px solid var(--cream);
+  outline-offset: 4px;
+  border-radius: 2px;
 }
 
 /* The hover indent used to animate the row's padding-inline, which relayouts

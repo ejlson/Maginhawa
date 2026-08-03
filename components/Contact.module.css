@@ -15,7 +15,10 @@
    and the two collided. On the home page it correctly has none — it butts
    up against the Locations film. */
 .sectionTop {
-  padding-top: clamp(88px, 13vh, 172px);
+  /* the shared clearance token — this section discovered the number, the
+     dark zone now owns it so ReviewUs clears the nav by the same amount */
+  padding-top: var(--rail-nav-clear);
+  scroll-margin-top: var(--rail-nav-clear);
   /* the FAQ below owns that boundary via its own top padding */
   padding-bottom: 0;
 }
@@ -37,12 +40,46 @@
   fill: var(--cream);
 }
 
+/* Was a bespoke `1fr 1.1fr`, which seated the form at 718 — an edge nothing
+   else on the page used. On the shared dark-zone rail the enquiries column
+   takes the first track and the form the other two, so the form starts at
+   503, the same x as the FAQ accordion above it and the Footer's blurb
+   below. Three edges on the page instead of eleven. */
+/* Single column by default, rail from 861px up — the SAME breakpoint the FAQ
+   below uses. It used to collapse at 760, which meant that at 820 the form was
+   still riding a three-track rail (seated at 287) while the FAQ under it had
+   already stacked to the page margin. One block on the grid and the next one
+   off it, at the width where that is most obvious. */
+/* The band under the wordmark. It used to carry a hairline across the full
+   rail (40 → 1400) to seat the two columns under the masthead. The rule is
+   gone: the CONTACT US wordmark is the page's one display-face moment — the
+   same Contralto scale as MAGINHAWA on /about and the footer wordmark — and
+   underlining it turned a masthead into a table header. The columns are
+   still seated: they share a top edge, they share a bottom edge (see
+   `.infoTail`), and they sit on the same rail as everything below.
+
+   The gap the rule sat in is preserved exactly. It was two stacked clamps,
+   margin clamp(22px, 4vh, 52px) + padding clamp(22px, 3vh, 40px); the single
+   clamp below is their term-by-term sum, so the distance from the wordmark to
+   the first label is unchanged at every viewport (63px at 900, 75.6 at 1080)
+   and only the line inside it has gone. */
 .grid {
-  margin-top: clamp(22px, 4vh, 52px);
+  margin-top: clamp(44px, 7vh, 92px);
   display: grid;
-  grid-template-columns: 1fr 1.1fr;
-  gap: clamp(28px, 4vw, 72px);
+  grid-template-columns: 1fr;
+  gap: clamp(28px, 4vh, 52px);
   color: var(--cream);
+}
+
+@media (min-width: 861px) {
+  .grid {
+    grid-template-columns: var(--rail);
+    column-gap: var(--rail-gap);
+    row-gap: clamp(28px, 4vh, 52px);
+  }
+  .formCell {
+    grid-column: span 2;
+  }
 }
 
 .info {
@@ -50,6 +87,25 @@
   flex-direction: column;
   gap: clamp(22px, 4vh, 40px);
 }
+
+/* The other half of the band's binding: the last group in the details column
+   is pushed to the FOOT of the column, so it finishes level with the submit
+   pill opposite. The two columns hold very different amounts — five short
+   lines against a four-field form — and left to their own devices the left
+   one stopped ~210px above the right one, which is the measurement behind
+   "it reads as two unrelated halves". Sharing a bottom edge as well as a top
+   one makes it one band with a spread in it.
+   `margin-top: auto` only bites where `.info` is a stretched grid item, i.e.
+   on the rail; in the single-column stack below 861px the column is exactly
+   as tall as its content and this is a no-op. */
+.infoTail {
+  margin-top: auto;
+}
+
+/* `.info .note` — the head-office caveat's own type rule — is gone with the
+   sentence it set. The distinction it spelled out now rides entirely on the
+   OFFICE HOURS label above the times; see the note in Contact.tsx for why
+   that label must not drift back to "Opening Times". */
 
 /* shared small-caps label for both the info block and the form fields */
 .label,
@@ -104,6 +160,22 @@
   gap: clamp(18px, 2.4vw, 36px);
 }
 
+/* The name pair, on the rail. An even split of the form's own width put the
+   seam at 934.5 / 969 — and the page's third rail edge is at 929. Five and a
+   half pixels is the near-miss distance this whole dark zone was rebuilt to
+   get rid of, and the form was the last block still generating one. Splitting
+   the pair by the rail's OWN second and third tracks instead lands Last Name
+   on 929 exactly, level with the FAQ aside, the ReviewUs helper line, the
+   review table's third column and the Footer's link columns. The two fields
+   come out unequal (382 / 471) — which is what the rail is, and on underlined
+   fields an unequal pair reads as measured rather than as a mistake. */
+@media (min-width: 861px) {
+  .row {
+    grid-template-columns: minmax(0, 30fr) minmax(0, 37fr);
+    column-gap: var(--rail-gap);
+  }
+}
+
 .field {
   display: flex;
   flex-direction: column;
@@ -116,7 +188,11 @@
   min-width: 0;
   background: transparent;
   border: none;
-  border-bottom: 1px solid rgba(250, 247, 241, 0.35);
+  /* 0.4, not 0.35. The underline is the ONLY thing that says where the field
+     is, which makes it a user-interface component under WCAG 1.4.11 and puts
+     it on a 3:1 floor against the maroon. Measured: 0.35 → 2.89:1 (fails),
+     0.4 → 3.45:1. */
+  border-bottom: 1px solid rgba(250, 247, 241, 0.4);
   color: var(--cream);
   font-family: var(--font-sans);
   font-size: var(--t-body);
@@ -134,16 +210,35 @@
   min-height: 5.5em;
 }
 
+/* 0.55, not 0.45. The placeholders are the only thing in an empty field that
+   says what goes in it, so they are body text and owe 4.5:1 — and at 0.45
+   cream on maroon they measured 4.09:1, the one text failure on the page.
+   0.55 measures 5.64:1 and still sits clearly below the typed value. */
 .field input::placeholder,
 .field textarea::placeholder {
   font-family: var(--font-sans);
   font-size: var(--t-small);
-  color: rgba(250, 247, 241, 0.45);
+  color: rgba(250, 247, 241, 0.55);
 }
 
 .field input:focus,
 .field textarea:focus {
   border-color: var(--cream);
+}
+
+/* The underline going from 40% cream to full is a real change, but it is a
+   1px line and it was the ONLY thing marking keyboard focus in this form —
+   the `outline: none` above out-specifies globals.css's `:focus-visible`
+   rule, so the fields were the one set of controls on the page with no ring.
+   (The global ring is maroon anyway, which is invisible on this section's
+   maroon ground; the submit pill, the FAQ rows and the footer's address
+   links all already override it with cream. This joins them.)
+   Keyboard only: a pointer knows where it just clicked. */
+.field input:focus-visible,
+.field textarea:focus-visible {
+  outline: 2px solid var(--cream);
+  outline-offset: 3px;
+  border-radius: 2px;
 }
 
 .submitRow {
@@ -169,7 +264,7 @@
   border-radius: 999px;
   padding: 0.9em 2em;
   font-family: var(--font-display);
-  font-weight: 300;
+  font-weight: var(--w-medium);
   font-size: var(--t-button);
   line-height: 1;
   letter-spacing: 0.16em;
@@ -225,8 +320,3 @@
   transform: translateX(0.24em);
 }
 
-@media (max-width: 760px) {
-  .grid {
-    grid-template-columns: 1fr;
-  }
-}

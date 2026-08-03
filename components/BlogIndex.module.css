@@ -8,36 +8,21 @@
 
 .head {
   /* tight top breath — .page's padding already clears the fixed nav, so
-     the head only needs a small gap of its own */
-  padding-block: clamp(16px, 2.5vh, 32px) clamp(28px, 4vh, 56px);
+     the head only needs a small gap of its own. The lower half absorbs the
+     ~31px the retired eyebrow used to occupy (13px line + its 12–18px
+     bottom margin), so the title keeps the same distance to the featured
+     lede's hairline as it had; without it the header collapsed onto the
+     rule and the page opened cramped. */
+  padding-block: clamp(16px, 2.5vh, 32px) clamp(44px, 5.6vh, 80px);
 }
 
-/* saffron-dot eyebrow — same chapter mark as Discover / AboutIntro */
-.eyebrow {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.7em;
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  color: var(--maroon);
-  margin-bottom: clamp(12px, 1.6vh, 18px);
-}
-
-.eyebrow::before {
-  content: "";
-  display: block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--saffron);
-  flex: none;
-}
+/* the .eyebrow rule that used to sit here — a saffron-dot chapter mark
+   reading "The Blog" — is retired with the eyebrow itself; see the comment
+   in BlogIndex.tsx for why this one was removed rather than promoted. */
 
 .title {
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: var(--w-regular);
   font-size: var(--t-display);
   line-height: var(--lh-display);
   letter-spacing: var(--tr-display);
@@ -83,7 +68,7 @@
 
 .featuredTag {
   font-family: var(--font-sans);
-  font-weight: 500;
+  font-weight: var(--w-regular);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
@@ -92,7 +77,7 @@
 
 .featuredTitle {
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: var(--w-regular);
   font-size: var(--t-h2);
   line-height: var(--lh-heading);
   letter-spacing: var(--tr-display);
@@ -191,7 +176,7 @@
 
 .cardTitle {
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: var(--w-regular);
   font-size: var(--t-h3);
   line-height: var(--lh-heading);
   letter-spacing: var(--tr-display);

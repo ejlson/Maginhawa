@@ -4,6 +4,12 @@
    settle plays during the departure itself as the block rides off
    toward the maroon DarkZone below. */
 .section {
+  /* The clock and the CTA pill below read in --font-ui, the interface voice
+     the navbar also takes. This carried a duplicate local stack while the nav
+     work was in flight; the shared token has landed, so the copy is gone —
+     two declarations of one family is how they drift apart. Note the token is
+     `--font-ui`, not the `--font-nav` the placeholder guessed at. */
+
   position: relative;
   /* stacked above the cream sections; DarkZone sits higher still so the
      film→DarkZone seam holds */
@@ -120,23 +126,88 @@
   object-fit: cover;
 }
 
-/* Dark wash over the footage — and now the ONLY thing standing between the
-   footage and WCAG 1.4.3, since the copy no longer inverts through a
-   difference blend.
-   Measured, not eyeballed: cream (#faf7f1) has relative luminance 0.932, so
-   4.5:1 needs a backdrop at or below 0.168 — a mid-grey of 114/255. Against
-   the worst case the footage can produce (a blown-white frame) an
+/* Dark wash over the footage — the ONLY thing standing between the footage
+   and WCAG 1.4.3, since the copy no longer inverts through a difference blend.
+
+   THE FLOOR, measured not eyeballed: cream (#faf7f1) has relative luminance
+   0.932, so 4.5:1 needs a backdrop at or below 0.168 — a mid-grey of 114/255.
+   Against the worst case the footage can produce (a blown-white frame) an
    rgba(18,0,0,a) wash composites to 255 − 237a, which clears 114 only from
-   a = 0.60 upward. The two layers below multiply to 0.66 at the centre and
-   0.83 at the corners, so even a white frame lands at ~98/255 → 5.7:1, and
-   the type never depends on which frame happens to be showing. */
+   a = 0.60 upward. So anywhere type sits, the layers below must multiply to
+   0.60 or more.
+
+   WHAT CHANGED. The old wash was a VIGNETTE — 0.664 composited at the centre
+   rising to 0.826 in the corners — i.e. it was darkest exactly where there is
+   no type, and it threw the whole frame away uniformly to protect a block that
+   occupies about a fifth of it. The clip is a sunlit café terrace with people
+   at tables; two-thirds of it was being spent on nothing.
+
+   THE SHAPE. One wide, flat ellipse centred on the copy block (which `.cta`
+   centres in the section, so 50% 50% IS the copy's centre), over a thin flat
+   floor. It has to be a SINGLE elliptical gradient rather than a horizontal
+   band plus a vertical taper, because background layers can only ever ADD
+   alpha: nothing stacked on a full-width band can pull its ends back off
+   again. A flat ellipse is also what stops it reading as a spotlight — at 58%
+   x 36% the pool is 2.3:1 wider than tall at 1920x1080, and its long axis runs
+   with the frame rather than around the copy.
+
+   The stops hold near-peak out to 46% of the ellipse and only then release, so
+   the copy sits on a PLATEAU rather than on the shoulder of a bell — which is
+   the difference between an even ground under a block of type and one that
+   fades out from under its own last line.
+
+   THE NUMBERS at 1920x1080. Composited alpha 1 − (1−pool)(1−floor):
+     copy centre     1 − 0.28x0.86 = 0.759  (was 0.664 — the pool is DARKER
+                                             than the wash it replaces, which
+                                             is what stops the saffron pill
+                                             dissolving into warm footage)
+     heading ink     0.749   at r 0.28
+     support copy    0.746   at r 0.38  — every text node clears the 0.60 floor
+     frame side edge 0.358   at mid-height, r 0.86 — the terrace's outer thirds
+                                                    are readable again
+     frame corner    0.140                  (was 0.826)
+   The 0.14 floor is the blown-frame insurance: not enough to carry type on its
+   own, and no type sits out there — it exists so a white sky in the top
+   corners never reads as a hole punched in the section.
+
+   WHY THE BREAKPOINT. The radii are percentages of the element, and the
+   element is the viewport, so the HORIZONTAL half-width is always 50% — a 58%
+   x-radius therefore releases at the frame's left and right edges (0.86 of the
+   way out) at every desktop width. But the COPY does not scale that way: at
+   1920 the support line is 480px inside a 1920 frame (0.22 of the radius), on
+   a 390 phone it is 350px inside a 390 frame (0.43 of a radius that is now
+   only 226px), i.e. it lands at 0.86 — exactly where the desktop pool is
+   releasing. Measured, the phone support line came back at 3.84:1 against the
+   desktop shape. So the phone gets its own pool: near full-bleed horizontally
+   (105%, since there are no outer thirds left to give back at that width) and
+   a shorter 32% vertically, which is what keeps the corners at 0.14 anyway. */
 .locScrim {
   position: absolute;
   inset: 0;
   z-index: 1;
   background:
-    radial-gradient(120% 100% at 50% 50%, rgba(18, 0, 0, 0.52), rgba(18, 0, 0, 0.72)),
-    linear-gradient(rgba(18, 0, 0, 0.3), rgba(18, 0, 0, 0.38));
+    radial-gradient(
+      58% 36% at 50% 50%,
+      rgba(18, 0, 0, 0.72) 0%,
+      rgba(18, 0, 0, 0.7) 46%,
+      rgba(18, 0, 0, 0.44) 76%,
+      rgba(18, 0, 0, 0) 100%
+    ),
+    linear-gradient(rgba(18, 0, 0, 0.14), rgba(18, 0, 0, 0.14));
+}
+
+@media (max-width: 980px) {
+  .locScrim {
+    background:
+      radial-gradient(
+        105% 32% at 50% 50%,
+        rgba(18, 0, 0, 0.72) 0%,
+        rgba(18, 0, 0, 0.7) 46%,
+        rgba(18, 0, 0, 0.44) 76%,
+        rgba(18, 0, 0, 0) 100%
+      ),
+      linear-gradient(rgba(18, 0, 0, 0.14), rgba(18, 0, 0, 0.14));
+  }
 }
 
 /* The invitation — set on the film, regardless of settle state.
@@ -188,6 +259,69 @@
   color: var(--cream);
 }
 
+/* ---------- the live line ----------
+
+   HELVETICA caps, at the reader's request. This line used to be mono, and
+   the mono was not arbitrary: globals.css reserves that voice for "labels,
+   pills, counters and indicators only", a clock is an indicator, and a
+   monospaced line cannot have its words shifted by its own digits. The
+   fixed-width guarantee is the one thing lost, and `.clockTime` below
+   already replaced it with something stronger (a reserved 5ch box), so the
+   sentence still cannot reflow on the minute.
+
+   Tracking moves with the face, from --tr-label-mono (0.03em) to --tr-label
+   (0.07em). DM Mono's advances are wide before any tracking is added;
+   Helvetica's caps are tight and closed, and at 13px the mono value leaves
+   them looking set solid. 0.07em is the site's own caps tracking for
+   proportional faces, so this is the pairing the scale already expects.
+
+   NO lozenge, no border, no pill radius. The reference boxes its token, but
+   the reference has no button underneath it; here a bordered capsule 100px
+   above an actual bordered capsule would read as two buttons, one of which
+   does nothing.
+
+   The 14px floor on the gap is the heading's own optical breath: at 1440 the
+   line box is 15.6px tall (--t-label 13px, line-height 1) against the
+   heading's 73.6px, so anything tighter than ~14px reads as the clock sitting
+   ON the H rather than above it. */
+.clock {
+  /* Was 1.6vh, which measured 17.2px at 1920x1080 and read as jammed: a 13px
+     line box sitting under an 80px display line whose cap band is enormous,
+     so the optical distance is far smaller than the geometric one. 2.6vh puts
+     it at 28.1 / 23.4 / 22px at 1920 / 1440 / 390 — clear of the H without
+     detaching from it. */
+  margin: 0 0 clamp(22px, 2.6vh, 34px);
+  font-family: var(--font-ui);
+  font-size: var(--t-label);
+  line-height: 1;
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  /* 0.88, not full cream: enough of a step down from the heading that the two
+     read as different weights, small enough a step that the line still clears
+     the floor where the pool is thinnest under it. 0.82 was the first try and
+     measured 3.84:1 on the phone's support line — the alpha is doing real
+     work against a 4.5 floor, so it is not a free dial. */
+  color: rgba(250, 247, 241, 0.88);
+}
+
+/* The five characters that change. This box used to be belt-and-braces over
+   a monospaced face; off mono it is the whole mechanism, and it still works
+   unchanged. `ch` is the advance of a "0", so 5ch reserves five digits —
+   wider than "16:12" (four digits and a narrow colon) and far wider than
+   "--:--", so BOTH strings sit centred inside a box neither of them fills
+   and the words on either side never move. tabular-nums keeps the digits
+   themselves from changing width minute to minute; Helvetica's lining
+   figures are tabular by default, but the fallback stack's need not be. */
+.clockTime {
+  display: inline-block;
+  min-width: 5ch;
+  text-align: center;
+  font-variant-numeric: tabular-nums;
+  /* the one word in the line at full cream — it is the part that is true only
+     for this minute, and the eye should find it first */
+  color: var(--cream);
+}
+
 /* the display heading — same grammar as "Our Restaurants." and "Blog.", one
    line, normal flow. Deliberately NOT the stretched-SVG treatment the
    footer's MAGINHAWA carries twelve hundred pixels below: firing that device
@@ -195,7 +329,8 @@
    stretch means off Contralto too — --font-display-big is reserved for
    wordmark moments (globals.css), and everything else is the grotesk. */
 .title {
-  /* nothing above it now — the heading opens the block */
+  /* the clock above carries the gap on its own margin-bottom, so the heading
+     owns no vertical margin of its own in either direction */
   margin: 0;
   font-family: var(--font-display);
   font-weight: 500;
@@ -213,21 +348,26 @@
    from this element, not from the pill, or the magnet becomes its own input
    and walks away from the cursor.
 
-   The gap: at 1440x900 this resolves to 36px against the heading's 73.6px
-   line box (--t-display caps at 5rem, --lh-display 0.92) — about half a
-   display line, where the old four-row index took a full one. The index
-   opened a second movement and needed the air; a single action is the same
-   sentence's verb. The 28px floor is not arbitrary either: the magnet's
-   vertical ceiling is half the pill's height, ~23px at every breakpoint
-   (the pill bottoms out near 46px), so a fully-pulled button still clears
-   the heading's descender band. */
+   THE GAP IS THE BLOCK'S LARGEST, and that is the whole point of the order.
+   With the pill in the middle of the stack it measured 43px above and 34px
+   below — near-symmetrical, so it read as centred INSIDE the lockup rather
+   than as its last move, and the section handed the reader an action and then
+   went on explaining. Last in the flow, 4.6vh (49.7 / 41.4 / 38.8px at 1920 /
+   1440 / 390) against the 2.2vh that binds the support line up to the
+   heading: better than twice the gap above it, so the action is isolated and
+   the two middle elements close ranks as one sentence.
+
+   The 34px floor is not arbitrary either: the magnet's vertical ceiling is
+   half the pill's height, ~23px at every breakpoint (the pill bottoms out
+   near 46px), so a fully-pulled button still clears the support line's
+   descender band. */
 .magnetHost {
   display: block;
   /* shrink-wrapped to the pill, so the measured rect is the button's and not
      the column's — which then needs auto margins to sit on the block's centre
      line, since a fit-content box does not inherit text-align */
   width: fit-content;
-  margin: clamp(28px, 4vh, 48px) auto 0;
+  margin: clamp(34px, 4.6vh, 60px) auto 0;
 }
 
 /* the spring lives here — transform only, never left/top/margin, so the
@@ -238,26 +378,42 @@
 }
 
 /* The closing action. Same pill grammar as the site's other UI chrome —
-   mono caps, 999px radius, a whisper of fill at rest and a solid cream fill
-   on hover — at --t-button rather than --t-label, because this is the one
-   button on the page's last frame rather than one of four in a list. */
+   999px radius, caps, --t-button rather than --t-label because this is the
+   one button on the page's last frame rather than one of four in a list. The
+   face is Helvetica now rather than the mono, at the reader's request, and
+   it takes the same tracking step the clock above does and for the same
+   reason. The two Helvetica elements are also the two ends of this lockup,
+   so the block still reads as bracketed by one voice.
+
+   SOLID SAFFRON, and it is the only saturated thing on this screen. The 6%
+   cream fill it replaces gave the pill a body but no voice: on a full-bleed
+   photograph a hairline capsule is chrome, and the last frame of the page
+   should not close on chrome. --saffron is already the site's accent
+   (globals.css:23) and is spent nowhere else in this section, so the eye has
+   exactly one place to land.
+
+   MAROON LABEL, NOT CREAM. #2f0000 on #c97e3f measures 5.85:1; cream on the
+   same fill is 2.99:1 and fails outright. The pill therefore inverts the
+   section's cream-on-dark relationship, which is the second reason it reads as
+   the action rather than as more copy. */
 .action {
   display: inline-flex;
   align-items: center;
   gap: 0.9em;
   border-radius: 999px;
   padding: 1em 2.1em;
-  font-family: var(--font-mono);
+  font-family: var(--font-ui);
   font-size: var(--t-button);
   line-height: 1;
-  letter-spacing: var(--tr-label-mono);
+  letter-spacing: var(--tr-label);
   text-transform: uppercase;
   white-space: nowrap;
-  color: var(--cream);
-  /* 6% fill: enough that the pill has a body before the cursor arrives,
-     light enough that the cream label still clears 5:1 on it */
-  background: rgba(250, 247, 241, 0.06);
-  border: 1px solid rgba(250, 247, 241, 0.55);
+  color: var(--maroon);
+  background: var(--saffron);
+  /* the border is kept, matched to the fill: it holds the pill's exact
+     geometry (and its 1px of extra height) so nothing about the magnet's
+     measuring box or the hover swap moves when the colour changes */
+  border: 1px solid var(--saffron);
   transition:
     background-color 220ms var(--ease-out),
     border-color 220ms var(--ease-out),
@@ -265,6 +421,11 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
+  /* Hover goes LIGHTER, not louder — cream fill, maroon label, 17.5:1. It is
+     the same swap the pill always had, and it still reads as a state change
+     because saffron→cream is a hue jump as well as a value one. Going darker
+     on hover would have put the pressed state and the hovered state on the
+     same side of rest. */
   .action:hover {
     background: var(--cream);
     border-color: var(--cream);
@@ -277,12 +438,54 @@
   }
 }
 
+/* A cream ring at 3px offset sits on the SCRIM, where it measures 7.0:1
+   against the worst backdrop the pool can composite to — but only 2.99:1
+   against the saffron it encircles, so on its own it would fail the moment it
+   touched the fill. The inset maroon ring is the other half: 5.85:1 on
+   saffron, 17.5:1 on the cream hover fill. Together the focus indicator is
+   legible against the pill AND against everything behind it, in both states. */
 .action:focus-visible {
   outline: 2px solid var(--cream);
   outline-offset: 3px;
+  box-shadow: inset 0 0 0 2px var(--maroon);
 }
+/* Pressed = saffron cut 12% toward the maroon, rgb(183,111,55). Distinguishable
+   from rest (the two fills are 1.26:1 apart, comfortably above the ~1.1:1 where
+   a value step stops registering) and the maroon label still measures 4.77:1 on
+   it, so the press does not open a hole in the contrast floor. Colour only: a
+   scale here would be a second transform in the same stack as the magnet. */
 .action:active {
-  background: rgba(250, 247, 241, 0.18);
+  background: rgb(183, 111, 55);
+  border-color: rgb(183, 111, 55);
+}
+
+/* ---------- the supporting line ----------
+
+   Centred under the pill, on the block's own centre line. NOT splayed to the
+   bottom corners: `.locScrim` is now a centred pool that releases toward the
+   frame edges, and text in the corners would demand the dark be dragged back
+   out there — which is precisely the thing that was just undone.
+
+   --measure-tight (60ch = ~74 real characters) breaks the sentence into two
+   near-even lines at every desktop width; text-wrap: balance keeps the second
+   from ending up a two-word orphan under a full first line. */
+.support {
+  /* Now sits BETWEEN the heading and the pill, so this gap binds it UPWARD to
+     the line it explains. It is deliberately the block's smallest gap (2.2vh
+     = 23.8 / 19.8 / 18.6px at 1920 / 1440 / 390) — smaller than both the
+     clock's 2.6vh above the heading and the 4.6vh below, which is what makes
+     the middle two elements read as one sentence and leaves the pill alone at
+     the bottom. */
+  margin: clamp(18px, 2.2vh, 28px) auto 0;
+  max-width: var(--measure-tight);
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
+  /* same 0.88 cream as the clock — the two quiet lines bracket the heading and
+     the pill at one weight, so the block reads as two loud things and two soft
+     ones rather than four competing ones. Worst measured case is this line on
+     the phone, where it sits furthest out in the pool: 5.4:1. */
+  color: rgba(250, 247, 241, 0.88);
+  text-wrap: balance;
 }
 
 .actionLabel {
@@ -304,9 +507,12 @@
    .cta pulled back into normal flow to stop the stage collapsing to zero and
    taking the film with it.
 
-   Two elements measure ~110px stacked at 375px (heading 35 at the 2.4rem
-   floor, gap 28, pill 46) inside 125svh = 834px. There is nothing
-   left to overflow, so the fixed height comes back everywhere — which also
+   Four elements measure 206px stacked at 390px (measured: clock 13, gap 14,
+   heading 35 at the 2.4rem floor, gap 34, pill 48, gap 27, support copy 2
+   lines at 21) inside 125svh = 1055px — a fifth of the box, and the block is
+   centred in it, so the copy clears the top edge by 425px and the bottom by
+   213px.
+   There is nothing left to overflow, so the fixed height stays — which also
    keeps --settle's departure distance identical at every breakpoint instead
    of stretching with the content. Below 981px the base .cta rule's
    `padding-inline: var(--pad-x)` is already the plain page margin, so there

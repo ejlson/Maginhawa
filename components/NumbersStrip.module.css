@@ -44,7 +44,7 @@
 /* the italic serif inflection riding each figure's baseline — saffron,
    small, Fraunces true italic (Contralto has no italic cut) */
 .suffix {
-  font-family: var(--font-serif);
+  font-family: var(--font-emphasis);
   font-style: italic;
   font-size: 0.3em;
   letter-spacing: 0;

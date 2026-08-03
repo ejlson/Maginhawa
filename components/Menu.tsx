@@ -12,7 +12,7 @@ const ITEMS = [
   { label: "Restaurants", href: "/restaurants" },
   { label: "Blog", href: "/blog" },
   { label: "About Us", href: "/about" },
-  { label: "Careers", href: "/join-us" },
+  { label: "Careers", href: "/careers" },
   { label: "Contact Us", href: "/contact" },
 ];
 
@@ -69,7 +69,14 @@ export default function Menu({
         animate={{ x: open ? "0%" : "118%", opacity: open ? 1 : 0 }}
         transition={{ duration: 0.55, ease: [0.76, 0, 0.24, 1] }}
         style={{ pointerEvents: open ? "auto" : "none" }}
-        aria-hidden={!open}
+        /* The closed panel is parked off-screen by a transform, which does
+           NOT take it out of the tab order — its six links stayed reachable
+           on every route, sending the focus ring off the right edge for six
+           presses. `inert` removes it from the tab order and the a11y tree
+           together, so no separate aria-hidden: inert already implies it, and
+           the pair (focusable + aria-hidden) was the worst of both — links a
+           screen reader announces as nothing. */
+        inert={!open}
       >
         <nav className={styles.list}>
           {ITEMS.map((it, i) => (

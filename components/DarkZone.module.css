@@ -1,4 +1,25 @@
 .zone {
+  /* THE DARK-ZONE RAIL — the one column system every block in here hangs off.
+     The Footer already ran three tracks at 33/30/37 with this gap, and it is
+     a full viewport tall on every route, so it is the rhythm a reader has
+     actually been taught by the time they reach it. Contact, FAQ and ReviewUs
+     now share it instead of each inventing a ratio: measured at 1440 the page
+     had eleven distinct left edges, including 494-vs-503 and 929-vs-947 pairs
+     that read as misalignment rather than intent. On this rail the content
+     edges collapse to 40 / 503 / 929.
+     Rejected: the 12-column `--grid-col` system in globals.css. Its 4/4/4 split
+     lands at 496, which is SEVEN pixels off the Footer's 503 — swapping one
+     near-miss for another. The rail wins because the Footer defines it and the
+     Footer cannot move (it renders on every route).
+     `minmax(0, …)` on every track: a bare `33fr` floors at min-content, which
+     a long restaurant name would blow past and push the whole row wide. */
+  --rail: minmax(0, 33fr) minmax(0, 30fr) minmax(0, 37fr);
+  --rail-gap: clamp(24px, 3vw, 56px);
+  /* how far a section's first heading must drop to clear the fixed nav. The
+     nav is mix-blend-mode over content and is deliberately not ours to change,
+     so clearance is bought on the section side. */
+  --rail-nav-clear: clamp(88px, 13vh, 172px);
+
   position: relative;
   /* above the Reservations film (z-index 4) so the film→DarkZone seam holds */
   z-index: 5;

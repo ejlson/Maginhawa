@@ -86,7 +86,7 @@
 .title {
   margin: 0;
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: var(--w-regular);
   font-size: clamp(3rem, 7.2vw, 6.75rem);
   line-height: var(--lh-display);
   letter-spacing: var(--tr-display);
@@ -98,7 +98,7 @@
    shimmy as they advance */
 .counter {
   font-family: var(--font-mono);
-  font-weight: 400;
+  font-weight: var(--w-regular);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label-mono);
   text-transform: uppercase;
@@ -208,7 +208,7 @@
    clears the 4.5:1 small-text contrast floor comfortably */
 .date {
   font-family: var(--font-sans);
-  font-weight: 500;
+  font-weight: var(--w-regular);
   font-size: var(--t-small);
   line-height: var(--lh-snug);
   color: var(--maroon);
@@ -220,7 +220,7 @@
   font-family: var(--font-sans);
   /* regular weight, clearly larger than the meta line — hierarchy carried
      by the global scale (--t-lead over --t-small), not by ad-hoc sizes */
-  font-weight: 400;
+  font-weight: var(--w-regular);
   font-size: var(--t-lead);
   /* heading leading, not body leading — two wrapped lines read as one
      title, not a paragraph */
@@ -243,7 +243,7 @@
   align-items: center;
   gap: 0.6em;
   font-family: var(--font-sans);
-  font-weight: 500;
+  font-weight: var(--w-regular);
   font-size: var(--t-small);
   line-height: var(--lh-snug);
   color: var(--maroon);
@@ -309,7 +309,7 @@
 }
 
 .ctaLabel {
-  font-weight: 500;
+  font-weight: var(--w-regular);
 }
 
 .ctaArrow {

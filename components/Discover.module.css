@@ -214,6 +214,17 @@
   z-index: 1;
 }
 
+/* THE PULL — the transform layer the SPLIT owns, wrapped around the one
+   plate the words open on. It scales about its own centre, which is the
+   deck seat's centre, so the plate grows out of exactly the point the words
+   are parting from. Its resting state is a plain identity transform, so the
+   seat it leaves for the flight is the seat the flight measures. */
+.introPull {
+  position: absolute;
+  inset: 0;
+  will-change: transform, opacity;
+}
+
 /* One deck plate. It carries the whole flight — a translate and a uniform
    scale onto its grid tile's exact rectangle — so it is promoted for the
    duration and composited rather than repainted. */

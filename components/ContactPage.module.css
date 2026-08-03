@@ -1,0 +1,173 @@
+/* /contact ONLY — the footer's invitation, swapped for something the page
+   cannot already do.
+
+   The Footer closes every route with "Got any questions? Contact us. → Get in
+   touch". On /contact that is an invitation to the page the reader is
+   standing on, offered directly beneath a form that already takes the
+   enquiry. It is the one route where the footer's strongest moment is spent
+   on a no-op.
+
+   Footer.tsx is not this component's to edit, and the fix must not reach any
+   other route, so it is done from the outside on both halves:
+
+     · SUPPRESSED structurally. Footer.module.css's class names are hashed and
+       unreachable from another module, so the block is found by shape rather
+       than by name: `.invite` is the only element in the footer that owns an
+       <h2>. `display: none` takes it out of the accessibility tree too, so no
+       orphaned heading is left behind in the outline.
+     · REFILLED in place. The suppressed block sat in the third track of the
+       footer's top band — the 929 edge at 1440. Leaving it empty would trade
+       a redundant invitation for a third of a screen of nothing, so the
+       replacement is stacked into the same cell: `.footerZone` puts the
+       footer and `.visitLayer` in one grid area, and the layer re-declares
+       the same rail the footer's top band runs on so its content lands in the
+       same track at the same x. `pointer-events` is off on the layer and back
+       on for the block itself, so everything in the footer underneath stays
+       clickable.
+
+   Both halves are scoped under `.footerZone`, a class that exists on no other
+   route. /, /about, /blog, /join-us and /restaurants are untouched. */
+.footerZone footer div:has(> h2) {
+  display: none;
+}
+
+/* Below the rail's breakpoint the footer stacks to one column and there is no
+   third track to sit in, so the layer is simply the page's closing band,
+   ahead of the footer in the flow — which is also its DOM order. */
+.visitLayer {
+  padding: var(--section-y-sm) var(--grid-margin) 0;
+}
+
+@media (min-width: 861px) {
+  .footerZone {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .footerZone > * {
+    grid-area: 1 / 1;
+  }
+  .visitLayer {
+    /* the footer paints later in DOM order, and a transparent box still hit
+       tests — without this the address links would be unclickable */
+    z-index: 1;
+    align-self: start;
+    /* mirrors `.footer`'s own padding in Footer.module.css so the block's
+       first line sits level with the mark and the blurb it now shares the
+       band with */
+    padding: clamp(24px, 4vh, 56px) var(--grid-margin) 0;
+    display: grid;
+    grid-template-columns: var(--rail);
+    column-gap: var(--rail-gap);
+    pointer-events: none;
+  }
+  .visit {
+    grid-column: 3;
+    pointer-events: auto;
+  }
+}
+
+/* Set at --t-h3, not the --t-h2 the invitation used. It is introducing a list
+   of addresses rather than making a statement, and at h2 it would out-shout
+   the wordmark two blocks down. */
+.visitTitle {
+  font-family: var(--font-display);
+  /* the token, not a literal 500: globals.css is collapsing the weight scale
+     and --w-medium is where that decision lives, so this heading moves with
+     it instead of being one more number to find later */
+  font-weight: var(--w-medium);
+  font-size: var(--t-h3);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tr-display);
+  color: var(--cream);
+  max-width: 16ch;
+}
+
+.visitList {
+  list-style: none;
+  margin: clamp(14px, 2.2vh, 22px) 0 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: clamp(6px, 1vh, 10px);
+  color: var(--cream);
+}
+
+.visitItem {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: baseline;
+  gap: 0.2em 0.7em;
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
+  text-decoration: none;
+  color: inherit;
+}
+
+/* the name never breaks mid-word: it is the thing being located, and the row
+   wraps at the space before the address instead */
+.visitName {
+  white-space: nowrap;
+}
+
+.visitAddr {
+  opacity: 0.7;
+  /* the hairline under the address is the affordance — it says the line is a
+     link to a map rather than a printed address. Colour only; nothing here
+     relayouts on hover. */
+  text-decoration: underline;
+  text-underline-offset: 0.25em;
+  text-decoration-color: rgba(250, 247, 241, 0.28);
+  transition: text-decoration-color 0.3s var(--ease-out);
+}
+
+.visitItem:hover .visitAddr,
+.visitItem:focus-visible .visitAddr {
+  text-decoration-color: var(--cream);
+}
+
+/* The list is the four restaurants that publish a street address. The rest of
+   the group is one link away, and this row says so rather than leaving the
+   reader to wonder where the others went. */
+.visitAll {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--cream);
+  opacity: 0.75;
+  text-decoration: none;
+  transition: opacity 0.3s ease;
+}
+
+.visitAll:hover,
+.visitAll:focus-visible {
+  opacity: 1;
+}
+
+.visitArrow {
+  display: inline-block;
+  transition: transform 0.32s var(--ease-out);
+}
+
+.visitAll:hover .visitArrow,
+.visitAll:focus-visible .visitArrow {
+  transform: translateX(5px);
+}
+
+/* a maroon ring would vanish into the footer's own maroon */
+.visitItem:focus-visible,
+.visitAll:focus-visible {
+  outline: 2px solid var(--cream);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .visitArrow {
+    transition: none;
+  }
+}

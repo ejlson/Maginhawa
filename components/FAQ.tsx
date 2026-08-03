@@ -91,9 +91,14 @@ export default function FAQ() {
       <div className={`container ${styles.layout}`}>
         <div className={styles.head}>
           <div className={styles.headTop}>
-            <Reveal as="span" className={styles.eyebrow}>
-              FAQ
-            </Reveal>
+            {/* The "FAQ" eyebrow that sat above this heading is gone. It was a
+                styled <span>, and the worry was that removing it would leave
+                the section unheaded — the defect /about has, where the two
+                biggest chapters are titled by <span>s and their <h3>s hang
+                under nothing. That is not the case here: the <h2> below has
+                always been this section's real heading, so the eyebrow was a
+                second label saying what it says. Deleting it takes the
+                duplicate away and leaves the outline exactly as it was. */}
             <Reveal>
               <h2 className={styles.title}>Your questions, our answers</h2>
             </Reveal>

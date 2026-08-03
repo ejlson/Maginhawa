@@ -19,7 +19,7 @@ const EXPLORE: FootLink[] = [
   { label: "Restaurants", href: "/restaurants" },
   { label: "About Us", href: "/about" },
   { label: "Blog", href: "/blog" },
-  { label: "Careers", href: "/join-us" },
+  { label: "Careers", href: "/careers" },
   { label: "Contact Us", href: "/contact" },
 ];
 

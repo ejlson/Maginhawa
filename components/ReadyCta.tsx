@@ -31,7 +31,7 @@ export default function ReadyCta() {
             <em className={styles.titleBig}>starts with you</em>
           </h2>
 
-          <Link href="/join-us" className={styles.cta} data-cta-blob-target>
+          <Link href="/careers" className={styles.cta} data-cta-blob-target>
             <span className={styles.ctaLabel}>Join Us</span>
             <svg
               className={styles.ctaArrow}

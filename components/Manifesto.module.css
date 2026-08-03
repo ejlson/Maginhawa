@@ -2,7 +2,8 @@
    The display line rides the BOTTOM-LEFT across 8 of the page's 12 columns;
    the sans support sentence sits on the right with its last line on the
    statement's bottom edge (shared align-self: end row seat). Maroon on the
-   cream ground, type only — no eyebrow, no media, no rules. */
+   cream ground, type only — no eyebrow, no media, no rules (including none
+   underneath it: see .section). */
 .section {
   background: var(--cream);
   color: var(--maroon);
@@ -10,15 +11,15 @@
      top pad so the statement arrives early in the cover, seated on the
      page margin like every other chapter */
   padding: clamp(28px, 4.5vh, 64px) var(--pad-x) clamp(48px, 8vh, 120px);
-  /* The rule that closes the statement — a hairline running the full width
-     of the screen, not the measure. It sits on the section's border box, so
-     it clears the page margin on both sides and reads as the sheet's own
-     bottom edge rather than as an underline belonging to the sentence.
-     A flat, OPAQUE warm grey — not the maroon, and not a tinted alpha. An
-     alpha rule takes its value from whatever passes beneath it, and full
-     maroon at full width read as the page being divided rather than as
-     this sheet ending. */
-  border-bottom: 1px solid #cec7bb;
+  /* NO CLOSING RULE. A full-width hairline used to sit on this section's
+     bottom border box, between the statement and Our Restaurants. It was
+     drawing a boundary the page does not have: the statement and the
+     restaurants chapter share the same cream ground and the same column
+     seat, and --home-gap already opens real air between them. A line on top
+     of that gap read as the page being divided in two rather than as one
+     continuous editorial scroll, and it was the only section rule left on
+     the home page (the others went when the uniform gap system landed).
+     The gap is the separator. Do not put the line back. */
 }
 
 /* stacked flow below the breakpoint; the page's 12-column grid above it */
@@ -45,7 +46,7 @@
 .statement {
   margin: 0;
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: var(--w-regular);
   font-size: clamp(2.2rem, 5vw, 4.75rem);
   line-height: var(--lh-display);
   letter-spacing: var(--tr-display);
@@ -130,7 +131,7 @@
   margin: 0;
   max-width: 34ch;
   font-family: var(--font-sans);
-  font-weight: 400;
+  font-weight: var(--w-regular);
   font-size: var(--t-small);
   line-height: var(--lh-body);
   color: var(--maroon);

@@ -291,7 +291,7 @@
 
 /* the signature — the italic serif inflection */
 .philoSig {
-  font-family: var(--font-serif);
+  font-family: var(--font-emphasis);
   font-style: italic;
   font-size: var(--t-lead);
 }

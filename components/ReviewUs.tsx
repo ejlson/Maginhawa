@@ -34,20 +34,26 @@ export default function ReviewUs() {
     <section className={styles.section} id="leave-a-review">
       <div className="container">
         <div className={styles.head}>
-          <div>
-            <Reveal as="span" className={styles.eyebrow}>
-              Your Voice Matters
-            </Reveal>
-            <Reveal>
-              <h2 className={styles.title}>
-                Loved your visit? Leave us a Google review.
-              </h2>
-            </Reveal>
-          </div>
-          <Reveal delay={0.1}>
-            <p className={styles.lede} aria-hidden>
-              (A few minutes of your words goes a long way — pick the
-              restaurant you visited and we&apos;ll take you straight there)
+          {/* The "Your Voice Matters" eyebrow that used to sit here is gone.
+              It only gestured at what the headline below states outright, so
+              it was furniture — and it cost the section a saffron dot and a
+              line of vertical space for nothing. */}
+          <Reveal className={styles.headMain}>
+            <h2 className={styles.title}>
+              Loved your visit? Leave us a Google review.
+            </h2>
+          </Reveal>
+          <Reveal delay={0.1} className={styles.ledeWrap}>
+            {/* Was right-aligned all-caps in brackets at 0.4 opacity, which
+                measured 3.4:1 against the maroon — the least legible text on
+                the page, and four ragged lines of it. Now it is a sentence
+                that does a job: it says what a card does when you click it.
+                No `aria-hidden` any more either; when it was decorative
+                punctuation that was right, but this is the only place the
+                interaction is explained. */}
+            <p className={styles.lede}>
+              Pick the restaurant you visited and we&apos;ll take you straight
+              there.
             </p>
           </Reveal>
         </div>

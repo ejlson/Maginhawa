@@ -139,10 +139,16 @@ function BlogIndexInner() {
 
       <main className={styles.page} data-nav-theme="light">
         <div className="container">
+          {/* NO EYEBROW. "The Blog" used to sit above the title as a
+              saffron-dot chapter mark, the same device Discover and
+              AboutIntro carry. It is gone site-wide, and here the removal is
+              free: unlike the About page's Awards section — which had only
+              the eyebrow, so its eyebrow had to be PROMOTED to a real
+              heading — this header already owns an <h1>, and the sentence in
+              it says what the page is. Promoting "The Blog" would have left
+              two headings naming the same thing, and the accessible outline
+              (h1 → h2 featured → h3 cards) is already correct without it. */}
           <header className={styles.head}>
-            <Reveal as="span" className={styles.eyebrow}>
-              The Blog
-            </Reveal>
             <Reveal>
               <h1 className={styles.title}>
                 Stories, openings, and ideas shaping the Maginhawa Group.

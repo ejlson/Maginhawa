@@ -1,114 +1,352 @@
 .section {
   position: relative;
-  padding: clamp(20px, 2.6vw, 36px) var(--pad-x) 0;
+  padding: clamp(12px, 1.6vw, 22px) var(--pad-x) 0;
   background: transparent;
-}
-
-/* ---- careers hero — one horizontal video plate spanning the full
-   content width, the height the old careers card held. The display
-   title (the About hero's type) sits inside the frame; the statement
-   rides the bottom-right corner as a small italic-serif line. ---- */
-.heroFrame {
-  position: relative;
-  height: clamp(420px, 64vh, 720px);
-  border-radius: var(--radius-tile);
-  overflow: hidden;
-  background: var(--maroon);
-}
-
-.heroFrameVideo {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-/* maroon-tinted legibility scrim, weighted to the corners the type sits in */
-.heroFrameScrim {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(31, 0, 0, 0.52) 0%,
-    rgba(31, 0, 0, 0.28) 45%,
-    rgba(31, 0, 0, 0.6) 100%
-  );
-  pointer-events: none;
-}
-
-/* the About hero's display treatment — same font, same inverted blend */
-.heroFrameTitle {
-  position: absolute;
-  top: clamp(20px, 3.4vh, 44px);
-  left: clamp(20px, 2.6vw, 48px);
-  margin: 0;
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: clamp(5rem, 10vw, 10rem);
-  line-height: 0.86;
-  letter-spacing: -0.01em;
-  text-transform: uppercase;
-  color: var(--cream);
-  mix-blend-mode: difference;
-}
-
-/* the About card's caps-label copy voice */
-.heroFrameTagline {
-  position: absolute;
-  right: clamp(20px, 2.6vw, 48px);
-  bottom: clamp(18px, 3vh, 40px);
-  margin: 0;
-  max-width: 34ch;
-  text-align: right;
-  font-family: var(--font-sans);
-  font-style: normal;
-  font-weight: 400;
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  line-height: var(--lh-body);
-  color: var(--cream);
-  mix-blend-mode: difference;
-}
-
-.eyebrow {
-  grid-column: 1 / 13;
-  display: inline-flex;
-  align-items: center;
-  gap: 0.7em;
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  color: var(--maroon);
-}
-.eyebrow::before {
-  content: "";
-  display: block;
-  width: 6px;
-  height: 6px;
-  border-radius: 50%;
-  background: var(--saffron);
-  flex: none;
 }
 
 .page {
   background: var(--cream);
   color: var(--maroon);
-  padding-top: clamp(80px, 10vh, 120px);
+  /* THE HERO HAS TO CLOSE ABOVE THE FOLD. The caption lives inside the
+     photograph and arrives last, so if the frame runs past the bottom of a
+     1440x900 window the third beat of the sequence plays where nobody can
+     see it. Every measurement from here to the frame was tightened for that
+     one reason — this was clamp(80px, 10vh, 120px). */
+  padding-top: clamp(56px, 7vh, 92px);
   overflow-x: clip;
 }
 
-/* .eyebrow {
-  display: block;
-  font-family: var(--font-sans);
+/* ---- CAREERS HERO --------------------------------------------------------
+   ONE SENTENCE WITH A PHOTOGRAPH INSIDE IT. The headline breaks across the
+   picture — the setup above it, the payoff below — and the entrance is that
+   arrangement being made in front of the reader: the two lines build
+   together in the middle of the frame, the photograph grows out of the seam
+   between them and pushes them apart, then the furniture arrives.
+
+   It replaces three earlier heroes: a full-width video plate with the title
+   hard left; a cream pasteboard with nine scattered prints; and a letterbox
+   clip-path "lens" under a centred headline. The lens is the one this
+   replaces directly, and it went for a simple reason — an aperture opening
+   is a thing happening TO the picture, in its own corner of the page, while
+   the type waits. This is one motion that the type is part of.
+
+   Transform and opacity only, on three promoted elements (two lines and the
+   frame). No clip-path animation, no layout animation, no filter. */
+.hero {
+  padding-top: clamp(4px, 1.6vh, 20px);
+  /* the air between each line's ink and the photograph when settled. It is
+     also the floor on the ceiling that keeps them apart during the split —
+     see SPLIT_AIR in JoinUs.tsx — so it may not go to zero. */
+  --band-air: clamp(18px, 2.6vh, 34px);
+}
+
+/* THE CORNER LABELS — the site's furniture voice (Nav, Blog's counter,
+   PressWall's signpost). Now in --font-ui, which is the whole site's UI face:
+   the page is collapsing onto two families, so a third one carrying two
+   labels and a caption was a typeface being kept alive by three elements.
+   Tracking moves with the face — --tr-label-mono is the monospace figure and
+   is too tight for caps set in the UI face.
+
+   An explicit tone rather than an opacity, for the same reason as the helper
+   text below: a composited alpha is a contrast you have to compute instead of
+   one you can read. Re-measured after the face change
+   (scripts/probe-join-contrast.mjs). */
+.heroLabels {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 16px;
+  margin-bottom: clamp(18px, 2.6vh, 34px);
+}
+
+.heroLabel {
+  font-family: var(--font-ui);
+  font-weight: 400;
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
-  color: var(--saffron);
-  margin-bottom: clamp(14px, 2vh, 22px);
-} */
+  color: rgba(47, 0, 0, 0.68);
+  white-space: nowrap;
+}
+
+/* THE COMPOSITION. A flex column carrying three things in paint order: the
+   top line, the photograph's band, the bottom line. Two of them are inside
+   the <h1>, which is `display: contents` so that its children join this flex
+   context directly and `order` can slot the band between them.
+
+   `display: contents` on a heading is safe in every current engine (the
+   Chrome/Safari bug that dropped such elements out of the accessibility tree
+   was fixed in Chrome 89 and Safari 15.4). What it buys is worth the
+   exoticism: the heading keeps its two spans as its only children, so it is
+   announced as one sentence in DOM order, and the photograph — with its alt
+   text and its caption — stays outside the heading's accessible name. */
+.heroSplit {
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+}
+
+.heroTitle {
+  display: contents;
+}
+
+/* THE TWO LINES. Centred, in the display face. Each is its own SplitWords
+   inside a span this stylesheet positions, because the y that opens the
+   split is written to THIS element and the word masks are written inside
+   it — two owners, two elements, and neither can clobber the other. */
+.heroLineTop,
+.heroLineBot {
+  display: block;
+  text-align: center;
+  font-family: var(--font-display);
+  font-weight: 500;
+  /* 7rem, up from 5.6rem. The ceiling here has always been the FOLD and not
+     taste — the caption is the third beat of the entrance and it lives inside
+     the photograph, so the headline can only be as tall as the window has
+     room for once the frame is under it. The frame is now 3.2:1 instead of
+     2.6:1, which gives ~98px back at 1440 and ~130px at 1920, and this is
+     that room spent on the type. probe-join-fold.mjs re-measures the
+     clearance at all four viewports rather than trusting the arithmetic.
+
+     The 2.5rem floor is not cosmetic either: at 390px the container is 358px
+     and "Every trial shift here" is the longest line, and a wrap here is not
+     a cosmetic problem — it would put THREE lines of type around a
+     photograph that opens between exactly two, and the split's measured
+     geometry would then be opening a seam in the middle of a line.
+     2.7rem measured at 354px of 358 — a 4px margin, which is not a margin,
+     it is luck. 2.5rem measures 328px and leaves 30. (Arial and Liberation
+     Sans are metrically compatible with Helvetica to the pixel, so the
+     fallback platforms do not widen this — but a copy edit would.) Checked
+     by probe-join-head.mjs, which counts rendered line boxes rather than
+     assuming the hand break is the only break. */
+  font-size: clamp(2.5rem, 7vw, 6.5rem);
+  line-height: 0.98;
+  /* size-specific tracking: display type this large reads loose at 0 */
+  letter-spacing: -0.028em;
+  color: var(--maroon);
+  /* each line is pushed ~230px by the split at 1440 — promoted for the
+     duration, and the promotion is cheap because nothing else on the page is
+     layered */
+  will-change: transform;
+}
+
+/* THE PROMOTION, HANDED BACK. Applied to the two lines and the frame once
+   the split has settled — see `settled` in JoinUs.tsx. Identical to their
+   resting state in every other respect, so nothing about the rendered page
+   changes; three compositor layers are simply released. */
+.heroRested {
+  will-change: auto;
+}
+
+/* PAINT ORDER, not DOM order. The <h1>'s two lines are 1 and 3; the
+   photograph's band is a sibling that comes after both in the document and
+   is pulled between them here. Reading order and tab order stay the
+   document's — see the header comment in JoinUs.tsx. */
+.heroLineTop {
+  order: 1;
+}
+.heroLineBot {
+  order: 3;
+}
+
+/* THE BAND — the photograph's untransformed shadow. It holds the aspect
+   ratio, the width and the place in the flow; the frame inside it is what
+   scales during the split. Two elements rather than one because the scroll
+   parallax measures a box (`useScroll` on this ref), and measuring a box
+   that is growing from nothing to full size during the entrance maps the
+   parallax against a rectangle that does not exist yet.
+
+   3.2:1, down from 2.6:1. The band is ~19% shorter at desktop (523px → 425px
+   at 1440) and the crop pays for it: the photograph's rendered box is 112% of
+   the band, so at 2.6 it kept 77% of the 1920x1080 source's height and at
+   3.2 it keeps ~62%. What the extra 15% discards is sky and ceiling at the
+   top and the front lip of the pass at the bottom; `object-position: 50% 42%`
+   holds the plate and the hands, which are the subject. It is a real crop and
+   it is close to the floor — probe-join-fold.mjs asserts neither axis loses
+   more than 40%, and 3.2 sits at 62/100. Going wider than this starts cutting
+   the chef.
+
+   THE OTHER TWO BREAKPOINTS GET SHORTER TOO, AND THERE IT COSTS NOTHING —
+   they were TALLER than the 1.78 source, so they were cropping the picture's
+   WIDTH, and flattening them hands width back. See the media queries below. */
+.heroBand {
+  order: 2;
+  position: relative;
+  width: 100%;
+  aspect-ratio: 3.2;
+  margin-block: var(--band-air);
+}
+
+/* THE FRAME — everything that moves.
+
+   BORDER RADIUS IS 0, not the 10px it was. The frame is the full container
+   measure: its left and right edges sit exactly on the page's grid margins,
+   so it reads as a bleed, and a bleed with rounded corners is a contradiction
+   — the corner curves away from an edge that has nothing to curve away from.
+   At 1360x425 a 10px radius is 0.7% of the width, which does not read as
+   softness so much as a slightly damaged corner. Everything else on this page
+   that is rounded (the plate that used to be here, the submit pill) is an
+   OBJECT sitting inside the measure. The hero band IS the measure.
+
+   `transform-origin` is left at its 50% 50% default deliberately: the scale
+   has to happen about the frame's own centre, because the centre is the
+   thing the split's y term is aiming at the seam. */
+.heroFrame {
+  position: absolute;
+  inset: 0;
+  border-radius: 0;
+  overflow: hidden;
+  /* the ground the photograph grows against, and the colour behind a
+     still-loading image — cream would flash white inside the frame */
+  background: var(--maroon);
+  will-change: transform, opacity;
+}
+
+/* the photograph is TALLER than its window so there is something to drift
+   into; Motion owns this box's transform (the scroll parallax) and nothing
+   else writes it */
+.heroPan {
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: -6%;
+  height: 112%;
+  will-change: transform;
+}
+
+.heroImg {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* the pass and the hands sit above centre in the source frame; 42% keeps
+     them when the 16:9 original is cropped to 2.1:1 */
+  object-position: 50% 42%;
+  user-select: none;
+}
+
+/* THE SCRIM STAYS, WITHOUT THE CAPTION IT WAS DRAWN FOR. It was built to
+   make the bottom-right corner reliably dark enough for cream type; the type
+   has moved out (see `.heroStand`), and the gradient is kept because it is
+   also what seats the photograph's bottom-right corner against the cream
+   page — this frame of video is bright there, and without it the picture's
+   corner glares against the paper. It is now a light fall-off rather than a
+   contrast device, so it could be lightened; it is left alone because
+   probe-join-caption.mjs's numbers were taken with it and changing it in the
+   same pass would make the before/after unreadable. Flagged. */
+.heroScrim {
+  position: absolute;
+  inset: 0;
+  pointer-events: none;
+  background: linear-gradient(
+    to top left,
+    rgba(16, 0, 0, 0.72) 0%,
+    rgba(16, 0, 0, 0.46) 18%,
+    rgba(16, 0, 0, 0.12) 38%,
+    rgba(16, 0, 0, 0) 56%
+  );
+}
+
+/* ---- THE STANDFIRST — OUT OF THE PHOTOGRAPH, AND THE COPY IS WHY ----
+   This line used to live INSIDE the picture, bottom-right, cream on the
+   frame, with a corner scrim under it. That worked for 41 characters
+   ("Cook with us. Sit with us. Build with us.") and it does not work for
+   152. Measured rather than assumed — scripts/probe-join-standfirst.mjs
+   puts the real copy back into the photograph at the old position and reads
+   the actual pixels behind it, because the 17.7:1 the short line measured
+   was a number about ONE CORNER of one frame of video and does not transfer
+   to a block four times the size.
+
+   The corner scrim is a `to top left` gradient that is gone by 56% of the
+   diagonal — it was drawn for a line, not for a paragraph — and the only
+   ways to hold 4.5:1 under the longer copy are to darken the photograph
+   further or to put a panel behind the text. Both spend the picture to
+   rescue the caption.
+
+   So the text comes out and becomes a standfirst under the payoff line,
+   where it is maroon on cream at 9.6:1 with nothing underneath it to fight,
+   and the photograph goes back to being a photograph. It is still beat 3,
+   still on the headline's word mask, and it now reads in the natural place
+   — the sentence finishes, then the paragraph explains it.
+
+   Set at --t-small with a 72ch measure: wide enough that 152 characters
+   land in two or three lines rather than five, which is what keeps the hero
+   closing above the fold at 1920x1080 (probe-join-fold.mjs). */
+.heroStand {
+  /* ORDER 4, EXPLICITLY. `.heroSplit` reorders its children (1 top line,
+     2 band, 3 bottom line) and an un-ordered flex item defaults to 0, which
+     sorts BEFORE all of them — so the standfirst rendered above the corner
+     labels' headline instead of under the payoff. Caught by
+     probe-join-fold.mjs, which reported it at y 158 with the title at 222.
+     Anything added to this composition needs a number. */
+  order: 4;
+  margin: clamp(14px, 1.9vh, 26px) auto 0;
+  max-width: 72ch;
+  text-align: center;
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  line-height: 1.45;
+  color: rgba(47, 0, 0, 0.78);
+  text-wrap: pretty;
+}
+
+/* THE FRAME GETS TALLER AS THE SCREEN GETS NARROWER. A 3.2:1 band on a 390px
+   phone is a 112px sliver with a person's hands in it; the ratio steps down
+   so the picture keeps enough height to be a picture.
+
+   BOTH OF THESE GOT SHORTER WITH THE DESKTOP RATIO AND BOTH KEPT MORE OF THE
+   PHOTOGRAPH FOR IT, which is the opposite of what happens at 1440 and is
+   worth saying plainly. A narrow frame is bounded by WIDTH: at 774px wide,
+   1.72:1 made the image box 1.54:1, which is NARROWER than the 1.78 source,
+   so it was cropping the picture sideways — 14% of its width gone. 2.05
+   lands the box at ~1.83:1, a hair wider than the source, so the tablet now
+   keeps essentially all of the width and ~97% of the height. */
+@media (max-width: 1100px) {
+  .heroBand {
+    aspect-ratio: 2.05;
+  }
+}
+
+@media (max-width: 600px) {
+  /* 1.65, up from 1.4 (and from the 1.16 tried before that). Same argument
+     one step further: 1.4 put the image box at 1.25:1 and threw away 30% of
+     the picture's width to gain height the fold did not need — the frame
+     still closed ~300px above it. 1.65 lands the box at ~1.47:1 and keeps
+     83% of the width, and at 358px wide the band is still 217px tall, which
+     is a photograph rather than a strip. */
+  .heroBand {
+    aspect-ratio: 1.65;
+  }
+  .heroImg {
+    object-position: 52% 45%;
+  }
+  /* two mono labels will not sit on one 358px line without truncating, and
+     a truncated label is worse than a stacked pair */
+  .heroLabels {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+  .heroStand {
+    max-width: none;
+  }
+}
+
+/* REDUCED MOTION: the hero arrives whole, and there is nothing here to
+   switch off. THE WHOLE SEQUENCE IS NOW OWNED BY THE TSX — the split's
+   progress is a MotionValue parked at 1, no timer is armed, SplitWords
+   honours the query itself and renders plain text, the corner labels mount
+   at opacity 1 so Motion starts no animation for them, and the parallax
+   reads a MotionValue that never moves, so nothing is subscribed to scroll
+   either.
+
+   That is deliberate rather than incidental. The previous hero had two CSS
+   keyframes (the aperture and the caption rise) that this block cancelled,
+   and a `@media` cancellation is a second copy of the decision — one that
+   the next person to add a keyframe will not know to update. Zero CSS
+   animations means the reduced-motion promise is enforced at the source.
+   probe-join-reduced.mjs asserts `document.getAnimations().length === 0`,
+   which is the only version of this claim that cannot rot. */
 
 .sectionTitle {
   font-family: var(--font-display);
@@ -120,74 +358,51 @@
   max-width: 22ch;
 }
 
-/* ---- Hero ---- */
-.hero {
-  padding-block: var(--section-y-sm) var(--section-y);
+/* ---- THE COUNTER — the loading screen's split-flap board, one cell wide.
+   Same recipe as Loader.module.css `.flip` / `.flipInner`: a fixed-width
+   cell with its own camera, and an inner span hinged at its bottom edge that
+   flaps in on every character change. Fixed width is load-bearing: without
+   it every digit change would reflow " positions across the group." beside
+   it, which is both ugly and a layout cost twenty times a second. ---- */
+/* inline-flex, so a two-digit count sits as two adjacent cells with no
+   word-space between them */
+.count {
+  display: inline-flex;
 }
 
-.heroTitle {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: var(--t-display);
-  line-height: var(--lh-display);
-  letter-spacing: var(--tr-display);
-  max-width: 22ch;
-  margin: 0 0 clamp(28px, 4vh, 56px);
+.flip {
+  display: inline-block;
+  /* the display face's digits are narrower than its caps; 0.58em is the
+     measured advance of "6" plus a hair, so the cell neither pads the
+     numeral nor clips a wide "0" */
+  width: 0.58em;
+  text-align: center;
+  /* the same absolute camera the loader gives each flap. In px, not em: the
+     flap is a physical hinge, and its foreshortening should not change with
+     the heading's clamp() */
+  perspective: 700px;
 }
 
-.heroLede {
-  font-family: var(--font-sans);
-  font-size: var(--t-lead);
-  line-height: var(--lh-body);
-  opacity: 0.85;
-  max-width: 54ch;
-  margin: 0;
+.flipInner {
+  display: inline-block;
+  /* hinged at the bottom edge — the flap falls into place */
+  transform-origin: 50% 100%;
+  backface-visibility: hidden;
+  will-change: transform, opacity;
 }
 
-/* ---- Why work with us — three pillars ---- */
-.pillars {
-  padding-block: var(--section-y);
-  border-top: 1px solid var(--rule);
-  border-bottom: 1px solid var(--rule);
-}
+/* (A dead `.hero` / `.heroTitle` / `.heroLede` block lived here — leftovers
+   from a text-only careers hero two designs ago. It was not merely unused:
+   its `.heroTitle` sat LATER in the file than the new one, so it silently won
+   the cascade and held the display title at --t-display (80px at 1440)
+   instead of the hero's own clamp. Deleted rather than renamed.) */
 
-.pillarGrid {
-  display: grid;
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(28px, 4vw, 64px);
-}
-
-.pillar {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(10px, 1.6vh, 18px);
-}
-
-.pillarMark {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: var(--t-h2);
-  line-height: 1;
-  letter-spacing: -0.012em;
-  color: var(--saffron);
-}
-
-.pillarTitle {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: var(--t-h3);
-  line-height: var(--lh-heading);
-  letter-spacing: -0.005em;
-  margin: 0;
-}
-
-.pillarBody {
-  font-family: var(--font-sans);
-  font-size: var(--t-small);
-  line-height: var(--lh-body);
-  opacity: 0.85;
-  margin: 0;
-}
+/* (A dead `.pillars` / `.pillarGrid` / `.pillar*` block lived here — the
+   stylesheet for a "why work with us" band that was cut from the page two
+   designs ago and whose copy, PILLARS, then sat in the TSX unrendered. The
+   copy is back as `.reasons` below, at the roles/application seam, and this
+   is the block it was built from. Deleted rather than left as a second,
+   nearly-identical set of rules for the same three paragraphs.) */
 
 /* ---- Open roles list ---- */
 .roles {
@@ -202,16 +417,28 @@
   margin-bottom: clamp(36px, 5vh, 64px);
 }
 
-/* pale interaction hint — same recipe as the Discover grid's
-   "(Click to learn more)": quiet label caps, far right of the head */
+/* THE INSTRUCTION, MADE READABLE. This was "(CLICK ANY ROLE TO READ THE
+   DETAILS)" — bracketed, uppercase, letter-spaced, right-aligned, at 40%
+   opacity. Every one of those five choices costs legibility, and they
+   compound: /contact's identical line measured 3.44:1 against the 4.5:1 body
+   minimum before it was rewritten the same way.
+
+   40% of maroon on cream composites to roughly #b0a49b, which is nowhere
+   near passing. `opacity` is the wrong tool for a quiet tone anyway — it
+   makes the contrast a thing you have to compute rather than a thing you can
+   read — so the tone is now an explicit colour with the ratio measured
+   (scripts/probe-join-contrast.mjs).
+
+   Left-aligned, and it lands on the head grid's second column edge, which is
+   a real alignment in the page rather than a ragged right edge floating in
+   space. */
 .rolesAside {
   font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  opacity: 0.4;
-  text-align: right;
-  justify-self: end;
+  font-size: var(--t-small);
+  line-height: var(--lh-snug);
+  color: rgba(47, 0, 0, 0.74);
+  text-align: left;
+  justify-self: start;
   align-self: end;
 }
 
@@ -226,13 +453,24 @@
   border-bottom: 1px solid var(--rule);
 }
 
+/* THE INDEX RHYTHM. These rows used to sit on clamp(20px, 2.6vh, 32px) of
+   padding — ~90px per row at 1440x900, which is enough air that six roles
+   read as six separate blocks with rules between them rather than one index
+   you can scan. At clamp(13px, 1.5vh, 20px) a desktop row measures ~56px:
+   the rules now fall close enough together to read as a table, and the rule
+   itself goes back to doing the separating (it cannot, when the whitespace
+   around it is already three times its neighbours' leading).
+
+   The floor is 13px, not lower, because on a phone the row is the touch
+   target: 13 + 13 + three stacked lines lands at ~105px, comfortably past
+   the 44px minimum with the padding alone contributing 26px. */
 .roleRow {
   width: 100%;
   display: grid;
   grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.4fr) minmax(0, 1fr) auto;
   gap: clamp(16px, 3vw, 40px);
   align-items: baseline;
-  padding: clamp(20px, 2.6vh, 32px) 0;
+  padding: clamp(13px, 1.5vh, 20px) 0;
   background: none;
   border: none;
   color: inherit;
@@ -366,33 +604,207 @@
   outline: none;
 }
 
-/* ---- Application form ----
-   no rule above — the roles list flows straight into the form so the two
-   sections read as one continuous flow */
+/* ---- THE APPLICATION SECTION, SECOND ATTEMPT ----
+
+   WHAT WAS HERE, AND WHY IT DID NOT WORK. The previous answer was a tinted
+   plate — `background: rgba(47,0,0,0.05)`, `border-radius: 8px`, big padding
+   — split into a left rail carrying the three reasons and a right column
+   carrying the form. Asked again for the same section, so it failed. Three
+   things were wrong with it, and they are worth writing down because they
+   rule out a whole family of fixes:
+
+     - THE GROUND WAS NOT A GROUND. 5% maroon on cream is a wash you have to
+       go looking for. It is not enough to read as arrival, and the honest
+       ways to make it enough — 10%, a border, a shadow — each turn a
+       1360px-wide block into a card, which is app language on an editorial
+       page.
+     - THE RAIL ARGUED WITH THE FORM. Three paragraphs, ~100 words, sat
+       beside the fields — an argument for taking the job, aimed at someone
+       who has already scrolled past six roles and put their hand on the
+       keyboard. It competed for attention at the one moment attention should
+       narrow to a single column of inputs.
+     - "STAND OUT" WAS READ AS "ADD INK". Both of the above are attempts to
+       make the section louder. On a page that is otherwise cream, type and
+       one photograph, the loudest available move is not more ink.
+
+   THREE STRUCTURES WERE WEIGHED THIS TIME. All three keep the constraints:
+   the form stays simple and fast to fill, no dark plate (the footer directly
+   below is a DarkZone and the two would merge into one long dark tail), and
+   no tenth photograph.
+
+     A. THE RULED LEDGER. Delete the ground entirely. Separate the section
+        with one hairline at full measure and let alignment and silence do
+        the work, the way an editorial page marks a chapter. Cheapest,
+        truest to the rest of the site. Rejected ALONE as too close to
+        nothing: the brief is that this section does not announce itself, and
+        "announce it with less" is a hard thing to hand back a second time.
+
+     B. THE COLUMN. <- shipped, with A's rule as its threshold.
+        Stop changing the COLOUR of the section and change its SHAPE. The
+        roles index above runs the full 1360px measure; the application
+        narrows to a 620px column and centres. A page that has been full-
+        width for two screens suddenly becoming a third as wide is a louder
+        event than any tint, and it costs no new material. Three things fall
+        out of it, all of them good:
+          - the form becomes SINGLE-COLUMN, which is the faster form. Two
+            columns make the eye pick a path at every row; one column has one
+            path, and the field order finally matches the tab order.
+          - the reasons cannot sit beside it, so they move (see `.reasons`)
+            to the seam above the rule, where they finish the roles index
+            instead of interrupting the form.
+          - it rhymes with the hero, which is also centred. The page now
+            reads: a centred claim, a left-aligned index, a centred ask —
+            the two centred moments being the two moments the page speaks
+            directly to the reader.
+
+     C. THE FULL-BLEED BAND. Break the section out of the container to the
+        viewport edges on a warmer ground — a real change of surface rather
+        than a card floating in one. Handsome, and it does not merge with the
+        footer the way a dark plate would. Rejected: it is still "standout =
+        colour", and it stacks a third ground into the last screen of the
+        page (cream, warm band, maroon footer) for a section whose job is to
+        be quiet enough to type into.
+
+   The rule at the top of `.formShell` is A, doing the one thing A was good
+   at: it is the threshold, and the narrowing is what happens on the other
+   side of it. */
 .form {
   padding-block: var(--section-y-sm) var(--section-y-lg);
 }
 
-.formHead {
+/* ---- THE THREE REASONS, AS THE LEAD-OUT OF THE ROLES INDEX ----
+   PILLARS was written for a full-width three-up band, sat unrendered in the
+   TSX after that band was cut, and was then squeezed into a stacked rail
+   beside the form. This is the copy back in the shape it was written in, at
+   the one place on the page where it is the natural next sentence: you have
+   just read six jobs, and before you are asked to apply you are told why the
+   job is worth having. Nothing sits beside the form after this. */
+.reasons {
+  list-style: none;
+  margin: 0 0 clamp(56px, 8vh, 104px);
+  padding: 0;
   display: grid;
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  align-items: end;
+  grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(28px, 4vw, 64px);
-  margin-bottom: clamp(36px, 5vh, 64px);
 }
 
-/* pale interaction hint — the Discover "(Click to learn more)" recipe */
-.formAside {
+.reason {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(8px, 1.2vh, 14px);
+}
+
+/* the mark is a numeral in the display face at heading scale — the same
+   treatment the cut band used, and the only saffron in the section */
+.reasonMark {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--t-h2);
+  line-height: 1;
+  letter-spacing: -0.012em;
+  color: var(--saffron);
+}
+
+.reasonTitle {
+  font-family: var(--font-display);
+  font-weight: 500;
+  font-size: var(--t-h3);
+  line-height: var(--lh-heading);
+  letter-spacing: -0.005em;
+  margin: 0;
+}
+
+/* an explicit tone, not `opacity: 0.85` — the same correction the two helper
+   lines on this page got. A composited alpha is a contrast you have to
+   compute; this one is measured (scripts/probe-join-contrast.mjs). */
+.reasonBody {
   font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  line-height: var(--lh-snug);
-  opacity: 0.4;
-  text-align: right;
-  justify-self: end;
-  align-self: end;
-  max-width: 40ch;
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
+  color: rgba(47, 0, 0, 0.78);
+  margin: 0;
+  max-width: 42ch;
+}
+
+/* ---- THE THRESHOLD ----
+   One hairline at the FULL measure. It is a sibling of the column rather
+   than a border on it, and that is the whole point: the line has to be as
+   wide as the thing it closes (the index and the reasons), so that the
+   narrowing is visible AGAINST it. A 620px rule over a 620px column is a box
+   lid, and a box lid is the plate again.
+
+   A real element rather than a `::before` with `width: 100vw` and a negative
+   offset, because 100vw includes the classic scrollbar on Windows and the
+   rule would then hang 7–8px past the measure at both ends. As a child of
+   `.form`, which is inside `.container`, it is the container's width by
+   construction and cannot drift. `<hr>` rather than a div: this IS a
+   thematic break — the argument ends and the ask begins. */
+.threshold {
+  width: 100%;
+  height: 1px;
+  margin: 0;
+  border: none;
+  background: var(--rule);
+}
+
+/* ---- THE COLUMN ----
+   760px, up from 620. The column was a single stack of eight controls, which
+   is a long scroll for a short form — and 620px was the width that stack
+   needed, not the width the form needs. Paired, it needs half-columns wide
+   enough for the widest thing in each: the dial-code select plus a number
+   beside it, and the position select's longest option ("Head Pastry Chef —
+   Café Mama & Sons"). At 760 the halves are 356px and both fit; at 620 they
+   would be 286px and the select would truncate its own options.
+
+   It is still the narrowing that announces the section — 56% of the 1360px
+   measure above it, against 46% before. The shape change survives; the
+   scroll does not. */
+.formShell {
+  max-width: 760px;
+  margin-inline: auto;
+  padding-top: clamp(44px, 6vh, 76px);
+}
+
+.formHead {
+  text-align: center;
+  margin-bottom: clamp(30px, 4vh, 52px);
+}
+
+/* The head steps down from the page's --t-display (80px at 1440). At page
+   scale "Send us your application." breaks four ways in a 620px column,
+   which reads as a heading that did not fit rather than one that was set —
+   and it does not need page scale, because the column has already announced
+   the section. */
+.formTitle {
+  font-size: clamp(1.9rem, 3.2vw, 3.1rem);
+  max-width: none;
+  margin-bottom: clamp(10px, 1.4vh, 16px);
+  /* centred type is only as good as its breaks — `balance` evens the two
+     lines instead of leaving a one-word second line hanging under a full
+     first one. Progressive: browsers without it get the greedy break they
+     would have had anyway. */
+  text-wrap: balance;
+}
+
+.formBody {
+  min-width: 0;
+}
+
+/* the same rewrite the roles hint got — sentence case, no brackets, an
+   explicit tone instead of an opacity, measured at 4.5:1 or better. Centred
+   with its heading, and capped so the two lines break evenly rather than
+   running the column's full 620px. */
+.formAside {
+  margin: 0 auto;
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
+  color: rgba(47, 0, 0, 0.74);
+  max-width: 44ch;
+  /* greedy wrapping broke this "…apply generally if you / don't see your
+     fit." — two words alone under a full line, centred, which reads as a
+     mistake */
+  text-wrap: balance;
 }
 
 /* ---- CV upload — hidden native input + styled underline proxy ----
@@ -410,8 +822,17 @@
   border: 0;
 }
 
-/* the proxy reads as one of the form's underline fields */
-.fileTrigger {
+/* the proxy reads as one of the form's underline fields.
+
+   `.field label.fileTrigger`, NOT `.fileTrigger` — and this was a live bug,
+   not a precaution. This element is a second <label> inside `.field`, so
+   `.field label` (0,1,1) matched it and beat the bare class (0,1,0): every
+   reset below was being thrown away and the filename slot was rendering as
+   UPPERCASE, letter-spaced, quiet-toned label type. "CHOOSE A FILE…" read as
+   a heading rather than a state, and a chosen filename would have come out
+   in caps with the tracking of an eyebrow. Two classes to outrank one class
+   and an element. */
+.field label.fileTrigger {
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -420,18 +841,29 @@
   padding: 0.5em 0;
   cursor: pointer;
   transition: border-color 0.3s ease;
-  /* the field label above already carries the caps treatment — reset the
-     inherited .field label styles on this second label */
+  /* the field label above already carries the caps treatment and the quiet
+     tone — reset both on this second label, because what sits inside it is a
+     VALUE (the chosen filename) and a value is full-strength ink */
   text-transform: none;
   letter-spacing: normal;
+  font-size: var(--t-body);
   opacity: 1;
+  color: var(--maroon);
 }
 
-.filePlaceholder {
+/* THE EMPTY STATE OF THE FILE FIELD. Not a placeholder — it is real text in
+   a real element and it does not vanish on focus — but it had the same
+   contrast fault placeholders usually have: `opacity: 0.45` composites to
+   ~rgb(159,136,133) on cream, which measures 3.10:1 against a 4.5:1 floor.
+   An explicit tone instead, measured with everything else. The wording
+   changed with it: "Choose a file…" is an instruction sitting where a value
+   goes, which is exactly the "is this filled in?" ambiguity this pass is
+   removing. "No file chosen" is a state. */
+.fileEmpty {
   font-family: var(--font-sans);
   font-size: var(--t-body);
   line-height: var(--lh-body);
-  opacity: 0.45;
+  color: rgba(47, 0, 0, 0.66);
 }
 
 .fileName {
@@ -463,11 +895,45 @@
   border-color: var(--saffron);
 }
 
+/* ---- THE FIELD GRID — PAIRED, NOT STACKED ----
+   THREE ARRANGEMENTS WERE WEIGHED, all of them centred:
+
+     1. ONE COLUMN, EIGHT ROWS — what was here. The single column is the
+        canonical "fast form" answer and it is right when the fields are
+        unrelated. These are not: first/last are one name, the dial code and
+        the number are one phone, and role-plus-CV is one answer to "what are
+        you applying for". Stacked, the form ran ~1100px and asked the reader
+        to scroll through a list of eight things that are really four.
+
+     2. FULL-MEASURE THREE-UP — break out of the column and lay the short
+        fields three across the 1360px page. Shortest possible form.
+        REJECTED: it undoes the narrowing, which is the only thing announcing
+        this section at all (see the header above `.reasons`), and a 440px
+        input for a first name is a field whose width lies about what goes
+        in it.
+
+     3. PAIRED HALVES INSIDE A WIDER COLUMN — this one. The pairs are the
+        semantic pairs, so proximity is doing real work rather than saving
+        space: first | last, email | phone, position | CV, and the message
+        alone at full width because it is the only field whose answer is
+        prose. Six rows become four. Tab order is the visual order read left
+        to right, top to bottom, which is also the order the email body is
+        assembled in.
+
+   The pairing collapses to one column at 600px — see the media query. At
+   390 a paired row would give each field 171px, which is narrower than a
+   phone number. */
 .formInner {
   display: grid;
   grid-template-columns: repeat(2, minmax(0, 1fr));
-  gap: clamp(18px, 2.4vw, 32px) clamp(24px, 3vw, 48px);
-  max-width: 880px;
+  gap: clamp(18px, 2.4vh, 28px) clamp(20px, 2.6vw, 40px);
+}
+
+/* the message, the submit row and the confirmation all run the full width —
+   the first because prose needs the measure, the other two because they are
+   not fields */
+.fieldFull {
+  grid-column: 1 / -1;
 }
 
 .field {
@@ -476,16 +942,47 @@
   gap: 6px;
 }
 
-.fieldFull {
-  grid-column: 1 / -1;
-}
-
+/* THE LABEL IS THE STRONGEST OF THE THREE LINES IN A FIELD. It was
+   `opacity: 0.62` (≈5.4:1) while the hint under it is 6.2:1 — a hierarchy
+   upside down, with the thing that names the field quieter than the thing
+   that qualifies it. An explicit tone, and darker than the hint. */
 .field label {
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
-  opacity: 0.62;
+  color: rgba(47, 0, 0, 0.78);
+}
+
+/* ---- THE HINT ----
+   THIS IS WHAT REPLACED THE PLACEHOLDERS. The four fields carried
+   "Jane Maginhawa", "jane@example.com", "07000 000 000" and "A few lines
+   about your experience and why this role." — all four gone, none replaced
+   in kind. Placeholder text has two failure modes and this form had both:
+   it DISAPPEARS the moment the field is focused, i.e. exactly when the
+   instruction is needed, and a grey string sitting where a value goes is
+   routinely read as a value already entered (users skip the field; screen
+   magnifier and low-vision users worst affected, and Safari/Chrome
+   autofill heuristics make it worse). A fake example name is the purest
+   version of the second fault — "Jane Maginhawa" is not guidance, it is a
+   demonstration that the field accepts text.
+
+   So: NOTHING on name and email, where the visible <label> already says
+   everything and the browser's own autocomplete does the rest; and a
+   persistent hint element, wired with aria-describedby, on the three fields
+   where a person genuinely does not know what is wanted — the phone format,
+   the accepted CV types, and how long the message should be. A hint is a
+   sibling of the input, so it is still on screen while the field is being
+   typed into. This is the GOV.UK Design System's pattern and it is the
+   right one.
+
+   Quieter than the label, louder than the 4.5:1 floor. */
+.hint {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  line-height: var(--lh-snug);
+  color: rgba(47, 0, 0, 0.66);
 }
 
 .field input,
@@ -511,12 +1008,11 @@
   font-family: var(--font-sans);
 }
 
-.field input::placeholder,
-.field textarea::placeholder {
-  font-family: var(--font-sans);
-  font-size: var(--t-small);
-  color: rgba(47, 0, 0, 0.42);
-}
+/* (`.field input::placeholder` / `.field textarea::placeholder` lived here,
+   setting a 0.42 tone — ~3.0:1 — on the four placeholders. There are no
+   placeholders on this form any more, so the rule is gone rather than left
+   as a trap for the next person to fill: a styled ::placeholder rule is an
+   invitation to add one back.) */
 
 .field input:focus,
 .field select:focus,
@@ -534,20 +1030,150 @@
   padding-right: 1.6em;
 }
 
+/* ---- THE PHONE FIELD — two controls, one field ----
+   The rule that makes them one thing lives HERE, on the row, and both
+   controls give theirs up. Anything else — two underlines, or a border round
+   the pair — reads as two fields that happen to be adjacent, and the whole
+   point of a dial-code picker is that it is part of the number.
+
+   `align-items: baseline` so the code and the number sit on the same
+   baseline rather than on the same box top; `auto` on the first track so the
+   select is exactly as wide as "+880 (BD)" and no wider. */
+.phoneRow {
+  display: grid;
+  grid-template-columns: auto minmax(0, 1fr);
+  align-items: baseline;
+  column-gap: clamp(10px, 1.2vw, 16px);
+  border-bottom: 1px solid rgba(47, 0, 0, 0.35);
+  transition: border-color 0.3s ease;
+}
+
+/* one underline, one focus state — whichever of the two has the caret */
+.phoneRow:focus-within {
+  border-color: var(--saffron);
+}
+
+/* `.field .phoneRow …`, two classes and an element, so it outranks the
+   `.field select` / `.field input` block above — which is where the border
+   and the 100% width come from, and both have to go for the row to own
+   them. (The same specificity trap that had the CV field's state text
+   rendering as a caps label; see `.field label.fileTrigger`.) */
+.field .phoneRow select,
+.field .phoneRow input {
+  border-bottom: none;
+}
+
+.field .phoneRow select {
+  width: auto;
+  /* the native arrow sits at `right 0.2em`; the code needs room beside it */
+  padding-right: 1.5em;
+  color: var(--maroon);
+}
+
+/* THE SELECT'S EMPTY STATE, TOLD APART FROM A CHOSEN ONE. "Select a role…"
+   is a real <option>, not a placeholder, so it survives focus — but rendered
+   in full-strength maroon it looks exactly like a picked value, which is the
+   same "is this filled in?" fault the placeholders had. The select is
+   `required` with an empty value, so `:invalid` is precisely "nothing
+   chosen": it takes the hint's tone until a role is picked, then goes to
+   full ink on its own. */
+.field select:invalid {
+  color: rgba(47, 0, 0, 0.66);
+}
+
 .submitRow {
   grid-column: 1 / -1;
   display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: clamp(12px, 1.6vw, 22px);
   justify-content: flex-start;
   margin-top: clamp(8px, 1.4vh, 16px);
 }
 
-.note {
-  grid-column: 1 / -1;
+/* (`.note` and `.submitAside` both lived here, and the CV field's hint went
+   with them. Between them they said, three times before the press, that this
+   form opens a `mailto:` draft and that a mailto draft cannot carry an
+   attachment. The repetition has been taken out; the fact has not. It is
+   carried by the card that appears AT the press — the moment the draft opens
+   and the reader can still act on it — which leads with "Attach your CV, then
+   send." and names the file they chose. See the comment at the submit row in
+   JoinUs.tsx: this is the one thing that must not be deleted outright, since
+   nothing here posts to a server. */
+
+/* ---- SUBMIT — Footer's `.inviteCta`, on cream ----
+   The rule this exists to enforce: the pill never changes SIZE. Hovering and
+   pressing only deepen the recess, so the control reads as being pushed
+   further in rather than growing. (MagneticButton, which used to sit here,
+   widens its padding by ~0.55em on hover and scales 0.97 on press.)
+
+   The recess is present — faintly — at rest, so hover only DEEPENS it; a
+   shadow that appears from nothing pops instead of easing. */
+.submitCta {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
   font-family: var(--font-sans);
-  font-size: var(--t-small);
-  opacity: 0.65;
-  margin: 0;
-  max-width: 56ch;
+  font-weight: 500;
+  /* the site's shared button size token */
+  font-size: var(--t-button);
+  line-height: 1;
+  white-space: nowrap;
+  color: var(--maroon);
+  /* the footer's pill is cream on maroon; this is its inverse on the cream
+     page — a whisper of maroon tint, so the recess has a surface to sink into */
+  background: rgba(47, 0, 0, 0.05);
+  border: none;
+  border-radius: 999px;
+  padding: 0.95em 1.9em;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  box-shadow: inset 0 2px 12px rgba(47, 0, 0, 0.12);
+  /* the recess is the ONLY thing that moves — no layout, no transform */
+  transition: box-shadow 320ms var(--ease-out);
+}
+
+.submitCtaLabel {
+  display: inline-block;
+}
+
+.submitCtaArrow {
+  display: grid;
+  place-items: center;
+  flex: none;
+}
+.submitCtaArrow svg {
+  width: 1.05em;
+  height: 1.05em;
+  display: block;
+  transition: transform 0.4s var(--ease-out);
+}
+
+/* HOVER: deeper recess, and the arrow leans — the only 2px of travel here */
+@media (hover: hover) and (pointer: fine) {
+  .submitCta:hover {
+    box-shadow: inset 0 4px 18px rgba(47, 0, 0, 0.26);
+  }
+  .submitCta:hover .submitCtaArrow svg {
+    transform: translateX(2px);
+  }
+}
+
+/* keyboard focus gets the same state */
+.submitCta:focus-visible {
+  outline: 2px solid var(--maroon);
+  outline-offset: 4px;
+  box-shadow: inset 0 4px 18px rgba(47, 0, 0, 0.26);
+}
+.submitCta:focus-visible .submitCtaArrow svg {
+  transform: translateX(2px);
+}
+
+/* press feedback — the recess goes deeper still, and quickly: the surface
+   is being pushed in under the finger */
+.submitCta:active {
+  box-shadow: inset 0 6px 24px rgba(47, 0, 0, 0.4);
+  transition: box-shadow 120ms var(--ease-out);
 }
 
 .successCard {
@@ -569,12 +1195,29 @@
 }
 
 /* ---- Responsive ---- */
-@media (max-width: 860px) {
-  .pillarGrid {
-    grid-template-columns: 1fr;
+@media (max-width: 980px) {
+  /* THREE REASONS DO NOT FIT IN THREE COLUMNS at 774px — each becomes a
+     19ch measure, which is a poem rather than a paragraph. Two columns, with
+     the third dropping under the first, keeps a readable line and keeps the
+     band from becoming a tall stack that competes with the form for the
+     screen. */
+  .reasons {
+    grid-template-columns: repeat(2, minmax(0, 1fr));
+    gap: clamp(26px, 4vh, 40px) clamp(28px, 4vw, 48px);
   }
-  .rolesHead,
-  .formHead {
+  /* the form column is already narrower than the tablet measure — it just
+     stops being a NARROWING, so it takes the measure it is given. 640 rather
+     than 560: the pairs still have to hold a dial code beside a number.
+     Not more than 600, either — the narrowing is the section's only
+     announcement, and at a 774px measure a 640px column was 83% of it,
+     which is not a narrowing, it is a margin. 600 is 78%. */
+  .formShell {
+    max-width: 600px;
+  }
+}
+
+@media (max-width: 860px) {
+  .rolesHead {
     grid-template-columns: 1fr;
     align-items: start;
   }
@@ -590,7 +1233,29 @@
   .roleDetail {
     grid-template-columns: 1fr;
   }
-  .formInner {
+}
+
+@media (max-width: 600px) {
+  .reasons {
     grid-template-columns: 1fr;
+    gap: clamp(24px, 3.4vh, 34px);
+  }
+  .formShell {
+    max-width: none;
+  }
+  /* PAIRS COLLAPSE. At 390 the measure is 358px, so a half is 171px — too
+     narrow for a phone number, and far too narrow for the position select's
+     options. One column, and the pairing is carried by order alone. */
+  .formInner {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  /* the head is centred at every width above this; on a 358px measure a
+     centred three-line heading over a centred three-line paragraph is two
+     ragged diamonds, and the fields under them are left-aligned anyway */
+  .formHead {
+    text-align: left;
+  }
+  .formAside {
+    margin-inline: 0;
   }
 }

@@ -105,7 +105,7 @@
    spaced so it reads as a fine, quiet eyebrow above the big line */
 .titleSmall {
   display: block;
-  font-family: var(--font-serif);
+  font-family: var(--font-emphasis);
   font-weight: 200;
   font-size: var(--t-h3);
   letter-spacing: 0.12em;

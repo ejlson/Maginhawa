@@ -13,15 +13,94 @@
   vertical-align: bottom;
   /* natural word spacing between adjacent masks */
   margin-right: 0.24em;
-  padding-block: 0.14em;
-  margin-block: -0.14em;
+  /* 0.30em, not 0.14em. The old value cleared the UPRIGHT face's descenders
+     and nothing more, so any caller setting a saffron italic run inside a
+     mask — the About hero lede's "served with heart.", the statement band —
+     had the italic 'f'/'y' tails shorn flat. It never showed in layout: the
+     word's border box sits well inside the padding box, and what overflows is
+     the glyph's paint, which no box measurement reports. The rise below moves
+     with this number; they are one setting in two places. */
+  padding-block: 0.3em;
+  margin-block: -0.3em;
 }
 
 .mask:last-child {
   margin-right: 0;
 }
 
+/* THE WORD GAP IS A MARGIN; THIS IS THE WORD GAP'S MEANING.
+
+   Splitting on " " and restoring the gaps with `margin-right` above left the
+   block's TEXT as one run — `textContent` on the About statement was
+   "MaginhawaisTagalogforcomfortable—alifeofease." and every deck body the
+   same, so copy-and-paste, find-in-page, text extraction and any AT falling
+   back to content all read it that way. The deck's stated reason for being
+   CSS 3D rather than a canvas is that its nine chapter bodies stay readable to
+   something that reads text, which is precisely the claim that string breaks.
+   So a real U+0020 now sits between every pair of masks.
+
+   IT MUST COST NOTHING, and font-size: 0 is how. Removing the margin and
+   letting the space itself be the gap was the obvious alternative and it moves
+   the type: a natural space is ~0.25-0.28em depending on the face, against the
+   0.24em three callers' measures were set against. A zero-size space has zero
+   advance in any font, so the margin remains the only gap and not one word
+   moved. The character is still in the DOM, still in the selection, still in
+   `textContent` and `innerText`, and still a line-break opportunity — which
+   adjacent inline-blocks only offer by the object-replacement rule anyway. */
+.space {
+  font-size: 0;
+}
+
 .word {
   display: inline-block;
   will-change: transform;
+}
+
+/* The same word once its block has finished building — see `settled` in the
+   component. Identical to `.word` minus the promotion, so nothing about the
+   rendered type changes; the layer is simply given back. */
+.wordRested {
+  display: inline-block;
+}
+
+/* ---- the CSS driver (SplitWords `css` prop) ----
+   The same 145% rise the Motion path runs, expressed so that starting it
+   costs a class toggle rather than N animation instances. See the component's
+   header for which caller needs that and why.
+
+   The stagger is `--w * --sw-stagger` — each word carries its own index as a
+   custom property, so one declaration produces the whole cascade and the
+   browser resolves it during style, not during script. */
+.cssWord {
+  display: inline-block;
+  /* AT REST THE WORD IS RISEN. The animation is what pushes it down and
+     brings it back, so removing the class leaves the text where it belongs
+     instead of snapping it under the mask. */
+  transform: none;
+}
+
+.cssOn .cssWord {
+  /* `both` holds translateY(145%) through the delay, which is what makes the
+     stagger read as a stagger rather than as every word starting flat and
+     then jumping */
+  animation: swRise var(--sw-dur, 0.75s) cubic-bezier(0.22, 1, 0.36, 1)
+    calc(var(--sw-delay, 0s) + var(--w) * var(--sw-stagger, 0.04s)) both;
+  /* promoted only while the block is ON — so one panel's words, not nine
+     panels'. The Motion path's `.word` carries a standing will-change, which
+     is correct for a block that builds once when it scrolls into view and
+     wrong for nine that are mounted for the life of a page. */
+  will-change: transform;
+}
+
+@keyframes swRise {
+  from {
+    /* 145%: the clip window is padded 0.30em taller than the word's line box
+       to protect ITALIC descenders (see .mask), so the word has that much
+       further to travel before it clears. Derived from the padding, not
+       chosen — move one and move the other. */
+    transform: translateY(145%);
+  }
+  to {
+    transform: translateY(0%);
+  }
 }

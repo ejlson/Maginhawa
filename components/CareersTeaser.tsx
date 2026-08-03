@@ -12,7 +12,7 @@ import styles from "./CareersTeaser.module.css";
 import { JOBS } from "@/lib/jobs";
 import Reveal from "./Reveal";
 
-// The index shows the first four live roles; /join-us carries the rest.
+// The index shows the first four live roles; /careers carries the rest.
 const SHOWN = JOBS.slice(0, 4);
 
 const CULTURE: { image: string; label: string; copy: string }[] = [
@@ -136,7 +136,7 @@ export default function CareersTeaser() {
         <div className={styles.openings}>
           <div className={styles.openingsHead}>
             <span className={styles.openingsLabel}>Current Openings</span>
-            <Link href="/join-us" className={styles.cta}>
+            <Link href="/careers" className={styles.cta}>
               <span className={styles.ctaLabel}>See All Roles</span>
               <ThinArrow />
             </Link>
@@ -146,7 +146,7 @@ export default function CareersTeaser() {
             {SHOWN.map((job, i) => (
               <Reveal as="li" key={job.id} delay={i * 0.06}>
                 <Link
-                  href="/join-us#open-roles"
+                  href="/careers#open-roles"
                   className={styles.roleRow}
                   aria-label={`${job.title} at ${job.restaurantName} — read the details`}
                 >

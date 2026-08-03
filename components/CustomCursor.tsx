@@ -77,7 +77,27 @@ export default function CustomCursor() {
       y: number,
       el: Element | null
     ): { mode: Mode; bound: Element | null } => {
-      const zone = el?.closest?.('[data-cursor="glass"]') ?? null;
+      /* Resolve to the NEAREST data-cursor ancestor and then ask what it
+         says, rather than searching for the nearest "glass" one. The two
+         differ wherever a zone is nested inside a glass zone, which is the
+         only way a nested section can own its cursor.
+
+         `default` IS AN OPT-OUT, and it was not. It only declined to be a
+         glass ZONE, then fell through to the media test below — so it worked
+         on an opaque cream page (where the test finds nothing) and did
+         nothing at all anywhere the section contains photography. The About
+         page's story deck is exactly that case: nine large photographs inside
+         the pinned video's glass scope, so the disc still sprang across the
+         chapter being read, over the copy beside it and over the year wheel,
+         with the cards themselves rotating in 3D underneath it. The attribute
+         now means what its name says — this subtree has no glass cursor,
+         whatever is in it — and it is used (see .story in About.tsx).
+         Anything else is a no-op, so `data-cursor` values other than the two
+         still fall through to the media test as before. */
+      const z = el?.closest?.("[data-cursor]") ?? null;
+      const declared = z?.getAttribute("data-cursor");
+      if (declared === "default") return { mode: "off", bound: null };
+      const zone = declared === "glass" ? z : null;
       const bound = zone ?? visibleMediaAt(x, y);
       if (!bound) return { mode: "off", bound: null };
       return { mode: el?.closest?.("a, button") ? "button" : "zone", bound };

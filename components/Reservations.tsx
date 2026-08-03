@@ -58,6 +58,33 @@ const PULL = 0.75;
 // pointer would flip button<->zone mode repeatedly on the way to rest.
 const MAGNET_SPRING = { stiffness: 260, damping: 22, mass: 0.5 };
 
+/* ---------- the live clock ----------
+
+   EUROPE/LONDON, never the visitor's zone. A reader in Manila told "it's
+   4:12am" about a London restaurant group has been handed a fact about
+   themselves, not about us; the whole point of the device is that it is
+   addressed to the reader ABOUT this place, now.
+
+   24-HOUR, and that is a layout decision as much as a register one. `h23`
+   always yields five characters (`00:07`, `16:12`), so the token's box never
+   changes width between one minute and the next — where a 12-hour clock
+   swings between `4:12 pm` (7) and `12:34 pm` (8) and would jiggle the
+   sentence around it twice a day. en-GB reads 24-hour natively anyway.
+
+   Built once at module scope: an Intl formatter is expensive to construct
+   (~0.1ms) and this one is stateless, so re-making it every tick would be
+   pure waste. */
+const LONDON_CLOCK = new Intl.DateTimeFormat("en-GB", {
+  timeZone: "Europe/London",
+  hour: "2-digit",
+  minute: "2-digit",
+  hourCycle: "h23",
+});
+// What the SERVER renders. It must be the same five-character shape as a real
+// value (see `.clockTime`'s reserved box) so the sentence does not reflow when
+// the real time lands after mount.
+const CLOCK_PLACEHOLDER = "--:--";
+
 export default function Reservations() {
   const ref = useRef<HTMLElement>(null);
 
@@ -171,10 +198,13 @@ export default function Reservations() {
             the bookable four here as well would be the same restaurants a
             third time, and the third telling loses hardest.
 
-            Two elements, and no eyebrow above them. A "Reservations" label
-            over a five-word invitation was captioning a sentence that already
-            says what it is, and it broke the centred lockup into three
-            weights where the film only needs two.
+            Four elements now, and the line above the heading is back — but
+            it is a different KIND of thing from the "Reservations" eyebrow
+            that was removed. That label captioned a sentence which already
+            said what it was; a live London clock states something the page
+            could not otherwise know, changes every minute, and is addressed
+            to whoever is reading at that minute. A static label earns its
+            line once; this one earns it continuously.
 
             ONE direct child by design. `.cta` is pointer-events: none with
             `.cta > *` restoring auto (it covers the whole stage and must not
@@ -184,12 +214,100 @@ export default function Reservations() {
             rule or its links would silently stop being clickable. */}
         <div className={styles.cta}>
           <div className={styles.book}>
+            <LondonClock />
             <h2 className={styles.title}>Pull up a chair.</h2>
+            {/* ON the centre line, deliberately — NOT splayed into the bottom
+                corners the way the reference CTA does it. That reference can
+                afford corners because its wash is uniform; ours is a centred
+                pool that releases toward the edges (see `.locScrim`), so copy
+                in the corners would drag the dark back out to the frame edges
+                and undo the one change that gives the photograph back.
+
+                ABOVE the pill, not below it. Measured at 1920x1080 the block
+                ran 17 / 43 / 34px between its four elements, which left the
+                button with 43px over it and 34px under — near-symmetrical, so
+                it read as centred INSIDE the lockup rather than as its last
+                move, and the section ended on an explanation after handing the
+                reader the action. Ordering it context → hook → why → action
+                puts the stack's largest gap under the heading where it belongs
+                and gives the pill the bottom of the block to itself.
+
+                The punctuation is load-bearing too: as one 470.4px
+                (--measure-tight) em-dashed sentence this broke INSIDE the
+                clause, splitting "Caribbean," from "ramen, ice cream". A full
+                stop after the first claim gives the line a natural place to
+                turn.
+
+                Every claim here is checkable against lib/restaurants.ts:
+                eight entries, of which Bunso (L181) carries
+                `comingSoon: true` (L191) — so seven trading and an eighth
+                on the way; every `location` is a London one (L48, 73, 91,
+                104, 130, 143, 163, 186); and the four cuisines named are
+                Bintang/Ramo/Belly/Bunso "Filipino" (L45, 101, 160, 183),
+                Guanabana/Hoodwood "Caribbean" (L70, 127), Ramo "Ramen"
+                (L101) and Mamasons "Ice Cream Parlour" (L88). No founding
+                year, no covers count, no award — the Michelin line is
+                already carried five times higher up this page. */}
+            <p className={styles.support}>
+              Seven places across London. Filipino, Caribbean, ramen, ice cream
+              — with an eighth on the way.
+            </p>
             <MagneticCta />
           </div>
         </div>
       </div>
     </section>
+  );
+}
+
+/**
+ * The live line above the invitation: "IT'S 16:12 IN LONDON".
+ *
+ * It says the TIME and nothing else. `lib/restaurants.ts` carries no opening
+ * hours — only `bookable`, `bookingUrl`, `addresses` and `comingSoon` — so any
+ * sentence about a kitchen being open, still serving, or holding a table
+ * tonight would be invented. The time itself is the one temporal fact this
+ * repo can actually stand behind, and it is enough: it makes the close read as
+ * addressed to a person who is here now rather than to nobody in particular.
+ *
+ * HYDRATION. The server's clock is not the reader's, so rendering a real time
+ * during SSR guarantees a text mismatch on hydration — and React 19 recovers
+ * from one by re-rendering the whole subtree client-side, which on a section
+ * this animation-heavy is a visible blank. So the server renders a placeholder
+ * of the SAME character count and the real value only ever arrives in an
+ * effect. Nothing about the markup differs between the two passes except the
+ * five characters inside a box that is sized to hold them either way.
+ */
+function LondonClock() {
+  const [clock, setClock] = useState(CLOCK_PLACEHOLDER);
+
+  useEffect(() => {
+    let timer = 0;
+    const tick = () => {
+      setClock(LONDON_CLOCK.format(new Date()));
+      // Re-arm ON the next minute boundary rather than polling every 60s from
+      // mount: a fixed interval starts wherever the page happened to load, so
+      // half the time the displayed minute would be up to 59s stale. Chasing
+      // the boundary keeps it under a second wrong, for the same one wake-up
+      // per minute. The 250ms cushion covers timer coarsening — firing a hair
+      // EARLY would format the minute we are leaving and then sit on it for
+      // another full minute.
+      timer = window.setTimeout(tick, 60_000 - (Date.now() % 60_000) + 250);
+    };
+    tick();
+    return () => window.clearTimeout(timer);
+  }, []);
+
+  return (
+    <p className={styles.clock}>
+      {/* Not a <time> element: its `datetime` attribute would have to be
+          absent (or wrong) for the placeholder, and a valid <time> demands a
+          parseable machine value, which "--:--" is not. The live region is
+          also deliberately absent — a clock that announced itself to a screen
+          reader every sixty seconds would interrupt the page for a fact
+          nobody asked for. */}
+      It’s <span className={styles.clockTime}>{clock}</span> in London
+    </p>
   );
 }
 

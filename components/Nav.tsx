@@ -16,7 +16,7 @@ const LINKS = [
   { label: "Restaurants", href: "/restaurants" },
   { label: "Blog", href: "/blog" },
   { label: "About Us", href: "/about" },
-  { label: "Careers", href: "/join-us" },
+  { label: "Careers", href: "/careers" },
   { label: "Contact Us", href: "/contact" },
 ];
 

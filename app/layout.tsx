@@ -1,5 +1,4 @@
 import type { Metadata } from "next";
-import { DM_Mono, Hanken_Grotesk } from "next/font/google";
 import "./globals.css";
 import PageTransition from "@/components/PageTransition";
 import CustomCursor from "@/components/CustomCursor";
@@ -7,26 +6,18 @@ import GlassFilters from "@/components/GlassFilters";
 import SmoothScroll from "@/lib/SmoothScroll";
 import { OrganizationJsonLd, WebSiteJsonLd } from "@/lib/jsonld";
 
-/* The site's single text family — a warm humanist grotesk. Variable (wght
-   100–900), so one file covers every weight in use, from the 200 eyebrows to
-   the 500 headings; true italics for the emphasis spots Fraunces used to
-   carry. Contralto (Adobe Fonts, below) survives only at wordmark scale. */
-const hanken = Hanken_Grotesk({
-  subsets: ["latin"],
-  style: ["normal", "italic"],
-  variable: "--font-hanken",
-  display: "swap",
-});
+/* NO next/font LOADER, AND THAT IS THE POINT.
+   The site ran Hanken Grotesk and DM Mono through next/font/google — two
+   self-hosted families, two preloaded woff2 files on every route. Both are
+   retired: the text voice is Helvetica now (see globals.css), which is
+   resident on macOS/iOS and metrically matched by Arial on Windows and
+   Liberation Sans on Linux. A resident face makes no request, so it cannot
+   FOUT and there is nothing left to preload.
 
-/* The UI-chrome voice (Telescope grammar): one mono face, caps, reserved
-   for labels, pills, counters and indicators — the only typographic
-   texture outside the Hanken system. Editorial copy never uses it. */
-const dmMono = DM_Mono({
-  subsets: ["latin"],
-  weight: ["400", "500"],
-  variable: "--font-dm-mono",
-  display: "swap",
-});
+   What next/font ALSO did was inject the `--font-hanken` / `--font-dm-mono`
+   custom properties onto <html>. Nothing reads them any more — globals.css
+   resolves --font-sans and --font-mono straight to the Helvetica stack — so
+   the className is empty and <html> carries no font class at all. */
 
 const SITE_URL = "https://maginhawa.group";
 
@@ -97,8 +88,28 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en-GB" className={`${hanken.variable} ${dmMono.variable}`}>
+    <html lang="en-GB">
       <head>
+        {/* Contralto (Adobe Fonts kit pev2vne) is now the ONLY web font on
+            the site, so its round-trip is the whole font critical path —
+            and it is a two-hop one: the kit CSS comes from use.typekit.net
+            and the woff2 files it @font-faces come from p.typekit.net.
+            Warming both connections costs two link tags and saves the
+            DNS + TLS handshake on the second hop, which used to be hidden
+            behind next/font's self-hosted files.
+            crossOrigin is required — fonts are always fetched in CORS mode,
+            and a preconnect without it warms a connection the font request
+            then refuses to reuse. */}
+        <link
+          rel="preconnect"
+          href="https://use.typekit.net"
+          crossOrigin="anonymous"
+        />
+        <link
+          rel="preconnect"
+          href="https://p.typekit.net"
+          crossOrigin="anonymous"
+        />
         <link rel="stylesheet" href="https://use.typekit.net/pev2vne.css" />
         <OrganizationJsonLd />
         <WebSiteJsonLd />

@@ -22,3 +22,74 @@
   height: 100%;
   object-fit: cover;
 }
+
+/* THE SLOW-NAVIGATION INDICATOR — see PageTransition.tsx for when it is
+   allowed to exist at all (it is mounted only past a threshold the happy path
+   has already cleared, so it never flashes on a fast route change).
+
+   Placed against the curtain's own corner rather than the viewport's, so it
+   rides the sheet: while the curtain is travelling this moves with it, which
+   is the spatial rule the whole transition is built on — the loading state
+   belongs to the sheet that is covering the page, not to the page underneath
+   it. */
+.loader {
+  position: absolute;
+  right: clamp(20px, 3.2vw, 44px);
+  bottom: clamp(20px, 3.2vh, 40px);
+  display: flex;
+  align-items: center;
+  gap: 0.7em;
+  font-family: var(--font-ui);
+  font-weight: 400;
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--cream);
+  /* the curtain is modal and absorbs clicks by design; this must not be the
+     thing that catches one */
+  pointer-events: none;
+}
+
+/* A ring with one open quadrant — the turn is legible because the gap is,
+   and a gap costs nothing to draw. `border-*-color: transparent` rather than a
+   conic gradient or an SVG arc: one element, no paint per frame, and the
+   rotation is a compositor transform. */
+.loaderRing {
+  width: 0.95em;
+  height: 0.95em;
+  border-radius: 50%;
+  border: 1px solid rgba(250, 247, 241, 0.28);
+  border-top-color: var(--cream);
+  /* the ring is the only thing in the corner that moves, so it is the only
+     thing that has to be promoted */
+  will-change: transform;
+  animation: loaderSpin 0.9s linear infinite;
+}
+
+@keyframes loaderSpin {
+  to {
+    transform: rotate(360deg);
+  }
+}
+
+/* REDUCED MOTION KEEPS THE INDICATOR AND DROPS THE SPIN — the message is
+   "still working", which is information rather than decoration, so the answer
+   is a gentler equivalent rather than nothing. A slow opacity breath at 0.5Hz
+   sits well clear of the ~0.2Hz band that reads as a distracting oscillation,
+   and it is opacity only: no rotation, no travel, nothing vestibular. */
+@media (prefers-reduced-motion: reduce) {
+  .loaderRing {
+    animation: loaderBreathe 2s ease-in-out infinite;
+    border-color: rgba(250, 247, 241, 0.55);
+  }
+}
+
+@keyframes loaderBreathe {
+  0%,
+  100% {
+    opacity: 0.35;
+  }
+  50% {
+    opacity: 1;
+  }
+}

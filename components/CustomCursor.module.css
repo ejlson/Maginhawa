@@ -1,3 +1,74 @@
+/* ---------------------------------------------------------------------------
+   `data-cursor="default"` GIVES THE NATIVE CURSOR BACK, and without this rule
+   it took one away instead.
+
+   THE BUG, and it is a cascade bug rather than a logic one. resolve() below
+   already treats `default` as a full opt-out: it returns mode "off", the disc
+   scales to 0, and the html.glass-cursor class comes off so the native cursor
+   is no longer hidden BY THE CLASS. What it cannot touch is the other half of
+   that rule in app/globals.css:
+
+     [data-cursor="glass"], [data-cursor="glass"] * { cursor: none }
+
+   which is STATIC. Every `default` zone on this site is nested inside a glass
+   one — that is the only reason the value exists — so the subtree that just
+   declined the glass cursor is still being told to draw no cursor at all. The
+   reader is left with nothing: no disc, no arrow, no I-beam.
+
+   Measured on /about, where both cases live:
+     - the story deck (.story) declines the zone, so the disc is off and the
+       pointer simply disappeared over the nine cards, the copy and the wheel;
+     - the Awards sheet (.coverage) is an opaque CREAM table, where a lens
+       refracting a flat field refracts nothing and the disc's ring is itself
+       cream — the disc was live and invisible, with the native cursor hidden
+       underneath it. Same symptom, different half of the mechanism.
+
+   `auto` PLUS AN EXPLICIT `pointer` LIST, and the obvious one-liner does not
+   work — this is worth recording because it looks like it should.
+
+   The tidy fix is `cursor: revert`, which rolls the property back past the
+   whole author origin and lets each element land on whatever the UA says: a
+   hand on links, an I-beam on text, an arrow elsewhere. It fails, and it fails
+   silently. `cursor` is an INHERITED property, so reverting the author origin
+   on an element with no user or UA declaration of its own does not reach
+   `auto` — it reaches the INHERITED value, which is the `none` that
+   [data-cursor="glass"] put on the ancestor. Measured: computed cursor still
+   `none` on the section and on every child, with the rule matching.
+
+   So the value is stated. `auto` gives the UA its choice per element (I-beam
+   over text, arrow elsewhere) and the second rule restores the hand, because
+   `.optOut[data-cursor="default"] *` at (0,2,0) would otherwise beat the UA
+   sheet's `a:link { cursor: pointer }` and quietly flatten every link in the
+   subtree to an arrow.
+
+   IT LIVES HERE rather than in the page's own stylesheet because the attribute
+   is this component's vocabulary. A page that writes data-cursor="default"
+   should get the whole meaning of it without also knowing what globals.css
+   does about cursors.
+
+   IT IS A CLASS AND AN ATTRIBUTE TOGETHER, and both halves are load-bearing.
+   The class is what makes the rule legal: Next's CSS Modules rejects any
+   selector carrying no local class ("pure selectors must contain at least one
+   local class or id"), so a bare [data-cursor="default"] cannot be written in
+   a module file at all, and a :global() wrapper does not satisfy it either.
+   The attribute is what makes the rule WIN: `.optOut *` alone is (0,1,0),
+   which ties globals.css and hands the decision to whichever stylesheet the
+   bundler emitted last. With the attribute both selectors are (0,2,0).
+
+   Apply it wherever data-cursor="default" is written:
+     className={`${styles.thing} ${cursor.optOut}`} data-cursor="default" */
+.optOut[data-cursor="default"],
+.optOut[data-cursor="default"] * {
+  cursor: auto;
+}
+
+.optOut[data-cursor="default"] a,
+.optOut[data-cursor="default"] button,
+.optOut[data-cursor="default"] summary,
+.optOut[data-cursor="default"] [role="button"] {
+  cursor: pointer;
+}
+
 /* Glass cursor — the glass is real refraction: backdrop-filter runs the
    page behind the disc through the #lg-lens SVG displacement filter
    (GlassFilters.tsx), so content bends at the rim instead of being

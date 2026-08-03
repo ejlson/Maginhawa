@@ -184,7 +184,7 @@
 .directLine {
   position: relative;
   font-family: var(--font-sans);
-  font-weight: 300;
+  font-weight: var(--w-regular);
   font-size: var(--t-lead);
   line-height: var(--lh-snug);
   color: var(--cream);
@@ -393,5 +393,5 @@
 
 .developer {
   font-family: var(--font-sans);
-  font-weight: 200;
+  font-weight: var(--w-hairline);
 }

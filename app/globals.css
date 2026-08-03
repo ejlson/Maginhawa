@@ -2,9 +2,11 @@
    Maginhawa Group — global styles & editorial design tokens
    =========================================================== */
 
-/* Contralto (Adobe Fonts / Typekit kit pev2vne) — loaded via <link> in the
-   document head. Falls back to a system serif if the kit isn't authorised
-   for the current domain. */
+/* TYPE: two families, Helvetica and Contralto. See the font block in :root.
+   Helvetica is resident (no request, no FOUT). Contralto is the only web
+   font left — Adobe Fonts / Typekit kit pev2vne, loaded via <link> in the
+   document head, preconnected in layout.tsx; it falls back to a system serif
+   if the kit isn't authorised for the current domain. */
 
 :root {
   /* warm paper — lifted from the old parchment cream (#f8f3ea): lighter and
@@ -28,33 +30,146 @@
      clears 5:1 while still reading unmistakably as the saffron accent. */
   --saffron-ink: #8f5220;
 
-  /* TWO-FAMILY SYSTEM. Hanken Grotesk (variable, via next/font) is the
-     site's single text voice — headings, body, buttons, labels, eyebrows.
-     Contralto (Adobe Fonts) survives ONLY at brand-wordmark scale, through
-     --font-display-big. The rule: if it isn't a stretched MAGINHAWA-style
-     wordmark moment, it's the grotesk. */
-  --font-sans: var(--font-hanken), -apple-system, "Helvetica Neue", Arial, sans-serif;
+  /* =========================================================================
+     TWO FAMILIES, AND THIS TIME IT IS TRUE.
 
-  /* Legacy names from the old three-family (Contralto/Fraunces/Inter)
-     system — kept as ALIASES so the swap is one token-level change instead
-     of a 60-file edit. All of them resolve to the grotesk now; keep using
-     the alias that matches the ROLE so a future re-pairing stays cheap. */
+     The site claimed a two-family system while shipping four: Hanken Grotesk
+     (next/font, the whole text voice), DM Mono (labels and counters),
+     Contralto (wordmarks) and Helvetica (the navbar and the clock). Hanken
+     and DM Mono are gone. What is left is HELVETICA for everything that is
+     read, and CONTRALTO for the brand's wordmark moments.
+
+     Helvetica is not loaded — it is resident on every macOS and iOS device,
+     and Arial is metrically compatible to the pixel on Windows, Liberation
+     Sans on Linux. So the text voice now costs zero bytes and cannot FOUT.
+     Only Contralto crosses the network (the Adobe kit in layout.tsx).
+
+     WHAT IT COSTS. Hanken was variable 100–900 and this site used 200 / 400
+     / 500. Helvetica is not variable and does not have all three — but it
+     has more than the two it is usually credited with, and the difference
+     turned out to matter. Measured, not assumed (scripts/probe-type-faces.mjs
+     plus a read of the OS/2 tables in /System/Library/Fonts/Helvetica.ttc):
+
+       Helvetica              usWeightClass 400   italicAngle   0
+       Helvetica Oblique      usWeightClass 400   italicAngle -12
+       Helvetica Light        usWeightClass 300   italicAngle   0
+       Helvetica Light Obl.   usWeightClass 300   italicAngle   0
+       Helvetica Bold         usWeightClass 700   italicAngle   0
+       Helvetica Bold Obl.    usWeightClass 700   italicAngle -12
+
+     So on macOS and iOS there IS a real Light and a real drawn Oblique.
+     Arial (Windows) and Liberation Sans (Linux) have Regular and Bold and
+     nothing else. Every weight decision below is written against that split.
+     ========================================================================= */
+
+  /* THE TEXT VOICE. Every word on the site that is not a wordmark.
+     Arial is not a fallback so much as the same design — metrically
+     compatible, so a Windows reader gets the same measured width to the
+     pixel. Liberation Sans does that job on Linux. */
+  --font-ui: Helvetica, "Helvetica Neue", Arial, "Liberation Sans", sans-serif;
+  --font-sans: var(--font-ui);
+
+  /* ROLE ALIASES, kept so the family decision stays ONE token-level change
+     instead of a 60-file edit, and so a future re-pairing (giving the
+     display roles back to Contralto's smaller optical cuts, say) is cheap.
+     Keep using the alias that matches the ROLE — every one of them resolves
+     to Helvetica today, and that is not meant to be permanent. */
   --font-display: var(--font-sans);
-  --font-serif: var(--font-sans);
   --font-display-sm: var(--font-sans);
   --font-display-xs: var(--font-sans);
 
-  /* the UI-CHROME voice (Telescope grammar): mono caps for labels, pills,
-     counters and indicators only — never editorial copy. Pairs with a
-     tighter +0.03em tracking than the sans labels carried
-     (--tr-label-mono below). */
-  --font-mono: var(--font-dm-mono), ui-monospace, "SFMono-Regular", Menlo,
-    Consolas, monospace;
-  --tr-label-mono: 0.03em;
+  /* the italic-emphasis voice — the hero kicker, .emItalic, the About title.
+     VERIFIED NOT SYNTHESISED, and the verification is worth describing
+     because the obvious test gives the wrong answer. Helvetica Oblique is
+     metrically IDENTICAL to Helvetica Roman: same advance, glyph for glyph.
+     So measuring the width of an italic string and comparing it to the roman
+     proves nothing — a sheared roman and a drawn oblique measure the same,
+     and the width test reports "synthesised" in both cases.
+     The test that works is a PIXEL diff of three renderings (roman / italic /
+     italic with `font-synthesis: none`). Suppressing synthesis changed
+     nothing and both italics differ from the roman, i.e. the browser is
+     picking up a drawn face, not shearing. Arial Italic and Liberation Sans
+     Italic are drawn faces too, so the emphasis voice is real everywhere.
+     See scripts/probe-type-faces.mjs. */
+  --font-emphasis: var(--font-sans);
 
-  /* the one surviving Contralto stack — big optical cut for the huge
-     edge-to-edge wordmarks (hero / footer / loader / STARTS WITH YOU) */
+  /* THE LABEL VOICE — eyebrows, counters, pills, indicators. It used to be
+     DM Mono, and the family WAS the distinction: a monospace next to a
+     grotesk told you at a glance that a line was apparatus rather than
+     prose. That signal is gone and cannot be bought back inside one family,
+     so the remaining three carry it:
+       CASE      — labels are uppercase, prose never is.
+       TRACKING  — --tr-label-mono below, opened out to the site's own
+                   uppercase value. 0.03em was tuned against a monospace's
+                   already-generous fixed advances; Helvetica's caps are
+                   tighter and at 13px they close up into a block without it.
+                   The two tracking tokens now hold the same value, which is
+                   honest: what --tr-label-mono encoded was a FAMILY
+                   difference, and there is no second family left to track
+                   differently. It stays a separate token so re-pairing is
+                   one line.
+       FIGURES   — `font-variant-numeric: tabular-nums` wherever a number
+                   changes in place (the journal counter, the home clock).
+                   The monospace gave that for free; Helvetica's lining
+                   figures happen to share one advance too, but the fallback
+                   stack's need not, so the declaration is load-bearing now.
+     The token name survives the face — six stylesheets point at it, two of
+     them owned by other work in flight. Renaming it to --font-label is the
+     right follow-up, not something to do underneath someone. */
+  --font-mono: var(--font-sans);
+  --tr-label-mono: var(--tr-label);
+
+  /* THE WORDMARK VOICE — Contralto, the brand's own face, from the Adobe
+     kit. Two optical cuts are in use:
+       --font-display-big   the huge edge-to-edge wordmarks (hero / footer /
+                            loader / STARTS WITH YOU)
+       --font-display-small the restaurant names on the showcase, which are
+                            set at heading rather than banner scale and want
+                            the small cut's sturdier strokes.
+     Both cuts carry true italics and a real 400/700; the big cut adds
+     300 / 600 / 900. That range is the argument for eventually giving the
+     display roles back to Contralto — Helvetica cannot offer it. */
   --font-display-big: "contralto-big", "contralto-medium", "Times New Roman", serif;
+  --font-display-small: "contralto-small", "contralto-medium", "Times New Roman",
+    serif;
+
+  /* WEIGHTS — three tiers, and only two of them survived the swap intact.
+
+     --w-medium IS GONE. It was 500. Nothing in the Helvetica stack draws a
+     500: CSS weight matching for a desired 500 looks at 500, then descends,
+     and lands on Regular. Pixel-verified — a 500 and a 400 render byte-
+     identical. The token now says 400 because that is what the screen shows;
+     leaving 500 in it would have been a number that no face on any platform
+     can honour. This is the LOUDEST visible change on the site: 86 literal
+     `font-weight: 500` declarations across the stylesheets resolve the same
+     way, so most section headings, card titles and eyebrows have stepped
+     down one notch of colour. Hierarchy is now carried by SIZE, CASE and
+     COLOUR rather than by weight.
+
+     --w-hairline SURVIVES, AT 300 RATHER THAN 200, and this is the one place
+     the "Helvetica only has Regular and Bold" shorthand would have cost real
+     design. macOS and iOS ship Helvetica Light (usWeightClass 300) inside
+     Helvetica.ttc, so 300 lands on a genuinely lighter DRAWN face for every
+     Apple reader — which is most of this site's audience. 200 does not: it
+     descends, finds nothing at or below 200, ascends, and arrives at the
+     same Light, so 300 is simply the honest spelling of what 200 was already
+     rendering. On Windows (Arial) and Linux (Liberation Sans) there is no
+     Light and 300 resolves to Regular — a graceful step down, NOT a
+     synthesised one. Browsers synthesise BOLD; they never shear a thin face
+     out of a roman. So the About page's hero kicker and its "GROUP?" keep
+     their hairline on Apple and read Regular elsewhere, which is exactly the
+     trade the old Hanken 200 was making anyway.
+
+     --w-bold is the real second step, and it is new. Nothing uses it yet;
+     putting Helvetica Bold under a 5rem display line is a design decision,
+     not a token swap. It is declared so the next person does not reach for
+     600 (which matches UPWARD to Bold and would surprise them).
+
+     Verified: scripts/probe-type-faces.mjs, PLATFORM FACE + WEIGHTS. */
+  --w-hairline: 300;
+  --w-regular: 400;
+  --w-medium: var(--w-regular);
+  --w-bold: 700;
 
   /* fluid type scale (~Perfect Fourth, 1.333) — clamp(min, fluid, max) */
   --t-hero: clamp(3.4rem, 13vw, 13rem); /* giant Maginhawa wordmark   */
@@ -92,10 +207,13 @@
   /* comfortable measure for long-form copy */
   --measure: 62ch;
 
-  /* the secondary/ranged-copy measure. 60ch = 74 real characters in Hanken
-     Grotesk (1ch = the "0" advance = 0.56em; the average prose character in
-     running copy is 0.4537em), for --t-small copy set ragged. Distinct from
-     --measure, which is the long-form 16px reading measure. */
+  /* the secondary/ranged-copy measure, for --t-small copy set ragged.
+     Distinct from --measure, which is the long-form 16px reading measure.
+     `ch` survived the family change intact: 1ch is the "0" advance, and
+     Helvetica draws it at 0.556em against Hanken's 0.56em — a 0.7%
+     difference, so every ch-based max-width on the site (and the clock's
+     5ch reservation) holds to within a pixel. Arial and Liberation Sans
+     are 0.556em too. */
   --measure-tight: 60ch;
 
   /* the golden ratio, named so the hard-coded 1.618/0.618 values in
@@ -427,7 +545,8 @@ html::-webkit-scrollbar {
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
-  font-weight: 500;
+  /* was a literal 500 — Helvetica has no 500, so this is what it renders */
+  font-weight: var(--w-regular);
   opacity: 0.75;
 }
 

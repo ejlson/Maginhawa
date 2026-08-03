@@ -61,14 +61,28 @@ export default function Contact({ standalone = false }: ContactProps) {
                 </a>
               </p>
             </Reveal>
-            <Reveal delay={0.08}>
-              <div className={styles.label}>Opening Times</div>
+            {/* THE LABEL IS LOAD-BEARING — do not let it drift back to
+                "Opening Times". On a restaurant group's contact page that
+                wording reads as when the RESTAURANTS are open, and these are
+                not those: lib/contact.ts:13 marks the value a placeholder for
+                head-office hours, and the field is called `officeHours`. An
+                unqualified "09:00 – 17:00" under the wrong label is the kind
+                of wrong that sends someone to a locked door on a Saturday.
+                A second line spelling the same distinction out in prose used
+                to sit under the times. It has been removed: "OFFICE HOURS"
+                already carries it, and the sentence was the label restated at
+                greater length. If the label ever changes, the sentence has to
+                come back with it. */}
+            <Reveal delay={0.08} className={styles.infoTail}>
+              <div className={styles.label}>Office Hours</div>
               <p>{CONTACT.officeHours.days}</p>
               <p>{CONTACT.officeHours.time}</p>
             </Reveal>
           </div>
 
-          <Reveal delay={0.1}>
+          {/* the form takes the second and third tracks of the shared
+              dark-zone rail — see .formCell */}
+          <Reveal delay={0.1} className={styles.formCell}>
             <form
               className={styles.form}
               onSubmit={(e) => e.preventDefault()}

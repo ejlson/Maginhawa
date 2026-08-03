@@ -82,7 +82,7 @@ const ITEMS: DiscoverItem[] = [
     name: "Mamasons",
     tag: "London's First Filipino Ice Cream Parlor",
     location: "91 Kentish Town Rd · 32 Newport China Town",
-    image: null,
+    image: "/images/mamasons.jpg",
     logo: "/logo/mamasons.png",
     blurb:
       "London's first Filipino ice cream parlour — Manila-style dirty ice cream, scooped fresh across two sites.",
@@ -267,9 +267,76 @@ const DOLLY_EASE = [0.4, 0, 0.75, 0.55] as const;
 const FLIGHT_STAGGER = 0.14;
 const FLIGHT_SPRING = { type: "spring", duration: 1.6, bounce: 0 } as const;
 
+/* THE SPLIT, as ONE progress. Both springs below drive a single normalised
+   value each (0 → 1); every element that belongs to the beat reads that
+   value rather than running an animation of its own. A `duration`/`bounce`
+   spring's normalised trajectory is distance-independent, so mapping one
+   progress onto the two words' very different clearances is exactly the
+   motion they had when each carried its own spring — with the guarantee
+   that they, and the plate, can no longer drift apart by a frame. */
+const SPLIT_SPRING = { type: "spring", duration: 1.4, bounce: 0 } as const;
+const DEPART_SPRING = { type: "spring", duration: 1.2, bounce: 0 } as const;
+
+/* THE PULL. The plate between the words is not a second animation that
+   happens to overlap the split — its size IS the split's progress, so the
+   words read as prising it open.
+
+   IT ALSO HAS TO BE IN THE HOLE. The two are separate facts and only the
+   first is about size. "Our" and "Restaurants." are wildly different widths
+   and the line is centred AS A LINE, so the words' measured clearances come
+   out at 15px and 342px on a 1440 screen: the joint between them starts
+   163px LEFT of the screen centre and migrates right as the split runs,
+   arriving at the centre only when the split completes. The plate's seat is
+   centred on the screen throughout. So a plate whose WIDTH is a perfectly
+   respectable 70% of the gap still sits straight across the "R" for the
+   first three quarters of the beat — measured at +168px of intrusion on the
+   opening frames, where the plate is entirely behind the word. A width
+   ratio is the wrong invariant; it cannot see position at all.
+
+   So the pull owns two transforms, both read off the same progress:
+
+   x      the plate rides the GAP'S OWN CENTRE and eases onto its clamped
+          resting centre as the split completes. `pullFrom * (1 - p)` is
+          not an approximation of that centre — both words land exactly on
+          the deck's clearance by construction, so the gap's centre is
+          exactly linear in the progress, and it reaches the seat's centre
+          at p = 1 to the pixel. Which is what keeps the resting geometry
+          (line 664's clamp, the flight's seats) untouched.
+   scale  the growth curve below, under a hard CEILING of the clearance the
+          words have actually opened. The curve is the target; the ceiling
+          is a limit it may not exceed. Overlap is then impossible by
+          construction rather than by tuning — whatever the words do, and
+          however lopsided the opening, the plate cannot cross either one.
+
+   PLATE_SEED  the size it is born at, as a fraction of its resting size.
+   PULL_BIAS   the exponent the progress is raised to before it becomes
+               size. A hair over 1: the plate tracks the gap almost exactly
+               (the whole point — the plate IS the hole the words have
+               opened), with just enough lag through the spring's fast
+               opening to keep air on both sides. A monotonic
+               reparametrisation of the SAME progress, so both still land on
+               the same frame.
+   PLATE_DAWN
+   PLATE_LIT   the slice of progress the plate fades up over. It does not
+               begin at zero: the ceiling binds below ~0.05, where the hole
+               is still only the word gap, and a plate drawn edge to edge
+               with two letters reads as a mistake even when it is legal.
+   PULL_AIR    the air the ceiling keeps on each side. Bounding boxes are
+               not letterforms — side bearings and the display face's
+               overshoot both live inside the box — so the ceiling is drawn
+               a couple of pixels inside the measurement.
+
+   All of it is a pure function of the split. Nothing here has a clock. */
+const PLATE_SEED = 0.12;
+const PULL_BIAS = 1.15;
+const PLATE_DAWN = 0.05;
+const PLATE_LIT = 0.3;
+const PULL_AIR = 2;
+
 // the deck's build order — Bintang at the front (index 0), the other seven
-// stacking up behind it
-const GATHER_LEAD = 0.3;
+// stacking up behind it. Bintang carries no gather delay of its own: it is
+// the plate the split pulls open, so it is born with the split (see PULL
+// above) rather than arriving a beat into it.
 const GATHER_FROM = 0.7;
 const GATHER_STAGGER = 0.1;
 
@@ -475,6 +542,67 @@ function StagePrint({
   );
 }
 
+/* ONE WORD of the intro line.
+
+   The horizontal is READ from the split's own progress rather than animated
+   per word. That is the whole point of the beat: the plate between the two
+   words takes its size from the same two values, so the words parting and
+   the plate opening are arithmetically the same motion and cannot drift by
+   a frame however the springs are retuned. `split` carries the parting,
+   `depart` the exit through the screen edge; they are separate values (not
+   one 0 → 2 ramp) so the plate's own transform is provably at rest before
+   the flight takes the plate's scale over.
+
+   Two elements, as before, and they never fight: this span owns the
+   horizontal, the span inside it owns the vertical build out of the mask. */
+function IntroWord({
+  word,
+  wordRef,
+  split,
+  depart,
+  apart,
+  away,
+  risen,
+  delay,
+}: {
+  word: string;
+  wordRef: React.RefObject<HTMLSpanElement | null>;
+  // the parting, 0 → 1
+  split: MotionValue<number>;
+  // the exit through this word's own edge, 0 → 1
+  depart: MotionValue<number>;
+  // this word's measured clearance — how far it moves to open the deck
+  apart: number;
+  // …and how far past the screen edge it finally leaves
+  away: number;
+  risen: boolean;
+  delay: number;
+}) {
+  const x = useTransform(
+    [split, depart] as MotionValue<number>[],
+    ([s, d]: number[]) => apart * s + (away - apart) * d,
+  );
+  return (
+    <motion.span
+      ref={wordRef}
+      className={styles.introWord}
+      style={{ x }}
+      // the probes read the split off the real DOM rather than off
+      // instrumentation, the way the rest of this sequence is measured
+      data-intro-word=""
+    >
+      <motion.span
+        className={styles.introRise}
+        initial={{ transform: "translateY(115%)" }}
+        animate={{ transform: risen ? "translateY(0%)" : "translateY(115%)" }}
+        transition={{ duration: 0.85, ease: EASE, delay }}
+      >
+        {word}
+      </motion.span>
+    </motion.span>
+  );
+}
+
 // Per-cell slide choreography for the view switch (and the scroll-in
 // entrance). A custom with d < 0 means "appear in place, instantly" — the
 // first grid render after the assembly intro, where the plates' layoutId
@@ -595,6 +723,13 @@ export default function Discover() {
   const restRef = useRef<HTMLSpanElement>(null);
   const [splitL, setSplitL] = useState(60);
   const [splitR, setSplitR] = useState(320);
+  // …and the hole those clearances open, measured on the same line at the
+  // same moment: how wide it starts, and how far its centre sits from the
+  // deck's seat. The pull rides both — see PULL_AIR above. `splitGap` is 0
+  // until it has genuinely been measured, which is how the ceiling knows
+  // not to clamp a plate it has no geometry for.
+  const [splitGap, setSplitGap] = useState(0);
+  const [pullFrom, setPullFrom] = useState(0);
   // the intro line's fitted size (see the arming effect) — held in state so
   // React keeps it across the many re-renders the step clock causes
   const [titlePx, setTitlePx] = useState<number | null>(null);
@@ -647,6 +782,42 @@ export default function Discover() {
   const dolly = useMotionValue(0);
   // the cream paper dissolving the neighbouring chapters away
   const veil = useMotionValue(0);
+
+  /* THE SPLIT, and everything that belongs to it, as two normalised values.
+     These are the beat's ONLY clock — the words' x and the plate's size are
+     both pure functions of them, so "the words pull the plate open" is true
+     arithmetically and not just approximately in the timings. Driven
+     imperatively from the step below; read through MotionValues, so the
+     whole beat costs zero React renders. */
+  const split = useMotionValue(0);
+  const depart = useMotionValue(0);
+  // handles kept only so a route change mid-beat doesn't leave springs
+  // running against values nothing is watching
+  const splitAnims = useRef<{ stop: () => void }[]>([]);
+
+  /* THE PULL. Bintang's plate is seeded small IN THE JOINT BETWEEN THE TWO
+     WORDS and reaches its resting size, on its resting centre, exactly as
+     the words reach their clearances — same progress, one landing frame.
+     Transform and opacity only, and both legs are zero at p = 1: the seat's
+     box, the deck's centre and the plate's resting size are all exactly
+     what they were, so the flight that measures this seat later still
+     measures the same rectangle. */
+  const pullX = useTransform(split, (p) => pullFrom * (1 - clamp01(p)));
+  const pullScale = useTransform(split, (p) => {
+    const q = clamp01(p);
+    const want = PLATE_SEED + (1 - PLATE_SEED) * Math.pow(q, PULL_BIAS);
+    // THE CEILING: half the clearance the words have opened, less its air,
+    // as a fraction of the plate's resting width. Centred on that same
+    // clearance (pullX above), a plate at or under this literally cannot
+    // reach either word — the guarantee is geometric, not a tuning.
+    if (!splitGap || !plateW) return want;
+    const room =
+      (splitGap + (splitL + splitR) * q - PULL_AIR * 2) / plateW;
+    return Math.min(want, Math.max(0, room));
+  });
+  const pullFade = useTransform(split, (p) =>
+    clamp01((p - PLATE_DAWN) / (PLATE_LIT - PLATE_DAWN)),
+  );
 
   /* WHERE THE COMPOSITION SITS. The glide parks this point at the middle of
      the screen, so it decides the framing of the entire sequence.
@@ -810,6 +981,20 @@ export default function Discover() {
     );
   }, [dolly, lockPage, unlockPage]);
 
+  /* THE SPLIT FIRES. Two springs, one per leg, started from the step and
+     never stopped by it: the exit spring outlives its own step (DEPART's
+     1.2s runs on through FLIGHT, which is the overlap that makes the words
+     leaving and the plates departing one gesture), so a cleanup keyed on
+     `step` would freeze the words mid-exit the moment the flight began. */
+  useEffect(() => {
+    if (!intro) return;
+    if (step === STEP.SPLIT) {
+      splitAnims.current.push(animate(split, 1, SPLIT_SPRING));
+    } else if (step === STEP.DEPART) {
+      splitAnims.current.push(animate(depart, 1, DEPART_SPRING));
+    }
+  }, [intro, step, split, depart]);
+
   // The veil is scrubbed CLOSED on the way in (with everything else) and
   // animated back OPEN as the plates fly, so the page returns underneath
   // the grid forming on it. One value, two owners, never at the same time.
@@ -840,6 +1025,7 @@ export default function Discover() {
   useEffect(
     () => () => {
       timers.current.forEach(clearTimeout);
+      splitAnims.current.forEach((a) => a.stop());
       unlockPage();
       lenisRef.current?.start();
     },
@@ -883,9 +1069,14 @@ export default function Discover() {
 
       // The deck's VISUAL extent is the seat's half-width PLUS the back
       // plates' spread — clearing only the seat is exactly why the plates
-      // used to overlap the words. 16px of air past the outermost plate
-      // keeps the words hugging the deck rather than drifting wide of it.
-      const pad = plate / 2 + plate * BACK_SPREAD + 16;
+      // used to overlap the words. The trailing term is pure air past the
+      // outermost plate, and it is the ONLY part of this that is free: the
+      // other two are the deck's own width and cannot be spent without the
+      // gathered plates touching the type again. Cut 16 -> 6, which closes
+      // 20px of the hole across the line. If the gap should close further
+      // than this the back spread has to come down with it, which changes
+      // how the deck itself looks — not a number to trim quietly here.
+      const pad = plate / 2 + plate * BACK_SPREAD + 6;
 
       // FIT THE LINE. Both words must sit the same 16px off the deck AND
       // stay on screen, and "Restaurants." is three times the width of
@@ -920,6 +1111,10 @@ export default function Discover() {
         // deck equals the air on its right.
         setSplitL(Math.max(0, Math.round(ourB.right - (cx - pad))));
         setSplitR(Math.max(0, Math.round(cx + pad - restB.left)));
+        // the hole itself, off the same two boxes: the plate is pulled out
+        // of THIS, not out of the middle of the screen
+        setSplitGap(Math.max(0, Math.round(restB.left - ourB.right)));
+        setPullFrom(Math.round((ourB.right + restB.left) / 2 - cx));
       }
 
       // The trigger band guarantees we are CLOSE to centre; this short
@@ -1232,14 +1427,33 @@ export default function Discover() {
                 const gx = Math.round(o.x * plateW);
                 const gy = Math.round(o.y * plateW);
                 const f = flight?.[i];
-                return (
+                // Bintang, the plate the split opens on. It is the only one
+                // the words pull: the other seven gather BEHIND it once the
+                // hole is already there, on their own quiet springs.
+                const lead = i === 0;
+                const plate = (
                   <motion.div
                     key={it.slug}
                     className={styles.introPlate}
                     // Bintang on top, then the deck in dealing order — the
-                    // same order they leave in
-                    style={{ zIndex: ITEMS.length - i, borderRadius: 2 }}
-                    initial={{ opacity: 0, scale: 0.86, x: gx, y: gy }}
+                    // same order they leave in. When the pull wrapper is
+                    // present it owns the stacking (a scaled element is its
+                    // own stacking context, so a z-index inside it can no
+                    // longer lift the plate above its siblings).
+                    style={{
+                      zIndex: lead ? undefined : ITEMS.length - i,
+                      borderRadius: 2,
+                    }}
+                    // The lead plate arrives already at rest: its whole
+                    // entrance — size and fade — belongs to the pull
+                    // wrapper, which reads the split. Leaving a second scale
+                    // and a second fade on this element would be exactly the
+                    // overlapping-timelines read the pull replaces.
+                    initial={
+                      lead
+                        ? { opacity: 1, scale: 1, x: gx, y: gy }
+                        : { opacity: 0, scale: 0.86, x: gx, y: gy }
+                    }
                     animate={
                       f
                         ? // FLIGHT: one translate + one uniform scale onto
@@ -1250,7 +1464,7 @@ export default function Discover() {
                             x: gx + f.dx,
                             y: gy + f.dy,
                           }
-                        : step >= STEP.SPLIT
+                        : lead || step >= STEP.SPLIT
                           ? { opacity: 1, scale: 1, x: gx, y: gy }
                           : { opacity: 0, scale: 0.86, x: gx, y: gy }
                     }
@@ -1261,12 +1475,9 @@ export default function Discover() {
                             // gathering plates arrive on long, quiet
                             // springs — controlled, never busy
                             type: "spring",
-                            duration: i === 0 ? 1.2 : 1.1,
+                            duration: 1.1,
                             bounce: 0,
-                            delay:
-                              i === 0
-                                ? GATHER_LEAD
-                                : GATHER_FROM + (i - 1) * GATHER_STAGGER,
+                            delay: GATHER_FROM + (i - 1) * GATHER_STAGGER,
                           }
                     }
                   >
@@ -1286,6 +1497,40 @@ export default function Discover() {
                       <div className={styles.introFallback} />
                     )}
                   </motion.div>
+                );
+                /* THE PULL, as its own transform layer. The wrapper reads
+                   the split and owns nothing else; the plate inside it
+                   keeps the gather and the whole flight. Two layers rather
+                   than one because they have different owners and must
+                   never share a property: the flight animates the plate's
+                   `scale` to its tile's exact ratio and its `x` to its
+                   tile's exact seat, and a split-driven transform writing
+                   either key would fight it mid-air. Composed, the flight
+                   still lands on f.s and f.dx exactly, because the pull is
+                   provably an identity transform by then — x back to 0 and
+                   scale back to 1 the moment the split lands.
+
+                   Only the LEAD plate is wrapped. The seven behind it enter
+                   at p ≈ 0.95, by which point the pull's offset is under
+                   ten pixels, so the deck never comes apart. And the seat
+                   itself is deliberately outside the wrapper: `deckRef` is
+                   what the flight measures, and it must not move. */
+                return lead ? (
+                  <motion.div
+                    key={it.slug}
+                    className={styles.introPull}
+                    style={{
+                      zIndex: ITEMS.length,
+                      x: pullX,
+                      scale: pullScale,
+                      opacity: pullFade,
+                    }}
+                    data-deck-pull=""
+                  >
+                    {plate}
+                  </motion.div>
+                ) : (
+                  plate
                 );
               })}
             </div>
@@ -1308,44 +1553,29 @@ export default function Discover() {
                   settle); then, once the deck is complete, they carry on
                   out through their own screen edges (critically damped —
                   things leaving don't bounce), clipped by the section's
-                  overflow-x */}
+                  overflow-x.
+
+                  Both phases are READ from `split` and `depart` rather than
+                  animated here — see IntroWord. The plate between the words
+                  reads the same values, which is what makes it look pulled
+                  open by them rather than merely opening at the same time. */}
               {(
                 [
                   ["Our", ourRef, -splitL, -offX],
                   ["Restaurants.", restRef, splitR, offX],
                 ] as const
               ).map(([word, ref, apart, away], i) => (
-                <motion.span
+                <IntroWord
                   key={word}
-                  ref={ref}
-                  className={styles.introWord}
-                  animate={
-                    step >= STEP.DEPART
-                      ? { x: away }
-                      : step >= STEP.SPLIT
-                        ? { x: apart }
-                        : { x: 0 }
-                  }
-                  transition={
-                    step >= STEP.DEPART
-                      ? { type: "spring", duration: 1.2, bounce: 0 }
-                      : { type: "spring", duration: 1.4, bounce: 0 }
-                  }
-                >
-                  <motion.span
-                    className={styles.introRise}
-                    initial={{ transform: "translateY(115%)" }}
-                    animate={{
-                      transform:
-                        nearing || armed
-                          ? "translateY(0%)"
-                          : "translateY(115%)",
-                    }}
-                    transition={{ duration: 0.85, ease: EASE, delay: i * 0.09 }}
-                  >
-                    {word}
-                  </motion.span>
-                </motion.span>
+                  word={word}
+                  wordRef={ref}
+                  split={split}
+                  depart={depart}
+                  apart={apart}
+                  away={away}
+                  risen={nearing || armed}
+                  delay={i * 0.09}
+                />
               ))}
             </h2>
           </div>
@@ -1453,8 +1683,12 @@ export default function Discover() {
             fromAssembly ? { opacity: 1, x: furnitureIn ? 0 : offX } : undefined
           }
           // a hair behind the standfirst — the two arrive as one gesture
-          // from the right, not as a single rigid block
-          transition={spring(1, 0.18, fromAssembly && furnitureIn ? 0.08 : 0)}
+          // from the right, not as a single rigid block. ZERO bounce: this
+          // was the only overshoot left in the section (every other spring
+          // here is already critically damped) and at 0.18 the toggle
+          // visibly rode past its seat and came back, which is the one
+          // thing the rest of the choreography is careful never to do.
+          transition={spring(1, 0, fromAssembly && furnitureIn ? 0.08 : 0)}
         >
           <div
             className={styles.viewToggle}

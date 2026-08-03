@@ -178,7 +178,7 @@
   height: clamp(24px, 2.1vw, 36px);
 }
 .cardName {
-  font-family: "contralto-small", var(--font-sans);
+  font-family: var(--font-display-small);
   font-size: var(--t-h3);
 }
 .cardLoc {
@@ -289,21 +289,44 @@
    The toggle's mirror image: the same clamp() insets on the opposite edge,
    so the two sit on one optical line across the foot of the hero.
 
-   It borrows the toggle's plaque grammar — 999px, hairline, blur — but at a
-   DEEPER wash, and that number is measured rather than matched. In card view
-   .cards lays a full cream sheet under this corner (it is z-index 3, this is
-   5), and the toggle's rgba(18,0,0,0.42) over #faf7f1 composites to 152/255,
-   where cream type returns 2.7:1. At 0.68 the same corner lands at 88/255 →
-   6.6:1 on the cream sheet, and ~12:1 over the brightest frame the footage
-   can throw in wheel view. Stroked icons could live at 0.42; a sentence
-   cannot.
+   NOTHING BEHIND IT. It used to wear the toggle's grammar — 999px, hairline,
+   an 8px blur and a flat rgba(18,0,0,0.68) fill — which made two floating
+   chips in the corners of a full-bleed film. The type now sits DIRECTLY on
+   the picture.
+
+   NOR A SCRIM. A soft ellipse fitted to the note's footprint was built here
+   and measured — 7.05:1 on the worst of ten sampled frames in wheel view,
+   11.8:1 in card view — and then removed, because the ask was for the
+   background to go and a shaped wash is still a background. The numbers this
+   costs are in the probe below; run it before putting anything back.
+
+   NOT `mix-blend-mode: difference` either, which is the obvious way to get
+   "the nav's inverse effect" and the one that cannot be made to work here.
+   The blend fails in the MIDDLE of the tonal range, not at the ends: cream
+   differenced against a mid-tone returns a pale value at almost the same
+   luminance as its ground. The nav's own worst link measures 1.03:1 on `/`
+   and 2.31:1 on /about over exactly this kind of footage.
+
+   WHAT REMAINS IS THE INK, and the ink is not a background. It follows its
+   ground, which is two different things. In wheel view the note is on the
+   film, so it is cream. In card view .cards lays a full cream sheet across
+   this corner (it is z-index 3, this is 5) and cream on cream is not a risk,
+   it is 1:1 — invisible, with certainty, on every frame. So the note
+   inverts to maroon there. That is the same inversion the nav performs,
+   done by choosing a colour rather than by blending, which makes it
+   measurable.
+
+   The ink colour is the one paint-property transition here: 420ms on two
+   lines of text, fired by a click on the view toggle, not per-frame work.
 
    pointer-events: none is load-bearing, not tidiness. Below 980px .cards is
    its own scroll box and carries data-lenis-prevent, which Lenis resolves
-   from the wheel event's composed path. A plaque floating over that box and
+   from the wheel event's composed path. Anything floating over that box and
    taking hits would become the target, the path would miss .cards, and the
    notch would scroll the PAGE instead of the grid — precisely the regression
-   that attribute was added to fix. */
+   that attribute was added to fix.
+
+   measure with: node scripts/probe-walkin-contrast.mjs [port] [w] [h] */
 .walkIn {
   position: absolute;
   right: clamp(20px, 5vw, 60px);
@@ -312,28 +335,35 @@
   pointer-events: none;
   /* sentence case, so --t-small rather than --t-label (globals.css:74-76) */
   max-width: min(34ch, 46vw);
-  padding: 0.5em 1.1em;
-  border: 1px solid rgba(250, 247, 241, 0.28);
-  border-radius: 999px;
-  background: rgba(18, 0, 0, 0.68);
-  -webkit-backdrop-filter: blur(8px);
-  backdrop-filter: blur(8px);
   font-size: var(--t-small);
   line-height: var(--lh-snug);
   text-align: right;
   /* two short lines rather than one long one and an orphan */
   text-wrap: balance;
   color: var(--cream);
+  transition: color 0.42s var(--ease-out);
 }
 
-/* On a phone the 46vw cap is ~179px, so the sentence runs to four lines and a
-   999px radius turns the plaque into a blob — the curve eats the first and
-   last line's ends. Widening it instead is not available: at 390px the note
-   would come within 4px of the view toggle. So the radius relaxes to the flat
-   media radius the rest of the site's tiles use and it reads as a card. */
-@media (max-width: 700px) {
+/* Card view swaps the INK, not the ground — and only where the ground is
+   actually cream. 981px is not a taste breakpoint, it is the exact width at
+   which `.cards` stops being a scroll box (see the media query further down):
+   above it the grid fits one screen and reserves the bottom strip, so this
+   corner is flat cream and cream type there is 1:1, invisible. Below it the
+   grid scrolls PHOTOGRAPHS through this corner, and measured at 390 the
+   maroon returns 2.32–2.52:1 on every one of 28 frames while cream on the
+   same pixels returns 7.13:1. So the inversion stops exactly where the sheet
+   does. */
+@media (min-width: 981px) {
+  .walkIn[data-view="cards"] {
+    color: var(--maroon);
+  }
+}
+
+/* A reduced-motion reader gets the end state, not a crossfade — the note must
+   be legible on the frame the toggle is released on, not 420ms later. */
+@media (prefers-reduced-motion: reduce) {
   .walkIn {
-    border-radius: var(--radius-media);
+    transition: none;
   }
 }
 
@@ -482,6 +512,23 @@
   height: calc(var(--row) * 5);
   overflow-y: auto;
   scrollbar-width: none;
+  /* THE LIST IS DRAGGED, so the browser must not start a pan of its own
+     before the gesture has decided what it is. `none` hands every pointer
+     event to the component; the horizontal-intent bail-out in the pointermove
+     handler is what gives a sideways gesture back, and a sub-threshold press
+     still reaches the name button underneath as a click.
+     A vertical touch that starts here is kept here. The list is eleven copies
+     of seven names with no ends, so there is nothing to hand the page back
+     AT — this is the iOS picker contract, and the column is `max-content`
+     wide (roughly half a phone) precisely so the page stays reachable beside
+     it. It is also the behaviour this box already had: `overflow-y: auto`
+     plus `overscroll-behavior: contain` never chained to the page either. */
+  touch-action: none;
+  /* a drag must not paint a text selection across the names as it travels */
+  user-select: none;
+  -webkit-user-select: none;
+  cursor: grab;
+  -webkit-tap-highlight-color: transparent;
   /* fade the top/bottom edges of the window */
   -webkit-mask-image: linear-gradient(
     transparent,
@@ -490,6 +537,9 @@
     transparent
   );
   mask-image: linear-gradient(transparent, #000 24%, #000 76%, transparent);
+}
+.scroller[data-dragging="true"] {
+  cursor: grabbing;
 }
 .scroller::-webkit-scrollbar {
   display: none;
@@ -517,7 +567,7 @@
   margin: 0;
   padding: 0;
   cursor: pointer;
-  font-family: "contralto-small", var(--font-sans);
+  font-family: var(--font-display-small);
   font-size: var(--name-size);
   line-height: var(--lh-heading);
   letter-spacing: -0.01em;
@@ -601,5 +651,15 @@
   .bgVideo,
   .name {
     transition: none;
+  }
+  /* A reduced-motion reader gets an ORDINARY SCROLLABLE LIST, not the drag
+     with its animation removed. The component installs no pointer handlers
+     and does not intercept the wheel in this mode, so the browser's own
+     panning is the only thing that must work — and it cannot while
+     `touch-action` is none. Selections land on the frame they are asked for;
+     see `glideTo`'s instant path. */
+  .scroller {
+    touch-action: pan-y;
+    cursor: auto;
   }
 }
