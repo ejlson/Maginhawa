@@ -86,11 +86,19 @@ export default function Experience() {
           <ChapterPin>
             <Discover />
           </ChapterPin>
-          {/* the positioning statement — what Maginhawa IS. It used to open
+          {/* The positioning statement — what Maginhawa IS. It used to open
               the page directly under the hero; it now answers the rooms
-              rather than introducing them, arriving once the reader has
-              seen what the group actually is. */}
-          <Manifesto />
+              rather than introducing them.
+
+              PINNED IN ITS TURN, the same grammar the restaurants chapter
+              uses: the reader scrub-sets the sentence, it is held once
+              complete, and the maroon About band climbs over it. That is
+              also why it carries a full-viewport cream ground — see
+              .section — since it is itself the sheet covering the chapter
+              above. */}
+          <ChapterPin>
+            <Manifesto />
+          </ChapterPin>
           {/* ONE maroon band under the story and the press credential — it
               is its own ground, and its own arrival */}
           <MaroonZone>

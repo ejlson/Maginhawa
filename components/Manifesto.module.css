@@ -10,7 +10,20 @@
   /* the first cream sheet that rides up OVER the pinned hero — a tight
      top pad so the statement arrives early in the cover, seated on the
      page margin like every other chapter */
-  padding: clamp(28px, 4.5vh, 64px) var(--pad-x) clamp(48px, 8vh, 120px);
+  /* A FULL VIEWPORT, and it has to be. This sheet climbs over the pinned
+     Our Restaurants chapter, and ChapterPin's cover works by the next
+     chapter's opaque ground simply passing over the held one — a sheet
+     shorter than the window cannot do that. Sized to its padding, it slid
+     ACROSS the restaurant grid with the statement drawn over the tiles
+     instead of covering them.
+
+     The content centres in that height rather than sitting at the top, so
+     the statement is framed by the screen it now owns. */
+  min-height: 100svh;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  padding: clamp(48px, 10vh, 128px) var(--pad-x);
   /* NO CLOSING RULE. A full-width hairline used to sit on this section's
      bottom border box, between the statement and Our Restaurants. It was
      drawing a boundary the page does not have: the statement and the
@@ -37,6 +50,30 @@
     /* one shared row — the support's first line tops out level with the
        statement's first line */
     align-items: start;
+  }
+}
+
+/* the question the statement answers — quiet, and well clear of the
+   display line so it reads as a label rather than a first line */
+.kicker {
+  margin: 0 0 clamp(16px, 2.2vh, 30px);
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--maroon);
+  opacity: 0.55;
+}
+
+/* .inner is a 12-column GRID above 981px, and the statement claims a row
+   explicitly — so an unplaced kicker auto-flowed into row 2, column 1:
+   below the sentence it introduces, and squeezed into one twelfth of the
+   measure, which wrapped "Who are we?" onto two lines. It needs its own
+   row and the full width. */
+@media (min-width: 981px) {
+  .kicker {
+    grid-column: 1 / 13;
+    grid-row: 1;
   }
 }
 
@@ -82,7 +119,7 @@
        wrap that put "London." on a line of its own and was fixed once
        already. Taking the freed columns puts it back to four everywhere. */
     grid-column: 1 / 13;
-    grid-row: 1;
+    grid-row: 2;
   }
 }
 

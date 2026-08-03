@@ -370,6 +370,14 @@ export default function Manifesto() {
   return (
     <section className={styles.section} data-nav-theme="light">
       <div className={styles.inner}>
+        {/* "Who are we?" — the one piece of furniture this chapter carries.
+            The section's own note above says "type only, no eyebrow", which
+            was true when the statement opened the page and needed no
+            introduction. It sits after the rooms now, and a reader arriving
+            from a grid of restaurants needs a beat to know the register has
+            changed from what we serve to who we are. Set as a plain label,
+            NOT the saffron-dot chapter mark that was retired site-wide. */}
+        <p className={styles.kicker}>Who are we?</p>
         {reduce || lines === null ? (
           flat
         ) : (
