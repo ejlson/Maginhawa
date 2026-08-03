@@ -76,9 +76,22 @@ export const BLOG: BlogEntry[] = [
       "Olive Magazine includes Belly in its rolling round-up of the best new restaurants in London — Filipino flavour read through a French bistro lens.",
     source: "Olive Magazine",
     url: "https://www.olivemagazine.com/restaurants/london/best-new-restaurants-in-london/",
-    // a Belly story wearing a Belly photograph. It is also the image the
-    // interlude above the journal flies down into this card — see Interlude.
-    image: "/images/blog/post-olive-web.jpg",
+    /* a Belly story wearing a Belly photograph, derived from
+       /images/belly3.jpg (6240x4160, 20MB — the blog renders through a raw
+       <img>, so nothing optimises it on the way out).
+
+       1600px LANDSCAPE, which breaks the 720x960 portrait shape the other
+       post-*-web files carry, for two reasons. The source is 3:2, and the
+       frames it lands in are 16/10 (the featured lede) and 16/9 (a grid
+       card) — cropping a landscape photograph into a portrait derivative
+       only to have `object-fit: cover` crop it back to landscape throws away
+       the middle of the picture twice. And this is the NEWEST entry, so it
+       is the page-1 lede at roughly 700 CSS px wide: 720px would land at
+       1.03x and read soft on any retina screen, where 1600 gives 2.3x.
+
+       (The previous file, post-olive-web.jpg, is left on disk — nothing
+       points at it now.) */
+    image: "/images/blog/belly3-web.jpg",
     restaurant: "belly",
     category: "feature",
     kind: "press",

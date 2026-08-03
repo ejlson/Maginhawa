@@ -1,16 +1,16 @@
 # Graph Report - Maginhawa  (2026-08-03)
 
 ## Corpus Check
-- 63 files · ~5,338,869 words
+- 63 files · ~6,558,457 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 432 nodes · 620 edges · 23 communities (20 shown, 3 thin omitted)
+- 440 nodes · 628 edges · 22 communities (19 shown, 3 thin omitted)
 - Extraction: 99% EXTRACTED · 1% INFERRED · 0% AMBIGUOUS · INFERRED: 7 edges (avg confidence: 0.5)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `240fcd94`
+- Built from commit: `cf081078`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -18,7 +18,6 @@
 - user-account-core-06dbaa1bcfe1a542-min.en-US.js
 - common-dabb52f27fbf7211-min.en-US.js
 - 8018.js
-- Zt
 - x
 - package.json
 - RestaurantsShowcase.tsx
@@ -64,23 +63,19 @@
 ## Import Cycles
 - None detected.
 
-## Communities (23 total, 3 thin omitted)
+## Communities (22 total, 3 thin omitted)
 
 ### Community 0 - "user-account-core-06dbaa1bcfe1a542-min.en-US.js"
 Cohesion: 0.06
 Nodes (33): 10. Home page copy, 11. Navigation & footer links, 12. Images & video, 13. Page titles & SEO, 14. Publishing your changes, 15. Known placeholders, 16. Troubleshooting, 1. Before you start (+25 more)
 
 ### Community 1 - "common-dabb52f27fbf7211-min.en-US.js"
-Cohesion: 0.14
-Nodes (14): CONTACT_LINKS, EXPLORE, FootLink, FootLinkA(), CURTAIN, IMAGES, Navigate, PageTransition() (+6 more)
+Cohesion: 0.07
+Nodes (20): metadata, EASE, HOME_SLUGS, POOL, BlogIndexInner(), FILTERS, pageCountFor(), postsForPage() (+12 more)
 
 ### Community 2 - "8018.js"
 Cohesion: 0.11
 Nodes (17): .next-about-dev/types/**/*.ts, .next-about/types/**/*.ts, .next-cb-dev/types/**/*.ts, .next-cb/types/**/*.ts, .next-contact/types/**/*.ts, next-env.d.ts, .next-join/types/**/*.ts, .next-menu/types/**/*.ts (+9 more)
-
-### Community 3 - "Zt"
-Cohesion: 0.27
-Nodes (7): LONDON_CLOCK, LondonClock(), MAGNET_SPRING, Reservations(), Clip, clipStyle(), VideoBackdrop()
 
 ### Community 20 - "x"
 Cohesion: 0.08
@@ -91,12 +86,12 @@ Cohesion: 0.10
 Nodes (19): devDependencies, puppeteer-core, @types/node, @types/react, @types/react-dom, typescript, name, private (+11 more)
 
 ### Community 29 - "RestaurantsShowcase.tsx"
-Cohesion: 0.09
-Nodes (22): metadata, ITEMS, Menu(), getNavTheme(), LINKS, Nav(), Theme, useRouteTransition() (+14 more)
+Cohesion: 0.08
+Nodes (28): metadata, ITEMS, Menu(), getNavTheme(), LINKS, Nav(), Theme, CURTAIN (+20 more)
 
 ### Community 30 - "Press.tsx"
-Cohesion: 0.11
-Nodes (22): generateMetadata(), RestaurantPage(), ExpandedCard(), Tile(), EASE, LANE, PressWall(), REVIEWABLE (+14 more)
+Cohesion: 0.13
+Nodes (17): generateMetadata(), RestaurantPage(), ExpandedCard(), Tile(), EASE, LANE, PressWall(), GroupPressJsonLd() (+9 more)
 
 ### Community 31 - "BlogIndex.tsx"
 Cohesion: 0.06
@@ -111,12 +106,12 @@ Cohesion: 0.17
 Nodes (13): EASE, Enter, ENTER_OFFSET, KEY_WORDS, Manifesto(), PARTS, SCRUB_EASE, ScrubLine() (+5 more)
 
 ### Community 38 - "Experience.tsx"
-Cohesion: 0.07
-Nodes (24): EASE, POOL, ChapterPin(), Experience(), HERO_INSETS, CLIPS, EASE, Interlude() (+16 more)
+Cohesion: 0.08
+Nodes (22): Experience(), HERO_INSETS, CLIPS, CYCLE, EASE, ALPHABET, FlipLetter(), holePath() (+14 more)
 
 ### Community 42 - "RestaurantDetail.tsx"
-Cohesion: 0.09
-Nodes (16): metadata, jsonLd, metadata, BlogIndexInner(), OTHERS, PAGE_COUNT, postsForPage(), Contact() (+8 more)
+Cohesion: 0.10
+Nodes (16): jsonLd, metadata, Contact(), ContactProps, ContactPage(), mapUrl(), VISITABLE, ITEMS (+8 more)
 
 ### Community 63 - "Product"
 Cohesion: 0.18
@@ -131,15 +126,15 @@ Cohesion: 0.22
 Nodes (6): files, found, globals, PROPS, ROOTS, tokens
 
 ### Community 89 - "Discover.tsx"
-Cohesion: 0.10
-Nodes (19): cellVariants, clamp01(), CUE, DECK_OFFSETS, DEPART_SPRING, Discover(), DiscoverItem, DOLLY_EASE (+11 more)
+Cohesion: 0.09
+Nodes (23): ChapterPin(), cellVariants, clamp01(), CUE, DECK_OFFSETS, DEPART_SPRING, Discover(), DiscoverItem (+15 more)
 
 ### Community 178 - "JoinUs.tsx"
 Cohesion: 0.10
-Nodes (16): jsonLd, metadata, clamp01(), DIAL_CODES, DIGITS, FlipDigit(), HERO_LINES, inkBox() (+8 more)
+Nodes (17): jsonLd, metadata, DarkZone(), clamp01(), DIAL_CODES, DIGITS, FlipDigit(), HERO_LINES (+9 more)
 
 ## Knowledge Gaps
-- **198 isolated node(s):** `jsonLd`, `metadata`, `metadata`, `jsonLd`, `metadata` (+193 more)
+- **202 isolated node(s):** `jsonLd`, `metadata`, `metadata`, `jsonLd`, `metadata` (+197 more)
   These have ≤1 connection - possible missing edges or undocumented components.
 - **3 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
@@ -147,16 +142,16 @@ Nodes (16): jsonLd, metadata, clamp01(), DIAL_CODES, DIGITS, FlipDigit(), HERO_L
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `SmoothScroll()` connect `x` to `common-dabb52f27fbf7211-min.en-US.js`?**
-  _High betweenness centrality (0.097) - this node is a cross-community bridge._
+  _High betweenness centrality (0.096) - this node is a cross-community bridge._
 - **Why does `dependencies` connect `x` to `package.json`?**
-  _High betweenness centrality (0.090) - this node is a cross-community bridge._
+  _High betweenness centrality (0.089) - this node is a cross-community bridge._
 - **Are the 6 inferred relationships involving `About()` (e.g. with `bandServerSnapshot()` and `bandSnapshot()`) actually correct?**
   _`About()` has 6 INFERRED edges - model-reasoned connections that need verification._
 - **What connects `jsonLd`, `metadata`, `metadata` to the rest of the system?**
-  _198 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _202 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `user-account-core-06dbaa1bcfe1a542-min.en-US.js` be split into smaller, more focused modules?**
   _Cohesion score 0.058823529411764705 - nodes in this community are weakly interconnected._
 - **Should `common-dabb52f27fbf7211-min.en-US.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.14035087719298245 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.07301587301587302 - nodes in this community are weakly interconnected._
 - **Should `8018.js` be split into smaller, more focused modules?**
   _Cohesion score 0.1111111111111111 - nodes in this community are weakly interconnected._

@@ -385,65 +385,63 @@ const STAGE_EDGE = 56;
 // composition is seated (see `seat` below)
 const HEAD_AIR = 28;
 
-// The pasteboard around the stage title — TEN editorial prints at varied
-// (never large) sizes, free to overlap EACH OTHER but seated in two
-// horizontal bands (top ≤ ~14%, bottom ≥ ~66%) that keep the centre band
-// completely clear — the prints never touch the title. Spread edge to
-// edge. DETERMINISTIC seats. Each carries its own scroll-parallax drift
-// and an `out` vector radiating away from the centre — the direction it
-// flies off in (while fading) as the grid forms.
-// Fifteen prints in four groups — a top band, two flanking pairs at the
-// title's own height, and a bottom band. `ar` is the CROP each print is
-// cut to (the source photography is almost all 2:3), which is where the
-// variety of shape comes from; `w` carries the variety of size. Between
-// them they read as a pasteboard rather than a tidy border.
-//
-// The centre stays clear: nothing is seated inside roughly x 26–74%,
-// y 36–64%, which is the box the title and the deck occupy. The flanking
-// prints sit at mid-height but hard against the screen edges, so they
-// frame the line without ever touching it.
-//
-// `depth` is how far each print travels TOWARDS the camera and `speed`
-// how quickly — the two together are what makes the field break apart at
-// different rates instead of moving as one sheet.
-// TEN seats, from the ten distinct editorial frames we have — one seat per
-// photograph, so nothing appears twice and every print is its own picture.
-// (`/images/careers-team.jpg` is deliberately absent: it is the identical
-// frame to DSCF2472-web.)
-//
-// Deliberately mixed shapes. `ar` is the CROP each print is cut to — the
-// source photography is almost all 2:3, so the variety is cut here rather
-// than found: three squares (1), four wide landscapes (1.35–1.5) and three
-// tall portraits (0.67–0.72). `w` carries the variety of size, 96 → 182.
-// Between shape and size no two prints read as a matched pair.
-//
-// Prints are free to OVERLAP: 2 sits on the corner of 1, and 4 on the
-// corner of 3. That is what stops the frame reading as a tidy border and
-// makes it read as photographs laid out on a desk.
-// CLOSER AND BIGGER. The bands used to sit against the screen's own edges
-// with a third of the height empty between them and the line, so the title
-// read as alone on the page with a border round it rather than as a line
-// laid down among photographs. Every print is ~22% larger and each band has
-// moved in towards the centre until its inner edge is just clear of the
-// title's box: the top band's bottoms now land at 18–34% (they were at
-// 6–22%) and the bottom band's tops at 60–66% (they were 63–75%). The
-// clear box itself is unchanged — nothing is seated inside x 26–74%,
-// y 36–64%, which is what the title and the opened deck occupy — so the
-// prints crowd the line without ever touching it.
+/* The pasteboard around the stage title — EIGHT editorial prints in three
+   groups: a top band, two flanks at the title's own height hard against the
+   screen edges, and a bottom band. `ar` is the CROP each print is cut to
+   (the source photography is almost all 2:3), which is where the variety of
+   shape comes from; `w` carries the variety of size. Between them they read
+   as photographs laid on a desk rather than a tidy border.
+
+   `depth` is how far each print travels TOWARDS the camera and `speed` how
+   quickly — the two together are what makes the field break apart at
+   different rates instead of moving as one sheet.
+
+   THE CENTRE STAYS CLEAR: nothing is seated inside x 26–74%, y 36–64%,
+   which is the box the title and the opened deck occupy. The flanks sit at
+   mid-height but outside that x range, so they frame the line without ever
+   touching it.
+
+   ---- why these eight, and why they sit where they do ----
+
+   This was TEN prints, and the seats were laid out against a wide viewport.
+   The trap is that a seat's position is a PERCENTAGE while its size is
+   FIXED PIXELS: narrow the window and the gaps close while the prints stay
+   the same size. Measured, that ran to one overlapping pair at 1920 but
+   FOUR at 1440 and 1280 — and print 1 was caught in two of them at once
+   (with 2 above it and 6 below), which is a pile of three photographs, not
+   a layered pair.
+
+   So the seats below are checked at 1280 — the narrowest they get before
+   the layout changes — and not at 1920. The gaps only widen from there:
+   x scales with the stage width, y with its height, and the prints
+   themselves never grow.
+
+   AT MOST TWO DEEP, ANYWHERE. Exactly one overlap survives by design —
+   print 04 on the corner of 03 — because a field with no overlap at all
+   reads as a border again. It is authored to hold at every width (32x53px
+   at 1920, 86x68px at 1280) rather than appearing only when the window is
+   small. Every other print is clear of every other print. If you move a
+   seat, re-check the narrow end, not the wide one.
+
+   Prints 02 and 05 are the two that went. 02 was the small landscape
+   sitting on 01, and 05 the tall frame colliding with the right flank — the
+   two collisions worth losing. Dropping them also keeps the shape families
+   even: three squares (01/04/07), three wide (03/08/09), two tall (06/10),
+   so no two prints read as a matched pair. Their files are still in
+   /images/ourrestaurants/ if a seat ever wants them back. */
 const STAGE_PRINTS = [
   // ---- top band ----
-  { src: "/images/ourrestaurants/print-01-web.jpg", left: "4%", top: "15%", w: 168, ar: 1, drift: 22, depth: 780, speed: 1 },
-  { src: "/images/ourrestaurants/print-02-web.jpg", left: "11%", top: "9%", w: 127, ar: 1.5, drift: -14, depth: 900, speed: 1.28 },
-  { src: "/images/ourrestaurants/print-03-web.jpg", left: "36%", top: "13%", w: 210, ar: 1.45, drift: 16, depth: 700, speed: 0.86 },
-  { src: "/images/ourrestaurants/print-04-web.jpg", left: "47%", top: "21%", w: 115, ar: 1, drift: -18, depth: 840, speed: 1.12 },
-  { src: "/images/ourrestaurants/print-05-web.jpg", left: "74%", top: "11%", w: 146, ar: 0.67, drift: 12, depth: 760, speed: 0.94 },
-  // ---- flanks: the title's own height, drawn in off the screen edges ----
-  { src: "/images/ourrestaurants/print-06-web.jpg", left: "3%", top: "32%", w: 120, ar: 0.72, drift: 14, depth: 660, speed: 0.8 },
-  { src: "/images/ourrestaurants/print-07-web.jpg", left: "84%", top: "28%", w: 161, ar: 1, drift: -16, depth: 920, speed: 1.34 },
+  { src: "/images/ourrestaurants/print-01-web.jpg", left: "4%", top: "12%", w: 170, ar: 1, drift: 22, depth: 780, speed: 1 },
+  { src: "/images/ourrestaurants/print-03-web.jpg", left: "33%", top: "8%", w: 195, ar: 1.45, drift: 16, depth: 700, speed: 0.86 },
+  // the one deliberate overlap — 04 laid across 03's bottom-right corner
+  { src: "/images/ourrestaurants/print-04-web.jpg", left: "41.5%", top: "16%", w: 126, ar: 1, drift: -18, depth: 840, speed: 1.12 },
+  // ---- flanks: the title's own height, hard against the screen edges ----
+  { src: "/images/ourrestaurants/print-06-web.jpg", left: "1%", top: "42%", w: 126, ar: 0.72, drift: 14, depth: 660, speed: 0.8 },
+  { src: "/images/ourrestaurants/print-07-web.jpg", left: "86%", top: "30%", w: 155, ar: 1, drift: -16, depth: 920, speed: 1.34 },
   // ---- bottom band ----
-  { src: "/images/ourrestaurants/print-08-web.jpg", left: "5%", top: "60%", w: 193, ar: 1.35, drift: 18, depth: 820, speed: 1.06 },
-  { src: "/images/ourrestaurants/print-09-web.jpg", left: "57%", top: "66%", w: 222, ar: 1.5, drift: 20, depth: 860, speed: 1.16 },
-  { src: "/images/ourrestaurants/print-10-web.jpg", left: "76%", top: "62%", w: 117, ar: 0.67, drift: -12, depth: 720, speed: 0.9 },
+  { src: "/images/ourrestaurants/print-08-web.jpg", left: "5%", top: "68%", w: 190, ar: 1.35, drift: 18, depth: 820, speed: 1.06 },
+  { src: "/images/ourrestaurants/print-09-web.jpg", left: "44%", top: "72%", w: 216, ar: 1.5, drift: 20, depth: 860, speed: 1.16 },
+  { src: "/images/ourrestaurants/print-10-web.jpg", left: "78%", top: "63%", w: 124, ar: 0.67, drift: -12, depth: 720, speed: 0.9 },
 ];
 
 const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
@@ -464,7 +462,7 @@ const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
    and the whole 1.3s the timed dolly used to spend is now spent by the
    reader on their way in.
 
-   Deliberately CSS 3D and not WebGL: thirteen composited layers moving on
+   Deliberately CSS 3D and not WebGL: eight composited layers moving on
    transform and opacity alone stay entirely on the compositor, cost no
    main-thread work per frame, need no context, no shaders and no extra
    bytes, and degrade honestly when 3D is unavailable. A canvas would buy
@@ -492,7 +490,7 @@ function StagePrint({
   // Each print takes its own slice of the entrance: it starts 4% of the
   // range after the one before it and ramps over half of it, so the
   // pasteboard LAYS ITSELF OUT print by print instead of switching on as
-  // one sheet. That reads better, and it stops thirteen photographs
+  // one sheet. That reads better, and it stops eight photographs
   // crossing the visibility threshold on a single frame.
   const e = useTransform(enter, (v) => clamp01((v - i * 0.04) / 0.5));
   // the entrance rise doubles as the print's parallax drift: it settles out
@@ -511,7 +509,7 @@ function StagePrint({
   );
 
   return (
-    // OUTER: the seat only, and a plain div — thirteen extra motion
+    // OUTER: the seat only, and a plain div — eight extra motion
     // components would each cost a subscription for a box that never moves.
     // INNER: one element owning the entire transform (drift + depth) and
     // the fade, so nothing ever fights over a property.
@@ -522,7 +520,7 @@ function StagePrint({
     >
       <motion.div className={styles.stagePrintDepth} style={{ y, z, opacity }}>
         {/* Sized and cropped to this seat, and served at that size —
-            thirteen full-resolution photographs would cost far more than
+            eight full-resolution photographs would cost far more than
             the effect is worth. */}
         <Image
           className={styles.stagePrintImg}
@@ -532,7 +530,7 @@ function StagePrint({
           height={Math.round(p.w / p.ar)}
           sizes={`${p.w}px`}
           draggable={false}
-          // Fetched EAGERLY but at idle priority. Left lazy, all thirteen
+          // Fetched EAGERLY but at idle priority. Left lazy, all eight
           // arrive within a few hundred milliseconds of each other exactly
           // as the pasteboard is being revealed, and the decode lands as
           // one 42ms frame right at the start of the effect. At ~5KB each
@@ -857,6 +855,20 @@ export default function Discover() {
       const grid = gridRef.current?.getBoundingClientRect();
       const plates = gridRef.current?.querySelectorAll<HTMLElement>("[data-plate]");
       if (!sec || !head || !grid || !plates?.length) return;
+      /* A HIDDEN LAYOUT MEASURES AS ZERO, AND ZERO IS TRUTHY.
+         getBoundingClientRect on an element inside a `display: none`
+         ancestor returns an all-zero DOMRect — an object, so every guard
+         above it passes. PageTransition mounts a route inside exactly such
+         a wrapper and only reveals it once its entrance runs, so on a hard
+         reload this effect could fire against a layout that has no size.
+
+         Every term then collapses: want = 0, lo = -vh/2, hi = vh/2 - AIR,
+         and the clamp returns 0 — a seat of `top: 0` that pins the
+         composition to the TOP of the chapter instead of its middle, and
+         nothing re-runs to correct it (see the observer below for why a
+         resize listener alone never noticed). Refuse the reading instead;
+         the observer will call back the moment the box is real. */
+      if (!sec.height || !grid.height || !head.height) return;
       let pt = Infinity;
       let pb = -Infinity;
       plates.forEach((el) => {
@@ -880,8 +892,30 @@ export default function Discover() {
       setSeat({ top, shift: Math.round(top - sec.height / 2) });
     };
     measure();
+
+    /* TWO TRIGGERS, because they catch different things and neither covers
+       the other.
+
+       The ResizeObserver is what makes the guard above safe: it fires when
+       the section goes from a zero box to a real one — the moment
+       PageTransition reveals the route — so a reading refused during the
+       hidden frame is retaken as soon as there is something to read. It
+       also covers every later reflow the window never hears about: the
+       display face arriving and re-wrapping the heading, the grid's own
+       photographs settling, a font-size change.
+
+       The resize listener stays because the seat depends on
+       window.innerHeight, and a viewport that changes height without
+       changing this section's height — a mobile URL bar retracting, a
+       desktop window resized vertically — moves the seat without resizing
+       the observed element at all. */
+    const ro = new ResizeObserver(measure);
+    if (sectionRef.current) ro.observe(sectionRef.current);
     window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", measure);
+    };
   }, [intro]);
 
   // what the choreography is showing right now — every animated element

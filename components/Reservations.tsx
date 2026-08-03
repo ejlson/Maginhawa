@@ -15,12 +15,18 @@ import Link from "next/link";
 import styles from "./Reservations.module.css";
 import VideoBackdrop from "./VideoBackdrop";
 
-// ONE clip, not a cycle. The four that used to rotate here weigh 107MB
-// combined (belly 25.2 / mamasons 25.6 / bintang 44.0); this one is 12.9MB,
-// lighter than the next by 3.4x, and it is the only one the page now pays
-// for. VideoBackdrop still crossfades on a `src` change — that machinery
-// simply never fires with a constant src.
-const CLIP = "/videos/hero-cafemama.mp4";
+/* ONE clip, not a cycle. The four that used to rotate here weigh 107MB
+   combined; this is the only one the page now pays for, and VideoBackdrop
+   still crossfades on a `src` change — that machinery simply never fires
+   with a constant src.
+
+   WEIGHT, stated plainly because it is the one cost this choice carries:
+   mamasons-hero is 25.6MB against hero-cafemama's 12.9MB, so the section is
+   ~12.7MB heavier than it was. hero-cafemama was originally picked here FOR
+   that gap. If this band ever reads as slow to arrive on a cold load, a
+   web-sized derivative of this clip is the fix, not a different restaurant —
+   the choice of room is editorial and belongs to the page. */
+const CLIP = "/videos/mamasons-hero.mp4";
 
 /* ---------- the magnetic button ----------
 

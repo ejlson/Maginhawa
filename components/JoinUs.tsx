@@ -776,9 +776,12 @@ export default function JoinUs() {
               transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
             >
               <HeroLabel>Careers</HeroLabel>
-              <HeroLabel>
-                {JOBS.length} open roles — London
-              </HeroLabel>
+              {/* The count is gone. It was the only number on the page that
+                  went stale on its own — every posting added or filled
+                  silently rewrote the hero — and it made the header a status
+                  readout rather than a place. The roles are listed in full
+                  further down, where they can be read rather than counted. */}
+              <HeroLabel>London</HeroLabel>
             </motion.div>
 
             <div className={styles.heroSplit}>
@@ -1011,9 +1014,10 @@ export default function JoinUs() {
                 <h2 className={`${styles.sectionTitle} ${styles.formTitle}`}>
                   Send us your application.
                 </h2>
-                <p className={styles.formAside}>
-                  Pick a role, or apply generally.
-                </p>
+                {/* No aside. It instructed the reader to do what the very
+                    next control already offers — a dropdown whose own first
+                    option reads "Select a role…" and whose last is "Other". A
+                    line that narrates the field beneath it is furniture. */}
               </Reveal>
 
               <Reveal className={styles.formBody} delay={0.08}>

@@ -49,7 +49,12 @@
   aspect-ratio: 16 / 10;
   max-height: clamp(340px, 46vh, 520px);
   overflow: hidden;
-  border-radius: var(--radius-tile);
+  /* 2px, the house cut for a PHOTOGRAPH — the same edge the Discover plates,
+     the manifesto prints, the story deck, the home blog strip and the
+     restaurants grid all carry. --radius-tile's 8px made these the only
+     pictures on the site rounded like an app card. Written literally rather
+     than by re-pointing the token, which has other callers. */
+  border-radius: 2px;
   background: var(--placeholder);
 }
 
@@ -58,6 +63,8 @@
   height: 100%;
   object-fit: cover;
   display: block;
+  /* same fade-up out of the skeleton as the grid cards — see .mediaLoading */
+  transition: opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1);
 }
 
 .featuredBody {
@@ -138,7 +145,12 @@
   position: relative;
   aspect-ratio: 16 / 9;
   overflow: hidden;
-  border-radius: var(--radius-tile);
+  /* 2px, the house cut for a PHOTOGRAPH — the same edge the Discover plates,
+     the manifesto prints, the story deck, the home blog strip and the
+     restaurants grid all carry. --radius-tile's 8px made these the only
+     pictures on the site rounded like an app card. Written literally rather
+     than by re-pointing the token, which has other callers. */
+  border-radius: 2px;
   background: var(--placeholder);
 }
 
@@ -147,7 +159,55 @@
   height: 100%;
   object-fit: cover;
   display: block;
-  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1);
+  /* opacity joins the existing hover scale: the photograph fades up out of
+     its skeleton rather than replacing it on one frame. Slower than the
+     shimmer's own cycle so the handover reads as a settle, not a blink. */
+  transition: transform 0.7s cubic-bezier(0.22, 1, 0.36, 1),
+    opacity 0.55s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+/* ---- the loading skeleton ----
+   A light band sweeping across the --placeholder ground the media boxes
+   already sit on, so the skeleton IS the resting placeholder with motion on
+   it rather than a second grey introduced for the occasion.
+
+   ::after, so it costs no extra element and disappears with the class. The
+   sweep animates background-position on a fixed gradient — one composited
+   property, no layout, and ten of them run together every time the reader
+   changes room or page. */
+.mediaLoading::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  background-image: linear-gradient(
+    100deg,
+    rgba(250, 247, 241, 0) 20%,
+    rgba(250, 247, 241, 0.55) 42%,
+    rgba(250, 247, 241, 0.8) 50%,
+    rgba(250, 247, 241, 0.55) 58%,
+    rgba(250, 247, 241, 0) 80%
+  );
+  background-repeat: no-repeat;
+  background-size: 220% 100%;
+  animation: mediaShimmer 1.45s linear infinite;
+  pointer-events: none;
+}
+
+@keyframes mediaShimmer {
+  from {
+    background-position: 150% 0;
+  }
+  to {
+    background-position: -50% 0;
+  }
+}
+
+/* an indefinite looping sweep is exactly what a vestibular trigger looks
+   like — hold the plain placeholder instead. The picture still fades in. */
+@media (prefers-reduced-motion: reduce) {
+  .mediaLoading::after {
+    animation: none;
+  }
 }
 
 .card:hover .cardMedia img {
@@ -203,7 +263,11 @@
   opacity: 1;
 }
 
-/* ---- divider between the latest story and older entries ---- */
+/* ---- the list's header line: label — rule — filter ----
+   The rule is a REAL element rather than the ::after it used to be. A
+   pseudo-element is always the last box in its parent, so with the filter
+   added the hairline could only ever have run after the control instead of
+   between the label and it. */
 .divider {
   display: flex;
   align-items: center;
@@ -211,7 +275,7 @@
   padding-block: clamp(20px, 3vh, 36px) clamp(4px, 0.8vh, 10px);
 }
 
-.divider span {
+.dividerLabel {
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
@@ -221,11 +285,117 @@
   white-space: nowrap;
 }
 
-.divider::after {
-  content: "";
+.dividerRule {
   flex: 1;
   height: 1px;
   background: rgba(47, 0, 0, 0.12);
+}
+
+/* ---- restaurant filter (menu on the right of the rule) ----
+   The trigger is type, not a box: same label voice as the row it sits on, so
+   it reads as the end of that line rather than as a widget dropped onto it.
+   Only the chevron and the ink change on hover. */
+.filter {
+  position: relative;
+  flex: none;
+}
+
+.filterTrigger {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.55em;
+  padding: 0.35em 0;
+  background: none;
+  border: none;
+  cursor: pointer;
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--maroon);
+  opacity: 0.75;
+  transition: opacity 0.25s ease;
+}
+
+.filterTrigger:hover,
+.filterTrigger:focus-visible {
+  opacity: 1;
+}
+
+.chevron {
+  width: 0.85em;
+  height: 0.85em;
+  display: block;
+  transition: transform 0.3s cubic-bezier(0.22, 1, 0.36, 1);
+}
+
+.filterTrigger[aria-expanded="true"] .chevron {
+  transform: rotate(180deg);
+}
+
+/* tabular so the counts hold a common width down the open menu, and a step
+   down in size/ink so the number reads as an annotation on the name rather
+   than as part of it */
+.filterCount {
+  font-size: 0.85em;
+  font-variant-numeric: tabular-nums;
+  opacity: 0.55;
+}
+
+/* RIGHT-ANCHORED: the trigger sits on the page's right margin, so a menu
+   growing leftward is the only direction that keeps it on screen. */
+.filterMenu {
+  position: absolute;
+  top: calc(100% + 8px);
+  right: 0;
+  z-index: 20;
+  min-width: max(100%, 220px);
+  max-height: min(60vh, 420px);
+  overflow-y: auto;
+  display: flex;
+  flex-direction: column;
+  padding: 6px;
+  background: var(--cream);
+  border: 1px solid rgba(47, 0, 0, 0.14);
+  border-radius: 2px;
+  box-shadow: 0 18px 40px -24px rgba(47, 0, 0, 0.45);
+}
+
+.filterOption {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: 1.4em;
+  width: 100%;
+  padding: 0.6em 0.7em;
+  background: none;
+  border: none;
+  border-radius: 2px;
+  cursor: pointer;
+  text-align: left;
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--maroon);
+  opacity: 0.7;
+  transition: opacity 0.2s ease, background-color 0.2s ease;
+}
+
+.filterOption:hover,
+.filterOption:focus-visible {
+  opacity: 1;
+  background: rgba(47, 0, 0, 0.06);
+}
+
+/* the chosen room in the accent — the same signal .pageNumActive uses for
+   the page you are on, so the two controls agree on what "current" looks
+   like */
+.filterOptionActive {
+  color: var(--saffron);
+  opacity: 1;
 }
 
 /* ---- numbered pagination ----
@@ -322,4 +492,13 @@
   .featured { grid-template-columns: 1fr; }
   .featuredMedia { max-height: none; }
   .grid { grid-template-columns: 1fr; }
+}
+
+/* the outlet, at the head of the meta line — see the card in BlogIndex.tsx.
+   One step up in ink from the date beside it, which is all the promotion it
+   needs: same size, same tracking, so the line still reads as one meta row
+   rather than as a label with a caption. */
+.cardSource {
+  color: var(--maroon);
+  opacity: 0.92;
 }

@@ -35,23 +35,23 @@
     "semantic_hash": ""
   },
   "components/About.tsx": {
-    "mtime": 1785749650.6058967,
-    "ast_hash": "56e5ce204b4de3151c2cbfe1b84c0659",
+    "mtime": 1785756409.971151,
+    "ast_hash": "fd22bdf45b24a7296d5135347a8fc3c0",
     "semantic_hash": ""
   },
   "components/AboutIntro.tsx": {
-    "mtime": 1785749650.6064858,
+    "mtime": 1785756409.9721968,
     "ast_hash": "dc54ecb4c88329a92cacbafec48e74a8",
     "semantic_hash": ""
   },
   "components/Blog.tsx": {
-    "mtime": 1785516752.8348773,
-    "ast_hash": "839ecea274b1ecd6873348d29ea9484e",
+    "mtime": 1785756409.97264,
+    "ast_hash": "64b1d90ec6dcd2b7e8f0f2ea88b8152a",
     "semantic_hash": ""
   },
   "components/BlogIndex.tsx": {
-    "mtime": 1785703562.7622144,
-    "ast_hash": "a5d476fb737505fbad0594800fde8479",
+    "mtime": 1785762454.0344481,
+    "ast_hash": "596768e5594497de03ac832c5c01de3c",
     "semantic_hash": ""
   },
   "components/Contact.tsx": {
@@ -75,12 +75,12 @@
     "semantic_hash": ""
   },
   "components/Discover.tsx": {
-    "mtime": 1785749077.6228502,
-    "ast_hash": "a25f701066850da81737e9d2304fb8cd",
+    "mtime": 1785756409.9739199,
+    "ast_hash": "edd5f36baeb71bb7095b33d85e280d3a",
     "semantic_hash": ""
   },
   "components/Experience.tsx": {
-    "mtime": 1785749484.8955913,
+    "mtime": 1785756409.974327,
     "ast_hash": "8add37e728ff56b1b33876eda0a500be",
     "semantic_hash": ""
   },
@@ -105,8 +105,8 @@
     "semantic_hash": ""
   },
   "components/JoinUs.tsx": {
-    "mtime": 1785747995.9331212,
-    "ast_hash": "238fa4f94a465bf328af1e46d7438b5e",
+    "mtime": 1785759849.6182806,
+    "ast_hash": "d3661acc132684ed5d9f3f1f145629f9",
     "semantic_hash": ""
   },
   "components/Loader.tsx": {
@@ -145,8 +145,8 @@
     "semantic_hash": ""
   },
   "components/RestaurantsShowcase.tsx": {
-    "mtime": 1785749411.1811383,
-    "ast_hash": "c5fda05ec8f67e916dcb31bcdbe9ea79",
+    "mtime": 1785756409.9771385,
+    "ast_hash": "0752a8d31a5655f23c14502b9b8e15a6",
     "semantic_hash": ""
   },
   "components/Reveal.tsx": {
@@ -175,8 +175,8 @@
     "semantic_hash": ""
   },
   "lib/blog.ts": {
-    "mtime": 1785516036.564935,
-    "ast_hash": "46a444c4bef876e908e273e4785156b2",
+    "mtime": 1785756410.0286865,
+    "ast_hash": "18d66002595dd9907dd45d3dbf7e37eb",
     "semantic_hash": ""
   },
   "lib/jobs.ts": {
@@ -195,8 +195,8 @@
     "semantic_hash": ""
   },
   "lib/restaurants.ts": {
-    "mtime": 1785531059.3433018,
-    "ast_hash": "c4fda2ef8cbddf41e476f263a00ed98d",
+    "mtime": 1785756410.0299063,
+    "ast_hash": "e367d77ca120e8b97e879389e0b5f297",
     "semantic_hash": ""
   },
   "next-env.d.ts": {
@@ -230,7 +230,7 @@
     "semantic_hash": ""
   },
   "tsconfig.json": {
-    "mtime": 1785749597.9987922,
+    "mtime": 1785756410.3294299,
     "ast_hash": "ec75720e7050d48f417913cdbbd8de8f",
     "semantic_hash": ""
   },
@@ -460,7 +460,7 @@
     "semantic_hash": ""
   },
   "public/images/omar.jpg": {
-    "mtime": 1785749620.294089,
+    "mtime": 1785756410.272816,
     "ast_hash": "a079ab8ba605ca12503ee7aac5e57100",
     "semantic_hash": ""
   },
@@ -700,13 +700,13 @@
     "semantic_hash": ""
   },
   "components/Manifesto.tsx": {
-    "mtime": 1785524374.3699608,
-    "ast_hash": "a84497d23fe68bce89badabd879e1f22",
+    "mtime": 1785756409.975945,
+    "ast_hash": "a97e59babf509fd50b4155e762564c84",
     "semantic_hash": ""
   },
   "components/Interlude.tsx": {
-    "mtime": 1785516702.6967456,
-    "ast_hash": "85d3a84cc552f350cb410871b6c8799a",
+    "mtime": 1785759144.98174,
+    "ast_hash": "4587890060f4ab1d723ab191920579ff",
     "semantic_hash": ""
   },
   "assets/menu/cafe_mama/wall-panel-40-2017-Corona.pdf": {
@@ -780,8 +780,8 @@
     "semantic_hash": ""
   },
   "components/Reservations.tsx": {
-    "mtime": 1785576127.0967555,
-    "ast_hash": "9357bc7b727628f7b458731869464ed7",
+    "mtime": 1785762351.4094088,
+    "ast_hash": "3f5370798b6773afdefe42cf782c648a",
     "semantic_hash": ""
   },
   "scripts/audit-type.mjs": {
@@ -805,7 +805,7 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1785749546.9869783,
+    "mtime": 1785756409.970022,
     "ast_hash": "7548fa8b1d7353e663664811ac2051c0",
     "semantic_hash": ""
   },
@@ -817,6 +817,131 @@
   "public/images/omarshah.jpeg": {
     "mtime": 1783956225.7447536,
     "ast_hash": "f55ce370612f35be65be032187ee8cc4",
+    "semantic_hash": ""
+  },
+  "public/images/belly3.jpg": {
+    "mtime": 1785756410.1885686,
+    "ast_hash": "2b20ebd520c16575b14562303b97f466",
+    "semantic_hash": ""
+  },
+  "public/images/blog/post-cny-web.jpg": {
+    "mtime": 1785756410.1928756,
+    "ast_hash": "9e4c472e167aa4ac1b05254d33236eab",
+    "semantic_hash": ""
+  },
+  "public/images/blog/post-forbes-web.jpg": {
+    "mtime": 1785756410.1938806,
+    "ast_hash": "f48614f2f45414f7a3a48459b5ead21c",
+    "semantic_hash": ""
+  },
+  "public/images/blog/post-hamhigh-web.jpg": {
+    "mtime": 1785756410.1949608,
+    "ast_hash": "1c9d3b3147e0b2d5aaa23351b66042c2",
+    "semantic_hash": ""
+  },
+  "public/images/blog/post-msn-web.jpg": {
+    "mtime": 1785756410.1958578,
+    "ast_hash": "be848b76f37c54728f7c0c45e4eb0ba9",
+    "semantic_hash": ""
+  },
+  "public/images/blog/post-mylondon-web.jpg": {
+    "mtime": 1785756410.1972106,
+    "ast_hash": "5b4451a941172b7c462d4f798e45774c",
+    "semantic_hash": ""
+  },
+  "public/images/blog/post-observer-web.jpg": {
+    "mtime": 1785756410.1982958,
+    "ast_hash": "f9252b7bc89cda09e3b3115a268ff03c",
+    "semantic_hash": ""
+  },
+  "public/images/blog/post-olive-web.jpg": {
+    "mtime": 1785756410.1994658,
+    "ast_hash": "f4d3e545f45b60aabb8427d01adfb36b",
+    "semantic_hash": ""
+  },
+  "public/images/blog/post-timeout-web.jpg": {
+    "mtime": 1785756410.2007058,
+    "ast_hash": "ea3c252feb4494cee64ad43b586242eb",
+    "semantic_hash": ""
+  },
+  "public/images/interlude-web.jpg": {
+    "mtime": 1785756410.2109373,
+    "ast_hash": "3764ab1864271d99866f65a7357a1aae",
+    "semantic_hash": ""
+  },
+  "public/images/manifesto/belly-web.jpg": {
+    "mtime": 1785756410.2122881,
+    "ast_hash": "3d25ffaa7d3661bac9403628cb40db77",
+    "semantic_hash": ""
+  },
+  "public/images/manifesto/cafemama-web.jpg": {
+    "mtime": 1785756410.2133808,
+    "ast_hash": "037bfa222e6e01ca5594b0f2723ac28e",
+    "semantic_hash": ""
+  },
+  "public/images/manifesto/group-web.jpg": {
+    "mtime": 1785756410.2143958,
+    "ast_hash": "3395a15f456a0f0c80a11f9b9599f76c",
+    "semantic_hash": ""
+  },
+  "public/images/manifesto/mamasons-web.jpg": {
+    "mtime": 1785756410.2154536,
+    "ast_hash": "de5f2eb5761b5e5c11b3d78b4da921d4",
+    "semantic_hash": ""
+  },
+  "public/images/ourrestaurants/print-01-web.jpg": {
+    "mtime": 1785756410.2787051,
+    "ast_hash": "30d876f8ea5c39c2cd011956c1e0c639",
+    "semantic_hash": ""
+  },
+  "public/images/ourrestaurants/print-02-web.jpg": {
+    "mtime": 1785756410.281252,
+    "ast_hash": "2b470ed744aa4618d0c5ea0716c6fe8e",
+    "semantic_hash": ""
+  },
+  "public/images/ourrestaurants/print-03-web.jpg": {
+    "mtime": 1785756410.2823076,
+    "ast_hash": "4928c50c9ebfe95a6c30c7e331c4596e",
+    "semantic_hash": ""
+  },
+  "public/images/ourrestaurants/print-04-web.jpg": {
+    "mtime": 1785756410.2837667,
+    "ast_hash": "2cc18c83af844bd980e789b88dc990b4",
+    "semantic_hash": ""
+  },
+  "public/images/ourrestaurants/print-05-web.jpg": {
+    "mtime": 1785756410.2851307,
+    "ast_hash": "aa9ec233d81df064392328e44b78ef20",
+    "semantic_hash": ""
+  },
+  "public/images/ourrestaurants/print-06-web.jpg": {
+    "mtime": 1785756410.286445,
+    "ast_hash": "612fdf6ab50503e5b4d5498ac9078043",
+    "semantic_hash": ""
+  },
+  "public/images/ourrestaurants/print-07-web.jpg": {
+    "mtime": 1785756410.2883763,
+    "ast_hash": "a467287cbdd47023de3c867068e93106",
+    "semantic_hash": ""
+  },
+  "public/images/ourrestaurants/print-08-web.jpg": {
+    "mtime": 1785756410.2898815,
+    "ast_hash": "462230fd293488ee0cdc38b368d5901d",
+    "semantic_hash": ""
+  },
+  "public/images/ourrestaurants/print-09-web.jpg": {
+    "mtime": 1785756410.2914,
+    "ast_hash": "67f8ca2f1ec28ebb433841a64ca8da3c",
+    "semantic_hash": ""
+  },
+  "public/images/ourrestaurants/print-10-web.jpg": {
+    "mtime": 1785756410.293369,
+    "ast_hash": "2b27e00e83d17d45e8fe1248f3759f94",
+    "semantic_hash": ""
+  },
+  "public/images/ramoramen.JPG": {
+    "mtime": 1785756410.328319,
+    "ast_hash": "ea23a2eff3c8f667f3f10e7fe4a46b37",
     "semantic_hash": ""
   }
 }
