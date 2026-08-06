@@ -58,7 +58,14 @@
   width: 0.95em;
   height: 0.95em;
   border-radius: 50%;
-  border: 1px solid rgba(250, 247, 241, 0.28);
+  /* THE TRACK, and the line below it is the arc. This one was #faf7f1, the
+     cream from two palettes ago, sitting immediately above a `var(--cream)`
+     that had tracked both swaps — so the ring's quiet three quadrants and its
+     lit one were literally two different palettes' creams, on the same
+     element, one line apart. 28% of the token, same alpha: the track is the
+     unlit part, and what carries the "still working" message is the arc's
+     contrast against it. Not measured — it exists only during a route change. */
+  border: 1px solid color-mix(in srgb, var(--cream) 28%, transparent);
   border-top-color: var(--cream);
   /* the ring is the only thing in the corner that moves, so it is the only
      thing that has to be promoted */
@@ -80,7 +87,14 @@
 @media (prefers-reduced-motion: reduce) {
   .loaderRing {
     animation: loaderBreathe 2s ease-in-out infinite;
-    border-color: rgba(250, 247, 241, 0.55);
+    /* WITH THE SPIN GONE THIS RING IS THE WHOLE INDICATOR — the comment above
+       makes the case that it carries information rather than decoration, and
+       that is exactly what 1.4.11 governs. So it takes the ×1.115 the other
+       load-bearing creams in this pass took, 0.55 -> 0.61, rather than the
+       flat re-point the track above it got: there is no bright arc here for a
+       reader to find it by, only this. Unmeasured — it exists only during a
+       route change, and no ratio is claimed for it. */
+    border-color: color-mix(in srgb, var(--cream) 61%, transparent);
   }
 }
 

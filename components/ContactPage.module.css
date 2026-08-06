@@ -114,10 +114,28 @@
   opacity: 0.7;
   /* the hairline under the address is the affordance — it says the line is a
      link to a map rather than a printed address. Colour only; nothing here
-     relayouts on hover. */
+     relayouts on hover.
+
+     BEING THE AFFORDANCE IS WHY THE ALPHA MOVED. It was
+     `rgba(250, 247, 241, 0.28)` — #faf7f1, the cream from two palettes ago —
+     and 0.28 -> 0.31 holds the composite the old literal made rather than its
+     number (the ×1.115 the two creams require).
+
+     THE `opacity: 0.7` ABOVE PASSES STRAIGHT THROUGH THE ARITHMETIC and is
+     worth naming, because it looks like it should break it. A uniform opacity
+     multiplies the whole composite, so it scales both creams by the same
+     factor and cancels out of the ratio between them — the effective alpha
+     here is 0.7 × 0.28 = 0.196, and it needs the identical ×1.115. Measured,
+     the old literal painted rgb(77,93,80), which is the 0.7 already in it.
+
+     STILL UNDER 3:1, PRE-EXISTING. That paint reads 1.80:1 on the maroon
+     ground against 1.4.11's 3:1; at the same 0.28 of the new cream it would be
+     1.71:1. Closing the rest means deciding this underline should be visibly
+     louder — or dropping the 0.7 that halves it — and neither is a migration's
+     call to make. */
   text-decoration: underline;
   text-underline-offset: 0.25em;
-  text-decoration-color: rgba(250, 247, 241, 0.28);
+  text-decoration-color: color-mix(in srgb, var(--cream) 31%, transparent);
   transition: text-decoration-color 0.3s var(--ease-out);
 }
 

@@ -39,14 +39,11 @@
   max-width: 22ch;
 }
 
-.body {
-  font-family: var(--font-sans);
-  font-size: var(--t-body);
-  line-height: var(--lh-body);
-  max-width: 52ch;
-  opacity: 0.88;
-  margin: 0;
-}
+/* No `.body` here any more. It was a dead prose utility with zero consumers,
+   and it earned its deletion the hard way: CSS modules merge same-named
+   classes file-wide, so its stray opacity: 0.88 silently landed on the
+   timeline's spotlight wrapper the moment that wrapper reused the name.
+   The wrapper is `.itemBody` now; keep new names collision-checked. */
 
 .back {
   display: inline-flex;
@@ -123,9 +120,15 @@
    where it is, so measured ink runs 1013.95 against an advance of 1013.44 —
    0.51px past the box, permanently shorn by a both-axis clip. A hairline is
    still the whole of the letter that is missing. */
-.heroLineTop .heroMask {
-  overflow: visible clip;
-}
+/* `.heroLineTop .heroMask` IS GONE WITH THE MASKS. It relaxed SplitWords'
+   both-axis clip to `overflow: visible clip` on this one line, because
+   MAGINHAWA's -0.01em tracking pushes the final A's ink 0.51px past its
+   advance box and a both-axis clip shears that hairline permanently, long
+   after the animation that needed the vertical half is over.
+   The display lines are plain <p>s now — the opening's beat 4 is scrubbed as
+   a block rather than built word by word — so nothing clips them at all and
+   the ink is simply unshorn. The measurement is kept here because it is the
+   thing anyone reinstating a mask on this line would have to rediscover. */
 
 /* "Who is" — small italic serif kicker sitting on the title's shoulder.
    Negative bottom margin swallows the display line's internal top leading
@@ -165,7 +168,11 @@
      kicker      ink(122,137,149)  ground(126,108,90)  1.40:1   (need 4.5)
 
    DIFFERENCE FAILS IN THE MIDDLE, NOT AT THE ENDS, which is why this was
-   never caught by looking at a dark frame or a light one. Cream (250,247,241)
+   never caught by looking at a dark frame or a light one. (The worked
+   example below uses cream = 250,247,241, the token's value at the time;
+   it is #eae3cc now, and the arithmetic lands in exactly the same place —
+   the failure is a property of `difference`, not of which cream.)
+   Cream (250,247,241)
    differenced against a mid-brown (127,105,100) gives (123,142,141) — a pale
    cyan at very nearly the same luminance as the ground it is sitting on. That
    is not an approximation of the failure, it IS the measured ink above. The
@@ -174,9 +181,17 @@
 
    SO THE INK IS SOLID CREAM AND THE GROUND IS SHAPED. Measured on the same
    frames, cream on the ground as it already stood — no new scrim at all —
-   reaches 4.62:1 on the lede and 6.89:1 on the display lines. Dropping the
+   reached 4.62:1 on the lede and 6.89:1 on the display lines. Dropping the
    blend was therefore the whole fix; but 4.62 against a 4.5 floor is 3% of
    margin on footage that changes 25 times a second, so this buys headroom.
+
+   ⚠️ RE-DERIVED AFTER THE PALETTE SOFTENING. --cream went L 0.872 → 0.768,
+   and the film did not move, so each reading above can be re-solved for its
+   own (unchanged) ground: the lede is 4.10:1 and the display lines 6.12:1
+   WITHOUT this ellipse. The lede therefore no longer clears 4.5:1 on its
+   own — the 3% of margin the note called thin is now a deficit, and this
+   element has gone from buying headroom to being load-bearing. It still
+   delivers: see the fitted-ellipse figure further down, re-derived with it.
 
    IT IS A SHAPE, NOT MORE WASH. A heavier flat gradient would have to darken
    the gutters, the plate and the whole lower half of the frame — where there
@@ -184,16 +199,18 @@
    recipe on this codebase is Reservations' .locScrim: an ellipse over the
    copy's own footprint, riding a low flat floor. Here .videoScrim IS that
    floor (0.55-0.62 maroon, constant, and it also serves the statement, the
-   chef block and the deck scrolling over the same film), so this element
-   contributes only the ellipse.
+   chef block and the story timeline scrolling over the same film), so this
+   element contributes only the ellipse.
 
    THE ELLIPSE IS FITTED TO THE TYPE, not centred by eye. The four lines
    occupy x 40-1368, y 245-590 of a 1440x900 hero: centre (49%, 46%), half-
    extents (46%, 19%). Radii of 74% x 40% about (46%, 44%) put the lede's
    worst corner — bottom-left, the line with the least contrast and the
    smallest type — at 0.65 of the radius, where the ramp still holds 0.24
-   alpha. That composites the brightest measured ground to L 0.11, i.e. cream
-   at ~6:1. The centre is pulled left and up off the geometric middle because
+   alpha. That composites the brightest measured ground to L 0.11 — a GROUND
+   luminance, which no palette change touches — putting cream on it at
+   5.11:1 (it was ~5.8:1 before the ground token softened). Still clear of
+   the 4.5:1 the lede owes, and now the only thing that is. The centre is pulled left and up off the geometric middle because
    the two lines that need help (the lede and the kicker) are both there;
    MAGINHAWA's right half and GROUP? are display type over the darkest part of
    the frame and already clear 3:1 twice over.
@@ -236,6 +253,182 @@
   }
 }
 
+/* ═══════════════════ THE SCROLL-SCRUBBED OPENING ═══════════════════
+   The runway, the screen that sticks inside it, and the title that parts.
+   Every number the MOTION uses lives in About.tsx; what is here is the box
+   the motion happens in.
+
+   THE RUNWAY IS THE CLOCK. Its height is the only thing that decides how
+   much scrolling the opening takes, and it is stated in svh so a mobile URL
+   bar retracting cannot change the mapping mid-scrub the way a vh would.
+   `--opening-vh` mirrors OPENING_VH in About.tsx — the two must agree, and
+   the component is the source: the scrub's `offset` is written against this
+   box's own start and end, so a disagreement does not break the mapping,
+   it only changes how long the opening lasts. */
+.opening {
+  --opening-vh: 320;
+  position: relative;
+  height: calc(var(--opening-vh) * 1svh);
+}
+
+/* REDUCED MOTION: TWO STILL SCREENS, NOT ONE.
+   The obvious version — collapse the runway to a single screen and let the
+   stage render its finished state — puts the title and the answer on the
+   same 900px of glass, and they are both display type at the same scale.
+   Photographed, "ABOUT US" sat in maroon straight through the middle of
+   "MAGINHAWA GROUP?": not a degraded animation, an unreadable page.
+   So the runway is sized to its content and the two layers become ordinary
+   full-height blocks in flow — the title on its own screen, the question
+   and the answer on the next. Nothing sticks, nothing is scrubbed, and both
+   things the opening had to say are legible with no motion at all. */
+.opening[data-static] {
+  height: auto;
+}
+
+.openStage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+  /* the title's words travel 58vw each and leave through the screen edges;
+     clip so they never widen the document on the way out. `clip` rather
+     than `hidden` so this never becomes a scroll container — the same call
+     .heroTrail makes two rules down. */
+  overflow: clip;
+}
+
+.opening[data-static] .openStage {
+  position: relative;
+  height: auto;
+  overflow: visible;
+}
+
+/* the title's layer, and the box the indicator is seated in. Absolute over
+   the stage while it is scrubbed; an ordinary screen-tall block when it is
+   not. */
+.openHead {
+  position: absolute;
+  inset: 0;
+}
+
+.opening[data-static] .openHead {
+  position: relative;
+  inset: auto;
+  min-height: 100svh;
+}
+
+/* THE TITLE. Maroon on the page's cream, because that is what is behind it:
+   the film starts at scale 0 and only ever occupies the hole BETWEEN the
+   two words (the clamp in About.tsx guarantees it), so neither word is ever
+   over the picture and neither needs the cream-on-film treatment the answer
+   below it wears.
+
+   Sized off the same `--hero-display-size` knob the answer's display lines
+   use, so the opening and the beat it hands over to are one voice at one
+   scale. `white-space: nowrap` on the line: "About Us" must be ONE line at
+   every width or the two words cannot part horizontally. */
+.openTitle {
+  --hero-display-size: clamp(3.4rem, 12vw, 12rem);
+  position: absolute;
+  inset-inline: 0;
+  top: 50%;
+  transform: translateY(-50%);
+  margin: 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  white-space: nowrap;
+  font-family: var(--font-display-big);
+  font-weight: 500;
+  font-size: var(--hero-display-size);
+  line-height: 0.86;
+  letter-spacing: -0.01em;
+  text-transform: uppercase;
+  color: var(--maroon);
+  pointer-events: none;
+}
+
+/* the two words. `will-change` is NOT set: an element with a transform being
+   written to it every frame is promoted by the compositor for exactly that
+   window, and a standing hint here would hold two layers over a pinned
+   video for the eleven thousand pixels below — the cost .heroTrailImg's
+   note measured and refused. */
+.openWord {
+  display: inline-block;
+}
+
+/* STATIC: the title takes a screen of its own, and it takes it ON the film —
+   which is why the ink changes. Maroon is correct while the picture is still
+   a hole between the words and everything around them is the cream page; on
+   a full-bleed frame it is the same near-invisible pairing .heroScrim's own
+   note measures. Cream over the constant .videoScrim is what every other
+   line in this scope wears. */
+.opening[data-static] .openTitle {
+  position: relative;
+  top: auto;
+  transform: none;
+  min-height: 100svh;
+  color: var(--cream);
+}
+
+/* the visible gap is this margin; the space character next to it carries no
+   advance at all. Both halves are load-bearing — see the note at the use
+   site, and SplitWords, which carries the same pair. */
+.openWord:first-of-type {
+  margin-right: 0.24em;
+}
+
+.openSpace {
+  font-size: 0;
+}
+
+/* BEAT 4's layer: the old hero, seated on the full-screen film. `inset: 0`
+   with the container inside it so `.hero`'s own centred flex column gets a
+   full screen to centre in, exactly as it did when it was a section in the
+   flow. */
+.openAnswer {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  align-items: stretch;
+}
+
+.opening[data-static] .openAnswer {
+  position: relative;
+  inset: auto;
+  min-height: 100svh;
+}
+
+.openAnswer > .container {
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+}
+
+.openAnswer .hero {
+  flex: 1;
+}
+
+/* the indicator sits under the title on the same axis — this screen is
+   CENTRED (one word either side of the middle), unlike the left-hung hero
+   the cue used to close, so a left-hung signpost would be the only thing on
+   it off the centre line */
+.opening .scrollCue {
+  left: 50%;
+  transform: translateX(-50%);
+  color: var(--maroon);
+}
+
+.opening .scrollCueInner {
+  color: var(--maroon);
+}
+
+/* …except when the title screen is ON the film, which is the static case —
+   the ink follows the title's own for the same reason (see above). */
+.opening[data-static] .scrollCue,
+.opening[data-static] .scrollCueInner {
+  color: var(--cream);
+}
+
 /* THE SCROLL CUE. The page is 11,114px tall and said so nowhere: the hero is
    a full-bleed film with no edge, no fold and nothing under the type to
    suggest it continues. The home hero has carried this signpost since it was
@@ -250,7 +443,7 @@
 
    IT DOES NOT MOVE once it has landed — no bob, no pulse. A signpost that
    animates is one more thing competing for the eye on a page that already has
-   a pinned film, a sprung deck and a scrubbed statement, and a slow looping
+   a pinned film, a scrubbed statement and a drifting timeline, and a slow looping
    oscillation is specifically the kind of ambient motion a reduced-motion
    reader is asking to be spared.
 
@@ -302,6 +495,24 @@
   overflow: hidden;
 }
 
+/* THE FRAME THE OPENING SCALES — the film and its scrim as one object, so
+   they shrink and grow together. See About.tsx's scrub block for the
+   derivation of the scale itself (it is the hole the title's two words have
+   opened, not a curve of its own).
+
+   `transform-origin` is left at its 50% 50% default deliberately: the frame
+   has to grow about the screen's centre, because the centre is where the
+   words part and therefore where the picture appears.
+   `backface-visibility: hidden` promotes it for the length of the scrub
+   without a standing `will-change` — the element is composited while a
+   transform is being written to it and released when it stops, which is the
+   same trade .heroTrailImg's comment argues for. */
+.filmFrame {
+  position: absolute;
+  inset: 0;
+  backface-visibility: hidden;
+}
+
 /* content overlays the sticky backdrop via negative margin. Positioned so
    it paints above the backdrop, but with z-index UNTOUCHED (auto): a
    stacking context here would isolate the type's difference blend from
@@ -341,33 +552,30 @@
    still the reader arrives on has to already be the start of the move.
    `forwards` additionally keeps the animation's final value applied FOREVER,
    which would leave an identity `transform: scale(1)` on the element that is
-   the backdrop for this entire scope, including the 3D deck four screens
-   below. The end value is visually identical to no transform at all, so the
+   the backdrop for this entire scope, including the story timeline four
+   screens below. The end value is visually identical to no transform at all, so the
    only thing `forwards` could ever do here is cost something. */
+/* NO SETTLE KEYFRAME. A `heroSettle` animation used to ease this element
+   from scale(1.06) to 1 over 1.7s at a 1.95s delay, timed against the old
+   entrance's HERO_LANDS_MS so the frame was already easing as playback
+   started — "a camera finding its framing and settling into it".
+
+   It is deleted rather than retimed, and the reason is compositional rather
+   than a clean-up: the film's arrival is now the whole subject of the
+   opening, and it is the reader who performs it. A second, timed scale on
+   the same footage, inside a frame the scrub is already scaling, is two
+   cameras on one shot — and the two transforms would compound, so the
+   settle's 6% would ride on top of whatever the scrub had the frame at.
+   The note that used to sit here also argued against an aperture ("a window
+   opening onto the film ... would make About read as a second homepage").
+   That call is reversed by instruction; what the opening does is not the
+   Loader's aperture in any case — the frame grows, it does not open a
+   window onto a still-full-size picture. */
 .heroVideo {
   width: 100%;
   height: 100%;
   object-fit: cover;
   display: block;
-  animation: heroSettle 1.7s cubic-bezier(0.22, 1, 0.36, 1) 1.95s backwards;
-}
-
-@keyframes heroSettle {
-  from {
-    transform: scale(1.06);
-  }
-  to {
-    transform: scale(1);
-  }
-}
-
-/* Reduced motion: the film is paused on its poster by About.tsx, and a poster
-   that silently resizes itself is the same vestibular event as one that
-   moves. No settle. */
-@media (prefers-reduced-motion: reduce) {
-  .heroVideo {
-    animation: none;
-  }
 }
 
 /* constant legibility scrim — maroon-tinted, heavier toward the lower
@@ -385,17 +593,13 @@
   pointer-events: none;
 }
 
-.srOnly {
-  position: absolute;
-  width: 1px;
-  height: 1px;
-  padding: 0;
-  margin: -1px;
-  overflow: hidden;
-  clip: rect(0, 0, 0, 0);
-  white-space: nowrap;
-  border: 0;
-}
+/* `.srOnly` IS GONE, and so is what it hid. The page carried an invisible
+   `<h1>Maginhawa Group</h1>` because its visible display type was split into
+   aria-hidden word masks and something had to name the document. The
+   opening's "About Us" is a real, visible <h1> now — the page's subject, its
+   route and its <title> all saying the same word — so there is no hidden
+   heading left to style, and adding a second h1 for the old string would
+   have been two h1s on one document. */
 
 /* ONE VOICE ACROSS BOTH LINES. "MAGINHAWA GROUP?" is one utterance, and it is
    now set as one: the same Contralto big cut, the same 500, the same size, on
@@ -437,9 +641,13 @@
   left: 0;
   top: 0;
   object-fit: cover;
-  /* the deck's own trim, so a print in the wake and a print on the deck are
-     the same object */
-  border-radius: 2px;
+  /* A trim, so a print in the wake reads as a print rather than as a raw
+     crop of the photograph — and it is the site's PHOTOGRAPHY token rather
+     than a literal 2px. This was the last photographic cut on the site
+     still carrying its own number: About's other media (the card, the
+     frames) already take --radius-tile, so one file was drawing two
+     different corners on two kinds of photograph. */
+  border-radius: var(--radius-tile);
   /* AT REST IT IS NOTHING. Every node starts fully transparent and is only
      ever moved by a Web Animation, so a reader who never moves the pointer —
      or whose device has no pointer — sees an empty box, and a reduced-motion
@@ -449,16 +657,24 @@
      standing hint here is seven permanently promoted layers for the life of
      the page — measured, it took the page's will-change count from 30 to 37,
      and they were still there scrolled seven screens past the hero. Seven
-     layers is the same objection this file already answers for the nine deck
-     cards ("will-change on them would buy nothing and cost eighteen permanent
-     layers"), and the answer is the same: an element with a RUNNING animation
+     standing layers is the same class of cost this stylesheet keeps refusing,
+     and the answer is the same: an element with a RUNNING animation
      on transform/opacity is promoted by the compositor for exactly as long as
      that animation lasts, which is precisely the window a hint would cover.
      The pool spends 900ms of promotion per emission instead of forever. */
   /* a hairline of separation from the footage; no blur, no shadow spread —
      seven blurred boxes over a playing video is a paint cost with nothing to
-     show for it at 0.5 alpha */
-  outline: 1px solid rgba(250, 247, 241, 0.14);
+     show for it at 0.5 alpha.
+
+     THE LITERAL WAS #faf7f1, the cream from TWO palettes ago — a copy rather
+     than a reference, so the softening never reached it. 14% of the token now,
+     at the SAME alpha: this separates a print from the film behind it and
+     identifies no control, so no floor applies and tracking the token is the
+     entire job. Measured with the print forced visible (they rest at opacity 0
+     and are emitted by the scroll, so there is nothing to read at a held
+     position): the old literal composited to rgb(36,36,35) against the darkest
+     footage under it, 1.34:1. */
+  outline: 1px solid color-mix(in srgb, var(--cream) 14%, transparent);
   outline-offset: -1px;
 }
 
@@ -637,8 +853,8 @@
    page — under the 3:1 large-text floor on the brighter frames. The chef block
    one section below got a shaped scrim for precisely this reason (see
    .chefScrim, including why the fix cannot be applied to .videoScrim itself:
-   its 45% stop is also what the deck's seat card sits behind, so raising it
-   would muddy every chapter photograph to fix four lines of type).
+   its 45% stop is also what the story timeline's frames sit behind, so raising
+   it would muddy every chapter photograph to fix four lines of type).
 
    SHAPED TO THE RIGHT, because the type is. The block occupies roughly the
    right 40% of the container and most of the height of a centred screen, so
@@ -646,18 +862,41 @@
 
    IT IS HEAVIER THAN THE HERO'S AND THE CHEF BLOCK'S, and the reason is the
    INK rather than the composition. Those two are cream (relative luminance
-   0.932) and clear their floors on the shared scrim alone; 0.30 buys them
-   headroom. Saffron is 0.273 — a third of cream's — so the same ground that
-   puts cream at 6.5:1 puts these phrases at 2.9:1, under the 3:1 large-text
-   floor. Measured on the rendered page with scripts/probe-hero-contrast.mjs
+   0.932 — the token's value two swaps ago; it is L 0.768 now) and clear
+   their floors on the shared scrim alone; 0.30 buys them headroom. Saffron
+   was 0.273 — a third of cream's — so the same ground that put cream at
+   6.5:1 put these phrases at 2.9:1, under the 3:1 large-text floor. Both
+   tokens have moved since; the re-derivation is in the table below. Measured on the rendered page with scripts/probe-hero-contrast.mjs
    (`statement` mode, and `noscrim` for the counterfactual):
 
      worst frame of the film      no scrim   at 0.30   at 0.52
      statement (cream)              4.34:1    6.47:1    9.67:1
      emphasis  (saffron)            2.40:1    2.89:1    3.43:1
 
-   0.52 is what puts the saffron over 3:1 with margin on the WORST frame of a
-   21-second film rather than on a frame chosen by hand. Composited with
+   0.52 is what put the saffron over 3:1 with margin on the WORST frame of a
+   21-second film rather than on a frame chosen by hand.
+
+   ⚠️ THAT TABLE IS TWO PALETTES OLD AND THE EMPHASIS ROW NO LONGER HOLDS.
+   It is written against cream at L 0.932 and saffron at L 0.273, which are
+   the #faf7f1 / #c97e3f pair — neither token has had those values for two
+   swaps. The film is unchanged, so re-solving each column for the CURRENT
+   tokens (cream L 0.768, accent L 0.127) gives:
+
+     worst frame of the film      no scrim   at 0.30   at 0.52
+     statement (cream)              3.61:1    5.39:1    8.05:1
+     emphasis  (saffron)            1.34:1    1.61:1    1.91:1
+
+   The cream row still clears its 3:1 large-display floor at 0.52 with room.
+   THE EMPHASIS ROW FAILS AT EVERY ALPHA, and it was already failing before
+   this pass — the accent has been drifting darker across two swaps while
+   this note went on quoting a value from before either of them. No scrim
+   alpha fixes it: at 0.52 the ground is already L 0.044 and the accent is
+   L 0.127, so the two are converging, not separating. The fix is a lighter
+   accent for THIS use (the mix PressWall.module.css uses on the maroon —
+   accent carried toward the ground rather than away from it — is the
+   pattern that works on a dark ground), and it is out of scope here.
+   Recorded rather than quietly corrected, because the number that was here
+   said the emphasis passed. Composited with
    .videoScrim it reaches ~0.80 at the core, which is dark — and it is a whole
    screen carrying one sentence, so the film is atmosphere here rather than
    subject. The fall to zero at the edges keeps it a vignette on the right
@@ -748,8 +987,7 @@
    WHAT WAS WRONG WAS THE TENURE, not the hint. It sat on `.statementWord`
    unconditionally, so nineteen compositor layers were held for the life of an
    11,000px page to serve one paragraph's worth of scroll — the exact standing
-   cost SplitWords' CSS driver exists to avoid for the deck's copy, paid two
-   sections above it. About.tsx toggles `.statementLive` from an observer on
+   cost SplitWords' CSS driver exists to avoid. About.tsx toggles `.statementLive` from an observer on
    the paragraph, so the promotion lasts as long as the block is near the
    viewport and no longer. Outside that the words are not moving. */
 .statementWord {
@@ -791,9 +1029,17 @@
      chefQuote  4.37:1  (need 3)     chefBody  4.51:1  (need 4.5)
      chefName   4.70:1  (need 3)     eyebrow   4.54:1  (need 4.5)
 
-   Every one of those passes and two of them pass by less than a percent, on
-   footage that changes twenty-five times a second — which is not a pass, it
-   is a coin toss with a good average. It also happens to be the block whose
+   Every one of those passed and two of them passed by less than a percent,
+   on footage that changes twenty-five times a second — which is not a pass,
+   it is a coin toss with a good average.
+
+   ⚠️ RE-DERIVED AFTER THE PALETTE SOFTENING, same film, cream L 0.872 →
+   0.768:  chefQuote 3.88:1 (need 3, still clear) · chefName 4.17:1 (need 3,
+   still clear) · chefBody 4.00:1 and eyebrow 4.03:1 — BOTH NOW UNDER THE
+   4.5:1 they owe. The coin toss the note describes has landed. The two
+   small runs need either more scrim on this block or a step up in size to
+   reach the large-text floor; that is a change to this section's design
+   rather than to the palette, so it is recorded here and not guessed at. It also happens to be the block whose
    bio was just rewritten to carry the whole succession, so it is now the only
    prose in the section and the least legible thing in it.
 
@@ -807,9 +1053,9 @@
    NOT ON .videoScrim ITSELF, which was the obvious one-line alternative — its
    45% stop is the lightest point of the shared gradient and raising it would
    have lifted this band. But that gradient is in VIEWPORT space, not page
-   space, so the 45% stop is also what the deck's seat card sits behind: every
-   chapter photograph would have been muddied to fix four lines of type two
-   screens above them. */
+   space, so the 45% stop is also what the story timeline's frames sit behind:
+   every chapter photograph would have been muddied to fix four lines of type
+   two screens above them. */
 .chefScrim {
   position: absolute;
   inset-block: -22%;
@@ -899,7 +1145,8 @@
    CREAM WITH ONE SAFFRON WORD, not the solid saffron it used to be. At
    --t-lead as a pull-quote the old treatment was a decorative line; at
    display size it is the largest type in the section and the whole line in
-   raw saffron measures ~2.2:1 on the dark scrim — under the 3:1 large-text
+   raw saffron measured ~2.2:1 on the dark scrim (~1.95:1 since the accent
+   and the ground both moved — same film, re-solved) — under the 3:1 large-text
    floor. Cream clears it several times over, and putting the accent on
    "family" alone spends the saffron on the one word the sentence turns on.
    It is also the statement's own grammar one screen above (.emItalic on the
@@ -936,1856 +1183,443 @@
   padding-block: var(--section-y) var(--section-y);
 }
 
-.storyShell {
-  display: grid;
-  grid-template-columns: minmax(320px, 36vw) minmax(0, 1fr);
-  gap: clamp(56px, 7vw, 140px);
-  align-items: start;
-}
+/* ===========================================================================
+   THE ARCHIVE TIMELINE — nine chapters on one centred spine
+   ===========================================================================
 
-.storyWheel {
-  /* THE ONE GAP IN THE STACK, and it has to be one value rather than two.
-     The column is label / numeral / dots, and it is centred as a whole while
-     what has to READ as centred is the numeral — so the space above the
-     numeral and the space below it must be equal by construction, not by
-     coincidence. The label's box and the dot row's box are both --t-label
-     tall (see .storyProgress), so with this gap on both sides the stack is
-     symmetric about the numeral at every viewport height.
+   The deck/list fork and the year wheel are gone; this is the one
+   presentation every width gets. The grammar is an archive index, not an
+   article: the year heads its item ON the spine with the photograph tucked
+   over its foot, the photograph sits in a seat dealt by SEATS in About.tsx,
+   and the chapter's title is the link out. The chapter prose stays in
+   CHAPTERS as the record; the index deliberately does not print it.
 
-     It is larger than the 18-32px the label used to carry because the two
-     stems that used to hold this column open are gone: they were 54-96px
-     each, and without a replacement the label and the dots collapsed onto a
-     124px numeral. */
-  --wheel-stack-gap: clamp(38px, 5.6vh, 72px);
+   THE GROUND IS THE PINNED FILM, so every value the reference archive shows
+   as black-on-off-white arrives here inverted: spine, marker, years and
+   titles are cream, and the frame's backing is cream at 10% rather than
+   white over white.
 
-  position: sticky;
-  top: 18vh;
-  height: 64vh;
-  min-height: 480px;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  justify-content: center;
-}
+   STATE LIVES IN THE STYLESHEET. Hover and focus do all the work — there is
+   no scroll-driven "active chapter" in this section any more, which is
+   deliberate rather than an omission. If the column ever reads
+   undifferentiated on a long scroll, raise the years' resting alpha or
+   tighten the item padding; do not reintroduce the observer. */
 
-/* THE STORY SECTION'S TITLE — an <h2> now, not a <span> (see About.tsx).
-   Helvetica, so the page's two section titles share one face: this and
-   "Awards & Recognition" both name a piece of apparatus rather than tell a
-   story, which is exactly the role --font-ui exists for.
-
-   IT KEEPS ITS SIZE, and that is deliberate rather than an oversight. The
-   Awards title is the only thing at the head of its section and carries the
-   weight accordingly; this one sits directly above a 124px numeral that is
-   already doing all the shouting, and its BOX is load-bearing — the wheel's
-   stack is symmetric about the year only because this element's box and the
-   indicator's box are both exactly --t-label tall (see .storyProgress and the
-   scoped line-height rule below). A section heading does not have to be the
-   largest type in its section; it has to be a heading. */
-.storyWheelLabel {
-  font-family: var(--font-ui);
+/* THE HEADING CARRIES THE SECTION ALONE NOW — and it amends, deliberately,
+   the law that used to live above the old wheel label: that this title and
+   "Awards & Recognition" share one Helvetica face because both name
+   apparatus. Both reasons that law gave for the small size died with the
+   wheel — there is no 124px numeral above it doing the shouting, and no
+   stack symmetry for its box to hold. By the old comment's own closing
+   logic (the Awards title carries weight because it is the only thing at
+   the head of its section), this heading now qualifies too: it is an
+   archive's masthead, not a label on an instrument. The two section titles
+   play different roles on purpose — one masthead, one apparatus — and
+   .coverageTitle keeps the apparatus voice, untouched. */
+.storyHeading {
+  margin: 0 0 clamp(48px, 7vh, 96px);
+  font-family: var(--font-display-big);
   font-weight: var(--w-regular);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  color: var(--cream);
-  opacity: 0.78;
-  /* margin-top: 0 matters — this is an h2 and would otherwise bring the UA's
-     own block margin into a stack whose symmetry is measured to the pixel */
-  margin: 0 0 var(--wheel-stack-gap);
-}
-
-/* NO `.storyWheelStem`. A 1px saffron gradient with a glowing 7px dot at its
-   centre ran above and below the year. Two of them, and between them they
-   were the brightest and the busiest thing in a column whose entire job is to
-   show one number — a rule, a glow and an accent colour spent on separating a
-   label from a numeral that a gap separates perfectly well. The room they held
-   is now --wheel-stack-gap above, so the column keeps its air and loses the
-   furniture. */
-
-.storyWheelMask {
-  --wheel-step: clamp(5.8rem, 10vw, 11.5rem);
-  /* THE OPTICAL CORRECTION, RE-MEASURED — and it was 14x too big, in the
-     wrong direction, for a face that has not loaded in a long time.
-
-     It said -0.166em and it was tuned for Contralto, whose unequal
-     ascent/descent did leave a numeral high in a line-height: 1 box. Since
-     the two-family swap --font-display resolves to the grotesk, whose lining
-     figures sit very nearly centred, and the old correction was left applying
-     itself to a face that did not need it: measured off the rendered page at
-     1440, it pushed the year's INK 22.0px above the centre of its own box.
-
-     WHAT THAT COST WAS VISIBLE AT THE STACK, WHICH IS HOW IT WAS FOUND. The
-     label above the year and the indicator below it are placed by equal
-     margins on equal boxes (see --wheel-stack-gap), so box-to-box the two
-     gaps measured 50.4px and 50.4px — correct, and not what the eye reads.
-     Measured to the numeral's INK the same two gaps were 55.8px above and
-     99.8px below: a 44px inequality, exactly twice the 22 the nudge was
-     introducing, and unfixable anywhere else because everything else in the
-     column was already symmetric.
-
-     IT WAS ALSO CLIPPING THE YEAR. The cell is --wheel-step (144px at 1440)
-     and the numeral's line box is 123.8, so it has ~10px of clearance each
-     side; a 20.6px shift put the top of the glyph 10.5px outside its own
-     cell, into the mask's 0-8% fade. Removing the over-correction gives that
-     back as well.
-
-     0.012em, measured rather than guessed: with the nudge zeroed the ink sits
-     1.45px above the box centre at the 1440 numeral, so this is that, in em,
-     so it scales with the clamp. Re-measure it, do not re-guess it, if the
-     face ever changes again. */
-  --story-num-nudge: 0.012em;
-
-  position: relative;
-  display: grid;
-  grid-template-columns: auto auto;
-  /* no gap — the century's trailing -0.05em letter-space becomes the
-     cross-column tracking, so "1987" reads as one evenly-set numeral */
-  gap: 0;
-  height: var(--wheel-step);
-  /* The SECOND horizontal clip on the numeral, and fixing only the columns
-     inside it would have moved the shear up one element rather than removing
-     it: this box is sized to the two auto tracks, so its left edge sits on
-     the century column's left edge — probed `cuts L0` at all three widths.
-     Same treatment (see .storyCenturyColumn), and it also widens the
-     mask-painting area, which is the border box: the gradient is 180deg, so
-     horizontally it is uniform and the extra 0.12em each side is simply more
-     opaque mask rather than a new fade. */
-  padding-inline: 0.12em;
-  margin-inline: -0.12em;
-  overflow: hidden;
-  font-family: var(--font-display);
-  font-weight: 500;
-  /* sized BELOW the wheel step so the glyphs sit fully inside the mask —
-     an oversize numeral was being clipped and eaten by the edge fades */
-  font-size: clamp(4.9rem, 8.6vw, 10rem);
-  line-height: 1;
-  letter-spacing: -0.05em;
-}
-
-/* thin edge softeners — a true alpha mask (not colour-gradient overlays),
-   so the fade works over the video backdrop where there is no flat page
-   colour to blend into. Same 8% extent as before. */
-.storyWheelMask {
-  -webkit-mask-image: linear-gradient(
-    180deg,
-    transparent 0%,
-    #000 8%,
-    #000 92%,
-    transparent 100%
-  );
-  mask-image: linear-gradient(
-    180deg,
-    transparent 0%,
-    #000 8%,
-    #000 92%,
-    transparent 100%
-  );
-}
-
-.storyCenturyColumn,
-.storySuffixColumn {
-  height: var(--wheel-step);
-  /* VERTICAL clipping is the odometer and stays exact — the year rolls
-     through this window and must be shorn at the window's edge. HORIZONTAL
-     clipping was never intended: it arrived as the other half of a shorthand
-     `overflow: hidden`, and because each column's box is sized to its own
-     digits (auto grid tracks, right/left-aligned content) that box lands
-     EXACTLY on the numeral's ink. Probed at 1440/1920/1280: `cuts L0 R0`
-     every time, zero tolerance, on glyphs carrying -0.05em letter-spacing —
-     so a hairline of the leading digit was being shorn.
-
-     `.heroLineClip` above solves the same thing on the other axis and this is
-     its treatment turned sideways: overflow clips at the PADDING box, so give
-     the clip breathing room and swallow it again with a matching negative
-     margin. The box grows 0.24em, both edges pull back 0.12em, the digits do
-     not move, and the seam between the two columns is unchanged. 0.12em is
-     ~15px at the 1440 numeral — far past any side bearing. */
-  padding-inline: 0.12em;
-  margin-inline: -0.12em;
-  overflow: hidden;
-}
-
-.storyNumberTrack {
-  display: flex;
-  flex-direction: column;
-  transition: transform 0.45s cubic-bezier(0.23, 1, 0.32, 1);
-  will-change: transform;
-}
-
-.storyNumber {
-  height: var(--wheel-step);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  color: var(--cream);
-  opacity: 0.22;
-  transform: translateY(var(--story-num-nudge)) scale(0.96);
-  transition:
-    opacity 0.25s cubic-bezier(0.23, 1, 0.32, 1),
-    transform 0.25s cubic-bezier(0.23, 1, 0.32, 1),
-    color 0.25s cubic-bezier(0.23, 1, 0.32, 1);
-  font-variant-numeric: tabular-nums;
-  /* no text-shadow — it read as a milky smear behind the numeral on cream */
-}
-
-/* both columns hug the shared seam so the four digits set as one numeral:
-   century right-aligned, suffix left-aligned. The suffix carries a 0.05em
-   right margin to cancel its trailing (negative) letter-space, keeping the
-   composite optically centered under the label and stems. */
-.storyCenturyColumn .storyNumber {
-  justify-content: flex-end;
-}
-
-.storySuffixColumn .storyNumber {
-  justify-content: flex-start;
-  margin-right: 0.05em;
-}
-
-.storyNumber.isActive {
-  opacity: 1;
-  transform: translateY(var(--story-num-nudge)) scale(1);
-  color: var(--cream);
-}
-
-.storySuffixColumn .storyNumber.isActive {
-  color: var(--saffron);
-}
-
-.storyList {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-.storyItem {
-  /* tighter rhythm — chapters read as a flowing feed while still tall
-     enough for the centre-line detector to flip cleanly per chapter */
-  min-height: clamp(420px, 58vh, 560px);
-  display: flex;
-  align-items: center;
-  padding-block: clamp(32px, 5vh, 64px);
-  border-top: 1px solid rgba(250, 247, 241, 0.14);
-  /* inactive chapters wait a touch dimmer and lower; activation rises them
-     on the house ease over a longer 0.6s travel, so the settle reads
-     editorial rather than snappy */
-  opacity: 0.5;
-  transform: translateY(24px);
-  transition:
-    opacity 0.6s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.storyItem:first-child {
-  border-top: none;
-}
-
-.storyItemActive {
-  opacity: 1;
-  transform: translateY(0);
-}
-
-/* a whisper of scale on the glass card itself — NOT the li, whose
-   IntersectionObserver geometry must stay untouched — so the card breathes
-   up to full size as its chapter takes focus */
-.storyItem .storyContent {
-  transform: scale(0.985);
-  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-}
-
-.storyItemActive .storyContent {
-  transform: none;
-}
-
-.storyMobileYear {
-  display: none;
-}
-
-/* glass card — each chapter's content sits on a translucent cream surface;
-   photo column left, text right (stacks on mobile) */
-.storyContent {
-  /* golden-ratio interior — one knob: the column gap tracks the card
-     padding at 1/φ (0.618), so the card's internal rhythm carries the
-     same proportion as its column split below */
-  --card-pad: clamp(20px, 2.4vw, 40px);
-
-  display: grid;
-  /* photo : text at 1 : φ — text is the major partner of the spread */
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1.618fr);
-  gap: calc(var(--card-pad) * 0.618);
-  align-items: center;
-  width: 100%;
-  max-width: 880px;
-  padding: var(--card-pad);
-  /* the house clear liquid glass (the CTAs' material): a whisper of
-     cream tint over a light blur so the footage reads through vividly,
-     no border, no light edges — just the tight recess hugging the rim.
-     The backdrop scrim carries the copy's legibility. */
-  background: rgba(250, 247, 241, 0.08);
-  -webkit-backdrop-filter: blur(6px) saturate(1.9) contrast(1.05);
-  backdrop-filter: blur(6px) saturate(1.9) contrast(1.05);
-  /* liquid-glass refraction (Chromium) — displacement bends the backdrop
-     at the rim; other engines keep the declaration above */
-  -webkit-backdrop-filter: url(#lg-card) blur(5px) saturate(1.9);
-  backdrop-filter: url(#lg-card) blur(5px) saturate(1.9);
-  box-shadow:
-    inset 0 0 0.45em rgba(18, 0, 0, 0.22),
-    inset 0 1px 2px rgba(18, 0, 0, 0.18);
-  border-radius: var(--radius-card);
-  corner-shape: squircle;
-}
-
-.storyText {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(12px, 1.8vh, 22px);
-}
-
-/* no backdrop-filter support → the glass would be invisible; fall back to
-   a near-solid maroon panel so the cream copy still has a surface */
-@supports not (backdrop-filter: blur(1px)) {
-  .storyContent {
-    background: rgba(31, 0, 0, 0.88);
-  }
-}
-
-.storyMeta {
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  color: var(--saffron);
-}
-
-/* neighbourhood tag riding the chapter number — quiet cream after a
-   middot so the meta line reads "Chapter 03 · Camden" */
-.storyMetaPlace {
-  color: var(--cream);
-  opacity: 0.6;
-}
-.storyMetaPlace::before {
-  content: "·";
-  margin: 0 0.6em;
-  color: var(--cream);
-  opacity: 0.5;
-}
-
-.storyTitle {
-  font-family: var(--font-display);
-  font-weight: 500;
   font-size: var(--t-display);
   line-height: var(--lh-display);
   letter-spacing: var(--tr-display);
-  /* cream on clear glass — the card barely tints the video now */
   color: var(--cream);
-  margin: 0;
-  max-width: 11ch;
 }
 
-.storyBody {
+.timeline {
+  /* easeOutQuart, module-local on purpose (no new global token): the title
+     reveal's 800/600 asymmetry is this section's signature timing, and
+     folding it into --ease-out would erase it. Quartic decelerates harder
+     early, which makes a 150% travel land rather than glide. */
+  --tl-ease-quart: cubic-bezier(0.25, 1, 0.5, 1);
+
+  /* how deep the photograph tucks over its year's foot — the occlusion
+     MOTIF, authored rather than accidental. Em-based so it scales with the
+     numeral through every clamp stop, and derived from the face the token
+     ACTUALLY resolves to today (--font-display-small is repointed to a
+     serif; Contralto's advances no longer apply). Canvas-measured on the
+     live page: this serif's lining digits ink from ≈0.15em to ≈0.87em of
+     their 1em line box, so 0.34em of tuck hides (0.87 − 0.66) / 0.72 ≈
+     29% of the DIGIT ink where a frame straddles the spine — an
+     unmistakable bite, while every date stays comfortably past the
+     two-thirds-visible floor even after anti-aliased edges shave the
+     pixel count. Re-derive from those two ink bounds
+     (probe-timeline-yearink.mjs) if the display face moves again. */
+  --tl-year-tuck: 0.34em;
+
   position: relative;
-  font-family: var(--font-sans);
-  font-size: var(--t-body);
-  line-height: var(--lh-body);
-  color: var(--cream);
-  opacity: 0.9;
-  margin: 0;
-  max-width: 58ch;
-  padding-top: clamp(10px, 1.4vh, 18px);
+  list-style: none;
+  margin: 0 auto;
+  padding: 0;
+  /* the measure every seat fraction in SEATS is a fraction OF. Uncapped, a
+     1920px container deals ~880px frames and the scatter reads as a gallery
+     rather than an archive. */
+  max-width: min(100%, 1120px);
 }
 
-.storyBody::before {
+/* the spine — a centred hairline, pitched between the old chapter border's
+   0.14 and full cream so it reads as structure rather than as a rule.
+
+   #faf7f1 until now, the cream from two palettes ago; 22% of the token at the
+   same alpha, because a spine hangs chapters off itself and identifies no
+   control. Measured against the footage behind the story column: the old
+   literal composited to rgb(47,28,27) for 1.19:1. */
+.timeline::before {
   content: "";
   position: absolute;
   top: 0;
-  left: 0;
-  width: 42px;
-  height: 1px;
-  background: var(--saffron);
+  bottom: 0;
+  left: 50%;
+  width: 1px;
+  transform: translateX(-50%);
+  background: color-mix(in srgb, var(--cream) 22%, transparent);
 }
 
-.storyImageFrame {
-  width: 100%;
-  /* landscape golden rectangle — φ : 1 */
-  aspect-ratio: 1.618 / 1;
-  /* the containing block for the chapter photograph, which is a next/image
-     `fill` and therefore absolutely positioned — see the list branch in
-     About.tsx for why it stopped being a raw <img> */
+/* one chapter. The li is the hover/focus HOST and carries no opacity of its
+   own — the spotlight dims .itemBody, so the year and the marker stay lit
+   while the photograph and title fade. That split is load-bearing: were the
+   year inside the dimmed wrapper, its 0.40 ink would multiply to 0.12 and
+   every date on the spine would sink whenever any sibling is hovered. */
+.storyItem {
   position: relative;
+  padding-bottom: 1.5rem;
+}
+
+/* THE YEAR IS CONTENT NOW, NOT ORNAMENT — the one place the date appears,
+   so it renders at every width and is never aria-hidden. It seats at the
+   item's HEAD, in flow and centred on the spine, and the photograph tucks
+   over its foot: the negative margin below pulls the frame (z 1) up over
+   the year's (z 0) bottom --tl-year-tuck. Six of the nine seats straddle
+   the spine by design, so those six numerals lose the same measured third
+   behind their own photograph — the recurrence is the composition — while
+   items 1, 3 and 6 sit clear at wide and show their year whole. It first
+   shipped vertically CENTRED behind the frame, which read as composition
+   in the stylesheet and as nothing on the screen: a centred frame covers
+   the spine at every narrow width, and the wide straddlers covered their
+   numerals whole — pixel-measured at 1/9 readable years at 768px. The head
+   seat keeps the occlusion motif without ever taking a date below
+   two-thirds visible.
+
+   THE TUCK HOLDS THROUGH THE PARALLAX because the year rides the frame's
+   own MotionValue (see TimelineItem) — a static year would surrender up to
+   |drift|/2 more of itself exactly at the viewport's centre, the position
+   every reader holds an item in.
+
+   The alpha lives in `color`, never `opacity`, so the sibling spotlight
+   cannot touch it. 0.40 cream at EVERY width now: the shipped 0.30 wide
+   value measured 2.45:1 against the film across all nine of its frames
+   (2.17:1 re-solved for the softened cream, same film) —
+   under the 3:1 large-text bar — and §9.5's remedy is the alpha, never the
+   size. The <time> value is available to assistive tech regardless. */
+.year {
+  display: block;
+  position: relative;
+  z-index: 0;
+  width: fit-content;
+  margin: 0 auto calc(var(--tl-year-tuck) * -1);
+  font-family: var(--font-display-small);
+  font-weight: var(--w-regular);
+  font-size: clamp(3.2rem, 5.5vw, 5.6rem);
+  line-height: 1;
+  letter-spacing: var(--tr-display);
+  /* THE ONE STRANDED LITERAL ON THIS PAGE THAT IS TYPE, AND THE ONLY ONE HERE
+     WHOSE ALPHA MOVED. It was `rgba(250, 247, 241, 0.4)` — #faf7f1, the cream
+     from two palettes ago. Everything else migrated in this file kept its
+     alpha, because ornament is supposed to dim when the ground does; a date
+     the reader has to read is not ornament.
+
+     0.4 -> 0.45 HOLDS THE COMPOSITE RATHER THAN THE NUMBER. 45% of the current
+     cream lands on the same luminance 40% of the old one did, so the dates
+     look exactly as they did before the swap. The factor is 1.115 and it is
+     not per-site taste: it is what the two creams' luminances require, and it
+     came out between 1.094 and 1.126 across all seven measured sites.
+
+     WHY IT DID NOT SIMPLY GO TO 3:1. This is large text (5.6rem at the top of
+     the clamp) so 1.4.3 asks 3:1 — and measured, it does not have it and never
+     did. The old literal reads 1.84:1 against the brightest footage under the
+     spine; at the same 0.4 of the new cream it would fall to 1.60:1. 0.45
+     stops the migration from taking anything, but the gap to 3:1 is a
+     PRE-EXISTING failure of pale type over a photograph, and closing it needs
+     a scrim or a heavier tone rather than another alpha — a design decision,
+     not a migration. Named here rather than quietly half-fixed. */
+  color: color-mix(in srgb, var(--cream) 45%, transparent);
+}
+
+/* the spotlight's one target — everything that dims on a sibling hover
+   lives in here; everything that must stay lit (year, marker) lives outside */
+.itemBody {
+  position: relative;
+  transition: opacity 750ms var(--ease-out);
+}
+
+/* framer-motion writes the parallax translate here — on a wrapper, never on
+   .frame itself, so the shutter below stays verifiable as pure clip-path:
+   the frame's own computed transform is `none` through every state */
+.parallax {
+  position: relative;
+}
+
+/* the photograph's seat. Narrow first: half the column, centred — the
+   scatter only exists where there is room for it. The entrance is a
+   clip-path wipe and the hover shutter is a clip-path inset: one property,
+   three states, and NEVER transform: scale, which would move the photograph
+   with the mat instead of closing the mat over it. Cream-at-10% is the
+   "never empty" backing (no LQIP exists for these runtime paths, and a
+   base64 pipeline is not this change's to add); the round token keeps the
+   house media radius through every inset. z-index 1 keeps the photograph in
+   front of the year even when reduced motion strips the wrapper transform
+   that would otherwise stack it. */
+.frame {
+  position: relative;
+  z-index: 1;
+  width: 50%;
+  margin-inline: auto;
+  aspect-ratio: var(--tl-ratio, 1.5);
   overflow: hidden;
-  background: var(--placeholder);
   border-radius: var(--radius-media);
-  corner-shape: squircle; /* Figma-style corner smoothing (superellipse); falls back to plain rounding */
-  box-shadow:
-    0 28px 70px -42px rgba(47, 0, 0, 0.55),
-    0 1px 0 rgba(255, 255, 255, 0.5) inset;
+  /* the "never empty" backing, #faf7f1 until now — two palettes stale like the
+     rest of this file. 10% of the token, same alpha: a photograph covers it the
+     moment one decodes, so it is a surface step rather than anything a floor
+     applies to, and it is not measured here for exactly that reason. */
+  background: color-mix(in srgb, var(--cream) 10%, transparent);
+  clip-path: inset(0% 0% 100% 0% round var(--radius-media));
+  transition: clip-path 700ms var(--ease-out);
 }
 
-/* ---- chapter layout variants — a varied editorial sequence ---- */
-
-/* portrait: text leads on the left, a tall image closes the spread —
-   text : photo at φ : 1, mirroring the landscape split */
-.storyPortrait {
-  grid-template-columns: minmax(0, 1.618fr) minmax(0, 1fr);
-}
-.storyPortrait .storyImageFrame {
-  order: 2;
-  /* the golden rectangle stood upright — 1 : φ */
-  aspect-ratio: 1 / 1.618;
-}
-
-/* NO `.storyWide`. The panoramic bookend was the list's half of a third
-   chapter shape, and the deck no longer has a third shape to match it with —
-   a chapter declares ONE proportion and both branches spend it (see the
-   `layout` union in About.tsx). Deleted rather than left dangling: an unused
-   variant here is exactly the kind of rule that gets re-attached later and
-   silently puts a shape back that the deck cannot carry. */
-
-/* quiet link out to the chapter's restaurant — same thin arrow language
-   as the Awards rows */
-.storyLink {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.8em;
-  margin-top: clamp(6px, 1vh, 12px);
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  color: var(--cream);
-  opacity: 0.75;
-  transition:
-    opacity 0.3s ease,
-    color 0.3s ease;
-}
-.storyLink svg {
-  width: 22px;
-  height: 10px;
-  transition: transform 0.4s var(--ease-out);
-}
-@media (hover: hover) and (pointer: fine) {
-  .storyLink:hover {
-    opacity: 1;
-    color: var(--saffron);
-  }
-  .storyLink:hover svg {
-    transform: translateX(5px);
-  }
+/* entered — set once by TimelineItem's observer (whileInView cannot fire
+   inside an overflow-hidden mask, which is exactly what .frame is) */
+.entered .frame {
+  clip-path: inset(0% 0% 0% 0% round var(--radius-media));
 }
 
 .storyImage {
-  width: 100%;
-  height: 100%;
   object-fit: cover;
-  display: block;
+  object-position: var(--tl-focus, 50% 50%);
+  /* the house photo grade, carried over from the list treatment */
   filter: saturate(0.96) contrast(0.98);
+  /* the sharp frame cross-fades in on decode, over the cream backing */
+  opacity: 0;
+  transition: opacity 500ms var(--ease-out);
 }
 
-/* restrained depth cue — scroll-driven engines only (Chromium): the photo
-   is oversized a touch and drifts a few percent inside its overflow-hidden
-   frame as the card crosses the viewport. The travel (±3.5%) stays inside
-   the 8% oversize, so no edge ever shows; it reads as depth, not motion.
-   Other engines (and reduced-motion readers) simply get the still crop. */
-@supports (animation-timeline: view()) {
-  @media (prefers-reduced-motion: no-preference) {
-    .storyImage {
-      scale: 1.08;
-      animation: storyParallax linear both;
-      animation-timeline: view();
-    }
-  }
+.storyImage[data-loaded="true"] {
+  opacity: 1;
 }
 
-/* coming-soon chapters ship no photography — the wordmark sits contained
-   on a maroon field (the Discover tile's treatment), and the parallax
-   drift is switched off so the mark stays seated. Declared after the
-   @supports block above so these overrides win in source order. */
+/* coming-soon chapters ship no photography — the wordmark sits contained on
+   a soft maroon field (the Discover tile's treatment, which is what the
+   `wordmark` flag has always denoted) */
 .storyImageWordmark {
   object-fit: contain;
   padding: clamp(24px, 16%, 88px);
-  background: var(--maroon);
+  background: var(--maroon-soft);
   filter: none;
-  scale: 1;
-  animation: none;
 }
 
-@keyframes storyParallax {
-  from {
-    translate: 0 -3.5%;
-  }
-  to {
-    translate: 0 3.5%;
-  }
-}
-
-/* ---------------------------------------------------------------------------
-   THE PAGE INDICATOR — nine chapters as nine identical dots, docked under the
-   year wheel (the wheel column is sticky, so the dots stay on screen for the
-   whole story and can never collide with the chapter cards).
-
-   WHAT IT REPLACED was a progress BAR pretending to be dots: a 300px hairline
-   track with eleven-pixel bordered circles spaced across it and the active one
-   painted saffron, scaled 1.35 and wrapped in an 8px glow. Four properties
-   changed at once and the loudest of them — a 27px halo — is the one that has
-   to be read from the corner of the eye while the reader is looking at a
-   photograph. It read as a control.
-
-   AN INDICATOR IS NOT A CONTROL, and Apple's is the proof: uniform dots, one
-   size, one colour, evenly spaced with no track under them, and the current
-   page told apart by weight rather than by decoration. 7px dots on a 9px gap
-   are its proportions. The row is 135px where the bar was 300 — it is a
-   subtitle to the numeral above it, not a second element competing with it.
-
-   THE ROW'S BOX IS --t-label ON PURPOSE. The wheel is centred as a stack while
-   what has to read as centred is the numeral, so the label's box above and
-   this row's box below have to be the same height or the numeral sits off
-   centre by half the difference (measured 4px low at 900 and 6px at 1400 the
-   last time they disagreed). The label is a --t-label line box at
-   line-height: 1; this row is declared to be one. 7px dots — 9.1px at the
-   active scale — sit inside 13px with room to spare.
-
-   COLOUR IS THE THIRD CUE, NOT THE FIRST. Scale and opacity carry the state
-   on their own (the row is legible in greyscale, which the old glow was not),
-   and the saffron is spent only to tie the active dot to the active year
-   suffix directly above it — the two are the same state and should say so. */
-.storyProgress {
-  /* nine 7px dots on a 9px gap — the row's width is stated by the dots
-     rather than by a container, which is what keeps them evenly spaced
-     without a `space-between` that would restretch on a resize */
-  display: flex;
-  align-items: center;
-  gap: 9px;
-  height: var(--t-label);
-  margin-top: var(--wheel-stack-gap);
-}
-
-.storyProgress span {
-  width: 7px;
-  height: 7px;
-  flex: none;
-  border-radius: 50%;
-  background: var(--cream);
-  /* 0.34, and it is a floor rather than a taste: these sit over a film, so
-     the resting dot has to hold its own against a lit frame as well as a dark
-     one. The shadow below is what does that without a border — an outline on
-     a 7px circle is most of the circle. */
-  opacity: 0.34;
-  box-shadow: 0 1px 3px rgba(18, 0, 0, 0.5);
-  /* A CRITICALLY DAMPED SPRING, WRITTEN AS A CURVE. bounce 0, perceptual
-     duration 0.35s — Apple's "response 0.3-0.4, damping 1.0" default for a
-     state change that no gesture threw. No overshoot: a chapter indicator
-     that bounces reads as a toy, and overshoot is reserved for motion the
-     reader's own hand put momentum into.
-
-     TRANSITIONS RATHER THAN KEYFRAMES BECAUSE THEY INTERRUPT. A transition
-     re-targets from the element's PRESENTATION value, so a reader scrubbing
-     three chapters in half a second gets each dot continuing from wherever it
-     had got to instead of snapping to a start state — which is the whole
-     property a scrubbed deck needs from its indicator, and the one thing an
-     @keyframes animation cannot do.
-
-     transform and opacity only, so the whole thing stays on the compositor
-     and never touches the scrub's frame budget. */
-  transition:
-    transform 650ms
-      linear(
-        0, 0.0792, 0.2371, 0.4044, 0.5525, 0.6726, 0.7652, 0.8341, 0.8842,
-        0.9199, 0.9451, 0.9626, 0.9747, 0.9829, 0.9886, 0.9924, 0.9949, 0.9966,
-        0.9978, 0.9985, 0.999, 1
-      ),
-    opacity 650ms
-      linear(
-        0, 0.0792, 0.2371, 0.4044, 0.5525, 0.6726, 0.7652, 0.8341, 0.8842,
-        0.9199, 0.9451, 0.9626, 0.9747, 0.9829, 0.9886, 0.9924, 0.9949, 0.9966,
-        0.9978, 0.9985, 0.999, 1
-      ),
-    background-color 320ms ease;
-}
-
-.storyProgress .progressActive {
-  opacity: 1;
-  /* 1.3 — 7px to 9.1px. Large enough to find without counting, small enough
-     that the row still reads as one line of equal marks. */
-  transform: scale(1.3);
-  background: var(--saffron);
-}
-
-/* reduced motion — the wheel snaps between years and the story items keep
-   a plain opacity fade; no rolling, no rises */
-@media (prefers-reduced-motion: reduce) {
-  .storyNumberTrack {
-    transition: none;
-  }
-
-  /* THE SCALE STAYS, THE SPRING GOES. The active dot is still the larger one
-     — that is state, and removing it would leave opacity carrying the whole
-     indicator — but it arrives at its size rather than travelling to it.
-     Dropping `transform` from the transition list is the whole change; the
-     opacity cross-fade is kept because a fade aids comprehension and is
-     exactly what the preference asks to be left alone. Not a width change:
-     these sit in a flex row, so an animated box would shove eight neighbours
-     sideways every chapter. */
-  .storyProgress span {
-    transition:
-      opacity 0.2s ease,
-      background-color 0.2s ease;
-  }
-
-  .storyItem {
-    transform: none;
-    transition: opacity 0.2s ease;
-  }
-
-  /* the card's activation scale is motion — the item's opacity fade above
-     is the whole effect for reduced-motion readers */
-  .storyItem .storyContent {
-    transform: none;
-    transition: none;
-  }
-}
-
-/* ===========================================================================
-   THE STORY DECK — nine chapters in one vertical stack, one camera
-   ===========================================================================
-
-   Read the header in About.tsx for the why. This is the second column of
-   .storyShell on wide viewports; the year wheel beside it, the container
-   around it and the pinned video behind it are the section's original
-   furniture and are not touched by anything below.
-
-   THREE LOAD-BEARING RULES:
-
-   1. `perspective` appears ONCE, on .railStage. Nine cards sharing one camera
-      is the entire effect; a second perspective anywhere in this subtree
-      gives that branch its own vanishing point and the stack kinks.
-   2. `transform-style: preserve-3d` is UNBROKEN from the stage down to each
-      card. .railTrack, .railList and .railItem all carry it — miss one and
-      all nine collapse onto a single flat plane, which looks like a bug in
-      the transforms rather than a missing property.
-   3. Containment (`overflow`, `contain`) goes on .railPin and NOWHERE inside
-      it. Both flatten a preserve-3d element; the pin is outside the 3D
-      context, so it is the only safe place to clip.
-
-   THE NUMBERS, AND WHERE THEY CAME FROM. Four measurements off the deck
-   reference, and every value below is solved from them rather than tuned:
-
-     - the front card projects to a TRAPEZOID, 513px across the top edge and
-       402 across the bottom (taper 0.784), 473 tall;
-     - the cards behind show as strips 48, 44, 41, 38px tall above the front
-       card's top edge, decelerating;
-     - corner radius ~20px at that scale;
-     - the cards are opaque.
-
-   THE TOP EDGE BEING WIDER THAN THE BOTTOM IS THE WHOLE GEOMETRY. It means
-   the card's top leans toward the camera and its bottom away — a rotateX. In
-   CSS, rotateX(+a) sends the TOP away, so this is a NEGATIVE angle.
-
-   SOLVING IT. Put u = (h/2)·sin(tilt), the distance the top edge leans
-   forward. Then:
-     top/bottom width  = (P + u)/(P − u)                  = 1.276
-     projected height  = h·cos(tilt) · P²/(P² − u²)       = 473
-   The first gives u/P = 0.1213 → u = 169.8 at P = 1400, hence h·sin = 339.6.
-   The second gives h·cos = 466.0. So
-
-     tilt = atan(339.6/466.0) = 36.1°, and h = 577, w = 513·(1 − 0.1213) = 451.
-
-   NOT the 40-44°/658 first estimated. Those cannot both hold: at h = 658 a
-   projected height of 473 demands tilt = 44.9°, which puts u at 232 and the
-   taper at 0.715 — visibly flatter-bottomed than the 0.784 measured. The
-   taper and the projected height over-determine the card; 36.1°/451×577 is
-   the pair that satisfies both at once.
-
-   OUR CARD is 440×560 at tilt -36°, the same 0.79:1 proportion scaled to sit
-   in a column beside the year wheel. It projects to 499 across the top, 394
-   across the bottom, 459 tall — taper 0.790 against the reference's 0.784.
-
-   THE STEPS follow from the strip series, which is a function of BOTH steps
-   at once. A card's top edge lands at
-
-     Y(k) = (k·Sy − A) · P/(P + k·Sz − u),   A = (h/2)cos(tilt) = 226.5
-
-   and the strip is Y(k−1) − Y(k). Sz = 60 sets how fast that decelerates;
-   Sy = -56 sets its size:
-
-     strips  48.6, 44.3, 40.6, 37.3, 34.4, 31.8, 29.5, 27.4
-     ref     48    44    41    38
-     scales  1.000 0.959 0.921 0.886 0.854 0.824 0.795 0.769 0.745
-
-   Sx is 0 — this is a vertical deck. The vanishing point is directly above
-   the seat at Sy·P/Sz = 1307px up, which is why the stack leans back rather
-   than fanning sideways.
-
-   THE DECK'S EXTENT is 550px above the seat and 203 below it, 753px tall, and
-   ~499px wide at its widest scanline. That box is what the seat percentages
-   below are placed against.                                                 */
-
-/* THIRDS — the wheel, the deck and the copy each own one, and the block is
-   centred in the viewport.
-
-   WHAT THIS REPLACED, and why it had to go. The shell was `22% | 1fr` with
-   the deck and the copy SHARING the second track: the wheel took 300px, the
-   deck a fixed 499, the copy whatever was left. Three elements, two tracks,
-   and no edge in the frame agreeing with any other — which is exactly what
-   "it looks all over the place" describes. Nothing was misaligned; there was
-   simply no measure for the eye to find.
-
-   THE CATCH, AND HOW IT WAS RESOLVED. A third of the capped 1400 block is
-   ~437px, and the deck's widest projected scanline was 499. Three ways out
-   were available and only one is honest:
-
-     - GROW THE CAP. Fails at the bottom, not the top: at a 1440 viewport the
-       container is only 1360px wide, so the cap does not bind there at all
-       and the third is 428 whatever the cap says. A cap can widen 1920 and
-       2560; it cannot widen 1440.
-     - THIRDS OF THE VIEWPORT. Fails at the top: at 2560 a third is 853px, so
-       the wheel (~350px of numerals) and the copy (42ch ≈ 460px) would each
-       float in 400px of dead air. That is the problem the cap was added to
-       fix, reintroduced.
-     - SHRINK THE CARD. Works everywhere, and it is what was done.
-
-   So the card drops from 440x560 to 356x452 — 19% — and its widest projected
-   scanline from 499 to 393 (419 for the widest size variant). That fits a
-   third at every width from the 1200px gate up, with 8.6px to spare in the
-   binding case (a 1440 viewport, where the third is 428.4). The geometry is
-   unchanged: same 0.788 proportion, same -36 degrees, same Sy/Sz, same strip
-   series. Only the scale moved, which is a move this file already makes once
-   at the narrow breakpoint.
-
-   WHAT IT COSTS. The wheel's third is ~430px and its numerals measure ~272,
-   so ~158px of that third is now air. That is the price of a measure: the
-   wheel is CENTRED in its own third rather than packed against the copy, and
-   the three centres are evenly spaced across the block. The deck is 19%
-   smaller than it was.
-
-   The cap and the centring are unchanged from the previous build — at 1920
-   the content ended at 1480 with 440px empty beside it, and capping spends
-   that surplus as equal margins instead.
-
-   `:has()` rather than a modifier class because the condition IS "this shell
-   contains the deck" — there is nothing for a class name to add, and a
-   modifier would have to be threaded through the branch in About.tsx to say
-   something the DOM already says. */
-.storyShell:has(.railPinWrap) {
-  /* ONE gutter for the whole frame, declared here and inherited by
-     .railPinWrap below, because the deck's internal split has to reproduce
-     the shell's own tracks exactly. Two separate values that happened to
-     match would be a drift waiting to happen. */
-  --rail-gap: clamp(28px, 2.6vw, 44px);
-
-  /* THE SHARED HORIZON — the one line the year, the seat card and the copy
-     are all placed against, and it lives on the SHELL because that is the
-     only element all three descend from.
-
-     It used to live on .railPinWrap, which the wheel is a SIBLING of, so the
-     wheel could not read it and was placed by its own unrelated rule
-     (`sticky; top: 18vh; height: 64vh`, i.e. centred at 50vh). The deck sits
-     at 56% of the pin and the seat card's centre lands lower still, so the
-     year and the copy were measured 124px apart at 1920 — each correctly
-     aligned to a different thing.
-
-     --rail-seat-y places the deck (see .railStage); --rail-axis-offset is how
-     far below that seat the two SIDE columns hang.
-
-     THE OFFSET IS NO LONGER THE SEAT CARD'S CENTRE, and that is the fix for
-     both "the cards are all one size" and "the content in the left middle and
-     right are not properly centered". It used to be written per chapter from
-     the seated card's own height, which made the axis a function of whatever
-     was on the deck: it stepped 15px between neighbouring chapters and sat
-     100-130px below the middle of the frame. It is now the deck's own fixed
-     geometry — the projected top edge every variant shares by construction,
-     plus a constant — so it depends on the breakpoint band and nothing else.
-     The full derivation is with railAxisOffset in About.tsx.
-
-     56% rather than the 68% this started at, and the move was an alignment
-     rather than a preference: the seat card is upright, so it is its full
-     height on screen rather than its raked projection. The cost is at the
-     top — the stack reaches ~505px above the seat, so the last cards clip off
-     the upper edge and seven are visible instead of nine. That is the
-     direction cards already leave in and it is what the reference shows.
-
-     The fallback is the widest band's figure so the rules read on their own
-     with JS out of the picture: −0.4045085 × 452 × 1.10483 + 145 = −57.0. */
-  --rail-seat-y: 56%;
-  --rail-axis-offset: -57px;
-
-  max-width: 1400px;
-  margin-inline: auto;
-  /* Equal thirds. `minmax(0, 1fr)` rather than `1fr` so the deck's fixed-px
-     stage can never force its track past its share — the same grid-item
-     escape hatch .railPinWrap carries. */
-  grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: var(--rail-gap);
-}
-
-/* THE YEAR WHEEL, RE-HUNG ON THE DECK'S HORIZON — and scoped with `:has()` so
-   the list branch keeps the rule it was designed with.
-
-   The wheel's own `top: 18vh; height: 64vh` centres it at 50vh, which is a
-   perfectly good place for it in a two-column layout and the wrong place in
-   this one by 124px. Restating it as a full-height sticky box centred at 50%
-   and then translated by (--rail-seat-y − 50%) puts its centre exactly on the
-   seat, and the second term puts it on the seat CARD.
-
-   translateY percentages resolve against the element's OWN height, which is
-   why this works out: the box is 100svh, the pin is 100svh, so 6% of one is
-   6% of the other. Written as a difference from 50% rather than as a literal
-   6% so that moving --rail-seat-y moves all three columns together.
-
-   min-height is dropped rather than kept. It exists to stop the wheel
-   collapsing in a short window; here the box is 100svh and a 100svh floor of
-   480px would fight the translate on a short screen instead of helping.
-
-   NO TRANSITION ANY MORE, because there is nothing left to transition. The
-   0.55s ease existed only to carry the wheel to a new place when the seat
-   card's height changed under it; the axis is fixed now (see
-   --rail-axis-offset above), so the only thing a transition could still do is
-   lag a resize. */
-.storyShell:has(.railPinWrap) .storyWheel {
-  top: 0;
-  height: 100svh;
-  min-height: 0;
-  transform: translateY(
-    calc(var(--rail-seat-y) - 50% + var(--rail-axis-offset))
-  );
-  /* TWO SEPARATE FACTS, AND CONFLATING THEM IS WHAT WENT WRONG HERE.
-
-     (1) WHERE THE COLUMN SITS. The deck is centred in its own third to 0.1px
-     by construction (.railTrack sits at left: 50% of a stage that IS the
-     third), so the gaps from the card to its COLUMN's two edges have always
-     been equal — measured -13.0 / -13.0 at 1440 with the landscape card
-     seated, +39.2 / +39.3 with the portrait. The unevenness the eye actually
-     reads is between the card and its two NEIGHBOURS, and it was 4.5:1:
-
-       1440x900   wheel ink -> card 110.1px    card -> copy ink 24.4px
-       1920x1080  wheel ink -> card  88.2px    card -> copy ink 35.5px
-
-     because the copy fills its track from the first pixel while this column
-     was CENTRED in its own — parking 85.7px of nothing between the year and
-     the deck on top of the 37.4px gutter, and none on the other side. So the
-     column is anchored to the END of its track, which closes exactly that
-     void and leaves both gaps as one quantity: the grid gutter, less the
-     card's own symmetric overhang.
-
-     (2) HOW THE STACK SITS INSIDE IT. That anchoring used to be spent as
-     `align-items: flex-end`, which does not move the column — it flushes
-     every CHILD right independently. The year is the widest of the three by a
-     long way (340px against the label's 117 and the dot row's 175), so the
-     label and the indicator ended up hugging the year's right edge with all
-     the slack on their left: read as a right-aligned stack, not a centred
-     one, which is exactly what it was.
-
-     Shrinking the column to `max-content` makes its width the year's width,
-     `margin-left: auto` puts that box at the end of the track, and the
-     inherited `align-items: center` then centres the label and the dots on
-     the numeral. Fact (1) is unchanged — the year's right edge lands where
-     flex-end put it — and the stack reads centred about the number, which is
-     what the column is for.
-
-     Scoped to the deck branch, like everything else in this rule, because the
-     list branch centres its wheel against a column of scrolling chapters
-     rather than against one card. */
-  width: max-content;
-  margin-left: auto;
-}
-
-/* THE LAST 4px, AND IT IS THE WHEEL'S OWN ASYMMETRY rather than anything to
-   do with the deck.
-
-   Centring the wheel column centres its whole STACK — label, numeral, dots —
-   and the numeral is not at that stack's middle unless the boxes above and
-   below it match. They did not: the label's own line box ran taller than
-   `--t-label` and the two margins were different clamps, which put the
-   numeral 4px low at 900 and 1080 and 6px low at 1400, the two clamps having
-   diverged above 1067px of viewport height.
-
-   Both terms are removable rather than correctable, and both are now removed
-   at their source: the margins are one shared --wheel-stack-gap (see
-   .storyWheel) and the dot row is declared --t-label tall (see
-   .storyProgress), so all this rule still owes is the label's line-height —
-   without it the label's box is ~1.2x --t-label and the boxes stop matching.
-   The stack is then symmetric ABOUT THE NUMERAL by construction, at every
-   viewport height, with no correction term to go stale.
-
-   Scoped, because on the list branch the wheel is centred against a column of
-   scrolling chapters and its own stack is the only thing it has to balance. */
-.storyShell:has(.railPinWrap) .storyWheelLabel {
-  line-height: 1;
-}
-
-.railPinWrap {
-  /* 72svh of scroll per chapter. The wrapper must OUTLIVE the sticky child:
-     100svh of pin plus the travel, or the pin engages and releases on the
-     same frame. */
-  --rail-step-vh: 72;
-  --rail-travel: calc(9 * var(--rail-step-vh) * 1svh);
-  /* THE DECK'S COLUMN, DERIVED RATHER THAN TYPED. The wrapper spans the
-     second and third shell tracks (see grid-column below), so it is exactly
-     two thirds plus one gutter wide — and (100% - gap)/2 is therefore the
-     third, to the sub-pixel, at every viewport and under any future change to
-     the cap or the gutter.
-
-     It used to be a literal 499px, which was the deck's widest projected
-     scanline. That number now runs the other way: the CARD is sized so its
-     widest scanline fits inside this column (see --rail-card-w), rather than
-     this column being sized to the card. The stage is wider than the card at
-     most widths, and since the seat is the stage's centre, the deck simply
-     centres itself in its third.
-
-     Both the stage's width and the copy's left edge are still spent off this
-     one value, so the two can never overlap by arithmetic. */
-  --rail-col: calc((100% - var(--rail-gap)) / 2);
-  /* the wrapper owns tracks 2 and 3: the deck's third and the copy's. The
-     copy is absolutely positioned inside the pin (see .railCopy) rather than
-     being a third grid item, because it has to be inside the STICKY box to
-     stay with the deck. */
-  grid-column: 2 / 4;
-  /* --rail-seat-y and --rail-axis-offset used to be declared HERE and that is
-     precisely why the year wheel could not find them: the wheel is a sibling
-     of this element, not a descendant. Both now live on .storyShell above,
-     where all three columns inherit them.
-
-     The offset briefly became a per-chapter value, when it was the seated
-     card's own centre and the variants differed in height. It is a per-BAND
-     value again — the deck's shared projected top edge plus a constant — so
-     it is written on a resize and never during a scrub. */
-
+/* the chapter title — an <h3>, and on wide screens also the reveal MASK.
+   The narrow state is the base state: in flow under the photograph, centred,
+   permanently visible. The resting off-mask translate lives ONLY inside the
+   hover gate below — in the base rule it would ship every touch device and
+   coarse-pointer laptop a timeline whose titles are parked out of sight.
+   Contralto small at every width; the sizes differ, the face does not. */
+.storyTitle {
   position: relative;
-  /* A PLAIN GRID ITEM in .storyShell — not full-bleed. The previous build
-     took this out of the container to give a diagonal ribbon the whole
-     viewport; a vertical deck belongs in the column the chapter photography
-     used to occupy, which is also the only way the year wheel keeps a column
-     to be sticky in. */
-  width: 100%;
-  height: calc(100svh + var(--rail-travel));
-  /* min-width: 0 is the grid-item escape hatch — without it the deck's fixed
-     px stage would force the `minmax(0, 1fr)` tracks wider than their share. */
-  min-width: 0;
-}
-
-.railPin {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  /* The deck leaves the frame at BOTH ends by design — the far strips climb
-     off the top, and a departing card is thrown down past the bottom at 1.7×
-     — and this is the only place either can be cropped: the pin sits outside
-     the 3D context, and `overflow` anywhere inside it would flatten
-     preserve-3d. */
-  overflow: clip;
-  /* NOT a grid. The stage has to be absolutely positioned — its box IS the
-     camera, and the seat is placed by shaping that box (see .railStage) — so
-     it leaves the flow, and a grid would then hand column 1 to the copy and
-     stack the two on top of each other. Both children are placed explicitly
-     off --rail-col instead: deck left, copy right, the original glass card's
-     photograph-left / text-right reading order. */
-}
-
-/* THE CAMERA, and the reason this box is shaped the way it is.
-   `perspective-origin` is left at its default 50% 50%, so the vanishing point
-   is pinned to the STAGE's centre — which means the stage's centre is the
-   front seat, and the seat is placed by shaping the stage rather than by
-   offsetting the cards inside it. Offsetting instead would shift every
-   projected position by (offset × (1 − scale)), i.e. quietly change the whole
-   geometry rather than move it.
-
-   The stage spans the deck's own column, so the seat is horizontally centred
-   in it by construction. Vertically, centre-from-top = top + (100% − top)/2
-   with bottom: 0, so the seat lands at (100 + top)/2 — which is why `top` is
-   written as `2·--rail-seat-y − 100%`, i.e. the inverse. One number
-   (--rail-seat-y) places both the deck and the copy; see .railPinWrap for
-   how it was measured. */
-.railStage {
-  /* Geometry, spent by .railCard below. Quoted in About.tsx as RAIL_SX/SY/SZ
-     — the two must never drift, so both carry the same numbers and the same
-     derivation (see the deck header above). */
-  --rail-sx: 0px;
-  --rail-sy: -56px;
-  --rail-sz: 60px;
-  /* The shared Z offset that keeps .railTrack's own plane from ever crossing
-     the camera — see RAIL_Z0 in About.tsx for what breaks without it. It is
-     the deck's full depth, 8 × the Z step, the minimum that works; About.tsx
-     computes it as RAIL_LAST * RAIL_SZ so changing the step can never
-     silently leave it short. */
-  --rail-z0: 480px;
-  /* NEGATIVE, and the sign is the entire reference. CSS rotateX(+a) sends the
-     TOP edge away from the camera, which would project a card NARROWER at the
-     top — the opposite of the 513-over-402 trapezoid measured. -36° leans the
-     top forward and the bottom back: the card is a lectern facing the reader,
-     and the strip of each card visible above the one in front is the top of
-     its photograph rather than its underside. */
-  --rail-tilt: -36deg;
-
-  /* THE CARD, AND THE TWO SIZE VARIANTS.
-
-     --rail-base-h IS THE GEOMETRY AND IS NO LONGER ANY CARD'S HEIGHT. It was
-     the middle variant's own box (356 x 452) until that variant was removed;
-     it stays at 452 because it is the reference PLANE the whole deck is
-     derived from, not a card. The proof below is what makes that legitimate:
-     h cancels out of every projected quantity, so h0 alone fixes the shared
-     top edge, the strip series, the mat's requirement, --rail-seat-y and
-     --rail-axis-offset. Changing it would move the composition; changing a
-     card's own height moves nothing but that card's bottom edge.
-
-     The defaults immediately below ARE the landscape card, so the base rule
-     needs no class and only the portrait carries one.
-
-     --rail-card-h is only this card's own box.
-     Every number in the deck header — the strip series, the mat height, the
-     seat percentage — is a function of where the cards' TOP EDGES project,
-     and the top edge is where it is because of the base height. The variants
-     below change --rail-card-w and --rail-card-h; they do NOT change
-     --rail-base-h, and .railCard's `top` and z compensation are what convert
-     "a different height" into "the same top edge, extended downward".
-
-     THE PROOF, because this is the one thing that would quietly wreck the
-     deck if it were merely asserted. A card of height h laid out at
-     top = -(h0/2 + 0.0954915(h - h0)) and pushed 0.293893(h0 - h) toward the
-     camera has, for the point m card-local px below its own top edge:
-
-       world y = -h0/2 + 0.0954915*h0 + 0.809017*m + k*Sy
-       world z = 0.293893*h0 - 0.587785*m - k*Sz
-
-     Both are free of h. So the top edge (m = 0), the strip series, the mat's
-     coverage requirement and the upright drop are all identical for every
-     variant — they depend on the base height alone. Vary a card about its
-     CENTRE instead, as the obvious reading of "different sizes" would, and
-     every one of those falls out of step.
-
-     THE SCALE, per breakpoint. One multiplier rather than nine literals, and
-     About.tsx mirrors it from the same two media queries — it needs each
-     card's true height in px to build that card's own upright compensation,
-     which used to be hard-coded off 560 and was a documented ~2px error at
-     the narrow breakpoint and would have been a ~15px error per variant. */
-  --rail-scale: 1;
-  --rail-base-h: calc(452px * var(--rail-scale));
-  /* THE LANDSCAPE CARD — the base rule, and it is five of the nine only by
-     coincidence now (see railShape in About.tsx: the shapes are dealt from a
-     hash, and this deal happens to give five).
-
-     THE BOX SHRANK AND THE CARD GREW, which is RAIL_PUSH and is worth stating
-     because the numbers here look like the opposite of the ask. The seat card
-     is pushed to z = +407.8 and so magnified 1.4111 rather than 1.1048, so
-     322 x 262 lands as 455.0 x 370.2 on screen — 13px wider and 19px shorter
-     than the 441.9 x 388.9 the old 400 x 352 box projected. Shorter and wider
-     is the ask; the box is only the pre-image of it. */
-  --rail-card-w: calc(322px * var(--rail-scale));
-  --rail-card-h: calc(262px * var(--rail-scale));
-  /* 2px. It was 20 (~20px at the reference's scale), which on a card this size
-     reads as a UI panel rather than as a print — and a print is what these
-     are. At 2 the corner is a trimmed edge: enough to stop the raster's
-     literal 90 degrees, not enough to be a shape.
-
-     NOT SCALED, unlike the 20 it replaces. A radius has to be a fraction of
-     the card only while it is large enough to read AS a radius; at 2px, 0.8 of
-     it is 1.6px, which is a sub-pixel difference nobody can see and which the
-     squircle below cannot draw cleanly either. Absolute px also means the
-     three bands trim identically, which is what a print does. */
-  --rail-card-r: 2px;
-
-  /* THE MAT — now a SCRIM over the photograph rather than a colour band, and
-     the strip the reader actually sees when a card is behind the seat. The
-     derivation of its HEIGHT is unchanged and is in About.tsx's mat header;
-     the short version is that the band must cover the worst case mid-swap at
-     k = 0.85, NOT the largest at-rest strip.
-
-     76 -> 84, AND THE EIGHT PIXELS ARE THE PRICE OF CENTRING THE SEAT CARDS.
-     The band is sized against the WORST strip it has to cover, and centring
-     opens the first strip from 49.9 to 63.2 screen px whenever the shorter
-     landscape card is seated (the full derivation is with railUprightDrop in
-     About.tsx). 76 covered 71; 84 covers 78, which carries 63.2 with 15.0px
-     of slack — enough for the mid-swap case, which runs ~6% above the at-rest
-     figure. Everything below is the ORIGINAL derivation and is unchanged: it
-     sets the floor this number has to clear, and 84 clears it by more than 76
-     did.
-
-     THE REQUIREMENT MOVED WITH THE CARD, and it moved the wrong way. Solving
-     screenY(k, -h0/2 + m) >= screenY(k-1, -h0/2) at each scale:
-
-       base height   at-rest (k=1)   +6% mid-swap   slack in 76px
-       452  (>=1440)     53.0             56.2          35%
-       406.8 (1320+)     54.6             57.9          31%
-       361.6 (1200+)     56.2             59.6          27%
-
-     A SMALLER card needs a LARGER mat, because the strip series is a function
-     of Sy and Sz and neither of those scales. That is the same reason the
-     height is ABSOLUTE PIXELS AND NOT A RATIO OF THE CARD — which is the
-     opposite of what it looks like it should be. A mat expressed as a
-     fraction of the card shrinks against a strip series that has not shrunk,
-     and it was measured doing exactly that: at 0.135*h the slack was 23.1
-     screen px on the old 560 card and 6.2 on the 471.
-
-     76px still clears every band, so it is untouched. The honest cost is at
-     the bottom: on the 361.6px base card the band is 21% of the card's
-     height, where on the old 560 it was 13.6%.
-
-     (The other half of that old problem is GONE rather than absorbed. The
-     upright compensation used to be hard-coded off 560 and over-shot by 10.8
-     screen px on the 471 card, growing the first strip from a predicted 49.7
-     to a measured 54.9. About.tsx now builds it from each card's own true
-     height, so the prediction and the measurement agree at every scale and at
-     every variant.)
-
-     THE MARK MOVED UP AND LOST 2px, and it is the other half of the centring
-     trade. The mark sits --rail-mark-top below its card's own top edge, so
-     its FOOT is at (top + height) card-local px — and the first strip has to
-     be at least that deep or the chapter coming next has its wordmark sliced.
-     Centring closes the first strip to 36.7 screen px whenever the taller
-     portrait card is seated (see railUprightDrop in About.tsx), and 11 + 28
-     projected to ~37: exactly on the line. 9 + 26 projects to ~33.3 and
-     clears it by 3.4px. The mark is 7% smaller and reads the same; a clipped
-     wordmark would not.
-
-     THE MARK'S BOX is height-capped on purpose. Every wordmark here is wider
-     than 12.9:1 would need to be for the width to bind, so `contain` in a
-     full-width box of a fixed height renders all eight at exactly
-     --rail-mark-h tall — 26px — and their own natural widths: 138px for Café
-     Mama at 5.33:1 down to 48px for Bintang at 1.70:1. Sizing by WIDTH
-     instead is what would let Bintang, the one square-ish mark, run past the
-     mat's bottom edge; capping the height makes that impossible rather than
-     merely unlikely.
-
-     Absolute px, like the mat itself, so the mark keeps its legible size on
-     the narrow bands where the card has shrunk under it.
-
-     THE MARK IS TOP-BIASED, not centred in the mat — see .railMat. */
-  --rail-mat-h: 84px;
-  --rail-mark-h: 26px;
-  --rail-mark-top: 9px;
-
-  position: absolute;
-  left: 0;
-  width: var(--rail-col);
-  top: calc(2 * var(--rail-seat-y) - 100%);
-  bottom: 0;
-  perspective: 1400px;
-}
-
-.railTrack {
-  /* zero-size anchor at the stage centre — the seat. Its transform is the one
-     write that moves the whole deck. */
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  width: 0;
-  height: 0;
-  transform-style: preserve-3d;
-}
-
-/* Promotion, held only while the section is on screen and the decode gate has
-   opened (About.tsx toggles this class). ONE promoted layer, not eighteen:
-   the cards and their li wrappers are already composited by virtue of their
-   3D transforms, so `will-change` on them would buy nothing and cost eighteen
-   permanent layers for the life of the page. */
-.railTrackLive {
-  will-change: transform;
-}
-
-.railList,
-.railItem {
-  position: absolute;
-  left: 0;
-  top: 0;
-  width: 0;
-  height: 0;
-  /* rule 2 — the 3D chain runs through both of these */
-  transform-style: preserve-3d;
-}
-
-.railList {
-  list-style: none;
-  margin: 0;
-  padding: 0;
-}
-
-/* .railItem carries the FLY-FORWARD (About.tsx writes its transform), which
-   is why it is a separate element from the card at all: the card's own
-   transform is static CSS driven by `--i` and must never be rewritten, so the
-   exit needs its own carrier inside the track's space. At rest this is
-   `transform: none` and costs nothing. */
-
-/* One chapter. The transform is STATIC CSS driven by an inherited `--i`, so
-   the compositor never re-reads it: all nine move because their shared parent
-   moved. `calc(var(--i) * var(--rail-sy))` resolves to a length because --i
-   is a bare number — no @property registration needed. */
-.railCard {
-  position: absolute;
-  left: calc(var(--rail-card-w) / -2);
-  /* ANCHORED ON THE PROJECTED TOP EDGE, not on the centre — this one line is
-     what makes the size variants safe.
-
-     A card is raked about its own centre, so a taller card's top edge leans
-     further forward and lands higher; centring every variant would give nine
-     cards nine different top edges and dissolve the strip series the whole
-     deck is derived from. Offsetting the layout box by 0.0954915 of the
-     height difference cancels the y half of that exactly — (1 - cos36)/2 is
-     the coefficient, and it is the same primitive the upright drop is built
-     from. The z half is cancelled in the transform below. */
-  top: calc(
-    -1 * (var(--rail-base-h) / 2 + 0.0954915 * (var(--rail-card-h) - var(--rail-base-h)))
-  );
-  width: var(--rail-card-w);
-  height: var(--rail-card-h);
-  display: block;
-  overflow: hidden;
-  /* Opaque backing. The photographs are opaque anyway (RAIL_ALPHA = 1) and
-     this only shows in the frame before one decodes — but on a deck that
-     frame matters, because a transparent card lets the eight behind it show
-     through a stack that is supposed to read as solid prints. Ink rather than
-     cream now the deck is back on the dark video scrim. */
-  background: #170303;
-  /* NO BORDER. It was a cream hairline at 0.16, and its real job was keeping
-     a dark photograph's top edge from bleeding into the card behind it — the
-     mat above it was a flat colour, so the only thing that could run together
-     was photography meeting photography at a card boundary.
-
-     What replaced it is inside the scrim rather than around the card: the mat
-     is now a RAMP, lighter at each card's top edge and darkest at the point
-     where the card in front cuts it off (see .railMat). So every strip runs
-     dark-to-light DOWN the stack and each boundary is a light-over-dark step
-     in the band itself. Measured on the rendered deck, that step is larger
-     than the 0.16 hairline ever was, and unlike the hairline it survives the
-     veil — which multiplies a ramp but flattens a fixed-alpha line. */
-  border-radius: var(--rail-card-r);
-  corner-shape: squircle;
-  /* NO box-shadow. `contain: paint` below clips an outer shadow to the card's
-     own box in Chrome, so the only way to get one was to drop the containment
-     and let nine cards each invalidate a blurred region — nine large paints
-     for a cue occlusion already carries. */
-  box-shadow: none;
-  backface-visibility: hidden;
-  /* clips the photo to the rounded corner and scopes paint invalidation to
-     the card. Safe on a leaf of the 3D chain — this card has no 3D children
-     for it to flatten. */
-  contain: paint;
-  /* rotateX, not rotateY — the axis IS the geometry. --rail-sx is 0, so the
-     X term is kept only to hold the CSS/JS mirror complete.
-
-     THE THIRD Z TERM is the other half of the variant compensation (see
-     `top` above): a card of height h has its top edge leaning
-     0.293893*h toward the camera, so a variant is pushed BACK by
-     0.293893*(h - h0) — written as (h0 - h) with a plus — and every variant's
-     top edge lands on the same plane, z = 0.293893*h0. That is also what
-     makes their projected widths comparable: all nine are magnified by the
-     same P/(P - 0.293893*h0), so --rail-card-w alone decides which is widest.
-     It is zero for a base-height card and costs nothing at rest. */
-  transform: translate3d(
-      calc(var(--i) * var(--rail-sx)),
-      calc(var(--i) * var(--rail-sy)),
-      calc(
-        var(--rail-z0) - var(--i) * var(--rail-sz) + 0.293893 *
-          (var(--rail-base-h) - var(--rail-card-h))
-      )
-    )
-    rotateX(var(--rail-tilt));
-}
-
-/* THE SIZE VARIANT — ONE class on top of the base card, because there are two
-   shapes and not three.
-
-     shape       box        projected at the seat   measured
-     landscape   322 x 262  455.0 x 370.2           454.4 x 369.7
-     portrait    248 x 300  350.0 x 423.3           349.9 x 423.3
-
-   THE BOX IS NOT THE CARD. The seat card is pushed to z = +407.8 (RAIL_PUSH in
-   About.tsx) and so magnified 1.4111 rather than 1.1048, which is why a 322px
-   box lands wider than the 400px one it replaces. Read the projected column;
-   the boxes are only its pre-image.
-
-   IT IS DERIVED FROM THE CHAPTER'S OWN `layout`, and that field is itself now
-   derived — see railShape in About.tsx, where the two shapes are dealt from a
-   hash of the chapter's title rather than typed. The narrow-screen list branch
-   reads the same field, so a chapter still has ONE declared shape.
-
-   WIDTH IS FREE OF THE GEOMETRY. rotateX touches y and z only, so width plays
-   no part in the strip series, the mat requirement or the upright drop.
-
-   IT IS NOT FREE OF THE COLUMN, and the landscape card spends a little of the
-   gutter: 454.4 projected against a 428.4px third at 1440, so 13.0px each side
-   into a 37.4px gutter. That was once a hard rule — "the ceiling is
-   --rail-col" — and it is relaxed rather than broken: nothing clips there
-   (.railPin's clip is two thirds wide) and the overhang is SYMMETRIC, so the
-   deck stays centred on the seat. Measured card-to-column gaps, both sides,
-   every seat, 1440 and 1920: equal to 0.1px. See the .storyWheel rule for the
-   gap that was NOT equal and what fixed it.
-
-   ---------------------------------------------------------------------------
-   THE TWO WAYS A CARD BEHIND CAN CUT INTO THE ONE BEING READ.
-
-   (1) AT THE SIDES, when the seat is narrower than the card behind it. This
-   used to be answered by the SEQUENCE — five landscapes then four portraits,
-   the only class of order with no portrait -> landscape step — and that
-   constraint is gone. It is answered by DEPTH now: RAIL_PUSH puts the seat
-   card far enough forward that its projected box out-measures anything behind
-   it. Measured at rest, every seat, every band: 0.0px, and deck-check's
-   contract A is 61/61 clean with a worst cover of 0.0%.
-
-   IT IS NOT ZERO MID-SWAP, and that is stated rather than glossed. An arriving
-   card earns its push on the same smoothstep as its rake, so at k = 0.5 it has
-   only half of it while the card behind has none of the 60px step to make up
-   the difference. Measured worst over 61 sweep positions: 8.2px each side, at
-   t = 2.642, at 4 of the 9 seats. Closing it needs RAIL_PUSH = 502, and the
-   arithmetic for why that is not available is with RAIL_PUSH in About.tsx —
-   the short version is that a 502 push magnifies the seat 1.83x, which forces
-   the landscape card to project 479px tall to hold the mat at today's share of
-   its face, hence 575px wide to still read as landscape, into a 428px column.
-
-   (2) UNDERNEATH, when the seat is shorter than the card behind it. A card
-   behind is raked, so its bottom edge falls away from the camera and projects
-   high; the seat card is upright and projects its full height. It was the
-   binding case at 320 x 494 and is not any more: the projected height
-   difference is 53.1px, and measured foot overhang over the same 61 positions
-   is 0.0px at every seat. scripts/probe-sliver.mjs is that measurement, and it
-   is a separate harness from deck-check for a reason: contract A tests the
-   cards in FRONT of the subject, and this is the half behind it. */
-.railCardTall {
-  --rail-card-w: calc(248px * var(--rail-scale));
-  --rail-card-h: calc(300px * var(--rail-scale));
-}
-
-/* THE PHOTOGRAPH, FULL-BLEED — and a wrapper element rather than an inset on
-   the image itself, because next/image `fill` writes position, inset, width
-   and height as INLINE style and no class rule can override that. The wrapper
-   carries no transform, so it adds nothing to the preserve-3d chain; the card
-   is already a leaf of it.
-
-   IT USED TO BE INSET BELOW THE MAT, when the mat was a flat colour band and
-   the photograph had to start where the colour stopped. The mat is now a
-   scrim ON the photograph, so the picture runs the full card and the band is
-   the same picture, darkened. That also deletes the inset SEAM the mat was
-   painted over — there is no longer an edge there to cover. */
-.railPhoto {
-  position: absolute;
-  inset: 0;
-}
-
-.railImage {
-  /* `cover` crops a little harder than it did, and it is the mat's doing
-     rather than the full bleed's: the box is now the card's own 0.788, where
-     it was the 0.908 the inset left. A 0.60 portrait source shows 58% of its
-     height where it showed 66%. That is a real cost and it is the right one —
-     the alternative is widening the card, which crops MORE, not less, and
-     would break both the solved geometry and the thirds. Every source here is
-     a dining room or a storefront, not a portrait with a head near the frame
-     edge. */
-  object-fit: cover;
-}
-
-/* the coming-soon chapter ships no photography — the wordmark sits contained
-   on a maroon field, the Discover tile's treatment. `contain` centres it in
-   the full card, and the padding is a percentage of the WIDTH on all four
-   sides, so on a 0.788 card the glyphs sit well inside the scrim's 76px. */
-.railImageWordmark {
-  object-fit: contain;
-  padding: 16%;
-  background: var(--maroon);
-}
-
-/* THE MAT — see --rail-mat-h on .railStage for the height, and the mat header
-   in About.tsx for why the band exists at all.
-
-   IT IS THE PHOTOGRAPH, DARKENED. The previous build put a flat brand colour
-   here, rotating maroon / cream / saffron by index, and the rotation was the
-   part that never sat right: no brand colours exist in lib/restaurants.ts, so
-   three of the site's own were being spent as if they meant something. Now
-   the band is a scrim over the picture that is already there, and the strip a
-   reader sees above the card in front is that chapter's own photograph in
-   near-darkness with its mark on it.
-
-   THE ELEMENT IS TALLER THAN THE REQUIREMENT, and separating those two ideas
-   is what let the fall get long.
-
-   --rail-mat-h (76px) is the REQUIREMENT: the depth of band that has to stay
-   opaque enough to hide the photograph, solved against the strip series and
-   absolute in px because the strip series is. The element is
-   `--rail-mat-h + HALF the card` — 302px on the base card, 316 on the tall,
-   257 at the narrowest band — and every pixel past the first 76 is fall-off.
-   That extra length is the only way to get a long gradient without weakening
-   the part that is doing the covering: shortening the covered depth instead
-   was tried on paper, and at 74% of a 76px band the scrim is down to 0.55,
-   which is a strip with a photograph legible through it.
-
-   Proportional rather than absolute for the tail alone, because it is a
-   COMPOSITIONAL length (how much of this picture is in shadow) where the 76px
-   is a GEOMETRIC one (how much has to be covered). At the narrowest band the
-   card is 362px tall and the tail is 181, so the treatment keeps its
-   proportions instead of swallowing a small card.
-
-   IT WENT FROM 21% OF THE CARD TO 50% BECAUSE 21% STILL READ AS A SLAB, and
-   the diagnosis is arithmetic rather than taste. The requirement is a fixed
-   76px; at a 171px element that is 44% of the band spent inside 8% of full
-   strength, so the reader saw a solid rectangle with a short fade tacked on
-   and could locate its bottom edge exactly. At 302px the same 76px is 25%,
-   and the remaining 226px carry a curve that is still moving at every point.
-   The alpha profile, effective, on the base card:
-
-     0px  0.95     76px 0.79     121px 0.62     151px 0.475
-     181px 0.33    211px 0.23    257px 0.066    302px 0
-
-   THE FALL IS DARKEST AT THE TOP EDGE. That is the opposite of an earlier
-   build's ramp, which ran LIGHT at the top edge and dark at the cut on the
-   theory that a dark-to-light step at every card boundary would replace the
-   1px border this file removed. It was measured and it did not: adjacent
-   strip boundaries came back at 1.00-1.07:1 luminance, i.e. nothing, because
-   by k >= 3 the veil has crushed the whole stack to L ~ 0.001-0.01 and a 0.12
-   difference in scrim alpha is invisible down there. Keeping a ramp that
-   does not separate anything, at the cost of the natural reading (darkest
-   where the material starts), was not a trade worth making. What separates
-   the strips is the marks, the veil's own 0.10 per step at shallow depths,
-   and the photographs differing.
-
-   THE MASK CARRIES THE WHOLE FALL-OFF, and the scrim colour is flat. Two
-   reasons. It lets the NOISE fade at exactly the band's own rate — a
-   gradient that ends transparent still leaves any layer stacked over it at
-   full strength, so grain would have run past the band and stopped at a hard
-   horizontal line across the picture. And it means there is ONE profile to
-   reason about: the previous build multiplied a shallow gradient by a mask
-   and the product was neither curve, which is how a 0.16 total swing ended up
-   passing for a graded material.
-
-   THE NOISE IS AN INLINE SVG feTurbulence AS A DATA URI — a static tiled
-   background image, not a filter and not a per-frame anything. It is decoded
-   once for the whole page (nine cards, one URL) and rasterised into each
-   card's existing layer, so it costs nothing on a scrub frame. A filter on
-   the card, or anything that repaints as the deck moves, would put nine
-   turbulence passes inside the frame budget. Measured after: median 8.3ms
-   unchanged, zero frames over 32ms.
-
-   Baked at 0.16 alpha inside the SVG rather than controlled from CSS,
-   because a background layer has no opacity of its own. It sits OVER the
-   scrim, so it can lighten the band — which is why the strength is a
-   measured number: the mark's contrast is re-read per chapter with the grain
-   in place (see the figures below and scripts/probe-mat.mjs).
-
-   THE STRENGTH IS SET BY THE MARK, and it is measured rather than judged. A
-   cream mark has relative luminance 0.932; clearing 3:1 needs the band under
-   it below 0.277. The mark sits at 11..39px — u = 0.036..0.129 of the base
-   card's element, where the smoothstep is still 0.996..0.955, so the
-   effective scrim under it is 0.946..0.907. Over a HYPOTHETICAL PURE WHITE
-   photograph that is luminance 0.017, a ratio of about 20:1 before the grain,
-   and every real source in the set is darker than white.
-
-   THE TWO CONSTRAINTS DO CAP THIS, and the cap is worth naming rather than
-   discovering later. Contract D fixes the covered depth at 76px absolute and
-   the mark fixes the alpha over 11..39px, so no curve can make the top of the
-   band lighter or shorter — the only free variables are how far the fall runs
-   below 76px and how smoothly it gets there. Both of those were spent here:
-   the tail more than doubled and the profile became a single C1 curve. If it
-   still reads hard, the next lever is not this gradient — it is the mark's
-   own placement (moving --rail-mark-top down would let the top 11px soften)
-   or the veil's per-step rate, and both change things this file has solved
-   elsewhere.
-
-   The history is worth keeping: at 0.72/0.86 the two brightest chapters (Café
-   Mama, Hoodwood) measured 2.5-2.9:1 at k = 2. The old colour mats were worse
-   still — a maroon mark on saffron measured 4.6:1 at the seat and fell under
-   3:1 from k = 2 as the veil took it, because the veil moves a dark mark and
-   a mid-tone mat the SAME direction. A cream mark on a dark band moves the
-   other way.
-
-   Ink at (10,2,2) rather than pure black — the same near-black the veil uses,
-   so the two stack without introducing a second hue. */
-.railMat {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  /* HALF the card of fall-off below the 84px requirement — 260px on the
-     landscape card, 284 on the portrait, 224 at the narrowest band.
-
-     THE LANDSCAPE CARD IS THE TIGHT ONE and it is stated rather than glossed:
-     84 absolute px on a 262px card is 32% of the card's face, against 28% on
-     the portrait — and 40% / 35% at the 0.8 band. The requirement cannot
-     shrink with the card (the strip series it has to cover is a function of Sy
-     and Sz, and neither scales), so a short card simply carries a
-     proportionally deeper band.
-
-     IT GREW FROM 24% AND THE EIGHT POINTS ARE RAIL_PUSH'S BILL. The mat's
-     requirement is a screen quantity measured on the card BEHIND, whose
-     magnification the push does not touch, so 84 card-local px is exactly the
-     number it was — but the SEAT card's own box shrank 26% to project the same
-     size from further forward, and an unchanged band on a smaller box is a
-     larger share of it. Nothing is uncovered by this (contract D's tightest
-     slack is 14.9px); the darkened band is simply deeper on the card being
-     read. It is the largest single cost of dealing the shapes at random. */
-  height: calc(var(--rail-mat-h) + var(--rail-card-h) * 0.5);
-  /* ONE SURFACE, ONE CURVE. The scrim is a FLAT colour and every bit of the
-     fall lives in the mask below — the previous build split it between a
-     gradient (0.94 -> 0.86 -> 0.78, a 0.16 swing over the whole element) and
-     a mask, which is why it read as a slab: two shallow ramps multiplied
-     together still spend 44% of their length within 8% of full strength.
-     With the colour constant, the mask IS the profile and there is exactly
-     one number to reason about at any depth.
-
-     The grain sits on that flat colour and is masked with it, so it fades out
-     at exactly the same rate rather than surviving past the band. */
-  background-color: rgba(10, 2, 2, 0.95);
-  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='150' height='150'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='150' height='150' filter='url(%23n)' opacity='0.16'/%3E%3C/svg%3E");
-  background-size: 150px 150px;
-  background-repeat: repeat;
-  /* A SMOOTHSTEP, sampled at 13 stops. u*u*(3-2u) is the same curve railLean
-     uses in About.tsx for the seat card's rake — the deck has one easing
-     shape and this is it — and its two end conditions are exactly the two
-     things being asked for here:
-
-       ZERO SLOPE AT u = 0. The top of the band cannot fall quickly, because
-       contract D needs the first 76 card-local px opaque enough to hide the
-       photograph. A curve that starts flat spends its shallowest section
-       precisely where the constraint is, instead of fighting it.
-
-       ZERO SLOPE AT u = 1. This is the "too abrupt" fix. The band approaches
-       nothing asymptotically, so there is no last stop where the alpha is
-       still 0.28 and then stops — which is what the 62% stop of the previous
-       ramp was, and what the eye was finding.
-
-     WHAT IT COSTS, STATED RATHER THAN TRADED. The first 25-30% of the element
-     is capped near-opaque by contract D and no curve can change that: over
-     0..76px the effective alpha only moves 0.95 -> 0.79. That IS a plateau in
-     the sense that it cannot be made lighter. What it is not any more is a
-     plateau with an edge — from 76px it falls continuously through 0.62 at
-     40%, 0.475 at 50%, 0.20 at 70%, 0.026 at 92%, over 226px on the base card
-     where the whole element used to be 171. */
-  -webkit-mask-image: linear-gradient(
-    180deg,
-    rgb(0 0 0 / 1) 0%,
-    rgb(0 0 0 / 0.982) 8%,
-    rgb(0 0 0 / 0.931) 16%,
-    rgb(0 0 0 / 0.855) 24%,
-    rgb(0 0 0 / 0.758) 32%,
-    rgb(0 0 0 / 0.648) 40%,
-    rgb(0 0 0 / 0.5) 50%,
-    rgb(0 0 0 / 0.352) 60%,
-    rgb(0 0 0 / 0.242) 68%,
-    rgb(0 0 0 / 0.145) 76%,
-    rgb(0 0 0 / 0.069) 84%,
-    rgb(0 0 0 / 0.018) 92%,
-    rgb(0 0 0 / 0) 100%
-  );
-  mask-image: linear-gradient(
-    180deg,
-    rgb(0 0 0 / 1) 0%,
-    rgb(0 0 0 / 0.982) 8%,
-    rgb(0 0 0 / 0.931) 16%,
-    rgb(0 0 0 / 0.855) 24%,
-    rgb(0 0 0 / 0.758) 32%,
-    rgb(0 0 0 / 0.648) 40%,
-    rgb(0 0 0 / 0.5) 50%,
-    rgb(0 0 0 / 0.352) 60%,
-    rgb(0 0 0 / 0.242) 68%,
-    rgb(0 0 0 / 0.145) 76%,
-    rgb(0 0 0 / 0.069) 84%,
-    rgb(0 0 0 / 0.018) 92%,
-    rgb(0 0 0 / 0) 100%
-  );
-  display: flex;
-  justify-content: center;
-  /* TOP-ALIGNED, and the inset is derived rather than picked. Only the top
-     ~50 card-local px of this element (k = 1; ~43 by k = 3) are ever exposed
-     above the card in front. The mark is centred in THAT window, at 11..39,
-     because the window is what the reader sees for eight of a chapter's nine
-     depths. Centring it in the element would now put it near 80px, entirely
-     below the exposed window — which is why the alignment is stated rather
-     than left to `center` even though the element grew. */
-  align-items: flex-start;
-  padding-top: var(--rail-mark-top);
-}
-
-/* MASKED, NEVER PLACED AS ARTWORK — the Footer's `.mark` precedent, and here
-   it is load-bearing rather than tidy. The logo files have full alpha but
-   wildly inconsistent ink: Mamasons is (3,6,6), Bunso is (255,255,255),
-   Belly is (254,0,0). Rendered as artwork, the black ones vanish on maroon
-   and the white ones on cream. Painting a chosen colour THROUGH the alpha
-   makes the mark's contrast a property of the band it sits on.
-
-   ONE COLOUR NOW, not three. The mark used to take whichever palette ink was
-   furthest from the mat it happened to land on, because the mat rotated. The
-   band is dark on every card now, so the mark is cream on every card — which
-   is also the only reading that survives the veil, since a dark mark on a
-   darkening band converges and a light one does not. */
-.railMark {
-  width: 100%;
-  height: var(--rail-mark-h);
-  background: var(--cream);
-  -webkit-mask: var(--rail-mark-src) center / contain no-repeat;
-  mask: var(--rail-mark-src) center / contain no-repeat;
-}
-
-/* No `.railYear`. The plate that used to sit on the card's bottom-left is
-   gone — the year is already carried by the wheel on the left and the
-   CHAPTER NN meta line on the right, and a third instance was the only type
-   on an otherwise clean photograph. Deleted rather than hidden so nothing is
-   left paying layout for it. */
-
-/* Depth haze toward the GROUND, which here is the dark video scrim — so this
-   is ink, not cream. A cream wash over photography on a dark ground is
-   exactly what reads as frosted glass, which is what this looked like before.
-   Full-alpha layer animated by OPACITY, never a background-color whose alpha
-   is animated: alpha is a paint property and would repaint nine boxes every
-   frame, where opacity is pure compositing. */
-.railVeil {
-  position: absolute;
-  inset: 0;
-  background: #0d0202;
-  opacity: 0;
-  pointer-events: none;
-}
-
-/* A focus ring on a card behind the front one is not just faint, it is
-   OCCLUDED — all but a 27-to-48px strip is under another card, and the ring
-   is drawn on the card, not on top of the stack. So this is half the
-   treatment; the other half is in About.tsx, where focusing a card scrolls it
-   to the front seat. */
-.railCard:focus-visible {
-  outline: 2px solid var(--saffron);
-  outline-offset: 5px;
-}
-
-/* ---- the chapter copy, beside the deck ----
-   The ORIGINAL treatment, unchanged: .storyMeta, .storyTitle, .storyBody and
-   .storyLink are the list branch's own classes and are shared, so the two
-   branches cannot drift apart typographically. Only the box around them is
-   new, and all it does is stack the nine panels in one grid cell.
-
-   No glass card. The list branch's chapters sit on `.storyContent`'s liquid
-   glass because a photograph and its caption needed a surface to share; here
-   the deck IS the surface and a second translucent panel behind the copy put
-   two competing materials in one frame. The scrim carries the legibility, as
-   it does for the hero type above. */
-.railCopy {
-  /* placed off --rail-col so it can never land under the stage */
-  position: absolute;
-  left: calc(var(--rail-col) + var(--rail-gap));
-  right: 0;
-  /* Centred on the DECK'S AXIS — the projected top edge every card variant
-     shares, plus a constant (see --rail-axis-offset). It used to be the
-     seated card's own centre, which meant this block moved every time the
-     chapter changed and had to be transitioned to hide it; the transition is
-     gone with the movement. Whatever is on the deck, the copy is here. */
-  top: var(--rail-seat-y);
-  transform: translateY(calc(-50% + var(--rail-axis-offset)));
-  /* All nine panels live in ONE grid cell so the block is as tall as its
-     tallest chapter and never resizes as the deck advances. */
-  display: grid;
-}
-
-/* THE SCROLL INDICATOR — the hero's own .scrollHint (Hero.module.css)
-   restated at the foot of the deck. Same three parts, same order: the word in
-   label caps, a hair of tracking, a chevron beneath it.
-
-   ONE CHANGE OF SUBSTANCE, and it is the type collapse rather than this
-   element: the hero's rule still says `var(--font-mono)`, which now resolves
-   to --font-sans anyway. Written as --font-ui here, which is what it is.
-
-   WHERE IT SITS IS TWO CONSTRAINTS, NOT A PREFERENCE.
-
-   NOT UNDER THE NAV. The nav is a fixed bar at the top of the frame; this is
-   pinned to the BOTTOM of the pin, which is the furthest point in the box
-   from it.
-
-   NOT OVER A CARD. The seat card's own bottom edge is the number to clear.
-   The deck's centre line sits at --rail-seat-y (56%) plus --rail-axis-offset,
-   and the tallest seat card projects 423.3px, so its foot lands at
-   0.56 * 100svh + 212 - 57 -> 659px in a 900 frame and 760 in a 1080. The
-   hint's own box tops out at 100svh - 34 - the label's line box, i.e. 838 and
-   1018. 179px of clearance at 900, 258 at 1080, and the gap only opens as the
-   frame gets taller because the card is measured in px and the offset in svh.
-
-   It is centred on the DECK'S column rather than on the pin, which spans two
-   thirds — centred on the pin it would sit under the copy. */
-.railHint {
-  position: absolute;
-  left: 0;
-  /* the stage's own box, so "centred" means centred on the seat */
-  width: var(--rail-col);
-  bottom: clamp(20px, 3.4vh, 34px);
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  gap: 0.45em;
-  font-family: var(--font-ui);
-  font-weight: 400;
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
+  z-index: 2;
+  margin: 2rem 0 0;
+  text-align: center;
+  font-family: var(--font-display-small);
+  font-weight: var(--w-regular);
+  font-size: var(--t-lead);
+  line-height: 1.05;
+  letter-spacing: var(--tr-display);
+  text-wrap: balance;
   color: var(--cream);
-  /* it is a signpost over footage, and the deck's own scrim is above it in
-     the stack, so the ink carries its own separation */
-  text-shadow: 0 1px 14px rgba(10, 2, 2, 0.75);
-  pointer-events: none;
-  /* opacity is written from About.tsx — see hintOpacity. Nothing else about
-     this element moves, which is the hero's rule too: "the label is a
-     signpost, not an animation". */
 }
 
-.railHint svg {
-  width: 0.9em;
-  height: 0.9em;
+.titleInner {
+  display: inline-block;
 }
 
-/* The chevron is the one thing that moves, and only far enough to point:
-   a 3px drift on a 2.4s cycle, which is well outside the 0.2Hz band that
-   reads as a distracting oscillation. Retired entirely under reduced motion —
-   the word alone carries the instruction. */
-@media (prefers-reduced-motion: no-preference) {
-  .railHint svg {
-    animation: railHintNudge 2.4s ease-in-out infinite;
+/* the title IS the link out — the archive's own grammar; the section's nine
+   restaurant links live here now that the "See the restaurant" rows are gone */
+.storyLink {
+  color: inherit;
+  text-decoration: none;
+  transition: color 0.3s ease;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .storyLink:hover {
+    color: var(--saffron);
   }
 }
 
-@keyframes railHintNudge {
-  0%,
-  100% {
+/* the coming-soon sub-line — carries the status the old "Bunso — coming
+   soon" title carried, at half size so the name stays the headline */
+.titleSoon {
+  display: block;
+  margin-top: 0.5rem;
+  font-size: 0.5em;
+  line-height: 1;
+  opacity: 0.75;
+}
+
+/* the diamond on the spine at the item's foot — ornament (aria-hidden in
+   the markup), centre seated exactly on the item boundary by the -4px pull.
+   z-index 1: the NEXT item's year heads its li on the same spine, and while
+   it rides its parallax its upper ink can cross this diamond. Unranked, the
+   later-DOM year paints over the diamond and its 0.40 cream stroke blends
+   into the solid cream — the diamond appears to melt wherever a date
+   passes. Ranked over the year, the diamond stamps crisply on the numeral
+   instead, the same order the frames already hold. */
+.marker {
+  position: absolute;
+  bottom: 0;
+  left: 50%;
+  margin-bottom: -4px;
+  width: 8px;
+  height: 8px;
+  transform-origin: center;
+  transform: translateX(-50%) rotate(45deg);
+  background: var(--cream);
+  z-index: 1;
+}
+
+/* keyboard focus — the global ring is maroon, which is invisible on this
+   dark ground; scoped to cream here rather than edited globally */
+.story :focus-visible {
+  outline-color: var(--cream);
+}
+
+/* ---- wide: the scatter ---------------------------------------------------
+   Layout only, gated on width alone — a coarse-pointer wide screen gets the
+   identical scatter, years and parallax, with permanently visible titles;
+   the hover choreography gates separately below. */
+@media (min-width: 981px) {
+  /* no .year override here any more — the resting alpha is 0.40 at every
+     width, because the 0.30 this gate used to hold measured 2.45:1 — 2.17:1
+     on the softened cream — against
+     the film (bar: 3:1 for large text; see the .year header) */
+
+  /* the seat — width and displacement arrive from SEATS via the per-item
+     custom properties; left edge = 0.5 + offset − span/2 */
+  .itemBody {
+    width: calc(var(--tl-span, 0.3) * 100%);
+    margin-left: calc(
+      (0.5 + var(--tl-offset, 0) - var(--tl-span, 0.3) / 2) * 100%
+    );
+  }
+
+  .frame {
+    width: 100%;
+    margin-inline: 0;
+  }
+
+  /* right-hung beside the frame, overhanging its right edge by 40% of the
+     frame's own width (the containing block is .itemBody, which IS
+     frame-sized here — that is what makes the -40% mean what it says).
+     --tl-safe keeps a long title from walking back across the column. */
+  .storyTitle {
+    position: absolute;
+    top: 50%;
+    right: -40%;
+    transform: translateY(-50%);
+    margin: 0;
+    text-align: right;
+    font-size: clamp(1.6rem, 2.4vw, 2.4rem);
+    line-height: var(--lh-display);
+    max-width: var(--tl-safe, 45ch);
+  }
+}
+
+/* ---- wide + a real pointer + motion allowed: the choreography ------------
+   All three extra gates matter: no hover grammar on touch (titles must never
+   park off-mask where no hover can retrieve them), none of it under reduced
+   motion, and none below the scatter.
+
+   :has(:focus-visible), NOT :focus-within. focus-within matches mouse focus
+   too: click a chapter link, take the cursor off the list entirely, and the
+   link is still focused — measured latching the spotlight open indefinitely,
+   siblings pinned at 0.3, shutter held, title out. The first cut reached for
+   focus-within on the claim that :has() cannot nest inside the
+   .timeline:has() spotlight selector; true of that formulation only. The
+   spotlight's :has() argument needs no nesting — a descendant combinator
+   (`.storyItem :focus-visible`) asks the same question — and the item's own
+   state, `.storyItem:has(:focus-visible)`, sits outside any :has() argument
+   entirely. Keyboard parity survives intact: Tab makes the link
+   :focus-visible and runs the full spotlight/shutter/reveal; a mouse click
+   never does, so nothing is left latched when the cursor departs. */
+@media (min-width: 981px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
+  /* the mask. -0.3em vertical bleed lets ascenders and descenders survive;
+     the small HORIZONTAL bleed hides nothing (the travel is vertical) and
+     exists so the focus ring is not shorn off at the sides. */
+  .storyTitle {
+    clip-path: inset(-0.3em -0.4em);
+  }
+
+  /* resting = parked below the mask — and the travel is calibrated to the
+     face the title ACTUALLY renders in, not to the token's old name. This
+     serif carries a 0.984em ascent against the 0.92 line box, so at 130%
+     the parked ascenders sat 0.86px — under one pixel — below the mask's
+     -0.3em bottom bleed, one rounding error from printing every title's
+     ascender tips through the window at rest (the é of Café Mama & Sons
+     was the nearest miss; canvas-measured). 150% banks ≈0.21em ≈ 7px of
+     hiding margin at every clamp stop, scale-proof because every term is
+     em-proportional. The 200ms delay applies BOTH ways — the asymmetry is
+     duration only: 800ms rising out, 600ms settling back. */
+  .titleInner {
+    transform: translateY(150%);
+    transition: transform 600ms var(--tl-ease-quart) 200ms;
+  }
+
+  .storyItem:hover .titleInner,
+  .storyItem:has(:focus-visible) .titleInner {
     transform: translateY(0);
+    transition-duration: 800ms;
   }
-  50% {
-    transform: translateY(3px);
+
+  /* the spotlight — pure CSS, and it dims .itemBody, never the item, so the
+     years and markers hold the spine while the photographs fade */
+  .timeline:has(.storyItem:hover, .storyItem :focus-visible)
+    .storyItem:not(:hover):not(:has(:focus-visible))
+    .itemBody {
+    opacity: 0.3;
   }
-}
 
-.railPanel {
-  grid-area: 1 / 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: clamp(12px, 1.8vh, 22px);
-  /* Hidden panels are opacity-0 + `inert`, never display:none — the nine
-     chapter bodies staying readable to a crawler is the reason this section
-     is CSS 3D and not a canvas. */
-  opacity: 0;
-  pointer-events: none;
-  transition: opacity 0.4s var(--ease-out);
-}
-
-/* THE ACTIVE PANEL SNAPS TO OPAQUE, and that is not an oversight — it is what
-   hands the entrance to the words.
-
-   The title and the body now arrive with the statement's word-mask grammar
-   (SplitWords, driven from the same integer index as the wheel), so each word
-   rises out of its own clip. If the panel ALSO faded in, the two would run at
-   once and the fade would win: a word rising through an element that is at
-   40% opacity reads as a cross-dissolve with extra steps, which is exactly
-   the treatment this replaced.
-
-   So: gaining the class carries `transition: none` and the panel is opaque on
-   the frame it becomes active, with every word still below its mask and
-   nothing visible. Losing the class falls back to the rule above and the
-   outgoing chapter fades over 0.4s. Transitions are read off the element's
-   NEW state, which is what makes one pair of rules do both. */
-.railPanelActive {
-  opacity: 1;
-  pointer-events: auto;
-  transition: none;
-}
-
-/* The meta line and the link do NOT split into words — a four-word label and
-   a two-word link read as stuttering rather than assembling when they are
-   staggered. They take the same rise as one block instead, bracketing the
-   words: the meta leads, the link lands after the body has finished.
-
-   A CSS animation rather than motion values, because it costs no elements and
-   no subscriptions: the class is toggled on the integer chapter change, and
-   adding a class is what starts an animation. `both` holds the from-state, so
-   an inactive panel's meta line is not sitting at full opacity underneath. */
-@keyframes railCopyRise {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
+  .timeline:has(.storyItem:hover, .storyItem :focus-visible)
+    :is(.storyItem:hover, .storyItem:has(:focus-visible))
+    .itemBody {
     opacity: 1;
-    transform: none;
+  }
+
+  /* the shutter — the mat closes 5% over the photograph, which itself does
+     not move (clip-path, never scale; the frame's transform stays none).
+     Gated on .entered so a cursor parked at the fold cannot half-summon a
+     frame the entrance wipe has not yet revealed. */
+  .storyItem.entered:hover .frame,
+  .storyItem.entered:has(:focus-visible) .frame {
+    clip-path: inset(5% 5% 5% 5% round var(--radius-media));
   }
 }
 
-/* The link's own resting opacity is 0.75 and it brightens to 1 on hover, so
-   its keyframe has to LAND on 0.75 rather than on 1 — and the fill has to be
-   `backwards`, not `both`. `both` would hold the animated value forever and
-   an animation outranks a transition, so the hover would stop working the
-   moment the chapter finished arriving. `backwards` applies the from-state
-   through the delay and then hands the element back to its own rules. */
-@keyframes railCopyRiseQuiet {
-  from {
-    opacity: 0;
-    transform: translateY(14px);
-  }
-  to {
-    opacity: 0.75;
-    transform: none;
-  }
-}
-
-.railPanelActive .storyMeta {
-  animation: railCopyRise 0.55s var(--ease-out) backwards;
-}
-
-.railPanelActive .storyLink {
-  /* 0.5s of delay so the link LANDS with the last words of the body rather
-     than under them — the body's own build finishes at 0.16 + 29*0.016 + 0.6
-     ~= 1.22s on the longest chapter, and this ends at 1.05. */
-  animation: railCopyRiseQuiet 0.55s var(--ease-out) 0.5s backwards;
-}
-
-/* The title's list-branch max-width is 11ch, which is set for a ~440px column
-   inside an 880px glass card. This column is narrower, so the cap would bite
-   before the column does and leave a ragged two-word line. */
-.railCopy .storyTitle {
-  font-size: clamp(2.4rem, 3.4vw, 3.4rem);
-  max-width: 14ch;
-}
-
-.railCopy .storyBody {
-  max-width: 42ch;
-}
-
-/* No `will-change` rule for the words here — SplitWords' CSS driver already
-   promotes them only while they are running (see .cssOn in
-   SplitWords.module.css). Nine blocks are mounted at once in this column, and
-   the Motion path's standing promotion would have been ~333 permanent layers
-   parked beside a 3D scene that has its own. */
-
-/* NARROW DESKTOP — two more bands, and they are a consequence of the thirds
-   rather than of the deck.
-
-   A third is (min(container, 1400) - 2*gap)/3, and the container is
-   viewport - 2*clamp(16px, 2.8vw, 40px). So the third the deck has to fit
-   inside is not one number but a curve, and its BINDING value in any band is
-   at that band's own lower edge:
-
-     viewport   container   gap     third    widest variant, projected
-     1200        1132.8     31.2    356.8   305.6 * 1.0821 = 330.7
-     1320        1246.1     34.3    392.5   343.8 * 1.0934 = 375.9
-     1440        1360.0     37.4    428.4   382.0 * 1.1048 = 422.0
-     1480+       1400.0     38.5    441.0     (cap binds; the third stops
-                                               growing)
-
-   Three bands, therefore, at 1 / 0.90 / 0.80 — and the scale is a single
-   multiplier so that About.tsx can mirror it from these same two queries. It
-   HAS to: each card's upright compensation is built from that card's own true
-   height, and the height is the variant times the scale.
-
-   `1439.98px` rather than `1439px` so the queries complement About.tsx's
-   `(min-width: 1440px)` exactly. A one-pixel band where CSS and JS disagreed
-   about the card's height would put the seat card's top edge a few px off its
-   own strip series, which is precisely the class of bug the CSS/JS mirror
-   rule exists to prevent.
-
-   --rail-col is NOT redeclared here: it is (100% - gap)/2 of a track that has
-   already shrunk, so it follows on its own. */
-@media (max-width: 1439.98px) {
-  .railStage {
-    --rail-scale: 0.9;
+/* ---- reduced motion ------------------------------------------------------
+   No parallax (TimelineItem withholds the transform), no entrance wipe, no
+   shutter, no title travel, no spotlight — the hover gate above excludes
+   itself, so this block only opens the frame and quickens the decode fade
+   to the section's ≤0.4s cross-fade precedent. Everything visible,
+   statically, at every width. */
+@media (prefers-reduced-motion: reduce) {
+  .storyItem .frame {
+    clip-path: inset(0% 0% 0% 0% round var(--radius-media));
+    transition: none;
   }
 
-  .railCopy .storyTitle {
-    font-size: clamp(2.2rem, 3.1vw, 3rem);
-  }
-}
-
-@media (max-width: 1319.98px) {
-  .railStage {
-    --rail-scale: 0.8;
+  .storyItem .storyImage {
+    transition-duration: 0.3s;
   }
 
-  .railCopy .storyTitle {
-    font-size: clamp(2.1rem, 3vw, 2.8rem);
+  .storyItem .itemBody {
+    transition: none;
   }
 }
 
@@ -2862,7 +1696,10 @@
   font-size: var(--t-small);
   line-height: var(--lh-snug);
   color: var(--maroon);
-  opacity: 0.7;
+  /* 0.70 → 0.75. On the old ground a 0.70 ink tone was 5.57:1; the softened
+     pair took it to a measured 4.25:1, under the 4.5:1 this --t-small copy
+     answers to. 0.75 computes 4.97:1. */
+  opacity: 0.75;
   margin: 0;
 }
 
@@ -2954,7 +1791,7 @@
     object-fit: cover;
     border-radius: var(--radius-media);
     corner-shape: squircle; /* Figma-style corner smoothing (superellipse); falls back to plain rounding */
-    /* the story frames' soft editorial shadow */
+    /* the house soft editorial shadow */
     box-shadow:
       0 28px 70px -42px rgba(47, 0, 0, 0.55),
       0 1px 0 rgba(255, 255, 255, 0.5) inset;
@@ -2968,8 +1805,8 @@
     transform: translateY(-50%) scale(0.96);
     transform-origin: right center;
     transition:
-      opacity 0.35s cubic-bezier(0.22, 1, 0.36, 1),
-      transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+      opacity 0.35s var(--ease-entrance),
+      transform 0.35s var(--ease-entrance);
   }
 
   /* ON ROW HOVER — the whole row is the target, not the image. `.coverageRow`
@@ -3046,7 +1883,10 @@
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
   color: var(--maroon);
-  opacity: 0.72;
+  /* 0.72 → 0.78. 0.72 ink on the old ground was 5.72:1 and on the new one
+     measured 4.40 / 4.46:1 across the restaurant lines — under the 4.5:1
+     floor for --t-label copy. 0.78 computes 5.38:1. */
+  opacity: 0.78;
   display: flex;
   flex-direction: column;
   gap: 2px;
@@ -3064,7 +1904,13 @@
   letter-spacing: var(--tr-label);
   line-height: var(--lh-snug);
   color: var(--maroon);
-  opacity: 0.85;
+  /* FULL INK, and it was 0.85. Uppercase --t-label with tracking is the
+     thinnest, smallest type on this block, and it loses far more to
+     anti-aliasing than the alpha arithmetic admits: 0.85 computes 6.72:1 on
+     the softened ground and MEASURED 4.10:1 at 390, under the 4.5:1 it owes.
+     There is no tone left to spend — a label this small on this ground needs
+     the whole ink (9.80:1). The hierarchy it used to carry now comes from
+     size and case, which is where it should have come from. */
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
@@ -3073,59 +1919,6 @@
 /* No `.coverageDate`. The column it styled is gone — see .coverageRow. */
 
 /* ---- Responsive ---- */
-
-@media (max-width: 980px) {
-  .storyShell {
-    grid-template-columns: 1fr;
-  }
-
-  .storyWheel {
-    display: none;
-  }
-
-  .storyItem {
-    min-height: auto;
-    display: block;
-    padding-block: clamp(48px, 8vh, 92px);
-    opacity: 1;
-    transform: none;
-  }
-
-  /* no activation states on mobile (every chapter is "on") — the card sits
-     at full size permanently */
-  .storyItem .storyContent {
-    transform: none;
-  }
-
-  .storyMobileYear {
-    display: block;
-    margin-bottom: clamp(16px, 2.6vh, 28px);
-    font-family: var(--font-display);
-    font-weight: 500;
-    font-size: clamp(3.2rem, 18vw, 6rem);
-    line-height: 0.9;
-    letter-spacing: -0.04em;
-    color: var(--saffron);
-  }
-
-  .storyTitle {
-    max-width: 14ch;
-  }
-
-  /* chapter cards stack: photo above text — both layout variants collapse
-     to the same single-column composition */
-  .storyContent,
-  .storyPortrait {
-    grid-template-columns: 1fr;
-    max-width: 880px;
-  }
-  .storyPortrait .storyImageFrame {
-    order: 0;
-    /* a tall crop reads wrong stacked — settle on the landscape golden
-       rectangle every card already speaks */
-    aspect-ratio: 1.618 / 1;
-  }
-}
 
 @media (max-width: 860px) {
   /* THE RIGHT-HANG IS A DESKTOP COMPOSITION. It exists to sit opposite a
@@ -3227,22 +2020,14 @@
 }
 
 @media (max-width: 600px) {
-  .storyTitle {
-    font-size: clamp(2rem, 12vw, 3.2rem);
+  /* the smallest spans stop being legible at half a phone column — widen
+     the frame and step the year down so a four-digit numeral still clears
+     the frame edges without touching them */
+  .frame {
+    width: 72%;
   }
 
-  .storyProgress {
-    gap: 18px;
-  }
-}
-
-/* .storyItem is deliberately absent here — its reduced-motion treatment (the
-   0.2s opacity-only fade) is declared with the story styles above, and listing
-   it again would clobber that fade with a hard snap */
-@media (prefers-reduced-motion: reduce) {
-  .storyNumberTrack,
-  .storyNumber,
-  .storyProgress span {
-    transition: none;
+  .year {
+    font-size: clamp(2.6rem, 14vw, 3.6rem);
   }
 }

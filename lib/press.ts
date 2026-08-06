@@ -19,30 +19,97 @@ export type PressMention = {
 
 // Outlets shown in the "As Seen In" wall on the home page. These are the
 // recognisable mastheads — each shouts credibility on its own.
-// `logo` points at the real SVG marks in `/public/press-logo/`. `scale` is
-// an optional per-outlet size multiplier for renderers with a common cell
-// height — very compact wordmarks (The Independent's "i") disappear at the
-// default size without it.
+// `logo` points at the real SVG marks in `/public/press-logo/`.
+//
+// ── `scale` IS MEASURED, NOT CHOSEN. Read this before touching a number. ──
+//
+// THE PROBLEM IT SOLVES. PressWall gives every masthead the same SEAT and
+// fills it with `height: 100%`, which equalises the BOXES. It does not
+// equalise the INK. Every file in /public/press-logo is a Figma export of a
+// raster PNG wrapped in `<svg><rect fill=pattern>`, and each was cropped by
+// a different hand: timeout.svg is a 3840x2160 frame with a small wordmark
+// floating in the middle of it, metro.svg a 1516x842 frame likewise, while
+// hypebeast.svg is trimmed hard to the letterforms. On one seat height those
+// three draw ink 47.7%, 42.3% and 100% of the box. That is the whole of "the
+// logos look different sizes", and it is why hand-guessed multipliers never
+// converged — The Independent ran an effective 2.16x and still read as one
+// of the smallest marks in the row.
+//
+// THE METHOD. Each SVG is drawn into a canvas in Chrome at a 600px box
+// height and every pixel classified as ink or ground (opaque enough to
+// occlude AND, premultiplied onto paper, darker than 229/255); `inkRatio`
+// below is the height of the resulting bounding box over the box height.
+// Rendered ink = seatHeight x inkRatio, so `scale = 1 / inkRatio` puts every
+// mark's ink on the same height. scripts/probe-press-ink.mjs re-measures it;
+// scripts/probe-press-lane.mjs measures what actually reaches the screen.
+//
+// THE RULE FOR STACKED LOCKUPS. Two marks are two lines of type, not one:
+// The Guardian ("The" over "Guardian") and Country & Townhouse ("COUNTRY &
+// TOWN" over "HOUSE"). Matching their TOTAL ink to the row would set their
+// letters at 56% and 73% of everyone else's; matching their DOMINANT LINE
+// would stand the lockup 1.8x and 1.4x taller than every neighbour. Neither
+// is right, so they take the geometric mean of the two rules —
+// `scale = 1 / sqrt(total x dominant)` — and end up a little taller than the
+// row with letters a little smaller, which is how a stacked masthead sits on
+// a press wall. Measured dominant lines: Guardian 0.561 (the "Guardian" line
+// alone, sampled in the columns where "The" is not), HOUSE 0.727.
+//
+// BBC GOOD FOOD IS NOT ONE OF THEM, though it looks like it. Measured, the
+// "BBC" badge tops out at row 111 of 900 and so does the "d/f" ascender of
+// "goodfood" — the badge sits beside the ascenders, not above them, and the
+// mark's ink extent is one line's ascender-to-descender. It takes the plain
+// rule.
+//
+//   outlet                inkRatio  rule                    scale
+//   The Sunday Times        0.902   1/r                     1.109
+//   Michelin Guide          1.000   1/r, +15% (see below)   1.150
+//   The Guardian            1.000   1/sqrt(1.000 x 0.561)   1.335
+//   The Independent         0.695   1/r                     1.439
+//   BBC Good Food           0.782   1/r                     1.279
+//   Time Out                0.477   1/r                     2.098
+//   Forbes                  0.922   1/r                     1.085
+//   Evening Standard        0.953   1/r                     1.049
+//   The Week                0.627   1/r                     1.596
+//   Metro                   0.423   1/r                     2.362
+//   Country & Townhouse     1.000   1/sqrt(1.000 x 0.727)   1.173
+//   The Infatuation         1.000   1/r                     1.000
+//   Hypebeast               1.000   1/r                     1.000
+//   That's Up               0.680   1/r                     1.471
+//
+// THE ONE JUDGEMENT CALL, stated so it is not mistaken for a measurement.
+// Michelin is the only mark here that is not type: a solid rosette on a
+// 0.91:1 box, so at equal ink height it is a ~26x24px dot standing next to a
+// 223px-wide "THE TIMES". Equal height is not equal presence for a lone
+// symbol, and it read as the smallest thing in the lane at 1.000. It carries
+// +15%. Everything else in the column above is arithmetic.
+//
+// TWO THINGS THIS CANNOT FIX, both measured, neither a reason to re-guess a
+// number. (1) The Times' royal crest is taller than its own capitals, so
+// with the lockup on the common height the letters of "THE TIMES" run at
+// 77% of the row's — the crest is part of the mark and it is what makes the
+// lockup tall. (2) metro.svg's ink sits 6.6% of its box ABOVE that box's
+// centre, and the lane centres BOXES, so Metro floats ~4px high; correcting
+// that needs the asset re-cropped, not a multiplier.
 export const FEATURED_OUTLETS: {
   name: string;
   tier?: "headline";
   logo?: string;
   scale?: number;
 }[] = [
-  { name: "The Sunday Times", tier: "headline", logo: "/press-logo/thesundaytimes.svg" },
-  { name: "Michelin Guide", tier: "headline", logo: "/press-logo/michelin.svg" },
-  { name: "The Guardian", logo: "/press-logo/theguardian.svg" },
-  { name: "The Independent", logo: "/press-logo/theindependent.svg", scale: 1.6 },
-  { name: "BBC Good Food", logo: "/press-logo/bbcgoodfood.svg" },
-  { name: "Time Out", logo: "/press-logo/timeout.svg" },
-  { name: "Forbes", logo: "/press-logo/forbes.svg" },
-  { name: "Evening Standard", logo: "/press-logo/eveningstandard.svg" },
-  { name: "The Week", logo: "/press-logo/theweek.svg" },
-  { name: "Metro", logo: "/press-logo/metro.svg" },
-  { name: "Country & Townhouse", logo: "/press-logo/country-townhouse.svg" },
-  { name: "The Infatuation", logo: "/press-logo/infatuation.svg" },
-  { name: "Hypebeast", logo: "/press-logo/hypebeast.svg" },
-  { name: "That's Up", logo: "/press-logo/thatsup.svg" },
+  { name: "The Sunday Times", tier: "headline", logo: "/press-logo/thesundaytimes.svg", scale: 1.109 },
+  { name: "Michelin Guide", tier: "headline", logo: "/press-logo/michelin.svg", scale: 1.15 },
+  { name: "The Guardian", logo: "/press-logo/theguardian.svg", scale: 1.335 },
+  { name: "The Independent", logo: "/press-logo/theindependent.svg", scale: 1.439 },
+  { name: "BBC Good Food", logo: "/press-logo/bbcgoodfood.svg", scale: 1.279 },
+  { name: "Time Out", logo: "/press-logo/timeout.svg", scale: 2.098 },
+  { name: "Forbes", logo: "/press-logo/forbes.svg", scale: 1.085 },
+  { name: "Evening Standard", logo: "/press-logo/eveningstandard.svg", scale: 1.049 },
+  { name: "The Week", logo: "/press-logo/theweek.svg", scale: 1.596 },
+  { name: "Metro", logo: "/press-logo/metro.svg", scale: 2.362 },
+  { name: "Country & Townhouse", logo: "/press-logo/country-townhouse.svg", scale: 1.173 },
+  { name: "The Infatuation", logo: "/press-logo/infatuation.svg", scale: 1 },
+  { name: "Hypebeast", logo: "/press-logo/hypebeast.svg", scale: 1 },
+  { name: "That's Up", logo: "/press-logo/thatsup.svg", scale: 1.471 },
 ];
 
 // Standout pull-quotes for the headline strip (rotates beneath the logos).

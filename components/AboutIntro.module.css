@@ -1,304 +1,233 @@
-/* "About Us" as the page's MAROON chapter — cream type on the deep ground.
-   The component scrubs the background cream → maroon as the section
-   scrolls in (this stylesheet's static maroon is the resting/reduced-
-   motion state). The film owns the golden major segment down the section's
-   full height, and at full view keeps a small EVEN breath of ground
-   between itself and the screen's top, bottom and left edges (the
-   section's own padding = the page margin on all three sides). RIGHT: the
-   display heading + story ranged right on the minor segment, the founder's
-   name line above his 4:5 portrait, the Learn More link left of the
-   portrait with bottoms aligned. All media square-cornered; the film's
-   entrance (in the component) is the section's only staged move. */
+/* "About Us" — the group's story, back on the MAROON ground.
+
+   THE CHAPTER CHANGED GROUND AGAIN, and this stylesheet is a re-inking
+   rather than a rewrite. It was built for the maroon, moved onto cream in
+   the previous pass, and is now back inside <MaroonZone> as the first of
+   the band's two chapters — see Experience.tsx for why it sits INSIDE the
+   zone rather than painting a maroon of its own.
+
+   WHAT DID NOT COME BACK WITH IT. This is not a revert to the old maroon
+   chapter: the full-height kitchen film, the dictionary definition set over
+   a bottom-up scrim, and the underline-draw link are all still gone, and
+   the two photographs keep the square corners and the top-ranged row the
+   last pass gave them. Only the ink changed, and the one control had to
+   invert — a maroon pill with a cream label is invisible on maroon.
+
+   THE SHAPE: an oversized title alone on row 1, then three columns on the
+   page's own 12 tracks — small portrait (1–2), story (4–7), large
+   photograph (9–12). Row 2 is TOP-RANGED: all three columns hang from the
+   row's top edge, so the whitespace collects BENEATH the two shorter ones.
+   (This paragraph said "BOTTOM-RANGED" and had said so since the rule was
+   reversed — the reversal is argued at `align-items: start` below, with the
+   283.9px it cost measured. Corrected here rather than left to contradict
+   the declaration forty lines down.) */
 .section {
-  position: relative;
-  /* NO air above the chapter beyond its own padding. The band arrives by
-     climbing over the chapter before it, so every pixel between the maroon's
-     top edge and the first thing worth reading is empty ground crossing the
-     window — and the film's breath below and to its left is only 12px, so
-     any margin here also made the frame visibly uneven at the top. The
-     padding IS the gap now: one even breath on all three screen-hugging
-     sides, which is what the comment above always claimed. */
-  margin-top: 0;
-  /* the maroon ground lives on the surrounding MaroonZone wrapper (shared
-     with As Seen In and the interlude) — this section stays transparent */
-  background: none;
-  color: var(--cream);
-  padding: var(--grid-margin);
+  /* NO `background` HERE, AND ITS ABSENCE IS THE DECISION. The zone above
+     owns the ground (MaroonZone.tsx); a second element painting the same
+     colour is a second place for it to go wrong — a collapsed margin, a
+     sub-pixel gap between two boxes meant to be one continuous surface, or
+     a --maroon changed in one of two places. `color` IS set, because the
+     type has to change and nothing else here would change it. */
+  color: var(--maroon);
+  /* TWO DIFFERENT SEAMS, TWO DIFFERENT NUMBERS, AND THE GROUND CHANGE MOVED
+     FROM ONE END OF THE CHAPTER TO THE OTHER. That is the whole of what the
+     move did to this rule — the pixels did not budge.
+
+     MEASURED BOTH WAYS at 1440×900 with
+     scripts/probe-about-maroon-seams.mjs, ink to ink rather than box to
+     box, because the display face's cap overshoots its own line box and the
+     reader sees the chapter start before the element does (3px, measured,
+     not the 17px an earlier note in this file estimated):
+
+                                     ON CREAM   ON MAROON
+       band's bottom → "About Us"      138px      138px
+       last photograph → "Featured In" 317px      317px
+
+     Identical, because nothing about the geometry changed — only which of
+     the two edges has a colour step across it.
+
+     THE TOP KEEPS ITS TIGHTER CLAMP, and it has MORE justification now, not
+     less. 15vh rather than the --home-gap-tight (22vh, 198px at 900 tall)
+     the bottom uses, set at the user's instruction to bring the chapter
+     closer to the band above. On cream that seam was band → cream. On
+     maroon it is band → deep maroon: a far bigger value step, doing more of
+     the separating, so 138px of air buys a cleaner chapter break than it
+     did. 15vh is not a hand-picked pixel — it is 0.68 × the token's own
+     22vh with the floor and ceiling scaled by the same factor, so it tracks
+     --home-gap-tight through every viewport height instead of crossing it.
+
+     THE BOTTOM KEEPS THE TOKEN, AND THIS IS THE CALL THE MOVE FORCED.
+     About and "Featured In" are now the SAME COLOUR, so the 317px between
+     them is no longer air stacked on top of a ground change — it is the
+     only separator left. Two readings were available:
+
+       ONE BAND, TWO CHAPTERS — let the maroon run unbroken and let the
+       whitespace mark the chapter change.
+       TWO SECTIONS — put a boundary back (a rule, a tone step, a second
+       painted ground) so the reader is told where one ends.
+
+     ONE BAND WON, and the reason is what the band is for. The maroon
+     arrives once on this page; it is the page's only change of register.
+     Cutting it in half with a hairline would spend that arrival on
+     furniture, and a tone step between two chapters that are supposed to be
+     the same ground is a seam pretending to be a decision. 317px is 35% of
+     a 900px viewport — a third of a screen of unbroken ground between the
+     last photograph and the words "Featured In". That is not ambiguity, it
+     is a paragraph break at chapter scale, and it is more air than the
+     tightest seam on this page gets (restaurant grid → statement, 153px)
+     WITH a ground change helping it.
+
+     So the padding still earns its value, and it earns more of it than it
+     did on cream — where PressWall.module.css criticised this very number
+     for being air on top of a separator that was already doing the job. It
+     is now the separator. */
+  padding: clamp(112px, 15vh, 208px) var(--grid-margin) var(--home-gap-tight);
 }
 
-@media (min-width: 981px) {
-  .section {
-    /* the full-viewport seat — the grid stretches to fill it, so the film
-       runs top-padding to bottom-padding */
-    min-height: 100svh;
-    display: flex;
-    flex-direction: column;
-    /* the film's breath: a TIGHT, even hairline on the screen-hugging sides
-       (left, top, bottom) — the shared --film-breath, so this frame and the
-       interlude's are the same frame. The RIGHT side keeps the page margin,
-       so the text column's right edge stays seated on the global grid and
-       aligns with every other chapter. */
-    padding: var(--film-breath) var(--grid-margin) var(--film-breath)
-      var(--film-breath);
-  }
-}
-
-/* ---------- the grid ---------- */
-/* Stacked flow below the desktop breakpoint; the GLOBAL 12-column grid at
-   ≥981px (the section padding is the page margin, so column 1 in here is
-   column 1 of the page). */
+/* stacked flow below the desktop breakpoint, in DOM order:
+   title → portrait → story → large photograph */
 .grid {
   display: flex;
   flex-direction: column;
-  gap: clamp(20px, 3vh, 40px);
+  gap: clamp(28px, 5vh, 56px);
 }
 
 @media (min-width: 981px) {
   .grid {
-    flex: 1;
-    min-height: 0;
     display: grid;
+    /* the GLOBAL 12-column grid — the section's padding is the page margin,
+       so track 1 in here is track 1 of the page and this chapter's columns
+       line up with the statement's and the restaurant grid's */
     grid-template-columns: repeat(12, minmax(0, 1fr));
-    /* head band / flexible air / lower band — the film spans all three
-       rows; the founder stack + link share row 3 */
-    grid-template-rows: auto minmax(0, 1fr) auto;
     column-gap: var(--grid-gutter);
-    row-gap: clamp(20px, 3vh, 40px);
+    /* the air under the title. Large, because it is the only whitespace in
+       the chapter doing real work: it is what makes the title read as a
+       chapter opening rather than as a heading attached to a paragraph. */
+    row-gap: clamp(64px, 10vh, 148px);
+    /* ROW 2 IS TOP-RANGED, and it was bottom-ranged first. Hanging all
+       three columns off the tall frame's bottom edge composed beautifully
+       in isolation — three objects on one baseline — and measured badly in
+       the scroll: the scene frame is 552px tall and the story is ~300, so
+       bottom-ranging left a measured ~250px of empty cream between the
+       title and the first line of the story, on top of the 90px row gap.
+       The reader met the chapter's heading and then a third of a screen of
+       nothing. Top-ranged, the story starts one row gap under the title
+       and the air collects at the BOTTOM of the two shorter columns
+       instead.
+       IT IS NOW THE WHOLE RULE. The portrait was the one exception,
+       hanging from the row's bottom edge; it is top-ranged with the rest
+       (see .portraitFrame), so this single declaration is what puts the
+       three columns on one horizontal. */
+    align-items: start;
   }
-}
 
-/* ---------- left: the kitchen film ---------- */
-.mediaFrame {
-  position: relative;
-  overflow: hidden;
-  /* sharp corners — all media in the chapter is square-cut */
-  border-radius: 0;
-  background: var(--placeholder);
-  aspect-ratio: 16 / 9;
-}
-
-@media (min-width: 981px) {
-  .mediaFrame {
-    /* GOLDEN-RATIO split: the film takes the major segment — 7 of the 12
-       tracks (58.3%, the nearest column seat to φ's 61.8%) — and runs the
-       grid's full height, so its outer edges sit exactly one page margin
-       from the screen's top, bottom and left. */
-    grid-column: 1 / 8;
-    grid-row: 1 / -1;
-    aspect-ratio: auto;
-    min-height: 0;
-  }
-}
-
-/* the film (and its reduced-motion poster stand-in) both cover the frame */
-.media {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-
-.mediaPoster {
-  object-fit: cover;
-}
-
-/* bottom-up legibility scrim behind the wordmark block — the Discover
-   scrim family's recipe, confined to the film's lower band so the footage
-   keeps its full strength everywhere the type isn't */
-.mediaScrim {
-  position: absolute;
-  inset: 0;
-  background: linear-gradient(
-    180deg,
-    rgba(47, 0, 0, 0) 46%,
-    rgba(47, 0, 0, 0.2) 66%,
-    rgba(47, 0, 0, 0.72) 100%
-  );
-  pointer-events: none;
-}
-
-/* ---------- on-film wordmark + dictionary definition ---------- */
-/* "Maginhawa" in the display face riding the film's lower-left corner —
-   the one cream passage in the chapter, carried by the scrim */
-.wordmarkBlock {
-  position: absolute;
-  left: clamp(20px, 2.4vw, 44px);
-  right: clamp(20px, 2.4vw, 44px);
-  bottom: clamp(20px, 3vh, 44px);
-  display: flex;
-  flex-direction: column;
-  gap: clamp(6px, 1vh, 12px);
-  max-width: 44ch;
-}
-
-.wordmark {
-  margin: 0;
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: clamp(2.4rem, 4vw, 4.5rem);
-  line-height: var(--lh-display);
-  letter-spacing: var(--tr-display);
-  color: var(--cream);
-}
-
-/* the entry line — pronunciation, part of speech, language: quiet and
-   lowercase, the way a dictionary sets it */
-.defMeta {
-  margin: 0;
-  font-family: var(--font-sans);
-  font-weight: 400;
-  font-size: var(--t-small);
-  font-style: italic;
-  line-height: var(--lh-snug);
-  color: var(--cream);
-  opacity: 0.65;
-}
-
-.defBody {
-  margin: 0;
-  max-width: 40ch;
-  font-family: var(--font-sans);
-  font-weight: 400;
-  font-size: var(--t-small);
-  line-height: var(--lh-body);
-  color: var(--cream);
-  opacity: 0.88;
-}
-
-/* ---------- top-right: heading + story ---------- */
-.headBlock {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(16px, 2vh, 24px);
-}
-
-@media (min-width: 981px) {
-  .headBlock {
-    /* the minor golden segment (tracks 9–12), ENDING flush at column 12's
-       right edge */
-    grid-column: 9 / 13;
+  .titleCell {
+    grid-column: 1 / 10;
     grid-row: 1;
-    align-items: flex-end;
-    text-align: right;
+  }
+
+  /* SMALL — two tracks. At 1440 that is ~205px wide, against the scene
+     frame's ~442px: the reference's contrast between the two pictures is
+     roughly 1:2 on the long edge, and two tracks against four is the
+     nearest seat the page's grid offers. */
+  .portraitFrame {
+    grid-column: 1 / 3;
+    grid-row: 2;
+    /* NOW TOP-RANGED WITH THE OTHER TWO, and this is a reversal.
+       `align-self: end` used to drop this frame to the row's bottom edge —
+       the tall photograph's bottom edge — so the chapter read on a diagonal
+       (title, story, big picture) with a weight in the bottom-left corner.
+       What that cost, measured at 1440×900: the portrait's top sat 283.9px
+       BELOW the story's first line, i.e. it hung most of a paragraph lower
+       than anything beside it, and the corner it anchored was one the
+       reader had already passed.
+
+       There is no `align-self` here at all now — the grid's own
+       `align-items: start` is the whole rule, which is what makes the
+       alignment EXACT rather than tuned: the portrait's top, the story
+       column's top and the first line box of "Maginhawa began in 1987…"
+       are the same edge of the same grid row, so the delta is 0 by
+       construction and cannot drift with the copy or the type size.
+       Measured after: Δ 0.00px (the cap inside that line sits 5.5px lower,
+       which is the paragraph's own half-leading and is left alone — the
+       instruction was to align to the line box). */
+  }
+
+  /* the story sits in the middle with a full track of air on either side
+     (3 and 8 are empty) — the columns are separated by whitespace, not by
+     rules or by butting against each other */
+  .copy {
+    grid-column: 4 / 8;
+    grid-row: 2;
+  }
+
+  /* LARGE — four tracks, ending flush on track 12's right edge */
+  .sceneFrame {
+    grid-column: 9 / 13;
+    grid-row: 2;
   }
 }
 
-/* same display grammar as the Discover title — cream on the maroon */
+/* ---------- the title ---------- */
+/* OVERSIZED AND ALONE. No superscript, no index marker, no eyebrow — the
+   user asked for the title only. 9vw is a step up from the 7.2vw this
+   chapter's heading used on the maroon: on cream the type has to carry the
+   chapter by itself, where before it shared the work with a ground change. */
 .title {
   margin: 0;
   font-family: var(--font-display);
   font-weight: 500;
-  font-size: clamp(3rem, 7.2vw, 6.75rem);
+  font-size: clamp(3.25rem, 9vw, 9.5rem);
   line-height: var(--lh-display);
   letter-spacing: var(--tr-display);
-  color: var(--cream);
+  /* the chapter's brightest object, and on this ground that means cream:
+     a measured 9.71:1 against the token pair's 9.80:1, the strongest the
+     palette has. 9vw stays — it was raised
+     from 7.2vw when the chapter was on cream and had to carry itself with
+     type alone. It has the ground change back now, so the size is no longer
+     load-bearing, but shrinking it would be a second, unasked change to a
+     composition that is otherwise being left exactly where it was. */
+  color: var(--maroon);
 }
 
-/* the two paragraphs' shared column. font-size is LOAD-BEARING here, not
-   decorative — --para-gap (0.9em) and .story's own max-width (in ch) both
-   need to resolve against --t-small, not the inherited 16px. Without it the
-   gap is 14.4px instead of 12.6px and the cap (once it lands, below) is
-   537.6px (85 chars) instead of 470.4px (74 chars). */
-.story {
-  display: flex;
-  flex-direction: column;
-  font-size: var(--t-small);
-  gap: var(--para-gap);
-}
+/* ---------- the two photographs ---------- */
+/* Same frame rule for both; only the seat and the ratio differ.
 
-@media (min-width: 981px) and (min-height: 780px) {
-  .story {
-    /* the cap adds ~2 lines at >=1600px wide, which on viewports at or
-       below ~730px tall tips the grid into overflow — hence the height
-       gate. Below it, the paragraphs fill the cell as they do today.
-       align-items: flex-end keeps both paragraphs flush to the cell's
-       right edge, matching .headBlock's align-items: flex-end above. */
-    max-width: var(--measure-tight);
-    align-items: flex-end;
-  }
-}
+   SQUARE CORNERS, BOTH OF THEM, at the user's instruction. They carried
+   `border-radius: var(--radius-tile)` — globals' 8px token for "photography
+   and editorial frames" — which was chosen to match the band above while
+   the band still rested at that same radius. The band has no radius at all
+   any more (it is full-bleed at every scroll position), so the argument
+   that put the 8px here has gone with it, and two square photographs on a
+   cream ground with no rule between them is the flatter, more editorial
+   read. There is deliberately NO `border-radius: 0` declaration below —
+   the rule is simply absent, because a token overridden back to its
+   initial value invites someone to "restore" it.
 
-.body {
-  margin: 0;
-  /* the ch/em cap lives on .story (see above) so it resolves at 14px
-     (--t-small), not the inherited 16px — this rule just sets the type. */
-  font-family: var(--font-sans);
-  font-weight: 400;
-  font-size: var(--t-small);
-  line-height: var(--lh-body);
-  color: var(--cream);
-  opacity: 0.85;
-  text-wrap: pretty;
-}
+   `overflow: hidden` STAYS. It is not the radius's clip: `object-fit:
+   cover` on a `fill` image paints to the frame's box, and the frame is the
+   only thing bounding it.
 
-/* ---------- lower-right band: name line + portrait ---------- */
-/* one stack seated in the chapter's bottom-right corner, right-edge-aligned
-   with the heading block above — its own row 3 cell, so it can never ride
-   over the paragraphs */
-.founderBlock {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  gap: clamp(8px, 1vh, 12px);
-}
-
-@media (min-width: 981px) {
-  .founderBlock {
-    /* two columns (11–12) — a small portrait mark, right edge shared with
-       the heading block */
-    grid-column: 11 / 13;
-    grid-row: 3;
-    align-self: end;
-  }
-}
-
-/* NAME, then alias, then portrait — one right-ranged stack sharing the
-   portrait's right edge, with the same gap between every pair so the three
-   read as one credit block. (The name and the alias used to sit on opposite
-   ends of a justified row above the picture, which left the name floating
-   away from the thing it names.) */
-/* the name line rides directly above the portrait, sharing its width —
-   name flush to the portrait's left edge, alias at its right end */
-.founderRow {
-  margin: 0;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  text-align: right;
-  /* the SAME gap the block uses below, so name → alias → portrait are
-     evenly spaced rather than two different distances */
-  gap: clamp(8px, 1vh, 12px);
-}
-
-.founderName {
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: clamp(1.6rem, 3vw, 2.6rem);
-  line-height: 1.1;
-  letter-spacing: var(--tr-display);
-  color: var(--cream);
-}
-
-.founderAka {
-  font-family: var(--font-sans);
-  font-weight: 400;
-  font-size: var(--t-small);
-  letter-spacing: normal;
-  color: var(--cream);
-  opacity: 0.6;
-  white-space: nowrap;
-}
-
-/* the portrait beneath the name — a true PORTRAIT crop (4:5, taller than
-   wide), sharp corners, fills the stack */
-.portraitFrame {
+   THE DECODE GROUND FOLLOWED THE CHAPTER. It was --placeholder, the straw
+   surface one step under the cream, which is right on a cream page and
+   wrong here: --placeholder measures 7.88:1 against the maroon, i.e. two
+   bright rectangles flashing on a dark band every time the photographs are
+   slow. --maroon-soft is the same idea one family over — the ink lifted
+   rather than the ground dropped — and measures 1.45:1 against the ground,
+   a frame you can see is a frame without it announcing itself. */
+.portraitFrame,
+.sceneFrame {
   position: relative;
-  width: min(50vw, 240px);
-  aspect-ratio: 4 / 5;
   overflow: hidden;
-  border-radius: 0;
-  background: var(--placeholder);
+  background: var(--maroon-soft);
+}
+
+.portraitFrame {
+  /* on a phone the small frame stays small — a portrait blown to the full
+     measure stops being the supporting picture and starts competing with
+     the scene below it */
+  width: min(56vw, 260px);
+  aspect-ratio: 4 / 5;
 }
 
 @media (min-width: 981px) {
@@ -307,166 +236,160 @@
   }
 }
 
-.portraitImg {
-  object-fit: cover;
-  /* TOP-ANCHORED, because the default centred it and took his scalp off.
-     omar.jpg is 4000x6000 (2:3) in a 4:5 frame, so `cover` scales to width
-     and 1000px of height is cropped — at the default `50%` that is 500px off
-     the top, and the crown of his head sits only ~225px down the source. It
-     was inside the cut.
+/* 4:5, not the 3:4 tried first. Four tracks is 445px at 1440, so 3:4 made
+   the frame 594px tall and the row with it; 4:5 lands at 557 and takes 37px
+   of that back without the picture stopping being the large one — it is
+   still 2.16× the small frame's width and 2.16× its area. The source is
+   737×1100 (2:3, the same shape the old one was), so the ratio survives the
+   photograph changing under it. */
+.sceneFrame {
+  width: 100%;
+  aspect-ratio: 4 / 5;
+}
 
-     `0%` rather than a middling value: 225px is ALL the air the photograph
-     has above him, so anything above 0% starts eating into the head again.
-     It reads as a tight crop because the source is tightly shot, not because
-     the frame is wrong. If it wants more room over his head the fix is a
-     taller frame (the source is 2:3 and would crop nothing at that ratio) or
-     a differently framed photograph — not this number. */
+.portraitImg,
+.sceneImg {
+  object-fit: cover;
+}
+
+.sceneImg {
+  /* TOP-ANCHORED, and measured against this specific frame. print-10 is
+     737×1100 in a 445×557 box, so `cover` scales to width (×0.604) and
+     crops 180 source px of height. At the default 50% that is 90px off each
+     end, which keeps a backlit head-and-cap silhouette across the bottom of
+     the picture — the one dead area in the frame. Cropping the full 180 off
+     the BOTTOM instead keeps the banderitas and the lit tables, which are
+     what the photograph is for, and pushes most of the silhouette out.
+     Rendered crops at 0% / 25% / 50% were compared before this was set. */
   object-position: 50% 0%;
 }
 
-/* ---------- bottom band: the Learn More link ---------- */
-.ctaCell {
+.portraitImg {
+  /* TOP-ANCHORED, carried over from the old founder portrait and for the
+     same reason: omar.jpg is 4000×6000 (2:3) in a 4:5 frame, so `cover`
+     scales to width and 1000px of height is cropped. At the default 50%
+     that is 500px off the top, and the crown of his head sits only ~225px
+     down the source — it was inside the cut. 0% rather than a middling
+     value because 225px is ALL the air the photograph has above him. */
+  object-position: 50% 0%;
+}
+
+/* ---------- the story ---------- */
+/* `font-size` is LOAD-BEARING on this box, not decorative: --para-gap is
+   0.9em and --measure-tight is in ch, and both have to resolve against
+   --t-small rather than the inherited 16px or the gap and the measure are
+   both ~14% too wide. */
+.copy {
   display: flex;
+  flex-direction: column;
+  font-size: var(--t-small);
+  gap: var(--para-gap);
+  max-width: var(--measure-tight);
 }
 
-@media (min-width: 981px) {
-  .ctaCell {
-    /* bottom band, LEFT-aligned to the text column's start (track 9 — the
-       same line the "About Us." block opens on), bottoms aligned with the
-       portrait via the shared align-self: end row seat */
-    grid-column: 9 / 11;
-    grid-row: 3;
-    align-self: end;
-    justify-content: flex-start;
-  }
+.body {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
+  color: var(--maroon);
+  /* NOT FULL-STRENGTH CREAM, and the argument survives the ground change
+     intact: the title is the chapter's brightest object, and body copy at
+     the same ink weight flattens the hierarchy between them. What inverted
+     is the DIRECTION the opacity travels — on cream it dimmed maroon type
+     toward the ground, on maroon it dims cream type toward it.
+     MEASURED off the rendered page at 0.82 on the maroon: 6.99:1
+     (scripts/probe-palette-blastradius.mjs; the arithmetic says 7.14:1 for
+     the composite rgb(198,196,175), and the 0.15 between them is the
+     anti-aliased rim the probe declines to average in — the measured figure
+     is the one of record). The same copy on the cream ground computes
+     6.01:1, so the move made this line MORE legible, not less. Either way
+     it clears the 4.5:1 this 400-weight copy answers to, so 0.82 is kept
+     rather than retuned. */
+  opacity: 0.82;
+  text-wrap: pretty;
 }
 
-/* the shared underline-draw grammar on the maroon ground — rest cream,
-   hover saffron, the 1px rule rides currentColor */
+/* ---------- the one control ---------- */
+/* THE PILL INVERTED WITH THE GROUND, and it had to — this is the single
+   change the move forced that is not just a colour swap.
+
+   On cream it was a MAROON FILL WITH A CREAM LABEL. Put that on the maroon
+   and the fill and the ground are the same colour: the pill measures 1:1
+   against what it sits on and stops being an object at all, leaving a cream
+   label floating in the middle of a paragraph with a chevron next to it.
+
+   So the two inks trade places: a CREAM FILL WITH A MAROON LABEL, which is
+   the same pair read the other way round — a measured 9.53:1 on the label,
+   against the tokens' own 9.80:1 — and the loudest object the chapter has — correct for the only control in it, and the exact treatment
+   the hero's `.actionPrimary` uses on ITS dark ground, which is where this
+   rule came from in the first place. Everything else is that rule's: 44px
+   minimum height (the tap floor, not a look), a 999px radius, sentence case
+   in the sans at 0.9375rem.
+
+   THE HOVER HAD TO INVERT TOO, and this is the part that would have been
+   missed. It emptied the fill to `transparent` and kept the label maroon —
+   on cream that leaves a maroon outline with maroon type, still 9.80:1
+   against the page. On maroon, an emptied fill exposes the dark ground and
+   a maroon label on it is 1:1: the control would have vanished on hover.
+   The hover now empties the fill AND takes the label to cream, so the
+   cream ring, the cream chevron and the cream word are all still 9.80:1.
+   The gesture is unchanged — it trades the inks rather than brightening. */
 .cta {
-  flex: none;
+  align-self: flex-start;
+  margin-top: clamp(22px, 3.2vh, 40px);
   display: inline-flex;
   align-items: center;
-  gap: 0.9em;
-  padding: 0.4em 0;
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
+  gap: 0.55em;
+  min-height: 44px;
+  padding: 0 clamp(20px, 2vw, 30px);
+  border: 1px solid var(--maroon);
+  border-radius: 999px;
+  background: var(--maroon);
   color: var(--cream);
-  position: relative;
-  cursor: pointer;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 0.9375rem;
+  letter-spacing: 0.005em;
   white-space: nowrap;
-  transition: color 0.3s ease;
+  text-decoration: none;
+  cursor: pointer;
+  transition:
+    background-color 0.35s var(--ease-state),
+    color 0.35s var(--ease-state);
 }
-.cta::after {
-  content: "";
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  height: 1px;
-  background: currentColor;
-  transform: scaleX(0.28);
-  transform-origin: left center;
-  transition: transform 0.45s var(--ease-out);
-}
-.cta:hover::after,
-.cta:focus-visible::after {
-  transform: scaleX(1);
-}
-.cta:hover,
-.cta:focus-visible {
-  color: var(--saffron);
-}
-.ctaLabel {
-  font-weight: 500;
-}
+
 .ctaChevron {
-  width: 0.85em;
-  height: 0.85em;
+  width: 1em;
+  height: 1em;
+  flex: none;
   transition: transform 0.45s var(--ease-out);
 }
-.cta:hover .ctaChevron,
-.cta:focus-visible .ctaChevron {
-  transform: translateX(4px);
-}
 
-
-/* ---------- parallax cells ---------- */
-/* The grid seat and the drift live here; the Reveal inside owns its own
-   entrance rise. Two boxes, because one element cannot have its `y` driven
-   by a scroll MotionValue and animated by a variant at the same time. */
-.headCell,
-.founderCell {
-  min-width: 0;
-}
-
-@media (min-width: 981px) {
-  .headCell {
-    grid-column: 9 / 13;
-    grid-row: 1;
+@media (hover: hover) and (pointer: fine) {
+  .cta:hover {
+    background: transparent;
+    /* cream, not maroon — see the block above. A maroon label on an emptied
+       fill would be maroon on maroon, and the control would disappear at
+       the moment the reader points at it. */
+    color: var(--maroon);
   }
-  .founderCell {
-    grid-column: 10 / 13;
-    grid-row: 3;
-    align-self: end;
-  }
-  /* the seats now belong to the cells above — the blocks just flow inside */
-  .headBlock,
-  .founderBlock {
-    grid-column: auto;
-    grid-row: auto;
-  }
-
-  /* THE LINK, lifted. It used to sit in row 3 beside a 4:5 portrait, and
-     between them they pushed the bottom band past a 100svh screen — so the
-     one call to action in the chapter was reliably below the fold. It now
-     sits directly under the story it belongs to. This does NOT close the
-     large empty middle the right-hand column had — it only moved the void
-     down a row. What closes it is the founder band's weight in row 3;
-     row 2's 1fr carries the deliberate remainder. */
-  .ctaCell {
-    grid-column: 9 / 13;
-    grid-row: 2;
-    align-self: start;
-    justify-self: end;
+  .cta:hover .ctaChevron {
+    transform: translateX(3px);
   }
 }
 
-/* The founder credit is a BYLINE, not a feature — a modest portrait with
-   the name above it, sized so the bottom band and the link both fit on one
-   screen. Capping the height (rather than the column width) keeps the 4:5
-   crop while letting the chapter breathe. */
-@media (min-width: 981px) {
-  .portraitFrame {
-    /* the WIDTH has to be the definite one. Constraining the height and
-       leaving `width: auto` against an aspect-ratio gave the box no
-       definite axis at all and it collapsed to 0x0 — the portrait
-       disappeared entirely. */
-    width: clamp(112px, 11vw, 176px);
-    aspect-ratio: 4 / 5;
-    margin-left: auto;
-  }
+/* the ring is cream now for the same reason the border is: a maroon ring
+   3px outside a pill on a maroon ground is a ring nobody can see */
+.cta:focus-visible {
+  outline: 2px solid var(--maroon);
+  outline-offset: 3px;
 }
 
-/* Taller viewports can afford a bigger byline — the block above is now the
-   short-viewport fallback. .founderCell is 3 tracks wide: its width
-   C = 3*col + 24 (two gutters of 12px). Two tracks (the portrait's own
-   width) = 2*col + 12 = 2(C-24)/3 + 12 = 2C/3 - 4, i.e. calc(200% / 3 - 4px)
-   against the CELL's own percentage — not var(--grid-col). That token is
-   computed from 100vw with SYMMETRIC margins and does not match this
-   section's asymmetric 12px/--grid-margin padding (off by 2.33px per column
-   at 1920), so plugging it in here would be wrong by construction. This
-   form is exact at every viewport and independent of --grid-col.
-   calc(30svh - 20px) is the height ceiling that stops a width-driven
-   portrait from eating a short screen — it's inert at 1080 (304 > 301.33
-   seat) and inert at 900 (250 > 248 at 1600), and only binds wide-and-short
-   (1920x900 -> 250px). min() of two WIDTH terms is still a definite width;
-   do not "simplify" this to max-height + width:auto — see the comment
-   above on why that collapses the box to 0x0. */
-@media (min-width: 981px) and (min-height: 860px) {
-  .portraitFrame {
-    width: min(calc(200% / 3 - 4px), calc(30svh - 20px));
+@media (prefers-reduced-motion: reduce) {
+  .cta,
+  .ctaChevron {
+    transition: none;
   }
 }

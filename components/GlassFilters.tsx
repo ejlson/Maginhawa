@@ -136,6 +136,27 @@ export default function GlassFilters() {
             <feBlend in="chRG" in2="chB" mode="screen" />
           </filter>
         ))}
+
+        {/* ═══ #cta-merge IS GONE, and this note is what is left of it.
+            It was a goo filter — a blur that turned each shape's alpha into
+            a soft field, then a steep colour-matrix ramp that thresholded
+            the sum, so two overlapping bodies resolved as one with a
+            concave fillet between them. Its one caller was the home
+            journal's "Read More" control.
+
+            IT DID NOT SURVIVE CONTACT WITH THE DESIGN IT WAS BUILT FOR. At
+            rest the blur swelled and wobbled both bodies before the
+            threshold cut them back, so the control read as a blob with a
+            bump rather than as a crisp pill beside a crisp disc; on hover
+            the fields never overlapped far enough to close, so the fillet
+            came out as a pinched waist with the arrow hanging over it.
+
+            The merge is geometry now: the pill is a clipped body whose
+            round cap lands exactly on the disc's centre at full close, so
+            the union IS a pill — nothing to blur, nothing to threshold and
+            no fillet to approximate. See the derivation in
+            Blog.module.css's archive-link block. Do not reintroduce a goo
+            filter here without reading it first. */}
       </defs>
     </svg>
   );

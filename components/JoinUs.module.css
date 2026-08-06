@@ -264,7 +264,11 @@
    rescue the caption.
 
    So the text comes out and becomes a standfirst under the payoff line,
-   where it is maroon on cream at 9.6:1 with nothing underneath it to fight,
+   where it is dark-on-cream at 8.57:1 with nothing underneath it to fight
+   (the note said 9.6:1; re-measured on the pre-softening ground the same
+   declaration is 9.26:1, and on the softened one 8.57:1 — the argument is
+   untouched either way, the point being that the line has no photograph to
+   fight, not the size of the number),
    and the photograph goes back to being a photograph. It is still beat 3,
    still on the headline's word mask, and it now reads in the natural place
    — the sentence finishes, then the paragraph explains it.
@@ -286,6 +290,24 @@
   font-family: var(--font-sans);
   font-size: var(--t-small);
   line-height: 1.45;
+  /* ⚠️ STRANDED LITERAL, LEFT DELIBERATELY, AND HERE IS THE REASONING SO
+     THE NEXT READER DOES NOT HAVE TO REDO IT. rgb(47,0,0) is #2f0000 — the
+     ink from TWO palettes ago. It is not --maroon and never tracked it.
+
+     It was found during the palette-softening pass and NOT re-pointed,
+     because re-pointing it is a visible design change rather than a
+     migration. Measured: this declaration is 8.57:1 on the new ground
+     (9.26:1 on the old), so it is nowhere near a floor and nothing is
+     broken. But `color-mix(in srgb, var(--maroon) 78%, transparent)` — the
+     literal translation — is 5.38:1, because #2f0000 is a far darker
+     red-black than the leaf-green ink that replaced it. Matching the
+     luminance needs ~92% of the token, and matching the HUE is not
+     possible at all: this line would go visibly greener.
+
+     So it is a real, named debt on a route that was out of scope, not an
+     oversight. Fixing it properly means deciding what this standfirst
+     should look like in the current palette and measuring the result — not
+     a find-and-replace. */
   color: rgba(47, 0, 0, 0.78);
   text-wrap: pretty;
 }
@@ -517,7 +539,7 @@
   display: grid;
   place-items: center;
   opacity: 0.7;
-  transition: transform 0.36s cubic-bezier(0.22, 1, 0.36, 1), opacity 0.3s ease;
+  transition: transform 0.36s var(--ease-entrance), opacity 0.3s ease;
 }
 .roleChev svg { width: 14px; height: 14px; }
 .roleChevOpen { transform: rotate(180deg); opacity: 1; }

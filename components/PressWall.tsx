@@ -8,34 +8,82 @@ import { FEATURED_OUTLETS } from "@/lib/press";
 const EASE = [0.22, 1, 0.36, 1] as const;
 
 /**
- * "As Seen In" — the press credential after the About story: a quiet label
- * over ONE continuously drifting line of mastheads. A single lane rather
- * than a stacked wall: this is a credential, not a chapter, and three rows
- * of it competed with the story above for weight it does not need. The line
- * fades out at both ends, so marks dissolve in and out instead of being cut
- * by an edge.
+ * The group's press credential, on the cream — ONE DRIFTING LANE OF
+ * MASTHEADS AND NOTHING ELSE.
+ *
+ * THIS IS THE FIFTH ARRANGEMENT AND THE SECOND TIME IT HAS DRIFTED. It
+ * began as a centred "As Seen In" over a moving lane, grew into three named
+ * credentials in display type with the logos demoted beneath them, was cut
+ * back to a label over a still wall, had that wall set as three hand-
+ * balanced justified rows — and is now a single scrolling lane again, at
+ * the user's instruction.
+ *
+ * WHAT CAME BACK, AND FROM WHERE. The lane, the doubled track, the edge
+ * masks and the 72s pass are recovered from the version at HEAD rather than
+ * rebuilt: this file's own note said to do that if a drifting lane ever
+ * returned, and it was right — the seamless-wrap trick below (the trailing
+ * pad that makes -50% land exactly one copy along) is the kind of thing
+ * that gets re-derived wrong.
+ *
+ * WHAT DID NOT COME BACK: the SCROLL-LINKED DECELERATION, a useScroll
+ * driving the animation's `playbackRate` 1 → 0 across the last 35% of the
+ * section's exit so the mastheads coasted to a stop as the journal arrived.
+ * It is not asked for here and it is the one piece of this section that was
+ * expensive; it is still in git if the seam ever wants it again.
+ *
+ * ── THE VISIBLE LABEL IS GONE, AND THE HEADING IS NOT ──
+ * "As featured in" is removed at the user's instruction. The <h2> stays as
+ * visually-hidden text, because it is doing two jobs the words on screen
+ * were only incidentally doing: the section is `aria-labelledby` it, and
+ * without a heading this becomes an unnamed region containing fourteen
+ * images whose alt text is a list of magazine names — which does not tell a
+ * screen reader what it is looking at. Nothing renders; the wall speaks for
+ * itself sighted, and the heading speaks for it otherwise.
  */
 
-// One lane, in a hand-set order that mixes wide and compact wordmarks so the
-// line never bunches. DETERMINISTIC (no measurement, no Math.random): server
-// and client render identical markup. Names must match FEATURED_OUTLETS
-// entries; each seat's `s` multiplies the outlet's canonical `scale`.
-const LANE: { name: string; s: number }[] = [
-    { name: "The Sunday Times", s: 1.25 },
-    { name: "Michelin Guide", s: 1.1 },
-    { name: "Evening Standard", s: 1.1 },
-    { name: "Forbes", s: 1.15 },
-    { name: "Time Out", s: 0.95 },
-    { name: "The Guardian", s: 1.3 },
-    { name: "BBC Good Food", s: 0.95 },
-    { name: "Metro", s: 1.05 },
-    { name: "The Infatuation", s: 1.0 },
-    { name: "Country & Townhouse", s: 0.9 },
-    { name: "The Week", s: 1.25 },
-    { name: "The Independent", s: 1.35 },
-    { name: "Hypebeast", s: 0.85 },
-  { name: "That's Up", s: 0.8 },
-];
+/* ONE LANE, in a hand-set ORDER that mixes wide and compact wordmarks so the
+ * line never bunches — the same job the three hand-balanced rows used to do,
+ * and a simpler one now that a lane has no measure to fill and no row ends to
+ * justify against.
+ *
+ * ⚠️ THE ORDER IS THE ONLY SPACING CONTROL LEFT, and it matters more than it
+ * did: on a fixed gap, three wide marks in a row read as a dense passage and
+ * three compact ones as a hole. Wide (The Independent, The Infatuation, The
+ * Sunday Times, Evening Standard, Hypebeast) and compact (Metro, Forbes, Time
+ * Out, That's Up, Michelin Guide) alternate below.
+ *
+ * THE INK-BALANCED THREE-ROW SPLIT IS RETIRED WITH THE WALL. It solved
+ * gap = (measure − ink) / (marks − 1) per row so the three rows read as
+ * evenly spaced; a lane has one gap for all fourteen and no margins to set
+ * flush to, so there is nothing left to solve. If the wall ever comes back,
+ * recover that arithmetic from git rather than re-deriving it.
+ *
+ * THIS LIST CARRIES NO SIZE. There is exactly ONE size knob, `scale` in
+ * lib/press.ts, and it is MEASURED off each logo's ink rather than guessed.
+ *
+ * DETERMINISTIC — no Math.random, no measurement at runtime. Server and
+ * client render identical markup; a shuffled lane would hydrate differently
+ * from the HTML it was sent. Names must match FEATURED_OUTLETS. */
+const ORDER = [
+  "The Independent",
+  "Metro",
+  "Hypebeast",
+  "Forbes",
+  "The Sunday Times",
+  "Time Out",
+  "Evening Standard",
+  "Michelin Guide",
+  "The Infatuation",
+  "BBC Good Food",
+  "Country & Townhouse",
+  "That's Up",
+  "The Week",
+  "The Guardian",
+] as const;
+
+const MARKS = ORDER.map((name) =>
+  FEATURED_OUTLETS.find((o) => o.name === name),
+).filter((o): o is NonNullable<typeof o> => Boolean(o?.logo));
 
 export default function PressWall() {
   const reduce = useReducedMotion();
@@ -43,18 +91,14 @@ export default function PressWall() {
   return (
     <section
       className={styles.section}
-      aria-label="As seen in"
-      data-nav-theme="dark"
+      aria-labelledby="featured-in"
+      data-nav-theme="light"
     >
-      <motion.h2
-        className={styles.label}
-        initial={reduce ? false : { opacity: 0 }}
-        whileInView={reduce ? undefined : { opacity: 0.45 }}
-        viewport={{ once: true, amount: 0.5 }}
-        transition={{ duration: 0.5, ease: "easeOut" }}
-      >
-        As Seen In
-      </motion.h2>
+      {/* the section's name, for the outline and for `aria-labelledby`.
+          Visually hidden — see the note above. */}
+      <h2 className={styles.srOnly} id="featured-in">
+        As featured in
+      </h2>
 
       <motion.div
         className={styles.lane}
@@ -62,44 +106,36 @@ export default function PressWall() {
         whileInView={
           reduce ? undefined : { opacity: 1, transform: "translateY(0px)" }
         }
-        viewport={{ once: true, amount: 0.4 }}
+        viewport={{ once: true, amount: 0.3 }}
         transition={{ duration: 0.55, ease: EASE }}
       >
         {/* The track holds the line TWICE and travels exactly -50%, so the
-            moment it wraps, the copy that has scrolled off the left is
-            sitting precisely where the original was — no seam, no jump. The
-            second copy is aria-hidden: it is the same mastheads again, and a
-            screen reader should hear the list once. */}
+            wrap is seamless — at the end of the pass the second copy sits
+            precisely where the first began. The reader is meant to see one
+            continuous lane, so the second copy is aria-hidden: it is the
+            same fourteen mastheads again, and a screen reader reading the
+            list twice would be reporting an implementation detail. */}
         <ul className={styles.track}>
           {[0, 1].map((copy) =>
-            LANE.map((seat) => {
-              const outlet = FEATURED_OUTLETS.find((o) => o.name === seat.name);
-              if (!outlet?.logo) return null;
-              return (
-                <li
-                  key={`${copy}-${seat.name}`}
-                  className={styles.logoSeat}
-                  aria-hidden={copy === 1}
-                  style={
-                    {
-                      "--s": seat.s * (outlet.scale ?? 1),
-                    } as React.CSSProperties
-                  }
-                >
-                  {/* eslint-disable-next-line @next/next/no-img-element */}
-                  <img
-                    className={styles.logo}
-                    src={outlet.logo}
-                    alt={copy === 0 ? outlet.name : ""}
-                    draggable={false}
-                  />
-                </li>
-              );
-            }),
+            MARKS.map((outlet) => (
+              <li
+                key={`${copy}-${outlet.name}`}
+                className={styles.logoSeat}
+                style={{ "--s": outlet.scale ?? 1 } as React.CSSProperties}
+                aria-hidden={copy === 1}
+              >
+                {/* eslint-disable-next-line @next/next/no-img-element */}
+                <img
+                  className={styles.logo}
+                  src={outlet.logo}
+                  alt={copy === 0 ? outlet.name : ""}
+                  draggable={false}
+                />
+              </li>
+            )),
           )}
         </ul>
       </motion.div>
-
     </section>
   );
 }

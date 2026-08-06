@@ -97,8 +97,12 @@
   display: grid;
   place-items: center;
   border-radius: 50%;
-  /* near-invisible tint; the refraction carries the glass */
-  background: rgba(250, 247, 241, 0.04);
+  /* near-invisible tint; the refraction carries the glass. #faf7f1 until now,
+     two palettes stale; 4% of the token at the same alpha. NOT MEASURED, and
+     no ratio is claimed for it: the disc needs a live pointer to exist, and at
+     0.04 under a refraction filter it is a tint rather than a boundary
+     anything is read against. */
+  background: color-mix(in srgb, var(--cream) 4%, transparent);
   -webkit-backdrop-filter: blur(1.5px) saturate(2) contrast(1.08);
   backdrop-filter: blur(1.5px) saturate(2) contrast(1.08);
   -webkit-backdrop-filter: url(#lg-lens) blur(1px) saturate(1.8);

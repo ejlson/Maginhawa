@@ -51,11 +51,14 @@
 
 /* The helper line. This was the "(Click to learn more)" recipe — right-
    aligned, uppercase, bracketed, 0.4 opacity — and every one of those four
-   choices fought reading: 0.4 cream on maroon measures 3.4:1, under the 4.5:1
+   choices fought reading: 0.4 cream on maroon measured 3.4:1, under the 4.5:1
    body minimum, and the uppercase ran to four ragged lines against the
    right edge. It now follows the recipe FAQ's `.aside` already settled on
-   (sentence case, left-aligned, ranged left with the column) at 0.7, which
-   measures 8.6:1. Setting it in --t-small rather than --t-label also stops it
+   (sentence case, left-aligned, ranged left with the column) at 0.7. That
+   measured 8.6:1 on the old ink and 5.68:1 on the softened one — the same
+   comfortable pass, from a pair that is no longer trying to win by the
+   largest possible margin. (0.4 would now be 2.89:1: the rejected value got
+   worse, which is the direction that keeps a rejection correct.) Setting it in --t-small rather than --t-label also stops it
    competing with the section's actual labels. */
 .lede {
   font-family: var(--font-sans);
@@ -145,9 +148,31 @@
   /* the frame — see the geometry note above */
   margin-inline: calc(var(--cell-reach) * -1);
   padding-inline: calc(var(--cell-reach) - 1px);
-  border-top: 1px solid rgba(250, 247, 241, 0.22);
-  border-left: 1px solid rgba(250, 247, 241, 0.22);
-  border-right: 1px solid rgba(250, 247, 241, 0.22);
+  /* THE LITERAL IS GONE, AND THE ALPHA DELIBERATELY DID NOT MOVE WITH IT.
+     Every rule in this table was `rgba(250, 247, 241, 0.22)` — #faf7f1, the
+     cream from TWO palettes ago. It never referenced --cream, so the palette
+     softening walked straight past it and this section kept drawing a dead
+     palette's cream next to the live one.
+
+     22% OF THE TOKEN, NOT A COMPENSATED NUMBER, and that is the whole point
+     of the migration rather than an oversight in it. Measured on /contact:
+     the old literal composited to rgb(82,98,85) on the maroon ground for
+     1.94:1; at the same 22% of the current --cream it is rgb(79,94,77) for
+     1.82:1. That step down is not damage, it is the softened ground arriving
+     somewhere it should already have been — a rule derived from the cream is
+     SUPPOSED to move when the cream does, and holding 1.94 here would mean
+     re-stranding the value against the next swap too.
+
+     NOTHING HERE IS LOAD-BEARING, which is what makes that the right call.
+     These rules group a table whose cells are links carrying their own text;
+     1.4.11's 3:1 governs what identifies a CONTROL, and neither the old
+     literal nor the new mix was ever close to it (1.94 and 1.82 alike). This
+     is ornament, measured and recorded as ornament. The boundaries on
+     /restaurants that DO identify controls were re-derived instead — see
+     RestaurantsShowcase.module.css. */
+  border-top: 1px solid color-mix(in srgb, var(--cream) 22%, transparent);
+  border-left: 1px solid color-mix(in srgb, var(--cream) 22%, transparent);
+  border-right: 1px solid color-mix(in srgb, var(--cream) 22%, transparent);
 }
 
 /* The list is seven restaurants and the grid is three wide, so the last row
@@ -190,14 +215,15 @@
      push the CTA ~60px away from the name it belongs to, so each entry reads
      as three loose fragments instead of one. The cell's height is its
      content; the rules do the grouping. */
-  border-bottom: 1px solid rgba(250, 247, 241, 0.22);
+  /* same 22% of the token as the frame above, and for the same reason */
+  border-bottom: 1px solid color-mix(in srgb, var(--cream) 22%, transparent);
   /* the interior vertical rule, drawn on the LEFT of every cell and therefore
      landing on the gap's midpoint. First-column cells put theirs half a gap
      outside the grid's padding box, where `.grid`'s clip removes it and the
      frame's own border stands in its place — which is how every vertical in
      the table gets drawn with no per-column selectors to keep in sync with
      the orphan rules below. */
-  border-left: 1px solid rgba(250, 247, 241, 0.22);
+  border-left: 1px solid color-mix(in srgb, var(--cream) 22%, transparent);
   text-decoration: none;
   color: inherit;
   transition: background-color 0.32s ease;

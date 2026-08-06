@@ -255,11 +255,23 @@
   transform: translateY(-3px);
 }
 
-/* hairline between the two bands, full bleed across the footer */
+/* hairline between the two bands, full bleed across the footer.
+
+   This was `rgba(250, 247, 241, 0.22)` — #faf7f1, the cream from TWO palettes
+   ago. A copy, never a reference, so it sat out the softening and drew a dead
+   palette's cream across the foot of every page on the site. 22% of the token
+   at the same alpha: measured on /, the old literal composited to rgb(82,98,85)
+   on the maroon ground for 1.94:1 and the new mix reads rgb(79,94,77) for
+   1.82:1.
+
+   NOT the same thing as --rule, which is the DARK hairline on the cream ground
+   and is held to 1.4.11's 3:1. This is its inverse — cream on maroon — and it
+   divides two bands of a footer rather than identifying any control, so it is
+   ornament and takes no floor. */
 .rule {
   flex: none;
   height: 1px;
-  background: rgba(250, 247, 241, 0.22);
+  background: color-mix(in srgb, var(--cream) 22%, transparent);
   margin-bottom: clamp(24px, 3.5vh, 44px);
 }
 
@@ -279,20 +291,31 @@
   }
 }
 
-/* social entries with no confirmed profile URL — plain text, not a link */
+/* social entries with no confirmed profile URL — plain text, not a link.
+
+   0.40 → 0.60, FORCED BY THE PALETTE. Cream at 0.40 on the ink measured
+   3.38:1 on the old pair and 2.88:1 on the new one — it was already under
+   the 4.5:1 this --t-small copy answers to, and the softened pair pushed it
+   further. 0.60 measures 4.62:1. It is still the quietest thing in the
+   column (the live links are 0.72, the hours 0.62), so the "no profile yet"
+   signal survives; it is just no longer signalled by illegibility. */
 .socialPending {
   font-family: var(--font-sans);
   font-size: var(--t-small);
   line-height: var(--lh-body);
-  opacity: 0.4;
+  opacity: 0.6;
 }
 
-/* office hours lines inside the contact column — text, not links */
+/* office hours lines inside the contact column — text, not links.
+   0.55 → 0.68 for the same reason: 0.55 measured 4.12:1 on the new ink, down
+   from 5.22:1 on the old. 0.62 (4.80:1 computed) cleared at 1440 and came
+   back at a measured 4.45:1 at 390 — still short — so the value is set by
+   the narrow reading. 0.68 computes 5.43:1. */
 .hours {
   font-family: var(--font-sans);
   font-size: var(--t-small);
   line-height: var(--lh-body);
-  opacity: 0.55;
+  opacity: 0.68;
 }
 /* the first hours line steps away from the phone number; the second sits
    tight under the first */
@@ -364,7 +387,17 @@
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
-  opacity: 0.7;
+  /* 0.70 → 0.85, AND THE ARITHMETIC UNDERSTATES WHY. 0.70 cream on the new
+     ink computes to 5.68:1, which looks safe — but the row is set in
+     --t-label and its "(EJ)" is --w-hairline, and MEASURED off the rendered
+     glyph core the three runs in here came back 4.24 / 4.34 / 3.46:1, all
+     under the 4.5:1 they answer to. Thin light strokes at 13px lose real
+     luminance to anti-aliasing that no opacity calculation predicts, which
+     is exactly why this file's numbers come off the pixels
+     (scripts/probe-palette-blastradius.mjs) rather than off a formula.
+     0.85 computes to 7.54:1 and carries the hairline over its floor with
+     the margin the thin weight costs. */
+  opacity: 0.85;
   /* No negative margin any more. The gap above this row used to be empty
      space INSIDE the wordmark's SVG box: getBBox reports the font's descender
      metric, but "MAGINHAWA" is all caps with no descenders, so ~5 of the
@@ -393,5 +426,16 @@
 
 .developer {
   font-family: var(--font-sans);
-  font-weight: var(--w-hairline);
+  /* --w-hairline → --w-regular, AND THE OPACITY WAS THE WRONG LEVER.
+     Raising .bottomRow from 0.70 to 0.85 lifted the two runs beside this one
+     over their floor (4.24 → clear, 4.34 → clear) and left "(EJ)" at a
+     measured 4.29:1, still under 4.5. The difference between them is not the
+     tone — they share a group opacity, so it cannot be — it is that this run
+     was the only 300-weight in the row. A light stroke at 13px gives up real
+     luminance to anti-aliasing, and no opacity value fixes a stroke that is
+     too thin to hold its own colour; pushing .bottomRow high enough to brute
+     it through would have made the whole legal row as loud as body copy.
+     Matching the siblings' weight is the smaller change and it addresses the
+     actual cause. */
+  font-weight: var(--w-regular);
 }

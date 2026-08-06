@@ -34,73 +34,204 @@
   filter: brightness(0.62);
 }
 
-/* Giant wordmark stretched edge-to-edge across the bottom of the hero */
-/* the hero's floor block: scroll cue, then the wordmark. One positioned
-   box so the two keep their spacing at every viewport and the cover
-   parallax moves them as a pair. */
-.titleStack {
+/* THE LOCKUP — statement, then the two ways in, centred on the film.
+   This box used to be seated on the hero's floor and sized to the wordmark
+   stretched edge-to-edge above it; both the wordmark and the floor anchor
+   are gone (the name is in the navbar now, see Nav.module.css). Centring is
+   done by the flex box rather than by a translate, because framer-motion
+   owns `transform` here for the cover parallax and the two would fight. */
+.lockup {
   position: absolute;
-  left: var(--pad-x);
-  right: var(--pad-x);
-  bottom: clamp(18px, 2.6vh, 34px);
+  inset: 0;
+  /* SEATED IN THE LOWER THIRD, not centred. Dead-centre put the statement
+     straight over the middle of the frame, which is where the footage keeps
+     its subject — the chef, the pass, the plate — so the type and the film
+     were fighting for the same 300px. Sitting it low leaves the middle to
+     the picture and still reads as a deliberate seat rather than as
+     something that fell to the bottom. */
+  padding: 0 var(--pad-x) clamp(56px, 11vh, 132px);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
   pointer-events: none;
   will-change: transform;
 }
 
-.titleWrap {
-  margin: 0;
-  color: var(--cream);
-  mix-blend-mode: difference;
-  /* the wordmark rises out of this clip — it must stay tight to the type,
-     which is why the cue sits OUTSIDE it rather than in the same box */
-  overflow: hidden;
-}
+/* ---------- what this is, and the way in ---------- */
 
-.titleInner {
-  display: block;
-  width: 100%;
-  will-change: transform;
-}
+/* THE IDENTIFYING LINE, NOW THE HERO'S ONLY TYPE.
+   It was Helvetica at --t-body, deliberately: a caption to the wordmark
+   below it, sized so it could not compete with the mark. There is no mark
+   here to lose to any more, so the reasoning inverts — this sentence IS the
+   hero, and a 16px line floating in the middle of a full-bleed film reads as
+   a caption to nothing.
 
-.titleSvg {
-  display: block;
-  width: 100%;
-  height: auto;
-}
-
-.titleText {
-  font-family: var(--font-display-big);
-  font-weight: 400;
-  text-transform: uppercase;
+   Display voice, at --t-h2 rather than --t-display: the sentence runs 76
+   characters and the bigger token would break it into six lines on a laptop.
+   The measure is deliberately tight so it sets as three or four short lines
+   — a statement with edges, not a paragraph that happens to be centred. */
+.lede {
+  margin: 0 auto clamp(22px, 3.2vh, 40px);
+  /* sized for the ONE sentence that wraps — "Seven London kitchens,
+     pan-Asian and Caribbean." is 47 characters, so this measure splits it
+     near its comma and the other two sentences sit on single lines */
+  max-width: 26ch;
+  text-align: center;
+  font-family: var(--font-display);
+  /* 500, NOT 400 — EB Garamond's regular is a text weight drawn for 10–14pt
+     and this line runs at --t-h2 over dimmed film. At 400 the thins fall
+     apart against a bright frame; the variable font carries a drawn 500. */
+  font-weight: var(--w-medium);
+  font-size: var(--t-h2);
+  line-height: var(--lh-heading);
   letter-spacing: var(--tr-display);
-  fill: var(--cream);
+  color: var(--cream);
+  /* NO SCRIM, and the reason it could go is the size. --scrim-text existed
+     because this line used to be 16px Helvetica floating on the footage,
+     where a bright frame could swallow it. At --t-h2 it is 48px display
+     type, which WCAG treats as large — a 3:1 floor rather than 4.5:1 — and
+     the film already carries filter: brightness(0.62). The shadow was
+     buying legibility the size now provides, at the cost of making clean
+     type look like it had been dropped onto the picture rather than set
+     into it. If the footage is ever re-graded brighter, put it back. */
 }
 
-/* ---------- the SCROLL indicator ---------- */
-/* mono-caps chrome (Telescope grammar) seated UNDERNEATH the wordmark and
-   centred on it — the cue reads as the next step in the page rather than as
-   a label pinned to a corner, and it points down into the space it is
-   asking you to go. Cream over the dimmed footage; no motion of its own
-   once landed. */
-.scrollHint {
-  /* in flow, directly above the wordmark — the air between them is the
-     wordmark's own optical breathing room, not a fixed gap */
-  margin-bottom: clamp(12px, 1.6vh, 22px);
+/* balance is set per-sentence rather than on .lede, because balancing the
+   whole heading would even out the line lengths ACROSS the three sentences
+   and undo the clause breaks this markup exists to get */
+.clause {
+  display: block;
+  text-wrap: balance;
+}
+
+.actions {
   display: flex;
   justify-content: center;
   align-items: center;
-  gap: 0.55em;
-  font-family: var(--font-mono);
-  font-weight: 400;
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label-mono);
-  text-transform: uppercase;
-  color: var(--cream);
-  pointer-events: none;
+  gap: clamp(10px, 1.2vw, 16px);
+  /* .lockup is pointer-events: none so the film stays draggable behind
+     the lockup — the only two things here that are clickable opt back in */
+  pointer-events: auto;
 }
 
-.scrollHint svg {
-  width: 0.85em;
-  height: 0.85em;
+/* 44px minimum height on both, which is the tap-target floor rather than a
+   look — at this size the text alone would land near 30px.
+
+   SENTENCE CASE, NOT CAPS. The chrome was running three uppercase things at
+   once — the wordmark, the nav links and these two buttons — and caps are
+   only a signal while something else is not shouting. Dropping the buttons
+   and the nav to sentence case leaves the WORDMARK as the only uppercase
+   thing above the fold, which is the one place the emphasis was worth
+   spending. It also reads warmer, and the brief for this group is a family
+   that has been cooking since 1987 rather than a fashion house.
+   Set 1px larger than the old --t-label: lowercase has a smaller apparent
+   size than caps at the same point size, so holding 13px would have made
+   the actions quieter, not just softer. */
+.actionPrimary,
+.actionSecondary {
+  min-height: 44px;
+  padding: 0 clamp(20px, 2vw, 30px);
+  border-radius: 999px;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 0.9375rem;
+  letter-spacing: 0.005em;
+  white-space: nowrap;
+  cursor: pointer;
+  transition:
+    background-color 0.35s var(--ease-state),
+    color 0.35s var(--ease-state),
+    border-color 0.35s var(--ease-state),
+    /* the press is deliberately an order of magnitude faster than the
+       colour change — feedback has to feel like contact, not like an
+       animation starting */
+    transform 120ms var(--ease-out);
+}
+
+/* THE PRESS, AND THE FRONT DOOR HAD NONE.
+   These two buttons and the navbar links were the only controls on the site
+   with a :hover and no :active — every card button, the footer and the
+   forms already respond to being pressed. That is the wrong way round: the
+   hero pair is the first thing anyone touches, and the moment a control
+   does nothing on pointer-down the interface stops feeling direct.
+
+   scale(0.97), which is the smallest value that reads as contact rather
+   than as a glitch, and it fires on POINTER-DOWN rather than on click —
+   waiting for touch-up is the latency that makes a button feel dead.
+
+   No :active inside the hover media query. A touch device reports
+   `hover: none`, and press feedback is exactly the affordance a touch
+   device needs MOST. */
+.actionPrimary:active,
+.actionSecondary:active {
+  transform: scale(0.97);
+}
+
+/* the filled pill is the one action most readers want — browsing the rooms
+   comes before booking one, because most arrivals have not chosen yet */
+.actionPrimary {
+  border: 1px solid var(--cream);
+  background: var(--cream);
+  color: var(--maroon);
+}
+
+.actionSecondary {
+  /* THE LITERAL IS GONE. It was rgba(250, 247, 241, 0.55) with a note
+     explaining that relative colour syntax appears nowhere else in these
+     stylesheets and is not worth the support floor — a fair argument that
+     answered the wrong question. rgb(from …) was never the only
+     alternative: `color-mix(in srgb, var(--cream) 55%, transparent)` is
+     the idiom this codebase already uses everywhere for exactly this, and
+     it is as widely supported as the color-mix in --rule.
+
+     WHAT THE LITERAL COST. It named #faf7f1, the cream from TWO palettes
+     ago — the note said so in as many words and was still true when it was
+     written. That border has been painting a dead palette's cream through
+     two swaps, on the hero, above the fold, on the home page. This is the
+     failure mode a token exists to prevent, preserved in amber. */
+  border: 1px solid color-mix(in srgb, var(--cream) 55%, transparent);
+  background: transparent;
+  color: var(--cream);
+}
+
+@media (hover: hover) {
+  .actionPrimary:hover {
+    background: transparent;
+    color: var(--cream);
+  }
+  .actionSecondary:hover {
+    border-color: var(--cream);
+    background: var(--cream);
+    color: var(--maroon);
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .actionPrimary,
+  .actionSecondary {
+    transition: none;
+  }
+  /* the press stays. A reduced-motion reader is asking not to be moved
+     THROUGH space, not to be denied confirmation that a control was hit —
+     and at 3% over 120ms there is no travel to be bothered by. The
+     transition is dropped above, so it becomes an instant state change,
+     which is exactly what this preference wants. */
+}
+
+/* one column on a phone: side by side, two uppercase labels at this size
+   either wrap or shrink below the tap floor */
+@media (max-width: 480px) {
+  .actions {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  /* the measure is in ch, so it already tracks the smaller size — what a
+     phone needs is the size itself brought down, not the measure narrowed
+     (at 26ch and the desktop size the middle sentence ran five lines) */
+  .lede {
+    max-width: 20ch;
+    font-size: clamp(1.45rem, 6.6vw, 1.9rem);
+  }
 }
 

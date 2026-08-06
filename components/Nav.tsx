@@ -101,11 +101,16 @@ export default function Nav({
         onClick={onLogoClick}
         aria-label="Maginhawa — home"
       >
-        <img
-          className={styles.logoImg}
-          src="/logo/maginhawa.png"
-          alt="Maginhawa"
-        />
+        {/* THE WORDMARK, SET RATHER THAN DRAWN. This was the line-art mark
+            (/logo/maginhawa.png, still in public/ and unused). The name now
+            lives here because the hero no longer sets it edge-to-edge, and a
+            group with seven rooms should be named in the one piece of chrome
+            that survives every route.
+
+            Live text, not an image: it inherits `currentColor` so the bar's
+            difference blend keeps it legible on cream, maroon and film alike
+            — which the PNG needed a filter: invert(1) to fake. */}
+        <span className={styles.logoWord}>Maginhawa</span>
       </a>
 
       <ul className={styles.links}>

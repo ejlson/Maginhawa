@@ -1,0 +1,188 @@
+/* The sheet's own layout only. Every COLOUR here is a var inherited from
+   lab.module.css's `[data-palette="plaster"]` block, and every FONT is a var
+   from its `[data-type]` blocks — this file must not name a hex or a family,
+   because the moment it does, a row stops being a faithful preview of the
+   panel it claims to preview. */
+
+.sheet {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--f-text);
+  padding: clamp(28px, 4vw, 56px) clamp(24px, 5vw, 88px) clamp(48px, 7vh, 96px);
+}
+
+/* ------------------------------------------------------------------ head */
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(20px, 3vw, 48px);
+  padding-bottom: clamp(22px, 3vh, 36px);
+  border-bottom: 1px solid var(--rule);
+}
+
+/* Contralto — the fixed point. It deliberately does NOT take --f-display:
+   the whole question this sheet asks is which display face sits best beside
+   the wordmark, and a wordmark that changed with each row would answer it
+   by erasing it. */
+.word {
+  flex: none;
+  padding-top: 4px;
+  font-family: "contralto-big", "contralto-medium", "Times New Roman", serif;
+  font-weight: 600;
+  font-size: clamp(17px, 1.3vw, 21px);
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+
+/* the sheet's own furniture is set in the TEXT face, not in any row's display
+   face, so the apparatus never competes with the specimens */
+.title {
+  margin: 0 0 6px;
+  font-size: clamp(1.1rem, 1.5vw, 1.35rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.sub {
+  margin: 0;
+  max-width: 80ch;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--soft);
+}
+.sub code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.95em;
+  color: var(--ink);
+}
+
+/* ------------------------------------------------------------------ rows */
+
+.row {
+  display: grid;
+  grid-template-columns: clamp(190px, 19vw, 260px) minmax(0, 1fr);
+  gap: clamp(20px, 3vw, 52px);
+  align-items: start;
+  padding: clamp(26px, 3.4vh, 42px) 0;
+  border-bottom: 1px solid var(--rule);
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.idx {
+  font-family: var(--f-text);
+  font-size: 0.75rem;
+  font-weight: 600;
+  letter-spacing: 0.1em;
+  color: var(--accent);
+}
+
+/* the face's NAME is set in the face itself — the cheapest possible specimen,
+   and it means the label answers "what does this look like" before the
+   heading below it does */
+.face {
+  margin: 2px 0 0;
+  font-family: var(--f-display);
+  font-weight: var(--display-weight);
+  font-size: clamp(1.05rem, 1.35vw, 1.3rem);
+  line-height: 1.15;
+  letter-spacing: var(--heading-track);
+}
+
+.pair {
+  margin: 0 0 10px;
+  font-size: 0.75rem;
+  line-height: 1.4;
+  color: var(--soft);
+}
+
+.note {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.55;
+  color: var(--soft);
+}
+
+/* ------------------------------------------------------------- specimens */
+
+.spec {
+  min-width: 0;
+}
+
+/* SIZED IN vw RATHER THAN AT THE PANELS' clamp(): the heading has less
+   horizontal room here than on a full panel, and holding the panel's size
+   would wrap the tighter faces (Petrona, Archivo) onto two lines while the
+   wider ones stayed on one — a difference in LEADING would then read as a
+   difference in the typeface. One line each, at every width. */
+.heading {
+  margin: 0 0 12px;
+  font-family: var(--f-display);
+  font-weight: var(--display-weight);
+  font-size: clamp(1.5rem, 2.9vw, 2.6rem);
+  line-height: 1.08;
+  letter-spacing: var(--heading-track);
+}
+.heading em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+.standfirst {
+  margin: 0 0 10px;
+  max-width: 46ch;
+  font-size: clamp(0.95rem, 1.1vw, 1.1rem);
+  line-height: 1.45;
+  color: var(--soft);
+}
+
+.para {
+  margin: 0 0 16px;
+  max-width: 66ch;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+/* the controls carry the TEXT face, as they do on the real page — a button
+   label is furniture, not display */
+.primary,
+.secondary {
+  min-height: 38px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-family: var(--f-text);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+.primary {
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--ground);
+}
+.secondary {
+  border: 1px solid color-mix(in srgb, var(--ink) 45%, transparent);
+  background: transparent;
+  color: var(--ink);
+}
+
+@media (max-width: 860px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+  .head {
+    flex-direction: column;
+    gap: 12px;
+  }
+}

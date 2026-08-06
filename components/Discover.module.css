@@ -1,20 +1,48 @@
 .section {
   display: flex;
   flex-direction: column;
-  /* the assembly stage is an OVERLAY on this box — it must not disturb the
-     settled layout underneath it, which is what the flight measures */
+  /* kept from the assembly stage, which was an absolutely-positioned
+     overlay on this box. Nothing is absolutely seated here now, but the
+     grid's expansion morph portals out of the section and the head's
+     masks are positioned against it, so this stays. */
   position: relative;
-  /* zero bottom padding — the air between the grid and the As Seen In
-     strip is that strip's own top padding, and the head→grid gap here uses
-     the same value, so the grid sits with EQUAL, tighter spacing above
-     and below */
-  /* The top gap is generous on purpose: it sets the chapter apart from the
-     statement above it, and it is what makes the section roughly a
-     viewport tall — so when the assembly stage parks it mid-screen, the
-     title and its pasteboard are genuinely the only things in view. */
-  padding: clamp(64px, 13vh, 184px) var(--pad-x) 0;
-  gap: clamp(22px, 2.7vh, 34px);
-  /* the view-switch choreography slides cells in from PAST the viewport
+  /* A CREAM GAP UNDER THE GRID. The bottom padding was zero: the air below
+     the grid was borrowed entirely from the next chapter's own top
+     padding, which was fine while the tiles ended on a caption sitting on
+     the cream — the type itself was the margin. Then the captions moved
+     INSIDE the plates, the chapter ended on a hard photographic edge, and
+     borrowed air read as the next section being flush against the
+     photographs — hence this padding. The type has since moved back OUT
+     (the information panels), but the padding stays: the grid's bottoms
+     are ragged now, and the tall cells still end close to photography. */
+  /* The top gap used to be generous (64/13vh/184) for two reasons, and
+     neither survives. It set the chapter apart from the statement above —
+     but stacked with the statement's own bottom padding that came to
+     ~190px of empty cream between a sentence and the chapter it
+     introduces. And it was what made the section "roughly a viewport
+     tall", which mattered when the stage parked it mid-screen; the grid is
+     three portrait rows now and the section is well over two viewports
+     whatever this value is. */
+  padding: clamp(36px, 6vh, 96px) var(--pad-x) clamp(40px, 6vh, 88px);
+  /* THE HEAD'S AIR BEFORE THE GRID, and it is the section's only gap —
+     .head and .grid are its two in-flow children (the assembly stage is an
+     absolutely-positioned overlay and does not participate).
+
+     It was clamp(22px, 2.7vh, 34px), which measured 18px from the
+     heading's ink to the grid's top edge at 1440×900. Two things were
+     wrong with that. A heading belongs to what FOLLOWS it, so it should
+     sit nearer its own content than its top margin — this had 60px above
+     and 18px below. And 18px was LESS than the 29px then separating the
+     card rows, so the heading was bound more tightly to the grid than the
+     cards were to each other, which is what read as crowding rather than
+     as a title. Now ~48px measured at the same viewport. */
+  /* TIGHTENED from clamp(40px, 6vh, 64px) — 54px to 34px at 900 — as part
+     of fitting the chapter on one screen. Every pixel here is a pixel the
+     cards cannot have, and the head-to-grid gap is the cheapest of the
+     three fixed costs to give up: the head already reads as a distinct
+     block because of the hairline closing it. */
+  gap: clamp(26px, 3.8vh, 44px);
+  /* the entrance choreography slides cells in from PAST the viewport
      edges (±110vw) — clip the x-axis so off-screen tiles never widen the
      page. clip (not hidden) keeps the y-axis genuinely visible and never
      creates a scroll container. */
@@ -23,265 +51,195 @@
 
 @media (min-width: 981px) {
   .section {
-    /* the shared middle-10 seat (left edge of column 2, both sides) —
-       the head's internal 12-column rows below are relative to this
-       inset span, so their column seats hold */
-    padding-inline: var(--grid-col2);
+    /* WIDENED TO THE PAGE MARGIN. This was `var(--grid-col2)` — the "shared
+       middle-10 seat", i.e. the chapter began at the left edge of column 2
+       — which put 154px of empty ground either side of the grid at 1440
+       while About and Featured In started at 40px. Eight photographs is the
+       page's main event and it was the most inset thing on it.
+
+       --pad-x resolves to --grid-margin (40px at 1440), so the restaurants
+       grid now shares its left edge with About Us and Featured In BY
+       DERIVATION rather than by a copied number, and the cards gain 228px
+       of width between them.
+
+       IT ALSO CLOSES A REAL DEFECT. The page had TWO left edges — the
+       margin (About, Featured In) and this column-2 seat (Discover, Blog) —
+       so a reader coming down it watched the left edge step out by a column
+       and back again. Blog is now the only chapter still on --grid-col2 and
+       should follow this to finish the job; it is left alone here because
+       it was not what was asked for.
+
+       The head's internal 12-column rows are relative to this span, so
+       their column seats still hold — they simply resolve against a wider
+       box. */
+    padding-inline: var(--pad-x);
   }
 }
 
-/* ---------- the assembly stage ---------- */
-/* The pasteboard that opens the chapter: the one-line title with the
-   prints scattered around it, laid OVER the settled section rather than
-   in place of it. The section keeps its final height throughout — the
-   grid underneath is already at its resting size with its plates simply
-   held invisible, so the deck's flight measures real seats, the document
-   never reflows, and the scroll position the flight was measured against
-   still means the same thing when the plates arrive. */
-.stage {
-  position: absolute;
-  inset: 0;
-  z-index: 4;
-  /* nothing on the stage is pressable; the grid beneath is muted from the
-     component while the plates are still in the air */
-  pointer-events: none;
-}
+/* ---------- the assembly stage: DELETED ----------
+   Everything the retired intro drew lived here — .stage, .stageVeil,
+   .stageVeilPaper, .stageField, .stagePrint (+ .stagePrintDepth,
+   .stagePrintImg and its nth-child rotations), .stageCenter, .introTitle,
+   .introWord, .introRise, .deckSeat, .introPull, .introPlate,
+   .introPlateImg and .introFallback, plus the two media blocks that hid
+   the pasteboard below 981px and stilled it under reduced motion.
 
-/* The veil: cream paper reaching 60vh past the section on both sides, so
-   whatever viewport it meets, the chapter is the only thing on screen
-   while the sequence plays. It also CLIPS the pasteboard: prints run to
-   several times their size on the way past the camera, and this keeps that
-   growth from spilling into the sections above and below. */
-.stageVeil {
-  position: absolute;
-  left: 50%;
-  width: 100vw;
-  transform: translateX(-50%);
-  top: -60vh;
-  bottom: -60vh;
-  overflow: clip;
-}
-
-.stageVeilPaper {
-  position: absolute;
-  inset: 0;
-  background: var(--cream);
-}
-
-/* The depth field is inset back to EXACTLY the section's own box (the
-   veil's 60vh margins, removed), for two reasons: the prints below are
-   seated in percentages of it, and its centre is the vanishing point every
-   print radiates from. The glide parks that centre at the middle of the
-   screen. `perspective` here and nowhere else means all fifteen share one
-   camera; perspective-origin is left at its default 50% 50%. */
-.stageField {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 60vh;
-  bottom: 60vh;
-  perspective: 1100px;
-}
-
-/* one scattered print — raw photograph on the paper, sharp 2px corners,
-   UPRIGHT (no tilt), free to overlap its neighbours; no border, no
-   caption, no shadow */
-.stagePrint {
-  position: absolute;
-  transform-style: preserve-3d;
-}
-
-/* The layer stack: the seat carries scroll parallax, this box carries the
-   run past the camera, and the IMG floats on its own slow oscillation —
-   three motions, three owners, zero conflicts. No preserve-3d here: the
-   image below is flat, and the seat above already keeps this box's
-   translateZ in the field's 3D space. */
-.stagePrintDepth {
-  transform-origin: 50% 50%;
-}
-
-/* Cropped to the seat's own aspect — the source photography is nearly all
-   2:3, so the variety of shape is cut here rather than found. The seat's
-   width/height attributes carry the crop, `height: auto` resolves the box
-   from them, and object-fit fills it. */
-.stagePrintImg {
-  display: block;
-  width: 100%;
-  height: auto;
-  object-fit: cover;
-  border-radius: 2px;
-  user-select: none;
-  animation: printFloat 7s ease-in-out infinite alternate;
-}
-
-.stagePrint:nth-child(2n) img {
-  animation-duration: 9s;
-  animation-delay: -3s;
-}
-
-.stagePrint:nth-child(3n) img {
-  animation-duration: 8s;
-  animation-delay: -5s;
-}
-
-@keyframes printFloat {
-  from {
-    transform: translateY(-5px);
-  }
-  to {
-    transform: translateY(5px);
-  }
-}
-
-/* the title rides ABOVE the pasteboard — prints may overlap each other,
-   never the words */
-.introTitle {
-  position: relative;
-  z-index: 2;
-}
-
-/* the prints only exist on the desktop pasteboard — stacked small screens
-   go straight to the title */
-@media (max-width: 980px) {
-  .stagePrint {
-    display: none;
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .stagePrint img {
-    animation: none;
-  }
-}
-
-/* The centred composition — title and deck share one anchor, seated on
-   the PLATE BLOCK's own centre (passed in as `top` by the component) so
-   the deck opens exactly where the grid will form and every plate flies
-   the shortest honest distance to its seat. */
-.stageCenter {
-  position: absolute;
-  left: 0;
-  right: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  /* above the veil and its pasteboard — prints may overlap each other, and
-     may pass right over the line on their way out, but the line itself is
-     never clipped by the veil's box */
-  z-index: 1;
-}
-
-/* the title with the deck opening between its two words — one nowrap line,
-   a size below the settled head title so the whole composition fits */
-.introTitle {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  gap: 0.28em;
-  white-space: nowrap;
-  font-size: clamp(1.5rem, 4.6vw, 4.4rem);
-}
-
-/* Each word is a CLIP that carries the split transform, with the word
-   itself climbing out of it — the manifesto's word-mask grammar at display
-   size. The padding/negative-margin pair holds the clip edge off the
-   display face's overshoot and the full stop's tail, so the line is never
-   shaved. Splitting the two transforms across two elements is what keeps
-   the horizontal part and the vertical build from overwriting each other. */
-.introWord {
-  display: inline-block;
-  overflow: hidden;
-  padding-block: 0.14em;
-  margin-block: -0.14em;
-  will-change: transform;
-}
-
-.introRise {
-  display: inline-block;
-  will-change: transform;
-}
-
-/* the deck's seat — CSS-centred behind the words; the words spring apart
-   symmetrically to reveal it, so the composition can never drift
-   off-centre */
-.deckSeat {
-  position: absolute;
-  left: 50%;
-  top: 50%;
-  transform: translate(-50%, -50%);
-  z-index: 1;
-}
-
-/* THE PULL — the transform layer the SPLIT owns, wrapped around the one
-   plate the words open on. It scales about its own centre, which is the
-   deck seat's centre, so the plate grows out of exactly the point the words
-   are parting from. Its resting state is a plain identity transform, so the
-   seat it leaves for the flight is the seat the flight measures. */
-.introPull {
-  position: absolute;
-  inset: 0;
-  will-change: transform, opacity;
-}
-
-/* One deck plate. It carries the whole flight — a translate and a uniform
-   scale onto its grid tile's exact rectangle — so it is promoted for the
-   duration and composited rather than repainted. */
-.introPlate {
-  position: absolute;
-  inset: 0;
-  overflow: hidden;
-  background: var(--placeholder);
-  will-change: transform;
-  backface-visibility: hidden;
-}
-
-.introPlate img,
-.introPlateImg {
-  display: block;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  user-select: none;
-}
-
-.introFallback {
-  position: absolute;
-  inset: 0;
-  background: var(--maroon);
-}
-
+   None of it has a consumer any more: the overlay, the deck, the flight
+   and the split are gone from Discover.tsx. The grid and the head below
+   are what the chapter is now. See the banner at the top of Discover.tsx
+   for what the sequence did and which three things outlived it. */
 /* ---------- head: 12-column editorial row ---------- */
-/* Below the 4-up breakpoint the head stacks left-aligned (heading, then
-   caption); at ≥981px it seats on the inset span's 12-column grid —
-   heading across columns 1–6, caption right-ranged in columns 10–12,
+/* Below the 4-up breakpoint the head stacks (heading, then the standfirst
+   right-ranged under it); at ≥981px it seats on the inset span's 12-column
+   grid — heading across columns 1–9 as ONE line, standfirst closing the
+   band from column 9 with its right edge on the band's own right edge,
    pulled down to the heading's baseline band. */
+/* ── THE HEAD, RESTRUCTURED ── label, then the display line, then a rule.
+
+   The old arrangement was a 3.9rem heading on the left with a small
+   right-ranged standfirst opposite it, seated on a 12-column grid. That
+   grid seat and the right-ranging are BOTH gone: the head is now a plain
+   left-ranged stack, because the composition it was balancing (big left,
+   small right) has inverted and there is no second column to balance. */
 .head {
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: clamp(14px, 2vh, 22px);
+  /* the gap between the label and the display line is deliberately TIGHT —
+     they read as one lockup, and the air that separates the head from the
+     grid is the rule's margin below, not this */
+  gap: clamp(10px, 1.4vh, 16px);
 }
 
-.title {
+/* the standing label: small, sans, the mark set into the line before it */
+.chapterLabel {
   margin: 0;
+  display: flex;
+  align-items: center;
+  gap: 0.62em;
+  font-family: var(--font-sans);
+  font-weight: var(--w-medium);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--maroon);
+}
+
+/* THE MARK, SIZED IN em SO IT TRACKS THE LABEL. A px height would need a
+   second clamp agreeing with the label's own, and the two would drift.
+
+   2.1em, NOT the 0.92em a wordmark would take. The file is a SQUARE mark
+   (1024×1024), so its optical weight at a given height is far lower than a
+   horizontal lockup's — at 0.92em it measured 12×12 beside 13px caps and
+   read as a speck rather than as a mark. A square sitting slightly PROUD of
+   the cap height is the standard setting for a bullet-style mark in a label
+   row, which is the role it plays here. */
+.labelMark {
+  /* 3.6em, at the user's instruction — 2.1em → 2.6em → here, and the
+     direction has been the same every time for the reason the note above
+     gives: a SQUARE mark next to 13px caps reads far smaller than its
+     measured height, so each value that looked correct in the file looked
+     undersized on the page.
+
+     STILL IN em, so it tracks --t-label rather than needing a second clamp
+     to agree with the label's own. At 13px caps this is 47px. It now stands
+     well proud of the line, which is the setting a standing mark takes —
+     the label reads as set INTO the mark's row rather than the mark being a
+     bullet in the label's. .chapterLabel is `align-items: center`, so the
+     words stay centred on it as it grows. */
+  height: 3.6em;
+  width: auto;
+  flex: none;
+  display: block;
+  object-fit: contain;
+}
+
+/* THE DISPLAY LINE — and it is now 400, the manifesto statement's weight.
+
+   ⚠️ THIS USED TO BE --w-hairline, AND THE NOTE THAT ARGUED FOR IT IS GONE
+   RATHER THAN AMENDED, because its premise no longer holds. It read:
+   "Freight Light is 300, FreightBig Pro ships a drawn Light, and this is
+   the line it was chosen for" — a good argument for a line considered on
+   its own, and the wrong one for a line considered against its neighbours.
+   The manifesto's statement (Manifesto.module.css:139) is --w-regular, and
+   these two are the only display sentences the home page sets at this
+   scale. At 300 against 400 they read as two different voices doing the
+   same job, which is the one thing a house display face is for. They now
+   agree.
+
+   THE FALLBACK STOPS BEING A FORK, which is the quiet win. EB Garamond's
+   range starts at 400, so a reader without Freight was already getting
+   400 here while the author saw 300 — the composition this file measures
+   was never the one most visitors saw. One weight, one composition.
+
+   THE MEASURE IS 17.7em, NOT THE FULL BAND (which is ~20.7em here).
+   Unconstrained, this sentence sets as one ~31em line and reads as a
+   stretched caption rather than as display type. 17.7em breaks it into two,
+   with the break landing after "stores," — the sentence's own clause
+   boundary — rather than after "where", which would strand a subordinating
+   conjunction at the end of line one.
+
+   17.7em is the CENTRE OF A MEASURED WINDOW, [17.4em, 18.0em], and both
+   edges are real: below 17.4em EB Garamond spills to three lines, above
+   18.0em Freight pulls "where" up. That window is only 0.6em wide, so this
+   value is not a round number to be tidied — changing the font-size, the
+   tracking, or the copy invalidates it and it has to be re-measured.
+
+   BOTH faces are held because Freight is currently a local desktop install:
+   the author sees Freight, every other visitor sees the EB Garamond
+   fallback, and the composition has to survive both. Times — reached only if
+   both webfonts fail — sets three lines, which is graceful, not broken.
+
+   Measure against the RENDERED element, not a string. SplitWords wraps each
+   word in an inline-block mask carrying margin-right: 0.24em, and those
+   boxes wrap differently from plain text; a plain-string probe of this same
+   sentence predicted 17em would hold EB Garamond at two lines, and on the
+   real element it gave three.
+
+   Below ~732px the font-size clamp hits its 2.15rem floor while the band
+   keeps narrowing, so this wraps past two lines on phones. That is correct:
+   two lines is a desktop composition, not an invariant. */
+.lede {
+  margin: 0;
+  max-width: 17.7em;
   font-family: var(--font-display);
-  font-weight: 500;
-  font-size: clamp(3rem, 7.2vw, 6.75rem);
-  line-height: var(--lh-display);
+  font-weight: var(--w-regular);
+  font-size: clamp(2.15rem, 4.7vw, 4.1rem);
+  line-height: 1.1;
   letter-spacing: var(--tr-display);
   color: var(--maroon);
 }
 
-/* Each line of the heading is a CLIP it climbs out of — the manifesto's
+/* HAIRLINE 1 OF 3 — closes the head, opens the grid. Full band width, so it
+   stretches rather than fitting the type above it: a rule that stops at the
+   text's right edge reads as an underline of the sentence, and this one is
+   a boundary for the whole chapter. --rule is the site's hairline token
+   (3.53:1, held to 1.4.11's 3:1 for a non-text boundary). */
+.headRule {
+  width: 100%;
+  height: 1px;
+  background: var(--rule);
+  margin-top: clamp(22px, 3.4vh, 40px);
+}
+
+
+/* Each word of the heading is a CLIP it climbs out of — the manifesto's
    word-mask grammar at display size. The padding/negative-margin pair holds
    the clip edge off the display face's overshoot and the full stop's tail,
-   so the line is never shaved.
+   so the word is never shaved.
 
-   Inline-block below the grid breakpoint so "Our Restaurants." still wraps
-   as one natural line of text; block at ≥981px, which is what used to be
-   the explicit <br>. */
+   Inline-block at EVERY width, so the settled heading reads as ONE line —
+   "Our Restaurants." — at every width the clamp's floor can pay for
+   (≥~338px; see the font-size note above for the arithmetic and the
+   verified 360/390 cases). It used to flip to `display: block` at
+   ≥981px (two stacked lines, standing in for what was once an explicit
+   <br>), which meant the chapter's name only assembled into a line while
+   the intro held it and came apart again the moment the sequence handed
+   over. The settled head now agrees with the intro line: one line, always.
+   What paid for it is WIDTH, not display — the heading's grid seat at
+   ≥981px grew from six columns to nine (see .title in the media block
+   below for the measured arithmetic), because the two words side by side
+   need the room the stack never did. */
 .titleLine {
   display: inline-block;
   overflow: hidden;
@@ -290,14 +248,47 @@
   vertical-align: bottom;
 }
 
+/* THE VISIBLE WORD GAP IS A MARGIN; THE TEXT'S SPACE IS A REAL CHARACTER.
+   Two halves of one fix, and each is load-bearing on its own.
+
+   The margin: the two words come from `["Our", "Restaurants."].map()`, so
+   JSX emits two adjacent elements, and side by side they butt straight
+   together without it (measured then: 0px gap at 390 and 768, 58px at
+   1440). 0.28em is the same word space `.captionWord` uses, so the two
+   places this grammar still appears agree. (`.introTitle` was the third
+   and went with the assembly stage.)
+
+   The character: a margin fixes the PIXELS and nothing else — the
+   heading's textContent still read "OurRestaurants.", so find-in-page for
+   "Our Restaurants" failed and copy-paste was wrong on the page's main
+   commercial heading (Chrome's accname inserted a space on its own;
+   engines that fall back to content would not). So the component also
+   renders a real space between the masks, wrapped in `.titleSpace` below —
+   SplitWords' exact pattern: the space carries the meaning, the margin
+   still carries the metric, and nothing moves by a pixel. */
+.titleLine:not(:last-child) {
+  margin-right: 0.28em;
+}
+
+/* the real space between the heading's two masks — font-size: 0 so it
+   contributes no advance width; the 0.28em margin above stays the one
+   owner of the visible gap. See SplitWords' `.space` for the original. */
+.titleSpace {
+  font-size: 0;
+}
+
 /* NAMING THE CHAPTER. "Restaurants." warms from maroon to saffron once
    everything else in the chapter has stopped moving — the chapter signing
    its own name last.
 
-   `--saffron-ink` rather than `--saffron`: the display saffron is ~3.0:1
-   on cream, which is the large-text floor with nothing spare, and this is
-   the one word on the page carrying the section's name. The ink shade
-   holds 5.7:1 and reads as the same colour at this size.
+   `--saffron-ink` rather than `--saffron`: the display saffron measured
+   ~3.0:1 on cream when this was written, which is the large-text floor
+   with nothing spare, and this is the one word on the page carrying the
+   section's name. THE ACCENT HAS MOVED TWICE SINCE and now measures 4.55:1
+   on the softened ground, so the original margin argument no longer holds
+   the way it did — but --saffron-ink still reads 5.91:1 (it was 6.66:1),
+   which is the brighter margin of the two, and it reads as the same colour
+   at this size. Keeping it.
 
    A transition on `color`, not a framer animation: it is one property on
    one word, changed once, and keeping it in CSS means the value stays a
@@ -307,7 +298,7 @@
 .titleRise {
   display: inline-block;
   will-change: transform;
-  transition: color 0.8s cubic-bezier(0.4, 0.05, 0.2, 1) 0.3s;
+  transition: color 0.8s var(--ease-state) 0.3s;
 }
 
 .titleRise[data-lit="on"] {
@@ -320,15 +311,27 @@
   }
 }
 
-@media (min-width: 981px) {
-  .titleLine {
-    display: block;
-  }
-}
-
+/* The standfirst is RIGHT-RANGED at every width: below the grid breakpoint
+   it hangs on the right of the stacked head, above it the grid pins it to
+   the band's right edge — so the head reads the same at every size, the
+   chapter's name ranged left and its description ranged right. `align-self`
+   only bites in the flex stack (<981px); in the grid that axis already
+   belongs to the row's `align-items: end`, where end-alignment is exactly
+   what it was doing anyway. */
 .caption {
   margin: 0;
-  max-width: 28ch;
+  /* 28ch → 42ch. The standfirst is right-ranged and the heading shrank
+     when it became "Our collection of restaurants", so at 28ch (~218px in
+     a 368px area) its left edge sat 142px clear of the heading's ink and
+     the band had a hole in the middle of it rather than a composition.
+     A wider measure sets the same words in fewer, longer lines, which
+     starts them further left and closes that gap without moving either
+     element's seat. REVERTIBLE ON ITS OWN: this is the whole of the
+     "standfirst" whitespace change — put 28ch back and nothing else in
+     the section moves. */
+  max-width: 42ch;
+  align-self: flex-end;
+  text-align: right;
   font-family: var(--font-sans);
   font-size: var(--t-small);
   line-height: var(--lh-snug);
@@ -336,31 +339,28 @@
   opacity: 0.75;
 }
 
-@media (min-width: 981px) {
-  .head {
-    display: grid;
-    grid-template-columns: repeat(12, minmax(0, 1fr));
-    column-gap: var(--grid-gutter);
-    /* one shared band: the heading is the tallest thing in the row, and
-       the caption + toggle both seat their bottoms on its bottom line */
-    align-items: end;
-  }
-  .title {
-    grid-column: 1 / 7;
-  }
-  .caption {
-    /* BETWEEN the heading and the switch, bottom on the heading's line */
-    grid-column: 8 / 12;
-    justify-self: end;
-    text-align: right;
-  }
-}
+/* THE 12-COLUMN HEAD SEAT IS DELETED. It re-declared `.head` as
+   `display: grid; grid-template-columns: repeat(12, …)` above 981px and
+   seated the old heading in columns 1–9 with the standfirst closing the
+   band from column 9, pulled onto the heading's baseline. That composition
+   no longer exists — the head is a left-ranged stack of label, display line
+   and rule — and leaving the override in place would have silently turned
+   the new flex column back into a grid at every desktop width, which is
+   exactly the kind of dead media query that survives a redesign and gets
+   blamed on something else a month later. */
+
 
 /* ---------- grid ---------- */
 /* Column counts (4 / 3 / 2 / 1 at 980 / 700 / 460) and gap keep the
-   /restaurants card-grid rhythm. Every plate holds its landscape crop at
-   all times, so rows are stable — the hover interaction lives INSIDE the
-   plate's clip (see .tileMedia). */
+   /restaurants card-grid rhythm. Every plate holds ITS OWN fixed crop at
+   all times (5:4 / 9:8 / 1:1 by venue — see PLATE_RATIO in the
+   component), so rows are stable; the deliberately ragged bottoms come
+   from the aspects differing BETWEEN cells, never from a cell changing.
+   The hover interaction lives INSIDE the plate's clip. */
+/* The horizontal reel's variants (.gridStrip and its scrollbar, :active
+   grab cursor, per-cell width and media aspect) and the height-animating
+   .listBox that wrapped both layouts were deleted with the view toggle —
+   see the note at the top of Discover.tsx's render. One grid, one height. */
 .grid {
   list-style: none;
   margin: 0;
@@ -370,14 +370,28 @@
   gap: clamp(10px, 1.2vw, 20px);
 }
 
-/* multi-column grids take a roomier row gap than the column gap — the
-   caption block under each plate needs clear air before the next row of
-   photography starts */
+/* THE ROW GAP STAYS A LITTLE WIDER THAN THE COLUMN GAP, for a different
+   reason than it was set for. It was widened when the type sat on the
+   page under each photograph, so a row ended on small text and the next
+   began on a picture. The type is back inside the card and the cards are
+   uniform again, so every row now ends on the same hard card edge — but
+   each card also carries a drop shadow that reaches ~20px below it, and
+   at a level gap the shadow of one row landed on the top edge of the next
+   and read as a seam rather than as depth. Wider by roughly the shadow's
+   own reach, no more. */
 @media (min-width: 461px) {
   .grid {
     grid-template-columns: repeat(2, 1fr);
     column-gap: clamp(10px, 1.2vw, 20px);
-    row-gap: clamp(28px, 3vw, 44px);
+    /* ROWS PULLED IN TOWARD THE COLUMNS. This was clamp(18px, 2vw, 30px),
+       which measured 29px against a 12px column gap at 1440 — cards 2.4x
+       further apart vertically than horizontally, so the eight read as
+       four columns rather than as one field. Now ~18px against the same
+       12px. NOT levelled to 12: the cards are tall portraits whose bottom
+       edge carries type and a control, and a row gap equal to the column
+       gap let the next row's photograph crowd that block. Some excess is
+       correct here; 2.4x was not. */
+    row-gap: clamp(12px, 1.25vw, 18px);
   }
 }
 
@@ -385,259 +399,127 @@
   .grid {
     grid-template-columns: repeat(3, 1fr);
     column-gap: clamp(10px, 1.2vw, 20px);
-    row-gap: clamp(28px, 3vw, 44px);
+    row-gap: clamp(12px, 1.25vw, 18px);
   }
 }
 
+/* FOUR UP (2026-08-04, by request). This used to be three — the note this
+   replaced argued four columns put the plates at ~274px wide, cramped for
+   a portrait 4:5 carrying its caption inside it. Eight venues over four
+   columns is two clean rows rather than three-plus-a-ragged-two, so the
+   "forced product grid" objection that applied to a 4x2 over THREE columns
+   doesn't carry over. Re-check .pillRow at this width if a caption's pills
+   ever wrap — they were tuned for the wider three-up plate. */
 @media (min-width: 981px) {
   .grid {
     grid-template-columns: repeat(4, 1fr);
-    /* the global 12-col grid's gutter between the four tiles */
+    /* the global 12-col grid's gutter between the tiles */
     column-gap: var(--grid-gutter);
-    row-gap: clamp(28px, 3vw, 44px);
+    row-gap: clamp(12px, 1.25vw, 18px);
   }
 }
 
-/* ---------- STRIP mode: the continuous horizontal reel ---------- */
-/* PORTRAIT plates in one row that scrolls sideways and bleeds off the
-   right viewport edge (the left edge keeps the chapter seat, so the reel
-   reads as running off the page). The wheel drives a slow lerped glide
-   (see the component) — cinema-reel drift, not stepped scrolling; mice
-   can also grab-drag; touch keeps native momentum. No snap (it would
-   fight the glide) and no visible scrollbar. */
-.gridStrip {
-  display: flex;
-  gap: var(--grid-gutter);
-  overflow-x: auto;
-  scrollbar-width: none;
-  -webkit-overflow-scrolling: touch;
-  cursor: grab;
-  /* bleed past the section's padding to BOTH viewport edges — the reel's
-     resting cards still seat on the grid (the padding puts them back), but
-     scrolled cards now run all the way to the screen's left edge before
-     they clip, instead of cutting off mid-page at the section inset */
-  margin-inline: calc(-1 * var(--pad-x));
-  padding-inline: var(--pad-x);
-}
-
-.gridStrip::-webkit-scrollbar {
-  display: none;
-}
-
-.gridStrip:active {
-  cursor: grabbing;
-}
-
-@media (min-width: 981px) {
-  .gridStrip {
-    margin-inline: calc(-1 * var(--grid-col2));
-    padding-inline: var(--grid-col2);
-  }
-}
-
-.gridStrip .cell {
-  flex: none;
-  width: clamp(240px, 23vw, 360px);
-}
-
-/* the reel's plates stand PORTRAIT (3:4) — the films and stills cover-crop
-   into the taller frame */
-.gridStrip .tileMedia {
-  padding-top: 133.333%;
-}
-
-/* ---------- entrance / view-switch choreography ---------- */
-/* All cell motion (scroll-in entrance AND the grid ⟷ reel switch) is
+/* ---------- entrance choreography ---------- */
+/* All cell motion is
    Framer-driven now — see cellVariants in the component. The cell carries
    NO css transform transition of its own, so the directional slides never
    fight a competing rule. */
 .cell {
   min-width: 0;
-  /* the caption row below asks how wide THIS TILE is, not how wide the
-     window is — see .cellLine */
-  container-type: inline-size;
+  /* The cell holds exactly ONE child now — the seat, and inside it the
+     shared <VenueCard>, which holds everything else. THE HOVER RULES NO
+     LONGER KEY OFF THIS ELEMENT: they were `.cell:hover .photo` and
+     friends, and they are now `.cardSurface:hover .photo` in
+     VenueCard.module.css. That is the same box (cell, seat and card are
+     one rectangle) written from inside the component, which is what lets
+     one stylesheet serve both grids — /restaurants has no `.cell` to
+     hover. `position: relative` stays: it is one lift or one morph away
+     from needing a local stacking context, and it is cheap to keep and
+     subtle to re-discover. */
+  position: relative;
 }
 
-/* ---------- tile: the fixed plate with an inner zoom ---------- */
+/* ---------- tile: the layout seat ---------- */
 /* Height via the padding-top percentage technique: the box is height 0 and
-   its padding-top sets the aspect — 66.667% = landscape 3:2, ALWAYS. The
-   plate never grows; hover/focus of the whole cell zooms the media inside
-   the clip instead: the photo (or, on photo-less tiles, the centred mark)
-   swells to 1.045 on the iOS drawer curve — slow, interruptible, no
-   bounce, transform-only.
+   its padding-top sets the aspect.
 
-   Triggering on the <li> (not the plate) means hovering the caption below
-   engages the same state — one cell, one response. */
+   THE 76% HERE IS ONLY THE FALLBACK — the real padding-top arrives
+   inline from PLATE_RATIO in Discover.tsx, because the same fraction must
+   also size the intro deck seat and the expansion, and a ratio stated
+   here AND there is a ratio that drifts (a drifted ratio stretches the
+   flight or deforms the morph). It is 0.76 for every venue, down from
+   3 : 3.8 (126.67%) and 3 : 4.3 before that — see the PLATE_RATIO note in
+   the component for the arithmetic, and note the reason is now the
+   viewport's height rather than the photograph's crop: 0.76 is the
+   shallowest of the fits and the only one that survives a 900px window.
+   The per-venue stagger this file used to describe was reversed on sight.
+
+   KEEP THIS NUMBER IN STEP WITH PLATE_RATIO. It is only ever painted for
+   the frame before hydration, but it is the first thing the reader sees,
+   and a fallback 50 percentage points off the real value lays the grid out
+   at the wrong height and then snaps it.
+
+   THIS BOX CARRIES THE layoutId AND data-plate, and nothing else. No
+   radius that matters, no shadow, no transform of its own: it is the
+   rectangle the intro flight lands on and the rectangle the expansion
+   morphs out of, and every hover response that could perturb a
+   measurement has been pushed down into .cardSurface below. */
 .tileMedia {
   position: relative;
   width: 100%;
   height: 0;
-  padding-top: 66.667%;
-  /* clipping (and the 16px radius) lives on .mediaGrow inside — this box
-     only holds the layout seat, so the grower can reach past its bottom */
+  padding-top: 76%;
+  /* clipping, radius and shadow all live on .cardSurface inside; this box
+     stays visible so the hover lift can breathe past its edge by 1% */
   overflow: visible;
 }
 
-/* THE CLIP. Pinned to the plate's top, it holds all the media.
 
-   It used to also GROW 10px taller on hover, reaching down over the caption
-   gap. That is a LAYOUT property changing under the pointer on a box that
-   carries a `layoutId`, which is the one kind of hover response this tile
-   cannot afford — and it made the plate visibly change shape rather than
-   just zoom. The hover is now purely a contained zoom: the photograph
-   swells a little INSIDE a clip that never moves and never resizes. */
-.mediaGrow {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: 100%;
-  overflow: hidden;
-  /* the sharp editorial 2px cut (Telescope grammar) */
-  border-radius: 2px;
-  background: var(--placeholder);
-}
-
-.photo {
-  object-fit: cover;
-  transform: scale(1);
-  transition: transform 700ms var(--ease-drawer);
-}
-
-/* pointer zoom — hover-capable, fine-pointer devices only. Touch gets a
-   static plate with plain links. The scrim deepens a touch alongside
-   (opacity-only) so the zoom reads as depth, not just growth. */
-@media (hover: hover) and (pointer: fine) {
-  .cell:hover .photo {
-    transform: scale(1.03);
-  }
-  .cell:hover .fallback ~ .center .brandGroup {
-    transform: scale(1.03);
-  }
-  .cell:hover .scrim {
-    opacity: 1;
-  }
-}
-
-/* keyboard parity — tabbing to the caption's links produces the identical
-   zoom. Lives OUTSIDE the hover media query so keyboards on touch hybrids
-   still get it. */
-.cell:focus-within .photo {
-  transform: scale(1.03);
-}
-.cell:focus-within .fallback ~ .center .brandGroup {
-  transform: scale(1.03);
-}
-.cell:focus-within .scrim {
-  opacity: 1;
-}
-
-/* photo-less tiles (Mamasons, Bunso) — deep maroon field so the centered
-   cream mark / wordmark carries the tile */
-.fallback {
-  position: absolute;
-  inset: 0;
-  background: var(--maroon);
-}
-
-/* Maroon-toned legibility scrim behind the centred mark — a soft radial
-   pad where the cream logo sits, plus slim top/bottom gradients, so the
-   photo's midtones read at close to full strength. Static: the expanded
-   state (and its deepening) is gone. */
+/* Ink-toned legibility scrim behind a centred mark — a soft radial pad
+   where the cream logo sits, plus slim top/bottom gradients. THE
+   EXPANSION'S ONLY, now: the tiles rest as clean photographs (their type
+   moved to the panel below, their mark to a hover arrival) and carry
+   .hoverShade instead. The expansion still centres a cream mark on the
+   photograph, so it keeps the resting ground that arrangement needs.
+   color-mix ON the token, never an rgba() literal: these stops used to be
+   rgba(47, 0, 0, …) — the RETIRED red-black spelled out by channel — so
+   when the palette moved to the green-black ink they silently kept
+   painting the old hue over every plate. A mix of var(--maroon) follows
+   whatever the ink becomes. */
 .scrim {
   position: absolute;
   inset: 0;
   background:
     radial-gradient(
       ellipse 72% 46% at 50% 50%,
-      rgba(47, 0, 0, 0.52) 0%,
-      rgba(47, 0, 0, 0.3) 52%,
-      rgba(47, 0, 0, 0) 100%
+      color-mix(in srgb, var(--maroon) 52%, transparent) 0%,
+      color-mix(in srgb, var(--maroon) 30%, transparent) 52%,
+      color-mix(in srgb, var(--maroon) 0%, transparent) 100%
     ),
     linear-gradient(
       180deg,
-      rgba(47, 0, 0, 0.44) 0%,
-      rgba(47, 0, 0, 0.07) 28%,
-      rgba(47, 0, 0, 0.07) 56%,
-      rgba(47, 0, 0, 0.66) 100%
+      color-mix(in srgb, var(--maroon) 44%, transparent) 0%,
+      color-mix(in srgb, var(--maroon) 7%, transparent) 28%,
+      color-mix(in srgb, var(--maroon) 7%, transparent) 56%,
+      color-mix(in srgb, var(--maroon) 66%, transparent) 100%
     );
   opacity: 0.9;
   pointer-events: none;
-  /* deepens a touch on hover/focus — opacity-only, same clock as the zoom */
-  transition: opacity 700ms var(--ease-drawer);
 }
 
-/* ---------- hover film ---------- */
-/* the clip sits between the still and the scrim (DOM order — no z juggling)
-   and fades in once it's playing; pausing fades it back to the still */
-.hoverClip {
-  position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-  opacity: 0;
-  transition: opacity 500ms var(--ease-drawer);
-  pointer-events: none;
-}
-
-.hoverClipOn {
-  opacity: 1;
-}
-
-/* ---------- hover blurb: the story ON the plate ---------- */
-/* Cream copy seated in the plate's bottom-left, hidden at rest — it rises
-   in over the deepening scrim while the photo zooms, all on the same
-   drawer clock so the three moves read as ONE response. Hover furniture:
-   only hover-capable fine pointers (and keyboards, below) ever see it;
-   touch reads the story in the expansion. */
-.hoverBlurb {
-  position: absolute;
-  left: clamp(14px, 1.8vw, 24px);
-  right: clamp(14px, 1.8vw, 24px);
-  bottom: clamp(12px, 1.6vw, 20px);
-  z-index: 3;
-  font-family: var(--font-sans);
-  font-weight: 400;
-  font-size: var(--t-label);
-  line-height: var(--lh-snug);
-  color: var(--cream);
-  text-align: left;
-  opacity: 0;
-  transform: translateY(10px);
-  transition:
-    opacity 700ms var(--ease-drawer),
-    transform 700ms var(--ease-drawer);
-  pointer-events: none;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .cell:hover .hoverBlurb {
-    opacity: 1;
-    transform: translateY(0);
-  }
-}
-
-.cell:focus-within .hoverBlurb {
-  opacity: 1;
-  transform: translateY(0);
-}
 
 /* ---------- center: brand group ---------- */
-/* THE LOGO LIFTS OUT OF THE BLURB'S WAY ON HOVER. The blurb is absolutely
-   seated at the tile's BOTTOM and its height is content-driven — RAMO's runs
-   four lines where most run two — while the mark is centred in `inset: 0`.
-   The two never negotiate, so on the long tiles the copy climbed straight
-   through the wordmark.
+/* THE EXPANSION'S ONLY, now. This centred a large cream mark on the
+   photo-less tile, which was the last place a venue logo appeared at
+   size. That tile wears the same small corner mark as the other seven
+   (see .cardLogo), so a second, centred copy of the same asset would
+   simply be the mark twice on one card — and the whole point of this pass
+   is that no card is a special case.
 
-   Lifting `.center` rather than the mark itself keeps the whole brand group
-   (mark + any wordmark under it) together as one object, and a PERCENTAGE
-   lift is of this element's own height, which is the tile's — so it scales
-   with the tile instead of needing a breakpoint.
-
-   The 700ms drawer clock is the one the photo zoom, the scrim and the blurb
-   already share, so this reads as part of the same single response rather
-   than a fourth thing happening. */
+   The expansion still centres a cream mark on the photograph, over its
+   own resting .scrim, so the block survives here for that. The hover lift
+   that used to keep it clear of the tile's blurb went with the tile: the
+   expansion has no .cell to hover. */
 .center {
   position: absolute;
   inset: 0;
@@ -647,50 +529,28 @@
   align-items: center;
   justify-content: center;
   gap: clamp(10px, 1.4vh, 16px);
-  padding: 10%;
+  /* dead centre of the expansion's plate */
+  padding: 8% 10%;
   text-align: center;
   pointer-events: none;
-  transform: translateY(0);
-  transition: transform 700ms var(--ease-drawer);
 }
 
-/* Sized off the tallest blurb rather than the average: at --t-label on
-   --lh-snug a four-line blurb plus its bottom inset stands ~90px up a ~260px
-   tile, which puts its top edge inside the centred mark's lower half. 12% of
-   the tile clears that with air left over, and on the two-line tiles it reads
-   as the mark simply rising to meet the hover. */
-@media (hover: hover) and (pointer: fine) {
-  .cell:hover .center {
-    transform: translateY(-12%);
-  }
-}
-
-.cell:focus-within .center {
-  transform: translateY(-12%);
-}
-
-/* the wordmark/logo commanding the plate (the Michelin credential now
-   lives down in the caption line, so the photography stays clean) */
+/* the wordmark/logo commanding the expansion's plate */
 .brandGroup {
   position: relative;
   display: flex;
   flex-direction: column;
   align-items: center;
   gap: clamp(10px, 1.4vh, 16px);
-  /* stretch to the tile's width — the logo mask below is %-sized, and a
+  /* stretch to the plate's width — the logo mask below is %-sized, and a
      content-sized flex parent would give it a collapsed-to-zero
      percentage basis */
   align-self: stretch;
-  /* photo-less tiles (Mamasons, Bunso) have no photo to zoom, so the mark
-     itself carries the hover response — the `.fallback ~ .center` selector
-     scopes the scale to those tiles only */
-  transform: scale(1);
-  transition: transform 700ms var(--ease-drawer);
 }
 
 /* white-mask technique — same --ov-logo-url pattern as the old carousel's
    ovLogo/previewLogo, cream fill for legibility over the scrim. Sized to
-   command the plate: the width tracks the tile, the height cap keeps
+   command the plate: the width tracks the plate, the height cap keeps
    squat marks from ballooning. */
 .logo {
   display: block;
@@ -711,115 +571,6 @@
   color: var(--cream);
 }
 
-/* ---------- caption below the plate ---------- */
-/* ONE quiet line — the plate's logo already names the place, so the cream
-   under it carries only cuisine · neighbourhood (plus Belly's small inline
-   Michelin mark) with the Book pill as the row's single action. */
-.cellCaption {
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  margin-top: clamp(12px, 1.4vw, 16px);
-}
-
-/* BASELINE, not centre. The cuisine line wraps to two lines on most tiles
-   and stays one line on others; centring the pills against that box parked
-   them halfway down the block on the wrappers and level on the rest, so no
-   two tiles in a row agreed. Seating them on the FIRST BASELINE puts every
-   pill on the same optical line as the first line of description, whatever
-   the copy below it does. */
-/* The pills are not compressible — "Kentish Town" plus "Book" is ~178px,
-   which on a 274px tile (a 1440-wide window) left the description nine
-   characters a line and five lines deep.
-
-   So the caption row is stacked by default and only goes side-by-side once
-   the TILE is wide enough to hold both properly. A container query, not a
-   viewport one: the same window gives four columns on the home grid and one
-   on a phone, so viewport width says nothing about how much room a caption
-   actually has. And because the threshold is the tile's width rather than
-   the pill row's content, every tile in a row makes the same choice —
-   letting each decide for itself (plain flex-wrap) put pills beside the
-   description on the tiles without a Book pill and underneath on the ones
-   with it, in the same row. */
-.cellLine {
-  width: 100%;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 10px;
-}
-
-@container (min-width: 360px) {
-  .cellLine {
-    flex-direction: row;
-    /* BASELINE, not centre: the description wraps to two lines on some
-       tiles and one on others, and centring against that box parked the
-       pills halfway down the block on the wrappers and level on the rest,
-       so no two tiles agreed. Seating them on the FIRST BASELINE puts every
-       pill on the same optical line as the first line of description,
-       whatever the copy below it does. */
-    align-items: baseline;
-    justify-content: space-between;
-    gap: 0.8em;
-  }
-}
-
-.cellTag {
-  min-width: 0;
-  font-family: var(--font-sans);
-  font-weight: 400;
-  font-size: var(--t-small);
-  line-height: var(--lh-snug);
-  color: var(--maroon);
-  opacity: 0.7;
-}
-
-/* the caption's split-text clips — the Manifesto's word-mask grammar at
-   caption scale: each word rises out of its own overflow-hidden box. The
-   padding/negative-margin pair protects descenders from the clip edge. */
-.capMask {
-  display: inline-block;
-  overflow: hidden;
-  vertical-align: bottom;
-  margin-right: 0.28em;
-  padding-block: 0.18em;
-  margin-block: -0.18em;
-}
-
-.capMask:last-child {
-  margin-right: 0;
-}
-
-.capWord {
-  display: inline-block;
-  will-change: transform;
-}
-
-/* the Michelin credential as a STICKER on the plate's top-right corner —
-   pressed on at a slight tilt, the way a guide sticker rides a
-   restaurant's window */
-.stickerBadge {
-  position: absolute;
-  top: clamp(10px, 1.4vw, 18px);
-  right: clamp(10px, 1.4vw, 18px);
-  z-index: 3;
-  display: block;
-  height: clamp(44px, 4.5vw, 64px);
-  /* the mark is square, and stating the box here (rather than letting a
-     bare img's intrinsic size decide) is what lets it be served at 128px
-     instead of decoded at its native 2965² */
-  aspect-ratio: 1;
-  transform: rotate(8deg);
-  /* flat by design (Telescope) — the tilt alone sells the sticker */
-  user-select: none;
-  pointer-events: none;
-}
-
-.stickerBadge img {
-  display: block;
-  width: 100%;
-  height: 100%;
-}
 
 /* quiet underlined text link into the detail page — a real 1px underline
    (not the CTA's draw), colour-only hover. Never `transition: all`. */
@@ -840,56 +591,142 @@
   color: var(--saffron);
 }
 
-.pillRow {
-  display: inline-flex;
-  align-items: center;
-  gap: 6px;
-  flex: none;
-}
+/* ---------- retired here: the card's `.actionRow` padding ----------
+   It was `flex: none; padding-top: clamp(2px, 0.4vw, 5px)` — a breath of
+   air over the metadata strip. The card's action row is declared once,
+   with the rest of the block, further UP this file; a second .actionRow
+   here would have won on source order and re-added a padding the block's
+   own gap already provides. It is deleted rather than merged, because
+   the row it described (one annatto pill, hard against a strip of facts)
+   no longer exists.
 
-/* ONE pill geometry, shared. The two pills used to differ by exactly the
-   2px of Book's border — enough that a filled chip and an outlined chip
-   sitting 6px apart never quite lined up. An explicit height plus a
-   transparent ring on the filled one makes them identical boxes, so the
-   pair reads as a set. `nowrap` keeps "Kentish Town · Soho" on its line
-   instead of folding the pill into two rows on a narrow tile. */
-.pill,
-.pillBook {
+   ---------- the EXPANSION's control ---------- */
+/* .panelAction below is now the EXPANSION'S ONLY. The card's two pills
+   are .cardBtn / .cardBtnGhost / .cardBtnFill, declared with the block.
+   The two were one class until this pass and splitting them is a real
+   decision, not a refactor: the card's ramp is photo-derived and takes a
+   different hue on every venue, and the expansion's sheet is cream. One
+   resting colour cannot be right on both any more.
+   Everything below this line, including the `.expandActions` inversion,
+   describes the pill on the expansion's cream sheet. */
+
+/* THE ACTION — FILLED, not a ring. The reference cards carry a solid pill
+   at the bottom of the dark panel and it is the one confident thing on the
+   card; an outline on ink reads as a disabled state.
+
+   ANNATTO FILL, CREAM LABEL, and the choice is decided by measurement
+   rather than by taste:
+     · cream on annatto             4.55:1 — clears 4.5:1 for this 13px
+                                             label. This is what ships. It
+                                             read 4.54:1 before the palette
+                                             softened; the accent was moved
+                                             three points precisely so this
+                                             number would survive intact.
+     · maroon on annatto            2.15:1 — fails, and fails harder than
+                                             the 3.08:1 it used to. So the
+                                             label CANNOT be maroon, which
+                                             is what the fill used to flip
+                                             it to on hover.
+     · cream fill, maroon label     9.80:1 — the safest number available
+                                             (14.00:1 on the old pair),
+                                             and rejected anyway: it would
+                                             delete the annatto from the
+                                             card entirely, and on an ink
+                                             panel a cream pill sits at the
+                                             same luminance as the venue
+                                             name and the metadata, so the
+                                             one control would stop being
+                                             the distinct thing and become
+                                             the third cream object. The
+                                             annatto is the only chromatic
+                                             element on the card; it is what
+                                             makes this read as the thing to
+                                             press. Food on the leaf, spent
+                                             exactly once, as before.
+
+   NOTE FOR ANYONE CHECKING THE OLD NUMBERS: the comment this replaces said
+   "cream on saffron is a failing 3.0:1" and "maroon on saffron is 5.8:1".
+   Both were true of the RETIRED saffron and neither survived the palette
+   swap to annatto — globals.css says as much in the --saffron-ink note.
+   Recomputed from today's hexes, the two have essentially traded places.
+
+   BIGGER, TOWARD THE REFERENCE'S WEIGHT. The reference card's CTA is a
+   large filled pill and the one confident thing on it; this was a 26px
+   chip. It goes to 34px with 1.15em of side padding (27px / 0.95em on the
+   narrow column), which is the reference's presence in the reference's
+   proportion — about 44% of the card's width at 1440.
+
+   IT STAYS ANNATTO, and the reference's LIGHT pill is deliberately not
+   copied. The old note rejected a cream fill partly because "on an ink
+   panel a cream pill sits at the same luminance as the venue name and the
+   metadata" — and half of that argument has just been deleted along with
+   the name. What replaces it is stronger, not weaker: the name's removal
+   makes a cream pill the ONLY large light object on the panel, so it would
+   stop reading as a control and start reading as the headline the panel no
+   longer has. And it would spend the card's single chromatic note on
+   nothing. The reference gets away with a light pill because it has a
+   large light title above it to be subordinate to. We do not have one.
+   The cream pill is not lost, either — it is the hover and focus state
+   below, which is now a genuine reward rather than a colour swap.
+
+   THE HAIRLINE IS NO LONGER LOAD-BEARING, and it stays anyway. It was put
+   there because annatto against the frosted panel measured 2.4:1, under
+   the 3:1 WCAG 1.4.11 asks of the visual information identifying a
+   control. Against the NEAR-SOLID panel the same fill computed to 3.08:1
+   — the fill cleared the bar on its own, which was a quiet dividend of
+   dropping brightness(0.7) and the thin tint with it.
+
+   ⚠️ THAT DIVIDEND IS SPENT. The palette softening lifted the ink and
+   darkened the accent, and the accent on the ink is now 2.15:1 — BELOW the
+   3:1 bar. The fill no longer identifies the control on its own, so the
+   hairline is load-bearing again, exactly as it was before. It is a good
+   thing nobody deleted it. The hairline is kept
+   as the same lit-edge language as the panel's own top hairline, which is
+   what keeps the control looking like it is made of the card, and as the
+   margin that stops a photograph-dependent number from being the only
+   thing between this control and a failure.
+
+   HOVER/FOCUS INVERT. The resting state is already filled, so the old
+   "fill on hover" reward has nowhere to go; the pill flips to the
+   cream-and-ink pair instead (9.80:1, and 14.00:1 before the palette
+   softened), which is a real change of state and
+   is the reference's white pill. The swell rides the drawer curve; press
+   snaps down quick. Specific properties only — never `all`.
+
+   THE HOVER TARGET IS A PAIR OF PROPERTIES, NOT A COLOUR, because this one
+   class is worn by TWO controls standing on two different grounds: the
+   card's ink panel and the expansion's cream sheet. The resting state is
+   identical on both and must stay that way — the expansion is the tile
+   opened. The hover state cannot be: a cream pill on the cream sheet is
+   invisible, which is the exact failure the retired .pillBook is on record
+   for (see the note at its use site in Discover.tsx). So the ground names
+   its own inversion and the rule below stays single. */
+.panelAction {
+  --action-hover-bg: var(--cream);
+  --action-hover-fg: var(--maroon);
+  --action-ring: var(--cream);
   display: inline-flex;
   align-items: center;
   justify-content: center;
-  min-height: 26px;
-  padding: 0 0.85em;
+  min-height: 34px;
+  padding: 0 1.15em;
   border-radius: 999px;
-  border: 1px solid transparent;
+  /* 42% → 48%, AND IT IS THE ONLY THING IDENTIFYING THIS CONTROL NOW.
+     The accent fill on the panel fell from 3.08:1 to 2.15:1 when the
+     palette softened, so the fill no longer meets 1.4.11's 3:1 on its own
+     and this hairline is the whole boundary. At 42% cream it measured
+     3.61:1 against the old panel and 3.05:1 against the new one — a pass
+     with five hundredths in it, which is not a margin, it is a coincidence.
+     48% restores 3.51:1. */
+  border: 1px solid color-mix(in srgb, var(--cream) 48%, transparent);
+  background-color: var(--saffron);
   font-family: var(--font-mono);
+  font-weight: 500;
   font-size: var(--t-label);
   letter-spacing: var(--tr-label-mono);
   line-height: 1;
   white-space: nowrap;
-}
-
-/* Neighbourhood pill — a neutral grey chip. It is a label, not an action,
-   and the saffron it used to carry is the page's one accent: spending it
-   here meant the tag out-shouted the Book pill sitting right beside it.
-   Grey lets the accent belong to the thing you can actually press. */
-.pill {
-  background: rgba(47, 0, 0, 0.06);
-  font-weight: 500;
-  color: rgba(47, 0, 0, 0.62);
-}
-
-/* Book pill — rests as a hairline OUTLINE, and on hover/focus fills solid
-   maroon with cream text: the fill is the reward state, the swell rides the
-   drawer curve, press snaps down quick. The ring is firmer than it was
-   (0.42): this is the only pressable thing in the caption row, and at 0.3
-   it read as quieter than the label next to it. Specific properties only —
-   never `all`. */
-.pillBook {
-  background: transparent;
-  border-color: rgba(47, 0, 0, 0.42);
-  font-weight: 500;
-  color: var(--maroon);
+  color: var(--cream);
   text-decoration: none;
   transition:
     background-color 400ms var(--ease-drawer),
@@ -897,205 +734,50 @@
     transform 400ms var(--ease-drawer),
     color 400ms var(--ease-drawer);
 }
-/* Hover fills the ring SAFFRON — the page's one accent, spent on the one
-   thing in the caption row you can act on. The label goes maroon, not
-   cream: cream on saffron measures 3.0:1, which fails AA at this size,
-   while maroon on saffron is 5.8:1. */
+
 @media (hover: hover) and (pointer: fine) {
-  .pillBook:hover {
-    background-color: var(--saffron);
-    border-color: var(--saffron);
-    color: var(--maroon);
+  .panelAction:hover {
+    background-color: var(--action-hover-bg);
+    border-color: var(--action-hover-bg);
+    color: var(--action-hover-fg);
     transform: scale(1.03);
   }
 }
-/* keyboard gets the same filled reward as hover */
-.pillBook:focus-visible {
-  background-color: var(--saffron);
-  border-color: var(--saffron);
-  color: var(--maroon);
-}
-.pillBook:focus-visible {
-  outline: 2px solid var(--maroon);
+
+/* keyboard gets the same reward as hover. The ring is a property too — a
+   maroon outline on a 94% maroon panel is an outline nobody can see, and a
+   cream one on the expansion's cream sheet is the same failure mirrored. */
+.panelAction:focus-visible {
+  background-color: var(--action-hover-bg);
+  border-color: var(--action-hover-bg);
+  color: var(--action-hover-fg);
+  outline: 2px solid var(--action-ring);
   outline-offset: 2px;
 }
-.pillBook:active {
+
+.panelAction:active {
   transform: scale(0.97);
   transition-duration: 120ms;
 }
 
-/* ---------- the GRID ⟷ STRIP view toggle ---------- */
-/* seated under the caption in the head's far columns */
-.toggleSeat {
-  display: flex;
+/* THE EXPANSION'S GROUND NAMES ITS OWN INVERSION. Its sheet is cream, so
+   hover goes the other way: maroon fill, cream label (9.80:1 either way
+   round — it is the same pair, and the symmetry is the point rather than
+   the figure, which was 14.00:1 before the palette softened) and a maroon
+   focus ring. Only the hover
+   target moves; the resting annatto pill is identical to the card's, which
+   is the agreement that actually matters.
+   Carried by SPECIFICITY (0,2,0 against 0,1,0), not by source order, so
+   this is safe where it reads best rather than only at the end of the
+   file — unlike the container-query block below, which is the opposite
+   case and has the banner to prove it. */
+.expandActions .panelAction {
+  --action-hover-bg: var(--maroon);
+  --action-hover-fg: var(--cream);
+  --action-ring: var(--maroon);
 }
 
-@media (min-width: 981px) {
-  .toggleSeat {
-    /* the far edge of the band, bottom on the heading's line */
-    grid-column: 12 / 13;
-    justify-self: end;
-    align-self: end;
-  }
-}
 
-/* The segmented pill. It now reads as a TRACK the thumb runs in rather
-   than as two buttons in a ring: a faint maroon wash fills the group, and
-   the border relaxes to a hairline because the fill is already doing the
-   containing. Without the wash the maroon thumb appeared to float on the
-   cream with nothing to slide along. */
-.viewToggle {
-  display: inline-flex;
-  align-items: center;
-  gap: 2px;
-  padding: 3px;
-  background: rgba(47, 0, 0, 0.05);
-  border: 1px solid rgba(47, 0, 0, 0.12);
-  border-radius: 999px;
-  transition:
-    border-color 300ms ease,
-    background-color 300ms ease;
-}
-
-.viewToggle:hover {
-  background: rgba(47, 0, 0, 0.08);
-  border-color: rgba(47, 0, 0, 0.24);
-}
-
-/* one option — the sliding maroon thumb (layoutId) renders behind the
-   icon + label; the resting option tints on hover and presses down */
-.toggleOpt {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  padding: 0.55em 0.8em;
-  margin: 0;
-  border: 0;
-  border-radius: 999px;
-  background: none;
-  cursor: pointer;
-  font-family: var(--font-mono);
-  font-weight: 500;
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label-mono);
-  text-transform: uppercase;
-  color: var(--maroon);
-  transition:
-    color 300ms ease,
-    background-color 300ms ease,
-    transform 160ms cubic-bezier(0.23, 1, 0.32, 1);
-}
-
-/* THE GHOST THUMB. Hovering the resting option swells a soft maroon pill
-   into the seat the real thumb would slide into — the control shows you
-   where it is about to go before you commit. It scales up from 0.82 on the
-   drawer curve rather than fading a background colour in, so the preview
-   has the same weight of movement as the thumb it is previewing, and it
-   costs transform + opacity instead of a repaint. */
-.toggleOpt::before {
-  content: "";
-  position: absolute;
-  inset: 0;
-  border-radius: 999px;
-  background: rgba(47, 0, 0, 0.09);
-  opacity: 0;
-  transform: scale(0.82);
-  pointer-events: none;
-  transition:
-    opacity 260ms var(--ease-drawer),
-    transform 260ms var(--ease-drawer);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .toggleOpt:not(.toggleOptOn):hover::before {
-    opacity: 1;
-    transform: scale(1);
-  }
-  /* the glyph leans in with it */
-  .toggleOpt:not(.toggleOptOn):hover .toggleIcon {
-    transform: scale(1.14);
-  }
-}
-
-/* keyboard parity — tabbing to the resting option previews it too */
-.toggleOpt:not(.toggleOptOn):focus-visible::before {
-  opacity: 1;
-  transform: scale(1);
-}
-
-.toggleOpt:active {
-  transform: scale(0.95);
-}
-
-.toggleOpt:focus-visible {
-  outline: 2px solid var(--maroon);
-  outline-offset: 2px;
-}
-
-.toggleOptOn {
-  color: var(--cream);
-}
-
-.toggleThumb {
-  position: absolute;
-  inset: 0;
-  border-radius: 999px;
-  background: var(--maroon);
-}
-
-.toggleIcon {
-  position: relative;
-  z-index: 1;
-  width: 1.15em;
-  height: 1.15em;
-  fill: currentColor;
-  /* the glyph crossfades cream⟷maroon as the thumb passes under it, on the
-     thumb's own clock — not a beat behind it — and leans in with the ghost */
-  transition:
-    fill 220ms var(--ease-drawer),
-    transform 260ms var(--ease-drawer);
-}
-
-/* ---------- the plate as a pressable ---------- */
-/* Bare button wrapper around the tile plate — the whole photo is the hit
-   area for the App Store expansion. Press feedback lives on the WRAPPER
-   (not the layoutId element inside), so the scale-down never fights the
-   morph's own transform. */
-.plateHit {
-  display: block;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  border: 0;
-  background: none;
-  cursor: pointer;
-  text-align: inherit;
-  /* the hover lift rides the drawer clock with the inner zoom; the press
-     override below snaps quick */
-  transition: transform 400ms var(--ease-drawer);
-}
-
-/* the plate LIFTS a touch while the photo zooms inside it — transform-only,
-   so the grid's rows never reflow */
-@media (hover: hover) and (pointer: fine) {
-  .cell:hover .plateHit {
-    transform: scale(1.01);
-  }
-}
-.cell:focus-within .plateHit {
-  transform: scale(1.01);
-}
-
-.plateHit:active {
-  transform: scale(0.985);
-  transition-duration: 120ms;
-}
-
-.plateHit:focus-visible {
-  outline: 2px solid var(--maroon);
-  outline-offset: 3px;
-}
 
 /* ---------- the App Store expansion ---------- */
 /* Fixed stage PORTALED to <body> (never inside .afterHero's z-index: 1
@@ -1111,11 +793,13 @@
   padding: clamp(16px, 3vw, 48px);
 }
 
-/* deep maroon dim — the room lights dropping, not a grey veil */
+/* deep ink dim — the room lights dropping, not a grey veil. Mixed from
+   the token (was an rgba() literal of the retired red-black — see the
+   .cellCaption note) so the dim stays the page's own dark. */
 .expandBackdrop {
   position: absolute;
   inset: 0;
-  background: rgba(24, 0, 0, 0.5);
+  background: color-mix(in srgb, var(--maroon) 50%, transparent);
 }
 
 /* the detail "card" is a TRANSPARENT column: the media plate above, the
@@ -1138,14 +822,16 @@
   display: none;
 }
 
-/* the media plate keeps the tiles' 3:2 crop AND radius, so the morph is a
-   pure scale-and-travel of the SAME object — no distortion, no crop
-   change, no corner animation */
+/* the media plate keeps the tiles' crop AND radius, so the morph is a pure
+   scale-and-travel of the SAME object — no distortion, no crop change, no
+   corner animation. It tracks .tileMedia: when the tile went portrait 4:5
+   this had to follow, or the expansion would have re-cropped the
+   photograph mid-flight and the morph would have read as a dissolve. */
 .expandMedia {
   position: relative;
   flex: none;
   width: 100%;
-  aspect-ratio: 3 / 2;
+  aspect-ratio: 4 / 5;
   overflow: hidden;
   background: var(--placeholder);
   /* rides ABOVE the body sheet's tucked-under top edge, so the pair reads
@@ -1202,7 +888,11 @@
   padding: calc(clamp(20px, 3vw, 32px) + 16px) clamp(20px, 3vw, 32px)
     clamp(20px, 3vw, 32px);
   background: var(--cream);
-  border-radius: 2px;
+  /* --radius-tile with the media above it, so the expanded card reads as
+     one object. It was 2px while the photograph it tucks under was 28px,
+     which the body sheet's overlap mostly hid; now that both are on the
+     token there is nothing left to hide. */
+  border-radius: var(--radius-tile);
   /* flat by design (Telescope) — the maroon backdrop dim already
      separates the card from the page */
 }
@@ -1285,29 +975,18 @@
 
 /* ---------- reduced motion ---------- */
 /* No zoom (transforms pinned), no entrance translate — colour/opacity-only
-   hovers survive. */
+   hovers survive.
+   THE CARD'S HALF OF THIS BLOCK MOVED WITH THE CARD. `.cardSurface`, the
+   two `.cell:*` lifts, `.photo`, `.hoverBlurb` and the `.cardBtn` family
+   are all answered by VenueCard.module.css's own reduced-motion block now.
+   What is left here is the expansion's single control, which is the one
+   piece of this chapter's motion the card does not own. */
 @media (prefers-reduced-motion: reduce) {
-  .plateHit,
-  .plateHit:active,
-  .cell:hover .plateHit,
-  .cell:focus-within .plateHit {
-    transform: none;
-    transition: none;
-  }
-  .photo,
-  .brandGroup {
-    transform: none !important;
-    transition: none;
-  }
-  /* the blurb still appears, but by fade alone — no rise */
-  .hoverBlurb {
-    transform: none;
-    transition: opacity 300ms ease;
-  }
-  /* the Book pill keeps its colour shift only — no swell, no press scale */
-  .pillBook,
-  .pillBook:hover,
-  .pillBook:active {
+  /* the expansion's action keeps its colour shift only — no swell, no
+     press scale. */
+  .panelAction,
+  .panelAction:hover,
+  .panelAction:active {
     transform: none;
     transition:
       background-color 200ms ease,

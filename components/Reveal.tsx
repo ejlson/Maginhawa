@@ -12,6 +12,19 @@ type RevealProps = {
   as?: "div" | "span" | "li" | "p" | "h2" | "section";
   /** if false, reveal replays every time the element re-enters */
   once?: boolean;
+  /**
+   * Corner radius in px. When set, the element reveals by WIPING — a
+   * clip-path inset opening upward with this radius — instead of rising and
+   * de-blurring. Pass the radius of whatever the picture should rhyme with;
+   * About's frames pass 28, the venue card's radius, so the chapter reads as
+   * cut from the same stock as the grid above it.
+   *
+   * The two entrances are deliberately EXCLUSIVE rather than additive. A
+   * picture that rises, de-blurs AND wipes at once is three ideas competing
+   * over 800ms, and the wipe is the one that carries meaning here — the
+   * others just make it late.
+   */
+  clip?: number;
 };
 
 /**
@@ -27,8 +40,39 @@ export default function Reveal({
   className,
   as = "div",
   once = true,
+  clip,
 }: RevealProps) {
   const shouldReduce = useReducedMotion();
+
+  /* THE WIPE. `inset(100% 0 0 0)` is a box clipped to nothing from the top
+     edge down, opening to `inset(0 0 0 0)` — the picture is uncovered from
+     the bottom up, travelling in the same direction the page is scrolling.
+
+     THE RADIUS RESOLVES TO SQUARE, and that is the whole idea rather than a
+     compromise. It starts at the radius passed in (About passes 28, the
+     venue card's) and animates to 0, so the picture arrives wearing the
+     corner of the grid the reader has just left and settles into its own
+     square one. A rhyme that resolves, not a borrowed shape kept.
+
+     It also has to be this way round. These frames are DELIBERATELY square
+     — see the note in AboutIntro.module.css — so holding 28px at the end
+     would quietly round two pictures the corners were explicitly taken off.
+
+     BOTH KEYFRAMES MUST NAME `round`, even the 0 one. A clip-path only
+     interpolates against another clip-path of the same shape function and
+     arity: `inset(100% 0 0 0 round 28px)` → `inset(0% 0 0 0)` does not
+     animate at all, it cuts on the first frame. It fails silently and looks
+     like the transition simply did not fire.
+
+     No opacity on the wipe. Fading a clipped box softens the revealed edge,
+     which reads as a dissolve; a hard edge travelling reads as a cut. */
+  const wipe: Variants = {
+    hidden: { clipPath: `inset(100% 0 0 0 round ${clip}px)` },
+    shown: {
+      clipPath: "inset(0% 0 0 0 round 0px)",
+      transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1], delay },
+    },
+  };
 
   const variants: Variants = shouldReduce
     ? {
@@ -38,7 +82,9 @@ export default function Reveal({
           transition: { duration: 0.4, ease: "easeOut", delay },
         },
       }
-    : {
+    : clip !== undefined
+      ? wipe
+      : {
         hidden: { opacity: 0, y, filter: "blur(8px)" },
         shown: {
           opacity: 1,

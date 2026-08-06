@@ -50,11 +50,19 @@ export default function Contact({ standalone = false }: ContactProps) {
           <div className={`${styles.info} measure`}>
             <Reveal>
               <div className={styles.label}>Enquiries</div>
-              <p>
-                <a className={styles.infoLink} href={`tel:${CONTACT.phone.replace(/\s/g, "")}`}>
-                  {CONTACT.phone}
-                </a>
-              </p>
+              {/* the phone line only appears once there is a real number to
+                  dial — see lib/contact.ts. Email carries enquiries alone
+                  until then. */}
+              {CONTACT.phone ? (
+                <p>
+                  <a
+                    className={styles.infoLink}
+                    href={`tel:${CONTACT.phone.replace(/\s/g, "")}`}
+                  >
+                    {CONTACT.phone}
+                  </a>
+                </p>
+              ) : null}
               <p>
                 <a className={styles.infoLink} href={`mailto:${CONTACT.email}`}>
                   {CONTACT.email}

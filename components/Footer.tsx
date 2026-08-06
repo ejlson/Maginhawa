@@ -23,10 +23,20 @@ const EXPLORE: FootLink[] = [
   { label: "Contact Us", href: "/contact" },
 ];
 
-// real destinations only — mailto/tel hand off to the OS
+// real destinations only — mailto/tel hand off to the OS. The phone row is
+// dropped entirely while CONTACT.phone is null rather than rendered as dead
+// text: a contact column is a list of ways to reach someone, and a line that
+// reaches nobody is worse than a shorter list.
 const CONTACT_LINKS: FootLink[] = [
   { label: CONTACT.email, href: `mailto:${CONTACT.email}` },
-  { label: CONTACT.phone, href: `tel:${CONTACT.phone.replace(/\s/g, "")}` },
+  ...(CONTACT.phone
+    ? [
+        {
+          label: CONTACT.phone,
+          href: `tel:${CONTACT.phone.replace(/\s/g, "")}`,
+        },
+      ]
+    : []),
 ];
 
 // internal links keep a real href (works without JS) but upgrade the click

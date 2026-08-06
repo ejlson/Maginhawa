@@ -129,12 +129,22 @@
 /* Dark wash over the footage — the ONLY thing standing between the footage
    and WCAG 1.4.3, since the copy no longer inverts through a difference blend.
 
-   THE FLOOR, measured not eyeballed: cream (#faf7f1) has relative luminance
-   0.932, so 4.5:1 needs a backdrop at or below 0.168 — a mid-grey of 114/255.
-   Against the worst case the footage can produce (a blown-white frame) an
-   rgba(18,0,0,a) wash composites to 255 − 237a, which clears 114 only from
-   a = 0.60 upward. So anywhere type sits, the layers below must multiply to
-   0.60 or more.
+   THE FLOOR, measured not eyeballed, AND RE-DERIVED FOR THE SOFTENED
+   PALETTE. The old derivation read "cream (#faf7f1) has relative luminance
+   0.932, so 4.5:1 needs a backdrop at or below 0.168 — a mid-grey of
+   114/255 … a = 0.60 upward". Two things were wrong with it by the time
+   the palette moved: #faf7f1 was the cream from TWO swaps ago, and the
+   ground has since deepened again.
+
+   Re-run against --cream as it stands (L 0.768, not 0.932): 4.5:1 needs a
+   backdrop at or below L 0.132 — a mid-grey of 102/255. Against the worst
+   case the footage can produce (a blown-white frame) an rgba(18,0,0,a) wash
+   clears that only from a = 0.62 upward. So anywhere type sits, the layers
+   below must now multiply to 0.62 or more, not 0.60.
+
+   NOTHING HAD TO CHANGE BELOW. Every composited figure in the table further
+   down is 0.746 or higher at the type, so the section clears the raised
+   floor untouched — the derivation moved, the wash did not need to.
 
    WHAT CHANGED. The old wash was a VIGNETTE — 0.664 composited at the centre
    rising to 0.826 in the corners — i.e. it was darkest exactly where there is
@@ -162,7 +172,7 @@
                                              is what stops the saffron pill
                                              dissolving into warm footage)
      heading ink     0.749   at r 0.28
-     support copy    0.746   at r 0.38  — every text node clears the 0.60 floor
+     support copy    0.746   at r 0.38  — every text node clears the 0.62 floor
      frame side edge 0.358   at mid-height, r 0.86 — the terrace's outer thirds
                                                     are readable again
      frame corner    0.140                  (was 0.826)
@@ -298,10 +308,31 @@
   text-transform: uppercase;
   /* 0.88, not full cream: enough of a step down from the heading that the two
      read as different weights, small enough a step that the line still clears
-     the floor where the pool is thinnest under it. 0.82 was the first try and
-     measured 3.84:1 on the phone's support line — the alpha is doing real
-     work against a 4.5 floor, so it is not a free dial. */
-  color: rgba(250, 247, 241, 0.88);
+     the floor where the pool is thinnest under it.
+
+     THE LITERAL WAS #faf7f1, THE CREAM FROM TWO PALETTES AGO. This line and
+     .support below were the two highest-impact of some thirty such strandings
+     across the components — the only two carrying TYPE rather than a hairline.
+     88% of the token now.
+
+     THE ALPHA DID NOT MOVE, AND THAT IS MEASURED, NOT ASSUMED. Re-read at both
+     widths with the old literal still in place, via
+     scripts/probe-palette-blastradius.mjs: this line 9.41:1 at 1440 and 9.21:1
+     at 390; .support 8.71:1 and 8.53:1. Against a 4.5 floor that is roughly
+     double, and 88% of the CURRENT cream composites near 7.9:1 — still three
+     quarters clear of the bar. Holding the old RATIO instead would have taken
+     a ≈ 0.98, which is full cream in all but name, and would have collapsed
+     the very heading-to-label separation this alpha exists to draw. The floor
+     is 4.5:1, not 9.41:1, and it is held with room to spare.
+
+     THE NUMBER THAT USED TO BE IN THIS COMMENT IS GONE BECAUSE IT WAS STALE.
+     It read "0.82 was the first try and measured 3.84:1 on the phone's support
+     line", and .support's note claimed 5.4:1 there. Both were true of a
+     composition that has since changed underneath them — .support moved up
+     between the heading and the pill, and .locScrim became a centred pool —
+     so this copy now sits far deeper in the dark than when those readings were
+     taken. Measured today it is 8.53:1, not 5.4:1. */
+  color: color-mix(in srgb, var(--cream) 88%, transparent);
 }
 
 /* The five characters that change. This box used to be belt-and-braces over
@@ -392,10 +423,21 @@
    (globals.css:23) and is spent nowhere else in this section, so the eye has
    exactly one place to land.
 
-   MAROON LABEL, NOT CREAM. #2f0000 on #c97e3f measures 5.85:1; cream on the
-   same fill is 2.99:1 and fails outright. The pill therefore inverts the
-   section's cream-on-dark relationship, which is the second reason it reads as
-   the action rather than as more copy. */
+   CREAM LABEL, NOT MAROON — AND IT USED TO BE THE OTHER WAY ROUND. The note
+   here read "#2f0000 on #c97e3f measures 5.85:1; cream on the same fill is
+   2.99:1 and fails outright", which was true of a palette two swaps ago and
+   had been carried forward untouched ever since. Measured against the pair
+   that actually shipped before this pass, the ink label was 3.02:1 on the
+   accent fill (scripts/probe-palette-blastradius.mjs) — under the 4.5:1 this
+   uppercase label answers to, and it had been for some time.
+
+   THE NEW ARITHMETIC REVERSES IT OUTRIGHT. The ground deepened and the
+   accent moved three points of lightness with it (globals.css), so:
+       ink on the accent fill      2.15:1   — worse, and now hopeless
+       ground on the accent fill   4.55:1   — clears the label floor
+   The label is therefore cream. The pill still reads as the action rather
+   than as more copy, but it does it with the SATURATION now instead of with
+   an inversion: it is the only saturated thing on the screen either way. */
 .action {
   display: inline-flex;
   align-items: center;
@@ -408,7 +450,7 @@
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
   white-space: nowrap;
-  color: var(--maroon);
+  color: var(--cream);
   background: var(--saffron);
   /* the border is kept, matched to the fill: it holds the pill's exact
      geometry (and its 1px of extra height) so nothing about the magnet's
@@ -421,11 +463,13 @@
 }
 
 @media (hover: hover) and (pointer: fine) {
-  /* Hover goes LIGHTER, not louder — cream fill, maroon label, 17.5:1. It is
-     the same swap the pill always had, and it still reads as a state change
-     because saffron→cream is a hue jump as well as a value one. Going darker
-     on hover would have put the pressed state and the hovered state on the
-     same side of rest. */
+  /* Hover goes LIGHTER, not louder — cream fill, maroon label, and the pair
+     measures 9.80:1 (it was 17.5:1 on the old palette, which is the number
+     this note used to carry; the softened pair is the change, not the rule).
+     It is the same swap the pill always had, and it still reads as a state
+     change because saffron→cream is a hue jump as well as a value one. Going
+     darker on hover would have put the pressed state and the hovered state
+     on the same side of rest. */
   .action:hover {
     background: var(--cream);
     border-color: var(--cream);
@@ -438,25 +482,46 @@
   }
 }
 
-/* A cream ring at 3px offset sits on the SCRIM, where it measures 7.0:1
-   against the worst backdrop the pool can composite to — but only 2.99:1
-   against the saffron it encircles, so on its own it would fail the moment it
-   touched the fill. The inset maroon ring is the other half: 5.85:1 on
-   saffron, 17.5:1 on the cream hover fill. Together the focus indicator is
-   legible against the pill AND against everything behind it, in both states. */
+/* THE TWO RINGS SWAPPED JOBS, and only the comment had to change.
+
+   A cream ring at 3px offset sits on the SCRIM, outside the pill. Against
+   the saffron it encircles it now measures 4.55:1 — it used to be 2.99:1 on
+   the old accent, which is why the note here said it "would fail the moment
+   it touched the fill" and why the inset ring existed to cover for it. The
+   deepened ground and the re-seated accent inverted that: the outer ring is
+   the PRIMARY indicator at rest now, clear of 1.4.11's 3:1 on its own.
+
+   The inset maroon ring is no longer the backstop on the rest state — it is
+   2.15:1 on the saffron, down from 3.08:1, and it cannot carry a fill by
+   itself any more. It stays because it is the only half that works on the
+   HOVER state, where the fill goes cream and the outer cream ring vanishes
+   into it: inset maroon on cream is 9.80:1. So each ring now owns one state
+   instead of both of them owning both, and the pair still leaves a legible
+   indicator against the pill AND against everything behind it, in both
+   states. */
 .action:focus-visible {
   outline: 2px solid var(--cream);
   outline-offset: 3px;
   box-shadow: inset 0 0 0 2px var(--maroon);
 }
-/* Pressed = saffron cut 12% toward the maroon, rgb(183,111,55). Distinguishable
-   from rest (the two fills are 1.26:1 apart, comfortably above the ~1.1:1 where
-   a value step stops registering) and the maroon label still measures 4.77:1 on
-   it, so the press does not open a hole in the contrast floor. Colour only: a
-   scale here would be a second transform in the same stack as the magnet. */
+/* PRESSED NOW GOES DARKER, WHERE IT USED TO GO LIGHTER, and the label is
+   what flipped it. This was the literal rgb(183,111,55) — a LIGHTER orange,
+   despite the note above it claiming "saffron cut 12% toward the maroon",
+   which is one more reason it is a color-mix of the token now and not a
+   frozen triplet. It went lighter because the label was maroon and a lighter
+   fill helped it; the label is cream now, so a lighter fill would fight it
+   (90% toward the ground puts the cream label at 3.87:1 and under its
+   floor). Darker helps instead.
+
+   75% accent / 25% ink, measured: the two fills are 1.25:1 apart — the same
+   step the old pair had, and above the ~1.1:1 where a value change stops
+   registering — and the cream label reads 5.69:1 on the pressed fill, better
+   than the 4.55:1 it gets at rest. The press does not open a hole in the
+   floor, it closes one. Colour only: a scale here would be a second
+   transform in the same stack as the magnet. */
 .action:active {
-  background: rgb(183, 111, 55);
-  border-color: rgb(183, 111, 55);
+  background: color-mix(in srgb, var(--saffron) 75%, var(--maroon));
+  border-color: color-mix(in srgb, var(--saffron) 75%, var(--maroon));
 }
 
 /* ---------- the supporting line ----------
@@ -480,11 +545,16 @@
   max-width: var(--measure-tight);
   font-size: var(--t-small);
   line-height: var(--lh-body);
-  /* same 0.88 cream as the clock — the two quiet lines bracket the heading and
-     the pill at one weight, so the block reads as two loud things and two soft
-     ones rather than four competing ones. Worst measured case is this line on
-     the phone, where it sits furthest out in the pool: 5.4:1. */
-  color: rgba(250, 247, 241, 0.88);
+  /* same 88% of the cream as the clock — the two quiet lines bracket the
+     heading and the pill at one weight, so the block reads as two loud things
+     and two soft ones rather than four competing ones.
+
+     Same stranded #faf7f1 as .clock, migrated the same way and for the reasons
+     set out there. Worst measured case is still this line rather than the
+     clock, but the old "5.4:1" was taken before .support moved up into the
+     deep part of the pool: measured today it is 8.53:1 at 390 and 8.71:1 at
+     1440, against a 4.5 floor. */
+  color: color-mix(in srgb, var(--cream) 88%, transparent);
   text-wrap: balance;
 }
 

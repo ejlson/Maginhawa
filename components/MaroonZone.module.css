@@ -8,13 +8,15 @@
    The band's END is a plain hard edge where the element stops; the cream
    journal below carries its own ground.
 
-   `flow-root` matters. Without it the About section's top margin COLLAPSES
-   out through this box, so the maroon started 400-odd pixels below where
-   the chapter does — and with the grid held still underneath, that gap
-   showed as a band of cream sliding down the screen ahead of the maroon.
-   Containing the margin puts the edge exactly on the chapter boundary and
-   turns that gap into the air above the heading, which is where it was
-   always meant to read. */
+   `flow-root` matters, and it is why this wrapper still exists now that it
+   holds a single chapter. Without it the first child's top margin COLLAPSES
+   out through this box, so the maroon starts wherever that margin ends
+   rather than at the chapter boundary — which showed, when About was the
+   first child, as 400-odd pixels of cream sliding down the screen ahead of
+   the dark ground. Containing the margin puts the edge exactly on the
+   chapter boundary. The press wall pads rather than margins, so nothing
+   escapes today; keep the `flow-root` anyway, because the failure only
+   reappears the moment something with a top margin is seated in here. */
 .zone {
   display: flow-root;
   position: relative;

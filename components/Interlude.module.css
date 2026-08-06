@@ -1,39 +1,73 @@
-/* The photo interlude — a full-screen photograph in a maroon frame, PINNED
-   while the journal scrolls up over it.
+/* The photo interlude — a full-screen photograph in a frame.
 
-   `position: sticky` is bounded by the element's CONTAINING BLOCK, so the
-   pin only exists because the section now sits inside `.pinScope`
-   (globals.css) alongside the Blog sheet. As the last child of the maroon
-   zone its containing block ended at its own bottom edge and it had nothing
-   to be held through.
+   THE PIN IS GONE. This was `position: sticky; top: 0` with the journal
+   sheet climbing over it at a higher z-index — the last of the page's
+   scroll-holds. It is removed for the same reason the other two were
+   ("it looks weird"): a reader whose scroll appears to stop working for a
+   viewport is paying a real cost for a plane change most of them never
+   consciously register, and the page now moves at one rate from the hero to
+   the footer.
+
+   `position: relative` rather than static so the picture inside it still has
+   something to be absolutely positioned against — the frame/inset structure
+   below is unchanged, and this section still fills a screen. It simply
+   scrolls past like everything else now.
 
    The section is the FRAME and the picture is inset into it, so what shows
-   around the photograph is this band's own maroon — the same --film-breath
+   around the photograph is this band's own ground — the same --film-breath
    the About film keeps against the screen edges, so the two full-height
    photographs on the page wear the same frame. */
 .section {
-  position: sticky;
-  top: 0;
-  /* under the journal that covers it — both are positioned, so document
-     order would decide anyway; saying it out loud keeps it decided */
-  z-index: 0;
+  position: relative;
   height: 100svh;
   overflow: hidden;
-  background: var(--maroon);
+  /* THE FRAME IS THE PAGE'S OWN GROUND, and this is the third value it has
+     held. It was --maroon, which worked: a dark mat around a photograph
+     reads as a mount. Dropping the dark band took it to --placeholder, and
+     that was wrong for a reason worth writing down — --placeholder is a
+     DECODE tone, the dull clay a frame holds while its picture arrives. It
+     is never meant to be seen once the image has painted. Here it was
+     permanently visible as a 12px border two steps darker than the page,
+     which reads as a dirty edge rather than as breath.
+     --cream continues the page into the frame, so the photograph sits in
+     the plaster with the same --film-breath the About film keeps. The
+     decode tone stays where it belongs, on .media, under the picture. */
+  background: var(--cream);
   /* the gap up to the masthead marquee. It was --home-gap-tight (a third of
      a screen), sized for a band that scrolled past; a beat that HOLDS wants
-     to arrive promptly instead. Contained by .pinScope's flow-root, so this
-     strip is maroon and continuous with the zone above it. */
-  margin-top: clamp(56px, 8vh, 110px);
+     to arrive promptly instead.
+     THE STRIP IS NO LONGER MAROON. It read as continuous with a dark zone
+     above it that no longer exists — this chapter's ground is now the
+     decode-time --placeholder under a full-height photograph, and the strip
+     above it is the plaster page. */
+  /* NO TOP MARGIN. It was clamp(56px, 8vh, 110px), sized for a chapter that
+     arrived after a scrolling band. The seam above is now owned by this
+     section's own frame inset (see .media) so that the gap from the About
+     picture to this one equals the gap between the story band's
+     photographs — 12px, one number across the whole page. A margin here
+     would stack on top of that inset and double it. */
+  margin-top: 0;
 }
 
 /* the picture, inset by the frame */
 .media {
   position: absolute;
-  inset: var(--film-breath);
+  /* --grid-gutter, NOT --film-breath. The token resolves to --grid-margin
+     (40px) at desktop, which was the frame this chapter wanted when it sat
+     on the page's margin like every other section. The page's photography
+     now runs on a 12px system — the story band's images, the About panel,
+     and the gaps between all of them — and a 40px mat here would read as
+     this one picture being inset differently from every other. It also
+     sets the seam upward: with the section's top margin removed, this inset
+     IS the gap from the About panel above. */
+  inset: var(--grid-gutter);
   overflow: hidden;
-  /* square-cut, like every other full-height film in the page */
-  border-radius: 0;
+  /* ROUNDED, at the user's instruction, and matched to the rest: the same
+     --radius-tile the band's prints, the About panel and its doors carry.
+     It read "square-cut, like every other full-height film in the page" —
+     that was true when nothing on the page was rounded, and it is now the
+     odd one out rather than the rule. */
+  border-radius: var(--radius-tile);
   background: var(--placeholder);
 }
 

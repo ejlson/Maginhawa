@@ -1,0 +1,244 @@
+/* The band under the statement — a byline, then the photographs drifting
+   sideways as the reader comes down the page.
+
+   IT IS NOT A SECTION. This lives INSIDE the manifesto's section so the
+   statement and the band can share one screen (see Manifesto.module.css),
+   which is why there is no background, no title and no inline padding here:
+   the host section owns the ground and the page margin, and this sits in
+   its content box.
+
+   THE HAIRLINE IS GONE. `.rule` — a full-band 1px --rule line closing the
+   statement and opening the band — was removed at the user's instruction.
+   It was hairline 2 of the three this page was building toward, so
+   Discover's `.headRule` is now the only one left on the home page. */
+
+/* ONE SHARED SPACING CONSTANT, and it is the reason this is a variable
+   rather than three separate values.
+
+   The user's requirement is a RELATIONSHIP, not a number: the gap between
+   the photographs, the gap from the photographs to the bottom of the
+   screen, and the gap between the restaurant cards in Discover all have to
+   be the same. Written out separately that agreement survives exactly
+   until someone tunes one of them.
+
+   --grid-gutter IS THE GAP BETWEEN THE CARDS, and it is a real shared
+   token rather than a copy — Discover's grid sets `column-gap:
+   var(--grid-gutter)` at ≥981px and calls it "the global 12-col grid's
+   gutter between the tiles". Pointing at the same token means the two
+   cannot drift apart.
+
+   MEASURED, because the obvious answer was wrong: `.grid` also carries
+   `gap: clamp(10px, 1.2vw, 20px)` in its base rule, which reads like the
+   card gap and is what this file used first. It is overridden at every
+   width from 461px up, so the cards actually sit 12px apart at 1440 while
+   the clamp computes 17.28px — the band was a visible 5px wider than the
+   grid it was supposed to match. Read the COMPUTED value off the cards,
+   not the first gap declaration in the file. */
+.band {
+  --band-gap: var(--grid-gutter);
+  /* THE SPACE UNDER THE PHOTOGRAPHS IS NO LONGER THE SPACE BETWEEN THEM,
+     and that identity was deliberate, so here is why it was given up.
+
+     It was one --band-gap, which made the gap below the band provably
+     equal to the gap between its frames rather than coincidentally
+     similar. Then About gained an opening hairline directly beneath this
+     band, and one gap unit put that rule 12px under the photographs and
+     12px above the video — squeezed between two large photographic masses,
+     where it stopped reading as an editorial mark and started reading as
+     the bottom edge of this band's container.
+
+     FOUR UNITS, NOT A NEW NUMBER. The rule needs air on the side facing
+     the band and none on the side facing About, because that asymmetry is
+     what makes it read as ABOUT'S opening rule rather than as a divider
+     belonging to neither chapter. Written as a multiple of --band-gap so
+     it still derives from the system: if the gutter moves, this moves with
+     it, and the relationship stays "four times the frame gap" instead of
+     drifting into an unrelated 48.
+
+     ⚠️ SUPERSEDED: THE GAP BELOW THE RULE IS NOW FOUR UNITS TOO, at the
+     user's instruction, so the rule is centred and the asymmetry argued
+     for below no longer exists. The reasoning is left standing because it
+     is the case AGAINST the current arrangement and the next person to
+     look at this seam should have it — but it describes what the rule used
+     to do, not what it does. The change and what it costs are recorded at
+     `.rule` in AboutSplit.module.css.
+
+     THE GAP BELOW THE RULE IS NOT OURS AND USED TO STAY 12px — it is the
+     rule's own margin-bottom in AboutSplit.module.css, and it is what
+     holds the video's 12px top inset. Do not balance this by adding air
+     there; the asymmetry is the point.
+
+     It is padding on the band rather than on the host section because
+     --band-gap is declared here: custom properties inherit downward, so
+     the section could not read a value set on its own child. */
+  padding-bottom: calc(var(--band-gap) * 4);
+}
+
+/* THE MASTHEAD: three marks, ends and true centre.
+
+   `1fr auto 1fr` RATHER THAN `space-between`, and the difference is the
+   whole point. space-between distributes the leftover room, so the middle
+   mark only lands on the page's axis when the two outer marks happen to be
+   the same width — here they are "Kentish Town, London" and "Filipino ·
+   Filipino-Japanese · Caribbean", which are nowhere near it, and the centre
+   would sit visibly left of the statement it sits under. Equal 1fr flanks
+   pin the middle column to the measure's centre whatever the ends say. */
+.meta {
+  display: grid;
+  grid-template-columns: 1fr auto 1fr;
+  align-items: baseline;
+  gap: clamp(12px, 2vw, 28px);
+  /* THE MASTHEAD BLEEDS TO THE PAGE EDGE, like the rail beneath it.
+     It sat in the section's content box, so the outer two marks lined up
+     with the page margin (--pad-x, 40px) while the photographs below them
+     ran full width — the row read as inset from a band it belongs to.
+     Bled out and re-padded by ONE GAP UNIT, "London" and "Est. 1987" now
+     sit the same 12px from the screen edge that the photographs keep from
+     each other and from the bottom of the screen. Four uses of one number:
+     between images, below images, above images, and at the sides. */
+  width: calc(100% + 2 * var(--pad-x));
+  margin-inline: calc(-1 * var(--pad-x));
+  padding-inline: var(--band-gap);
+  /* NO TOP PADDING. The hairline it used to be spaced from is gone, and the
+     statement above is vertically centred in whatever room is left, so the
+     air above this row is set by the layout rather than by a pad here.
+
+     THE BOTTOM IS ONE GAP UNIT, the same --band-gap that separates the
+     photographs from each other and from the bottom of the screen. The
+     byline then sits exactly one unit above the pictures it belongs to,
+     which is both as close as the user asked for and part of the same
+     rhythm rather than a fourth spacing decision. */
+  padding-bottom: var(--band-gap);
+}
+
+/* one mark. SMALLER than the site's --t-label (13px): a masthead is
+   supporting apparatus under a display sentence, and at 13px uppercase it
+   competed with the statement instead of sitting beneath it. 11px with
+   0.16em tracking reads as a caption line — the tracking goes UP as the
+   size comes down, because letterspacing is what keeps small caps legible
+   rather than merely small.
+
+   --maroon-soft (6.56:1), not --maroon: still far past the 4.5:1 this size
+   answers to, and a full-strength ink on three lines of apparatus would
+   pull the eye down off the sentence. */
+.mark {
+  font-family: var(--font-sans);
+  font-weight: var(--w-medium);
+  font-size: 0.6875rem;
+  letter-spacing: 0.16em;
+  text-transform: uppercase;
+  color: var(--maroon-soft);
+  /* line-height 1 so the box hugs the caps. The gap below this row is meant
+     to equal the gap between the photographs, and with a default ~1.5
+     line-height half of that measurement would be invisible leading rather
+     than the space the eye actually reads. */
+  line-height: 1;
+}
+
+.mark:nth-child(2) {
+  text-align: center;
+}
+
+.mark:nth-child(3) {
+  text-align: right;
+}
+
+/* ── THE BAND ───────────────────────────────────────────────────────────
+   FULL PAGE WIDTH, derived rather than declared. `100% + 2 × --pad-x` is
+   exactly the host section's content box plus its margins, which IS the
+   page's width, and negative inline margins get there without naming the
+   width twice.
+
+   Deliberately NOT `100vw`: on a platform with a classic space-taking
+   scrollbar, 100vw includes the scrollbar, and the band would be a
+   scrollbar's width too wide and horizontally off-centre. This form cannot
+   be wrong, because it is measured from the box the page is laid out in.
+
+   `overflow: hidden` is load-bearing, not tidiness — it is what stops the
+   drifting track from adding horizontal document scroll. */
+.rail {
+  width: calc(100% + 2 * var(--pad-x));
+  margin-inline: calc(-1 * var(--pad-x));
+  overflow: hidden;
+  /* THE CLIP WOULD OTHERWISE EAT THE SHADOW. `overflow: hidden` clips on
+     ALL FOUR SIDES, and only the horizontal clip is wanted — it is what
+     hides the drifting track. The frames' shadow paints outside their
+     border box and reaches ~44px below them, so without this it was cut
+     off flush at the bottom of the pictures and the band looked like it
+     had a hard edge rather than a shadow.
+
+     A clip happens at the PADDING edge, so vertical padding buys the
+     shadow room inside it, and matching negative margins take that room
+     back out of the flow — the rail still occupies exactly the height of
+     the photographs, so the 12px gap measured below them is unaffected.
+     Padding is `block` only: adding any inline padding would move the
+     horizontal clip and let the track's ends show. */
+  padding-block: 12px 48px;
+  margin-block: -12px -48px;
+}
+
+.track {
+  display: flex;
+  /* the same gap the restaurant cards keep — see --band-gap */
+  gap: var(--band-gap);
+  /* the row must be free to run past the window — without this the flex
+     line would compress the frames to fit and there would be nothing to
+     drift */
+  width: max-content;
+}
+
+/* one frame. 3:2 LANDSCAPE and BIG — 30vw, so roughly three and a third sit
+   across a 1440 window.
+
+   It was a 4:5 upright at 24vw, then 3:2 at 22vw. Upright was wrong for a
+   band (seven posters tall enough to compete with the statement they are
+   evidence for); 22vw was landscape but small enough to read as a strip of
+   thumbnails. At 30vw the pictures are large enough to be looked at while
+   the row is still obviously a row. */
+.frame {
+  position: relative;
+  flex: none;
+  margin: 0;
+  width: clamp(300px, 30vw, 480px);
+  aspect-ratio: 3 / 2;
+  overflow: hidden;
+  /* --radius-tile (8px) is the site's own token for "photography and
+     editorial frames — a quiet edge-soften, not an app-card curve", which
+     is exactly this object. Deliberately NOT the 2px sharp print cut the
+     Discover plates and blog media carry: the user asked for these to be
+     rounded, and 8px is the rounding this design system already has a name
+     for, so the band joins a system instead of inventing a ninth radius. */
+  border-radius: var(--radius-tile);
+  /* the tone every other frame on this site holds while its photograph
+     decodes — cream would flash white inside the picture */
+  background: var(--placeholder);
+  /* THE SAME FOUR-LAYER RAMP THE RESTAURANT CARDS CARRY, copied from
+     VenueCard.module.css rather than invented. A shadow is a light source,
+     and two different shadows on one page are two light sources — the cards
+     are one chapter above these frames, so anything else would read as the
+     band being lit from somewhere else.
+     Layered rather than single: a lone large blur reads as fog, while a
+     tight contact shadow plus progressively wider, more transparent casts
+     reads as a print resting on the plaster. Mixed from --maroon so it
+     tints with the ground instead of greying it. */
+  box-shadow: var(--shadow-card);
+}
+
+/* The radius is repeated on the picture itself rather than left to the
+   frame's `overflow: hidden` alone. The frame is inside a TRANSFORMED
+   parent (.track drifts), and a rounded overflow clip under a transform is
+   the one place WebKit has historically leaked square corners on repaint.
+   Declaring it here costs nothing and makes the corner independent of
+   whether the clip holds. */
+.img {
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+@media (max-width: 780px) {
+  .frame {
+    /* wider share of a narrow screen — at 30vw a phone would show three
+       thumbnails rather than a band of rooms */
+    width: clamp(240px, 68vw, 340px);
+  }
+}

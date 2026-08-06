@@ -1,0 +1,207 @@
+/* Layout only. Colours come from lab.module.css's plaster block, EXCEPT
+   --ink and --soft, which each row overrides inline — that override is the
+   entire point of the page. Fonts come from its literata block. Nothing here
+   names a hex or a family. */
+
+.sheet {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--f-text);
+  padding: clamp(28px, 4vw, 56px) clamp(24px, 5vw, 88px) clamp(48px, 7vh, 96px);
+}
+
+/* ------------------------------------------------------------------ head */
+
+.head {
+  display: flex;
+  align-items: flex-start;
+  gap: clamp(20px, 3vw, 48px);
+  padding-bottom: clamp(22px, 3vh, 36px);
+  border-bottom: 1px solid var(--rule);
+}
+
+/* Contralto, fixed — the wordmark is what the ink has to sit beside */
+.word {
+  flex: none;
+  padding-top: 4px;
+  font-family: "contralto-big", "contralto-medium", "Times New Roman", serif;
+  font-weight: 600;
+  font-size: clamp(17px, 1.3vw, 21px);
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+
+.title {
+  margin: 0 0 6px;
+  font-size: clamp(1.1rem, 1.5vw, 1.35rem);
+  font-weight: 600;
+  letter-spacing: -0.01em;
+  line-height: 1.1;
+}
+
+.sub {
+  margin: 0;
+  max-width: 82ch;
+  font-size: 0.8125rem;
+  line-height: 1.6;
+  color: var(--soft);
+}
+.sub code,
+.figures code {
+  font-family: ui-monospace, SFMono-Regular, Menlo, monospace;
+  font-size: 0.95em;
+  color: var(--ink);
+}
+
+/* ------------------------------------------------------------------ rows */
+
+/* THE `color` DECLARATION HERE IS LOAD-BEARING, and it is the whole reason
+   this page works. `.sheet` sets `color: var(--ink)` on <main>; that var
+   resolves ONCE, at <main>, against the palette's ink. Everything below
+   inherits the resolved rgb() — not the var reference — so a row redefining
+   --ink further down changed nothing for anything that merely inherited its
+   colour. The pills were correct (they declare `background: var(--ink)` on
+   themselves, below the override) and every heading rendered the palette's
+   claret while claiming to be a maroon.
+
+   Re-declaring `color: var(--ink)` ON the row, which is the element carrying
+   the inline override, forces the resolution to happen here instead. A custom
+   property cascades; a resolved colour does not. */
+.row {
+  display: grid;
+  grid-template-columns: clamp(200px, 20vw, 270px) minmax(0, 1fr);
+  gap: clamp(20px, 3vw, 52px);
+  align-items: start;
+  padding: clamp(26px, 3.4vh, 42px) 0;
+  border-bottom: 1px solid var(--rule);
+  color: var(--ink);
+}
+
+.meta {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+}
+
+.swatchRow {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+  margin-bottom: 8px;
+}
+
+.letter {
+  font-size: 0.8125rem;
+  font-weight: 700;
+  letter-spacing: 0.08em;
+  color: var(--soft);
+}
+
+/* the colour itself, as a flat field — the heading below shows it as strokes,
+   which reads several points lighter than the same value as an area, and
+   judging a ground-scale decision off type alone is how a colour ends up
+   darker than intended */
+.swatch {
+  width: 46px;
+  height: 22px;
+  border-radius: 3px;
+  background: var(--ink);
+}
+
+.name {
+  margin: 0 0 6px;
+  font-family: var(--f-display);
+  font-weight: var(--display-weight);
+  font-size: clamp(1rem, 1.25vw, 1.2rem);
+  line-height: 1.15;
+  letter-spacing: var(--heading-track);
+}
+
+.figures {
+  margin: 0 0 10px;
+  font-size: 0.75rem;
+  line-height: 1.55;
+  color: var(--soft);
+  font-variant-numeric: tabular-nums;
+}
+
+.note {
+  margin: 0;
+  font-size: 0.75rem;
+  line-height: 1.55;
+  color: var(--soft);
+}
+
+/* ------------------------------------------------------------- specimens */
+
+.spec {
+  min-width: 0;
+}
+
+.heading {
+  margin: 0 0 12px;
+  font-family: var(--f-display);
+  font-weight: var(--display-weight);
+  font-size: clamp(1.5rem, 2.9vw, 2.6rem);
+  line-height: 1.08;
+  letter-spacing: var(--heading-track);
+}
+/* the accent is FIXED across every row — it is the control */
+.heading em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+.standfirst {
+  margin: 0 0 10px;
+  max-width: 46ch;
+  font-size: clamp(0.95rem, 1.1vw, 1.1rem);
+  line-height: 1.45;
+  color: var(--soft);
+}
+
+.para {
+  margin: 0 0 16px;
+  max-width: 66ch;
+  font-size: 0.9375rem;
+  line-height: 1.6;
+  color: var(--ink);
+}
+
+.actions {
+  display: flex;
+  gap: 10px;
+}
+
+.primary,
+.secondary {
+  min-height: 38px;
+  padding: 0 18px;
+  border-radius: 999px;
+  font-family: var(--f-text);
+  font-size: 0.875rem;
+  cursor: pointer;
+}
+/* the filled pill is the second reason to look at a row: it is the largest
+   AREA of ink on the real page, and area is where a hue shows itself */
+.primary {
+  border: 1px solid var(--ink);
+  background: var(--ink);
+  color: var(--ground);
+}
+.secondary {
+  border: 1px solid color-mix(in srgb, var(--ink) 45%, transparent);
+  background: transparent;
+  color: var(--ink);
+}
+
+@media (max-width: 860px) {
+  .row {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 14px;
+  }
+  .head {
+    flex-direction: column;
+    gap: 12px;
+  }
+}

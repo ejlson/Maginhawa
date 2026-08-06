@@ -1,0 +1,504 @@
+/* The group's story as a 50/50 split — photograph left, text right. */
+
+/* A FULL SCREEN, like the manifesto chapter above it. `min-height` rather
+   than `height` for the same reason it is min there: on a short viewport
+   the picture and the reading column genuinely need more room, and a fixed
+   height would crop rather than let the page grow.
+
+   THE PADDING IS ONE NUMBER ON ALL FOUR SIDES, and that number is now the
+   STORY BAND'S GAP rather than the page margin. The requirement is a
+   relationship: the air around the photograph has to equal the gap between
+   the photographs in the horizontal band above. --grid-gutter is what that
+   band uses (via --band-gap in StoryStrip), and it is also the gap between
+   the restaurant cards, so pointing at the same token makes all of them
+   agree by construction.
+
+   It went 8vh/40px → 40px all round → 12px all round. Note the consequence,
+   because it is a real departure: this section no longer sits on the page's
+   --pad-x margin like every other chapter. It is deliberately edge-to-edge
+   furniture, matched to the band above it rather than to the page. If the
+   text column ever looks like it is falling off the right edge, that is
+   this decision showing, not a bug. */
+/* ⚠️ A SCREEN, PLUS WHAT THE RULE'S GAP TAKES. It was a flat `100svh`, and
+   that is why widening the opening rule's bottom margin (12px → 48px, see
+   .rule) silently SHRANK THE PICTURE instead of moving anything: the
+   section is a fixed screen and `.split` is `flex: 1`, so every pixel the
+   rule gained came straight out of the video. Measured at 1440x900 — the
+   section stayed exactly 900px while the split went 875 → 839.
+
+   The three extra gutter units are precisely what the rule took, so the
+   split is 875px again and the section grows by the difference instead.
+   Derived from the same token the rule multiplies, so the two cannot drift:
+   if --grid-gutter moves, the rule's gap and this compensation move
+   together and the picture keeps its height.
+
+   THE COST, stated because the old comment leaned on it: this section is no
+   longer EXACTLY one screen, so the note below about the video sitting
+   "flush to the bottom of the reader's screen" is now approximate — it
+   overhangs by 36px at 1440x900. That is the price of a centred rule and a
+   full-height picture, and the picture is the thing worth keeping. */
+.section {
+  background: var(--cream);
+  color: var(--maroon);
+  min-height: calc(100svh + var(--grid-gutter) * 3);
+  display: flex;
+  flex-direction: column;
+  /* SIDES, PLUS THE BOTTOM. Not the top.
+
+     THE TOP IS THE NEIGHBOUR'S. The story band above closes on a --band-gap
+     bottom padding, which puts exactly --grid-gutter between the last band
+     photograph and this video — measured, 12px. Adding 12px here as well
+     would make that seam 24px: two correct values summing to a wrong one,
+     which is the trap this whole spacing pass keeps hitting.
+
+     THE BOTTOM HAS TO BE OURS, because there is no neighbour left to give
+     it. While the photo interlude sat below, its own 12px `inset` closed
+     the video's frame from the other side. The interlude is gone; press
+     replaced it and press is type on cream, so the video ran flush to the
+     section edge and — since this section is exactly one screen — flush to
+     the BOTTOM OF THE READER'S SCREEN. A dark video bleeding off the fold
+     while its other three sides sit in a 12px mount does not read as a
+     deliberate bleed, it reads as a crop.
+
+     AND THE TOP IS STILL ZERO EVEN THOUGH A RULE NOW SITS THERE. The rule
+     is the section's first child with no margin above it, so it lands on
+     the section's top edge and the band's --band-gap is still the only
+     thing between the last band photograph and it. The rule then carries
+     --grid-gutter beneath itself, which is what gives the picture its top
+     inset. Putting padding here as well would seam twice.
+
+     `box-sizing: border-box` with `min-height: 100svh` means none of this
+     costs page height: the section is still exactly one screen. ALL FOUR
+     SIDES OF THE PICTURE ARE --grid-gutter — 12px to the left screen edge,
+     12px up to the rule, 12px down to the fold — which is the same number
+     as the gap between the band's photographs, and the requirement the
+     user set. */
+  padding: 0 var(--grid-gutter) var(--grid-gutter);
+}
+
+/* ── THE RULE THAT OPENS THE CHAPTER ───────────────────────────────────
+   Added at the user's instruction. THERE IS A PRECEDENT AGAINST IT and it
+   should be read before this is extended: Manifesto.module.css records a
+   full-width hairline being REMOVED from the statement's bottom edge, on
+   the grounds that the home page's chapters share one cream ground and one
+   column seat, so a rule "read as the page being divided in two rather
+   than as one continuous editorial scroll" — signed off "The gap is the
+   separator. Do not put the line back."
+
+   THIS WAS A PAIR AND IS NOW ONE. A matching rule closed the chapter, and
+   the two together read as a frame rather than as a division, which was
+   the argument for having them at all. The closing rule is removed at the
+   user's instruction, so that argument no longer applies: what is left is
+   a single hairline on a seam, which is the exact thing the Manifesto note
+   warns about. It is kept because it was asked for, and it is recorded
+   here so the next person does not rediscover the objection as a bug.
+
+   IT IS THE CONTENT'S WIDTH, NOT THE VIEWPORT'S. `width: 100%` inside the
+   section's --grid-gutter side padding puts it at 12px → 1428px at 1440,
+   exactly the video's left edge and the reading column's right edge. A
+   full-bleed rule would frame the window; this frames the picture and the
+   text, which is what is being framed.
+
+   ── THE RULE IS NOW CENTRED, at the user's instruction, AND THIS REVERSES
+   A DOCUMENTED DECISION. Say so plainly rather than leaving two files
+   disagreeing.
+
+   WHAT WAS HERE: `margin-bottom: var(--grid-gutter)`, i.e. 12px below the
+   rule against the four gutter units (48px) the story band pads above it.
+   StoryStrip.module.css argues for exactly that asymmetry — "the rule
+   needs air on the side facing the band and none on the side facing
+   About, because that asymmetry is what makes it read as ABOUT'S opening
+   rule rather than as a divider belonging to neither chapter" — and signs
+   off "THE GAP BELOW THE RULE ... MUST STAY 12px".
+
+   AND THE COMMENT THAT USED TO SIT HERE WAS SIMPLY WRONG: it claimed the
+   rule was "centred in a 12 / 12 gap". Measured at 1440x900 it was 48
+   above and 12 below (scripts' seam probe), so the file asserting symmetry
+   and the file arguing for asymmetry were describing the same rule and
+   only one of them was right. It is genuinely centred now.
+
+   WHAT THE CHANGE COSTS, so it is not rediscovered as a bug: the rule no
+   longer leans toward About. Centred between two large photographic masses
+   it reads as a boundary between the band and the chapter rather than as
+   the chapter's own opening mark — which is the reading StoryStrip's note
+   was written to avoid. That is the trade the instruction makes.
+
+   FOUR UNITS, NOT A LITERAL 48. `--band-gap` is declared on StoryStrip's
+   `.band` and custom properties inherit DOWNWARD, so it does not reach
+   this sibling section — but --band-gap IS --grid-gutter, so multiplying
+   the gutter by the same four reproduces the band's own derivation. If the
+   gutter moves, both sides of this rule move together and it stays
+   centred. Do not replace this with 48px. */
+.rule {
+  flex: none;
+  height: 1px;
+  background: var(--rule);
+  margin-bottom: calc(var(--grid-gutter) * 4);
+}
+
+.split {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  /* THE GUTTER IS THAT SAME NUMBER. The three vertical spaces across the
+     row — edge, gutter, edge — are all --grid-gutter, so nothing inside the
+     section is looser or tighter than its own margin.
+     The text column carries its own inset instead (see .copy): a reading
+     column butted 12px against a photograph would be unreadable, and the
+     fix belongs to the text rather than to the grid, or the picture would
+     lose the edge alignment the whole change was for. */
+  gap: var(--grid-gutter);
+  align-items: stretch;
+  /* claim the full height of the 100svh section, so the picture is as tall
+     as the screen allows and the text column can hang its heading off the
+     top and its footnote off the bottom */
+  flex: 1;
+  min-height: 0;
+}
+
+/* ── the picture ── */
+.media {
+  position: relative;
+  margin: 0;
+  overflow: hidden;
+  border-radius: var(--radius-tile);
+  /* the tone every frame on this site holds while its photograph decodes */
+  background: var(--placeholder);
+  /* the house ramp, same as the restaurant cards and the story band — a
+     shadow is a light source, and the page may only have one */
+  box-shadow: var(--shadow-card);
+}
+
+.mediaImg {
+  object-fit: cover;
+}
+
+/* the clip fills the frame the way next/image's `fill` does — absolutely
+   positioned rather than laid out, so the frame's height stays governed by
+   the grid row and never by the video's intrinsic aspect ratio */
+.mediaVideo {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  display: block;
+}
+
+/* THE SCRIM, AND THE GUARANTEE IT CARRIES.
+   This stylesheet's own history is that a scrim on a photograph is usually
+   a guess: a radial ramp tuned on one crop measured a mean 8.03:1 and a
+   WORST PIXEL of 1.08:1 once object-fit took a different crop at another
+   width (see Manifesto.module.css).
+
+   What makes this one safe is that it is opaque enough to bound the worst
+   case rather than to improve the average. At 72% maroon the composite over
+   the BRIGHTEST POSSIBLE backdrop — pure white — is rgb(118, 87, 85), and
+   cream on that is 5.4:1. Over anything darker it only improves, so that is
+   a floor rather than a measurement.
+
+   THE STOPS ARE IN PIXELS, NOT PERCENTAGES, AND THAT IS THE WHOLE FIX.
+   Written as percentages of the scrim's own height this failed exactly the
+   way that note predicts: the ramp reached 78% only at its very bottom and
+   was down to ~40% where the caption's TOP line sat, which measured 2.33:1
+   over a pale photograph — a fail, produced by a scrim that looked
+   generous. A percentage ramp moves with the frame, and the frame's height
+   here is set by the screen, so the caption's position inside the ramp is
+   not a constant. Pixel stops make the guarantee positional instead: the
+   bottom 200px is always at least 72%, whatever the frame does, and the
+   caption is ~147px tall. */
+.mediaScrim {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--maroon) 80%, transparent) 0px,
+    color-mix(in srgb, var(--maroon) 72%, transparent) 200px,
+    color-mix(in srgb, var(--maroon) 26%, transparent) 310px,
+    transparent 390px
+  );
+  pointer-events: none;
+}
+
+.mediaLine {
+  position: absolute;
+  left: 0;
+  bottom: 0;
+  /* held inside the ramp's guaranteed band — see .mediaScrim */
+  padding: clamp(20px, 3vw, 34px);
+  max-width: 22ch;
+  font-family: var(--font-display);
+  font-weight: var(--w-hairline);
+  /* THE SAME SIZE AS THE HEADING OPPOSITE — literally the same clamp, so
+     the two cannot drift apart when either is tuned. The caption is now a
+     title facing a title across the split rather than a note under a
+     picture.
+     WATCH THE SCRIM WHEN CHANGING THIS. Two lines at 4.2rem plus this
+     padding makes a caption box ~194px tall, and the scrim only guarantees
+     its 72% floor for the bottom 200px (see .mediaScrim). There is 6px of
+     headroom. A third line, or a larger size, puts the top line out of the
+     guaranteed band and back into the 2.33:1 failure this already had once. */
+  font-size: clamp(2.4rem, 4.2vw, 4.2rem);
+  line-height: 1.04;
+  letter-spacing: var(--tr-display);
+  color: var(--cream);
+}
+
+/* ── the text column ── */
+/* THE VOID BETWEEN THE TWO BLOCKS IS THE POINT.
+   `space-between` pins the heading and its call to action to the top and
+   the reading block to the bottom, and the empty middle is the thing the
+   reference does that is hard to copy: it does not fill the column.
+   Filling it would make this an ordinary two-column feature. */
+.copy {
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  /* THE VOID IS A MINIMUM, AND THAT IS WHY IT OVERFLOWED. `gap` on a
+     space-between column is a floor, not a spring: when heading + pill +
+     gap + reading block exceed the column, the column grows and the section
+     runs past one screen — which is exactly what the longer paragraphs did.
+     Halved from clamp(40px, 8vh, 96px) so the void still reads as
+     deliberate emptiness but stops being the thing that breaks the screen. */
+  gap: clamp(20px, 3vh, 48px);
+  min-width: 0;
+  /* THE COLUMN'S OWN INSET. The section's padding is down to 12px so the
+     photograph can sit that far from the screen edge, but text cannot: it
+     needs room from the picture on one side and from the window on the
+     other. Carried here rather than in the grid gap so the picture keeps
+     its 12px and only the reading column is inset.
+     The TOP value is larger than the others on purpose — the heading and
+     its pill were level with the top of the frame and are now dropped
+     clear of it, at the user's request. DROPPED AGAIN this pass, from
+     clamp(28px, 5vh, 72px): the heading was still reading as level with
+     the picture's top edge rather than hanging below it. The vh term is
+     what does the work on a normal window (5vh → 8vh is 45px → 72px at
+     900 tall), and the ceiling moves with it so a tall window keeps the
+     same relationship instead of clipping back to the old value. */
+  padding: clamp(40px, 8vh, 104px) clamp(16px, 2vw, 40px)
+    clamp(20px, 3vh, 44px) clamp(16px, 2vw, 34px);
+}
+
+/* heading and pill travel together at the top */
+.lead {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(20px, 3vh, 36px);
+}
+
+/* LARGER AND A LITTLE BOLDER, at the user's request — from
+   clamp(2rem, 3.5vw, 3.4rem) at --w-hairline. --w-regular (400) rather than
+   --w-medium: at this size FreightBig's 500 starts to read as a different
+   voice from the manifesto statement above, which is the page's one display
+   line and should stay the heaviest thing on it. 400 is a step up in weight
+   without competing. */
+/* 22ch, HALF AS WIDE AGAIN as the 15ch it held — the requested "50% more
+   wider", applied to the measure rather than to the type size, which is
+   what actually controls how far a heading runs. */
+.heading {
+  margin: 0;
+  max-width: 22ch;
+  font-family: var(--font-display);
+  font-weight: var(--w-regular);
+  font-size: clamp(2.4rem, 4.2vw, 4.2rem);
+  line-height: 1.04;
+  letter-spacing: var(--tr-display);
+  color: var(--maroon);
+}
+
+/* the em-dash prefix. `margin-right` rather than a space in the text so the
+   gap is tunable and cannot collapse; the character is aria-hidden in the
+   markup so it is never announced. */
+.dash {
+  margin-right: 0.3em;
+}
+
+/* THE PILL, MAROON, DIRECTLY UNDER THE HEADING — the reference's shape and
+   the user's instruction. Note this is the page's THIRD filled control
+   (the reservations index and the footer both carry one); it is here
+   because it was asked for, and because this section is now the home
+   page's only route to /about, so the ask should look like an ask. */
+.pill {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.6em;
+  padding: 0.95em 1.7em;
+  border-radius: 999px;
+  background: var(--maroon);
+  /* 13.06:1 — the palette's own pairing, inverted */
+  color: var(--cream);
+  font-family: var(--font-sans);
+  font-weight: var(--w-medium);
+  font-size: var(--t-label);
+  letter-spacing: 0.1em;
+  text-transform: uppercase;
+  text-decoration: none;
+  /* the house ramp, tuned for a small raised object — the same four layers
+     the cards carry would pool a 44px cast under a 46px-tall control */
+  box-shadow: var(--shadow-control);
+  transition:
+    background-color 220ms var(--ease-state),
+    box-shadow 220ms var(--ease-state),
+    transform 220ms var(--ease-state);
+}
+
+@media (hover: hover) {
+  .pill:hover {
+    background: var(--maroon-soft);
+    transform: translateY(-2px);
+    /* the shadow grows with the lift, or the pill reads as sliding up a
+       wall rather than rising off the page */
+    box-shadow: var(--shadow-control-hover);
+  }
+}
+
+.pill:active {
+  transform: translateY(0);
+}
+
+.pill:focus-visible {
+  outline: 2px solid var(--maroon);
+  outline-offset: 3px;
+}
+
+/* 72ch, half as wide again as the 48ch it held — the requested "50% more
+   wider", matched to the heading's own widening.
+   NOTE THE LIMIT THIS SITS ON: ~75ch is the top of the comfortable range
+   for a reading measure, so there is no room to widen this a third time
+   without the lines becoming hard to track back. The reduced type size
+   below helps — smaller type at the same pixel width is more characters
+   per line, which is why both changes had to land together. */
+.readingBlock {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(14px, 2vh, 22px);
+  max-width: 72ch;
+}
+
+/* SMALLER AND TIGHTER, after the reference. Both paragraphs came down a
+   step and both lost leading (1.6 → 1.45): the reference's block reads as a
+   dense footnote against a large heading, and at 15px/1.6 across 72ch this
+   was reading as body copy that happened to be low on the page. */
+.para {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: var(--w-regular);
+  font-size: clamp(0.8125rem, 0.92vw, 0.9375rem);
+  line-height: 1.45;
+  color: var(--maroon);
+}
+
+/* THE FOOTNOTE PARAGRAPH — smaller and lighter than the one above the
+   prints, exactly as the reference sets it. The two are doing different
+   jobs (a belief, then the record that backs it) and setting them
+   identically would read as one paragraph interrupted by pictures.
+   --maroon-soft is 6.56:1, well past the 4.5:1 this size answers to. */
+.paraFine {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: var(--w-regular);
+  font-size: clamp(0.75rem, 0.82vw, 0.8125rem);
+  line-height: 1.42;
+  color: var(--maroon-soft);
+}
+
+/* ── the three doors ── */
+.doors {
+  display: flex;
+  gap: var(--grid-gutter);
+  list-style: none;
+  margin: 0;
+  padding: 0;
+}
+
+.door {
+  display: flex;
+  flex-direction: column;
+  gap: 0.7em;
+  text-decoration: none;
+  color: var(--maroon-soft);
+}
+
+/* the frame is a separate span from the link so the shadow and the lift
+   belong to the picture, while the label below stays put */
+.doorFrame {
+  position: relative;
+  display: block;
+  /* WIDER, at the user's instruction — from clamp(96px, 10vw, 148px), about
+     +22%. The aspect is unchanged, so they grow in both axes rather than
+     stretching. The three plus their two --grid-gutter gaps have to stay
+     inside the reading column, which is half the section minus its inset:
+     at 1440 that is ~660px against 3 × 180 + 2 × 12 = 564px, so there is
+     room. Below ~1180px the vw term is what governs and they shrink with
+     the column rather than overflowing it. */
+  width: clamp(112px, 12.2vw, 180px);
+  aspect-ratio: 4 / 3;
+  overflow: hidden;
+  border-radius: var(--radius-tile);
+  background: var(--placeholder);
+  /* the same house ramp, scaled down — these are small objects, so the
+     wide 28/44 cast the cards carry would pool under them rather than
+     lift them */
+  box-shadow: var(--shadow-card);
+  transition:
+    transform 260ms var(--ease-state),
+    box-shadow 260ms var(--ease-state);
+}
+
+.doorImg {
+  object-fit: cover;
+  border-radius: inherit;
+}
+
+/* `.doorLabel` IS DELETED with the captions under the prints, at the user's
+   instruction. It was the only sighted affordance marking these as links —
+   see the note in AboutSplit.tsx. The hover lift below is now doing that
+   job alone, and it cannot do it on touch. */
+
+@media (hover: hover) {
+  .door:hover .doorFrame {
+    transform: translateY(-4px);
+    box-shadow: var(--shadow-card-hover);
+  }
+}
+
+.door:focus-visible {
+  outline: 2px solid var(--maroon);
+  outline-offset: 4px;
+  border-radius: 2px;
+}
+
+/* ── stacked ── */
+/* 900px, not the site's usual 981. The break here is set by the MEASURE,
+   not by the layout grid: at half of 900 the reading column is ~38
+   characters, below the 45 a paragraph wants, and it hits that before the
+   12-column grid's own breakpoint does. */
+@media (max-width: 900px) {
+  .section {
+    min-height: 0;
+  }
+  .split {
+    grid-template-columns: 1fr;
+  }
+  .media {
+    min-height: clamp(320px, 52vh, 460px);
+  }
+  .copy {
+    gap: clamp(28px, 5vh, 48px);
+  }
+  .readingBlock,
+  .heading {
+    max-width: none;
+  }
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .pill,
+  .doorFrame {
+    transition: none;
+  }
+  .pill:hover,
+  .door:hover .doorFrame {
+    transform: none;
+  }
+}

@@ -43,7 +43,7 @@ const emWordStart = (words: string[], em?: string) => {
 const EASE = [0.22, 1, 0.36, 1] as const;
 // the same curve for the CSS driver below — one shape, written twice because
 // the two runtimes spell it differently and neither can read the other's form
-const EASE_CSS = "cubic-bezier(0.22, 1, 0.36, 1)";
+const EASE_CSS = "var(--ease-entrance)";
 
 /**
  * The page's word-mask split text, in one place.

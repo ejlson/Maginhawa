@@ -5,8 +5,18 @@
 // Contact.tsx and are the first thing a partner, journalist or supplier checks,
 // so they need replacing with the group's actual details before launch.
 export const CONTACT = {
-  /** PLACEHOLDER — replace with the group's real enquiries line. */
-  phone: "+44 01234 5678",
+  /**
+   * `null` until the group's real enquiries line is supplied — the same
+   * discipline SOCIALS uses below, and for the same reason. This held
+   * "+44 01234 5678" and rendered it as a live `tel:` link in the footer of
+   * every page, so a reader tapping it dialled a stranger's number on a site
+   * whose whole job is reading as established and credible. A missing phone
+   * line costs less than a wrong one.
+   *
+   * Supply the number here and the footer row and the Contact page entry come
+   * back automatically — both already guard on it.
+   */
+  phone: null as string | null,
   /** PLACEHOLDER — replace with the real enquiries inbox. */
   email: "hello@maginhawa.group",
   /**

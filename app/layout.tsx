@@ -5,19 +5,78 @@ import CustomCursor from "@/components/CustomCursor";
 import GlassFilters from "@/components/GlassFilters";
 import SmoothScroll from "@/lib/SmoothScroll";
 import { OrganizationJsonLd, WebSiteJsonLd } from "@/lib/jsonld";
+import { EB_Garamond, Figtree } from "next/font/google";
 
-/* NO next/font LOADER, AND THAT IS THE POINT.
-   The site ran Hanken Grotesk and DM Mono through next/font/google — two
-   self-hosted families, two preloaded woff2 files on every route. Both are
-   retired: the text voice is Helvetica now (see globals.css), which is
-   resident on macOS/iOS and metrically matched by Arial on Windows and
-   Liberation Sans on Linux. A resident face makes no request, so it cannot
-   FOUT and there is nothing left to preload.
+/* TWO next/font LOADERS: the DISPLAY voice and, for the first time in a
+   while, the TEXT voice as well.
 
-   What next/font ALSO did was inject the `--font-hanken` / `--font-dm-mono`
-   custom properties onto <html>. Nothing reads them any more — globals.css
-   resolves --font-sans and --font-mono straight to the Helvetica stack — so
-   the className is empty and <html> carries no font class at all. */
+   THE DISPLAY FACE IS EB GARAMOND. Five faces got here first and the reasons
+   they lost are the spec for this one. Fraunces was rejected on sight.
+   Newsreader read flat and generic at hero display scale against the moody
+   photography. Instrument Serif fixed that and then lost on a
+   non-typographic ground: Big Mamma Group already uses it, and they are the
+   comparison every London reader makes. Gilda Display held the role for a
+   while and lost for the reason below.
+
+   WHAT ALL OF THEM SHARED, AND WHY IT WAS THE WRONG SHAPE OF FACE.
+   Contralto — the wordmark, the one thing not up for debate — is a
+   high-contrast Didone: vertical stress, hairline thins, sharp terminals.
+   Every face tried for the display role was built the same way, Gilda most
+   of all, and the note in the version of this comment that Gilda replaced
+   said as much: "two of those on a page blur into each other until the
+   wordmark stops being the sharpest thing on screen". The answer was to
+   pick a QUIETER Didone, and that only ever managed the symptom.
+
+   EB Garamond is not a Didone at all. It is an old-style humanist:
+   DIAGONAL stress, low stroke contrast, calligraphic roots — the opposite
+   construction. The wordmark now reads as a different KIND of object rather
+   than as a larger heading, which is the thing the display role was
+   supposed to buy and never did. See the specimen sheet the decision came
+   off (throwaway route /lab/type/plaster, nine systems on one ground).
+
+   NOT ONE STATIC WEIGHT ANY MORE. Gilda shipped 400 and nothing else, so
+   there was no weight-based hierarchy available inside the display role. EB
+   Garamond is variable 400–800, and the display role runs 500 rather than
+   400 deliberately — Garamond's regular is a TEXT weight drawn for 10–14pt,
+   and at hero scale it goes weedy and the ink loses its authority. 500 is a
+   drawn instance on the variable font, not a synthesised bold. */
+const displayFace = EB_Garamond({
+  subsets: ["latin"],
+  display: "swap",
+  /* named for the ROLE this loader fills, not the face in it — this token
+     has now outlived five faces and the name should stop needing to change
+     with them. globals.css owns --font-display-face and reads this. */
+  variable: "--font-display-loaded",
+});
+
+/* THE TEXT VOICE IS FIGTREE, AND HELVETICA IS RETIRED.
+
+   Helvetica was chosen for a good reason and kept for a bad one. The good
+   reason: it is resident on macOS and iOS, metrically matched by Arial on
+   Windows, so the text voice cost zero bytes and could not FOUT. The bad
+   one: `maginhawa` is Tagalog for COMFORTABLE, and the most deliberately
+   neutral face in the canon was arguing against every word of the copy. The
+   font block in globals.css admitted this in as many words and then used it
+   to justify adding a display serif rather than to reconsider the text face.
+
+   WHAT THE SWAP ACTUALLY FIXES, beyond tone. Helvetica's weights differ BY
+   PLATFORM: macOS ships a real Light at 300, Arial and Liberation Sans do
+   not. Every weight decision on this site was written against that split,
+   and --w-medium was aliased away to 400 entirely because nothing in the
+   stack draws a 500 (see the weights block in globals.css). Figtree is
+   variable 300–900 and self-hosted, so all three weights are real, drawn,
+   and identical on every platform. The split is gone.
+
+   WHAT IT COSTS: one more woff2 on the critical path, where there were
+   none. next/font self-hosts and preloads it, and `display: swap` means
+   text paints in the fallback rather than not at all — but this is a real
+   regression against "the text voice makes no request", and it is the price
+   of the tone being right. */
+const textFace = Figtree({
+  subsets: ["latin"],
+  display: "swap",
+  variable: "--font-text-loaded",
+});
 
 const SITE_URL = "https://maginhawa.group";
 
@@ -88,7 +147,7 @@ export default function RootLayout({
   children: React.ReactNode;
 }) {
   return (
-    <html lang="en-GB">
+    <html lang="en-GB" className={`${displayFace.variable} ${textFace.variable}`}>
       <head>
         {/* Contralto (Adobe Fonts kit pev2vne) is now the ONLY web font on
             the site, so its round-trip is the whole font critical path —

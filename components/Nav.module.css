@@ -56,13 +56,30 @@
   flex: none;
 }
 
-.logoImg {
-  height: clamp(26px, 3.4vh, 38px);
-  width: auto;
+/* The wordmark, and the ONLY place Contralto still earns its keep at chrome
+   scale. --font-display-big is the wordmark token — the same cut the footer
+   and the loader set MAGINHAWA in — so the name reads identically wherever
+   it appears. No filter and no invert: currentColor rides the theme classes
+   above, and the difference blend does the rest.
+
+   Caps at nav scale need the tracking opened up; Contralto's caps are close
+   set and at 20px they knit together without it. */
+.logoWord {
   display: block;
-  /* black line-art → white so the nav's difference blend keeps it visible on
-     both light and dark sections (like the old cream wordmark) */
-  filter: invert(1);
+  font-family: var(--font-display-big);
+  /* 600, not the 400 the wordmark takes at banner scale. Contralto is a
+     high-contrast face: its thins are hairlines, and at 20px sitting in a
+     difference-blended bar over moving footage the 400 dropped out entirely
+     against a bright frame — verified on a phone shot over a white plate.
+     The big cut carries a real 600 (see the font block in globals.css), so
+     this is a drawn weight rather than a synthesised one. */
+  font-weight: 600;
+  font-size: clamp(19px, 2.3vh, 26px);
+  line-height: 1;
+  letter-spacing: 0.06em;
+  text-transform: uppercase;
+  color: currentColor;
+  white-space: nowrap;
 }
 
 /* ---- inline editorial nav (desktop) ---- */
@@ -136,16 +153,52 @@
      WHAT IS NOT FIXED HERE, because it predates this change and is not a
      type problem: over photography the difference blend puts at least one of
      the five links on a patch whose luminance is near the cream's, and there
-     |backdrop − cream| collapses. The SAME frozen-background run measures
+     |backdrop − cream| collapses. The SAME frozen-background run measured
      the worst link at 1.05:1 on the home hero, 2.33:1 on /about and 2.26:1
      on /restaurants — at the OLD setting, before any of this. The floor for
      13px text is 4.5:1. That is a real accessibility defect in the blend
-     itself and it wants a scrim or a theme swap, not a tracking value. */
+     itself and it wants a scrim or a theme swap, not a tracking value.
+
+     THE PALETTE SOFTENING CHANGED WHAT THE BLEND COMPUTES TO, and it had
+     to be re-measured rather than assumed, because `difference` subtracts
+     channels: cream against the ink used to resolve to rgb(221,203,201),
+     a mark reading 10.22:1 on that ground, and now resolves to
+     rgb(199,171,163) reading 5.86:1. Over a PAINTED ground the bar is
+     therefore still comfortably clear. Over FOOTAGE it is not, and it did
+     not get better: re-measured on /restaurants with the film frozen
+     (scripts/probe-palette-blastradius.mjs) the five links read 4.41 /
+     3.80 / 3.45 / 3.13:1 for Blog, Contact Us, About Us and Careers,
+     against 5.09 / 4.11 / 3.31 / 3.50:1 on the old pair. Same defect,
+     same cause, marginally different numbers — the worst link moved 3.31 →
+     3.13. Still the blend, still wants a scrim or a theme swap. */
+  /* SENTENCE CASE, NOT CAPS — and the tracking table above is now history
+     rather than instruction, because it was measuring a setting these links
+     no longer use. The bar was running three uppercase things at once (the
+     wordmark, these five links, and the two hero buttons below them), and
+     caps only signal while nothing else is shouting. The WORDMARK keeps
+     them; nothing else above the fold does.
+
+     Tracking drops from 0.11em to near zero with the case. Caps need the
+     air because they have no ascenders or descenders to separate them;
+     lowercase already has that shape variety, and holding 0.11em on
+     sentence case reads as a stretched word rather than a tracked label.
+     Size goes up a step for the same reason the hero buttons did —
+     lowercase carries a smaller apparent size than caps at equal points.
+
+     STILL NOT FIXED, and it is not a type problem: over photography the
+     difference blend puts at least one link on a patch whose luminance is
+     near the cream's, where |backdrop − cream| collapses. Measured on a
+     frozen background at the OLD setting — worst link 1.05:1 on the home
+     hero, 2.33:1 on /about, 2.26:1 on /restaurants, against a 4.5:1 floor.
+     Re-measured after the palette softening, /restaurants reads 4.41 /
+     3.80 / 3.45 / 3.13:1 across the five links (worst 3.31 → 3.13). The
+     full arithmetic of what `difference` now resolves to is in the block
+     above. That is an accessibility defect in the blend and it wants a
+     scrim or a theme swap. Sentence case does not change it either way. */
   font-family: var(--font-ui);
   font-weight: var(--w-regular);
-  font-size: var(--t-label);
-  letter-spacing: 0.11em;
-  text-transform: uppercase;
+  font-size: 0.9375rem;
+  letter-spacing: 0.005em;
   color: inherit;
   padding: 6px 0;
   white-space: nowrap;
@@ -164,7 +217,7 @@
   background: currentColor;
   transform: scaleX(0);
   transform-origin: left center;
-  transition: transform 0.35s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.35s var(--ease-entrance);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -176,6 +229,24 @@
   .link:focus-visible::after {
     transform: scaleX(1);
   }
+}
+
+/* THE PRESS, OUTSIDE THE HOVER QUERY ON PURPOSE — see the same note in
+   Hero.module.css. These five links had a hover and no active state, which
+   meant the entire navbar was inert to touch: a phone reports `hover: none`,
+   so a tapped link gave no acknowledgement at all until the route changed.
+
+   OPACITY RATHER THAN A TRANSFORM, and that is specific to this bar. The
+   navbar runs `mix-blend-mode: difference` over film; a scale on a
+   difference-blended element resamples the blend every frame across the
+   whole label, which is a composite the compositor cannot cheaply cache.
+   Taking the link to full opacity is a paint the blend already does on
+   hover, so the press costs nothing new and still reads as contact. */
+.link:active {
+  opacity: 1;
+}
+.link:active::after {
+  transform: scaleX(1);
 }
 
 /* ---- hamburger button (3 lines -> X) — mobile only ---- */

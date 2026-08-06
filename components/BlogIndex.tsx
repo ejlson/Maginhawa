@@ -2,6 +2,7 @@
 
 import { Suspense, useEffect, useRef, useState } from "react";
 import { useRouter, useSearchParams } from "next/navigation";
+import Image from "next/image";
 import Nav from "./Nav";
 import Menu from "./Menu";
 import Reveal from "./Reveal";
@@ -9,12 +10,21 @@ import Footer from "./Footer";
 import DarkZone from "./DarkZone";
 import styles from "./BlogIndex.module.css";
 import { BLOG, type BlogEntry } from "@/lib/blog";
-import { RESTAURANTS } from "@/lib/restaurants";
+import { RESTAURANTS, getRestaurant } from "@/lib/restaurants";
 import { lenisRef } from "@/lib/SmoothScroll";
 
-// page 1 = the featured latest + the next PER_PAGE posts; every following
-// page shows PER_PAGE more. Unfiltered, 24 entries → 1+9 / 9 / 5.
-const PER_PAGE = 9;
+/* page 1 = the featured latest + the next PER_PAGE posts; every following
+   page shows PER_PAGE more. Unfiltered, 24 entries → 1+8 / 8 / 7.
+
+   EIGHT, BECAUSE THE GRID IS FOUR-UP — at the user's instruction, two full
+   rows and no orphan. It was 9, which is the one count a four-column grid
+   cannot fill: every page ended in a lone card with three columns of cream
+   beside it, and the pagination under it read as sitting on a broken row.
+   ⚠️ THIS NUMBER AND .grid's COLUMN COUNT ARE A PAIR. If the grid ever goes
+   back to three-up, this has to become a multiple of three (or the orphan
+   returns); the two live in different files, so neither can check the
+   other. */
+const PER_PAGE = 8;
 
 // the page count and the slices are derived PER FILTERED SET, not once at
 // module scope — a filter that leaves 6 entries has one page, and a stale
@@ -113,10 +123,16 @@ function CardMedia({
   src,
   alt,
   className,
+  children,
 }: {
   src: string;
   alt: string;
   className: string;
+  /* the corner furniture that rides ON the photograph — today the venue's
+     mark. It is a child of the media box rather than a sibling so it clips
+     to the same radius and travels with the box's own zoom-free frame; the
+     zoom is on the <img> alone. */
+  children?: React.ReactNode;
 }) {
   const [loadedSrc, setLoadedSrc] = useState<string | null>(null);
   const imgRef = useRef<HTMLImageElement>(null);
@@ -143,7 +159,40 @@ function CardMedia({
         onError={() => setLoadedSrc(src)}
         style={{ opacity: loaded ? 1 : 0 }}
       />
+      {children}
     </div>
+  );
+}
+
+/* THE VENUE'S MARK ON A STORY'S PHOTOGRAPH — the one thing that makes a
+   journal card belong to this group rather than to any magazine.
+
+   It is the same object the venue cards carry (VenueCard.module.css's
+   `.cardLogo` / `.cardCrown::before`): a cream mask over a radial wash off
+   the photograph's top-left corner, so it takes the palette rather than
+   whatever ink the source PNG happens to have, and it has a ground to sit
+   on. The wash is what buys the contrast — a bare cream mark on a bright
+   photograph measures ~1.16:1, i.e. it is not there.
+
+   THE DATA WAS ALREADY HERE. Every entry in lib/blog.ts carries a
+   `restaurant` slug — it is what the room filter is built from — and every
+   restaurant carries a `logo`. The card simply never asked for it, so a
+   reader could not tell whose story they were looking at.
+
+   `role="img"` + the venue's name, for the reason VenueCard states: the
+   mark is a logotype a reader recognises, and the accessible name is the
+   string a screen reader needs. Entries with no restaurant (or a slug with
+   no mark on file) render nothing rather than a gap. */
+function VenueMark({ slug }: { slug?: string }) {
+  const venue = slug ? getRestaurant(slug) : undefined;
+  if (!venue?.logo) return null;
+  return (
+    <span className={styles.cardMark} role="img" aria-label={venue.name}>
+      <span
+        className={styles.cardMarkInk}
+        style={{ "--ov-logo-url": `url(${venue.logo})` } as React.CSSProperties}
+      />
+    </span>
   );
 }
 
@@ -446,7 +495,7 @@ function BlogIndexInner() {
            during the glide, and the reader arrives at a list that has
            already finished assembling itself.
 
-           Expo-out, matching the site's cubic-bezier(0.22, 1, 0.36, 1): most
+           Expo-out, matching the site's var(--ease-entrance): most
            of the distance is covered early, then it settles. A linear scroll
            of ~2000px reads as being dragged. */
         const reduce = window.matchMedia(
@@ -483,6 +532,12 @@ function BlogIndexInner() {
   const posts = postsForPage(others, page);
   const activeLabel = FILTERS.find((f) => f.slug === room)?.label ?? "All";
 
+  /* THE LEDE IS PAGE ONE'S ALONE, and everything below keys off this one
+     flag rather than re-deriving `page === 1 && featured` three times — the
+     head's rule and the list's header line both change shape when it is
+     absent, and they must never disagree about whether it is there. */
+  const showLede = page === 1 && Boolean(featured);
+
   return (
     <>
       <Nav
@@ -494,25 +549,83 @@ function BlogIndexInner() {
 
       <main className={styles.page} data-nav-theme="light">
         <div className="container">
-          {/* NO EYEBROW. "The Blog" used to sit above the title as a
-              saffron-dot chapter mark, the same device Discover and
-              AboutIntro carry. It is gone site-wide, and here the removal is
-              free: unlike the About page's Awards section — which had only
-              the eyebrow, so its eyebrow had to be PROMOTED to a real
-              heading — this header already owns an <h1>, and the sentence in
-              it says what the page is. Promoting "The Blog" would have left
-              two headings naming the same thing, and the accessible outline
-              (h1 → h2 featured → h3 cards) is already correct without it. */}
+          {/* ═══ THE CHAPTER HEAD — the same three-part lockup Discover
+              opens with: the group's mark set into a standing label, the
+              display sentence under it, then a full-width hairline that
+              closes the head and opens the entries.
+
+              WHAT IT REPLACES: a bare <h1> sitting alone on the page
+              margin. The comment that used to live here argued the eyebrow
+              was better gone — "this header already owns an <h1>, and the
+              sentence in it says what the page is" — and that reasoning was
+              about a SAFFRON-DOT eyebrow, a device since retired site-wide.
+              This is not that device. It is Discover's label row, the
+              chapter grammar the home page settled on, and the journal was
+              the last chapter still opening without it.
+
+              THE LABEL IS A <p>, NOT A PROMOTED HEADING, and that is the
+              one place this deliberately parts from Discover. Discover's
+              label IS its <h2> because a section's name is its heading;
+              /blog is a PAGE, its <h1> is the sentence that names it (and
+              the string the OG description echoes), and adding a second
+              heading that said "Blog" would put two headings on one idea.
+              The outline stays h1 → h2 featured → h3 cards, exactly as the
+              retired comment wanted.
+
+              THE MARK IS DECORATIVE, hence alt="". The word beside it
+              already says what it is. 1024×1024 is the file's real size —
+              maginhawa.png is a SQUARE mark, not a horizontal lockup, and
+              declaring it as one would reserve a 5.33:1 box for a 1:1
+              picture (see the same note in Discover.tsx).
+
+              "BLOG", NOT "JOURNAL". The nav, the footer and the menu all
+              say Blog and so does the home chapter; the page's <title> and
+              OG tags say Journal. The visible label follows the four
+              surfaces a reader navigates by. The metadata mismatch is real
+              and is left alone here — it is a copy decision, not a layout
+              one. ═══ */}
           <header className={styles.head}>
             <Reveal>
+              <p className={styles.chapterLabel}>
+                <Image
+                  className={styles.labelMark}
+                  src="/logo/maginhawa.png"
+                  alt=""
+                  width={1024}
+                  height={1024}
+                  aria-hidden
+                />
+                Blog
+              </p>
+            </Reveal>
+            <Reveal delay={0.06}>
               <h1 className={styles.title}>
                 Stories, openings, and ideas shaping the Maginhawa Group.
               </h1>
             </Reveal>
+            {/* THE HEAD'S RULE ONLY EXISTS WHEN SOMETHING SEPARATES IT FROM
+                THE LIST'S RULE — i.e. on page one, where the featured lede
+                sits between them.
+
+                THE BUG IT FIXES: from page two on, the lede unmounts and
+                these two hairlines land ~30px apart with nothing but air
+                between them. The reader sees the head underlined twice, and
+                a doubled rule reads as a rendering fault rather than as
+                structure — it was the "two lines" reported on the next
+                page. Neither rule is wrong on its own; there is simply only
+                one boundary there to draw.
+
+                THE LIST'S RULE IS THE SURVIVOR, not this one, because it
+                carries the label and the filter. Keeping this one instead
+                would mean dropping the control that is a reader's only way
+                back out of a filtered set. .dividerLead below then takes
+                over this rule's own margin, so the surviving hairline lands
+                where the eye already expects a line. */}
+            {showLede && <span className={styles.headRule} aria-hidden />}
           </header>
 
           {/* compact featured lede — page 1 only */}
-          {page === 1 && featured && (
+          {showLede && featured && (
             <Reveal>
               <a
                 className={styles.featured}
@@ -524,15 +637,18 @@ function BlogIndexInner() {
                   className={styles.featuredMedia}
                   src={featured.image}
                   alt={featured.title}
-                />
+                >
+                  <VenueMark slug={featured.restaurant} />
+                </CardMedia>
                 <div className={styles.featuredBody}>
                   <span className={styles.featuredTag}>
                     Latest · {featured.dateLabel} · {featured.source}
                   </span>
                   <h2 className={styles.featuredTitle}>{featured.title}</h2>
                   <p className={styles.featuredExcerpt}>{featured.excerpt}</p>
-                  <span className={styles.featuredLink}>
-                    Read the story <span aria-hidden>→</span>
+                  <span className={`${styles.cardBtn} ${styles.featuredBtn}`}>
+                    Read the story
+                    <span aria-hidden>→</span>
                   </span>
                 </div>
               </a>
@@ -553,7 +669,12 @@ function BlogIndexInner() {
               the rule and the menu stay, and the row reads as a bare hairline
               with a control on it. aria-hidden sits on the label alone — on
               the row it would have taken the menu with it. */}
-          <div ref={dividerRef} className={styles.divider}>
+          <div
+            ref={dividerRef}
+            className={`${styles.divider} ${
+              showLede ? "" : styles.dividerLead
+            }`}
+          >
             {posts.length > 0 && (
               <span className={styles.dividerLabel} aria-hidden>
                 Earlier Entries
@@ -583,6 +704,26 @@ function BlogIndexInner() {
             >
               {posts.map((item, i) => {
                 const card = (
+                  /* ═══ THE CARD IS AN OBJECT NOW, not a photograph with a
+                     caption under it. Photograph on top, type on a cream
+                     body below, both inside ONE 28px radius and one
+                     four-stop shadow — the same material the venue cards
+                     are cut from (VenueCard.module.css), and the reason
+                     this grid and the restaurants grid now read as one
+                     system.
+
+                     WHAT IT DOES NOT BORROW, deliberately: the venue
+                     card's RAMP. That card seats its type ON the
+                     photograph because its type is short and fixed —
+                     three nowrap ellipsised lines and two stats. A
+                     headline here runs two lines of Contralto and the
+                     excerpt three, over 24 uncontrolled editorial stills.
+                     VenueCard's own stylesheet spends forty lines on what
+                     it cost to hold 4.5:1 over eight KNOWN photographs,
+                     and says plainly that cream copy over an ink wash on
+                     an unknown photograph "cannot be guaranteed". So the
+                     type stays on cream, where its contrast is a constant.
+                     The material is shared; the legibility bet is not. ═══ */
                   <a
                     className={styles.card}
                     href={item.url}
@@ -593,22 +734,36 @@ function BlogIndexInner() {
                       className={styles.cardMedia}
                       src={item.image}
                       alt={item.title}
-                    />
-                    {/* THE OUTLET LEADS, the date follows. Both were already
-                        here, in the other order — and on a page where every
-                        entry links OUT to someone else's publication, the
-                        masthead is the credential and the thing a reader
-                        scans for. "Forbes" earns attention; "11 Feb 2026"
-                        does not. The date keeps its place in the line, just
-                        not the front of it. */}
-                    <div className={styles.cardMeta}>
-                      <span className={styles.cardSource}>{item.source}</span>
-                      <span className={styles.cardSep} aria-hidden />
-                      <span>{item.dateLabel}</span>
+                    >
+                      <VenueMark slug={item.restaurant} />
+                    </CardMedia>
+                    <div className={styles.cardBody}>
+                      {/* THE OUTLET LEADS, the date follows. Both were
+                          already here, in the other order — and on a page
+                          where every entry links OUT to someone else's
+                          publication, the masthead is the credential and
+                          the thing a reader scans for. "Forbes" earns
+                          attention; "11 Feb 2026" does not. The date keeps
+                          its place in the line, just not the front of it. */}
+                      <div className={styles.cardMeta}>
+                        <span className={styles.cardSource}>{item.source}</span>
+                        <span className={styles.cardSep} aria-hidden />
+                        <span>{item.dateLabel}</span>
+                      </div>
+                      <h3 className={styles.cardTitle}>{item.title}</h3>
+                      <p className={styles.cardExcerpt}>{item.excerpt}</p>
+                      {/* A REAL PILL, in the house control language — the
+                          same 999px box the venue card's Menu/Book carry
+                          and the same one /blog's own pagination arrows
+                          use. It was a caps text link, which is the one
+                          affordance grammar this site does not otherwise
+                          use for a card's action. A <span>, never a nested
+                          anchor: the whole card is the link. */}
+                      <span className={styles.cardBtn}>
+                        Read
+                        <span aria-hidden>↗</span>
+                      </span>
                     </div>
-                    <h3 className={styles.cardTitle}>{item.title}</h3>
-                    <p className={styles.cardExcerpt}>{item.excerpt}</p>
-                    <span className={styles.cardArrow}>Read ↗</span>
                   </a>
                 );
                 // staggered reveal for the very first mount only; once the

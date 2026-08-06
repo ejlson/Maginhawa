@@ -1,50 +1,215 @@
-/* "As Seen In" — the centred label over the full masthead set in justified
-   rows: each hand-set row of 4–5 logos stretches edge to edge of the
-   chapter's inset span, so the stack reads as one set block. Sits INSIDE
-   the MaroonZone band after the About story — transparent ground, cream
-   type, light-on-dark marks. */
+/* "Featured In" — the press credential, on the cream.
+
+   THE SECTION IS LEFT-RANGED, and it is now left-ranged on the PAGE MARGIN
+   proper rather than on the column-2 content seat. It was put there to share
+   an edge with the "About Us" title that used to sit directly above it; that
+   chapter is gone, but the edge survives the move and is now worth more than
+   it was — measured at 1440, this title and Discover's head both start at
+   x=40, and only Blog is still out at the column-2 seat (x=154). The trade
+   that buys is written out at the deleted override below; read it before
+   moving this back.
+
+   IT IS A LABEL OVER A DRIFTING LANE, and that is the whole section. It was
+   that once before — a CENTRED label over a centred lane — then grew three
+   named credentials in display type with the mastheads demoted beneath
+   them. The credentials are gone at the user's instruction. What is
+   different from the first version is that the label is LEFT-RANGED on the
+   page margin rather than centred, so it hangs off the same edge as every
+   other chapter head instead of floating.
+
+   IT IS ON THE CREAM. This section used to sit inside MaroonZone, where the
+   ground was transparent and the type was cream; the dark band is gone, the
+   zone is unreferenced, and `.section` below re-inks to var(--maroon) on the
+   page's own plaster. Anything in this file that still argues from "the
+   maroon above and the maroon below" is describing a page that no longer
+   exists — this note replaced the last of it. */
+/* THE VERTICAL PADDING IS DELIBERATELY NOT --home-gap-tight, and the number
+   still comes off a measurement rather than off taste. The reasoning was
+   built against AboutIntro, which closed on --home-gap-tight (198px at 900
+   tall) and stacked with this section's opening: on the same token the seam
+   measured ~396px, nearly half a screen of empty ground between the last
+   photograph and the words "Featured In", and 13vh brought it to 317px.
+
+   BOTH OF THOSE NUMBERS ARE DEAD, because the neighbour changed. AboutSplit
+   contributes NO vertical padding at all — it is edge-to-edge furniture that
+   lets its neighbours own the seams — so nothing stacks here any more and
+   this padding is the entire gap. Re-measured at 1440×900: 117px of padding,
+   135px ink to ink from the video's bottom edge to the title's cap. That is
+   less than half the seam this rule was tuned to produce, and it is the
+   right size for what it now separates. Do not "restore" 317px on the
+   strength of the paragraph above; it was buying air off a chapter that no
+   longer pads.
+
+   ── THE TOP PADDING IS NOT ZEROED, AND THE HANDOFF SAID IT WOULD BE ──
+   This section now follows AboutSplit, in the slot the photo interlude
+   used to hold. The interlude zeroed its own box and let a 12px `inset`
+   own the seam, and the note handing this work over expected the same
+   here — "or the 12px seam up to AboutSplit won't hold".
+
+   IT DOES NOT HOLD, AND IT SHOULD NOT. That seam was 12px because the
+   interlude put a PHOTOGRAPH there: AboutSplit's video runs flush to its
+   own section edge (`padding: 0 var(--grid-gutter)`, no vertical padding
+   at all), and 12px between two pictures reads as one band — the same
+   relationship the story strip's frames have. Measured, the video keeps
+   exactly that 12px to the story band above it.
+
+   Below it there is no picture any more, only a title. Two things follow.
+   First, 12px of cream under a photograph and above display type does not
+   read as a band, it reads as a caption welded to the image. Second, and
+   decisively: the gap here is cream whichever box owns it, so splitting
+   117px into "12px of seam plus 105px of head margin" is INVISIBLE — a
+   frame only reads where ink or another picture bounds it. Zeroing this
+   would buy nothing and cost the chapter its opening air.
+
+   So the 12px furniture rhythm ends at AboutSplit, deliberately. What is
+   below is a type chapter and it is spaced like one. If a photograph ever
+   returns to this slot, restore the 12px with it. */
+/* ── AND IT IS CLOSER TO ABOUT NOW, at the user's instruction. The top was
+   clamp(88px, 13vh, 176px) — 117px at 900 tall, 129px measured from the
+   video's bottom edge to the label's cap. Roughly halved.
+
+   THE TWO SIDES ARE NO LONGER EQUAL, which is the point. This section used
+   to open and close on the same number because it was a chapter with a
+   display title; it is now a label over a wall of marks, sitting between
+   the group's story and the journal. Pulling the top in binds it to the
+   chapter it credentials while the bottom keeps the full chapter break down
+   to the journal. */
+/* THE TOP PAD COMES IN A THIRD TIME, and this time it stops being a vh
+   clamp at all: clamp(26px, 3.8vh, 52px) → --grid-gutter, at the user's
+   instruction ("much closer").
+
+   MEASURED, THE SEAM WAS NOT WHAT THE PARAGRAPH BELOW ASSUMED. The last ink
+   above this section is not the About copy — the right column runs short —
+   it is the VIDEO in AboutSplit's left half, and AboutSplit closes on a 12px
+   bottom pad of its own. So the real gap was video-bottom to label-cap:
+   53px at 1920x1080, 46px at 1440x900, 42px at 1280x800, drifting with the
+   viewport HEIGHT because 3.8vh was doing the work.
+
+   ON THE GUTTER TOKEN IT IS 12 + 12 = 24px AT EVERY VIEWPORT — AboutSplit's
+   bottom pad plus this one, both --grid-gutter, and no longer a function of
+   window height. That is the same 12px the story band puts between its
+   frames, so the wall now hangs off the video the way the band's own
+   photographs hang off each other.
+
+   THE 12px-READS-AS-A-CAPTION ARGUMENT ABOVE STILL STANDS and is not being
+   overruled: it was about ZEROING this box so a single 12px inset owned the
+   seam. Two gutters is not one gutter, and what sits under the video is a
+   label at --t-label rather than display type.
+
+   THE BOTTOM WAS UNTOUCHED BY THIS CHANGE — it was still clamp(88px, 13vh,
+   176px) when the above was written, so the box read 24px above and 176px
+   below. It has since come in as well; the note that follows owns that
+   number now, and this paragraph should not be read for it. What survives
+   here is the reason the two sides are argued separately at all: this
+   section CREDENTIALS the chapter above it, so it belongs to About and is
+   bound tight to it, while what follows is a different subject. */
+/* ── THE BOTTOM COMES IN TOO, at the user's instruction, and the reason is
+   that THE PARAGRAPH ABOVE STOPPED BEING TRUE THE DAY THE JOURNAL WAS
+   REBUILT. It argues that this padding IS the chapter break — a claim that
+   only holds while the section below contributes nothing. The journal is a
+   full-screen sheet with a MINIMUM breath of its own on both edges
+   (clamp(64px, 9vh, 132px), and its top and bottom are equal by
+   construction), so 13vh here was not the break, it was the break plus
+   another one.
+
+   MEASURED at 1440x900 before this change: 117px of padding here, then
+   81px of the journal's, i.e. 198px of cream between the last logo and the
+   journal's opening rule — against the 81px the journal leaves between its
+   last story and the film below it. The same seam, twice the width, on the
+   two sides of one chapter.
+
+   ON --grid-gutter IT IS 12 + 81 = 93px, which is the journal's own breath
+   plus a gutter, and the page's chapter boundaries read as one measure
+   again. The break is not lost — it simply belongs to the chapter it opens
+   rather than to the wall it closes, which is the same argument this file
+   already makes about the seam above ("the gap here is cream whichever box
+   owns it").
+
+   ⚠️ IF A SECTION WITHOUT VERTICAL PADDING EVER FOLLOWS THIS ONE, the
+   break has to come back here — this value now assumes its neighbour
+   brings its own. */
 .section {
-  padding: clamp(52px, 8vh, 132px) var(--pad-x) 0;
+  padding: var(--grid-gutter) var(--pad-x);
   background: none;
-  color: var(--cream);
+  color: var(--maroon);
 }
 
-@media (min-width: 981px) {
-  .section {
-    /* the shared middle-10 seat — flush with the neighbouring chapters */
-    padding-inline: var(--grid-col2);
-  }
+/* ── THE DESKTOP INDENT IS GONE, AND IT COST SOMETHING. Say plainly what.
+
+   What was here: `@media (min-width: 981px) { padding-inline:
+   var(--grid-col2) }` — "the shared middle-10 seat", i.e. the chapter began
+   at the left edge of grid column 2 rather than at the page margin.
+   --grid-col2 is not a local choice: globals.css calls it "THE content
+   seat" and Discover (the restaurant grid) and Blog both hang their heads
+   off it, so this section agreed with them.
+
+   IT NOW AGREES WITH ABOUT INSTEAD, at the user's instruction, and the two
+   cannot both be had. AboutIntro pads on `var(--grid-margin)` — the page
+   margin proper — so at 1440 the two chapters' titles were measured
+   114.33px apart: "About Us" ink at x=40, "Featured In" ink at x=154.33
+   (scripts/probe-flatband-aboutraise-pressrange.mjs). Deleting the override
+   drops this section back onto the base rule's --pad-x, which globals
+   defines as `var(--grid-margin)` exactly, so the match is by DERIVATION
+   and not by a copied number: About and Featured In now both start at 40px,
+   and they will still agree at any viewport the clamp resolves differently.
+
+   THE COST: the page no longer has ONE left edge on desktop. It has two —
+   the page margin (About, Featured In, and this section's mastheads) and
+   the column-2 seat (Discover, Blog). A reader coming down the page sees
+   the left edge step out by one column at the restaurants grid and step
+   back in at About. That is a real regression against the "one bound column
+   system" globals.css describes, and the honest fix if it grates is to move
+   Discover and Blog to --grid-margin too — NOT to put this override back,
+   because that would re-open the 114px gap the user asked to close.
+
+   BELOW 981px NOTHING CHANGED: the override never applied there, and both
+   chapters were already measured at 16px.
+
+   There is no replacement declaration — the base rule above already says
+   --pad-x, and the override is deleted rather than restated. */
+
+/* ---------- the heading, hidden ---------- */
+/* THE FOUR WORDS ARE GONE FROM THE PAGE, at the user's instruction, and the
+   heading is not. `.label` — centred, --t-label, uppercase, pointed at the
+   same tokens as Discover's chapter label so the two could not drift — is
+   deleted with them; this is what replaces it.
+
+   The clip-path spelling rather than the old 1px-clip hack: it does not
+   create a scroll container and does not collapse the text to one character
+   per line in some engines. Same rule VenueCard uses for its stat labels. */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
 }
 
-/* ---------- the centred label ---------- */
-.label {
-  margin: 0 0 clamp(26px, 4vh, 44px);
-  font-family: var(--font-mono);
-  font-weight: 400;
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label-mono);
-  text-transform: uppercase;
-  color: var(--cream);
-  text-align: center;
-  /* a quiet signpost — the mastheads are the content here, not this */
-  opacity: 0.45;
-}
+/* ---------- the drifting lane ---------- */
+/* ONE LANE, RECOVERED. What was here: three hand-set rows of mastheads, each
+   justified flush to both page margins with the membership solved against
+   measured ink so the three gaps came out within 1.7px of each other. All of
+   it — `.wall`, `.wallRow`, the 768px centred fallback, the ink arithmetic in
+   the TSX — is deleted at the user's instruction, and it is worth one line
+   saying what it bought so it is not rediscovered as a regression: every
+   masthead was legible at once, none was ever half-faded behind a mask edge,
+   and the page had no horizontal motion anywhere.
 
-/* ---------- the masthead rows ---------- */
-.rows {
-  display: flex;
-  flex-direction: column;
-  gap: clamp(22px, 3.4vh, 40px);
-}
+   THE LANE TAKES THAT BACK AND GIVES SOMETHING ELSE: fourteen marks read as
+   one continuous credential rather than as a block to be scanned, and the
+   section stops being a wall of type in the middle of a page of pictures.
 
-/* ---------- the drifting lanes ---------- */
-/* Each row scrolls CONTINUOUSLY, and fades at both ends: a mask takes the
+   IT BLEEDS TO BOTH VIEWPORT EDGES and fades at both ends: the mask takes the
    lane to transparent over the outer 10%, so mastheads dissolve in as they
    arrive and dissolve out as they leave rather than being chopped off by an
-   edge. The lane bleeds to both viewport edges so there is nowhere for a
-   hard cut to show. */
+   edge. Bleeding is what leaves nowhere for a hard cut to show. */
 .lane {
   position: relative;
+  /* out to the viewport edges, undoing the section's own page margin */
   margin-inline: calc(-1 * var(--pad-x));
   overflow: hidden;
   -webkit-mask-image: linear-gradient(
@@ -63,15 +228,20 @@
   );
 }
 
-@media (min-width: 981px) {
-  .lane {
-    margin-inline: calc(-1 * var(--grid-col2));
-  }
-}
+/* THE TRACK CARRIES THE LINE TWICE AND TRAVELS EXACTLY -50%, so the wrap is
+   seamless: at the end of the pass the second copy sits precisely where the
+   first began and the animation restarts on an identical frame.
 
-/* The track carries the row twice and travels exactly -50%, so the wrap is
-   seamless. translate3d only — the whole lane is one composited layer and
-   costs no paint per frame. */
+   ⚠️ `padding-right` IS WHAT MAKES -50% CORRECT, and it is the one thing here
+   that is easy to delete as redundant. Twenty-eight marks in one flex row
+   have TWENTY-SEVEN gaps, so half the track is fourteen marks plus thirteen
+   and a half gaps — while one copy is fourteen marks plus fourteen gaps. The
+   difference is half a gap, and it shows as a visible stutter every 72s. A
+   trailing pad of exactly one gap makes the track two identical halves.
+
+   translate3d only — the whole lane is one composited layer and costs no
+   paint per frame. One long, slow pass: a credential drifting past, not a
+   ticker. */
 .track {
   list-style: none;
   margin: 0;
@@ -81,20 +251,14 @@
   width: max-content;
   gap: clamp(28px, 4vw, 72px);
   padding-right: clamp(28px, 4vw, 72px);
-  /* one long, slow pass — a credential drifting past, not a ticker */
   animation: pressDrift 72s linear infinite;
   will-change: transform;
 }
 
-/* alternate rows run the other way, so the wall drifts rather than marches */
-.trackBack {
-  animation-direction: reverse;
-}
-
-/* The lane does NOT pause on hover. It is a credential drifting past, not
-   a menu — and it sits in the middle of a scrolling page, so the cursor
-   lands on it constantly without being aimed there. A line that stops
-   dead every time the pointer crosses it reads as a bug, not a courtesy. */
+/* The lane does NOT pause on hover. It is a credential drifting past, not a
+   menu — and it sits in the middle of a scrolling page, so the cursor lands
+   on it constantly without being aimed there. A line that stops dead every
+   time the pointer crosses it reads as a bug, not a courtesy. */
 
 @keyframes pressDrift {
   from {
@@ -105,30 +269,108 @@
   }
 }
 
+/* ── THE MARKS ARE BIGGER THAN THEY WERE, AND THE OLD REASONING FOR THEIR
+   SIZE IS RETIRED WITH THE WALL ──
+   The seat was clamp(15px, 1.65vw, 30px), chosen by simulating the WRAP:
+   every mark's width is its seat height x its own `scale` x its own aspect,
+   so that one number decided how many marks fitted per row and therefore
+   where the wall broke. 1.65vw was picked because 1.8vw landed on an orphan
+   case — 8 / 5 / 1, with "thatsup" alone on a row, which reads as a mistake
+   rather than as a wall. scripts/probe-press-wrap.mjs is what measured it.
+
+   A LANE DOES NOT WRAP, so none of that constrains anything any more: the
+   track is `width: max-content` and simply runs as long as it runs. The seat
+   goes back to the drifting lane's own clamp(18px, 2vw, 36px) — ~29px at
+   1440 against ~24px — because a mark passing through a mask has a moment to
+   be read rather than a page to be scanned on, and because the row no longer
+   has to fit inside the measure.
+
+   ⚠️ IF THE STILL WALL EVER RETURNS, THE PROBE HAS TO RUN AGAIN. This value
+   is safe only while nothing wraps. */
 .logoSeat {
   flex: none;
   height: calc(clamp(18px, 2vw, 36px) * var(--s, 1));
 }
 
-/* Real image elements (not masks), flipped for the MAROON ground:
-   grayscale(1) normalises every colour and invert(1) turns the dark
-   letterforms light. No `mix-blend-mode` — on a solid maroon ground it made
-   almost no visible difference, and a blended child stops the parent's
-   paint being cached, which on a lane that moves every frame is a cost paid
-   continuously for nothing. */
+/* ── THE MARKS ARE AT FULL STRENGTH AND IN THEIR OWN COLOUR, at the user's
+   instruction. `filter: grayscale(1)` and `opacity: 0.72` are both gone.
+
+   WHAT THE FILTER WAS FOR, so the trade is on the record rather than
+   rediscovered as a regression. It NORMALISED the set: fourteen mastheads
+   drawn by fourteen different art departments, reduced to one ink so the
+   wall read as a single object and no mark shouted louder than its
+   neighbours for reasons of brand palette rather than of standing. Its
+   history is the same argument twice — it was `grayscale(1) invert(1)`
+   when this section sat on a maroon band, and the invert had to go when
+   the ground became plaster or the marks went white-on-cream and vanished.
+
+   WHAT COMES BACK, AND WHAT IT COSTS. Colour is the outlets' own, so the
+   wall now carries the Michelin flower's red and every other mark's native
+   palette. The cost is exactly what the filter was buying: the row is no
+   longer one ink, and a coloured mark reads as louder than a black
+   wordmark beside it at the same ink height. That is a real change to how
+   evenly the wall reads, and it is the change that was asked for.
+
+   THE OPACITY GOES WITH IT rather than being tuned again. 0.72 was set
+   against `grayscale(1)` — the two were always one decision, a grey wash
+   dark-on-plaster needing more alpha than a light mark on maroon — and
+   holding a colour back to 72% only produces a washed-out colour. Full
+   colour means full alpha.
+
+   NORMALISATION SURVIVES WHERE IT MATTERS MOST: every mark's INK HEIGHT is
+   still equalised by the measured `scale` values in lib/press.ts, which is
+   the part that kept the wall from looking arbitrary. Only the colour
+   normalisation is gone.
+
+   No `mix-blend-mode` — it made almost no visible difference here, and a
+   blended child stops the parent's paint being cached. */
+/* ── THE max-width HAD TO MOVE, and it is the reason the old sizes could not
+   be fixed by any multiplier. It was clamp(120px, 12vw, 200px): 172.8px at
+   1440. With `object-fit: contain`, a mark whose natural width at its seat
+   height exceeds that cap is scaled DOWN to fit — the cap is a height cap in
+   disguise, at maxWidth / aspect.
+
+   MEASURED, IT WAS ALREADY BITING BEFORE ANY OF THIS CHANGED. The
+   Independent's frame is 3747x363, aspect 10.32:1, so 172.8px capped it to a
+   16.7px box — BELOW the 21.6px base — and its ink to 12.0px, the second
+   smallest thing in the lane, while its `scale` said 1.6. Two marks were
+   clamped at the old size (The Independent wanted 357px, The Infatuation
+   186px) and three more were already inside 7px of it — The Sunday Times at
+   168, Hypebeast 170, Evening Standard 166, against a 172.8px cap. The
+   arithmetic that follows: the largest ink height every mark could reach
+   TOGETHER under that cap was 172.8 x 0.695 / 10.32 = 11.6px — smaller than
+   the smallest the lane already had. Equalising upward was not possible
+   until this number moved.
+
+   WHERE IT IS NOW, AND WHY IT CANNOT BITE. With the ink on a common height
+   the widest mark is The Independent at inkRatio 0.695 and 10.32:1, i.e.
+   base x 14.85. Against the base above that is 237.6px below 889px wide,
+   26.7vw through the fluid band, and 475.1px above 1778px. This clamp clears
+   all three by roughly 4-5%: 248px / 28vw / 496px. It stays a guard rail
+   against some future mark with a pathological frame — it is not deleted —
+   but no logo in the current set reaches it at any viewport. If a new logo
+   ever looks squashed, check it here first. */
 .logo {
   height: 100%;
   width: auto;
-  max-width: clamp(140px, 15vw, 240px);
+  max-width: clamp(248px, 28vw, 496px);
   object-fit: contain;
   display: block;
-  opacity: 0.85;
-  filter: grayscale(1) invert(1);
   user-select: none;
 }
 
-/* Reduced motion: the wall holds still. The rows keep their doubled markup
-   (harmless — it simply overflows behind the mask) but never travel. */
+/* ── REDUCED MOTION: THE LANE HOLDS STILL ──
+   The drift is back, so this block is back with it. The track keeps its
+   doubled markup — harmless, it simply overflows behind the mask — and never
+   travels, which leaves the first fourteen marks parked exactly where the
+   animation would have started. The section's other motion is its entrance,
+   which PressWall.tsx gates on `useReducedMotion` in JS.
+
+   ⚠️ THE READER LOSES THE MARKS THAT WOULD HAVE DRIFTED PAST. A still lane
+   shows only what fits the viewport, and unlike the wall it replaced there
+   is no second row for the rest. That is the honest cost of a marquee under
+   this query, and the record is intact elsewhere: /about's Awards &
+   Recognition table lists every outlet in text. */
 @media (prefers-reduced-motion: reduce) {
   .track {
     animation: none;

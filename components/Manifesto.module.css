@@ -7,23 +7,88 @@
 .section {
   background: var(--cream);
   color: var(--maroon);
-  /* the first cream sheet that rides up OVER the pinned hero — a tight
-     top pad so the statement arrives early in the cover, seated on the
-     page margin like every other chapter */
-  /* A FULL VIEWPORT, and it has to be. This sheet climbs over the pinned
-     Our Restaurants chapter, and ChapterPin's cover works by the next
-     chapter's opaque ground simply passing over the held one — a sheet
-     shorter than the window cannot do that. Sized to its padding, it slid
-     ACROSS the restaurant grid with the statement drawn over the tiles
-     instead of covering them.
+  /* SIZED TO ITS CONTENT. `min-height: 100svh` with the sentence centred in
+     it has been deleted, and the reason it was here has been deleted with
+     it: this used to be the opaque sheet that COVERED the restaurants
+     chapter under ChapterPin, and a sheet shorter than the window cannot do
+     that job — sized to its padding it slid ACROSS the grid instead,
+     photographed at scrollY 1620 with grid images bleeding above and below
+     the sentence. There is no pin and no cover any more.
 
-     The content centres in that height rather than sitting at the top, so
-     the statement is framed by the screen it now owns. */
-  min-height: 100svh;
+     What the forced screen was actually costing, measured at 1440×900
+     before the change: the section's box was 900px tall and the sentence's
+     first ink sat 340px INSIDE it, so the gap from the last card's bottom
+     edge to the first word ran to 394px — a third of a screen of empty
+     cream between the rooms and the line about them. That is the same
+     failure the comment this replaces already recorded for the era when the
+     statement sat under the hero ("a screen of empty cream"); seated after
+     the grid it simply came back.
+
+     Sized to content the same measurement reads 153px, and the section's
+     box goes from 900px to 419px. */
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  padding: clamp(48px, 10vh, 128px) var(--pad-x);
+  /* THE SEAM WITH THE GRID ABOVE IS THE SUM OF TWO FILES, which is why it
+     cannot be read off either one: this value stacks with Discover's
+     `.section` bottom padding (clamp(40px, 6vh, 88px) — 54px at 900).
+     Measured at 1440×900, last card's bottom edge to the statement's first
+     line box (scripts/probe-home-seam.mjs):
+       before   54px + 99px +  340px of centring  =  394px
+       after    54px + 99px                       =  153px
+     THE PADDING ITSELF IS UNCHANGED. Dropping the forced screen is the
+     whole of the "move it closer" change, and it is already a 61% cut;
+     trimming this as well would take the seam under 130px, which is less
+     than the statement keeps between its own lines and would read as the
+     sentence crowded up against the last row of photographs rather than as
+     a new chapter. "Not by too much" is what stopped here.
+     The bottom pad is HALF what it was (was 48/8vh/120): it stacks with
+     whatever follows the statement. */
+  /* ══════════ ONE SCREEN: STATEMENT IN THE MIDDLE, BAND AT THE BOTTOM ═══
+     The chapter is now a full viewport tall and holds BOTH halves — the
+     statement centred in the room left above the band, and the band of
+     photographs sitting on the bottom edge.
+
+     `min-height`, NOT `height`. On a short viewport (a 1440×600 laptop, or
+     a phone in landscape) the statement plus the band genuinely need more
+     than a screen, and a fixed height would crop the pictures rather than
+     let the page grow. "Fits one screen" is true at every ordinary window
+     and degrades by scrolling, which is the correct failure.
+
+     THE HISTORY MATTERS HERE, because this file has been round this loop
+     once already. `min-height: 100svh` was REMOVED from this section in an
+     earlier pass: with the statement centred and nothing else on the sheet,
+     it produced 394px of empty cream between the last restaurant card and
+     the first word — a third of a screen of nothing. The reason it is safe
+     to bring back is that the section is no longer nearly empty. It now
+     carries the band as well, so the centring divides real content instead
+     of padding out a void.
+
+     THE TOP PAD IS SMALL ON PURPOSE, down from clamp(150px, 21vh, 300px).
+     With a forced screen and `flex: 1` centring, a large pad no longer buys
+     air — it pushes the total past 100svh and breaks the single screen. The
+     seam is now produced by the CENTRING rather than by padding: measured
+     at 1440×900, the statement's first ink sits 194px below the last
+     restaurant card.
+
+     THAT IS A REAL REDUCTION AND IT IS A TRADE, not a free win. The seam
+     was opened to 243px at the user's request an hour before this; holding
+     one screen costs ~49px of it, because the statement can only be as far
+     down as the band above the fold allows. 194px is still comfortably
+     past the 153px that read as crowded, and the single screen was the
+     later and more specific instruction — but if the seam matters more
+     than the screen, this padding is the lever, and `min-height: 100svh`
+     is what has to give.
+
+     THERE IS NO BOTTOM PAD, and that is deliberate. The space under the
+     last row of photographs has to equal the space BETWEEN them, and only
+     the band knows that number (--band-gap, see StoryStrip.module.css).
+     Custom properties inherit downward, so a `var(--band-gap)` here could
+     not read a value declared on a child — it would silently fall back and
+     the two gaps would differ by however wrong the fallback was. The band
+     carries its own bottom padding instead, which keeps the one number in
+     the one file that owns it. */
+  min-height: 100svh;
+  padding: clamp(24px, 4vh, 56px) var(--pad-x) 0;
   /* NO CLOSING RULE. A full-width hairline used to sit on this section's
      bottom border box, between the statement and Our Restaurants. It was
      drawing a boundary the page does not have: the statement and the
@@ -36,9 +101,16 @@
 }
 
 /* stacked flow below the breakpoint; the page's 12-column grid above it */
+/* THE STATEMENT TAKES ALL THE ROOM THE BAND DOES NOT, AND CENTRES IN IT.
+   `flex: 1` claims the leftover height of the 100svh section; the centring
+   puts the sentence in the middle of that space. This is what produces the
+   "text in the middle, pictures at the bottom" reading, and it is also what
+   now creates the seam to the restaurants grid above — see .section. */
 .inner {
+  flex: 1;
   display: flex;
   flex-direction: column;
+  justify-content: center;
   gap: clamp(18px, 2.6vh, 32px);
 }
 
@@ -47,46 +119,15 @@
     display: grid;
     grid-template-columns: repeat(12, minmax(0, 1fr));
     column-gap: var(--grid-gutter);
-    /* one shared row — the support's first line tops out level with the
-       statement's first line */
-    align-items: start;
+    /* the statement is the only child now, but it still declares its seat
+       against the page's 12 columns rather than filling an anonymous box.
+       `align-content`, NOT `align-items`: the grid is taller than its one
+       row (it is a flex child with flex: 1), and align-content is what
+       positions the ROW TRACK inside that extra height. align-items would
+       only stretch or align the item within a row that is still sitting at
+       the top, which is the bug this replaces — it read `start`. */
+    align-content: center;
   }
-}
-
-/* the question the statement answers — quiet, and well clear of the
-   display line so it reads as a label rather than a first line */
-.kicker {
-  margin: 0 0 clamp(16px, 2.2vh, 30px);
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  color: var(--maroon);
-  opacity: 0.55;
-}
-
-/* .inner is a 12-column GRID above 981px, and the statement claims a row
-   explicitly — so an unplaced kicker auto-flowed into row 2, column 1:
-   below the sentence it introduces, and squeezed into one twelfth of the
-   measure, which wrapped "Who are we?" onto two lines. It needs its own
-   row and the full width. */
-@media (min-width: 981px) {
-  .kicker {
-    grid-column: 1 / 13;
-    grid-row: 1;
-  }
-}
-
-/* the group's name in Contralto, the display face — the rest of the line
-   stays in the sans label voice, so the name reads as the proper noun it
-   is rather than the label being set twice. Sized up a touch and its
-   tracking dropped, because the display face runs small and tight against
-   the sans at a shared size. */
-.kickerName {
-  font-family: var(--font-display);
-  font-size: 1.28em;
-  letter-spacing: 0;
-  text-transform: none;
 }
 
 /* ---------- the statement ---------- */
@@ -106,10 +147,63 @@
   line-height: var(--lh-display);
   letter-spacing: var(--tr-display);
   color: var(--maroon);
+  /* CENTRED — the lines on a common axis, and the block on the page's.
+     `margin-inline: auto` is what centres the BLOCK below 981px, where
+     .inner is ordinary flex flow; above it the grid seat does the same job
+     with justify-self (see the media query).
+     THE CENTRING USED TO BE THE EXPENSIVE PART. While photographs opened
+     slots in the sentence, a centred line re-centred itself as each slot
+     grew, so every word moved sideways on every frame and the paragraph
+     relaid out continuously — which is what the slot widths were quantised
+     to survive. The prints are gone and nothing animates geometry any more,
+     so centring is now free: the line boxes are fixed from first paint and
+     the scrub only writes opacity. */
+  text-align: center;
+  margin-inline: auto;
+}
+
+/* THE BLOCK — eyebrow and statement as one object.
+
+   The grid seat and the measure moved HERE from .statement when the eyebrow
+   was added. They have to sit on a common parent or the two elements take
+   independent seats in the 12-column grid and the eyebrow centres itself on
+   the full measure while the sentence centres on 88% of it — a mis-centring
+   of a few pixels that is invisible on any one element and obvious between
+   two stacked ones. */
+.block {
+  display: flex;
+  flex-direction: column;
+  /* align-items is left at its `stretch` default ON PURPOSE. Setting it to
+     `center` would make each child shrink-to-fit, so the statement would
+     wrap against its own max-content width rather than against the block's
+     measure — the centring would still look right and the LINE BREAKS
+     would be decided by the wrong box. Stretched children fill the measure
+     and their own `text-align: center` does the centring. */
+}
+
+/* the descriptor over the statement — what this actually is.
+
+   SENTENCE CASE AT --t-label, deliberately NOT the uppercase tracked voice
+   the masthead marks use below the photographs. The two are close enough on
+   the page to be read together, and set identically they would frame the
+   statement in two matching rails, which reads as a caption above and a
+   caption below rather than as an introduction and an imprint. Sentence
+   case says "this is a description"; small caps says "this is apparatus".
+
+   --maroon-soft (6.56:1, well past the 4.5:1 this size answers to) so it
+   introduces the sentence rather than competing with it. */
+.eyebrow {
+  margin: 0 0 clamp(16px, 2.4vh, 30px);
+  font-family: var(--font-sans);
+  font-weight: var(--w-regular);
+  font-size: var(--t-label);
+  letter-spacing: 0.01em;
+  color: var(--maroon-soft);
+  text-align: center;
 }
 
 @media (min-width: 981px) {
-  .statement {
+  .block {
     /* 1 / 10, not 1 / 9 — ONE column bought to save a line. At eight columns
        the measure ran out immediately after "of" and dropped "London." onto a
        fifth line on its own: a one-word widow carrying the accent colour and
@@ -120,111 +214,259 @@
        this takes — measured at 1440 the statement ended at ~907px of a 1440
        viewport with the support text starting past 1180.
 
-       The wrap is FROZEN by useLockedLines (each line becomes its own block so
-       a word cannot leave its line as the photo slots open), so this changes
-       what gets locked, not just how it flows. Re-check the line count if the
-       copy or the print widths change — the breaks are a measured result, not
-       a hand-set one. */
+       The breaks are GROUPED by useLockedLines (each line becomes its own
+       block so it can own a scroll range), so this changes what gets grouped,
+       not just how it flows. Re-check the line count if the copy or the
+       measure changes — the breaks are a measured result, not a hand-set
+       one. */
     /* THE FULL MEASURE. This was 1 / 10, holding columns 10–13 clear for a
        support paragraph that no longer exists — and at the larger size the
        statement had gone back to five lines at 1440 and below, which is the
        wrap that put "London." on a line of its own and was fixed once
        already. Taking the freed columns puts it back to four everywhere. */
     grid-column: 1 / 13;
-    grid-row: 2;
+    grid-row: 1;
+    /* THE WIDOW THIS CAP EXISTED TO FIX IS GONE, and the cap is now a
+       preference rather than a fix. Recorded honestly, because the note it
+       replaces asserted "a real optimum and not a preference" and that is
+       no longer true of this sentence.
+
+       WHAT IT WAS FOR. With four photographs opening slots in the text the
+       sentence ran long, and at the full measure it set in four lines whose
+       fourth was "London." ON ITS OWN — a one-word widow carrying the accent
+       and the full stop. 88% was the one value that broke the third line
+       after "in the" and pulled "heart of London." down with it; 92% still
+       widowed at 1728 and 84% ran to five at 1440. It was off the column
+       grid on purpose, falling between 10 and 11 of the 12 columns, because
+       neither boundary was clean.
+
+       WHAT IS TRUE NOW. Without the prints the sentence is shorter and sets
+       in THREE lines closing on "parlours in the heart of London." — six
+       words, no widow. Swept at 1440 across 76/80/84/88/92/96/100%: every
+       cap from 84% up gives that same three-line set, and 76–80% gives four
+       lines with the same six-word close. There is no widow at any measure,
+       so nothing here is load-bearing any more.
+
+       It stays at 88% because a display line that runs the full 12 columns
+       reads as a paragraph stretched to the page rather than as a statement
+       held on it — but that is taste, and anything from 84% up is safe.
+       Desktop only: below 981px .inner is stacked flow on a measure that is
+       already narrow, and capping it there just adds lines. */
+    max-width: 88%;
+    /* the 88% measure sits on the page's centre line, not against the left
+       margin — the grid gives the seat, this centres the block inside it */
+    justify-self: center;
   }
 }
 
-/* the split-text line boxes: each word rises inside its own clip. The mask
-   is display: inline-block so it sits in the normal ragged flow; the word
-   inside carries the transform. */
-.wordMask {
-  display: inline-block;
-  overflow: hidden;
-  vertical-align: bottom;
-  /* natural word spacing between adjacent masks */
-  margin-right: 0.24em;
-  /* the display face sits on a 0.92 line-height, so the raw line box is
-     SHORTER than the glyphs — pad the clip window out (and pull the same
-     amount back with negative margins) so ascenders and the "p"/"g"
-     descenders never get shaved at rest */
-  padding-block: 0.14em;
-  margin-block: -0.14em;
-}
+/* ONE BOX PER WORD, and it is no longer a mask.
 
-.wordMask:last-child {
-  margin-right: 0;
-}
+   THE CLIP IS GONE WITH THE RISE. Each word used to be a `.word` carrying a
+   transform inside a `.wordMask` with `overflow: hidden`, because the word
+   climbed into view out of its own box. Nothing travels any more — the
+   words ink in on the spot (see REST_INK in the component) — so the mask
+   has nothing to hide and the two elements collapse into this one.
 
+   THE DESCENDER PADDING GOES WITH IT, and that is the part worth recording
+   rather than silently dropping. `padding-block: 0.22em` paired with
+   `margin-block: -0.22em` existed to stop the clip window shaving
+   ascenders and the "p"/"g" tails: the display face sits on a 0.92
+   line-height, so the raw line box is SHORTER than the glyphs, and
+   scripts/probe-manifesto.mjs measured a uniform +5px overflow on all 18
+   words when the display roles moved to a taller-metric face. The pair
+   cancelled, so it only ever changed the clip window — with no clip there
+   is nothing to shave and nothing to protect against.
+
+   `display: inline-block` STAYS, and it is load-bearing twice over: it
+   keeps a word from being broken across a line, and it is what makes each
+   word a measurable box for the line grouping in useLockedLines.
+
+   NO `will-change`. The old rule declared `will-change: transform`
+   permanently, which holds a compositor layer per word for the life of the
+   page — eighteen of them, on a chapter the reader may never reach. Motion
+   sets and clears the hint around the values it is actually animating.
+   This stylesheet has already paid that cost once knowingly (the band's
+   `will-change: clip-path` held a ≈1440×470 layer, and it is recorded
+   below as one of the reasons that mechanism was worth deleting); there is
+   no reason to keep paying it here for a property that composites anyway. */
 .word {
+  /* inline-block so the word can carry a transform and cannot be broken
+     across a line. It needs nothing else: the spacing between words is a
+     REAL SPACE in the markup now (see Manifesto.tsx), not a margin, which
+     is what lets a centred line stay on the page's axis without a
+     `:last-child` rule to strip a trailing gap. */
   display: inline-block;
-  will-change: transform;
 }
 
 /* the accent on the words that carry the claim — see KEY_WORDS in the
-   component for why this is the ink and not the raw saffron */
+   component for why this is the ink and not the raw saffron.
+
+   ITALIC AS WELL AS COLOUR, at the user's request ("make comfort and
+   promise italic too"). Both faces in the display stack ship a DRAWN
+   italic — FreightBig Pro across its whole weight range, and EB Garamond,
+   which is the fallback everyone without the local Freight install sees —
+   so this is a real italic and not a synthesised oblique slanting the
+   roman. Worth checking if the display face is ever changed again: a stack
+   whose italic is faked will show it worst at this size.
+
+   NOTE, since it is a judgement rather than a fact: this is DOUBLE
+   emphasis. The reference that prompted it (Tandem) italicises and does
+   not recolour, and one signal usually reads stronger than two — the
+   colour already makes these words the only non-maroon ink on the sheet.
+   If it looks like too much, deleting the `color` line here leaves a clean
+   italic-only accent and nothing else has to change. */
 .key {
   color: var(--saffron-ink);
+  font-style: italic;
 }
 
-/* The print's SLOT — the box that opens and pushes the words aside. Its
-   width and its word-spacing margin are BOTH animated (a closed slot that
-   kept its margin would still reserve a gap in the sentence), so the
-   stylesheet must not set the margin here. */
-.imgMask {
-  overflow: hidden;
-  white-space: nowrap;
-  margin-right: 0;
-  will-change: width;
-}
+/* NO BRAND-FACE RULE HERE, and the reason is worth keeping. "Maginhawa
+   Group" was briefly the sentence's subject, set in Contralto caps; the
+   statement speaks in the first person now ("We are…") and the navbar
+   carries the name on every route, so there is nothing left on this sheet
+   to set in the display face.
+   If it ever comes back: --font-display no longer resolves to Contralto at
+   all. It resolves to INSTRUMENT SERIF (see the display-face block in
+   globals.css — the display roles moved off Contralto so the brand face is
+   only ever the wordmark), so Contralto has to be named through
+   --font-display-big EXPLICITLY. The cap-match below was measured against Contralto small and
+   does not transfer: at a common 100px the faces cap at 71.73 (Helvetica)
+   and 70.00 (Contralto small), so 1.025em cap-matched THOSE two. Re-measure
+   before reusing it. */
 
-/* One locked line. Making each line its own block is what stops a word
-   leaving its line as the slots open, and what fixes the headline's height
-   — see useLockedLines in the component. */
-.line {
-  display: block;
-}
+/* `.line` IS DELETED with the per-line scrub. It made each measured line
+   its own block so the line could hang a scroll range on its own box. The
+   entrance runs on one timeline now (see Manifesto.tsx), the sentence is an
+   ordinary paragraph again, and the browser is free to wrap it differently
+   at different widths without anything needing to be re-measured. */
 
-/* the inline photograph riding the sentence (image-in-headline) — sized
-   to the cap band of the surrounding display line, bottom on the text
-   baseline, cut at the pasteboard's sharp 2px print radius (deliberately
-   NOT the 16px interactive-plate rounding — prints aren't buttons). The
-   WIDTH is per-print (set inline — it is what makes one upright and the
-   next landscape); the height is shared, so they sit on one optical band. */
-.inlineImg {
-  display: inline-block;
-  height: 0.86em;
-  width: 100%;
-  object-fit: cover;
-  border-radius: 2px;
-  vertical-align: bottom;
-  max-width: none;
-}
+/* `.imgMask` AND `.inlineImg` ARE DELETED with the three photographs that
+   used to ride inside the sentence.
+     · `.imgMask` was the print's SLOT — the box that opened in the text
+       flow to push the words aside. It animated `width` AND `margin-right`
+       together (a closed slot that kept its margin would still reserve a
+       gap in the sentence), and it carried `will-change: width`, i.e. a
+       standing hint on a LAYOUT property.
+     · `.inlineImg` was the print itself: height locked to 0.86em so the
+       three sat on one optical band, width set per-print inline so the
+       shapes differed, bottom on the text baseline, cut at the
+       pasteboard's sharp 2px print radius — deliberately not the 16px
+       interactive rounding, since prints are not buttons.
+   Removed rather than left in place: a rule that animates width inside a
+   centred paragraph is precisely the kind of thing that gets copied onto
+   something else and takes its reflow cost along with it. The measured
+   cost is recorded in Manifesto.tsx. */
 
-/* ---------- support line ---------- */
-.support {
-  margin: 0;
-  max-width: 34ch;
-  font-family: var(--font-sans);
-  font-weight: var(--w-regular);
-  font-size: var(--t-small);
-  line-height: var(--lh-body);
-  color: var(--maroon);
-  opacity: 0.8;
-}
+/* NO SUPPORT LINE. ".support" and its right-hand seat lived here for the
+   sans sentence that used to sit opposite the statement. That sentence now
+   introduces the rooms under the Our Restaurants title (see Discover), the
+   element went with it, and the rules are gone rather than left orphaned. */
 
-@media (min-width: 981px) {
-  .support {
-    /* right side of the measure, TOP aligned with the statement via the
-       grid's align-items: start. Right-ranged (the Discover caption's
-       grammar) so every line's right edge sits on the page margin, not
-       just the longest one. The negative nudge counters the sans line
-       box's half-leading, seating its cap line ON the statement's cap
-       line (the display face's 0.92 line box has almost none). */
-    grid-column: 10 / 13;
-    grid-row: 1;
-    justify-self: end;
-    text-align: right;
-    margin-top: -0.2em;
-  }
-}
+/* ═══════════════════════════ THE BAND ═══════════════════════════
+   IT IS A SIBLING OF `.inner`, NOT A CHILD. `.inner` becomes a 12-column
+   grid at ≥981px and the statement takes a column span inside it; the band
+   is the FULL page width, so putting it in that grid would have meant
+   giving it `grid-column: 1 / -1` and then fighting the column gap.
+
+   WHAT USED TO BE HERE, AND WHY IT IS NOT ANY MORE.
+   Three rules and two custom properties are gone with the scroll
+   expansion the user asked to remove:
+     · `.bandRunway` — a positioned seat laid out at the RESTING geometry
+       (the content measure at `aspect-ratio: 3.2`) whose only jobs were to
+       be the element `useScroll` watched and to reserve `--band-grow` of
+       flow below itself so the growing picture could never cover About.
+     · `--band-grow` (clamp(24px, 5vh, 80px)) and `--band-pad` — the growth
+       the clip opened into, and the pill's inset from the picture's corner.
+     · `.bandBleed`'s `clip-path: inset(… round var(--radius-tile))`, its
+       `height: calc(100% + var(--band-grow))`, its `will-change: clip-path`
+       (which held a ≈1440×470 layer for the life of the page), and the
+       `@media (prefers-reduced-motion)` block that had to force the open
+       state back on with `!important`.
+   The whole mechanism collapses to the four declarations below because
+   there is no longer a second state to interpolate towards.
+
+   MEASURED CONSEQUENCE, at 1440×900: the picture was 1440×470 when open
+   and 1360×425 at rest (one 1440-wide box, an inset clip doing the rest),
+   sitting in a 425px runway plus a 45px reserve — 470px of flow, exactly
+   the height the open picture needed. It is now 1440×450 with nothing
+   reserved: the SAME 3.2 ratio this stylesheet has always declared, applied
+   to the page width instead of to the content measure. The chapter is
+   therefore 20px shorter, and that is the whole of it — the document's
+   scrollable height went 7946 → 7863 (−83px), of which 63px is About's own
+   top padding coming down and 20px is this. */
+
+/* THE PICTURE.
+   Full page width — `100% + 2 * --pad-x` is exactly the section's border
+   box, which is the page's own width, and negative inline margins on an
+   auto-width block get there without stating the width twice. Deliberately
+   NOT `100vw`: on a platform with a classic (space-taking) scrollbar, 100vw
+   includes the scrollbar and the band would be a scrollbar's width too wide
+   and horizontally off-centre. This form cannot be wrong, because it is
+   derived from the box the page is actually laid out in.
+
+   `aspect-ratio: 3.2`, stepping to 2.05 then 1.65 as the frame narrows,
+   tracks JoinUs.module.css .heroBand step for step — a narrow frame is
+   bounded by WIDTH, and a tall ratio there crops the photograph sideways
+   rather than giving it height.
+
+   The maroon under it is the ground the photograph loads against; cream
+   would flash white inside the frame.
+
+   Nothing here is sticky, fixed or pinned, and nothing reads the scroll.
+   The box scrolls at the page's one rate and never changes shape. */
+/* .band and .bandImg ARE DELETED with the photograph they styled — see
+   Manifesto.tsx for why the band went. They are removed rather than left
+   in place "in case it comes back": an absolutely-positioned aspect-ratio
+   box with a full-bleed negative margin is exactly the kind of rule that
+   gets copied onto something else and drags its assumptions along. */
+
+/* ── WHAT ELSE WENT WITH THE EXPANSION, recorded once rather than left as
+   dead rules. Roughly 160 lines of this stylesheet were the pill on the
+   photograph and the scrim written to make it legible there:
+
+     · `.bandScrim` — a radial `color-mix(in srgb, var(--maroon) N%,
+       transparent)` ramp anchored on the picture's bottom-left corner.
+     · `.bandCtaSeat` / `.bandCta` / `.bandCtaChevron`, their hover (which
+       traded the two inks rather than brightening) and their two-ring
+       focus indicator.
+
+   THE MEASUREMENT THEY CARRIED IS WORTH KEEPING even though the object is
+   gone, because the next control anyone seats on a photograph on this site
+   will hit it again. Measured at 1440×900 on careers-hero-alt.jpg
+   (scripts/probe-band-about-press.mjs, section 5): a cream fill against the
+   real pixels of that corner ran mean 5.01:1 but a WORST PIXEL of 1.48:1 —
+   a pill dissolving into a highlight on the linen. The scrim took the mean
+   to 8.03:1 and still failed at 390 (1.08:1 worst pixel, because
+   `object-fit: cover` takes a different crop at 1.65 than at 3.2). The fix
+   that actually generalises was a 1px maroon hairline on the cream fill:
+   the control then presents BOTH inks at once, and since cream and maroon
+   are a fixed distance apart, for any backdrop between them
+       CR(cream,bg) × CR(bg,maroon) = CR(cream,maroon)
+   so the larger of the two is always at least the square root of that
+   constant. A scrim seats a control; only a dual-ink edge guarantees it.
+
+   THE IDENTITY SURVIVED THE PALETTE SOFTENING; THE CONSTANT DID NOT. The
+   pair was 14.00:1, which put the guarantee at √14.00 = 3.74:1. It is now
+   9.80:1, so the guarantee is √9.80 = 3.13:1. Still over the 3:1 a
+   graphical object answers to — which is the bar this argument was built
+   to clear — but the 0.74 of headroom is down to 0.13, and the guarantee
+   is now the tightest structural margin on the page. If the pair is ever
+   softened again, THIS is the number that fails first: the ink and the
+   ground cannot come closer than 9:1 without the dual-ink edge stopping
+   being a guarantee at all.
+
+   THE PILL WAS NOT RELOCATED. About's "Get to Know Us" one screen below is
+   the surviving control to /about, and asking twice in two screens was the
+   reason to drop one of them rather than to move it.
+
+   REDUCED MOTION needs no block here any more. It used to force the open
+   clip back on with `!important` so the scrub could stay dumb about media
+   queries; with no clip and no transition on this chapter there is nothing
+   left to suppress. */
+
+/* THE TWO `.band` MEDIA QUERIES THAT SAT HERE ARE DELETED. They stepped the
+   photograph's aspect ratio down (3.2 → 2.05 at 1100, → 1.65 at 600) so a
+   narrow frame gained height instead of cropping sideways. `.band` itself
+   was removed with the photograph in an earlier pass and these were left
+   behind — rules matching nothing, at the bottom of the file where the
+   deletion note above them reads as if the job were finished. */

@@ -92,16 +92,29 @@
   }
 }
 
-/* ---- accordion list ---- */
+/* ---- accordion list ----
+
+   Both rules were `rgba(250, 247, 241, 0.22)` — #faf7f1, the cream from TWO
+   palettes ago, copied rather than referenced, so the palette softening never
+   reached them. 22% of the token at the SAME alpha: measured on /contact, the
+   old literal composited to rgb(82,98,85) on the maroon ground for 1.94:1 and
+   the new mix reads rgb(79,94,77) for 1.82:1. The step down is the migration
+   working, not damage — the longer argument is in ReviewUs.module.css, whose
+   table rules are the same hairline at the same alpha on the same ground.
+
+   ORNAMENT, which is what makes holding the old number the wrong instinct.
+   What identifies each row as a control is its <button> and the text in it,
+   not the rule between rows; 1.4.11's 3:1 governs the former, and neither the
+   old literal nor the new mix was ever within a mile of it. */
 .list {
   list-style: none;
   margin: 0;
   padding: 0;
-  border-top: 1px solid rgba(250, 247, 241, 0.22);
+  border-top: 1px solid color-mix(in srgb, var(--cream) 22%, transparent);
 }
 
 .list > li {
-  border-bottom: 1px solid rgba(250, 247, 241, 0.22);
+  border-bottom: 1px solid color-mix(in srgb, var(--cream) 22%, transparent);
 }
 
 .row {

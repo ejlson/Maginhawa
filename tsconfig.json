@@ -40,9 +40,10 @@
     ".next-menu/types/**/*.ts",
     ".next-nav/types/**/*.ts",
     ".next-prod/types/**/*.ts",
+    ".next-verify/types/**/*.ts",
     ".next/types/**/*.ts",
     "next-env.d.ts",
-    ".next-verify/types/**/*.ts"
+    ".next-dev-alt/types/**/*.ts"
   ],
   "exclude": [
     "node_modules"

@@ -1,396 +1,292 @@
 "use client";
 
-import {
-  cubicBezier,
-  motion,
-  useReducedMotion,
-  useScroll,
-  useTransform,
-  type MotionValue,
-} from "framer-motion";
-import { useEffect, useLayoutEffect, useRef, useState } from "react";
+import { motion, useReducedMotion, type Variants } from "framer-motion";
+import { Fragment } from "react";
+import StoryStrip from "./StoryStrip";
 import styles from "./Manifesto.module.css";
 
-// the site's shared enter curve — ease-out dominant, settles long. The
-// scrub needs it as a FUNCTION (a bezier tuple is a transition shorthand,
-// which useTransform does not take), so it is built once here.
-const EASE = [0.22, 1, 0.36, 1] as const;
-const SCRUB_EASE = cubicBezier(0.22, 1, 0.36, 1);
+/* ══════════ THE SENTENCE NOW SAYS WHAT THE NAME MEANS ══════════
+   It has been through three versions. The first described the category
+   ("a vibrant Filipino and pan-Asian collective of restaurants, cafés and
+   parlours in the heart of London") — every clause a fact a directory
+   already carries, doing its persuading with "vibrant", which every
+   restaurant group on earth calls itself. The second stated a priority
+   ("a family first, and a restaurant group second") — a real claim, but
+   one any family-run group could make word for word.
 
-// The statement as a STREAM of words and inline photographs — Telescope's
-// image-in-headline move: each photo reads as one more "word" the sentence
-// opens up to admit.
-// `w` is the print's width in em of the display size; the height is fixed
-// by .inlineImg, so w IS the shape. Mixed on purpose — two uprights, two
-// landscapes and a square, so the line reads as photographs laid into a
-// sentence rather than a row of identical chips.
-/** how one print arrives once its slot has opened for it */
-type Enter = "drop" | "slide" | "rise";
-type StatementPart = string | { img: string; w: number; enter: Enter };
+   THIS ONE CANNOT BE SAID BY ANYONE ELSE, because it is about the name.
+   "Maginhawa" is Tagalog for comfortable, and the line turns that into the
+   group's actual promise: the room before the food.
 
-/* THREE prints, not five. Five put a picture on every line and turned a
-   sentence into a contact sheet — the words stopped leading and the effect
-   started repeating before it had finished being a surprise. Three sit one
-   per line, each a different shape and each arriving a different way. */
-const PARTS: StatementPart[] = [
+   IT IS NOT NEW COPY — it is the group's own established framing, lifted
+   from the standfirst already written in app/lab/type/plaster/page.tsx
+   ("The word is Tagalog for comfortable, and it is a promise about the room
+   before it is a promise about the food"). Using the site's existing voice
+   rather than inventing a fourth one, and putting it where the page's
+   opening statement belongs instead of leaving it in a throwaway lab
+   route. */
+const WORDS = [
+  "Maginhawa",
+  "is",
+  "Tagalog",
+  "for",
+  "comfort.",
   "A",
-  "vibrant",
-  "Filipino",
-  { img: "/images/manifesto/group-web.jpg", w: 1.5, enter: "drop" }, // upright
+  "quiet",
+  "idea",
+  "that",
+  "shapes",
+  "every",
+  "room",
+  "we",
+  "create,",
+  "every",
+  "meal",
+  "we",
+  "serve,",
   "and",
-  "pan-Asian",
-  "collective",
-  "of",
-  "restaurants",
-  { img: "/images/manifesto/belly-web.jpg", w: 1, enter: "rise" }, // square
-  ", cafés",
-  { img: "/images/manifesto/cafemama-web.jpg", w: 0.86, enter: "slide" }, // square
-  "and",
-  "parlours",
-  { img: "/images/manifesto/mamasons-web.jpg", w: 1.5, enter: "rise" }, // landscape
-  "in",
-  "the",
-  "heart",
-  "of",
-  "London.",
+  "every",
+  "guest",
+  "we",
+  "welcome.",
 ];
 
-/* The two words that say WHAT this is and the one that says WHERE, lifted
-   into the accent. Three of fifteen — any more and the emphasis stops being
-   emphasis. `--saffron-ink`, not `--saffron`: the accent proper computes
-   ~3.0:1 on the cream, which is a hair under the 3:1 large-text floor even
-   at this size, while the ink clears 5.7:1 and reads unmistakably as the
-   same colour. */
-const KEY_WORDS = new Set(["Filipino", "pan-Asian", "London."]);
+/* THE ACCENT: the two words the claim turns on. "comfortable" is what the
+   name means; "room" is the thing being promised, and the whole point of
+   the sentence is that it comes before the food. Deliberately still TWO —
+   five accented words of twenty is most of the sentence, and an accent on
+   most of a sentence is not an accent. Deliberately NOT "Maginhawa": it
+   opens the line and carries the full weight of the display size already,
+   and colouring it as well would make the first word shout twice.
+   The lookup strips trailing punctuation (see wordClass), so "comfortable."
+   matches on "comfortable" — which is the entire reason that exists. */
+/* "promise" WAS ASKED FOR AND IS NOT IN THE COPY. The request named
+   "comfort" and "promise"; the replacement sentence supplied in the same
+   message drops "promise" entirely ("A quiet idea that shapes every room we
+   create…"). "quiet" takes the second emphasis instead — it is the word
+   that characterises the idea, and it is the only other word in the line
+   carrying an argument rather than a mechanism. Say the word and it moves. */
+const KEY_WORDS = new Set(["comfort", "quiet"]);
 
-const STATEMENT = PARTS.filter((p) => typeof p === "string").join(" ");
-
-/* NO SUPPORT LINE. "Explore our family of restaurants and stores, where
-   tradition is served with a modern twist." used to sit opposite the
-   statement here. It now introduces the rooms themselves, under the Our
-   Restaurants title (see Discover) — which is where an invitation to
-   explore them belongs, and it was doing nothing beside a statement that
-   already says what the group is. The statement holds the measure alone. */
-
-/* ============================ THE SCRUB ============================
-   THE READER'S HAND SETS THE SENTENCE, ONE LINE AT A TIME.
-
-   Each locked line owns its own scroll range, and that range OPENS when the
-   line reaches the middle of the screen: progress 0 is the line's centre on
-   the viewport's centre, progress 1 is that centre a third of a screen
-   higher. So the top line is already set while the last is still closed,
-   and the sentence composes itself down the page under the reader's hand
-   rather than playing a timeline at them once.
-
-   This replaces a whileInView timeline of staggered springs. The springs
-   are gone entirely — a scrubbed value must be a pure function of scroll or
-   it fights the wheel on the way back up. */
-/* BOTH ENDS MOVED TOGETHER, which is the difference between "earlier" and
-   "slower". The offsets are `targetPoint containerPoint`, and the container
-   point runs 0 at the top of the viewport to 1 at the bottom — so a LARGER
-   number is lower on screen, and therefore sooner as the reader comes down
-   the page.
-
-   The start was `center center`: nothing happened until a line's centre had
-   climbed all the way to the middle of the screen, which is late — the line
-   is fully in view and has been sitting there closed for a third of a screen
-   by then. It now opens at 0.68, roughly a fifth of a viewport earlier.
-
-   The end moves by the SAME 0.18 rather than staying put. Holding it would
-   have stretched each line's range from 0.32 of a screen to 0.50 and made the
-   whole sentence set more slowly under the same hand — a different change
-   from the one asked for. Shifted together, the travel is identical and only
-   the onset moves. */
-const SCRUB_START = "center 0.68";
-const SCRUB_END = "center 0.36";
-
-/** how much of a line's range one part takes to complete */
-const PART_SPAN = 0.55;
-
-/** the window inside [0,1] that part `i` of `n` runs in */
-function windowFor(i: number, n: number): [number, number] {
-  if (n <= 1) return [0, PART_SPAN];
-  const step = (1 - PART_SPAN) / (n - 1);
-  const from = i * step;
-  return [from, from + PART_SPAN];
+/** the class list for one word. Shared so the static and animated passes
+    cannot drift apart on it. */
+function wordClass(word: string) {
+  const bare = word.replace(/[^\p{L}\p{M}-]+$/u, "");
+  return KEY_WORDS.has(bare) ? `${styles.word} ${styles.key}` : styles.word;
 }
 
-/* AND THEN THE PICTURE ARRIVES INTO THE SPACE.
-   The slot opening and the photograph entering are two events, a beat
-   apart: the sentence makes room, and only then is something put in it.
-   Each print comes from a different edge of its own slot — one falls in,
-   one is pushed in from the left behind the words it just moved, one rises.
+/** the accessible name — the sentence, plainly */
+const STATEMENT = WORDS.join(" ");
 
-   Percentages are of the PRINT, and the slot clips, so 150% is always fully
-   out of sight whatever the shape. No opacity on the print itself: the slot
-   does the hiding, and a picture that fades as it travels reads as a
-   slideshow rather than as something being placed. */
-const ENTER_OFFSET: Record<Enter, { x: string; y: string }> = {
-  drop: { x: "0%", y: "-150%" },
-  slide: { x: "-130%", y: "0%" },
-  rise: { x: "0%", y: "150%" },
+/* ══════════ THE EYEBROW: WHAT THIS ACTUALLY IS ══════════
+   A small descriptor over the display line, the way the reference sets
+   "Real estate developers and managers" over its statement.
+
+   IT IS NOT DECORATION — it repairs a gap the new statement opened. The
+   sentence below is a BELIEF ("a promise about the room before it is a
+   promise about the food"), which is the right register for a manifesto and
+   is also, on its own, unreadable as a business. A first-time visitor
+   landing on this screen would learn that a Tagalog word means comfortable
+   and nothing whatsoever about restaurants. Every earlier version of the
+   statement carried that load itself, which is exactly why they read as
+   category descriptions rather than as claims.
+
+   Splitting the two jobs is what lets both be good: the eyebrow says what
+   the group is in one plain line, and the sentence is then free to say
+   something only this group could say. The masthead under the photographs
+   completes it — where, who, when.
+
+   IT NOW INTRODUCES THE SENTENCE RATHER THAN CATEGORISING THE GROUP. It
+   read "Filipino, Filipino-Japanese and Caribbean kitchens" — a plain
+   descriptor, chosen because the statement is a belief and something on the
+   screen had to say what the business is. That job is now done elsewhere on
+   the page: the masthead under the photographs says London and Est. 1987,
+   the story split below opens "A London family, cooking since 1987", and
+   the restaurants chapter sits directly above. With the what-is-it covered
+   three times over, this line is free to do the thing an eyebrow does best
+   — pose the question the display line answers. */
+/* It read "What our name asks of us" — a question posed as a label, which
+   made the display line beneath it read as the answer to a quiz. This is a
+   statement of the same shape as the sentence it introduces: one word, then
+   its consequences, which is exactly the structure of "Maginhawa is Tagalog
+   for comfort. A quiet idea that shapes every room…". */
+const EYEBROW = "One word, and everything that follows";
+
+/* ══════════════════ THE ENTRANCE ══════════════════
+   IT PERFORMS ONCE, ON ARRIVAL. It does not track the wheel.
+
+   WHAT THIS REPLACES, and why the change is a real improvement rather than
+   a restyle. Every previous version was SCROLL-SCRUBBED, line by line: the
+   sentence set itself under the reader's hand, each line owning a slice of
+   scroll. That produced two problems the design kept working around.
+
+     · A SCRUBBED SENTENCE IS NEVER FINISHED. Stop scrolling halfway and it
+       stays halfway, indefinitely. That is why the previous entrance had to
+       be a bare opacity fade with a measured 0.55 floor: any animation
+       whose partial state is a DEFECT — a word standing off its baseline, a
+       half-open letterspacing — was unavailable, because a partial state
+       was a resting state. The floor was a constraint the technique imposed,
+       not a feature.
+     · IT MADE THE SENTENCE'S DELIVERY A FUNCTION OF SCROLL SPEED. A fast
+       reader got the whole line at once; a slow one got it word by word
+       over several seconds. A statement should read the same way to
+       everybody.
+
+   Triggered once on entry, the words can travel — they lift into place as
+   they ink in — because the animation is guaranteed to COMPLETE. Nothing is
+   ever left ragged, so nothing has to be legible mid-flight.
+
+   The old objection to whileInView does not apply here. The reason the
+   scrub replaced a timeline of staggered SPRINGS was that a spring driven
+   off scroll fights the wheel on the way back up. This is not scroll-linked
+   at all: it fires once and runs on its own clock. */
+const EASE_ENTRANCE = [0.22, 1, 0.36, 1] as const;
+
+/* TWO LEVELS OF STAGGER, because the block has two kinds of child.
+   `staggerChildren` only ever applies to DIRECT children, so the outer
+   block sequences [eyebrow, statement] and the statement then sequences its
+   own twenty words. Variants cascade by name through both levels, so one
+   `whileInView` on the block drives the whole cascade. */
+const blockVariants: Variants = {
+  hidden: {},
+  shown: { transition: { staggerChildren: 0.12, delayChildren: 0.04 } },
 };
 
-/** the beat between a slot opening and its print being placed in it */
-const PLACE_GAP = 0.3;
+const eyebrowVariants: Variants = {
+  hidden: { y: "40%", opacity: 0 },
+  shown: {
+    y: "0%",
+    opacity: 1,
+    transition: { duration: 0.6, ease: EASE_ENTRANCE },
+  },
+};
 
-/** one word, rising out of its own clip as the line is scrubbed */
-function ScrubWord({
-  p,
-  at,
-  word,
-}: {
-  p: MotionValue<number>;
-  at: [number, number];
-  word: string;
-}) {
-  // 130% (not ~110%) because the mask's clip window is padded taller than
-  // the word's own line box to protect descenders — see .wordMask
-  const y = useTransform(p, at, ["130%", "0%"], { clamp: true, ease: SCRUB_EASE });
-  return (
-    <span className={styles.wordMask} aria-hidden>
-      <motion.span
-        className={
-          KEY_WORDS.has(word) ? `${styles.word} ${styles.key}` : styles.word
-        }
-        style={{ y }}
-      >
-        {word}
-      </motion.span>
-    </span>
-  );
-}
+const statementVariants: Variants = {
+  hidden: {},
+  shown: {
+    transition: {
+      /* 0.045s × 20 words = ~0.9s from first word to last, over a 0.75s
+         word — so the wave is always in flight across several words at
+         once and never reads as a queue of individual events. */
+      staggerChildren: 0.045,
+      delayChildren: 0.06,
+    },
+  },
+};
 
-/** one print: the slot opens to push the words aside, then the picture is
-    placed into the space the slot just made */
-function ScrubPrint({
-  p,
-  at,
-  part,
-}: {
-  p: MotionValue<number>;
-  at: [number, number];
-  part: { img: string; w: number; enter: Enter };
-}) {
-  const [from, to] = at;
-  const span = to - from;
-  /* QUANTISED, AND THAT IS THE WHOLE FIX FOR THE SCROLL STALL.
-
-     `width` and `marginRight` are LAYOUT properties and they are the point —
-     the slot has to physically open in the text flow so the sentence makes
-     room for the photograph rather than the photograph appearing on top of
-     it. That cannot become a transform without losing the effect.
-
-     What it can stop being is CONTINUOUS. Driven straight off the scrub these
-     produced a new sub-pixel value every frame, and every one of them
-     reflowed the paragraph — which re-lays-out every word mask in the
-     sentence, the same masks the scrub is writing transforms to on that frame.
-     Profiled over the section at 1440: worst frame 530.3ms, seven frames past
-     50ms. (The Discover section next door, which drives only transforms and
-     opacity, measured zero frames past 32ms over the same sweep.)
-
-     A layout only happens when the value actually CHANGES, so rounding to a
-     step the eye cannot resolve cuts the reflow count by roughly the ratio of
-     the step to a pixel. 0.04em is ~2.6px at this display size — invisible on
-     a growing edge mid-scroll, and it takes the paragraph from reflowing every
-     frame to reflowing about twenty times across the whole open.
-
-     The margin is quantised on its own, finer scale: it only ever travels
-     0.24em, so it needs a smaller step to stay smooth, and it is one value
-     for the whole run rather than per-print. */
-  const QUANTUM = 0.04;
-  const widthEm = useTransform(p, at, [0, part.w], {
-    clamp: true,
-    ease: SCRUB_EASE,
-  });
-  const width = useTransform(
-    widthEm,
-    (v) => `${Math.round(v / QUANTUM) * QUANTUM}em`,
-  );
-  const marginEm = useTransform(p, at, [0, 0.24], {
-    clamp: true,
-    ease: SCRUB_EASE,
-  });
-  const marginRight = useTransform(
-    marginEm,
-    (v) => `${Math.round(v / 0.02) * 0.02}em`,
-  );
-  // the print is already making room before it becomes visible, rather than
-  // appearing and then shoving
-  const opacity = useTransform(p, [from + span * 0.2, from + span * 0.6], [0, 1], {
-    clamp: true,
-  });
-  const place: [number, number] = [from + span * PLACE_GAP, to];
-  const off = ENTER_OFFSET[part.enter];
-  const x = useTransform(p, place, [off.x, "0%"], { clamp: true, ease: SCRUB_EASE });
-  const y = useTransform(p, place, [off.y, "0%"], { clamp: true, ease: SCRUB_EASE });
-
-  return (
-    <motion.span
-      className={`${styles.wordMask} ${styles.imgMask}`}
-      aria-hidden
-      style={{ width, marginRight, opacity }}
-    >
-      <motion.img
-        className={styles.inlineImg}
-        src={part.img}
-        alt=""
-        draggable={false}
-        style={{ width: `${part.w}em`, x, y }}
-      />
-    </motion.span>
-  );
-}
-
-/** one locked line, and its own scroll range */
-function ScrubLine({ group }: { group: number[] }) {
-  const ref = useRef<HTMLSpanElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: [SCRUB_START, SCRUB_END],
-  });
-  const n = group.length;
-  return (
-    <span className={styles.line} ref={ref}>
-      {group.map((i, k) => {
-        const part = PARTS[i];
-        const at = windowFor(k, n);
-        return typeof part === "string" ? (
-          <ScrubWord key={i} p={scrollYProgress} at={at} word={part} />
-        ) : (
-          <ScrubPrint key={i} p={scrollYProgress} at={at} part={part} />
-        );
-      })}
-    </span>
-  );
-}
+const wordVariants: Variants = {
+  /* `y` IS A PERCENTAGE, NOT AN em. Framer resolves transform percentages
+     against the element's OWN box, so 55% of a word's line box is a
+     consistent fraction of the type size at every breakpoint — an em value
+     would not resolve here, and a px value would be a different-sized lift
+     at 2.4rem than at 5.2rem. */
+  hidden: { y: "55%", opacity: 0 },
+  shown: {
+    y: "0%",
+    opacity: 1,
+    transition: { duration: 0.75, ease: EASE_ENTRANCE },
+  },
+};
 
 /**
- * Group the statement's parts into the lines they will finally occupy.
+ * The positioning statement: the display line across the full measure, with
+ * the band of photographs beneath it sharing the same screen.
  *
- * Returns null on the first pass. While it is null the headline renders
- * FLAT and OPEN — every slot at its final width, nothing animating — which
- * is both the layout we want to measure and exactly what the server sent,
- * so hydration matches and nothing flashes. The measurement runs in a
- * layout effect, i.e. before the browser paints, so the swap to the locked,
- * collapsed, scrubbed version is never seen.
- *
- * Once locked, each line is its own block: a word cannot leave its line, the
- * line count cannot change, and therefore neither can the headline's height
- * or the position of anything below it. That is also what makes the slot
- * widths safe to drive from scroll — see ScrubPrint.
- */
-function useLockedLines(ref: React.RefObject<HTMLElement | null>, on: boolean) {
-  const [lines, setLines] = useState<number[][] | null>(null);
-
-  useLayoutEffect(() => {
-    if (!on || lines !== null) return;
-    const el = ref.current;
-    if (!el) return;
-    const parts = Array.from(el.querySelectorAll<HTMLElement>("[data-part]"));
-    if (!parts.length) return;
-    const groups: number[][] = [];
-    let lastTop: number | null = null;
-    for (const node of parts) {
-      const top = Math.round(node.getBoundingClientRect().top);
-      // a new line box, not just a taller print on the same one
-      if (lastTop === null || Math.abs(top - lastTop) > 6) {
-        groups.push([]);
-        lastTop = top;
-      }
-      groups[groups.length - 1].push(Number(node.dataset.part));
-    }
-    setLines(groups);
-  }, [ref, on, lines]);
-
-  // a resize re-wraps the sentence, so the lock has to be re-taken: drop
-  // back to the flat pass and let the effect above measure again
-  useEffect(() => {
-    if (!on) return;
-    const onResize = () => setLines(null);
-    window.addEventListener("resize", onResize);
-    return () => window.removeEventListener("resize", onResize);
-  }, [on]);
-
-  return lines;
-}
-
-/**
- * The positioning statement directly under the hero: the display line
- * bottom-left across 8 columns — with three small photographs the sentence
- * opens up to admit — and the sans support sentence on the right.
- *
- * The whole headline is SCROLL-SCRUBBED, line by line: each line starts
- * setting itself when it reaches the middle of the screen, its words rising
- * out of their clips and its print pushing them aside, all at whatever pace
- * the reader is moving. Reduced motion renders everything static and open.
+ * The words lift into place and ink in, staggered, once, when the sentence
+ * arrives. Reduced motion renders it static and fully inked.
  */
 export default function Manifesto() {
   const reduce = useReducedMotion();
-  const h2Ref = useRef<HTMLHeadingElement>(null);
-  const lines = useLockedLines(h2Ref, !reduce);
 
-  // PASS ONE (and reduced motion): flat and open — what the server sent,
-  // and the layout the lock is measured from.
-  const flat = (
-    <h2 ref={h2Ref} className={styles.statement} aria-label={STATEMENT}>
-      {PARTS.map((p, i) =>
-        typeof p === "string" ? (
-          <span className={styles.wordMask} key={i} data-part={i} aria-hidden>
-            <span
-              className={
-                KEY_WORDS.has(p) ? `${styles.word} ${styles.key}` : styles.word
-              }
-            >
-              {p}
-            </span>
-          </span>
-        ) : (
-          <span
-            className={`${styles.wordMask} ${styles.imgMask}`}
-            key={i}
-            data-part={i}
-            aria-hidden
-            style={{ width: `${p.w}em`, marginRight: "0.24em" }}
-          >
-            {/* eslint-disable-next-line @next/next/no-img-element */}
-            <img
-              className={styles.inlineImg}
-              src={p.img}
-              alt=""
-              draggable={false}
-              style={{ width: `${p.w}em` }}
-            />
-          </span>
-        ),
+  /* THE WORDS ARE SEPARATED BY REAL SPACES, not by margin.
+
+     Every earlier version gave each word `margin-right: 0.24em` because the
+     masks were inline-blocks with no whitespace between them. On a CENTRED
+     paragraph that margin is not harmless: it rides on the last word of
+     every line, widens the line box, and pushes the visible ink half a
+     margin off the page's axis. The old code fixed that with a
+     `:last-child` rule, which only worked because each line was its own
+     block — and lines stopped being their own blocks when the per-line
+     scrub was removed.
+
+     A real space collapses at a line break, which is exactly the behaviour
+     wanted, and it costs nothing. It also means the sentence is selectable
+     and copies out as a sentence. */
+  const words = WORDS.map((w, i) => (
+    <Fragment key={i}>
+      {reduce ? (
+        <span className={wordClass(w)}>{w}</span>
+      ) : (
+        <motion.span className={wordClass(w)} variants={wordVariants}>
+          {w}
+        </motion.span>
       )}
-    </h2>
-  );
+      {i < WORDS.length - 1 ? " " : null}
+    </Fragment>
+  ));
 
   return (
     <section className={styles.section} data-nav-theme="light">
       <div className={styles.inner}>
-        {/* "Who are we?" — the one piece of furniture this chapter carries.
-            The section's own note above says "type only, no eyebrow", which
-            was true when the statement opened the page and needed no
-            introduction. It sits after the rooms now, and a reader arriving
-            from a grid of restaurants needs a beat to know the register has
-            changed from what we serve to who we are. Set as a plain label,
-            NOT the saffron-dot chapter mark that was retired site-wide. */}
-        <p className={styles.kicker}>
-          Who is <span className={styles.kickerName}>Maginhawa Group</span>?
-        </p>
-        {reduce || lines === null ? (
-          flat
+        {/* TYPE ONLY — no eyebrow, no label. The sentence names the group in
+            its own first word, and a label asking the question the line
+            immediately answers is furniture. */}
+        {reduce ? (
+          <div className={styles.block}>
+            <p className={styles.eyebrow}>{EYEBROW}</p>
+            <h2 className={styles.statement} aria-label={STATEMENT}>
+              {words}
+            </h2>
+          </div>
         ) : (
-          <h2 className={styles.statement} aria-label={STATEMENT}>
-            {lines.map((group, li) => (
-              <ScrubLine group={group} key={li} />
-            ))}
-          </h2>
+          <motion.div
+            className={styles.block}
+            variants={blockVariants}
+            initial="hidden"
+            whileInView="shown"
+            /* ONCE. A statement that replays every time it re-enters the
+               viewport turns the page's thesis into a loop. `amount: 0.35`
+               waits until a third of the block is on screen, so it does not
+               start while only the eyebrow has crept past the edge. */
+            viewport={{ once: true, amount: 0.35 }}
+          >
+            <motion.p className={styles.eyebrow} variants={eyebrowVariants}>
+              {EYEBROW}
+            </motion.p>
+            <motion.h2
+              className={styles.statement}
+              aria-label={STATEMENT}
+              variants={statementVariants}
+            >
+              {words}
+            </motion.h2>
+          </motion.div>
         )}
-
       </div>
+
+      {/* THE BAND SHARES THIS SCREEN, which is why it is rendered here
+          rather than as its own chapter in Experience. The section is a
+          full viewport tall, the statement is centred in whatever room is
+          left above the band, and the band sits on the bottom edge — claim
+          in the middle, evidence beneath it, both visible at once. Two
+          sections cannot divide one viewport between them without one
+          knowing the other's height, so the chapter owns both halves. */}
+      <StoryStrip />
     </section>
   );
 }
+
+/* ══════════ WHAT WAS DELETED WITH THE SCRUB, recorded once ══════════
+   `useLockedLines`, `ScrubLine`, `ScrubWord`, `windowFor`, `PART_SPAN`,
+   `SCRUB_START`/`SCRUB_END`, `SCRUB_EASE` and `REST_INK` are all gone.
+
+   useLockedLines measured where every word landed and re-rendered the
+   sentence as one block PER LINE, so each line could own a slice of scroll.
+   It carried a resize listener to re-take the measurement, a null first
+   pass that had to render identically to the server output or hydration
+   would mismatch, and a layout effect to swap the two before paint. All of
+   it existed to serve per-line scrubbing. With the entrance on a single
+   timeline the sentence is just a paragraph again: no measurement, no
+   re-render on resize, no dual render path, and the wrap is whatever the
+   browser decides — which is now free to differ between breakpoints without
+   anything having to be re-locked. */

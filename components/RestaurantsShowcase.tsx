@@ -7,7 +7,11 @@ import Nav from "./Nav";
 import Menu from "./Menu";
 import { useRouteTransition } from "./PageTransition";
 import VideoBackdrop from "./VideoBackdrop";
-import Placeholder from "./Placeholder";
+// THE GRID VIEW'S CARD, shared with the home page's Discover grid. It is
+// the same object at a different aspect — see the derivation in
+// VenueCard.module.css for what a 1:1 card costs against a 3 : 4.3 one.
+import VenueCard from "./VenueCard";
+import { venueCards } from "@/lib/venueCards";
 // ALIASED, and it has to be: this file declares its own `RESTAURANTS` below
 // (L70) — the carousel's ordered list with its per-venue video and display
 // overrides. Importing the canonical array under the same name is a
@@ -132,26 +136,22 @@ const RESTAURANTS = [
 
 const N = RESTAURANTS.length;
 
-const LOGOS: Record<string, string> = {
-  Bintang: "/logo/bintang.png",
-  Belly: "/logo/belly.png",
-  Mamasons: "/logo/mamasons.png",
-  "Café Mama & Sons": "/logo/cafemama.png",
-  Guanabana: "/logo/guanabana.png",
-  "Ramo Ramen": "/logo/ramo.png",
-  Hoodwood: "/logo/hoodwood.png",
-  Bunso: "/logo/bunso.png",
-};
+/* THE GRID VIEW'S EIGHT RECORDS, in the canonical order. Derived, never
+   typed out: lib/venueCards.ts merges lib/restaurants.ts with the few
+   things only a card prints (the three-line address, the price, the
+   Michelin sticker, a focal point), and the home grid is meant to read
+   the same function.
 
-const PHOTOS: Record<string, string> = {
-  Bintang: "/images/bintang.jpg",
-  Belly: "/images/belly3.jpg",
-  "Café Mama & Sons": "/images/cafemama.jpg",
-  Guanabana: "/images/guanabana.jpg",
-  "Ramo Ramen": "/images/ramo.jpg",
-  Hoodwood: "/images/hoowood.jpg",
-  Mamasons: "/images/mamasons.jpg",
-};
+   RETIRED HERE: the local `LOGOS` and `PHOTOS` maps. They were two
+   display-name-keyed tables restating `logo` and `image` off the
+   canonical record, and one of them had already drifted — `PHOTOS` sent
+   Ramo Ramen to /images/ramo.jpg while every other surface used
+   /images/ramoramen.JPG. Both files exist, so nothing 404'd and nothing
+   caught it; the grid simply showed a different photograph of the same
+   restaurant from the one the home page shows. That is exactly the class
+   of bug a second spelling produces, and it is why the card now reads one
+   record. */
+const CARDS = venueCards();
 
 // many stacked copies → an endless loop. We don't touch scrollTop mid-scroll
 // (that kills inertia and feels janky); instead we silently re-centre on the
@@ -325,14 +325,30 @@ export default function RestaurantsShowcase() {
     return () => mq.removeEventListener("change", on);
   }, []);
 
-  // this route is all dark — paint the page (and overscroll) maroon so no
-  // cream/white ever shows, and release the global loader scroll lock
+  // this route is all dark — paint the page (and overscroll) in the ink so
+  // no ground colour ever shows, and release the global loader scroll lock.
+  //
+  // READ THE TOKEN, do not repeat its value. This was the literal #2f0000
+  // and it was the only place in the codebase that hardcoded a palette
+  // colour, so a palette swap left the overscroll gutter painted the old
+  // ink while every other surface moved. Reading the computed value means
+  // the gutter is correct by construction.
+  //
+  // THE FALLBACK IS THE SAME TRAP ONE LEVEL DOWN, and it caught this file
+  // once already: `|| "#17251b"` was the PREVIOUS ink, left behind by the
+  // last palette swap because nobody re-read the right-hand side of an `||`.
+  // It only fires when the custom property is missing entirely — a case that
+  // does not happen in this app — but a wrong colour that never renders is
+  // still a wrong colour waiting for the day it does. It now names the
+  // current ink, and the next person to move --maroon has to move this too.
   useEffect(() => {
     const html = document.documentElement;
+    const ink =
+      getComputedStyle(html).getPropertyValue("--maroon").trim() || "#233829";
     const prevHtml = html.style.backgroundColor;
     const prevBody = document.body.style.backgroundColor;
-    html.style.backgroundColor = "#2f0000";
-    document.body.style.backgroundColor = "#2f0000";
+    html.style.backgroundColor = ink;
+    document.body.style.backgroundColor = ink;
     document.body.classList.remove("is-loading");
     return () => {
       html.style.backgroundColor = prevHtml;
@@ -1019,7 +1035,41 @@ export default function RestaurantsShowcase() {
           </div>
         </div>
 
-        {/* Card-list view — photo grid on a clean cream surface.
+        {/* ═══ CARD-LIST VIEW — a grid of SQUARE venue cards on a cream
+            sheet, and it is now the SAME CARD the home page's Discover
+            grid ships, at 1:1 instead of 3 : 4.3.
+
+            WHAT IT REPLACES: a photo tile with a bottom gradient carrying
+            a cream mark, a location line and a wrapping row of up to three
+            outline pills. It was a different object doing the same job,
+            with its own logo sizing (including a per-venue exception for
+            Bintang), its own ink (`rgba(18, 0, 0, …)`, a hardcoded
+            red-black from the retired palette), its own dimming
+            (`brightness(0.72)` on the photograph itself, which dims the
+            picture rather than grounding the type) and its own contrast
+            budget — none of which had been measured. All of it is gone in
+            favour of the card that has been.
+
+            THE CARDS ARE `<article>`s AND THE CARD IS INSIDE THEM. The
+            article is the SEAT: it owns the aspect (`aspect-ratio: 1`) and
+            nothing else, exactly as the home grid's `<li>` owns 3 : 4.3.
+            See the banner in VenueCard.tsx for why the seat cannot belong
+            to the card.
+
+            NO EXPANSION HERE. The home grid's card presses open a portalled
+            detail overlay; this page has no such thing and inventing one
+            would put a second modal on a page that already portals
+            <MenuOverlay>. The press goes where a reader on this page
+            expects — the venue's own page, through the route transition
+            this component already uses for the wheel's Visit action.
+
+            THE MENU CONTROL OPENS THE OVERLAY rather than navigating,
+            which is this page's own behaviour and is better than the home
+            card's link: the pages are already mounted here. It renders
+            only where the venue carries `menuPages`; the four that do not
+            get one control and no disabled stub. That is a real change
+            from the retired tile, which rendered a greyed-out `Menu`
+            button on every venue but Bunso.
 
             `data-lenis-prevent`: below 980px this box becomes its own
             scroller (see the media query in the stylesheet), and Lenis
@@ -1027,90 +1077,44 @@ export default function RestaurantsShowcase() {
             never reached the grid and the bottom rows were simply
             unreachable. Measured at 900x800: 489px of cards below the fold,
             0px of travel. The attribute tells Lenis to skip any wheel whose
-            composed path passes through here and let the browser scroll this
-            element natively. Harmless above the breakpoint, where the grid
-            fits the screen and there is nothing to scroll. */}
+            composed path passes through here and let the browser scroll
+            this element natively. Harmless above the breakpoint, where the
+            grid fits the screen and there is nothing to scroll. ═══ */}
         <div
           className={styles.cards}
           data-hidden={view !== "cards"}
+          /* THE HIDDEN VIEW IS OUT OF THE TAB ORDER, and this is new.
+             Both views stay MOUNTED so they can crossfade, and
+             `pointer-events: none` only stops the mouse — every control in
+             here was still reachable by Tab while the wheel was on screen,
+             which put the focus ring on an invisible card. The card added
+             a pressable layer of its own, so the count went from three
+             controls per venue to four and the problem stopped being
+             theoretical. `inert` removes the subtree from focus, hit
+             testing and the accessibility tree in one attribute, and
+             — unlike `display: none` — leaves the crossfade intact. */
+          inert={view !== "cards"}
           data-lenis-prevent
         >
-          <div className={styles.cardsGrid}>
-            {RESTAURANTS.map((r) => (
-              <article key={r.name} className={styles.card}>
-                <span className={styles.cardImg}>
-                  {PHOTOS[r.name] ? (
-                    <img src={PHOTOS[r.name]} alt={r.name} />
-                  ) : r.name === "Bunso" ? (
-                    <span className={styles.cardField} aria-hidden>
-                      Bunso
-                    </span>
-                  ) : (
-                    <Placeholder ratio="auto" label={r.name} />
-                  )}
-                </span>
-                <div className={styles.cardOverlay}>
-                  {LOGOS[r.name] ? (
-                    <img
-                      className={`${styles.cardMark} ${
-                        r.name === "Bintang" ? styles.cardMarkLg : ""
-                      }`}
-                      src={LOGOS[r.name]}
-                      alt={r.name}
-                    />
-                  ) : r.name !== "Bunso" ? (
-                    // Bunso's field wordmark already names the card
-                    <span className={styles.cardName}>{r.name}</span>
-                  ) : null}
-                  <span className={styles.cardLoc}>{r.location}</span>
-                  <div className={styles.cardActions}>
-                    {/* Bunso has no menu yet — skip even the disabled stub */}
-                    {r.name !== "Bunso" && (
-                      <button
-                        type="button"
-                        className={styles.cardBtn}
-                        onClick={() => openMenuFor(r.name)}
-                        disabled={!hasMenu(r.name)}
-                        aria-label={`View ${r.name} menu`}
-                      >
-                        Menu
-                      </button>
-                    )}
-                    {getBookingUrl(r.name) && (
-                      <a
-                        href={getBookingUrl(r.name)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={styles.cardBtn}
-                      >
-                        Book a Table
-                      </a>
-                    )}
-                    {/* Visit → the restaurant's own site in a new tab;
-                        internal detail page as the no-website fallback */}
-                    {getWebsite(r.name) ? (
-                      <a
-                        href={getWebsite(r.name)}
-                        target="_blank"
-                        rel="noopener noreferrer"
-                        className={`${styles.cardBtn} ${styles.cardBtnSolid}`}
-                      >
-                        Visit
-                      </a>
-                    ) : (
-                      <button
-                        type="button"
-                        className={`${styles.cardBtn} ${styles.cardBtnSolid}`}
-                        onClick={() => {
-                          const slug = SLUG_BY_NAME[r.name];
-                          if (slug) navigate(`/restaurants/${slug}`);
-                        }}
-                      >
-                        Visit
-                      </button>
-                    )}
-                  </div>
-                </div>
+          <div className={styles.cardsGrid} data-venue-grid>
+            {CARDS.map((v) => (
+              <article key={v.slug} className={styles.card}>
+                <VenueCard
+                  item={v}
+                  square
+                  /* the column count this grid actually produces, in the
+                     order the media queries fire — see the stylesheet.
+                     `24vw` at the wide end is the 4-up minus its share of
+                     the gutters and the sheet's padding; getting this
+                     wrong is a 4032px decode on a 220px box. */
+                  sizes="(max-width: 460px) calc(100vw - 32px), (max-width: 700px) 46vw, (max-width: 980px) 31vw, 24vw"
+                  onPress={() => navigate(`/restaurants/${v.slug}`)}
+                  pressLabel={`Open ${v.name}`}
+                  /* passed unconditionally: the card itself is what knows
+                     whether there is a menu behind the control, so the
+                     rule lives in one place for both grids */
+                  onMenu={() => setMenuFor(v.slug)}
+                />
               </article>
             ))}
           </div>

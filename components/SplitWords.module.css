@@ -83,7 +83,7 @@
   /* `both` holds translateY(145%) through the delay, which is what makes the
      stagger read as a stagger rather than as every word starting flat and
      then jumping */
-  animation: swRise var(--sw-dur, 0.75s) cubic-bezier(0.22, 1, 0.36, 1)
+  animation: swRise var(--sw-dur, 0.75s) var(--ease-entrance)
     calc(var(--sw-delay, 0s) + var(--w) * var(--sw-stagger, 0.04s)) both;
   /* promoted only while the block is ON — so one panel's words, not nine
      panels'. The Motion path's `.word` carries a standing will-change, which

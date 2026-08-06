@@ -3,17 +3,15 @@
 import {
   cubicBezier,
   motion,
-  useMotionValue,
   useMotionValueEvent,
-  useReducedMotion,
   useScroll,
-  useSpring,
   useTransform,
 } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import styles from "./Reservations.module.css";
 import VideoBackdrop from "./VideoBackdrop";
+import { useMagnet } from "@/lib/useMagnet";
 
 /* ONE clip, not a cycle. The four that used to rotate here weigh 107MB
    combined; this is the only one the page now pays for, and VideoBackdrop
@@ -27,42 +25,6 @@ import VideoBackdrop from "./VideoBackdrop";
    web-sized derivative of this clip is the fix, not a different restaurant —
    the choice of room is editorial and belongs to the page. */
 const CLIP = "/videos/mamasons-hero.mp4";
-
-/* ---------- the magnetic button ----------
-
-   Three numbers, all derived from the button's own box so the effect stays
-   proportional if the pill's type or padding ever changes.
-
-   REACH — the activation radius as a multiple of the button's HALF-DIAGONAL
-   (not a pixel constant, which would mean something different on every
-   breakpoint). The rendered pill measures ~290x47 at 1440, half-diagonal
-   ~147, so the magnet wakes at ~235px from centre: roughly one button-width
-   of approach, close enough that it never reaches across the column for a
-   pointer that is plainly going somewhere else.
-
-   PULL + the QUADRATIC falloff together shape the curve. Displacement is
-   `PULL * offset * (1 - dist/radius)^2`: zero at the centre (there is no
-   offset to follow), zero at the boundary (so nothing snaps when the pointer
-   crosses in or out), peaking in between. Squaring the falloff is what keeps
-   the far half of the radius quiet — with a LINEAR falloff the same peak
-   forced a 15px shove while the pointer was still 200px away, which read as
-   the button lunging at people walking past. At 1440 the curve measures:
-   200px away -> 3px, 150 -> 15px, 100 -> 23px (capped), 50 -> 23px, 20 -> 13px.
-
-   CAP — half the button's own height (~23px). The ceiling the spec asks for:
-   at full pull the pill still overlaps its rest rect by better than 75% of
-   its area, so it never separates from the space the reader saw it occupy.
-   It binds only in a narrow band around dist ~78px, which is exactly where
-   the raw curve would otherwise overshoot. */
-const REACH = 1.6;
-const PULL = 0.75;
-// Damping 22 against 2*sqrt(stiffness*mass) = 22.8 puts this at zeta ~= 0.96 —
-// just inside critical, so the button returns home without crossing its rest
-// position. Overshoot here is not merely cosmetic: this section is
-// data-cursor="glass", and CustomCursor resolves its mode from
-// elementFromPoint every frame, so an edge swinging back across a stationary
-// pointer would flip button<->zone mode repeatedly on the way to rest.
-const MAGNET_SPRING = { stiffness: 260, damping: 22, mass: 0.5 };
 
 /* ---------- the live clock ----------
 
@@ -364,7 +326,9 @@ function LondonClock() {
  * The one action on the page's closing frame — a pill that drifts toward the
  * pointer as it approaches and springs home when it leaves.
  *
- * The three-element nesting is load-bearing, not decoration:
+ * The physics lives in lib/useMagnet.ts — it is shared with the Blog
+ * chapter's archive pill, which asks for the same behaviour. The three-
+ * element nesting is load-bearing, not decoration:
  *
  *   .magnetHost   NEVER transformed — its border box is the button's REST
  *                 rect, which is what the offset math has to measure from.
@@ -376,126 +340,7 @@ function LondonClock() {
  *                 pressable at rest and at full pull alike.
  */
 function MagneticCta() {
-  const reduce = useReducedMotion();
-  const hostRef = useRef<HTMLSpanElement>(null);
-  // false until an effect proves otherwise: SSR has no matchMedia, and a
-  // static button is the correct thing to render for touch and for reduced
-  // motion, so the safe default is also the fallback.
-  const [magnetic, setMagnetic] = useState(false);
-
-  const mx = useMotionValue(0);
-  const my = useMotionValue(0);
-  const x = useSpring(mx, MAGNET_SPRING);
-  const y = useSpring(my, MAGNET_SPRING);
-
-  useEffect(() => {
-    if (reduce) return;
-    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches)
-      return;
-    setMagnetic(true);
-
-    /* ONE pass per animation frame, every read before every write.
-
-       CustomCursor.tsx:86-102 records what the other shape of this costs: a
-       handler that measured on every pointer event burned ~47% of frames over
-       32ms while scrolling, because a trackpad emits pointermove at ~120Hz
-       and Lenis's lerp of 0.032 turns one wheel notch into seconds of scroll
-       events. So the listeners below do nothing but store two numbers and ask
-       for a frame; the single getBoundingClientRect lives inside the frame,
-       and even there it is skipped unless something has actually invalidated
-       the cached rect. */
-    const pointer = { x: 0, y: 0 };
-    let rect: DOMRect | null = null;
-    let stale = true;
-    let raf = 0;
-    // the last value written, so a pointer resting outside the radius stops
-    // touching the MotionValues entirely instead of re-setting 0 at 120Hz
-    let px = 0;
-    let py = 0;
-
-    const write = (tx: number, ty: number) => {
-      // sub-tenth-pixel changes are below what the spring can render; skipping
-      // them keeps a stationary pointer from waking the animation loop
-      if (Math.abs(tx - px) < 0.1 && Math.abs(ty - py) < 0.1) return;
-      px = tx;
-      py = ty;
-      mx.set(tx);
-      my.set(ty);
-    };
-
-    const frame = () => {
-      raf = 0;
-      const host = hostRef.current;
-      if (!host) return;
-
-      // ---- reads ----
-      if (stale || !rect) {
-        rect = host.getBoundingClientRect();
-        stale = false;
-      }
-      const dx = pointer.x - (rect.left + rect.width / 2);
-      const dy = pointer.y - (rect.top + rect.height / 2);
-      const dist = Math.hypot(dx, dy);
-      const radius = (Math.hypot(rect.width, rect.height) / 2) * REACH;
-
-      // ---- writes ----
-      if (dist >= radius) {
-        write(0, 0);
-        return;
-      }
-      const falloff = (1 - dist / radius) ** 2;
-      let tx = dx * PULL * falloff;
-      let ty = dy * PULL * falloff;
-      const cap = rect.height / 2;
-      const mag = Math.hypot(tx, ty);
-      if (mag > cap) {
-        tx = (tx / mag) * cap;
-        ty = (ty / mag) * cap;
-      }
-      write(tx, ty);
-    };
-
-    const queue = () => {
-      if (!raf) raf = requestAnimationFrame(frame);
-    };
-
-    const onMove = (e: PointerEvent) => {
-      pointer.x = e.clientX;
-      pointer.y = e.clientY;
-      queue();
-    };
-    // The pointer can leave the window mid-pull; without this the button
-    // would hold that displacement until the cursor came back.
-    const onLeave = () => {
-      pointer.x = -1e4;
-      pointer.y = -1e4;
-      queue();
-    };
-    // Scroll and resize only INVALIDATE the rect — a boolean write, no layout.
-    // A frame is requested as well, but only while the button is actually
-    // displaced: that is the one state where scrolling changes the answer, and
-    // it bounds the per-frame measurement to the moments the reader is on the
-    // pill rather than paying for it down the whole page.
-    const onShift = () => {
-      stale = true;
-      if (px || py) queue();
-    };
-
-    window.addEventListener("pointermove", onMove, { passive: true });
-    document.addEventListener("pointerleave", onLeave);
-    window.addEventListener("scroll", onShift, { passive: true });
-    window.addEventListener("resize", onShift);
-    return () => {
-      window.removeEventListener("pointermove", onMove);
-      document.removeEventListener("pointerleave", onLeave);
-      window.removeEventListener("scroll", onShift);
-      window.removeEventListener("resize", onShift);
-      if (raf) cancelAnimationFrame(raf);
-      mx.set(0);
-      my.set(0);
-    };
-  }, [reduce, mx, my]);
-
+  const { hostRef, magnetic, x, y } = useMagnet<HTMLSpanElement>();
   return (
     <span ref={hostRef} className={styles.magnetHost}>
       {/* no style prop at all when the magnet is off, so the computed

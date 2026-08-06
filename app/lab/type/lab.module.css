@@ -1,0 +1,671 @@
+/* One stylesheet, N directions, and the two variables are now GENUINELY
+   separate: a panel carries `data-palette` and `data-type` independently, so
+   any colourway can be shown in any type system by changing one attribute in
+   the markup. The first version fused them into a single `data-dir` block per
+   direction, which meant showing 04's colours in 05's type would have been a
+   hand-copy of eleven tokens — eleven chances to get one wrong and then
+   measure the wrong thing. Nothing below is allowed a `data-dir` special
+   case, because a direction that needs one is not a token swap and would not
+   transfer to the real site as cheaply as it appears to here.
+
+   WHICH AXIS OWNS WHAT. Ground, ink, soft, accent, the pill label, the
+   hairline alpha and the shadow are COLOUR. Both families, both weights, both
+   tracking values and the corner radius are TYPE — radius sits here because
+   it was authored alongside each type system's proportions (a 20px corner
+   under a soft grotesque, a 4px corner under a tight one) and moving it to
+   the colour axis would silently restyle every card on a swap.
+
+   WHY --shadow EXISTS AND IS NOT JUST --ink. The card's shadow used to be
+   mixed from --ink, which is correct on a light palette by coincidence: the
+   ink happens to be the darkest thing in the file. On a DARK palette the ink
+   is the cream, so every dark panel was drawing a pale halo around its card
+   rather than a shadow — visible on 02, 05 and 06 before this token existed.
+   A shadow is not "the text colour at low alpha", it is a darkness, and the
+   only way to say that across an inverting palette is to name it. */
+
+.lab {
+  --pad: clamp(24px, 5vw, 96px);
+}
+
+/* =========================================================================
+   PALETTES
+   ========================================================================= */
+
+/* COBALT & BONE — the accent sits at 4.77:1 rather than the 4.23:1 the first
+   mix produced; it was darkened until it cleared the label floor, same
+   discipline as the live palette. */
+.lab[data-palette="cobalt"],
+.lab [data-palette="cobalt"] {
+  --ground: #eeede7;
+  --ink: #1b3a6e;
+  --soft: #4a628c;
+  --accent: #b83e24;
+  /* the label a WHITE pill carries over film. It is not --ground: on a light
+     palette the ground is near-white, so a ground-coloured label on a white
+     fill is the white-on-white button the a11y check exists to catch. Every
+     palette names the darkest thing it owns. */
+  --pill-ink: #1b3a6e;
+  --rule: color-mix(in srgb, var(--ink) 40%, transparent);
+  --shadow: #16305e;
+}
+
+/* UBE & CALAMANSI — the accent clears 10.67:1 here. On a dark ground a bright
+   accent is FREE, which is the structural advantage of inverting and the
+   reason the dark palettes can use their accent far more liberally than the
+   light ones can. */
+.lab[data-palette="ube"],
+.lab [data-palette="ube"] {
+  --ground: #241a2f;
+  --ink: #eae3da;
+  --soft: #a99db2;
+  --accent: #c8d94a;
+  --pill-ink: #241a2f;
+  --rule: color-mix(in srgb, var(--ink) 28%, transparent);
+  /* the ground's own hue taken below the ground, not the cream ink */
+  --shadow: #0d0813;
+}
+
+/* PAPER & EMBER — #f7f5f0 carries a fraction of the yellow the live ground
+   does, so warmth has to come from the typeface rather than the background.
+   Ink is a soft off-black at 11.69:1, deliberately NOT the 16.42:1 a true
+   black would make — that is the extreme the current palette was moved away
+   from. */
+.lab[data-palette="paper"],
+.lab [data-palette="paper"] {
+  --ground: #f7f5f0;
+  --ink: #323238;
+  --soft: #63636b;
+  --accent: #c4401a;
+  --pill-ink: #323238;
+  --rule: color-mix(in srgb, var(--ink) 38%, transparent);
+  --shadow: #1c1c20;
+}
+
+/* PLASTER & CLARET — the ground is the decision. This is a clay with real
+   pigment in it, not a white tinted toward warm, which is the line the live
+   --cream sits on the wrong side of. Ink is claret rather than a brown-black,
+   so the page is warm-on-warm and the only cool thing on it is the accent.
+
+   BOTH ENDS WERE PULLED APART on request — a lighter cream and a darker ink:
+
+     ground  hsl(24, 46%, 86.1%) → hsl(26, 51%, 92.0%)   L* 87.6 → 93.0
+     ink     hsl(347, 54%, 21.4%) → hsl(346, 57%, 18.4%) L* 18.9 → 15.8
+     pair    9.88:1 → 12.46:1
+
+   TWO THINGS THAT FOLLOW, recorded here because neither is visible in the
+   hexes. First, L* 93.0 is essentially the lightness of #f4f0e4 (L* 94.8) —
+   the cream this project moved AWAY from when the note was "the cream is not
+   that light". What keeps this a different colour is hue and pigment, not
+   value: 26° at 51% saturation against that cream's 45° at 42%. It is the
+   same brightness wearing a different colour, and if the old ground felt
+   washed out this one will too.
+
+   Second, the pair is now 12.46:1, walking back toward the 14.00:1 the live
+   palette was softened away from. Deliberate and asked for; noted so the next
+   person to read this file does not "fix" it. */
+/* SHIPPED. The claret became a maroon — row C off /lab/type/red — and this
+   block now mirrors what globals.css carries, so nothing in the lab shows a
+   colour that no longer exists anywhere. hsl(346, 57%, 18.4%) →
+   hsl(4, 55%, 16.5%); the move was HUE, not depth. 12.46:1 → 13.06:1. */
+.lab[data-palette="plaster"],
+.lab [data-palette="plaster"] {
+  --ground: #f5e9e0;
+  --ink: #411613;
+  --soft: #774440;
+  --accent: #2a5c4a;
+  --pill-ink: #411613;
+  --rule: color-mix(in srgb, var(--ink) 34%, transparent);
+  --shadow: #411613;
+}
+
+/* EMBER & PANDAN — the same inversion as ube and the same free accent that
+   comes with it. The ground carries a red cast rather than a violet one,
+   which is the whole difference between a dining room and a bar.
+
+   THE GROUND WENT DOWN with the plaster's going up:
+
+     ground  hsl(5, 37%, 12.4%) → hsl(7, 41%, 8.6%)   L* 10.1 → 6.0
+
+   Everything laid on it gains rather than loses, which is the asymmetry of
+   deepening a dark ground: ink 12.47 → 13.51, soft 6.38 → 6.91, accent 8.81
+   → 9.55. Nothing needed re-deriving. It stops at 8.6% lightness rather than
+   going lower because below roughly 7% the red cast stops reading and the
+   ground becomes a generic near-black — which would throw away the one thing
+   separating this from 02. */
+.lab[data-palette="ember"],
+.lab [data-palette="ember"] {
+  --ground: #1f0f0d;
+  --ink: #e8dac9;
+  --soft: #b09a89;
+  --accent: #8fc79b;
+  --pill-ink: #1f0f0d;
+  --rule: color-mix(in srgb, var(--ink) 26%, transparent);
+  --shadow: #0d0605;
+}
+
+/* =========================================================================
+   CLARET & PLASTER — 04 IN DARK MODE.
+
+   Not an inversion, and the accent is the reason. Swapping ground and ink
+   would carry the bottle green across untouched, and 04's accent —
+   hsl(158, 37%, 26.3%) — reads 1.93:1 on this ground. Invisible. A dark
+   scheme is a re-derivation of every token against a new ground, and only
+   the HUES survive the trip:
+
+     ground   ← 04's INK hue      hsl(346, 57%, 18.4%) → hsl(346, 54%, 11%)
+     ink      ← 04's GROUND hue   hsl(26, 51%, 92%)    → hsl(24, 38%, 84.3%)
+     accent   ← 04's ACCENT hue   hsl(158, 37%, 26.3%) → hsl(146, 31%, 63.7%)
+
+   So the page is still claret, plaster and bottle green — it is the same
+   three colours seen in a dark room rather than three new ones.
+
+   THE INK IS NOT THE LIGHT MODE'S GROUND. Carried across at #f5e9e0 it
+   measures 15.05:1, which on a ground this dark is glare rather than
+   contrast; toning it to 84.3% lightness and dropping saturation 51% → 38%
+   lands 12.49:1, the same neighbourhood the light mode's own pair sits in.
+
+   THE ACCENT TRAVELLED FURTHEST — 37 points of lightness — because that is
+   what a dark ground demands, and it is the single most common thing a
+   hand-rolled dark mode gets wrong. It buys something in return: 8.52:1
+   where the light mode's green manages 6.46:1, so this scheme can afford to
+   use its accent more freely than 04 can. */
+.lab[data-palette="claret"],
+.lab [data-palette="claret"] {
+  --ground: #2b0d14;
+  --ink: #e6d4c8;
+  --soft: #b8988f;
+  --accent: #86bf9f;
+  --pill-ink: #2b0d14;
+  --rule: color-mix(in srgb, var(--ink) 26%, transparent);
+  --shadow: #150609;
+}
+
+/* =========================================================================
+   TYPE SYSTEMS
+   ========================================================================= */
+
+/* BRICOLAGE GROTESQUE + INSTRUMENT SANS. Bricolage carries an optical-size
+   axis, so the display voice changes SHAPE between caption and headline
+   rather than just scaling — which is what makes type read as drawn. */
+.lab[data-type="bricolage"],
+.lab [data-type="bricolage"] {
+  --f-display: var(--lab-d1-display), Georgia, serif;
+  --f-text: var(--lab-t1-text), Helvetica, Arial, sans-serif;
+  --display-weight: 500;
+  --display-track: -0.03em;
+  --heading-track: -0.025em;
+  --radius: 20px;
+}
+
+/* ARCHIVO + HOST GROTESK. Archivo has newspaper roots and a width axis; set
+   heavy and tight it is a masthead voice, which is why it takes the harder
+   corner. */
+.lab[data-type="archivo"],
+.lab [data-type="archivo"] {
+  --f-display: var(--lab-d2-display), Helvetica, Arial, sans-serif;
+  --f-text: var(--lab-t2-text), Helvetica, Arial, sans-serif;
+  --display-weight: 600;
+  --display-track: -0.02em;
+  --heading-track: -0.02em;
+  --radius: 4px;
+}
+
+/* EB GARAMOND + FIGTREE. An old-style humanist with calligraphic roots: the
+   stress is diagonal and the contrast is low, which is the opposite
+   construction to Contralto's vertical-stress, hairline-thin Didone. That
+   opposition is the point — a display face built the SAME way as the wordmark
+   competes with it, which is exactly the fault in the live Gilda pairing.
+
+   WEIGHT 500, NOT 400, and this is the one thing this pairing gets wrong if
+   left alone. Garamond's regular is a TEXT weight drawn for 10–14pt; run at
+   --t-h2 it goes weedy and the claret loses its authority. 500 is a real
+   drawn weight on the variable font, not a synthesised one. */
+.lab[data-type="garamond"],
+.lab [data-type="garamond"] {
+  --f-display: var(--lab-d4-display), Georgia, serif;
+  --f-text: var(--lab-t4-text), Helvetica, Arial, sans-serif;
+  --display-weight: 500;
+  --display-track: -0.01em;
+  --heading-track: -0.005em;
+  --radius: 16px;
+}
+
+/* LITERATA + FAMILJEN GROTESK. The only face here besides Bricolage carrying
+   a real optical-size axis — drawn for Google Play Books, so it changes SHAPE
+   between caption and headline rather than merely scaling. Squarer serifs and
+   a heavier colour than Garamond, which is what lets it hold a warm ground
+   without going soft. */
+.lab[data-type="literata"],
+.lab [data-type="literata"] {
+  --f-display: var(--lab-d5-display), Georgia, serif;
+  --f-text: var(--lab-t5-text), Helvetica, Arial, sans-serif;
+  --display-weight: 600;
+  --display-track: -0.015em;
+  --heading-track: -0.01em;
+  --radius: 8px;
+}
+
+/* YOUNG SERIF + SCHIBSTED GROTESK. A low-contrast old-style with wedge
+   serifs — a completely different skeleton from Contralto's high-contrast
+   Didone, which is what keeps the wordmark distinct from the headings. */
+.lab[data-type="young"],
+.lab [data-type="young"] {
+  --f-display: var(--lab-d3-display), Georgia, serif;
+  --f-text: var(--lab-t3-text), Helvetica, Arial, sans-serif;
+  --display-weight: 400;
+  --display-track: -0.015em;
+  --heading-track: -0.01em;
+  --radius: 0px;
+}
+
+/* NEWSREADER + PUBLIC SANS. Drawn for reading news on screen, and the closest
+   thing here to a traditional book serif — higher stroke contrast than
+   Literata and a more conventional skeleton. Its optical axis works the
+   opposite way to Bricolage's: it OPENS the letterforms and thins the
+   hairlines as size goes up, which is what a text face has to do to stop
+   looking clotted at headline size. */
+.lab[data-type="newsreader"],
+.lab [data-type="newsreader"] {
+  --f-display: var(--lab-d6-display), Georgia, serif;
+  --f-text: var(--lab-t6-text), Helvetica, Arial, sans-serif;
+  --display-weight: 500;
+  --display-track: -0.012em;
+  --heading-track: -0.008em;
+  --radius: 10px;
+}
+
+/* ZILLA SLAB + EPILOGUE. The one construction nothing else in this set
+   covers: slab serifs, blunt-ended and the same weight as the stems, so
+   there is no contrast to speak of at all. That makes it the most robust
+   option on a warm ground and the least precious.
+
+   WEIGHT 500 AND THE FACE IS STATIC. Zilla ships no variable axis, so the
+   weights are enumerated in fonts.ts and only those exist. Asking for 550
+   here would get a SYNTHESISED bold — smeared stems, no drawn form — and
+   nothing in the page would report it. */
+.lab[data-type="zilla"],
+.lab [data-type="zilla"] {
+  --f-display: var(--lab-d7-display), Georgia, serif;
+  --f-text: var(--lab-t7-text), Helvetica, Arial, sans-serif;
+  --display-weight: 500;
+  --display-track: -0.02em;
+  --heading-track: -0.015em;
+  --radius: 2px;
+}
+
+/* SYNE + FIGTREE. Wide, eccentric, drawn for a contemporary art centre — the
+   outlier of the set and the only one that would read as a design statement
+   before it read as a restaurant. Included because the range is worth seeing;
+   it argues against the brief's "credibility over gimmick" and it should be
+   picked knowingly rather than by accident.
+   Tracking is POSITIVE here, alone in this file: Syne's caps are already
+   wide-set and pulling them tighter collapses the counters. */
+.lab[data-type="syne"],
+.lab [data-type="syne"] {
+  --f-display: var(--lab-d8-display), Helvetica, Arial, sans-serif;
+  --f-text: var(--lab-t4-text), Helvetica, Arial, sans-serif;
+  --display-weight: 700;
+  --display-track: 0.005em;
+  --heading-track: 0em;
+  --radius: 6px;
+}
+
+/* PETRONA + ONEST. A narrow, low-contrast serif with slightly awkward curves
+   that never quite resolve into elegance — which is the appeal. It sets
+   noticeably tighter than everything else here, so the same heading runs
+   shorter and the standfirst gets more room. */
+.lab[data-type="petrona"],
+.lab [data-type="petrona"] {
+  --f-display: var(--lab-d9-display), Georgia, serif;
+  --f-text: var(--lab-t8-text), Helvetica, Arial, sans-serif;
+  --display-weight: 600;
+  --display-track: -0.01em;
+  --heading-track: -0.005em;
+  --radius: 12px;
+}
+
+/* ---------------------------------------------------------------- shell */
+
+.dir {
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--f-text);
+  padding-bottom: clamp(32px, 5vh, 64px);
+}
+
+.bar {
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: 40px;
+  padding: 20px var(--pad) 14px;
+}
+
+/* Contralto, unchanged in every panel — the wordmark is the fixed point the
+   directions are being judged against, not another variable */
+.word {
+  font-family: "contralto-big", "contralto-medium", "Times New Roman", serif;
+  font-weight: 600;
+  font-size: clamp(19px, 1.5vw, 24px);
+  letter-spacing: 0.06em;
+  line-height: 1;
+}
+
+.links {
+  display: flex;
+  gap: clamp(20px, 2.2vw, 34px);
+  font-size: 0.9375rem;
+  color: var(--soft);
+}
+
+/* ----------------------------------------------------------------- hero */
+
+.hero {
+  position: relative;
+  margin: 0 var(--pad);
+  height: clamp(340px, 46vh, 520px);
+  border-radius: var(--radius);
+  overflow: hidden;
+}
+
+.heroImg {
+  object-fit: cover;
+}
+
+/* the ground's own hue pushed into the film, rather than a neutral black —
+   this is what stops a dark palette's hero reading as a different site from
+   its body */
+.heroInk {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    to top,
+    color-mix(in srgb, var(--ground) 12%, rgba(0, 0, 0, 0.72)) 0%,
+    rgba(0, 0, 0, 0.32) 55%,
+    rgba(0, 0, 0, 0.2) 100%
+  );
+}
+
+.lockup {
+  position: absolute;
+  inset: 0;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: flex-end;
+  gap: clamp(18px, 2.4vh, 30px);
+  padding: 0 clamp(20px, 4vw, 60px) clamp(34px, 5vh, 62px);
+  text-align: center;
+}
+
+.lede {
+  margin: 0;
+  max-width: 24ch;
+  font-family: var(--f-display);
+  font-weight: var(--display-weight);
+  font-size: clamp(1.6rem, 3.1vw, 2.7rem);
+  line-height: 1.16;
+  letter-spacing: var(--display-track);
+  color: #fff;
+}
+.lede span {
+  display: block;
+  text-wrap: balance;
+}
+
+.actions {
+  display: flex;
+  gap: 12px;
+}
+
+.primary,
+.secondary {
+  min-height: 44px;
+  padding: 0 clamp(18px, 1.7vw, 26px);
+  border-radius: 999px;
+  font-family: var(--f-text);
+  font-size: 0.9375rem;
+  cursor: pointer;
+}
+.primary {
+  border: 1px solid #fff;
+  background: #fff;
+  color: var(--pill-ink);
+}
+.secondary {
+  border: 1px solid color-mix(in srgb, #fff 55%, transparent);
+  background: transparent;
+  color: #fff;
+}
+
+/* ----------------------------------------------------------------- body */
+
+.body {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) clamp(300px, 30vw, 420px);
+  gap: clamp(28px, 4vw, 72px);
+  align-items: start;
+  padding: clamp(38px, 6vh, 76px) var(--pad) 0;
+}
+
+.copy {
+  min-width: 0;
+}
+
+.eyebrow {
+  margin: 0 0 14px;
+  font-size: 0.75rem;
+  font-weight: 500;
+  letter-spacing: 0.14em;
+  text-transform: uppercase;
+  color: var(--accent);
+}
+
+.heading {
+  margin: 0 0 18px;
+  font-family: var(--f-display);
+  font-weight: var(--display-weight);
+  font-size: clamp(2rem, 4.2vw, 3.4rem);
+  line-height: 1.06;
+  letter-spacing: var(--heading-track);
+}
+/* the accent lands on the noun, as it does on the live page */
+.heading em {
+  font-style: normal;
+  color: var(--accent);
+}
+
+.standfirst {
+  margin: 0 0 22px;
+  max-width: 42ch;
+  font-size: clamp(1.05rem, 1.35vw, 1.3rem);
+  line-height: 1.45;
+  color: var(--soft);
+}
+
+.para {
+  margin: 0 0 26px;
+  max-width: 62ch;
+  font-size: 1rem;
+  line-height: 1.62;
+  color: var(--ink);
+}
+
+.spec {
+  margin: 0;
+  padding-top: 16px;
+  border-top: 1px solid var(--rule);
+  font-size: 0.8125rem;
+  line-height: 1.7;
+  color: var(--soft);
+}
+.spec span {
+  color: var(--ink);
+}
+.ratio {
+  font-variant-numeric: tabular-nums;
+}
+
+/* ----------------------------------------------------------------- card */
+
+.card {
+  position: relative;
+  aspect-ratio: 3 / 4.3;
+  border-radius: var(--radius);
+  overflow: hidden;
+  /* --shadow, NOT --ink. See the note at the top of this file: on the dark
+     palettes --ink is the cream, so this was drawing a pale halo. The alphas
+     are higher on the dark schemes because a dark shadow on a dark ground has
+     less room to register — which is why dark interfaces lean on elevation
+     rather than on shadow, and why this card leans on its own photograph. */
+  box-shadow:
+    0 1px 2px color-mix(in srgb, var(--shadow) 22%, transparent),
+    0 8px 20px color-mix(in srgb, var(--shadow) 20%, transparent),
+    0 22px 48px color-mix(in srgb, var(--shadow) 16%, transparent);
+}
+
+.cardImg {
+  object-fit: cover;
+}
+
+/* the darkening ramp, derived from the photograph rather than tinted with the
+   brand — the live card's behaviour, kept so the panels differ only where
+   they are meant to */
+.ramp {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(to top, rgba(0, 0, 0, 0.82) 0%, rgba(0, 0, 0, 0.5) 26%, rgba(0, 0, 0, 0) 58%);
+}
+
+.cardLogo {
+  position: absolute;
+  top: 18px;
+  left: 18px;
+  width: auto;
+  height: clamp(26px, 2.4vw, 34px);
+  object-fit: contain;
+  filter: brightness(0) invert(1);
+}
+
+.cardFoot {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 62px;
+  display: flex;
+  align-items: flex-end;
+  gap: 10px;
+  color: #fff;
+}
+
+.addr {
+  min-width: 0;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  gap: 1px;
+  font-size: 0.8125rem;
+  line-height: 1.35;
+  color: color-mix(in srgb, #fff 84%, transparent);
+}
+.addr span {
+  overflow: hidden;
+  text-overflow: ellipsis;
+  white-space: nowrap;
+}
+.addrName {
+  font-family: var(--f-display);
+  font-weight: var(--display-weight);
+  font-size: 1.15rem;
+  letter-spacing: var(--heading-track);
+  color: #fff !important;
+  margin-bottom: 2px;
+}
+
+.stats {
+  display: flex;
+  align-items: center;
+  gap: 9px;
+  flex: none;
+  font-size: 0.8125rem;
+  color: color-mix(in srgb, #fff 84%, transparent);
+}
+.stats i {
+  width: 1px;
+  height: 12px;
+  background: color-mix(in srgb, #fff 40%, transparent);
+}
+
+.cardActions {
+  position: absolute;
+  left: 18px;
+  right: 18px;
+  bottom: 18px;
+  display: flex;
+  gap: 8px;
+}
+
+.cardPrimary,
+.cardSecondary {
+  min-height: 34px;
+  padding: 0 16px;
+  border-radius: 999px;
+  font-family: var(--f-text);
+  font-size: 0.8125rem;
+  cursor: pointer;
+}
+.cardPrimary {
+  border: 1px solid #fff;
+  background: #fff;
+  color: #1a1a1a;
+}
+.cardSecondary {
+  border: 1px solid color-mix(in srgb, #fff 55%, transparent);
+  background: transparent;
+  color: #fff;
+}
+
+/* ------------------------------------------------------------ the label */
+
+.tag {
+  display: flex;
+  gap: clamp(14px, 1.6vw, 24px);
+  align-items: flex-start;
+  margin: clamp(34px, 5vh, 60px) var(--pad) 0;
+  padding-top: 20px;
+  border-top: 1px solid var(--rule);
+}
+
+.tagIndex {
+  font-family: var(--f-display);
+  font-weight: var(--display-weight);
+  font-size: clamp(1.6rem, 2.4vw, 2.2rem);
+  line-height: 1;
+  color: var(--accent);
+}
+
+.tagName {
+  margin: 0 0 6px;
+  font-family: var(--f-display);
+  font-weight: var(--display-weight);
+  font-size: clamp(1.25rem, 1.8vw, 1.6rem);
+  line-height: 1.1;
+  letter-spacing: var(--heading-track);
+}
+
+.tagThesis {
+  margin: 0;
+  max-width: 74ch;
+  font-size: 0.9375rem;
+  line-height: 1.55;
+  color: var(--soft);
+}
+
+@media (max-width: 900px) {
+  .body {
+    grid-template-columns: minmax(0, 1fr);
+  }
+  .card {
+    max-width: 380px;
+  }
+}

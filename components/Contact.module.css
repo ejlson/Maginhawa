@@ -131,11 +131,29 @@
 }
 
 /* phone / email / index links — underlined on the maroon ground so they read
-   as links without needing a colour the palette doesn't have */
+   as links without needing a colour the palette doesn't have.
+
+   THE UNDERLINE IS THE AFFORDANCE, so its alpha moved where the ornament in
+   this pass did not. It was `rgba(250, 247, 241, 0.35)` — #faf7f1, the cream
+   from TWO palettes ago. The notes further down this file record the same
+   literal being found and replaced in the form's inputs; this line sat four
+   rules above them and was missed by that sweep.
+
+   0.35 -> 0.39 HOLDS THE COMPOSITE, NOT THE NUMBER. 39% of the current cream
+   lands on the luminance 35% of the old one did — the ×1.115 the two creams'
+   luminances require — so the underline weighs what it always weighed instead
+   of thinning by the width of a palette swap.
+
+   IT IS STILL SHORT OF 3:1, AND THAT IS PRE-EXISTING. Measured on /contact,
+   the old literal composited to rgb(110,123,111) on the maroon ground: 2.80:1
+   against the 3:1 that 1.4.11 asks of the thing identifying a link. At the
+   same 0.35 of the new cream it would have fallen to 2.56:1. What is left is a
+   design call about how loud an underline should be on this ground — and it is
+   the whole 0.2, not the sliver this migration would otherwise have added. */
 .infoLink {
   text-decoration: underline;
   text-underline-offset: 0.25em;
-  text-decoration-color: rgba(250, 247, 241, 0.35);
+  text-decoration-color: color-mix(in srgb, var(--cream) 39%, transparent);
   transition: text-decoration-color 0.3s var(--ease-out);
 }
 
@@ -188,11 +206,17 @@
   min-width: 0;
   background: transparent;
   border: none;
-  /* 0.4, not 0.35. The underline is the ONLY thing that says where the field
-     is, which makes it a user-interface component under WCAG 1.4.11 and puts
-     it on a 3:1 floor against the maroon. Measured: 0.35 → 2.89:1 (fails),
-     0.4 → 3.45:1. */
-  border-bottom: 1px solid rgba(250, 247, 241, 0.4);
+  /* 0.5, AND IT WAS 0.4, AND THE LITERAL IS GONE. The underline is the ONLY
+     thing that says where the field is, which makes it a user-interface
+     component under WCAG 1.4.11 and puts it on a 3:1 floor against the
+     maroon. The old note read "0.35 → 2.89:1 (fails), 0.4 → 3.45:1" and was
+     measured on an ink that has since lifted: on the softened pair 0.4 is
+     2.99:1 and fails by a hundredth. 0.5 is 3.71:1.
+
+     It was also `rgba(250, 247, 241, …)` — #faf7f1, the cream from TWO
+     palettes ago, hardcoded. It is a color-mix of the token now, so the
+     next swap moves it. */
+  border-bottom: 1px solid color-mix(in srgb, var(--cream) 50%, transparent);
   color: var(--cream);
   font-family: var(--font-sans);
   font-size: var(--t-body);
@@ -210,15 +234,19 @@
   min-height: 5.5em;
 }
 
-/* 0.55, not 0.45. The placeholders are the only thing in an empty field that
-   says what goes in it, so they are body text and owe 4.5:1 — and at 0.45
-   cream on maroon they measured 4.09:1, the one text failure on the page.
-   0.55 measures 5.64:1 and still sits clearly below the typed value. */
+/* 0.62, AND IT WAS 0.55, AND 0.45 BEFORE THAT. The placeholders are the only
+   thing in an empty field that says what goes in it, so they are body text
+   and owe 4.5:1. 0.45 measured 4.09:1 — the one text failure on the page —
+   and 0.55 measured 5.64:1, both on the old ink. The softened pair takes 0.45
+   to 3.28:1 and 0.55 to 4.12:1, so the fix that was made has been undone by
+   the palette. 0.62 is 4.80:1 and still sits clearly below the typed value.
+   The literal went with it: this was rgba(250, 247, 241, …), the cream from
+   two palettes ago. */
 .field input::placeholder,
 .field textarea::placeholder {
   font-family: var(--font-sans);
   font-size: var(--t-small);
-  color: rgba(250, 247, 241, 0.55);
+  color: color-mix(in srgb, var(--cream) 62%, transparent);
 }
 
 .field input:focus,

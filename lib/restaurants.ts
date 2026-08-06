@@ -195,6 +195,60 @@ export const RESTAURANTS: Restaurant[] = [
 export const getRestaurant = (slug: string) =>
   RESTAURANTS.find((r) => r.slug === slug);
 
+/**
+ * THE ONE THING A READER CAN DO FROM A TILE, chosen by what the venue is.
+ *
+ * The grid used to hand an inline pill only to the four rooms that take
+ * reservations. Mamasons, Hoodwood, Café Mama and Bunso — the parlour, the
+ * takeaway, the café and the new one — got a photograph and a neighbourhood
+ * and nothing to press. Half the collective the group is NAMED for read as
+ * lesser rooms on first scan, and the closing section reinforced it by
+ * transacting only the bookable four.
+ *
+ * A venue whose job is walk-in does not want a Book button; it wants to tell
+ * you where it is and when it is open. So the action is derived from the
+ * venue rather than bolted on: every tile now carries exactly one, and which
+ * one is a fact about the restaurant.
+ *
+ * ⚠️ `Visit` IS A HOLDING LABEL for the three walk-in venues, and it points
+ * at their own sites because that is the only destination their data
+ * currently supports. The intended labels are `Order` for Hoodwood and
+ * `Find us` for Mamasons and Café Mama — both are blocked, and on data
+ * rather than on code:
+ *   — `Order` asserts that hoodwood.co.uk sells online. Nobody has checked,
+ *     and a button that promises ordering and delivers a homepage is worse
+ *     than one that says Visit.
+ *   — `Find us` has to show a street address and today's hours. Only the
+ *     four bookable venues carry `addresses`, and no venue carries hours at
+ *     all (see DESIGN-PLAN.md decision 3).
+ * Fill those two gaps and this function is where the labels change — once,
+ * for every surface that renders a tile.
+ */
+export type VenueAction = {
+  label: string;
+  href: string;
+  /** external destinations open in a new tab and get rel="noopener" */
+  external: boolean;
+};
+
+export function primaryAction(r: Restaurant): VenueAction | null {
+  // not open yet — say so plainly rather than inviting a visit to a door
+  // that is not there. Bunso's own site is the only place with news.
+  if (r.comingSoon)
+    return r.website
+      ? { label: "Opening soon", href: r.website, external: true }
+      : null;
+
+  if (r.bookable && r.bookingUrl)
+    return { label: "Book", href: r.bookingUrl, external: true };
+
+  if (r.website) return { label: "Visit", href: r.website, external: true };
+
+  // no booking host and no site of their own: the group's own page for the
+  // venue is still a real destination, and it carries the menu
+  return { label: "View", href: `/restaurants/${r.slug}`, external: false };
+}
+
 
 // map the showcase's display name → canonical slug, since the carousel uses
 // "Café Mama & Sons" / "Ramo Ramen" etc. as keys

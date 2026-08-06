@@ -1,0 +1,1415 @@
+/* ═══════════════════════ THE VENUE CARD ═══════════════════════════════
+   One object: a full-bleed photograph, the venue's mark bare in the
+   top-left, a photo-derived ramp in the bottom edge carrying a three-line
+   address, two slim stats and up to two controls, and a four-stop shadow
+   holding the whole thing off the page.
+
+   THIS FILE IS THE CARD'S ONLY STYLESHEET. Every rule below started as the
+   home grid's card in components/Discover.module.css and was lifted here
+   so a SECOND surface (the /restaurants grid) could wear it without a
+   second tuning pass. For one session it was a COPY and both files
+   declared the card, because components/Discover.tsx was being rewritten
+   by another process at the time and editing it would have clobbered work
+   in flight. THAT IS OVER: Discover.module.css's card rules are deleted,
+   Discover.tsx renders <VenueCard> inside its own seat, and the four hover
+   rules it used to write as `.cell:hover .x` are the `.cardSurface:hover
+   .x` ones below — the same box, written from inside the component, which
+   is what lets one sheet serve a grid that has cells and a grid that has
+   none. There is nothing left to keep in sync.
+
+   WHAT THE TWO PAGES STILL OWN, and why it is not duplication:
+     · the SEAT (see below) — different aspects, and the home grid's also
+       carries the expansion's `layoutId` and the probes' `data-plate`;
+     · `.photo`, `.fallback` and `.stickerBadge` are ALSO used by
+       Discover's expansion, which imports this file for exactly those
+       three. They are card rules and they live here.
+   The probe that watches both grids is scripts/probe-square-cards.mjs; its
+   `--home` mode snapshots the home grid's geometry and computed styles so
+   any future move can prove it did not shift the picture.
+
+   ── THE CARD IS SIZED BY ITS SEAT, NOT BY THIS FILE ──
+   `.cardSurface` is `position: absolute; inset: 0` inside whatever box
+   the page gives it, so the ASPECT belongs to the page: the home grid
+   seats it in a 3 : 4.3 padding-top box, /restaurants in an
+   `aspect-ratio: 1` box. Everything on the card that has to know the
+   aspect reads it from the four custom properties below, and the
+   `.square` class is the only place their square values are written.
+   ═══════════════════════════════════════════════════════════════════ */
+
+/* THE CARD SURFACE. A FLEX COLUMN, and that is load-bearing: the
+   photographic layers (still, film, shade, ramp) and the corner furniture
+   are absolutely positioned out of it, and the only two items in flow are
+   .cardTop (flex: 1) and .glass (flex: none). That is what lets the hover
+   blurb sit exactly on the block's top edge without anything having to
+   know how tall the block is.
+
+   THE LIFT AND THE PRESS LIVE HERE, not on an ancestor. On the home grid
+   this element sits INSIDE the box that carries framer's `layoutId`, so
+   its transform cannot reach the rectangle the expansion morph measures.
+   That is why the scale is on the surface and not on the seat, and it is
+   a bug this card has already shipped once (a wrapping <button> lifted the
+   measured box by 1%). Do not move it up. */
+.cardSurface {
+  /* ── THE FOUR ASPECT KNOBS ── portrait defaults; `.square` overrides.
+     They are custom properties rather than a second copy of each rule so
+     that the ramp, the wash and the block stay ONE description of one
+     card with two shapes. */
+
+  /* THE RAMP'S HEIGHT, as a share of the CARD's height. 58% is the home
+     grid's portrait value; see .rampBlur for what the ramp is and see
+     .square for how the square's number was derived. */
+  --vc-ramp-h: 58%;
+
+  /* THE MARK'S CORNER WASH — its box height, i.e. the vertical radius of
+     the ellipse, and the ellipse's stop list. Both move together: the
+     stops are placed against the normalised distance the mark's far
+     corner lands at, and that distance is a function of this height. */
+  --vc-wash-h: clamp(96px, 55cqi, 175px);
+  --vc-wash-stops:
+    color-mix(in srgb, var(--maroon) 74%, transparent) 0%,
+    color-mix(in srgb, var(--maroon) 70%, transparent) 24%,
+    color-mix(in srgb, var(--maroon) 62%, transparent) 58%,
+    color-mix(in srgb, var(--maroon) 22%, transparent) 82%,
+    /* transparent MAROON, never the `transparent` keyword: sRGB
+       interpolation toward transparent-black greys the fade, and the rest
+       of this file already spells its zero stops out this way */
+      color-mix(in srgb, var(--maroon) 0%, transparent) 100%;
+
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: 100%;
+  display: flex;
+  flex-direction: column;
+  overflow: hidden;
+  /* THIS IS THE ELEMENT THE READER'S EYE READS THE CORNER OFF. It is the
+     one in the tile that both clips (`overflow: hidden`) and curves; the
+     2px on Discover's .tileMedia above it paints nothing, because that box
+     is `overflow: visible` by design.
+
+     --radius-tile (8px), at the user's instruction, so the restaurant
+     cards match the story band's photographs. It was 28px, argued as a
+     CURVATURE number rather than a size one: on a 274×393 card a 20px
+     radius turns for only ~7% of the short edge, so the eye reads a
+     straight edge stopping abruptly with a quarter-circle stuck on, while
+     28 spent ~10% and began the turn early enough to read as one contour.
+
+     THAT ARGUMENT HAD ALREADY EXPIRED, which is worth recording rather
+     than quietly overwriting. It was built for a 3:4.3 UPRIGHT. The cards
+     are 331×252 landscape now (PLATE_RATIO 0.76), so 28px was spending
+     ~11% of the short edge on a box half the height it was reasoned about
+     — the curve had grown relative to the card without anyone choosing it.
+
+     The site already owns the number this wants: --radius-tile is defined
+     as "photography + editorial frames — a quiet edge-soften, not an
+     app-card curve", and the band, the About prints and the blog media all
+     take it. The cards now join that system instead of holding a ninth
+     radius of their own. */
+  border-radius: var(--radius-tile);
+  background: var(--placeholder);
+  /* THE CARD IS THE MEASURE, NOT THE VIEWPORT — see the @container rules
+     at the foot of this file. The same 4-up card is 183px wide at a 981px
+     window and 274px at 1440; a viewport media query cannot tell those
+     apart, and it is the CARD's width the block's type has to fit. */
+  container-type: inline-size;
+  container-name: card;
+  /* THE SHADOW — FOUR STOPS, and the count is the point. Two stops cannot
+     describe a real penumbra: light falls off continuously and a pair of
+     them draws a hard little shadow with a soft halo hovering clear of it,
+     the gap between the two radii visible as a band. Four roughly-doubling
+     radii (2 / 6 / 18 / 44) with alpha falling as they widen approximate
+     that curve closely enough that the falloff reads as one shadow.
+     Ink rather than grey throughout so it belongs to the palette, and
+     every stop is negative-spread except the contact one — a wide shadow
+     at full spread bleeds sideways past the card and, on a four-up grid,
+     pools in the column gaps between neighbours. */
+  box-shadow: var(--shadow-card);
+  transform: scale(1);
+  transition:
+    transform 400ms var(--ease-drawer),
+    box-shadow 400ms var(--ease-drawer);
+}
+
+/* ═══ THE SQUARE — /restaurants' grid, and the only thing about that card
+   that is not the home card. ═══
+
+   THE ONLY INPUT THAT CHANGED IS THE CARD'S HEIGHT: 1.4333 × its width
+   became 1.0 × its width, i.e. the card lost 30% of its height and kept
+   all of its width. Nothing that is sized in `cqi` moved at all — cqi is
+   1% of the container's INLINE size, so at a given card width every type
+   size, the mark's box and the stats are pixel-identical to the home
+   card's. What DID have to move is everything expressed as a share of the
+   card's HEIGHT, because that share now buys 30% fewer pixels.
+
+   ── 1. THE RAMP: 58% → 70% ──
+   The number that actually matters is not the ramp's height, it is where
+   the block's TOP EDGE lands inside the ramp's gradient — call it f,
+   measured from the ramp's top. f is what decides how much ink is under
+   the block's first line, and therefore every contrast number this card
+   was signed off on. f = (rampH − blockH) / rampH.
+
+   The block's height is a function of the card's WIDTH and the viewport
+   (cqi type sizes, vw paddings) and NOT of the card's height, so it does
+   not shrink with the card. Both grids measured on the real render by
+   scripts/probe-square-cards.mjs (`--home` for the portrait column):
+
+                     ── SQUARE (/restaurants) ──  ── PORTRAIT (home) ──
+     viewport   card   block  ramp        f       card       block  ramp   f
+     1440       325.5  134.4  227.8 (70%) 0.410   273.8x392  134.3  227.6  0.410
+     981        221.7  103.2  172.9 (78%) 0.403   183.4x263  103.2  152.5  0.323
+     390        358.0  116.4  250.6 (70%) 0.536   358.0x513  116.4  297.6  0.609
+
+   THE BLOCK IS THE SAME HEIGHT TO A TENTH OF A PIXEL on both grids at
+   every width, which is the arithmetic proof that nothing sized in cqi or
+   vw needed re-deriving — only the things expressed against the card's
+   height did. And f, the number the contrast depends on, lands at or
+   above the portrait card's at the two widths where it is tight (the 78%
+   at ≤250px is the narrow-card override at the foot of this file, and it
+   exists precisely because 70% did not).
+
+   WHAT IT COSTS, stated plainly: the photograph's own clean area falls
+   from 42% of the card to 30% of it (22% on the narrow column). That is
+   the price of a square card carrying the same block, and no arrangement
+   avoids it — the block does not get shorter just because the card did.
+   Holding the ramp's ABSOLUTE height instead (83cqi, which would
+   reproduce home's f exactly at any width) leaves 17% of photograph and
+   was rejected: at that point the card is a gradient with a picture on
+   top.
+
+   ── 2. THE MARK'S WASH: 55cqi → 34cqi, and the plateau re-placed ──
+   The wash has to die inside the photograph's clean area, which is now
+   30% of the card rather than 42%, so its box comes down. But the mark it
+   grounds did NOT come down — the mark's box is cqi-sized and the crown's
+   inset is vw-sized, so the mark's far corner sits at the same PIXEL
+   depth on a square card as on a portrait one while the ellipse under it
+   got shorter. Its normalised distance into that ellipse therefore rises,
+   and the stop list has to follow it or the mark loses its ground.
+
+   Mark far corner (x = mark width, y = crown inset + mark height), and
+   the normalised distance d = sqrt((x/cardW)² + (y/washH)²):
+
+     card    mark box    corner      washH   d       ink at d
+     325px   104 x 38    104, 54     110px   0.584   64.4%
+     222px    84 x 31     84, 45      75px   0.702   62.3%
+     358px   104 x 38    104, 48     122px   0.490   66.0%
+
+   — the same 62–66% band the portrait card reads, which is what the
+   4.09:1 measured on the worst photograph in the set was bought with.
+   (That reading was taken against the old cream; the softened ground puts
+   the same mark at 3.64:1 — see the wash's own note, which shows the
+   re-derivation. Still over the 3:1 bar a graphical object answers to, and
+   the geometry below is unaffected: it is about WHERE the plateau lands,
+   not how bright the mark is.)
+   The stops that put it there are 74 / 70@26% / 62@72%, against the
+   portrait's 74 / 70@24% / 62@58%: the plateau simply reaches further out
+   because the mark is further out.
+
+   THE WASH NOW OVERLAPS THE RAMP'S TOP BY 9–15px, and that is deliberate
+   rather than tolerated. The portrait card leaves a band of untouched
+   photograph between the two gradients and its stylesheet argues for it;
+   a square card cannot have both that band and a legible mark, because
+   34cqi is already the smallest ellipse that carries the corner. What
+   overlaps is two TAILS — the wash is under 22% ink there and the ramp is
+   under 12% — so the result is a slightly earlier darkening on the left,
+   not a seam. The probe scans the whole ramp for a row-to-row luminance
+   step and reports the largest; that is the assertion, not this sentence.
+
+   TWO EXTRA STOPS ON THE WAY OUT (34% / 12%) where the portrait has one.
+   The wash's outer fade has 26% of a 110px box to spend rather than 18%
+   of a 151px one — 29px against 27px, near enough the same distance, but
+   from a higher starting ink, so it is broken into three legs instead of
+   two to keep the falloff smooth. */
+.square {
+  --vc-ramp-h: 70%;
+  --vc-wash-h: clamp(64px, 34cqi, 122px);
+  --vc-wash-stops:
+    color-mix(in srgb, var(--maroon) 74%, transparent) 0%,
+    color-mix(in srgb, var(--maroon) 70%, transparent) 26%,
+    color-mix(in srgb, var(--maroon) 62%, transparent) 72%,
+    color-mix(in srgb, var(--maroon) 34%, transparent) 85%,
+    color-mix(in srgb, var(--maroon) 12%, transparent) 94%,
+    color-mix(in srgb, var(--maroon) 0%, transparent) 100%;
+}
+
+.photo {
+  object-fit: cover;
+  transform: scale(1);
+  transition: transform 700ms var(--ease-drawer);
+}
+
+/* pointer zoom — hover-capable, fine-pointer devices only. Touch gets a
+   static card with plain links. The shade comes up alongside
+   (opacity-only) so the zoom reads as depth, not just growth, and the
+   whole card lifts a little on a deeper shadow.
+
+   KEYED OFF THE CARD ITSELF rather than off the grid cell that holds it.
+   Discover.module.css writes these as `.cell:hover .photo`, which it can
+   because the cell is its own class; a shared module has no such class to
+   name. The two are equivalent in every layout that ships: the cell, the
+   plate seat and the card surface are one box, and every focusable on the
+   card is inside this element. */
+@media (hover: hover) and (pointer: fine) {
+  .cardSurface:hover .photo {
+    transform: scale(1.03);
+  }
+  .cardSurface:hover .hoverShade {
+    opacity: 1;
+  }
+  .cardSurface:hover {
+    transform: scale(1.01);
+    box-shadow: var(--shadow-card-hover);
+  }
+}
+
+/* keyboard parity — tabbing to the card's controls produces the identical
+   response. OUTSIDE the hover media query so keyboards on touch hybrids
+   still get it. */
+.cardSurface:focus-within .photo {
+  transform: scale(1.03);
+}
+.cardSurface:focus-within .hoverShade {
+  opacity: 1;
+}
+.cardSurface:focus-within {
+  transform: scale(1.01);
+  box-shadow: var(--shadow-card-hover);
+}
+
+/* the press. Scoped with :has() to the plate button specifically, so
+   pressing the card's ACTION does not scale the whole card down under the
+   reader's finger — the anchor has its own press state. (In an engine
+   without :has() the rule drops whole and the card simply has no press
+   scale, which is a missing nicety, not a break.) */
+.cardSurface:has(.plateHit:active) {
+  transform: scale(0.985);
+  transition-duration: 120ms;
+}
+
+/* the focus ring rides the card's own edge. An outline is NOT clipped by
+   the element's own `overflow: hidden`, so it sits outside the radius. */
+.cardSurface:has(.plateHit:focus-visible) {
+  outline: 2px solid var(--maroon);
+  outline-offset: 3px;
+}
+
+/* the photo-less card (Bunso today) — a deep maroon field. It is NOT an
+   exception to the design: it gets the same bare mark, the same ramp, the
+   same block and the same control as the photographed cards. The field is
+   simply the picture it has, and it reads as a plate still waiting for
+   its photograph, which is true. */
+.fallback {
+  position: absolute;
+  inset: 0;
+  background: var(--maroon);
+}
+
+/* THE HOVER SHADE — the card's ink, spent only under the pointer.
+   A SINGLE BOTTOM BAND. The card's resting furniture carries its own
+   grounds (the mark has the corner wash, the sticker is an opaque mark,
+   the type sits on the ramp), so the only thing that needs ink on demand
+   is the blurb: cream copy directly on a playing film.
+
+   SHAPED TO WHERE THE BLURB IS, which is just above the block. It ramps
+   from 28% and reaches full strength at 64%; below that it is behind the
+   block and free. Same 700ms drawer clock as the zoom and the blurb, so
+   the three moves read as ONE response.
+
+   HONEST LIMIT: cream copy over an ink wash on an unknown photograph is
+   the arrangement that cannot be guaranteed — 62% ink over a white
+   photograph puts cream at about 2:1, and about 1.8:1 since the ground
+   token deepened, which does not change the conclusion by a hair: both
+   numbers mean "not legible", and the point of the note is the category,
+   not the decimal. That is why nothing PERMANENT on
+   this card is built that way. The blurb is hover-only supplementary copy
+   whose full text is on the venue's page. */
+.hoverShade {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    180deg,
+    color-mix(in srgb, var(--maroon) 0%, transparent) 28%,
+    color-mix(in srgb, var(--maroon) 62%, transparent) 64%,
+    color-mix(in srgb, var(--maroon) 62%, transparent) 100%
+  );
+  opacity: 0;
+  pointer-events: none;
+  transition: opacity 700ms var(--ease-drawer);
+}
+
+/* ---------- hover film ---------- */
+/* The clip sits between the still and the ramp (DOM order — no z
+   juggling) and WIPES OPEN FROM THE CURSOR: the circle is pinched to
+   nothing at the point the pointer entered and opens past the far corner,
+   so the still reads as becoming the moving image at the place you
+   touched it rather than as two layers swapping. --wipe-x/y are written
+   straight onto the element by the enter handler.
+
+   ASYMMETRIC ON PURPOSE. The exit does NOT run the wipe backwards — a
+   circle collapsing back into the cursor reads as an undo. Leaving is a
+   plain 260ms fade, faster than the 520ms arrival, so the film withdraws
+   instead of retreating. clip-path and opacity are both composited, so
+   the whole move stays off the layout and paint path. */
+.hoverClip {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  --wipe-x: 50%;
+  --wipe-y: 50%;
+  opacity: 0;
+  /* resting clip is OPEN, so the exit fades a full frame rather than a
+     circle that has already snapped shut */
+  clip-path: circle(145% at var(--wipe-x) var(--wipe-y));
+  transition: opacity 260ms linear;
+  pointer-events: none;
+}
+
+/* one frame, applied and flushed before .hoverClipOn: pinches the circle
+   at the cursor with no transition, so the open has somewhere to start */
+.hoverClipEnter {
+  opacity: 1;
+  clip-path: circle(0% at var(--wipe-x) var(--wipe-y));
+  transition: none;
+}
+
+.hoverClipOn {
+  opacity: 1;
+  clip-path: circle(145% at var(--wipe-x) var(--wipe-y));
+  transition: clip-path 520ms var(--ease-entrance);
+}
+
+/* ═══════════════════ THE RAMP — the card's bottom material ═══════════
+   TWO LAYERS over the bottom `--vc-ramp-h` of the card. Layer one takes
+   the PHOTOGRAPH'S OWN COLOUR; layer two darkens it NEUTRALLY. There is
+   no third layer, no tint, and no edge.
+
+   WHAT THIS REPLACES: a near-solid `--maroon` panel with a straight top
+   and a lit hairline — one brand ink pasted across eight different
+   photographs, which put a green cast on every card.
+
+   ⚠️ THESE TWO RULES ARE THIS FILE'S ONLY SANCTIONED EXCEPTION TO THE
+   TOKENS-ONLY COLOUR RULE, AND THE EXCEPTION IS THE POINT. Everywhere
+   else a dark stop is `color-mix(in srgb, var(--maroon) N%, transparent)`.
+   Here the ink is `rgba(0, 0, 0, …)` ON PURPOSE: `--maroon` is a
+   GREEN-black (#233829 as of the palette softening, #17251b before it —
+   the hue is the constant, and it is the hue that is the problem), and
+   mixing it into the scrim is exactly the cast this
+   material exists to remove. The scrim must add luminance and NOTHING
+   else, so the only hue in the ramp is the one the blur pulled out of
+   that card's own photograph.
+   DO NOT "FIX" THESE BACK TO color-mix(var(--maroon) …). If the palette's
+   ink ever changes, these two gradients are meant not to move.
+
+   ⚠️ AND THE ORDER IS LOAD-BEARING. `.rampBlur` must precede
+   `.rampScrim` IN THE DOM. `backdrop-filter` samples everything painted
+   BELOW its element, so a scrim painted first would be blurred into the
+   result and the ramp would darken itself recursively as it went down the
+   card. Blur the picture, then darken what came out. */
+
+/* LAYER ONE — the photograph, sampled and handed back as colour.
+
+   34px of blur is chosen against the CARD, not in the abstract: the
+   narrowest card in either grid is ~183px, and a radius much under ~30px
+   leaves recognisable shapes legible through the ramp, which is the
+   failure the near-solid panel was built to fix. Much over ~40px and the
+   sample goes flat grey — the blur pulls colour from so wide an area that
+   every card converges on the same average. saturate(150%) puts back what
+   a large-radius blur always takes out.
+
+   THE MASK IS WHY THERE IS NO EDGE. A backdrop-filter with no mask has a
+   hard boundary at its own box. Masked, the layer's own alpha ramps from
+   0 at the top of the box to solid at 62%, so the blur arrives gradually
+   and the transition from picture to material has no locatable start.
+   Both spellings are declared: Safari still needs `-webkit-mask-image`.
+
+   ITS OWN OPACITY MAY BE ANIMATED and that is SAFE — an element's own
+   opacity is composited after its backdrop filter. An ANCESTOR's opacity
+   is not: it forms a backdrop root and the filter would sample an empty
+   backdrop. That is why this is a SIBLING of the scrim rather than the
+   two being children of one wrapper, and why the home grid's staged intro
+   puts the fade on each of them separately. */
+.rampBlur {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  /* the bottom share of the card. It is NOT the block's height and must
+     not be confused with it: the block sits INSIDE this, and the band
+     above the block is pure gradient with nothing on it. That headroom is
+     what stops the type from ever sitting near the ramp's own beginning,
+     where it is thinnest — see .square for how much of it a square card
+     can afford. */
+  height: var(--vc-ramp-h);
+  -webkit-backdrop-filter: blur(34px) saturate(150%);
+  backdrop-filter: blur(34px) saturate(150%);
+  -webkit-mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.4) 32%,
+    #000 62%,
+    #000 100%
+  );
+  mask-image: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.4) 32%,
+    #000 62%,
+    #000 100%
+  );
+  pointer-events: none;
+}
+
+/* LAYER TWO — the neutral darkening, and the whole of the type's
+   contrast budget.
+
+   Four stops rather than two so the ramp accelerates: almost nothing
+   through the first quarter (where the reader is still looking at the
+   photograph), then most of the ink between 26% and 74% (where the block
+   begins), then nearly flat to the bottom. A two-stop linear ramp over
+   the same distance puts too much ink too high — you see it start.
+
+   The numbers are the design's and they are NEUTRAL black at
+   0 / .22 / .52 / .68 / .76. The per-venue contrast table off the real
+   render is in scripts/probe-square-cards.mjs; those printed numbers are
+   the ones to trust rather than this paragraph. */
+.rampScrim {
+  position: absolute;
+  left: 0;
+  right: 0;
+  bottom: 0;
+  height: var(--vc-ramp-h);
+  background: linear-gradient(
+    180deg,
+    transparent 0%,
+    rgba(0, 0, 0, 0.22) 26%,
+    rgba(0, 0, 0, 0.52) 50%,
+    rgba(0, 0, 0, 0.68) 74%,
+    rgba(0, 0, 0, 0.76) 100%
+  );
+  pointer-events: none;
+}
+
+/* THE FALLBACK, AND IT MATTERS. The ramp's COLOUR comes from the blur;
+   with the blur gone the card is left with the scrim alone — a neutral
+   wash whose deepest stop is 0.76, i.e. up to 24% of an UNBLURRED
+   photograph showing through behind three lines of 11px type. On a bright
+   picture that is a legibility failure, not a cosmetic one.
+
+   So the substitute is a heavier NEUTRAL ramp — the same shape, the same
+   black, every stop deepened to what the blur+scrim pair composites to in
+   the engines that have both. It gives up the per-card colour (which
+   cannot be had without the filter) and keeps the contrast (which is not
+   negotiable). The blur layer is hidden outright rather than left as an
+   inert box.
+
+   The query tests BOTH spellings, because Safari shipped the prefixed
+   property for years before the plain one and a single-property test
+   would send every one of those versions down this path. */
+@supports not (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
+  .rampBlur {
+    display: none;
+  }
+  .rampScrim {
+    background: linear-gradient(
+      180deg,
+      transparent 0%,
+      rgba(0, 0, 0, 0.34) 26%,
+      rgba(0, 0, 0, 0.7) 50%,
+      rgba(0, 0, 0, 0.84) 74%,
+      rgba(0, 0, 0, 0.88) 100%
+    );
+  }
+}
+
+/* ---------- hover blurb: the story ON the plate ---------- */
+/* Cream copy seated on the block's TOP EDGE, hidden at rest — it rises in
+   over the shade's bottom band while the photo zooms, all on the same
+   drawer clock so the three moves read as ONE response.
+
+   A CHILD OF THE BLOCK, so `bottom: calc(100% + …)` measures from the
+   block's top edge with NOTHING having to know how tall the block is —
+   which is exactly the property that lets one rule serve a portrait card
+   and a square one whose blocks are different fractions of the card.
+
+   CLAMPED TO TWO LINES. This is content-length copy in a fixed box: the
+   longest blurb runs four lines on the narrow columns and the card's
+   overflow would cut the fourth mid-sentence, which reads as a bug rather
+   than as an excerpt. An ellipsis reads as an excerpt. Two rather than
+   three because every line added is a line further UP the photograph and
+   out of the shade's legible band. */
+.hoverBlurb {
+  position: absolute;
+  left: clamp(12px, 1.4vw, 18px);
+  right: clamp(12px, 1.4vw, 18px);
+  bottom: calc(100% + clamp(10px, 1.2vw, 14px));
+  z-index: 1;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: var(--t-label);
+  line-height: var(--lh-snug);
+  color: var(--cream);
+  text-align: left;
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 700ms var(--ease-drawer),
+    transform 700ms var(--ease-drawer);
+  pointer-events: none;
+}
+
+@media (hover: hover) and (pointer: fine) {
+  .cardSurface:hover .hoverBlurb {
+    opacity: 1;
+    transform: translateY(0);
+  }
+}
+
+.cardSurface:focus-within .hoverBlurb {
+  opacity: 1;
+  transform: translateY(0);
+}
+
+/* ---------- the crown: the card's top corner furniture ---------- */
+/* A FLEX ROW, not two absolutely-seated corners. The venue's mark is at
+   the left and the Michelin credential at the right, and the row
+   space-betweens them with the mark allowed to shrink (`min-width: 0`
+   below). That is what makes the collision structurally impossible rather
+   than merely unlikely at the widths anyone happened to measure: on the
+   narrowest column the mark gives up width instead of running under the
+   sticker.
+
+   Pointer-transparent — the plate button underneath is what a press on
+   the photograph should hit. */
+.cardCrown {
+  position: absolute;
+  /* ONE number for the three insets AND for the wash's reach below. The
+     pseudo-element has to undo exactly this to touch the card's own
+     edges, and an inset stated twice is an inset that drifts. */
+  --crown-inset: clamp(10px, 1.4vw, 16px);
+  top: var(--crown-inset);
+  left: var(--crown-inset);
+  right: var(--crown-inset);
+  z-index: 4;
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 8px;
+  pointer-events: none;
+}
+
+/* THE MARK'S GROUND, AND IT IS THE WHOLE BUDGET.
+   A gradient wash off the photograph's top-LEFT corner, of the kind a
+   property card or a film poster uses — not a chip, a capsule or a plate,
+   and it has no edge anywhere near the mark. There is no drop-shadow on
+   the mark to help it; that stack was removed at the user's instruction
+   and this carries the number alone.
+
+   THE GEOMETRY IS DERIVED, not dialled. The ellipse is 100% wide by
+   `--vc-wash-h` tall, so its horizontal radius IS the card's width: alpha
+   reaches zero exactly at the card's right edge, which is what keeps the
+   wash from ending on a visible cut. The stop list is placed against the
+   normalised distance the mark's far corner lands at — see `.square` for
+   that arithmetic on a square card, and for why the two numbers move
+   together.
+
+   MEASURED on the portrait card, sRGB, against the brightest sky pixel
+   behind any mark in the set (rgb(251,255,255), L 0.993): a bare cream
+   mark on it is 1.13:1, i.e. not there — 1.16:1 on the softened cream,
+   which is the same answer. Under 62.6% of this wash that pixel computes
+   to L 0.175, and the mark on it measured 4.09:1 when --cream was L 0.872.
+
+   RE-DERIVED FOR THE SOFTENED GROUND: --cream is now L 0.768, and the wash
+   and the photograph are both unchanged, so the same mark on the same
+   pixel is (0.768 + 0.05) / (0.175 + 0.05) = 3.64:1. It still clears the
+   3:1 WCAG 1.4.11 asks of a graphical object (1.4.3 exempts a logotype
+   from the text bar outright) — but the margin has gone from 1.09 to 0.64,
+   and this is now the tightest graphical value on the card. The wash was
+   NOT deepened to win it back: the stop list is what makes the wash read
+   as light rather than as a plate, and 3.64:1 is a pass, not a rescue.
+   If a brighter photograph joins the set, deepen the wash here before
+   touching the mark.
+
+   It is a ::before rather than an element so it fades on the SAME opacity
+   as the crown it belongs to — a separate always-on div would paint a
+   gradient over an invisible plate during the home grid's assembly intro,
+   which is a bug that shipped once. `position: absolute` also keeps it
+   out of the crown's flex flow; a static ::before would become a third
+   flex item and break the space-between that keeps the mark off the
+   sticker. */
+.cardCrown::before {
+  content: "";
+  position: absolute;
+  top: calc(-1 * var(--crown-inset));
+  left: calc(-1 * var(--crown-inset));
+  right: calc(-1 * var(--crown-inset));
+  /* THE ELLIPSE'S VERTICAL RADIUS, so the fade must die exactly here — a
+     box shorter than the gradient's reach would end the wash on a visible
+     cut across the photograph. Sized in cqi (against the CARD) rather
+     than vw, because vw tracks the window while the card's width tracks
+     the COLUMN COUNT, and the mark it grounds is cqi-sized too. */
+  height: var(--vc-wash-h);
+  background: radial-gradient(100% 100% at 0% 0%, var(--vc-wash-stops));
+}
+
+/* THE VENUE'S MARK, PERMANENTLY, AND DIRECTLY ON THE PHOTOGRAPH.
+   No chip, no capsule, no plate, no shadow. It is the card's IDENTITY
+   rather than a watermark: the block below does not repeat the venue's
+   name in a display face, so this is the venue's own lettering doing that
+   job, and it is sized to read as one — 38% of the card's width.
+
+   SIZED AGAINST THE CARD, NOT THE VIEWPORT. On a plain `vw` clamp the
+   mark came out 104px on the 274px card at 1440 and 72px on the 358px
+   card at 390 — SMALLER on the wider card, because vw tracks the window
+   while the card's width tracks the column count. The fix is a cqi clamp
+   with the vw clamp left above it as the fallback for an engine without
+   container units. TWO DECLARATIONS, DELIBERATELY; do not delete the
+   first as a duplicate.
+
+   STILL TWO ELEMENTS: the outer is the flex slot that yields width to the
+   sticker, the inner is the mask. */
+.cardLogo {
+  position: relative;
+  display: flex;
+  align-items: flex-start;
+  /* shrink before the sticker does */
+  min-width: 0;
+  flex: 0 1 auto;
+  height: clamp(30px, 3.1vw, 38px);
+  height: clamp(30px, 13.9cqi, 38px);
+}
+
+/* THE MARK ITSELF — a mask, so it takes the palette rather than whatever
+   colour the source PNG happens to be. CREAM: there is no chip under it,
+   and cream is the only ink this palette has that survives on a
+   photograph at all.
+
+   SIZED BY AREA, ANCHORED TOP-LEFT. The origin was `center` and should
+   never have been: the box is one width for every venue but the marks
+   fill it differently (a wordmark takes the whole 104, a compact lockup
+   64.5), so centring meant eight cards with eight different mark
+   positions on a grid whose entire argument is that the rooms are
+   presented as equals. `left top` gives all eight one origin: the crown's
+   inset, exactly. The source PNGs carry 3.7–4.0% of transparent padding
+   per edge, so after scaling the INK's left edge lands within 1.2px
+   across the set — the alignment is real, not nominal.
+
+   `max-width: 100%` is what makes the slot's `flex: 0 1 auto` real: when
+   the crown is narrow enough that the mark must yield width to the
+   sticker, the box shrinks and `contain` re-fits inside it rather than
+   overflowing. Without it the width clamp wins and the mark runs under
+   the sticker. */
+.cardLogoMark {
+  display: block;
+  /* vw first as the fallback, cqi second because it wins where container
+     units exist — see the sizing note on .cardLogo */
+  width: clamp(72px, 7.6vw, 104px);
+  width: clamp(72px, 38cqi, 104px);
+  max-width: 100%;
+  height: 100%;
+  min-width: 0;
+  background-color: var(--cream);
+  /* `contain` + `left top` — the CSS-mask spelling of `object-fit:
+     contain` with `object-position: left top`. This element is a masked
+     span, not a replaced image, so the object-* properties do not apply;
+     these two are their exact equivalents, and staying a mask is what
+     lets the mark take --cream instead of the PNG's own ink. */
+  -webkit-mask: var(--ov-logo-url) no-repeat left top / contain;
+  mask: var(--ov-logo-url) no-repeat left top / contain;
+}
+
+/* the Michelin credential as a STICKER on the card's top-right corner —
+   pressed on at a slight tilt, the way a guide sticker rides a
+   restaurant's window. A flex item of .cardCrown rather than an
+   absolutely-seated corner; `flex: none` is what makes the venue mark the
+   one that gives up width when the column is narrow. The 8° rotation
+   grows the square's bounding box by ~2.8px per side, which the crown's
+   inset absorbs — and the card's clip would take the difference anyway.
+
+   `position: relative` for the same reason .cardLogo carries it: the
+   crown's wash is an absolutely-positioned ::before and a static flex
+   item paints in an earlier layer. The wash dies to zero in this corner
+   anyway, so nothing visible depends on it — which is exactly the kind of
+   accident worth nailing down before someone retunes the gradient. */
+.stickerBadge {
+  position: relative;
+  display: block;
+  flex: none;
+  height: clamp(44px, 4.5vw, 64px);
+  /* the mark is square, and stating the box here (rather than letting a
+     bare img's intrinsic size decide) is what lets it be served at 128px
+     instead of decoded at its native 2965² */
+  aspect-ratio: 1;
+  transform: rotate(8deg);
+  transform-origin: center;
+  user-select: none;
+  pointer-events: none;
+}
+
+.stickerBadge img {
+  display: block;
+  width: 100%;
+  height: 100%;
+}
+
+/* ---------- the card's photographic area ---------- */
+/* THE SPACER, and only the spacer. .glass is `flex: none` at the end of
+   the card's flex column, so something has to occupy the space above it
+   or the block would sit at the top; this is that something. Kept rather
+   than replaced with a margin because the block's height is not a
+   constant and a flex spacer is the only thing that does not need to know
+   it. Pointer-transparent for the same reason as the crown. */
+.cardTop {
+  position: relative;
+  z-index: 3;
+  flex: 1 1 auto;
+  min-height: 0;
+  pointer-events: none;
+}
+
+/* ---------- the block: the type that sits ON the ramp ---------- */
+/* IT HAS NO MATERIAL OF ITS OWN. This element used to BE the panel — a
+   96%→99% `--maroon` gradient with a lit top hairline and a ::before that
+   faded the photograph into its top edge. All three are gone: the card's
+   bottom is the photo-derived ramp above, and a second ground stacked on
+   top of it would put back the one thing the ramp exists to remove — a
+   locatable edge.
+
+   THE CLASS IS STILL CALLED `.glass`. It has been a misnomer since the
+   frosted material went and it is kept because the probes and the home
+   grid's intro motion both name it. What it means today: the block of
+   type in the card's bottom edge.
+
+   WHAT IT CARRIES, top to bottom: a row (three-line address at the left,
+   two slim stats at the right), a hairline, and the controls.
+
+   NO min-height. The address is THREE non-wrapping lines on every venue
+   by construction (see .addrLine's ellipsis) and both controls are one
+   height, so the block's height is a constant without anything propping
+   it up. A min-height here could only introduce dead air. The probe
+   asserts the eight heights agree to within a pixel.
+
+   POINTER-TRANSPARENT. The plate button covers the whole card underneath;
+   the anchors inside take their own clicks back. */
+.glass {
+  position: relative;
+  z-index: 5;
+  flex: none;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  gap: clamp(8px, 0.9vw, 11px);
+  padding: clamp(10px, 1.1vw, 14px) clamp(12px, 1.3vw, 16px)
+    clamp(12px, 1.3vw, 16px);
+  pointer-events: none;
+}
+
+/* the anchors and buttons take their clicks back out of the
+   pointer-transparent block */
+.glass a,
+.glass button {
+  pointer-events: auto;
+}
+
+/* ---------- the address + stats row ---------- */
+/* THE MEASURE FIGHT LIVES HERE. On the narrowest 4-up card the row has
+   ~163px and has to hold a 19-character road line beside two stats.
+
+   `align-items: flex-end` seats the stats on the address's LAST line, so
+   both groups sit directly on the rule below and the row reads as one
+   band resting on it. Not flex-start (which hangs them from the first
+   line's cap height, two lines clear of the rule) and not centre (which
+   parks them against the middle line — the one line of the three that has
+   no relationship to them). */
+.blockTop {
+  display: flex;
+  align-items: flex-end;
+  gap: clamp(8px, 0.9vw, 10px);
+}
+
+/* THE ADDRESS COLUMN.
+
+   ⚠️ `min-width: 0` IS NOT A TIDY-UP. A flex item's `min-width` is
+   `auto`, which resolves to its content's MIN-CONTENT size — so without
+   this the column refuses to shrink below its longest word, takes more
+   than its share of the row, and pushes the stats off the block instead
+   of accepting the residual width. Every `text-overflow: ellipsis` on the
+   three lines below is inert until this line exists, because a box that
+   never shrinks never overflows. It is the single most load-bearing
+   declaration in this section. */
+.addr {
+  margin: 0;
+  flex: 1 1 auto;
+  min-width: 0;
+  display: flex;
+  flex-direction: column;
+  /* the three lines are one address, not three facts: they sit almost
+     solid, with the leading doing the separating */
+  row-gap: 1px;
+}
+
+/* LINE 1 — THE VENUE'S NAME. Larger and at full cream: with the display
+   name deleted from this block, the mark in the corner is a picture and
+   this is text, and they are not the same job. Search, screen readers and
+   anyone who does not recognise a logotype get the name here.
+
+   700, AND THERE IS NO SLIGHTER STEP TO TAKE. This said 500 — a number
+   nothing in the text stack can honour: the Helvetica family here draws
+   300 / 400 / 700 and nothing between, so CSS weight matching resolved
+   500 down to Regular and the line rendered identically to the two below
+   it. 600 would ascend to the same 700 this now names outright. Writing
+   the weight that actually paints is the rule the font block in
+   globals.css sets.
+
+   Against the CARD, like everything else on it: 5.1cqi is 14px at a 274px
+   card and hits the floor at a ~235px one, so it only ever gets smaller
+   where it has to. The plain rem value above is the fallback for an
+   engine without container units. */
+/* THE VENUE NAME, and it is now a step bigger than the address under it.
+   It was clamp(0.75rem, 5.1cqi, 0.875rem) — 14px at the desktop card width,
+   the SAME size as the two address lines below it and separated from them
+   only by weight. That reads as a bolded first line of an address rather
+   than as the name of the restaurant, which is the single most important
+   word on the card.
+
+   clamp(0.875rem, 6.4cqi, 1.0625rem) puts it at 17px on the desktop card
+   and keeps a real step at every width. Sized in cqi against the card's own
+   container, so it tracks the card rather than the viewport — the /restaurants
+   grid runs the same component at a different width and gets the same
+   proportion rather than the same pixels.
+
+   The nowrap+ellipsis below still holds it to one line, so a longer name
+   (Café Mama & Sons) truncates rather than pushing the grid out of line. */
+.addrArea {
+  font-family: var(--font-sans);
+  font-weight: 700;
+  font-size: 1.0625rem;
+  font-size: clamp(0.875rem, 6.4cqi, 1.0625rem);
+  line-height: 1.25;
+  color: var(--cream);
+  /* all three lines are nowrap+ellipsis. A wrapped line would make the
+     block four lines tall on one card and three on the rest, and a grid
+     that stops lining up is worse than a lost tail. */
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* LINES 2 AND 3 — the road, then city + postcode. One size, one colour:
+   they are a pair and reading them as a pair is the point.
+
+   THE COLOUR IS MIXED WITH BLACK, NOT WITH `--maroon`, AND NOT SET IN
+   ALPHA. This is the second half of the ramp's sanctioned exception (the
+   first is at .rampScrim, which has the full argument). `--maroon` is a
+   green-black; mixing type toward it puts the same cast on the words that
+   the retired panel put on the picture. And a cream at reduced ALPHA
+   would let the blurred photograph through the letterforms, so the
+   reading would shift card to card. A solid neutral mix is the only
+   option that is both quiet and stable.
+
+   84%, AND IT WAS 78%, AND THE DESIGN SAID 68%. Every one of those steps
+   was forced by measurement rather than chosen: this block's ground is a
+   PHOTOGRAPH under a neutral scrim, so its brightness is a fact about each
+   picture rather than a constant, and the only thing this stylesheet
+   controls is the LUMINANCE of the type.
+
+     68% cream (L 0.367) measured 3.64 / 3.90 / 3.94:1 against the
+     brightest ground three of the eight put under this line — three
+     failures of the 4.5:1 this 12px type needs.
+     78% (L 0.498) took the same three to 5.17 / 5.12 / 4.78.
+
+   THEN THE GROUND TOKEN DEEPENED AND TOOK THE TYPE WITH IT. --cream is a
+   term in this mix, so softening the palette cost this line ~12% of its
+   luminance without a character of this file changing: 78% went L 0.498 →
+   L 0.440, and the three worst addresses on the home page measured 3.92 /
+   4.44 / 4.49:1 (scripts/probe-palette-blastradius.mjs). Back under the
+   floor, from one token edit, in a file that names the token exactly once.
+
+   84% IS DERIVED FROM THOSE MEASUREMENTS, NOT GUESSED AT. The photograph
+   did not move, so its ground luminance can be recovered from each ratio
+   and re-solved for the type: the worst of the eight sits at L 0.075
+   behind this line, which needs the type at L 0.512 or better to clear
+   4.5:1. 84% of the new cream is L 0.521 — the same three now compute
+   4.57 / 5.17 / 5.23:1.
+
+   IT DOES NOT SIMPLY RESTORE THE OLD LUMINANCE, and that is deliberate.
+   L 0.498 (the old 78%) would have brought back the OLD numbers, and the
+   old numbers included a 4.39:1 on that worst card — the probe reads the
+   WORST PIXEL under the run, which is a harsher and more honest bar than
+   the "brightest ground" the 78% was set against, and by that bar this
+   line had been failing quietly all along. 84% fixes the regression and
+   the pre-existing miss in the same value.
+
+   Deepening the scrim instead was refused again for the original reason:
+   its stops are what make the ramp read as air rather than as a panel,
+   where this value is a text colour with one job.
+
+   The hierarchy the 68% bought survives — line 1 is full cream, the stat
+   values are 88%, this pair is 84%. Three distinguishable voices, though
+   the top two are closer than they were; if that flattens too far, the
+   move is to raise .statValue, not to lower this. */
+.addrLine {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 0.75rem;
+  font-size: clamp(0.6875rem, 4.4cqi, 0.75rem);
+  line-height: 1.3;
+  color: color-mix(in srgb, var(--cream) 84%, #000);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+/* ---------- the two stats ---------- */
+/* Icon + value, twice, with a vertical hairline between — and NO LABELS.
+   "Per head" and "Today" are both deleted: "Today" claims live opening
+   data this codebase does not have, and the pair cost the row width on
+   the one side that could afford to give it back.
+
+   `flex: none` — the stats take their content width and the address takes
+   everything else. Reversing that is what put the address at 96px in the
+   specimen this ships from. */
+.stats {
+  display: flex;
+  align-items: center;
+  flex: none;
+  /* hang from the address's cap line rather than its ascender line: the
+     icons are 11px against a 14px first line, and matching the box tops
+     leaves them visibly high */
+  margin-top: 1px;
+}
+
+.stat {
+  display: inline-flex;
+  align-items: center;
+  /* 3px, halved from the specimen's 6. The icon is 11px and the value is
+     12px; at 3px they read as one object, which is what a stat is, and at
+     6px they read as an icon standing next to a number. */
+  gap: 3px;
+}
+
+.statIcon {
+  display: block;
+  flex: none;
+  width: clamp(9px, 4cqi, 11px);
+  height: clamp(9px, 4cqi, 11px);
+  /* the glyphs are strokes on `currentColor`, so they take the value's
+     colour and there is one place to change it. A step quieter than the
+     value beside them: the number is the datum and the glyph only says
+     which datum it is. 72% MEASURED 4.07:1 against the brightest ground
+     under it ON THE OLD CREAM, where the mix came out at L 0.418. The same
+     72% of the new cream is L 0.366, and re-solving against that same
+     photograph (the picture did not move, so its ground luminance is
+     recoverable from the old reading) puts it at 3.62:1. An icon is a
+     graphical object and answers to 1.4.11's 3:1, so it still clears —
+     which is why this is left at 72% rather than chased back up like the
+     address lines above, whose 4.5:1 it does not have to meet. The margin
+     is thinner than it was; if a brighter photograph is ever added to the
+     set, this is the value to re-measure first. */
+  color: color-mix(in srgb, var(--cream) 72%, #000);
+}
+
+/* the value sits a step brighter than the address's quiet pair and a step
+   below its leading line — three values, three voices, which is the only
+   hierarchy this block has */
+.statValue {
+  font-family: var(--font-sans);
+  font-weight: 500;
+  font-size: 0.75rem;
+  font-size: clamp(0.6875rem, 4.4cqi, 0.75rem);
+  line-height: 1.3;
+  color: color-mix(in srgb, var(--cream) 88%, #000);
+  white-space: nowrap;
+  /* tabular figures where the face has them: "12–11" beside "£££" on
+     eight cards should not shimmy from card to card */
+  font-variant-numeric: tabular-nums;
+}
+
+/* the rule between the two stats. A 1px line at 24% cream, which is the
+   same weight the block's own hairline carries; two different hairline
+   weights inside one block reads as one of them being a mistake. */
+.statRule {
+  display: block;
+  flex: none;
+  width: 1px;
+  height: clamp(10px, 4.4cqi, 12px);
+  margin: 0 clamp(5px, 0.6vw, 8px);
+  background: color-mix(in srgb, var(--cream) 24%, transparent);
+}
+
+/* ---------- the block's hairline ---------- */
+/* It closes the facts and opens the controls. A REAL ELEMENT rather than
+   a border on the action row: the row below is the last child of a flex
+   column, and a border travelling with it would end up against the
+   controls on any card with spare height instead of under the facts.
+   Alpha is fine here in a way it is not for the type — it is a 1px line
+   with nothing to read through it, and mixing to transparent lets it sit
+   correctly on whatever colour the ramp pulled out of that card's own
+   photograph, which a solid mix could not. */
+.blockRule {
+  display: block;
+  height: 1px;
+  background: color-mix(in srgb, var(--cream) 24%, transparent);
+}
+
+/* ---------- the controls ---------- */
+/* TWO SMALL PILLS, SIZED TO CONTENT. They do not stretch: a full-width
+   control on a 242px block reads as a form's submit button, and the card
+   is not a form. */
+.actionRow {
+  display: flex;
+  align-items: center;
+  flex: none;
+  gap: clamp(6px, 0.7vw, 8px);
+}
+
+/* THE PRIMARY IS PUSHED RIGHT, BUT ONLY WHEN IT HAS SOMETHING TO BE
+   PUSHED AWAY FROM. `margin-left: auto` on an only child would shove the
+   single control on the four venues with no menu on file over to the
+   right-hand edge, where it would read as floating rather than as seated.
+   `:last-child:not(:first-child)` states exactly that condition. */
+.actionRow > :last-child:not(:first-child) {
+  margin-left: auto;
+}
+
+/* THE SHARED PILL. Both controls are the same box; only the fill differs.
+
+   NO ANNATTO ANYWHERE ON THIS CARD, and it is a decision rather than an
+   omission. The retired single control was an annatto fill, argued for on
+   the grounds that it was "the only chromatic element on the card". That
+   argument dies with the panel: the ramp is photo-derived, so the card's
+   bottom takes a different hue on every venue, and a fixed orange pill
+   that sat correctly on a maroon panel sits wrong on half of them. Cream
+   is the one ink that reads on all eight, for the same reason the mark
+   above is cream.
+
+   30px, down from 34, and 26 on the narrow card: there are two of these
+   now where there was one, and two 34px pills on a 242px block is a
+   footer with more control than content in it. */
+.cardBtn {
+  display: inline-flex;
+  align-items: center;
+  justify-content: center;
+  flex: none;
+  min-height: clamp(26px, 2.4vw, 30px);
+  padding: 0 0.9em;
+  border-radius: 999px;
+  border: 1px solid transparent;
+  font-family: var(--font-mono);
+  font-weight: 500;
+  font-size: 0.75rem;
+  font-size: clamp(0.6875rem, 4.2cqi, 0.75rem);
+  letter-spacing: var(--tr-label-mono);
+  line-height: 1;
+  white-space: nowrap;
+  text-decoration: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+  transition:
+    background-color 400ms var(--ease-drawer),
+    border-color 400ms var(--ease-drawer),
+    transform 400ms var(--ease-drawer),
+    color 400ms var(--ease-drawer);
+}
+
+/* THE SECONDARY — a cream OUTLINE. It is the "Menu" control and it only
+   exists on the venues that carry `menuPages`; the others render NOTHING
+   in this slot, because a "Menu" pill on a venue with no menu on file is
+   the dead control this design forbids.
+   42% is the weight at which an outline reads as a control rather than as
+   a disabled state: below ~35% on this ramp it stops being a boundary and
+   starts being a smudge. Its own label is at full cream, which is what
+   keeps it from reading as secondary-because-disabled. */
+.cardBtnGhost {
+  background-color: transparent;
+  border-color: color-mix(in srgb, var(--cream) 42%, transparent);
+  color: var(--cream);
+}
+
+/* THE PRIMARY — a cream FILL with the ink label. Cream on --maroon (now
+   #233829) is 9.80:1; it read 14.0:1 on the old pair, and it is still the
+   largest number available on this palette, which is the property that
+   matters here rather than the absolute figure. It is spent on this
+   deliberately: it is the one thing on the card a reader is meant to
+   press. It is also the only OPAQUE object on the ramp, which is what
+   makes it the loudest without any colour at all. */
+.cardBtnFill {
+  background-color: var(--cream);
+  border-color: var(--cream);
+  color: var(--maroon);
+}
+
+/* HOVER AND FOCUS. The two pills trade places rather than brightening:
+   the outline fills in, and the fill lifts to a full-strength edge. Both
+   swell on the drawer curve, which is the same response the card itself
+   gives. Specific properties only — never `all`. */
+@media (hover: hover) and (pointer: fine) {
+  .cardBtnGhost:hover {
+    background-color: var(--cream);
+    border-color: var(--cream);
+    color: var(--maroon);
+    transform: scale(1.03);
+  }
+  .cardBtnFill:hover {
+    transform: scale(1.03);
+  }
+}
+
+/* keyboard gets the same reward as hover, and a ring the ramp cannot
+   swallow: cream at full strength, offset clear of the pill's own edge. */
+.cardBtn:focus-visible {
+  outline: 2px solid var(--cream);
+  outline-offset: 2px;
+}
+.cardBtnGhost:focus-visible {
+  background-color: var(--cream);
+  border-color: var(--cream);
+  color: var(--maroon);
+}
+
+.cardBtn:active {
+  transform: scale(0.97);
+  transition-duration: 120ms;
+}
+
+/* ---------- visually hidden ---------- */
+/* The stats' values are announced with the word that makes them mean
+   something. "££" and "12–11" read aloud on their own are noise, the
+   glyph beside them is aria-hidden, and the design has no room for a
+   visible label — so the sense goes here.
+   The clip-path spelling rather than the old 1px-clip hack: it does not
+   create a scroll container and does not collapse the text to one
+   character per line in some engines. */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  margin: -1px;
+  padding: 0;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ---------- the card as a pressable ---------- */
+/* AN EMPTY LAYER, NOT A WRAPPER. The card's controls are anchors and an
+   anchor inside a button is invalid content with unpredictable
+   activation — so the pressable became a transparent layer covering the
+   card, UNDER the crown and the block, both of which are
+   pointer-transparent so a press anywhere but on a control lands here.
+
+   It carries NO visual state of its own: the lift, the press scale and
+   the focus ring are all on .cardSurface, selected from this element's
+   state with :has(). Putting them here would have scaled an invisible
+   box. */
+.plateHit {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  display: block;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  background: none;
+  cursor: pointer;
+  text-align: inherit;
+  /* the outline is drawn on the card (see .cardSurface:has(…)), so this
+     element must not draw a second one inside it */
+  outline: none;
+}
+
+/* ═══ THE NARROW-CARD OVERRIDES LIVE HERE, AT THE END, and that is not
+   tidiness. A rule inside @container carries the specificity of its own
+   selector and nothing more, so `.glass` inside a container query and
+   `.glass` outside it are a dead heat that SOURCE ORDER decides. Placed
+   next to the rules they override — where they read best — every one of
+   them lost to the base rule further down the file and the whole block
+   was inert: the computed type size at a 183px card never moved.
+   ANYTHING ADDED BELOW THIS POINT THAT A NARROW CARD NEEDS TO OVERRIDE
+   MUST MOVE ABOVE IT.
+
+   The `.square` block near the top of this file is exempt, and only
+   because it sets nothing but custom properties: a variable declared on
+   .cardSurface is read by the rule that uses it wherever that rule
+   happens to sit, so there is no order to lose. Do not add a real
+   declaration to `.square` for anything this block also sets —
+   `.square .glass` (0,2,0) would beat `.glass` (0,1,0) in here and the
+   narrow card would silently lose its override. ═══ */
+
+/* ---------- the block on a NARROW card ---------- */
+/* THE 4-UP COLUMN IS THE HARD CASE. At the 981px breakpoint the home card
+   is 183px wide and the /restaurants square is 222px; both leave the
+   block a measure that has to hold three non-wrapping address lines, the
+   longest of which is "157 Kentish Town Rd", beside the stats. At the
+   base sizes the stats take ~98px of a 163px row and leave the address
+   ~56px against the ~105px that line needs.
+
+   THE HOURS STAT GOES, AND THE OTHER TWO CANDIDATES WERE REFUSED:
+     · STACKING the stats under the address gives the address the full
+       measure — and adds a whole row to the block, taking it from 43% to
+       52% of the card. The 4-up is the width where that matters most, so
+       the fix that costs height is the wrong fix at exactly the width it
+       is needed. On a SQUARE card, where the block is already the larger
+       share of a shorter card, it is wronger still.
+     · SHRINKING THE ADDRESS further. The lines are already at their clamp
+       floors here (12px and 11px); below that they stop being readable at
+       arm's length on a laptop.
+   Dropping `hours` costs 47px of row and buys the address 123px against
+   the 105 it needs — it is the only lever that pays for itself. It is
+   also the RIGHT fact to lose: the price is real data and `hours` is a
+   placeholder. The rule is targeted by `[data-stat]`, not by position: a
+   venue with no price would make hours the FIRST child, and `:last-child`
+   would silently take the price off every other card instead.
+
+   250px is the card width at which the column stops being cramped. */
+@container card (max-width: 250px) {
+  .glass {
+    gap: 6px;
+    padding: 8px 10px 10px;
+  }
+  /* the stats lose the hours pair — the value, its glyph and the rule
+     that divided them. All three go together or the block is left with a
+     hairline dividing one stat from nothing. */
+  .stats [data-stat="hours"],
+  .stats .statRule {
+    display: none;
+  }
+  .blockTop {
+    gap: 8px;
+  }
+  /* the controls come down with the card but stay PILLS, not chips.
+     Measured on the 163px measure: "Menu" and "Book" at 11px plus 0.8em
+     of side padding are 50 and 47px, which with the 6px gap is 103px —
+     63% of the block's width. */
+  .cardBtn {
+    min-height: 26px;
+    padding: 0 0.8em;
+  }
+  .actionRow {
+    gap: 6px;
+  }
+  /* the sticker comes in — a 64px credential on a 183px card is a quarter
+     of its width. The MARK is deliberately not overridden: its box is a
+     cqi clamp that already tracks the card, and a fixed override would
+     fight that clamp for no measured gain. */
+  .stickerBadge {
+    height: 38px;
+  }
+  /* THE MARK'S WASH IS DELIBERATELY NOT OVERRIDDEN HERE either. Both axes
+     of its ellipse already track the card — the horizontal radius IS the
+     card's width and --vc-wash-h is a cqi clamp — so the mark's far
+     corner lands at close to the same normalised distance on the narrow
+     column as at 1440 (0.70 against 0.58 on the square; the stop list is
+     placed to cover both). Adding an override here would be a second
+     number to keep in step for no measured gain. Measured on the narrow
+     square column, the mark cleared 4.48:1 against the brightest ground
+     under it, against the 3:1 a graphical object answers to. THAT WAS THE
+     OLD CREAM (L 0.872). Re-solved for the softened one (L 0.768) on the
+     same unchanged photograph, it is 3.97:1 — still over the bar with
+     room, and still no override needed here.
+
+     ── THE SQUARE'S RAMP GOES DEEPER ON A NARROW CARD: 70% → 78% ──
+     ⚠️ IT IS SET ON THE TWO RAMP LAYERS AND NOT ON `.square`, AND THAT
+     IS NOT A STYLE CHOICE. `.square` IS `.cardSurface`, i.e. the QUERY
+     CONTAINER — and a container query never matches its own container.
+     `@container card { .square { … } }` is not an error, it is simply
+     inert: it parsed, it shipped, and the computed ramp on a 222px card
+     stayed at exactly 70.0% while the probe went on reporting the same
+     three contrast failures. The variable therefore has to be declared on
+     a DESCENDANT, and the two elements that read it are the obvious ones.
+     Anything else this block ever needs to change about the square card's
+     material must be written the same way.
+     (`.square .rampBlur` is (0,2,0) against the base rule's (0,1,0), so
+     this wins on specificity and not on order — it would still work if
+     the file were reordered, which the rest of this block cannot claim.)
+
+     WHY. The block's height does not shrink with the card anything like
+     as fast as the card does: at 222px the block is 103px, i.e. 46.5% of
+     a square card against 41.3% at 325px. So the band of ramp ABOVE the
+     block — which is the entire contrast budget for the block's first
+     line — is squeezed from both ends, and at 70% it left the block's top
+     edge only 33.5% of the way into the gradient. Measured there, three
+     lines fell under the 4.5:1 this 11–12px type needs:
+
+       venue        line   at 70%   at 78%
+       Belly        road    4.32     5.09
+       Guanabana    name    4.34     6.04
+       Hoodwood     road    4.55     5.16
+
+     (Both columns are measured, not modelled — the brightest composited
+     pixel inside each line's own band on the real render, with the type
+     hidden so a cream glyph cannot be read as its own ground. The whole
+     table moves, not just the three: the worst reading on the column goes
+     4.32 → 5.09 and the best 12.4 → 12.5.)
+
+     ⚠️ THE TABLE ABOVE WAS TAKEN AT A TYPE COLOUR THAT NO LONGER EXISTS.
+     Both columns assume the address pair at `--cream 78%`, which was
+     L 0.498 when they were measured. The ground token has since deepened
+     and the pair was re-derived to `--cream 84%` (L 0.521) to hold its
+     floor — see .addrLine's own note. The RAMP conclusion is unaffected,
+     because 70% vs 78% is a statement about how deep the gradient is under
+     the block and not about the type on it; the absolute figures in the
+     right-hand column are ~4% conservative now. Re-run the ramp probe
+     before quoting them as current.
+
+     78% puts the block's top edge at 40.3% into the ramp — the same depth
+     the wide square card reads (41.0%) and the same the home portrait
+     card reads at its own 4-up width. The alternative was to brighten the
+     address pair from 78% cream, and it was refused: the type colours are
+     part of what "the same card" means, and the ramp's share of a square
+     card is the number this variant exists to re-derive.
+
+     WHAT IT COSTS: the photograph's clean band on this column falls to
+     22% of the card, 49px, and the mark's box bottom sits at 44.5px — so
+     the mark now ends about where the ramp begins. That is survivable
+     because the ramp's first tenth carries under 8% of ink; it is checked
+     by the flat-ground edge scan rather than asserted here. */
+  .square .rampBlur,
+  .square .rampScrim {
+    --vc-ramp-h: 78%;
+  }
+}
+
+/* ---------- reduced motion ---------- */
+/* Everything that MOVES is stripped; nothing that INFORMS is. The hover
+   film's wipe becomes a plain crossfade (the clip-path is dropped rather
+   than the video), the card's lift and press become instant, and the
+   pills stop swelling. The colour changes stay: they are the state, not
+   the animation. */
+@media (prefers-reduced-motion: reduce) {
+  .hoverClip,
+  .hoverClipEnter,
+  .hoverClipOn {
+    transition: none;
+    clip-path: none;
+  }
+  .cardSurface,
+  .cardSurface:hover,
+  .cardSurface:focus-within,
+  .cardSurface:has(.plateHit:active) {
+    transform: none;
+    transition: none;
+  }
+  .photo,
+  .hoverShade,
+  .hoverBlurb {
+    transition: none;
+    transform: none;
+  }
+  .cardBtn,
+  .cardBtnGhost:hover,
+  .cardBtnFill:hover,
+  .cardBtn:active {
+    transform: none;
+    transition: none;
+  }
+}

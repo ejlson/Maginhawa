@@ -9,26 +9,201 @@
    if the kit isn't authorised for the current domain. */
 
 :root {
-  /* warm paper — lifted from the old parchment cream (#f8f3ea): lighter and
-     much less yellow, so the photography and the quiet grotesk sit clean on
-     it while the ground still reads warm next to a true gallery white */
-  --cream: #faf7f1;
-  --maroon: #2f0000;
-  --maroon-soft: #3a0a0a;
-  --placeholder: #e2dfd9;
-  --placeholder-line: #c9c3b6;
-  --rule: rgba(47, 0, 0, 0.55);
+  /* =========================================================================
+     THE KAMAYAN PALETTE.
 
-  /* warm saffron accent — used sparingly on eyebrow labels, the "Latest" tag,
-     and link hover states. Food-tied (turmeric / annatto / scotch bonnet);
-     pairs warm-on-warm with the maroon and lifts off the cream. */
-  --saffron: #c97e3f;
+     Kamayan is the Filipino meal eaten by hand off banana leaves, everyone
+     reaching into the same spread — which is the argument this group's site
+     has to make: seven kitchens, one collective. The three colours are the
+     three things on that table.
 
-  /* the same hue burnt down for SMALL TEXT on the cream. #c97e3f computes
-     ≈3.0:1 against the cream — fine for large display glyphs and 1px
-     rules, below the 4.5:1 floor for label-sized copy. This deep cut
-     clears 5:1 while still reading unmistakably as the saffron accent. */
-  --saffron-ink: #8f5220;
+       BANIG      the woven mat            → the ground
+       LEAF       banana leaf in shadow    → the ink
+       ATSUETE    annatto, kare-kare oil   → the accent
+
+     Green as the INK rather than as an accent is the whole move. An accent
+     colour is decoration and reads as a choice about taste; a coloured ink
+     is structural and reads as a choice about identity. It also means the
+     page is never using green and maroon and cream at once — there are two
+     values doing the work and one doing the pointing, which is what makes
+     it editorial rather than themed.
+
+     THE NAMES ARE NOW HISTORICAL and this is deliberate rather than lazy.
+     --cream, --maroon and --saffron are referenced several hundred times
+     across twenty-odd stylesheets; renaming them to --ground / --ink /
+     --accent is the correct follow-up and it is a mechanical sed, but doing
+     it in the same change as a palette swap would mean no single diff you
+     could read to check the colour decision. Swap first, rename second.
+     Nothing reads the NAME for meaning — every consumer just wants the
+     ground colour, the ink colour, or the accent.
+
+     THE PAIR HAS BEEN SOFTENED, and this is the change everything below is
+     written against. The ground was #f4f0e4 and the ink #17251b, which met
+     at 14.00:1 — a ratio that is not a design, it is the maximum the two
+     hues can produce. Read on a real screen it was a near-white sheet with a
+     near-black cut into it, and the user's note was exactly that: the maroon
+     is not that dark and the cream is not that light.
+
+     SO BOTH ENDS GAVE UP GROUND, SYMMETRICALLY. Each token keeps its hue and
+     its saturation to the decimal — this is a value move, not a re-hue —
+     and each travels about six and a half points of HSL lightness toward the
+     other:
+
+       ground   hsl(45, 42%, 92.5%) → hsl(45, 42%, 86%)     L* 94.8 → 90.2
+       ink      hsl(137, 23%, 11.8%) → hsl(137, 23%, 18%)   L* 13.1 → 21.4
+
+     The ground is still banig and the ink is still banana leaf; they are
+     just no longer shouting at each other across the widest gap available.
+     The ink lift is the bigger perceptual move of the two (+8.3 L* against
+     −4.6) because near-black is where a value change reads hardest — at
+     L* 13 the green was information the eye discarded, and at L* 21 it is a
+     colour.
+
+     MEASURED, NOT ESTIMATED. Every number here came off
+     scripts/probe-palette-blastradius.mjs or the same arithmetic it uses;
+     none of it is eyeballed, and the probe re-derives all of it on demand:
+
+       ink on ground        9.80:1   (needs 4.5 for body — was 14.00:1)
+       ink soft on ground   6.76:1   (needs 4.5 — secondary copy; was 9.76:1)
+       accent on ground     4.55:1   (needs 4.5 for label text; was 4.54:1)
+       accent ink on ground 5.91:1   (needs 4.5 for label text; was 6.66:1)
+       ground on accent     4.55:1   (the accent used as a FILL; was 4.03:1
+                                      before the accent was re-seated, and
+                                      3.08:1 for an ink label on that fill —
+                                      see Reservations.module.css .action)
+       rule on ground       3.55:1   (a hairline, held to 1.4.11's 3:1)
+       placeholder          1.24:1 / placeholder-line 1.61:1 against the
+                            ground — surface steps, not text pairs
+
+     THE NAMES ARE STILL HISTORICAL. --cream, --maroon and --saffron are
+     referenced several hundred times across twenty-odd stylesheets; renaming
+     them to --ground / --ink / --accent is the correct follow-up and it is a
+     mechanical sed, but doing it in the same change as a palette swap would
+     mean no single diff you could read to check the colour decision. Swap
+     first, rename second. Nothing reads the NAME for meaning — every
+     consumer just wants the ground colour, the ink colour, or the accent.
+     ========================================================================= */
+
+  /* PLASTER — a clay wall, and the hue is the whole decision.
+     hsl(26, 51%, 92%). The banig straw it replaces was hsl(46, 42%, 86%):
+     twenty degrees further round toward yellow, nine points less saturated
+     and six points darker. That yellow-grey was the difference between a
+     ground that reads as PAPER and one that reads as a wall with pigment in
+     it, and paper is the thing every warm-craft site defaults to.
+
+     ITS LIGHTNESS IS NOT NEW, AND THAT IS WORTH KNOWING. At L* 93.0 this is
+     within two points of #f4f0e4 (L* 94.8), the cream this project moved
+     away from when the note was "the cream is not that light". What makes it
+     a different colour is hue and pigment rather than value — 26° at 51%
+     saturation against that cream's 45° at 42%. If the old ground read
+     washed out, the fix here is more pigment, not less light. */
+  --cream: #f5e9e0;
+
+  /* MAROON, and this time the name is literal again.
+     hsl(4, 55%, 16.5%). The banana-leaf green it replaces was hsl(137, 23%,
+     18%) — a hundred and thirty degrees away and less than half as
+     saturated. Green as the ink was a defensible idea and it made the page
+     look like a wellness brand; a warm dark red makes it look like a dining
+     room, which is what this group actually is.
+
+     THE HUE MATTERED MORE THAN THE DEPTH, and that took three passes to
+     find. The candidate before this one was a claret at 346° — the
+     pink-magenta side of red — and it read as WINE however far down it went.
+     Maroon is a brownish red, and 4° is what makes it read that way rather
+     than a lower lightness. Picked off a seven-step ladder rendered on this
+     exact ground (throwaway route /lab/type/red, row C).
+
+     13.06:1 on the ground. That is above the 9.80:1 the previous pair made
+     and below the 14.00:1 the pair before THAT made — the one softened away
+     from deliberately. It sits where it does because both ends were pulled
+     apart on request; it is not drift. */
+  --maroon: #411613;
+
+  /* the ink lightened for secondary copy, re-derived rather than carried:
+     the old soft was a green tuned to a green ink. hsl(4, 30%, 36%) holds
+     the ink's hue exactly and drops 25 points of saturation, which is the
+     same relationship the old pair had (137→133°, 23%→17%) expressed for a
+     red. 6.56:1 measured — 50% of the ink's own ratio against the old pair's
+     69%, because the ink itself has moved so much further from the ground. */
+  --maroon-soft: #774440;
+
+  /* TWO SURFACE STEPS BELOW THE GROUND, not text colours — the tone a frame
+     holds while its photograph decodes, and the hairline inside it. They are
+     re-derived to hold their MEASURED STEP against the new ground rather
+     than their old hex or their old HSL offset: 1.24:1 and 1.61:1, the same
+     two numbers they made against the old cream. A surface step is a
+     perceptual quantity, so preserving the ratio is what keeps the family
+     looking the same; preserving the offset would not have. */
+  --placeholder: #e2cfc1;
+  --placeholder-line: #cfb7a5;
+
+  /* THE HAIRLINE, AND IT IS NO LONGER A LITERAL. This was
+     rgba(23, 37, 27, 0.55) — the OLD ink's channels, frozen. It survived the
+     last palette swap only because nobody noticed it was a copy of --maroon
+     rather than a reference to it, and it would have survived this one the
+     same way, quietly drawing the previous palette's rule across the new
+     ground. It is a color-mix of the token now, so it cannot drift again.
+     THE ALPHA IS BACK TO 0.55. It went to 0.62 under the green ink because
+     55% of THAT ink measured 2.99:1 and missed 1.4.11's 3:1 bar by a hair.
+     The maroon is far darker, so 55% now measures 3.53:1 — within two
+     hundredths of the 3.55:1 this hairline has weighed since the beginning.
+     Re-measured rather than carried: 62% of the maroon would have made
+     4.33:1, a rule visibly heavier than the one every layout was drawn
+     against. */
+  --rule: color-mix(in srgb, var(--maroon) 55%, transparent);
+
+  /* BOTTLE GREEN — the accent, and it has changed side of the wheel.
+     hsl(158, 37%, 26.3%). It was an annatto orange, hsl(17, 60%, 40%), which
+     worked when the ink was green: the page was green and cream and the
+     accent was the one warm thing on it. With a MAROON ink that logic
+     inverts. An orange accent beside a warm dark red is a difference of
+     value rather than of hue — it reads as a lighter patch of the same
+     colour instead of as a mark. Green is the complement of the ink, so the
+     accent points again.
+
+     Red ink with a green accent is the one pairing that can go wrong in a
+     specific way, and the guard against it is saturation: at 55% and 37%
+     respectively, both are muted enough to read as claret and bottle rather
+     than as a seasonal decoration. Two saturated versions of this pair would
+     be a Christmas card.
+
+     6.46:1 on the ground, against the 4.55:1 the orange managed. About
+     twenty `color: var(--saffron)` sites are written on the promise that
+     this token clears 4.5:1 for label text, and it does so with more room
+     than it ever has.
+
+     THE NAME IS NOW ACTIVELY WRONG rather than merely historical — --saffron
+     naming a green is worse than --cream naming a clay. It stays for exactly
+     one more change: renaming the three tokens to --ground / --ink / --accent
+     is a mechanical sed across twenty-odd stylesheets, and doing it in the
+     same diff as a palette swap would leave no single readable diff for the
+     colour decision itself. Swap first, rename second. */
+  --saffron: #2a5c4a;
+
+  /* the same hue burnt down further for SMALL TEXT — hsl(158, 40%, 22%),
+     four points more saturated and four darker, the same relationship the
+     orange pair had. 7.81:1 on the ground. Less load-bearing than ever now
+     that the accent itself clears 6.46:1, but kept because label-sized copy
+     wants the extra weight and because Discover and Manifesto both read it.
+
+     WHAT THE ACCENT CANNOT DO: 2.02:1 on the ink, so nothing may set raw
+     accent type on the maroon. That is the same constraint the orange had
+     (2.15:1) and the same workaround applies — PressWall mixes the accent
+     toward the ground first. The number to beat if anything ever wants it
+     is 3:1 for large text. */
+  --saffron-ink: #224f3e;
+
+  /* THE SCRIM FOR TEXT ON MEDIA. Cream copy sits directly on film and
+     photography in several places — the hero lede, the tile captions, the
+     "ma·gin·ha·wa" definition card. Contrast there cannot be measured the
+     way it can on a painted ground: a still can be audited, but a VIDEO's
+     luminance changes frame to frame, so any single reading is a reading of
+     one frame. The honest answer is not to measure harder but to stop
+     depending on the footage — this shadow keeps small cream text legible
+     over a bright frame without laying a visible box over the picture.
+     A token rather than a per-component guess, so the twenty-odd runs that
+     need it agree, and so raising it later is one line. */
+  --scrim-text: 0 1px 3px rgba(18, 0, 0, 0.55), 0 2px 12px rgba(18, 0, 0, 0.4);
 
   /* =========================================================================
      TWO FAMILIES, AND THIS TIME IT IS TRUE.
@@ -66,17 +241,33 @@
      Arial is not a fallback so much as the same design — metrically
      compatible, so a Windows reader gets the same measured width to the
      pixel. Liberation Sans does that job on Linux. */
-  --font-ui: Helvetica, "Helvetica Neue", Arial, "Liberation Sans", sans-serif;
+  /* FIGTREE, self-hosted by next/font — see the loader in layout.tsx for why
+     Helvetica was retired. The fallbacks are the old stack, so a reader who
+     somehow gets no webfont lands exactly where the site used to live rather
+     than on a default serif. */
+  --font-ui: var(--font-text-loaded), Helvetica, Arial, "Liberation Sans", sans-serif;
   --font-sans: var(--font-ui);
 
-  /* ROLE ALIASES, kept so the family decision stays ONE token-level change
-     instead of a 60-file edit, and so a future re-pairing (giving the
-     display roles back to Contralto's smaller optical cuts, say) is cheap.
-     Keep using the alias that matches the ROLE — every one of them resolves
-     to Helvetica today, and that is not meant to be permanent. */
-  --font-display: var(--font-sans);
-  --font-display-sm: var(--font-sans);
-  --font-display-xs: var(--font-sans);
+  /* ROLE ALIASES. The re-pairing this block was built for has happened: the
+     display roles are back on Contralto's smaller optical cuts, and the
+     change was the three lines below, exactly as the token layer promised.
+
+     WHY, and it is a brand argument rather than a typographic one. Helvetica
+     held every role on the site, wordmarks aside. It is a defensible
+     editorial position and it was carefully reasoned — but `maginhawa` is
+     Tagalog for COMFORTABLE, and the About copy promises food with deep
+     roots, rooms that feel like home, and guests treated as family. The most
+     neutral face in the canon was arguing against all of it. Type is the
+     loudest thing on a page with this much whitespace; it should say what
+     the group says.
+
+     Helvetica keeps the TEXT voice (--font-ui / --font-sans below) — body
+     copy, captions, labels, forms. This is a re-pairing, not a replacement:
+     Contralto speaks at display size where its high contrast is an asset,
+     Helvetica carries anything anyone has to actually read at length. */
+  --font-display: var(--font-display-small);
+  --font-display-sm: var(--font-display-small);
+  --font-display-xs: var(--font-display-small);
 
   /* the italic-emphasis voice — the hero kicker, .emItalic, the About title.
      VERIFIED NOT SYNTHESISED, and the verification is worth describing
@@ -130,45 +321,147 @@
      300 / 600 / 900. That range is the argument for eventually giving the
      display roles back to Contralto — Helvetica cannot offer it. */
   --font-display-big: "contralto-big", "contralto-medium", "Times New Roman", serif;
-  --font-display-small: "contralto-small", "contralto-medium", "Times New Roman",
-    serif;
 
-  /* WEIGHTS — three tiers, and only two of them survived the swap intact.
+  /* NEWSREADER ON THE DISPLAY ROLES, CONTRALTO ONLY ON THE WORDMARK.
+     A logotype is artwork, not a typeface role, so Contralto does not have
+     to set the section headings just because it draws MAGINHAWA. Now that
+     it doesn't, the Adobe kit has stopped being a dependency of the whole
+     page and become a dependency of a handful of wordmarks — and once those
+     are outlined to SVG, of nothing.
 
-     --w-medium IS GONE. It was 500. Nothing in the Helvetica stack draws a
-     500: CSS weight matching for a desired 500 looks at 500, then descends,
-     and lands on Regular. Pixel-verified — a 500 and a 400 render byte-
-     identical. The token now says 400 because that is what the screen shows;
-     leaving 500 in it would have been a number that no face on any platform
-     can honour. This is the LOUDEST visible change on the site: 86 literal
-     `font-weight: 500` declarations across the stylesheets resolve the same
-     way, so most section headings, card titles and eyebrows have stepped
-     down one notch of colour. Hierarchy is now carried by SIZE, CASE and
-     COLOUR rather than by weight.
+     WHICH FACE. The role is set in INSTRUMENT SERIF. It was picked off a
+     specimen sheet where seven candidates set the same four strings at the
+     same sizes, which is the only honest way to choose one.
 
-     --w-hairline SURVIVES, AT 300 RATHER THAN 200, and this is the one place
-     the "Helvetica only has Regular and Bold" shorthand would have cost real
-     design. macOS and iOS ship Helvetica Light (usWeightClass 300) inside
-     Helvetica.ttc, so 300 lands on a genuinely lighter DRAWN face for every
-     Apple reader — which is most of this site's audience. 200 does not: it
-     descends, finds nothing at or below 200, ascends, and arrives at the
-     same Light, so 300 is simply the honest spelling of what 200 was already
-     rendering. On Windows (Arial) and Linux (Liberation Sans) there is no
-     Light and 300 resolves to Regular — a graceful step down, NOT a
-     synthesised one. Browsers synthesise BOLD; they never shear a thin face
-     out of a roman. So the About page's hero kicker and its "GROUP?" keep
-     their hairline on Apple and read Regular elsewhere, which is exactly the
-     trade the old Hanken 200 was making anyway.
+     THREE FACES GOT HERE FIRST and their failure modes are the spec.
+     Fraunces was rejected on sight. Newsreader was proposed on an explicit
+     argument — Contralto is very high contrast, a second high-contrast
+     serif on the same page blurs into it, and the wordmark should stay the
+     sharpest thing on screen, so the display face wants to be the QUIETER
+     half of the pair — and then read flat and generic at hero scale
+     against the photography, which is the cost of quiet. Instrument Serif
+     fixed the flatness and lost on a non-typographic ground: Big Mamma
+     Group already uses it, and they are the comparison every London reader
+     will make.
 
-     --w-bold is the real second step, and it is new. Nothing uses it yet;
-     putting Helvetica Bold under a 5rem display line is a design decision,
-     not a token swap. It is declared so the next person does not reach for
-     600 (which matches UPWARD to Bold and would surprise them).
+     EB GARAMOND IS THE RESOLUTION, AND IT IS A DIFFERENT KIND OF ANSWER
+     from the four guesses above it. Every one of those — Fraunces,
+     Newsreader, Instrument Serif, Gilda — is a vertical-stress,
+     high-or-moderate-contrast Didone, the same construction as Contralto.
+     The best any of them could do was be a QUIETER Didone, and Gilda was
+     chosen precisely for that: "moderate contrast, so it does not crowd the
+     wordmark". Managing the symptom.
 
-     Verified: scripts/probe-type-faces.mjs, PLATFORM FACE + WEIGHTS. */
+     EB Garamond is an old-style humanist — diagonal stress, low contrast,
+     calligraphic roots. Against Contralto it is not a quieter version of the
+     same thing, it is a different thing, which is what makes the wordmark
+     read as a mark rather than as the largest heading. Runners-up on the
+     sheet that shipped this decision (nine systems on one ground, throwaway
+     route /lab/type/plaster): Literata (squarer, an optical-size axis,
+     the closest call), Young Serif (chunky wedge serifs, the most
+     food-coded), Archivo (a grotesque, the hardest editorial edge), Zilla
+     Slab, Newsreader, Petrona, Bricolage Grotesque, Syne.
+
+     IT RUNS AT 500, NOT 400. Garamond's regular is a text weight drawn for
+     10–14pt; at display scale it goes weedy and the ink loses its authority.
+     The variable font carries a drawn 500, so this is an instance rather
+     than a synthesised bold.
+
+     Loaded self-hosted through next/font in layout.tsx — same origin,
+     preloaded, no domain authorisation to fail closed on. The loader
+     variable is --font-display-loaded, named for the ROLE rather than the
+     face, because this token has outlived four of them.
+
+     WHAT IS NOT SETTLED: the metrics. A few places were tuned to
+     Contralto's advances by hand. The two big ones turned out to be safe —
+     the 201.6px in About.module.css and the footer wordmark's 127.9 units
+     are both on --font-display-big, which has not moved. The Manifesto's
+     1.025em cap-match was measured against Contralto small and no longer
+     transfers; its comment says so.
+
+     TO CHANGE FACE: this is one line. Point --font-display-small at a
+     different --font-display-face and swap the loader. Nothing else in the
+     codebase knows which face is in the display role. */
+  --font-display-contralto: "contralto-small", "contralto-medium",
+    "Times New Roman", serif;
+  /* FREIGHT FIRST, EB GARAMOND BEHIND IT — and the order is a deliberate
+     staged handover rather than a preference.
+
+     Freight is an ADOBE FONTS family. It cannot be self-hosted through
+     next/font and it does not arrive by naming it here: it has to be added
+     to the Typekit kit this site already loads for Contralto (pev2vne, see
+     the <link> in layout.tsx). Until someone adds it in the Adobe Fonts
+     account, every name below simply does not resolve and the stack falls
+     through to EB Garamond, which is why Garamond is still in it — the site
+     renders exactly as it does today rather than dropping to Times.
+
+     "FreightBig Pro" FIRST, AND IT IS A LOCAL DESKTOP NAME, NOT A KIT ONE.
+     Audited on this machine (system_profiler SPFontsDataType): FreightBig
+     Pro is installed and is the ONLY Freight family present — no
+     FreightDisplay, no FreightText. It carries the full range, Light through
+     Black with italics, so `font-weight: 300` gets a genuinely drawn
+     Freight Light rather than a synthesised one.
+
+     FreightBig is also the correct cut for this role by design: it is
+     Freight's LARGE-SIZE optical master, drawn for headlines, where
+     FreightText is the reading cut and would look coarse at 5rem.
+
+     ⚠️ A DESKTOP INSTALL IS ONE MACHINE. It renders for whoever has the font
+     and for nobody else — every visitor to the live site falls straight
+     through to EB Garamond. Making Freight real on the web still requires
+     adding it to the Typekit kit this site already loads for Contralto
+     (pev2vne, see layout.tsx); `freight-big-pro` and `freight-display-pro`
+     are the CSS names that kit would expose, which is why they sit between
+     the local name and the fallback. Nothing else has to change when it is
+     added.
+
+     THE WEIGHT IS NOT MOVED GLOBALLY. "Freight Light" is 300, and the two
+     chapters restructured alongside this change ask for it directly. The
+     remaining display sites stay at 500 deliberately: FreightBig Medium is
+     a real drawn weight, and dropping --w-medium to 300 site-wide would
+     take EB Garamond below its own 400 floor for every visitor who does not
+     have Freight — i.e. regress the live page in service of a font most
+     readers cannot see. */
+  --font-display-face: "FreightBig Pro", "freight-big-pro",
+    "freight-display-pro", var(--font-display-loaded), "Times New Roman", serif;
+  --font-display-small: var(--font-display-face);
+
+  /* WEIGHTS — four real tiers, for the first time on this site.
+
+     THE WHOLE BLOCK BELOW USED TO BE AN APOLOGY FOR HELVETICA. Both faces
+     are variable and self-hosted now (EB Garamond 400–800, Figtree 300–900),
+     so every weight named here is drawn, and drawn identically on every
+     platform. The platform split the previous version of this comment spent
+     twenty lines negotiating is simply gone.
+
+     --w-medium IS 500 AGAIN, AND THIS IS THE LOUDEST VISIBLE CHANGE.
+     It was aliased to 400 because nothing in the Helvetica stack draws a
+     500 — CSS weight matching descends from 500 and lands on Regular, and a
+     500 and a 400 rendered byte-identical. That alias meant 86 literal
+     `font-weight: 500` declarations across these stylesheets were rendering
+     at 400: most section headings, card titles and eyebrows sat one notch
+     lighter than the CSS asked for, and hierarchy was carried by size, case
+     and colour instead. All 86 now render at a real 500 with no edit to any
+     of them. Expect the page to read heavier — that is the CSS finally being
+     honoured rather than a new decision.
+
+     --w-hairline: 300 IS NOW REAL EVERYWHERE. Under Helvetica it landed on a
+     drawn Light for Apple readers and quietly degraded to Regular on Windows
+     and Linux, which is why the navbar was left at 400 rather than made
+     lighter (see Nav.module.css). Figtree draws 300 for everyone, so that
+     constraint has lifted and the navbar decision is worth revisiting.
+
+     --w-bold: 700 is drawn in both families. Still barely used; putting a
+     700 under a 5rem display line is a design decision rather than a token
+     swap.
+
+     THE OLD MEASUREMENTS ARE HISTORY, NOT INSTRUCTION.
+     scripts/probe-type-faces.mjs read the OS/2 tables of a system
+     Helvetica.ttc that nothing on this site loads any more. It has not been
+     re-pointed and its output no longer describes what renders. */
   --w-hairline: 300;
   --w-regular: 400;
-  --w-medium: var(--w-regular);
+  --w-medium: 500;
   --w-bold: 700;
 
   /* fluid type scale (~Perfect Fourth, 1.333) — clamp(min, fluid, max) */
@@ -230,10 +523,27 @@
      have deliberate weight. `--ease-out` for entrances/press feedback,
      `--ease-in-out` for on-screen movement/morphs, `--ease-drawer` for
      panel-style motion (from Ionic). Use these across the app instead of
-     `ease`, `ease-out`, `ease-in-out` keywords. */
+     `ease`, `ease-out`, `ease-in-out` keywords.
+
+     TWO MORE TOKENS, AND THEY ARE NOT NEW CURVES — they are the two curves
+     the stylesheets were ALREADY using most, written as literals that
+     bypassed this block entirely. Audited: `cubic-bezier(0.22, 1, 0.36, 1)`
+     appeared 18 times across 12 files and `cubic-bezier(0.4, 0.05, 0.2, 1)`
+     13 times across 4. Between them that is 31 declarations agreeing with
+     each other by copy-paste rather than by reference, in a file whose own
+     comment says "use these across the app".
+
+     They are not folded into --ease-out and --ease-in-out because they are
+     genuinely different: --ease-entrance is a gentler out-quint than
+     --ease-out and is what every reveal on the site actually uses, and
+     --ease-state has a slow in AND out for colour/border changes where
+     --ease-in-out's near-linear middle reads as a snap. Naming what is
+     already there beats retuning 31 sites to a curve none of them chose. */
   --ease-out: cubic-bezier(0.23, 1, 0.32, 1);
   --ease-in-out: cubic-bezier(0.77, 0, 0.175, 1);
   --ease-drawer: cubic-bezier(0.32, 0.72, 0, 1);
+  --ease-entrance: cubic-bezier(0.22, 1, 0.36, 1);
+  --ease-state: cubic-bezier(0.4, 0.05, 0.2, 1);
   /* smooth with a whisper of overshoot — the Apple/Emil "settle" for
      interactive transforms (press, pill widen, card arrivals). The real
      bounce lives in the framer springs (Reveal); this is the gentle CSS
@@ -248,6 +558,48 @@
   --radius-tile: 8px; /* photography + editorial frames — a quiet edge-soften, not an app-card curve */
   --radius-card: 16px;  /* pressable/floating UI panels — NOT photos */
   --radius-media: 10px; /* media nested inside a rounded UI panel */
+
+  /* ── ELEVATION — FOUR TOKENS, AND EVERY SHADOW ON THE SITE IS ONE OF THEM.
+     There were none of these. The same four-stop stack was written out by
+     hand in FIVE stylesheets (Blog's card, BlogIndex's featured, VenueCard's
+     surface, StoryStrip's frame, AboutSplit's media) and three more carried
+     near-misses of it, so "the shadow" was eight independent decisions that
+     happened to agree until one of them was edited. Consistency was a
+     coincidence; now it is a reference.
+
+     THEY ARE ALSO ROUGHLY HALVED, at the user's instruction. The old resting
+     stack ended `0 28px 44px -20px` at 26% — which threw ink 30px below the
+     card (offsetY + blur/2 − spread) and read as a UI card floating over a
+     document rather than as a print lying on plaster. That 30px is also what
+     was clipping: Blog's strip is an overflow container padded 26px to let
+     the shadow through, sized against a comment that estimated "~24px".
+
+     The rest: 16px of throw, and alphas down by about a third. The page is
+     photography on cream, and a photograph's edge should be the thing that
+     separates it from the page.
+
+     SHADOWS ARE MEASURED IN --maroon, never black or an rgba() literal. The
+     ink is a warm red-brown; a neutral shadow under it greys the cream. */
+  --shadow-card:
+    0 1px 2px color-mix(in srgb, var(--maroon) 6%, transparent),
+    0 3px 6px -2px color-mix(in srgb, var(--maroon) 8%, transparent),
+    0 8px 14px -6px color-mix(in srgb, var(--maroon) 12%, transparent),
+    0 16px 28px -14px color-mix(in srgb, var(--maroon) 16%, transparent);
+  --shadow-card-hover:
+    0 2px 4px color-mix(in srgb, var(--maroon) 8%, transparent),
+    0 12px 28px -8px color-mix(in srgb, var(--maroon) 18%, transparent);
+  /* controls sit ON the page rather than above it — a pill throwing a card's
+     shadow reads as a floating chip */
+  --shadow-control:
+    0 1px 2px color-mix(in srgb, var(--maroon) 8%, transparent),
+    0 4px 10px -4px color-mix(in srgb, var(--maroon) 14%, transparent);
+  --shadow-control-hover:
+    0 2px 4px color-mix(in srgb, var(--maroon) 10%, transparent),
+    0 8px 18px -6px color-mix(in srgb, var(--maroon) 18%, transparent);
+  /* how far --shadow-card actually throws below its box: 16 + 28/2 − 14.
+     Any overflow container that has to let the shadow through pads by this
+     (see Blog's .strip) instead of guessing at it. */
+  --shadow-card-throw: 16px;
 
   /* fluid spacing scale — shared rhythm for gaps & section padding */
   --space-2xs: 8px;
@@ -524,22 +876,19 @@ html::-webkit-scrollbar {
   background: var(--cream);
 }
 
-/* THE JOURNAL'S ENTRANCE — the scope a `position: sticky` interlude is
-   pinned inside.
-   The photograph sticks to the top of the window and the Blog sheet scrolls
-   up over it, so the scope has to be an ancestor that OUTLIVES the pinned
-   element: sticky is bounded by its containing block, and while the
-   interlude sat as the last child of the maroon zone that block ended at
-   its own bottom edge — zero travel, no pin. Wrapping the interlude and the
-   journal together is what gives the pin something to hold through.
-   `flow-root` so the interlude's top margin is contained and reads as this
-   box's maroon rather than collapsing out into the cream page above; the
-   ground is maroon for exactly that strip, and the journal covers the rest. */
-.pinScope {
-  position: relative;
-  display: flow-root;
-  background: var(--maroon);
-}
+/* .pinScope IS DELETED, along with the pin it existed for.
+
+   It wrapped the interlude and the journal so the interlude's
+   `position: sticky` had a containing block that outlived it — sticky is
+   bounded by its containing block, and as the last child of the dark zone
+   the interlude's block ended at its own bottom edge, giving zero travel
+   and no pin. The rule also painted the strip between the two chapters so
+   the band read as one continuous ground.
+
+   Both jobs are gone: the pin is removed (see Interlude.module.css) and the
+   dark band with it, so the strip is simply the page. The rule is deleted
+   rather than emptied — a wrapper class with no wrapper is a thing the next
+   person has to work out is dead. */
 
 .eyebrow {
   font-family: var(--font-sans);

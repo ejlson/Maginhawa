@@ -68,7 +68,7 @@
 /* crossfade between the two views (both stay mounted) */
 .stage,
 .cards {
-  transition: opacity 0.5s ease, transform 0.5s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: opacity 0.5s ease, transform 0.5s var(--ease-entrance);
 }
 .stage[data-hidden="true"] {
   opacity: 0;
@@ -81,7 +81,27 @@
   pointer-events: none;
 }
 
-/* ---- card-list view: photo grid on a clean cream surface (fits one screen) */
+/* ═══ CARD-LIST VIEW — a grid of SQUARE venue cards on a cream sheet,
+   fitted to one screen.
+
+   THE CARDS THEMSELVES ARE NOT DESCRIBED HERE. They are <VenueCard>, the
+   same object the home page's Discover grid ships, and every rule that
+   makes them look like anything lives in VenueCard.module.css. What is
+   left in this file is the SHEET, the GRID and the SEAT — i.e. where the
+   cards go and how big they are, which is the only part of a card that
+   belongs to a page.
+
+   RETIRED HERE, and worth naming because it is what a reader of this diff
+   will be looking for: .cardImg / .cardField / .cardOverlay / .cardMark /
+   .cardMarkLg / .cardName / .cardLoc / .cardActions / .cardBtn /
+   .cardBtnSolid, plus the 2px photograph cut on .card and the
+   `filter: brightness(0.72)` on the photograph itself. That tile grounded
+   its type by DIMMING THE PICTURE and then laying an
+   `rgba(18, 0, 0, …)` gradient — a hardcoded red-black from the retired
+   palette — over the result, and no number in it had been measured
+   against a rendered pixel. The card that replaces it grounds its type on
+   a photo-derived ramp instead, leaves the picture alone, and carries a
+   per-venue contrast table. ═══ */
 .cards {
   position: absolute;
   inset: 0;
@@ -89,154 +109,106 @@
   background: var(--cream);
   color: var(--maroon);
   overflow: hidden;
-  /* extra bottom space so the view toggle never covers a card */
-  padding: clamp(64px, 10vh, 100px) clamp(16px, 3vw, 48px)
-    clamp(74px, 11vh, 104px);
+  /* ONE DECLARATION OF EACH PAD, because .cardsGrid's height cap below
+     has to do arithmetic with them and a pad stated twice is a pad that
+     drifts. The bottom is the deeper of the two so the view toggle in the
+     corner never covers a card. */
+  --cards-pad-top: clamp(64px, 10vh, 100px);
+  --cards-pad-bottom: clamp(74px, 11vh, 104px);
+  --cards-gap: clamp(10px, 1.2vw, 20px);
+  padding: var(--cards-pad-top) clamp(16px, 3vw, 48px) var(--cards-pad-bottom);
 }
+
+/* THE GRID. Four columns and eight venues, so two clean rows.
+
+   ⚠️ THE ROWS ARE NO LONGER `1fr`, AND THAT IS THE WHOLE CHANGE. They
+   were `grid-auto-rows: 1fr` inside a `height: 100%` grid, which made a
+   card exactly half the available height and as wide as a quarter of the
+   sheet — i.e. its aspect was whatever the window happened to be, and a
+   1440x900 card (326 x 347) and a 1440x1200 card (326 x 497) were
+   different objects. Square cards cannot be sized that way: the aspect is
+   fixed, so the CARD'S WIDTH now decides its height and the grid has to
+   be capped or two rows of squares would run off the bottom of a short
+   window.
+
+   THE CAP, derived rather than dialled. Let A be the height this sheet
+   actually has (its box is the 100svh hero minus the two pads above), g
+   the gutter and w a card's edge. Two rows must fit:
+       2w + g ≤ A                        →  w ≤ (A − g) / 2
+   and the grid's width is four cards and three gutters:
+       W = 4w + 3g
+   Substituting gives W ≤ 2A + g, which is the max-width below, with the
+   grid centred inside whatever is left. Above that width the sheet is
+   wider than it is tall and the cards are HEIGHT-bound (the cap binds,
+   the grid centres horizontally); below it they are WIDTH-bound (the cap
+   is slack and `align-content: center` centres the two rows vertically).
+   Either way the eight cards are one size and the view still fits one
+   screen, which is the contract this page has always kept. */
 .cardsGrid {
   display: grid;
-  grid-template-columns: repeat(4, 1fr);
-  grid-auto-rows: 1fr;
-  gap: clamp(10px, 1.2vw, 20px);
+  /* minmax(0, 1fr), not 1fr: a bare 1fr is minmax(auto, 1fr) and refuses
+     to shrink below its content's min-content width, which on a card
+     carrying a nowrap address line means the track wins and the grid
+     overflows its own sheet. */
+  grid-template-columns: repeat(4, minmax(0, 1fr));
+  gap: var(--cards-gap);
   height: 100%;
   min-height: 0;
+  align-content: center;
+  max-width: calc(
+    2 * (100svh - var(--cards-pad-top) - var(--cards-pad-bottom)) +
+      var(--cards-gap)
+  );
+  margin-inline: auto;
 }
 
-/* each card is a single photo tile with everything overlaid inside it */
+/* THE SEAT, and only the seat. It owns the card's ASPECT and nothing
+   else: no radius (the card's own 28px cut is inside it), no clip (the
+   card clips itself), no shadow (the card carries a four-stop one that
+   must be allowed to spill past this box), and no hover (the card
+   answers the pointer itself, and a 1% lift needs room to breathe).
+
+   `aspect-ratio: 1` on the SEAT rather than on the card, because the card
+   is `position: absolute; inset: 0` — it has no intrinsic size to give an
+   aspect to, and the seat is the box the grid measures. */
 .card {
   position: relative;
-  min-height: 0;
-  overflow: hidden;
-  /* 2px, not --radius-tile's 8px — the house corner language for a
-     PHOTOGRAPH, which these are. The Discover plates on the home page, the
-     manifesto prints, the About story deck and the blog cards all sit on the
-     same sharp editorial 2px cut; these tiles were the outlier at 8, which
-     read as an app card rather than a print.
-
-     Written locally rather than by moving --radius-tile: that token is shared
-     with other callers and is documented as "a quiet edge-soften" for
-     editorial frames generally. Changing it here would silently re-cut
-     everything else using it, which is not what was asked for. */
-  border-radius: 2px;
+  aspect-ratio: 1;
+  min-width: 0;
 }
 
-.cardImg {
-  position: absolute;
-  inset: 0;
-}
-.cardImg img,
-.cardImg > div {
-  width: 100%;
-  height: 100%;
-  object-fit: cover;
-}
-.cardImg img {
-  display: block;
-  /* dim the photo so the cream overlay text/buttons stay legible */
-  filter: brightness(0.72);
-  transition: transform 0.6s cubic-bezier(0.22, 1, 0.36, 1);
-}
-/* coming-soon card (Bunso) — typographic cream wordmark on a maroon field,
-   matching the home Discover grid's treatment */
-.cardField {
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  width: 100%;
-  height: 100%;
-  background: var(--maroon);
-  color: var(--cream);
-  font-family: var(--font-display);
-  font-weight: 500;
-  font-size: clamp(2rem, 3vw, 3.2rem);
-  letter-spacing: -0.025em;
-  line-height: 1;
-}
-.card:hover .cardImg img {
-  transform: scale(1.05);
-}
+/* ---- view switch, bottom-left ----
 
-.cardOverlay {
-  position: absolute;
-  left: 0;
-  right: 0;
-  bottom: 0;
-  z-index: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  gap: 0.45em;
-  padding: clamp(14px, 1.3vw, 22px);
-  color: var(--cream);
-  background: linear-gradient(
-    to top,
-    rgba(18, 0, 0, 0.9),
-    rgba(18, 0, 0, 0.55) 48%,
-    rgba(18, 0, 0, 0) 100%
-  );
-}
-.cardMark {
-  height: clamp(16px, 1.4vw, 24px);
-  width: auto;
-  max-width: 80%;
-  object-fit: contain;
-  /* render any mark as a clean cream silhouette over the photo */
-  filter: brightness(0) invert(1);
-}
-/* Bintang's mark reads small at the shared height — give it a touch more */
-.cardMarkLg {
-  height: clamp(24px, 2.1vw, 36px);
-}
-.cardName {
-  font-family: var(--font-display-small);
-  font-size: var(--t-h3);
-}
-.cardLoc {
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  opacity: 0.8;
-}
+   FIVE CREAMS IN THIS FILE WERE #faf7f1, THE CREAM FROM TWO PALETTES AGO —
+   the toggle's boundary, the thumb behind the active icon, the wheel's
+   selection band, its focus ring and the action pills. None of the five
+   referenced --cream, so the palette softening walked past every one of them
+   and this page has been drawing a dead palette's cream over live photography
+   ever since — beside declarations like `.actBtnSolid`'s `var(--cream)`, which
+   tracked both swaps correctly. Two different creams in one stylesheet, which
+   is the failure mode a token exists to prevent.
 
-.cardActions {
-  display: flex;
-  flex-wrap: wrap;
-  gap: 5px;
-  margin-top: 0.25em;
-}
-.cardBtn {
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  padding: 0.45em 0.85em;
-  border: 1px solid rgba(250, 247, 241, 0.55);
-  border-radius: 999px;
-  background: none;
-  color: var(--cream);
-  cursor: pointer;
-  white-space: nowrap;
-  transition: background 0.3s ease, color 0.3s ease, border-color 0.3s ease;
-  -webkit-tap-highlight-color: transparent;
-}
-.cardBtn:hover:not(:disabled) {
-  background: var(--cream);
-  color: var(--maroon);
-  border-color: var(--cream);
-}
-.cardBtn:disabled {
-  opacity: 0.35;
-  cursor: not-allowed;
-}
-.cardBtnSolid {
-  background: var(--cream);
-  color: var(--maroon);
-  border-color: var(--cream);
-}
-.cardBtnSolid:hover {
-  opacity: 0.85;
-}
+   ALL FIVE IDENTIFY A CONTROL OR ITS STATE, so unlike the ornament migrated
+   elsewhere in this pass they each take ×1.115 on their alpha — the factor
+   that seats the current cream on the luminance the old one made, so nothing
+   here gets quieter than it already was. (Ornament was migrated at its
+   original alpha on purpose; see ReviewUs.module.css for that argument.)
 
-/* ---- view switch, bottom-left ---- */
+   AND ALL FOUR MEASURABLE ONES WERE ALREADY UNDER 3:1, which is the
+   uncomfortable part and the reason none of this is described as a fix.
+   Measured at 1440 on /restaurants with the OLD literals still in place
+   (scripts/probe-cream-literals.mjs):
+
+     toggle boundary  2.14:1        selection band  1.14:1
+     active thumb     1.28:1        action pill     2.52:1
+
+   1.4.11 asks 3:1 of every one of them. The raise stops this change taking
+   anything further; it does not pretend to close that gap, and it could not.
+   A pale hairline over an UNCONTROLLED photograph cannot be brought to 3:1 by
+   alpha, because the worst backdrop moves with the picture — the honest fixes
+   are a scrim behind the controls or opaque edges instead of translucent ones.
+   That is a design decision, and a real one. Named here rather than buried
+   under a number that reads better. */
 .viewToggle {
   position: absolute;
   left: clamp(20px, 5vw, 60px);
@@ -245,13 +217,14 @@
   display: flex;
   gap: 4px;
   padding: 4px;
-  border: 1px solid rgba(250, 247, 241, 0.28);
+  border: 1px solid color-mix(in srgb, var(--cream) 31%, transparent);
   border-radius: 999px;
   background: rgba(18, 0, 0, 0.42);
   -webkit-backdrop-filter: blur(8px);
   backdrop-filter: blur(8px);
 }
-/* sliding highlight behind the active icon */
+/* sliding highlight behind the active icon — the ONLY thing that says which
+   view is active, so it is a state indicator and takes the same ×1.115 */
 .toggleThumb {
   position: absolute;
   left: 4px;
@@ -259,7 +232,7 @@
   width: 34px;
   height: 34px;
   border-radius: 999px;
-  background: rgba(250, 247, 241, 0.18);
+  background: color-mix(in srgb, var(--cream) 20%, transparent);
 }
 .viewToggle button {
   position: relative;
@@ -307,15 +280,21 @@
    NOR A SCRIM. A soft ellipse fitted to the note's footprint was built here
    and measured — 7.05:1 on the worst of ten sampled frames in wheel view,
    11.8:1 in card view — and then removed, because the ask was for the
-   background to go and a shaped wash is still a background. The numbers this
-   costs are in the probe below; run it before putting anything back.
+   background to go and a shaped wash is still a background. Both figures
+   were taken on the pre-softening cream and are ~12% optimistic now; the
+   numbers this costs are in the probe below, and it should be re-run rather
+   than adjusted on paper before anything is put back.
 
    NOT `mix-blend-mode: difference` either, which is the obvious way to get
    "the nav's inverse effect" and the one that cannot be made to work here.
    The blend fails in the MIDDLE of the tonal range, not at the ends: cream
    differenced against a mid-tone returns a pale value at almost the same
-   luminance as its ground. The nav's own worst link measures 1.03:1 on `/`
-   and 2.31:1 on /about over exactly this kind of footage.
+   luminance as its ground. The nav's own worst link measured 1.03:1 on `/`
+   and 2.31:1 on /about over exactly this kind of footage — and 3.13:1 on
+   THIS route after the palette softening, re-measured with the film frozen
+   (scripts/probe-palette-blastradius.mjs). Softening the pair narrowed what
+   `difference` resolves to (cream over the ink went 10.22:1 → 5.86:1) but
+   did not touch the failure mode, which is the backdrop, not the tokens.
 
    WHAT REMAINS IS THE INK, and the ink is not a background. It follows its
    ground, which is two different things. In wheel view the note is on the
@@ -370,9 +349,13 @@
    above it the grid fits one screen and reserves the bottom strip, so this
    corner is flat cream and cream type there is 1:1, invisible. Below it the
    grid scrolls PHOTOGRAPHS through this corner, and measured at 390 the
-   maroon returns 2.32–2.52:1 on every one of 28 frames while cream on the
-   same pixels returns 7.13:1. So the inversion stops exactly where the sheet
-   does. */
+   maroon returned 2.32–2.52:1 on every one of 28 frames while cream on the
+   same pixels returned 7.13:1. Those were taken on the old pair; the
+   photographs have not moved, so re-solving them for the softened tokens
+   gives maroon 1.83–1.99:1 and cream ~6.3:1. BOTH ENDS GOT WORSE AND THE
+   CONCLUSION IS UNCHANGED — cream still wins this corner by more than
+   three times, which is the only thing the inversion depends on. So the
+   inversion stops exactly where the sheet does. */
 @media (min-width: 981px) {
   .walkIn[data-view="cards"] {
     color: var(--maroon);
@@ -425,34 +408,35 @@
   transform: none;
 }
 
-/* below the one-screen breakpoint the grid scrolls with fixed-aspect photos */
+/* BELOW THE ONE-SCREEN BREAKPOINT THE GRID SCROLLS, and the height cap
+   comes off with the promise it was keeping. Three columns of eight is
+   three rows, which was never going to fit a phone-shaped viewport, so
+   `max-width: none` and `height: auto` let the grid run its natural
+   length and the sheet scroll it. The cards stay square — the seat's
+   `aspect-ratio: 1` is unconditional, which is why nothing here has to
+   restate it. (The retired tile needed a `3 / 4` aspect on its image at
+   this breakpoint precisely because it had no aspect of its own above
+   it; that rule is gone with the tile.) */
 @media (max-width: 980px) {
   .cards {
     overflow-y: auto;
     overscroll-behavior: contain;
   }
   .cardsGrid {
-    grid-template-columns: repeat(3, 1fr);
-    grid-auto-rows: auto;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
     height: auto;
-  }
-  /* in-flow (not absolute) so the aspect ratio actually sizes the card —
-     the overlay keeps anchoring to the .card box, whose height this sets */
-  .cardImg {
-    position: static;
-    display: block;
-    width: 100%;
-    aspect-ratio: 3 / 4;
+    max-width: none;
+    align-content: start;
   }
 }
 @media (max-width: 700px) {
   .cardsGrid {
-    grid-template-columns: repeat(2, 1fr);
+    grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (max-width: 460px) {
   .cardsGrid {
-    grid-template-columns: 1fr;
+    grid-template-columns: minmax(0, 1fr);
   }
 }
 
@@ -484,8 +468,12 @@
   top: 50%;
   height: var(--row);
   transform: translateY(-50%);
-  border-top: 1px solid rgba(250, 247, 241, 0.28);
-  border-bottom: 1px solid rgba(250, 247, 241, 0.28);
+  /* the band naming the committed restaurant — a state indicator, so it takes
+     the ×1.115 the boundaries above it do. Measured 1.14:1 with the old
+     literal: the lowest reading of the five, because these two rules cross the
+     full width of the photograph and meet its brightest passage somewhere. */
+  border-top: 1px solid color-mix(in srgb, var(--cream) 31%, transparent);
+  border-bottom: 1px solid color-mix(in srgb, var(--cream) 31%, transparent);
   pointer-events: none;
 }
 .step {
@@ -610,8 +598,15 @@
   -webkit-user-select: none;
   -webkit-tap-highlight-color: transparent;
 }
+/* THE FOCUS RING, and the one row in this file the probe could not read: an
+   outline paints only in :focus-visible, which Chrome refuses to grant a
+   scripted .focus(), and `outline-offset: 4px` then draws it OUTSIDE the
+   element's own box. The probe now forces the pseudo-state over CDP and pads
+   its sample box to match, but the ring still sits on moving footage, so it is
+   migrated on the same ×1.115 as the boundaries above rather than on a number
+   of its own. 0.6 -> 0.67. */
 .name:focus-visible {
-  outline: 1px solid rgba(250, 247, 241, 0.6);
+  outline: 1px solid color-mix(in srgb, var(--cream) 67%, transparent);
   outline-offset: 4px;
 }
 .nameActive {
@@ -631,7 +626,14 @@
   align-items: center;
   gap: 0.5em;
   padding: 0.6em 1.3em;
-  border: 1px solid rgba(250, 247, 241, 0.5);
+  /* the pill's edge is the only thing drawing this button — background is
+     `none` — so it is the boundary 1.4.11 means. 0.5 -> 0.56 on the same
+     ×1.115. Measured 2.52:1 with the old literal. NOTE the sibling
+     `.actBtnSolid` below sets `border-color: var(--cream)` outright and was
+     never one of the stranded literals; matching them by substring picks it
+     first, which is how a first pass at this measured a migration that had
+     already happened. */
+  border: 1px solid color-mix(in srgb, var(--cream) 56%, transparent);
   border-radius: 999px;
   background: none;
   color: var(--cream);
@@ -653,7 +655,7 @@
   cursor: not-allowed;
 }
 .actBtn span {
-  transition: transform 0.4s cubic-bezier(0.22, 1, 0.36, 1);
+  transition: transform 0.4s var(--ease-entrance);
 }
 .actBtn:hover span {
   transform: translateX(4px);
