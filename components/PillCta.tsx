@@ -60,7 +60,10 @@ type Props = {
   className?: string;
   /** "accent" is for the one instance standing on a photograph rather than
       on the cream page. */
-  tone?: "default" | "accent" | "cream";
+  tone?: "default" | "accent" | "cream" | "saffron";
+  /** the closing frame's pill is the page's last action and wants to be
+   *  read from across a full-bleed film — see `.large` in the stylesheet */
+  size?: "default" | "large";
   magnet?: { reach?: number; pull?: number; cap?: number };
 };
 
@@ -70,6 +73,7 @@ export default function PillCta({
   "aria-label": ariaLabel,
   className,
   tone = "default",
+  size = "default",
   magnet: magnetOpts = MAGNET,
 }: Props) {
   const { hostRef, magnetic, x, y } = useMagnet<HTMLSpanElement>(magnetOpts);
@@ -87,7 +91,7 @@ export default function PillCta({
       >
         <Link
           href={href}
-          className={[styles.cta, tone === "accent" && styles.accent, tone === "cream" && styles.cream]
+          className={[styles.cta, tone === "accent" && styles.accent, tone === "cream" && styles.cream, tone === "saffron" && styles.saffron, size === "large" && styles.large]
             .filter(Boolean)
             .join(" ")}
           aria-label={ariaLabel}

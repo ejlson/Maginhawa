@@ -59,6 +59,13 @@ export type VenueCardItem = {
   /** `object-position` for a photograph whose subject is off-centre */
   focal?: string;
   logo: string | null;
+  /** what the room IS, in four or five words — "Caribbean Takeaway",
+   *  "London's First Filipino Ice Cream Parlor". Taken straight from the
+   *  canonical record's `tagline`; the card prints it under the name, which
+   *  is the line that tells eight venues apart. NOT derived from `cuisine`
+   *  ("Filipino · Fusion") — that is a filter facet, written to be sorted
+   *  rather than read. */
+  tagline?: string;
   address: VenueAddress;
   priceRange?: string;
   hours?: string;
@@ -190,6 +197,7 @@ export function venueCard(slug: string): VenueCardItem | null {
   return {
     slug: r.slug,
     name: r.name,
+    tagline: r.tagline,
     // `undefined` means "the extras have nothing to say"; `null` is a
     // deliberate "there is no photograph", and the two must not collapse
     image: x.image !== undefined ? x.image : r.image,

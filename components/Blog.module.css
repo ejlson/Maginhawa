@@ -280,7 +280,27 @@
      it. It was briefly the COLUMN gap as well (one measure for both axes),
      and it is not any more: see the gap below. */
   --rail-air: clamp(7px, 0.8vh, 11px);
-  margin-inline: var(--blog-margin);
+  /* ── CENTRED ON A NARROWER MEASURE, at the user's instruction ──
+     The head stays left-ranged on the page margin; only the pictures move.
+     ELEVEN of the binding grid's twelve columns, centred, so the inset is
+     half a column either side rather than a number: 1297px at 1440 against
+     the 1416 the head still spans, i.e. 71px of cream at each end.
+
+     IT WAS TEN, and eleven is the last step that still reads as centred —
+     twelve IS the head's measure, at which point the block is flush and the
+     centring has nothing to show. Ten left 131px a side, which the user
+     asked to close up.
+
+     `width: min(…)` RATHER THAN `max-width` + `margin-inline: auto`,
+     because the margin has to survive as a FLOOR: below the width where ten
+     columns exceed the viewport, the first term wins and the block falls
+     back to the page margin instead of overflowing. One declaration does
+     both jobs. */
+  width: min(
+    100% - 2 * var(--blog-margin),
+    calc(var(--blog-col) * 11 + var(--blog-gutter) * 10)
+  );
+  margin-inline: auto;
   display: grid;
   /* SIX COLUMNS FOR THE CARD, down from seven at the user's instruction —
      788px to 674px at 1440. The rail takes the rest (1fr), which lands it
@@ -292,9 +312,16 @@
      cost of the gap being the rail's air rather than --grid-gutter: the
      two outer edges still seat on the page margin, which is the edge a
      reader can actually see. */
-  grid-template-columns:
-    calc(var(--blog-col) * 6 + var(--blog-gutter) * 5)
-    1fr;
+  /* ── TWO EQUAL COLUMNS, and the change is forced by the centring above ──
+     This was `calc(var(--blog-col) * 6 + var(--blog-gutter) * 5) 1fr`: the
+     card took six columns of the FULL page grid and the rail took whatever
+     was left. That is exact while the block spans the whole measure and
+     wrong the moment it does not — the card would have held its 674px
+     inside a 1261px block and the rail would have absorbed the entire
+     inset, shifting a ratio nobody chose to change. Two `1fr` tracks keep
+     the split the six-column seat produced (674 against 672, measured) at
+     any block width. */
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
   /* ── THE COLUMN GAP IS ITS OWN MEASURE AGAIN, at the user's instruction.
      It was `--rail-air * 2` — exactly the air between two rail rows, 14.4px
      at 1440 — on the argument that one measure on both axes makes the block

@@ -193,7 +193,13 @@
    --maroon-soft (6.56:1, well past the 4.5:1 this size answers to) so it
    introduces the sentence rather than competing with it. */
 .eyebrow {
-  margin: 0 0 clamp(16px, 2.4vh, 30px);
+  /* ── HALVED, at the user's instruction ── It was clamp(16px, 2.4vh,
+     30px). That distance was right while the eyebrow and the statement made
+     the SAME gesture — both rose and inked in, so they read as one movement
+     and wanted air between them. The eyebrow pops now and the sentence
+     builds after it, which is a sequence: the two are a question and its
+     answer, and an answer sits close to its question. */
+  margin: 0 0 clamp(8px, 1.2vh, 15px);
   font-family: var(--font-sans);
   font-weight: var(--w-regular);
   font-size: var(--t-label);
@@ -289,6 +295,31 @@
    `will-change: clip-path` held a ≈1440×470 layer, and it is recorded
    below as one of the reasons that mechanism was worth deleting); there is
    no reason to keep paying it here for a property that composites anyway. */
+/* ── THE MASK: what the word rises from behind ──
+   `overflow: hidden` on a box the size of the word, with the word inside
+   it starting a full 110% below. That is the whole reveal.
+
+   ⚠️ THE PADDING IS NOT OPTIONAL AND THE NEGATIVE MARGIN CANCELS IT.
+   A clip tight to the line box shaves descenders — this sentence carries
+   Tagalog, shapes, every and guest, so four of its twenty words would lose
+   their tails, and the italic `q` in "quiet" and the `f` in "comfort"
+   overhang sideways as well. The padding grows the clip past the ink; the
+   equal negative margin takes that growth back out of the layout, so the
+   line box, the leading and the centring are exactly what they were before
+   the mask existed.
+
+   `vertical-align: bottom` because an inline-block with `overflow: hidden`
+   baseline-aligns on its BOTTOM MARGIN EDGE rather than on its text
+   baseline — without this every word sits a padding's worth high and the
+   line rides up. */
+.wordMask {
+  display: inline-block;
+  overflow: hidden;
+  padding: 0.06em 0.07em 0.22em;
+  margin: -0.06em -0.07em -0.22em;
+  vertical-align: bottom;
+}
+
 .word {
   /* inline-block so the word can carry a transform and cannot be broken
      across a line. It needs nothing else: the spacing between words is a

@@ -55,10 +55,46 @@
      that the ramp, the wash and the block stay ONE description of one
      card with two shapes. */
 
-  /* THE RAMP'S HEIGHT, as a share of the CARD's height. 58% is the home
-     grid's portrait value; see .rampBlur for what the ramp is and see
-     .square for how the square's number was derived. */
-  --vc-ramp-h: 58%;
+  /* THE RAMP'S HEIGHT, as a share of the CARD's height. See .rampBlur for
+     what the ramp is and .square for how the square's number was derived.
+
+     ── 78%, UP FROM 58%, AND IT IS FORCED BY THE BLOCK'S NEW HEIGHT ──
+     The number that matters is not this one, it is where the block's TOP
+     EDGE lands inside the gradient: f = (rampH − blockH) / rampH, which is
+     how much ink sits under the block's first line and therefore every
+     contrast figure this card was signed off on. This file's own table
+     records f = 0.41 as the value the readings were taken at.
+
+     The block restructured — the venue's name and a tagline above the rule,
+     the address and the controls sharing one row below it — and grew from
+     ~110px to 144px on a 262px card. At 58% the ramp was 152px, so f fell
+     to (152 − 144) / 152 = 0.05: the first line of type was sitting where
+     the gradient is still almost transparent, on an unblurred photograph.
+     That is a legibility regression, not a cosmetic one.
+
+     THEN THE STATS WENT BACK ABOVE THE RULE and the block got most of its
+     height back: price and hours closing the head row instead of stacking
+     under the address takes a whole row off the left column. Re-measured,
+     the block is 124px, so 76% of the card (199px) puts f at 0.377.
+
+     THEN THE BLOCK WAS TIGHTENED and the ramp came down with it, at the
+     user's instruction: the inset and the gaps lost 12px between them, so
+     68% of the card holds the SAME f the 76% ramp held against the taller
+     block, and gives 8% of the card back to the photograph. That is the
+     relationship to keep in view — f is the number, this percentage is
+     only ever a consequence of it.
+
+     f STILL LANDS SHORT OF THE 0.41 THE TABLE WAS TAKEN AT, and the honest
+     reason not to chase it: the last of the distance costs photograph and
+     nothing else. What sits at the block's top edge is the venue's NAME at
+     FULL cream — the loudest line on the card and the one with the most
+     headroom — while the address pair at 84% sits further down where the
+     ramp is deep. The thinnest part of the gradient is carrying the most
+     robust line. It briefly sat at 78% when the block was 144px tall.
+
+     THE PROBE IS scripts/probe-square-cards.mjs. Re-run it if the block
+     gains a row again; f is the number to watch, not this percentage. */
+  --vc-ramp-h: 68%;
 
   /* THE MARK'S CORNER WASH — its box height, i.e. the vertical radius of
      the ellipse, and the ellipse's stop list. Both move together: the
@@ -806,9 +842,30 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
-  gap: clamp(8px, 0.9vw, 11px);
-  padding: clamp(10px, 1.1vw, 14px) clamp(12px, 1.3vw, 16px)
-    clamp(12px, 1.3vw, 16px);
+  /* ── ONE INSET ON ALL FOUR SIDES, and one gap between the three rows ──
+     It was `clamp(10px, 1.1vw, 14px)` on top against `clamp(12px, 1.3vw,
+     16px)` on the sides and bottom: 14 / 16 / 16 at the desktop card, so
+     the block sat 2px nearer its own top edge than its sides, on a card
+     whose contents are now symmetric about the hairline (facts above,
+     facts below). Nothing was buying that 2px.
+
+     THE SIDE VALUE IS THE ONE THAT SURVIVES, because it is already load-
+     bearing: the stats and the controls both close their rows flush to it,
+     so it is the block's right margin as well as its padding. Measured
+     after the change, every edge is 16px and the two right-hand groups
+     land on it exactly.
+
+     THE GAP IS THE RULE'S AIR, above and below it equally — the hairline
+     is the only thing between the two rows, so a lopsided gap would read
+     as it belonging to one of them. */
+  /* ── TIGHTENED, at the user's instruction: the block was taking too much
+     of the card ── 16px of inset and 11px of gap became 12 and 8, which
+     takes 12px off the block's height (8 from the two paddings, 4 from the
+     two gaps) without touching a single type size. The proportions above
+     are unchanged: one inset on all four sides, and the rule's air equal
+     above and below it. */
+  gap: clamp(6px, 0.7vw, 8px);
+  padding: clamp(9px, 1vw, 12px);
   pointer-events: none;
 }
 
@@ -829,10 +886,42 @@
    line's cap height, two lines clear of the rule) and not centre (which
    parks them against the middle line — the one line of the three that has
    no relationship to them). */
-.blockTop {
+/* ── ABOVE THE RULE: who this is, and the two facts about it ──
+   Name and description at the left, price and hours closing the row at the
+   right. `align-items: flex-end` seats the stats on the description's
+   baseline, so the row reads as one band resting on the hairline rather
+   than as two things at different heights. */
+.blockHead {
   display: flex;
   align-items: flex-end;
-  gap: clamp(8px, 0.9vw, 10px);
+  justify-content: space-between;
+  gap: clamp(8px, 0.9vw, 12px);
+}
+
+/* the name + description column. ⚠️ `min-width: 0` IS NOT A TIDY-UP: a flex
+   item's min-width resolves to its content's min-content size, so without
+   it this column refuses to shrink below its longest word and pushes the
+   stats off the block. Every `text-overflow: ellipsis` below is inert until
+   this line exists. */
+.blockWho {
+  display: flex;
+  flex-direction: column;
+  /* the two lines are one lockup — the leading does the separating */
+  row-gap: 1px;
+  min-width: 0;
+  flex: 1 1 auto;
+}
+
+/* ── BELOW THE RULE: the address at the left, the controls at the right ──
+   `align-items: flex-end` seats the controls on the address's LAST line, so
+   both groups sit on the block's floor and the row reads as one band. The
+   address takes the residual width (`min-width: 0` on it below is what
+   makes its ellipses real) and the controls take their content. */
+.blockFoot {
+  display: flex;
+  align-items: flex-end;
+  justify-content: space-between;
+  gap: clamp(8px, 0.9vw, 12px);
 }
 
 /* THE ADDRESS COLUMN.
@@ -888,7 +977,7 @@
 
    The nowrap+ellipsis below still holds it to one line, so a longer name
    (Café Mama & Sons) truncates rather than pushing the grid out of line. */
-.addrArea {
+.venueName {
   font-family: var(--font-sans);
   font-weight: 700;
   font-size: 1.0625rem;
@@ -956,6 +1045,34 @@
    values are 88%, this pair is 84%. Three distinguishable voices, though
    the top two are closer than they were; if that flattens too far, the
    move is to raise .statValue, not to lower this. */
+/* ── WHAT THE ROOM IS ──
+   One line under the name, at the user's instruction. It is the only thing
+   on the card that distinguishes a ramen bar from an ice cream parlour —
+   six of the eight venues share a street, so the address cannot do it.
+
+   A STEP QUIETER THAN THE NAME AND A STEP LOUDER THAN THE ADDRESS: the
+   block now has four voices (name, this, address pair, stat values) where
+   it had three, and this one sits second. Mixed with black rather than set
+   in alpha, for the reason .addrLine states at length — a cream at reduced
+   alpha lets the blurred photograph through the letterforms and the reading
+   shifts card to card.
+
+   NOWRAP + ELLIPSIS like every other line in this block: "London's First
+   Filipino Ice Cream Parlor" is 41 characters and will not fit the narrow
+   column, and a wrapped line makes the block a row taller on one card than
+   on the seven beside it. */
+.venueTag {
+  font-family: var(--font-sans);
+  font-weight: 400;
+  font-size: 0.8125rem;
+  font-size: clamp(0.6875rem, 4.6cqi, 0.8125rem);
+  line-height: 1.3;
+  color: color-mix(in srgb, var(--cream) 90%, #000);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
 .addrLine {
   font-family: var(--font-sans);
   font-weight: 400;
@@ -977,14 +1094,13 @@
    `flex: none` — the stats take their content width and the address takes
    everything else. Reversing that is what put the address at 96px in the
    specimen this ships from. */
+/* THE STATS CLOSE THE HEAD ROW at its right. `flex: none` — they take
+   their content width and the name column takes everything else; reversing
+   that is what put the name at 96px in an earlier specimen. */
 .stats {
   display: flex;
   align-items: center;
   flex: none;
-  /* hang from the address's cap line rather than its ascender line: the
-     icons are 11px against a 14px first line, and matching the box tops
-     leaves them visibly high */
-  margin-top: 1px;
 }
 
 .stat {
@@ -1283,7 +1399,7 @@
   .stats .statRule {
     display: none;
   }
-  .blockTop {
+  .blockFoot {
     gap: 8px;
   }
   /* the controls come down with the card but stay PILLS, not chips.

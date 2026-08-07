@@ -66,7 +66,14 @@ const WORDS = [
    create…"). "quiet" takes the second emphasis instead — it is the word
    that characterises the idea, and it is the only other word in the line
    carrying an argument rather than a mechanism. Say the word and it moves. */
-const KEY_WORDS = new Set(["comfort", "quiet"]);
+/* ── "welcome" JOINS THEM, at the user's instruction ──
+   The sentence opened in the accent and closed in plain roman: comfort and
+   quiet carry the claim, and then the payoff — the last word, the one the
+   whole line is travelling toward — was set like any other. Three accents
+   across twenty words is still restraint, and it closes the sentence in the
+   voice it opened in.
+   The lookup strips trailing punctuation, so this matches "welcome." */
+const KEY_WORDS = new Set(["comfort", "quiet", "welcome"]);
 
 /** the class list for one word. Shared so the static and animated passes
     cannot drift apart on it. */
@@ -152,12 +159,30 @@ const blockVariants: Variants = {
   shown: { transition: { staggerChildren: 0.12, delayChildren: 0.04 } },
 };
 
+/* ── THE EYEBROW POPS, at the user's instruction ──
+   It rose 40% of its own height and inked in over 0.6s — the same gesture
+   the statement under it makes, at a smaller size, which is why the two
+   read as one movement rather than as a line being introduced and then
+   answered.
+
+   A SPRING ON SCALE, NOT AN EASE ON y. The pop is 0.88 → 1 with a touch of
+   overshoot, which is a different KIND of motion from the statement's rise
+   and is what makes the sequence read as two beats. Damping 14 against
+   2·sqrt(320·0.6) = 27.7 puts it at zeta ≈ 0.5 — visibly springy where the
+   site's other springs sit near critical, and deliberately so: this is the
+   only pop on the page and it has one small line to animate.
+
+   `opacity` STAYS ON A TWEEN. A spring on opacity overshoots past 1 and
+   clamps, which shows as a flat spot at the end of the fade. */
 const eyebrowVariants: Variants = {
-  hidden: { y: "40%", opacity: 0 },
+  hidden: { scale: 0.88, opacity: 0 },
   shown: {
-    y: "0%",
+    scale: 1,
     opacity: 1,
-    transition: { duration: 0.6, ease: EASE_ENTRANCE },
+    transition: {
+      scale: { type: "spring", stiffness: 320, damping: 14, mass: 0.6 },
+      opacity: { duration: 0.4, ease: EASE_ENTRANCE },
+    },
   },
 };
 
@@ -180,10 +205,27 @@ const wordVariants: Variants = {
      consistent fraction of the type size at every breakpoint — an em value
      would not resolve here, and a px value would be a different-sized lift
      at 2.4rem than at 5.2rem. */
-  hidden: { y: "55%", opacity: 0 },
+  /* ── AND IT IS A MASKED REVEAL NOW, at the user's instruction: the same
+     gesture the careers page's "Where craft finds its place." makes ──
+     That headline's own note calls this "the manifesto's mask", which was
+     true of the technique's ancestry and not of what this file actually
+     did: the words here lifted 55% and FADED in, so what a reader saw was
+     type resolving out of the cream rather than rising from behind an
+     edge. The difference is the clip — see `.wordMask` in the stylesheet.
+
+     110%, NOT 55%: with a mask the word has to start fully below its own
+     clip or its top edge is visible at rest. It is a percentage for the
+     reason the old note gave — Framer resolves transform percentages
+     against the element's own box, so it is a consistent fraction of the
+     type size at every breakpoint where an em would not resolve and a px
+     would be a different lift at 2.4rem than at 5.2rem.
+
+     THE OPACITY GOES. A masked word does not need to fade — the clip is
+     doing the reveal, and fading as well makes the entrance mushy at the
+     exact moment it should be crisp. */
+  hidden: { y: "110%" },
   shown: {
     y: "0%",
-    opacity: 1,
     transition: { duration: 0.75, ease: EASE_ENTRANCE },
   },
 };
@@ -217,9 +259,14 @@ export default function Manifesto() {
       {reduce ? (
         <span className={wordClass(w)}>{w}</span>
       ) : (
-        <motion.span className={wordClass(w)} variants={wordVariants}>
-          {w}
-        </motion.span>
+        /* TWO ELEMENTS PER WORD: the mask clips, the word travels. The
+           mask carries the accent class as well, because it is the box
+           that has to grow to fit an italic's overhang. */
+        <span className={`${styles.wordMask} ${wordClass(w)}`}>
+          <motion.span className={styles.word} variants={wordVariants}>
+            {w}
+          </motion.span>
+        </span>
       )}
       {i < WORDS.length - 1 ? " " : null}
     </Fragment>

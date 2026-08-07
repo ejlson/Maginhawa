@@ -461,62 +461,76 @@ export default function VenueCard({
               4. the labels, which go anyway.
             The per-venue proof is the clip table in
             scripts/probe-square-cards.mjs. ═══ */}
-        <div className={styles.blockTop}>
-          <p className={styles.addr}>
-            {/* THREE SEPARATE ELEMENTS, NOT ONE WRAPPING PARAGRAPH. Each
-                is `white-space: nowrap` with its own ellipsis, so a line
-                too long for the card loses its own tail rather than
-                reflowing the block to four lines and breaking the grid's
-                shared card height. Three lines on every venue, always —
-                which is what makes the block's height a constant without a
-                min-height propping it up. */}
-            {/* LINE 1 IS THE VENUE'S NAME, not its neighbourhood. It held
-                the area, and the street below it opens with the same words
-                — the card spent its strongest line repeating what the line
-                under it already said, on a set where most venues share one
-                neighbourhood, so the field read as one address printed
-                eight times. */}
-            <span className={styles.addrArea}>{item.name}</span>
-            <span className={styles.addrLine}>{item.address.road}</span>
-            <span className={styles.addrLine}>{item.address.city}</span>
-          </p>
+        {/* ═══ ABOVE THE RULE: WHO THIS IS ═══
+            The name, and under it what the room actually is. At the user's
+            instruction, and it is the change that stops eight cards reading
+            as one address printed eight times: `tagline` is a per-venue
+            line that already existed in lib/restaurants.ts and was only
+            ever shown in the home grid's hover expansion, so a reader on
+            touch — or anyone who did not hover — met a set of near-identical
+            Kentish Town addresses with no way to tell a ramen bar from an
+            ice cream parlour. */}
+        <div className={styles.blockHead}>
+          <span className={styles.blockWho}>
+            <span className={styles.venueName}>{item.name}</span>
+            {item.tagline ? (
+              <span className={styles.venueTag}>{item.tagline}</span>
+            ) : null}
+          </span>
 
-          {/* THE STATS — icon + value, twice, with a vertical hairline
-              between. `flex: none`, so they take their content width and
-              the address takes everything else. */}
+          {/* THE STATS STAY ABOVE THE RULE AND CLOSE THE ROW, at the user's
+              instruction: price and hours are FACTS about the room, so they
+              belong with its name rather than with its address. It also
+              keeps the block short — carried under the address they added a
+              third row to the left column and pushed the block to 55% of
+              the card. */}
           {stats.length > 0 ? (
-            <div className={styles.stats}>
+            <span className={styles.stats}>
               {stats.map(([key, value], si) => (
-                <Fragment key={key}>
-                  {si > 0 ? <span className={styles.statRule} aria-hidden /> : null}
-                  {/* data-stat, not a position, because the narrow card
-                      sheds one of these and the pair is conditional: a
-                      venue with no price makes hours the FIRST child, so a
-                      positional rule would take the wrong one. */}
+                  <Fragment key={key}>
+                    {si > 0 ? (
+                    <span className={styles.statRule} aria-hidden />
+                  ) : null}
+                    {/* data-stat, not a position: the narrow card sheds one
+                        of these and the pair is conditional, so a venue with
+                        no price makes hours the FIRST child and a positional
+                        rule would take the wrong one. */}
                   <span className={styles.stat} data-stat={key}>
-                    {key === "price" ? <PriceGlyph /> : <HoursGlyph />}
-                    {/* the value is announced with what it MEANS. "££" and
-                        "12–11" are meaningless read aloud on their own and
-                        the icon beside them is decorative, so the sense
-                        goes in a visually hidden span rather than into a
-                        label the design has no room for. */}
+                      {key === "price" ? <PriceGlyph /> : <HoursGlyph />}
                     <span className={styles.srOnly}>
-                      {key === "price" ? "Price range " : "Opening hours "}
-                    </span>
+                        {key === "price" ? "Price range " : "Opening hours "}
+                      </span>
                     <span className={styles.statValue}>{value}</span>
-                  </span>
-                </Fragment>
-              ))}
-            </div>
+                    </span>
+                  </Fragment>
+                ))}
+              </span>
           ) : null}
         </div>
 
-        {/* the hairline between the facts and the controls. A real element
-            rather than a border on the action row, because the row is the
-            last child of a flex column and a border would travel with it,
-            leaving the rule against the controls instead of closing the
-            facts. */}
+        {/* the hairline. A real element rather than a border on the row
+            below it, because that row is the last child of a flex column
+            and a border would travel with it, leaving the rule against the
+            controls instead of closing the facts. */}
         <span className={styles.blockRule} aria-hidden />
+
+        {/* ═══ BELOW THE RULE: WHERE IT IS, AND WHAT TO DO ═══
+            Address at the left, controls at the right, at the user's
+            instruction. The two used to sit on opposite sides of the rule —
+            facts above, actions below — and this puts them on one line
+            instead, which is what lets the name and its description own the
+            whole of the block's top half. */}
+        <div className={styles.blockFoot}>
+          <p className={styles.addr}>
+            {/* TWO LINES NOW, NOT THREE: the venue's name has moved above
+                the rule, so this is the postal address alone. Each line is
+                still `white-space: nowrap` with its own ellipsis — a line
+                too long for the card loses its tail rather than reflowing
+                the block to an extra row and breaking the grid's shared
+                card height. */}
+            <span className={styles.addrLine}>{item.address.road}</span>
+            <span className={styles.addrLine}>{item.address.city}</span>
+          </p>
 
         {/* THE CONTROLS — two small pills, and NO ANNATTO ANYWHERE ON THE
             CARD. The ramp under these is photo-derived, so its hue moves
@@ -561,6 +575,7 @@ export default function VenueCard({
             ) : null}
           </motion.div>
         ) : null}
+        </div>
       </motion.div>
     </div>
   );

@@ -148,6 +148,26 @@
   --cta-ink: var(--maroon);
 }
 
+/* ── SAFFRON, ON FILM ONLY ── see the note on --annatto in globals.css: the
+   palette retired this orange because it blurs into maroon ink, and the one
+   place that argument does not reach is a pill on a photograph. Cream on it
+   is 4.89:1. */
+.saffron {
+  --cta-fill: var(--annatto);
+  --cta-ink: var(--cream);
+}
+
+/* ── LARGE ── the closing frame's pill is the last action on the page and
+   the only thing on its screen; at the default 40px it read as a chip on a
+   full-bleed film. 52px is the tap-target floor plus half again, and the
+   label steps up with it — a bigger pill around the same 13px type would
+   read as padding rather than as scale. --cta-h drives the disc and the
+   clip's geometry too, so the whole control grows as one body. */
+.large {
+  --cta-h: clamp(44px, 3.6vw, 52px);
+  font-size: var(--t-button, 0.9375rem);
+}
+
 .accent {
   --cta-fill: var(--saffron);
   --cta-ink: var(--cream);

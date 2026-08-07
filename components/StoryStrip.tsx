@@ -1,7 +1,13 @@
 "use client";
 
 import Image from "next/image";
-import { motion, useReducedMotion, useScroll, useTransform } from "framer-motion";
+import {
+  motion,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+  type Variants,
+} from "framer-motion";
 import { useRef } from "react";
 import styles from "./StoryStrip.module.css";
 
@@ -96,6 +102,35 @@ const MARKS = ["London", "Maginhawa", "Est. 1987"];
 const DRIFT_FROM = "-2%";
 const DRIFT_TO = "-14%";
 
+/* ── THE ARRIVAL ──
+   0.07s between frames: at the band's EIGHT prints that is a 0.56s wave
+   across the row, which is long enough to read as left-to-right and short
+   enough that the last frame is not still arriving when the reader has
+   finished looking at the first. Measured mid-flight, six of the eight are
+   in motion at once (opacities 0.99 / 0.97 / 0.93 / 0.85 / 0.70 / 0.45 /
+   0.07 / 0), which is the wave the stagger is tuned for — a queue of
+   separate events would show one or two. Each print rises a little and inks in over 0.7s on
+   the site's entrance curve, so several are always in flight at once and
+   the row never reads as a queue of separate events.
+
+   THE TRAVEL IS SMALL — 24px against a frame ~300px tall. The band already
+   carries a scroll-linked horizontal drift (see `x` below); a large
+   entrance on top of that would read as two unrelated movements rather than
+   as one band settling. */
+const bandVariants: Variants = {
+  hidden: {},
+  shown: { transition: { staggerChildren: 0.07, delayChildren: 0.05 } },
+};
+
+const frameVariants: Variants = {
+  hidden: { y: 24, opacity: 0 },
+  shown: {
+    y: 0,
+    opacity: 1,
+    transition: { duration: 0.7, ease: [0.22, 1, 0.36, 1] },
+  },
+};
+
 export default function StoryStrip() {
   const reduce = useReducedMotion();
   const bandRef = useRef<HTMLDivElement>(null);
@@ -112,7 +147,33 @@ export default function StoryStrip() {
   const x = useTransform(scrollYProgress, [0, 1], [DRIFT_FROM, DRIFT_TO]);
 
   return (
-    <div className={styles.band} ref={bandRef}>
+    /* ── THE BAND IS THE THIRD BEAT, at the user's instruction ──
+       The eyebrow pops, the sentence builds out of its masks, and then the
+       photographs used to simply be there. They arrive now, left to right,
+       so the screen reads as one choreographed frame rather than as type
+       with a strip under it — and the crop at the fold becomes something
+       ARRIVING rather than something cut off.
+
+       ⚠️ THE OBSERVER IS ON THE BAND, NOT ON THE TRACK, AND THAT IS NOT A
+       PREFERENCE. `.rail` is `overflow: hidden` and the track is wider than
+       it: an IntersectionObserver intersects its target against the clip
+       rect of every ancestor, so a `whileInView` on the track or on a frame
+       would be measuring a box that is mostly clipped away — the same trap
+       recorded in Discover.tsx, where a word parked below its own mask
+       reported a 0 ratio forever and its heading could never rise.
+
+       Variants reach the frames through React context, so the plain
+       `.rail` div between this element and them does not break the chain;
+       the track is a motion component that declares no variants of its own
+       and simply passes them through. */
+    <motion.div
+      className={styles.band}
+      ref={bandRef}
+      variants={bandVariants}
+      initial={reduce ? false : "hidden"}
+      whileInView={reduce ? undefined : "shown"}
+      viewport={{ once: true, amount: 0.15 }}
+    >
       {/* THE MASTHEAD — three marks across the measure, ends and centre.
 
           NO HAIRLINE ABOVE IT. A rule sat here closing the statement and
@@ -145,7 +206,11 @@ export default function StoryStrip() {
           style={reduce ? undefined : { x }}
         >
           {PRINTS.map((src) => (
-            <div className={styles.frame} key={src}>
+            <motion.div
+              className={styles.frame}
+              key={src}
+              variants={frameVariants}
+            >
               {/* alt="" ON PURPOSE. With the names gone these carry no
                   information a reader could act on, and the claim they
                   illustrate is made in words directly above them by the
@@ -160,10 +225,10 @@ export default function StoryStrip() {
                 fill
                 sizes="(max-width: 780px) 68vw, 30vw"
               />
-            </div>
+            </motion.div>
           ))}
         </motion.div>
       </div>
-    </div>
+    </motion.div>
   );
 }

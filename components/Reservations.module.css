@@ -323,7 +323,20 @@
      so the optical distance is far smaller than the geometric one. 2.6vh puts
      it at 28.1 / 23.4 / 22px at 1920 / 1440 / 390 — clear of the H without
      detaching from it. */
-  margin: 0 0 clamp(22px, 2.6vh, 34px);
+  /* ── TIGHTER TO THE HEADING, and the rhythm is the reason ──
+     Measured at 1440x900 the lockup read 23 / 20 / 41: the clock 23px above
+     the heading, the support line 20px below it, the action 41px under
+     that. The first two are the same distance, so an EYEBROW and a
+     STANDFIRST — which belong to opposite sides of the line between them —
+     were bound to it equally, and the block read as three loose lines
+     rather than as a question with an introduction and an answer.
+
+     14 / 26 / 41 now: each step is bigger than the last as the relationship
+     gets looser. The clock belongs to the heading it introduces, so it sits
+     closest; the support line is a separate statement, so it sits further;
+     the action is isolated, which is the argument the magnet's own note
+     already makes for the largest gap. */
+  margin: 0 0 clamp(9px, 1.6vh, 18px);
   font-family: var(--font-ui);
   font-size: var(--t-label);
   line-height: 1;
@@ -463,7 +476,9 @@
      clock's 2.6vh above the heading and the 4.6vh below, which is what makes
      the middle two elements read as one sentence and leaves the pill alone at
      the bottom. */
-  margin: clamp(18px, 2.2vh, 28px) auto 0;
+  /* a step wider than the eyebrow's gap above the heading — see the
+     note there for the 14 / 26 / 41 rhythm */
+  margin: clamp(17px, 2.9vh, 34px) auto 0;
   max-width: var(--measure-tight);
   font-size: var(--t-small);
   line-height: var(--lh-body);

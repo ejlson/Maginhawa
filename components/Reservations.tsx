@@ -338,14 +338,22 @@ function LondonClock() {
  * pill would read as a hole rather than an action. The accent keeps it the
  * one saturated thing on the screen, which is what it always was.
  */
+/* SAFFRON AND LARGE, at the user's instruction. The tone is the retired
+   annatto orange, reintroduced for this control alone — see the note on
+   --annatto in globals.css for why the palette's argument against it (an
+   orange blurs into maroon ink) does not reach a pill sitting on a
+   photograph. `large` takes the control from 40px to 52px: this is the last
+   action on the page and the only thing on its screen, and at the default
+   size it read as a chip on a full-bleed film. */
 function MagneticCta() {
   return (
     <PillCta
       href="/restaurants"
       className={styles.magnetHost}
-      tone="accent"
+      tone="saffron"
+      size="large"
     >
-      Choose a restaurant
+      Pick a restaurant
     </PillCta>
   );
 }

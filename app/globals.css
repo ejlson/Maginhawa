@@ -180,6 +180,27 @@
      colour decision itself. Swap first, rename second. */
   --saffron: #2a5c4a;
 
+  /* ── ANNATTO, THE RETIRED ACCENT, BACK FOR EXACTLY ONE THING ──
+     hsl(17, 60%, 40%) — the orange --saffron was before the swap above, and
+     the note there is the argument for retiring it: "an orange accent
+     beside a warm dark red is a difference of value rather than of hue — it
+     reads as a lighter patch of the same colour instead of as a mark."
+
+     THAT ARGUMENT IS ABOUT ORANGE BESIDE MAROON INK, and the one caller of
+     this token is not beside maroon ink: the closing frame's pill sits on a
+     PHOTOGRAPH, at the user's instruction, where there is no claret for it
+     to blend into and the only question is whether it reads against film.
+     It does — it is the warmest thing on a frame the grade has already
+     cooled, which is what an accent is for.
+
+     ⚠️ IT IS NOT A SECOND ACCENT. Nothing on the cream or the maroon may
+     take this: put it beside the ink and the retired argument applies again
+     exactly as written. One caller, on film, and the palette's decision
+     stands everywhere else.
+
+     Cream on it measures 4.89:1 — clear of the 4.5:1 its label needs. */
+  --annatto: hsl(17, 60%, 40%);
+
   /* the same hue burnt down further for SMALL TEXT — hsl(158, 40%, 22%),
      four points more saturated and four darker, the same relationship the
      orange pair had. 7.81:1 on the ground. Less load-bearing than ever now
