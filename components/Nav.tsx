@@ -1,9 +1,28 @@
 "use client";
 
 import { motion } from "framer-motion";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import styles from "./Nav.module.css";
+
+/* ── THE NAV PUBLISHES WHERE ITS LINKS BEGIN ──
+   The hero's caption column is seated on the same x as the first nav link
+   at the user's instruction, and that x is not derivable in CSS: the link
+   row is right-ranged on the page margin and its width is whatever five
+   words happen to measure, so the left edge moves with the CONTENT of the
+   nav rather than with the viewport.
+
+   So it is measured once per layout and written to the root as
+   `--nav-links-left`. Hero.module.css reads it; nothing else does.
+
+   ⚠️ IT COUPLES THE HERO TO THE NAV'S CONTENT. Add a sixth link and the
+   hero's caption moves left with it. That is the alignment working rather
+   than breaking — but it is worth knowing before anyone edits the nav and
+   wonders why the home page shifted.
+
+   A ResizeObserver on the row rather than a window resize listener: the row
+   also changes width when a font finishes loading, which no resize event
+   reports. */
 import { useRouteTransition } from "./PageTransition";
 
 type Theme = "blend" | "light" | "dark";
@@ -20,6 +39,28 @@ const LINKS = [
   { label: "Contact Us", href: "/contact" },
 ];
 
+function useLinksLeft() {
+  const ref = useRef<HTMLUListElement>(null);
+  useEffect(() => {
+    const el = ref.current;
+    if (!el) return;
+    const write = () => {
+      const first = el.firstElementChild as HTMLElement | null;
+      if (!first) return;
+      document.documentElement.style.setProperty(
+        "--nav-links-left",
+        `${Math.round(first.getBoundingClientRect().left)}px`,
+      );
+    };
+    write();
+    const ro = new ResizeObserver(write);
+    ro.observe(el);
+    ro.observe(document.documentElement);
+    return () => ro.disconnect();
+  }, []);
+  return ref;
+}
+
 export default function Nav({
   started,
   menuOpen,
@@ -29,12 +70,23 @@ export default function Nav({
   menuOpen: boolean;
   onMenuToggle: () => void;
 }) {
+  const linksRef = useLinksLeft();
   // Scrolling DOWN hides the navbar; scrolling UP reveals it.
   const [hidden, setHidden] = useState(false);
   // Navbar adopts the theme of the section currently behind it.
   const [theme, setTheme] = useState<Theme>("blend");
   // hairline divider fades in once the page has scrolled past the hero edge
   const [scrolled, setScrolled] = useState(false);
+  /* ── THE BAR'S WORDMARK STANDS DOWN OVER THE HERO ──
+     at the user's instruction, and the hero is why: it sets MAGINHAWA at
+     ~160px across the bottom of the frame, so the 20px copy in the bar is
+     the same word twice on one screen — the smaller one reading as a label
+     for the larger. Everywhere else the bar is the only place the group is
+     named and it comes back.
+     Sampled from the same elementFromPoint probe the theme uses, by the
+     hero's own id rather than by its theme: `blend` is also the closing
+     film's theme, and the wordmark is wanted there. */
+  const [onHero, setOnHero] = useState(true);
   const navigate = useRouteTransition();
   const pathname = usePathname();
 
@@ -47,6 +99,7 @@ export default function Nav({
       const t = (host?.dataset.navTheme as Theme) || "blend";
       latestTheme = t;
       setTheme(t);
+      setOnHero(host?.id === "top");
     };
     const onScroll = () => {
       const y = window.scrollY;
@@ -68,6 +121,12 @@ export default function Nav({
 
   // While the menu is open the bar sits on the cream overlay → light theme.
   const activeTheme: Theme = menuOpen ? "light" : theme;
+  /* ⚠️ AND THE MENU IS NOT THE HERO. `onHero` is sampled from what sits
+     under the bar, which is still the film when the overlay is open — but
+     the reader is looking at a cream sheet with no wordmark on it, so the
+     one reason to stand the logo down is gone and the bar should be named
+     again. Same override the theme takes, one line above. */
+  const hideLogo = onHero && !menuOpen;
   const show = started && (menuOpen || !hidden);
 
   // route links use the page-transition curtain; in-page hashes scroll natively
@@ -96,10 +155,14 @@ export default function Nav({
       transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
     >
       <a
-        className={styles.logo}
+        className={[styles.logo, hideLogo && styles.logoStood]
+          .filter(Boolean)
+          .join(" ")}
         href="/"
         onClick={onLogoClick}
         aria-label="Maginhawa — home"
+        aria-hidden={hideLogo}
+        tabIndex={hideLogo ? -1 : undefined}
       >
         {/* THE WORDMARK, SET RATHER THAN DRAWN. This was the line-art mark
             (/logo/maginhawa.png, still in public/ and unused). The name now
@@ -113,7 +176,7 @@ export default function Nav({
         <span className={styles.logoWord}>Maginhawa</span>
       </a>
 
-      <ul className={styles.links}>
+      <ul ref={linksRef} className={styles.links}>
         {LINKS.map((l) => (
           <li key={l.label}>
             <a

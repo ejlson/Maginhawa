@@ -23,7 +23,35 @@
      tall", which mattered when the stage parked it mid-screen; the grid is
      three portrait rows now and the section is well over two viewports
      whatever this value is. */
-  padding: clamp(36px, 6vh, 96px) var(--pad-x) clamp(40px, 6vh, 88px);
+  /* ── THE BOTTOM PAD COMES IN, at the user's instruction, and it is the
+     one seam on the page that was measurably out of line. Ink to ink at
+     1440x900 the chapter seams read 89 (hero→here), 125 (here→statement),
+     49 (statement→about) and 93 either side of the press lane: the widest
+     was 2.5x the tightest, with nothing saying which relationship earned
+     which. 125 was this chapter's clamp(40px, 6vh, 88px) — 54px at 900 —
+     stacked on the statement's own top pad AND on the centring that seats
+     its sentence in a forced screen.
+
+     clamp(16px, 2.4vh, 36px) is 22px at 900 and lands the seam at ~93,
+     i.e. on the same measure as the two the press lane already keeps. Four
+     of the five seams now agree; the fifth (statement→about, 49px) stays
+     tight on purpose, because that one is a handover inside one subject
+     rather than a change of chapter.
+
+     WHAT THE OLD VALUE WAS FOR is still true and still met: the grid ends
+     on a hard photographic edge and needs cream under it rather than
+     borrowing the next chapter's air. 22px of this chapter's own padding
+     plus the statement's 36px is more cream than the cards ever had
+     between their own rows. */
+  /* ── THE HEAD COMES UP THE SHEET, at the user's instruction ──
+     The top was clamp(36px, 6vh, 96px) — 54px at 900 — and with the
+     opening rule deleted above it there is nothing left in that air to
+     justify it: the chapter simply began 54px down a cream field. At
+     clamp(16px, 2.6vh, 40px) it is 23px, so the mark and eyebrow sit
+     close under the seam and the chapter starts where the cream does.
+     The bottom is unchanged; it is doing the seam arithmetic to the
+     statement below (see its own note). */
+  padding: clamp(16px, 2.6vh, 40px) var(--pad-x) clamp(16px, 2.4vh, 36px);
   /* THE HEAD'S AIR BEFORE THE GRID, and it is the section's only gap —
      .head and .grid are its two in-flow children (the assembly stage is an
      absolutely-positioned overlay and does not participate).
@@ -41,13 +69,32 @@
      cards cannot have, and the head-to-grid gap is the cheapest of the
      three fixed costs to give up: the head already reads as a distinct
      block because of the hairline closing it. */
-  gap: clamp(26px, 3.8vh, 44px);
+  /* NAMED for .topRule, which subtracted it so the opening hairline could
+     sit 18px off the head rather than a full gap away. That rule is
+     deleted, so nothing reads this any more — it is kept because it is the
+     honest name for what the gap is, and the next thing seated against the
+     head will want it. The value has never changed. */
+  --sec-gap: clamp(26px, 3.8vh, 44px);
+  gap: var(--sec-gap);
   /* the entrance choreography slides cells in from PAST the viewport
      edges (±110vw) — clip the x-axis so off-screen tiles never widen the
      page. clip (not hidden) keeps the y-axis genuinely visible and never
      creates a scroll container. */
   overflow-x: clip;
 }
+
+/* ── THE OPENING RULE IS GONE, at the user's instruction, and the chapter
+   signature goes with it ──
+   It was a hairline above the head, matching the one the journal still
+   opens on, so both cream chapters announced themselves the same way:
+   rule, mark + eyebrow, display line, rule, pictures. That symmetry is
+   what is given up here; the journal keeps its opening rule and this
+   chapter now starts on open cream.
+
+   ⚠️ .footRule STILL CLOSES THE CHAPTER and its note calls the two "a
+   matched pair bracketing the whole chapter". They are not a pair any
+   more. Read that comment as describing what the bottom rule does on its
+   own, not as a claim about a rule above it. */
 
 @media (min-width: 981px) {
   .section {
@@ -72,7 +119,27 @@
        The head's internal 12-column rows are relative to this span, so
        their column seats still hold — they simply resolve against a wider
        box. */
-    padding-inline: var(--pad-x);
+    /* ── AND WIDER AGAIN: THE GUTTER, NOT THE MARGIN, at the user's
+       instruction, so this chapter measures the same as About Us.
+       --grid-gutter (12px flat) against --pad-x's clamp(16px, 2.8vw, 40px):
+       the grid gains 56px at 1440 and its edges land where AboutSplit's
+       video and story band already sit.
+
+       IT FINISHES A MOVE THE PAGE HAD HALF-MADE. AboutSplit and the story
+       band have run on the 12px gutter since the band was built; Discover
+       and Blog were the two chapters still on the page margin, so a reader
+       coming down the page watched the left edge step IN by 28px for the
+       restaurants, out for About, and in again for the journal. Both move
+       together — see Blog.module.css, which takes the same value and
+       re-derives its column arithmetic against it.
+
+       ⚠️ WHAT IS NOW OUT OF STEP is the rest of the page: Reservations and
+       the footer still seat on --pad-x. That is a smaller inconsistency
+       than the one this fixes (those two are full-bleed dark bands whose
+       type is centred, not left-ranged grids), but it is a real one, and
+       it is the next thing to decide rather than something that was
+       missed. */
+    padding-inline: var(--grid-gutter);
   }
 }
 
@@ -107,8 +174,11 @@
   align-items: flex-start;
   /* the gap between the label and the display line is deliberately TIGHT —
      they read as one lockup, and the air that separates the head from the
-     grid is the rule's margin below, not this */
-  gap: clamp(10px, 1.4vh, 16px);
+     grid is the rule's margin below, not this.
+     NAMED because .headRule subtracts it — see the note there. Value
+     unchanged. */
+  --head-gap: clamp(10px, 1.4vh, 16px);
+  gap: var(--head-gap);
 }
 
 /* the standing label: small, sans, the mark set into the line before it */
@@ -210,16 +280,73 @@
   color: var(--maroon);
 }
 
-/* HAIRLINE 1 OF 3 — closes the head, opens the grid. Full band width, so it
+/* THE MIDDLE HAIRLINE — closes the head, opens the grid.
+
+   ⚠️ IT USED TO SAY "HAIRLINE 1 OF 3" and the count had been wrong through
+   at least two passes, so the rules are NAMED here rather than numbered.
+   The chapter carries three, and each one is doing a different job:
+     .topRule   opens the chapter, above the head
+     .headRule  THIS ONE — divides the head from the pictures
+     .footRule  closes the chapter, under the last row
+   topRule and footRule are a matched pair bracketing the whole chapter;
+   this one is the internal division. Full band width, so it
    stretches rather than fitting the type above it: a rule that stops at the
    text's right edge reads as an underline of the sentence, and this one is
    a boundary for the whole chapter. --rule is the site's hairline token
    (3.53:1, held to 1.4.11's 3:1 for a non-text boundary). */
+/* ── 18px OFF THE DISPLAY LINE, THE SAME AS .topRule IS OFF THE EYEBROW ──
+   at the user's instruction, and it closes the last asymmetry in the head:
+   measured at 1440x900 the lockup read 18px above the label and 43px below
+   the display line, so the two hairlines bracketing the head sat at
+   different distances from the type they bracket. A reader does not measure
+   it, but they see one rule attached to its type and the other floating.
+
+   THE MARGIN SUBTRACTS THE HEAD'S OWN GAP, which is why --head-gap is
+   named: this rule is the last item of a flex column, so the gap is already
+   between it and the display line and the margin only has to make up the
+   difference. `calc(18px - var(--head-gap))` states the intent — "18px
+   under the type, whatever the lockup's gap is" — and survives a retune of
+   that clamp. Same construction as .topRule above. */
 .headRule {
   width: 100%;
   height: 1px;
   background: var(--rule);
-  margin-top: clamp(22px, 3.4vh, 40px);
+  margin-top: calc(18px - var(--head-gap));
+}
+
+/* THE CLOSING HAIRLINE, at the user's instruction — the partner to
+   `.topRule`, so the chapter is bracketed rather than merely started.
+
+   ⚠️ IT REOPENS A DECISION THAT WAS WRITTEN DOWN, and the note it argues
+   with is worth reading before this one is ever moved again.
+   Manifesto.module.css carries: "NO CLOSING RULE. A full-width hairline
+   used to sit on this section's bottom border box… It was drawing a
+   boundary the page does not have… The gap is the separator. Do not put
+   the line back."
+
+   WHAT HAS CHANGED SINCE, and why the instruction is not simply that
+   decision being undone:
+     · THE ORDER INVERTED. That rule sat under the STATEMENT, which is a
+       single centred sentence on open cream — a line under it read as the
+       page being cut in half, because there was nothing above the line but
+       air. This one sits under a GRID of eight photographs, where it is
+       the bottom edge of a block that already has a hard top edge (the
+       head's own hairline). It closes a shape rather than dividing a page.
+     · IT IS NOW A PAIR, NOT A STRAY. `.topRule` already opens this
+       chapter; this shuts it, so the whole thing is bracketed rather than
+       started and then abandoned. A single unmatched line between two
+       sections was the thing that read wrong, and this is the opposite of
+       that — it is the second half of a rule that already existed.
+
+   SEATED INSIDE THE CHAPTER'S PADDING, not on the section's border box —
+   the section's bottom padding stays below it, so the rule belongs to the
+   restaurants and the air belongs to the seam. It ends where the grid ends
+   because it is a child of the same padded box, which is why there is no
+   margin-inline here to keep in step with anything. */
+.footRule {
+  width: 100%;
+  height: 1px;
+  background: var(--rule);
 }
 
 

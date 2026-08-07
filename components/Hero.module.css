@@ -49,189 +49,361 @@
      were fighting for the same 300px. Sitting it low leaves the middle to
      the picture and still reads as a deliberate seat rather than as
      something that fell to the bottom. */
-  padding: 0 var(--pad-x) clamp(56px, 11vh, 132px);
+  /* ── LEFT-RANGED ON THE PAGE'S OWN MEASURE, at the user's instruction ──
+     It was `0 var(--pad-x)` with the lockup centred. Two things were wrong
+     with that once the cream chapters moved: --pad-x is 40px at 1440 where
+     Discover, About and the journal all now open at 12, so the hero and the
+     page under it had different left edges; and a CENTRED hero over
+     LEFT-RANGED chapters means the page's first screen shares no edge with
+     anything that follows it. The statement now hangs off the same line as
+     every chapter head below — the reader meets one left edge on the first
+     screen and never loses it. */
+  padding: 0 var(--grid-gutter) clamp(56px, 11vh, 132px);
   display: flex;
   flex-direction: column;
-  align-items: center;
+  align-items: flex-start;
   justify-content: flex-end;
   pointer-events: none;
   will-change: transform;
 }
 
-/* ---------- what this is, and the way in ---------- */
+/* ═══════════ THE PLATE'S FOOT — wordmark, caption, one action ═══════════
 
-/* THE IDENTIFYING LINE, NOW THE HERO'S ONLY TYPE.
-   It was Helvetica at --t-body, deliberately: a caption to the wordmark
-   below it, sized so it could not compete with the mark. There is no mark
-   here to lose to any more, so the reasoning inverts — this sentence IS the
-   hero, and a 16px line floating in the middle of a full-bleed film reads as
-   a caption to nothing.
+   WHAT THIS REPLACES: a centred lockup holding the identifying sentence at
+   --t-display with two equal pills under it. The sentence was the hero and
+   the wordmark was not on the page at all (it had moved to the navbar).
 
-   Display voice, at --t-h2 rather than --t-display: the sentence runs 76
-   characters and the bigger token would break it into six lines on a laptop.
-   The measure is deliberately tight so it sets as three or four short lines
-   — a statement with edges, not a paragraph that happens to be centred. */
-.lede {
-  margin: 0 auto clamp(22px, 3.2vh, 40px);
-  /* sized for the ONE sentence that wraps — "Seven London kitchens,
-     pan-Asian and Caribbean." is 47 characters, so this measure splits it
-     near its comma and the other two sentences sit on single lines */
-  max-width: 26ch;
-  text-align: center;
-  font-family: var(--font-display);
-  /* 500, NOT 400 — EB Garamond's regular is a text weight drawn for 10–14pt
-     and this line runs at --t-h2 over dimmed film. At 400 the thins fall
-     apart against a bright frame; the variable font carries a drawn 500. */
-  font-weight: var(--w-medium);
-  font-size: var(--t-h2);
-  line-height: var(--lh-heading);
-  letter-spacing: var(--tr-display);
+   THE WORDMARK IS THE HERO AGAIN, and the sentence is its caption. The
+   scale relationship is the whole idea: ~150px against 15px is 10:1, where
+   the retired arrangement ran 80px against 15px and read as a website
+   rather than as a cover. A reader meets the group's NAME, set in the
+   group's own face, and the sentence explains it underneath.
+
+   IT SITS INSIDE .panel, which is what crops it. The wordmark is sized to
+   the FRAME (10.5vw, no max), so at every width it runs about two thirds of
+   the plate and its final letter approaches the right edge — and the plate's
+   `overflow: hidden` is what makes that a crop rather than an overflow. */
+.lockup {
+  position: absolute;
+  inset: auto 0 0 0;
+  /* THE PAGE MARGIN, NOT A LOCAL CLAMP — the caption's right edge and the
+     wordmark's left now line up with the navbar's own two ends, which they
+     cannot do from a different inset. */
+  padding: 0 var(--pad-x) clamp(20px, 3vh, 40px);
+  display: grid;
+  /* ── SIDE BY SIDE AGAIN, WITH THE WORDMARK SIZED TO THE SPACE LEFT OVER ──
+     at the user's instruction, and it resolves the conflict below rather
+     than choosing a side of it. The caption column keeps the width it had —
+     its left edge is still the navbar's first link — and the wordmark is no
+     longer a fixed share of the viewport at all: it is sized BY SUBTRACTION
+     to exactly the measure remaining to its left. See .mark for the
+     arithmetic. So the alignment holds and the word is as large as that
+     alignment permits, at every width, with nothing measured by hand.
+
+     ⚠️ `align-items: end` RATHER THAN `stretch`, and that is a real change
+     to what lines up. Stretch made the caption column exactly as tall as
+     the wordmark, which is what put the small text's top on the word's cap
+     AND the button's foot on its baseline. That only worked while the
+     column FIT inside the cap height — and the caption is three lines now
+     (123px at 1440) against a cap height of ~104px, because the wordmark
+     shrank to make room for it. Ending both boxes on the same line keeps
+     the alignment that reads — the button's bottom on the word's baseline,
+     both sitting on the frame's floor — and gives up the one that cannot
+     be had at this length. Shorten the caption to two lines and stretch
+     becomes available again.
+
+     THE ORIGINAL CONFLICT, kept because it is the reason for all of this:
+     Side by side, "make the wordmark bigger" and "seat the caption's left
+     edge on the navbar's first link" are mutually exclusive, and the
+     numbers say so plainly. The nav's link row is CONTENT-sized (~485px at
+     every width, because the type is px-set), so its left edge sits at 64%
+     of the frame at 1440 and 72% at 1920 — while the wordmark's width is a
+     fixed SHARE of the frame. At 1440 the word already ran to 70% before
+     either change, i.e. 95px PAST where the caption was being asked to
+     start. Honouring the alignment in one row would have meant shrinking
+     the word to ~10.3vw, which is the opposite of what was asked.
+
+     Stacked, both are satisfied at once and neither is a compromise: the
+     caption gets its own row and seats on the nav's x, and the wordmark
+     gets the whole measure and grows. It also lifts the ceiling on the
+     caption's LENGTH — the old side-by-side capped it at two lines,
+     because the column had to fit inside the word's cap height. */
+  --hero-gap: clamp(20px, 2.2vw, 40px);
+  grid-template-columns: minmax(0, 1fr) auto;
+  column-gap: var(--hero-gap);
+  align-items: stretch;
+  /* the film stays draggable behind the lockup — the control opts back in */
+  pointer-events: none;
+  will-change: transform;
+}
+
+/* ── THE GROUND UNDER THE TYPE ──
+   ⚠️ IT WAS A CORNER RAMP AND IT HAD TO STOP BEING ONE. At 100deg it rose
+   from the bottom-LEFT and died before the top-right quarter, which was
+   right while the type was a wordmark in that corner with a caption beside
+   it. The caption is now a full-width band across the bottom — three lines
+   and a control, seated on the navbar's x — so a ramp that grounds one
+   corner leaves the last two thirds of the copy on whatever the film is
+   doing. Measured on the frame this ships with, that is a lit tablecloth.
+
+   180deg, and only the bottom 58%: straight up from the floor, dying before
+   the middle of the picture. The frame keeps its top half at full
+   brightness, which is the half the photograph is actually for.
+
+   IT IS NEUTRAL BLACK, NOT --maroon, for the reason VenueCard's ramp states
+   at length: --maroon is a green-black and mixing it into a scrim puts a
+   cast on the photograph. This adds luminance and nothing else.
+
+   MEASURED, THIS IS WHY IT EXISTS. Cream on the ungraded film sampled
+   L 0.831 against a worst ground of L 0.341 — 2.25:1, under the 3:1 floor
+   large text answers to, on the brightest frames of the clip. */
+.ramp {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    0deg,
+    color-mix(in srgb, #000 76%, transparent) 0%,
+    color-mix(in srgb, #000 62%, transparent) 18%,
+    color-mix(in srgb, #000 34%, transparent) 38%,
+    color-mix(in srgb, #000 10%, transparent) 50%,
+    color-mix(in srgb, #000 0%, transparent) 58%
+  );
+  pointer-events: none;
+}
+
+/* ── THE GRAIN ──
+   An SVG feTurbulence rendered once as a data URI and tiled. It is the
+   cheapest real grain available: no second video track, no canvas loop, no
+   image request — one string in this stylesheet, composited as a single
+   layer.
+
+   `mix-blend-mode: overlay` rather than a flat opacity: overlay leaves the
+   midtones alone and works into the shadows and highlights, which is what
+   film grain does. On a flat alpha the whole frame just goes milky.
+
+   IT IS NOT ANIMATED, and that is the choice that makes it read as film
+   rather than as a bad stream: moving grain is noise, still grain is stock.
+   It also costs nothing per frame.
+
+   IT SITS OVER THE RAMP as well as the film, so the gradient gets the same
+   texture and never reads as a clean CSS wash laid on a photograph. */
+.grain {
+  position: absolute;
+  inset: -50%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* ── THE WORDMARK ──
+   CONTRALTO, and this is the one role the face is kept for. globals.css
+   states the rule outright: "NEWSREADER ON THE DISPLAY ROLES, CONTRALTO
+   ONLY ON THE WORDMARK — a logotype is artwork, not a typeface role." This
+   is a logotype at 150px, so it is exactly the sanctioned use, and the
+   Adobe kit is already loaded for the navbar's copy of it.
+
+   10.5vw WITH NO CLAMP AND NO MAX. Every other size on the site is a clamp
+   because it has to stay readable; this one has to stay CROPPED. A max
+   would let the plate outgrow the word at wide viewports and the whole
+   composition — a word too big for its frame — would quietly become a word
+   sitting in a frame.
+
+   ── THE BOX IS TRIMMED TO THE INK, and that is what makes the alignment
+   the user asked for exact rather than approximate ──
+   `line-height: 0.78` got the box close to cap-height by hand, and close is
+   the problem: measured at 1440, the element box ran 701→819 while the
+   LETTERS ran 659→860, so the caption stretched to that box started 42px
+   below the M's cap and the button's foot landed 6px above the baseline.
+   Aligning to a box that is not the ink is aligning to nothing a reader can
+   see.
+
+   `text-box: trim-both cap alphabetic` makes the box exactly cap-top to
+   baseline, so the grid's stretch (see .lockup) now aligns the caption to
+   the CAP and the button's bottom to the BASELINE — the two edges the eye
+   actually reads as the top and bottom of a word. `line-height: 1` because
+   the trim removes the leading itself; leaving 0.78 under it would trim a
+   box that had already been squeezed.
+
+   FALLBACK, stated because it is silent: an engine without text-box keeps
+   the untrimmed box and lands where the hand-tuned 0.78 used to — a few
+   pixels out, never broken. Chrome 133+ and Safari 18.2+ have it.
+
+   ── IT IS SIZED BY SUBTRACTION, NOT IN vw, at the user's instruction ──
+   Every previous value here was a share of the viewport — 10.5, then 12,
+   then 15.5 — and each one was a guess at how much room the caption beside
+   it would leave. It cannot be guessed, because the caption's left edge is
+   the NAVBAR's first link and that x moves with the nav's content, not with
+   the window: 64% of the frame at 1440, 72% at 1920.
+
+   So the size is solved instead. MEASURED, this string in this face at this
+   tracking is 5.297 x its font size wide — "MAGINHAWA" came out 791.1px at
+   149.3px — and the ratio holds because case, tracking and letterforms are
+   all fixed. The measure available to it is everything left of the caption:
+
+       nav-links-left − page-margin − the column gap
+
+   and dividing that by 5.66 is the largest size that fits it exactly. The
+   word therefore fills its side of the frame at every viewport with nothing
+   clamped and nothing measured by hand.
+
+   ⚠️ 5.297 IS A PROPERTY OF THE STRING. Change the word, the face, the
+   weight or the tracking and it has to be re-measured — select the
+   element's contents with a Range and divide the rendered width by the
+   font size. If a future edit makes the word wrap or overflow, this
+   constant is the first thing to check. It was 5.66 at 0.06em of tracking.
+
+   ── THE TRACKING CAME IN TO 0.02em, AND IT IS WHAT BOUGHT THE LAST SIZE ──
+   0.06em was taken from `.logoWord` so the hero's wordmark would match the
+   navbar's, and case and face still do. Tracking should not: 0.06em is a
+   20px-caps value, where letterspacing buys legibility, and the same
+   figure at 150px is air the design is paying for in SIZE — the string is
+   5.66 x its font size at 0.06 against 5.297 at 0.02, so the looser
+   setting cost ~8% of the word. Optical sizing runs the other way from
+   this: the larger the display type, the tighter it wants to be set.
+
+   THE OLD NOTE, kept because the reasoning still applies to the caption:
+   The two were one problem. The wordmark is sized in vw so its width is a
+   fixed share of the viewport (~0.055 x the vw number, measured), where the
+   caption was capped in `ch` against a nearly-flat font size — so the
+   caption's share SHRANK as the window grew and the gap between them opened
+   up: 58% + 24% at 1440 left 15% of dead frame, and 58% + 18% at 1920 left
+   21%. Raising the wordmark alone would have closed it at one width and
+   reopened it at the next.
+
+   BOTH ARE PROPORTIONAL NOW. 12vw puts the word at ~66% of the viewport and
+   the caption takes 24vw (see .copy), so the two ends and the space between
+   them hold the same ratio at every width — ~73px of gap at 1440, and the
+   same 5% of the frame at 1920.
+
+   STILL NO CLAMP AND NO MAX: the word has to stay sized to the frame, and a
+   max would let the frame outgrow it. */
+.mark {
+  margin: 0;
+  font-family: var(--font-display-big);
+  font-weight: var(--w-regular);
+  font-size: calc(
+    (var(--nav-links-left, 66vw) - var(--pad-x) - var(--hero-gap)) / 5.297
+  );
+  line-height: 1;
+  text-box: trim-both cap alphabetic;
+  /* ── UPPERCASE, AND TRACKED LIKE THE NAVBAR'S, at the user's
+     instruction ── It was title case and untracked, which is why it did not
+     look like the same wordmark as the one in the bar above it even though
+     both are set in Contralto: `.logoWord` in Nav.module.css is
+     `text-transform: uppercase` on `letter-spacing: 0.06em`, and case plus
+     tracking is most of what a reader means by "the same lettering".
+     Both values are taken from that rule, so the two cannot drift.
+
+     IT ALSO TIDIES THE ALIGNMENT: caps have no descender, so the baseline
+     IS the visual bottom of the word and the button's foot lands on the
+     edge the eye reads rather than on a line the 'g' hangs below. */
+  letter-spacing: 0.02em;
+  text-transform: uppercase;
   color: var(--cream);
-  /* NO SCRIM, and the reason it could go is the size. --scrim-text existed
-     because this line used to be 16px Helvetica floating on the footage,
-     where a bright frame could swallow it. At --t-h2 it is 48px display
-     type, which WCAG treats as large — a 3:1 floor rather than 4.5:1 — and
-     the film already carries filter: brightness(0.62). The shadow was
-     buying legibility the size now provides, at the cost of making clean
-     type look like it had been dropped onto the picture rather than set
-     into it. If the footage is ever re-graded brighter, put it back. */
+  white-space: nowrap;
 }
 
-/* balance is set per-sentence rather than on .lede, because balancing the
-   whole heading would even out the line lengths ACROSS the three sentences
-   and undo the clause breaks this markup exists to get */
-.clause {
-  display: block;
-  text-wrap: balance;
-}
+/* ── THE CAPTION COLUMN, SEATED ON THE NAVBAR'S FIRST LINK ──
+   `--nav-links-left` is written to the root by Nav.tsx, which measures it:
+   the link row is right-ranged on the page margin and its width is whatever
+   five words come to, so the x cannot be derived in CSS. The column is
+   right-anchored on the same page margin the nav uses, and given exactly
+   the width that puts its LEFT edge on that measured x.
 
-.actions {
+   THE FALLBACK IS A GUESS AND IS MEANT TO BE: if the variable is missing —
+   the one frame before the observer runs, or JS off — 34vw is close enough
+   to the measured ~34% at 1440 that nothing jumps visibly when the real
+   value lands. */
+.copy {
+  justify-self: end;
+  width: calc(100vw - var(--nav-links-left, 66vw) - var(--pad-x));
   display: flex;
-  justify-content: center;
-  align-items: center;
+  flex-direction: column;
+  justify-content: space-between;
+  align-items: flex-start;
+  /* A FLOOR, NOT THE SPACING. `space-between` is what seats the caption on
+     the wordmark's cap and the control on its baseline, so this only does
+     anything in the band where the column would otherwise be the taller of
+     the two — and it is deliberately small so that band starts as low as
+     possible. See the note on the caption's length in Hero.tsx. */
   gap: clamp(10px, 1.2vw, 16px);
-  /* .lockup is pointer-events: none so the film stays draggable behind
-     the lockup — the only two things here that are clickable opt back in */
+  /* no max-width: the measure IS the nav's link row, by construction */
+}
+
+/* THE SENTENCE, DEMOTED. It was the <h1> at 80px; it is 15px here and it
+   is the better job for it — it names the cuisine, the city and the year,
+   which is caption work. Mixed with black rather than set in alpha, so the
+   film cannot show through the letterforms and shift the reading frame to
+   frame (the same rule the venue cards' address pair follows). */
+/* ⚠️ TRIMMED AT THE START for the same reason the wordmark is trimmed at
+   both: this paragraph's first line carries half-leading above its cap
+   (line-height 1.45 at 15px is ~5px of it), so a box aligned to the
+   wordmark's cap would still print its own cap 5px lower. `trim-start cap`
+   takes the box to the cap and the two tops become one line. */
+.sentence {
+  margin: 0;
+  text-box: trim-start cap;
+  font-family: var(--font-sans);
+  font-weight: var(--w-regular);
+  font-size: clamp(0.875rem, 1.05vw, 0.9375rem);
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--cream) 88%, #000);
+}
+
+/* ── ONE ACTION ──
+   THE CONTROL ITSELF LIVES IN PillCta — its fill, its merge, its magnet and
+   its reduced-motion pass are all over there, which is the point of it
+   being a component. What is left here is the seat. ──
+   "Find a restaurant" and "Book a table" were two pills of equal weight,
+   which halves the force of both; they are one control now, at the user's
+   instruction, reading "Choose a restaurant" — the words the closing frame
+   already uses for the same destination.
+
+   PILL + DISC, the two-cell control the journal's head carries, so the
+   page's loudest action is an object it already owns. */
+
+/* 44px minimum, which is the tap-target floor rather than a look.
+
+   SENTENCE CASE, NOT CAPS. The wordmark beside it is the only thing above
+   the fold that should be shouting. */
+
+/* the disc that closes the control — same height as the pill, so the two
+   read as one body */
+
+/* THE PRESS. scale(0.97) is the smallest value that reads as contact rather
+   than as a glitch, and it fires on POINTER-DOWN — waiting for touch-up is
+   the latency that makes a button feel dead. Outside any hover query: a
+   touch device reports `hover: none` and needs this most. */
+
+/* ── NARROW: THE COLUMN STACKS, AND 1100px IS MEASURED ──
+   The two-end alignment holds only while the wordmark's cap height is the
+   GREATER of the two column heights. It shrinks with the viewport (10.5vw)
+   while the caption does not (its clamp is nearly flat and its measure
+   narrows, so it gains lines) — the two cross at about 1150px, where a
+   ~85px cap meets a caption that has gone to three lines. Below the
+   breakpoint the caption goes underneath the wordmark, where there is
+   nothing to align to and the rule is dropped with the two-column grid.
+   10.5vw of a phone is 41px, which is not a giant word either, so the
+   wordmark takes a floor here as well. */
+@media (max-width: 1100px) {
+  .lockup {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 18px;
+    padding: clamp(14px, 4vw, 20px);
+  }
+  .mark {
+    font-size: clamp(2.75rem, 15vw, 7rem);
+  }
+  .copy {
+    max-width: none;
+  }
+}
+
+/* the control's seat. PillCta brings its own everything; this only says
+   where it sits — and `pointer-events: auto` opts it back out of .lockup's
+   `none`, which is what keeps the film draggable behind the type. */
+.cta {
   pointer-events: auto;
 }
-
-/* 44px minimum height on both, which is the tap-target floor rather than a
-   look — at this size the text alone would land near 30px.
-
-   SENTENCE CASE, NOT CAPS. The chrome was running three uppercase things at
-   once — the wordmark, the nav links and these two buttons — and caps are
-   only a signal while something else is not shouting. Dropping the buttons
-   and the nav to sentence case leaves the WORDMARK as the only uppercase
-   thing above the fold, which is the one place the emphasis was worth
-   spending. It also reads warmer, and the brief for this group is a family
-   that has been cooking since 1987 rather than a fashion house.
-   Set 1px larger than the old --t-label: lowercase has a smaller apparent
-   size than caps at the same point size, so holding 13px would have made
-   the actions quieter, not just softer. */
-.actionPrimary,
-.actionSecondary {
-  min-height: 44px;
-  padding: 0 clamp(20px, 2vw, 30px);
-  border-radius: 999px;
-  font-family: var(--font-sans);
-  font-weight: 400;
-  font-size: 0.9375rem;
-  letter-spacing: 0.005em;
-  white-space: nowrap;
-  cursor: pointer;
-  transition:
-    background-color 0.35s var(--ease-state),
-    color 0.35s var(--ease-state),
-    border-color 0.35s var(--ease-state),
-    /* the press is deliberately an order of magnitude faster than the
-       colour change — feedback has to feel like contact, not like an
-       animation starting */
-    transform 120ms var(--ease-out);
-}
-
-/* THE PRESS, AND THE FRONT DOOR HAD NONE.
-   These two buttons and the navbar links were the only controls on the site
-   with a :hover and no :active — every card button, the footer and the
-   forms already respond to being pressed. That is the wrong way round: the
-   hero pair is the first thing anyone touches, and the moment a control
-   does nothing on pointer-down the interface stops feeling direct.
-
-   scale(0.97), which is the smallest value that reads as contact rather
-   than as a glitch, and it fires on POINTER-DOWN rather than on click —
-   waiting for touch-up is the latency that makes a button feel dead.
-
-   No :active inside the hover media query. A touch device reports
-   `hover: none`, and press feedback is exactly the affordance a touch
-   device needs MOST. */
-.actionPrimary:active,
-.actionSecondary:active {
-  transform: scale(0.97);
-}
-
-/* the filled pill is the one action most readers want — browsing the rooms
-   comes before booking one, because most arrivals have not chosen yet */
-.actionPrimary {
-  border: 1px solid var(--cream);
-  background: var(--cream);
-  color: var(--maroon);
-}
-
-.actionSecondary {
-  /* THE LITERAL IS GONE. It was rgba(250, 247, 241, 0.55) with a note
-     explaining that relative colour syntax appears nowhere else in these
-     stylesheets and is not worth the support floor — a fair argument that
-     answered the wrong question. rgb(from …) was never the only
-     alternative: `color-mix(in srgb, var(--cream) 55%, transparent)` is
-     the idiom this codebase already uses everywhere for exactly this, and
-     it is as widely supported as the color-mix in --rule.
-
-     WHAT THE LITERAL COST. It named #faf7f1, the cream from TWO palettes
-     ago — the note said so in as many words and was still true when it was
-     written. That border has been painting a dead palette's cream through
-     two swaps, on the hero, above the fold, on the home page. This is the
-     failure mode a token exists to prevent, preserved in amber. */
-  border: 1px solid color-mix(in srgb, var(--cream) 55%, transparent);
-  background: transparent;
-  color: var(--cream);
-}
-
-@media (hover: hover) {
-  .actionPrimary:hover {
-    background: transparent;
-    color: var(--cream);
-  }
-  .actionSecondary:hover {
-    border-color: var(--cream);
-    background: var(--cream);
-    color: var(--maroon);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  .actionPrimary,
-  .actionSecondary {
-    transition: none;
-  }
-  /* the press stays. A reduced-motion reader is asking not to be moved
-     THROUGH space, not to be denied confirmation that a control was hit —
-     and at 3% over 120ms there is no travel to be bothered by. The
-     transition is dropped above, so it becomes an instant state change,
-     which is exactly what this preference wants. */
-}
-
-/* one column on a phone: side by side, two uppercase labels at this size
-   either wrap or shrink below the tap floor */
-@media (max-width: 480px) {
-  .actions {
-    flex-direction: column;
-    align-items: stretch;
-  }
-  /* the measure is in ch, so it already tracks the smaller size — what a
-     phone needs is the size itself brought down, not the measure narrowed
-     (at 26ch and the desktop size the middle sentence ran five lines) */
-  .lede {
-    max-width: 20ch;
-    font-size: clamp(1.45rem, 6.6vw, 1.9rem);
-  }
-}
-

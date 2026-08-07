@@ -17,6 +17,24 @@ import type { HeroInsets } from "./types";
 
 // Full-screen hero: the video panel fills the viewport edge-to-edge, so the
 // loader window also grows to fill the screen (square corners at full size).
+/* ── FULL BLEED, and it went to a plate and back ──
+   For one pass these were 12/12/12/2 — the hero inset on the page's gutter
+   with the photography radius, so it read as the same object as every
+   picture below it. Reverted at the user's instruction: the opening frame
+   is the one place on the page that should not look like a card on a page.
+   The mechanism stays wired for the next time it is wanted.
+
+   THEY GO THROUGH THIS OBJECT rather than straight into Hero.module.css
+   because the mechanism already existed for the retired entry animation,
+   which scrubbed these four values from a rounded plate to full bleed. Only
+   the values changed.
+
+   ⚠️ THEY ARE NUMBERS, NOT `var(--grid-gutter)` / `var(--radius-tile)`, and
+   that is forced rather than chosen: Loader.tsx reads the same object to
+   size the hole its wordmark opens into (`vp.w - 2 * insets.side`), so these
+   have to be arithmetic. 12 and 2 MIRROR those two tokens — if either moves,
+   move these with it. The alternative (a second source of truth in CSS and a
+   getComputedStyle read in the loader) is worse than one comment. */
 const HERO_INSETS: HeroInsets = { top: 0, side: 0, bottom: 0, radius: 0 };
 
 // the full-screen intro loader plays once per session — returning to the home

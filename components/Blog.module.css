@@ -17,12 +17,31 @@
 .section {
   position: relative;
   isolation: isolate;
-  /* seated on the GLOBAL 12-column grid (globals.css) — same margin, gutter
-     and column seat as Discover and the other cream chapters. The local
-     names survive as aliases only. */
-  --blog-margin: var(--grid-margin);
+  /* ── THE CHAPTER MEASURES WHAT ABOUT US MEASURES, at the user's
+     instruction: --grid-gutter (12px flat) rather than --grid-margin
+     (clamp(16px, 2.8vw, 40px)). The journal gains 56px at 1440 and its
+     left edge lands where AboutSplit's video and the story band already
+     sit. Discover takes the same value in the same pass — see the note in
+     Discover.module.css for why the page had three left edges and which
+     one survives.
+
+     ⚠️ AND THE COLUMN HAS TO BE RE-DERIVED, WHICH IS THE PART THAT IS
+     EASY TO MISS. --grid-col is computed in globals.css against the PAGE
+     MARGIN: (100vw − 2·margin − 11·gutter) / 12. Inheriting it into a
+     chapter that no longer uses that margin would size the lede card as
+     six columns of a NARROWER grid inside a WIDER measure — the card would
+     have stayed 674px while the band grew to 1416, silently shifting the
+     card:rail ratio the layout was set at. The same expression is restated
+     below against --blog-margin, so twelve local columns span exactly this
+     chapter's own measure.
+
+     --blog-col2 is left pointing at the global column-2 seat: nothing
+     reads it any more except the ≤900px alias at the foot of this file. */
+  --blog-margin: var(--grid-gutter);
   --blog-gutter: var(--grid-gutter);
-  --blog-col: var(--grid-col);
+  --blog-col: calc(
+    (100vw - 2 * var(--blog-margin) - 11 * var(--blog-gutter)) / 12
+  );
   --blog-col2: var(--grid-col2);
   /* IT NO LONGER COVERS ANYTHING. This sheet used to climb over the pinned
      interlude above it — the photograph held its screen and this section's
@@ -65,8 +84,10 @@
   display: flex;
   flex-direction: column;
   /* head → body gap on the Discover head's rhythm — the display heading
-     needs the same air over the photography */
-  gap: clamp(22px, 2.7vh, 34px);
+     needs the same air over the photography. NAMED because .topRule
+     subtracts it; the value is unchanged. */
+  --sec-gap: clamp(22px, 2.7vh, 34px);
+  gap: var(--sec-gap);
   background: var(--cream);
   color: var(--maroon);
   /* the card and the rail both rise a little on entrance, and the magnet on
@@ -89,11 +110,22 @@
 
    Same 1px on --rule as .headRule — two hairlines of different weights in
    one chapter reads as one of them being a mistake. */
+/* ── AND IT SITS 18px OFF THE HEAD, matching Discover's copy of this rule.
+   It was riding the section's own gap (24px here, 34px there), so the
+   signature the two chapters are supposed to share did not measure the same
+   in either one — and a rule equidistant between the chapter above and the
+   head below reads as a divider rather than as an opening. A rule belongs
+   to what it introduces.
+
+   The negative margin subtracts the section's gap; see the fuller note on
+   Discover.module.css's .topRule for why it cannot simply take a smaller
+   gap (the same gap sets the head→body distance and must not move). */
 .topRule {
   display: block;
   height: 1px;
   background: var(--rule);
   margin-inline: var(--blog-margin);
+  margin-bottom: calc(18px - var(--sec-gap));
 }
 
 /* ---------- head row — display heading on the left, the archive pill
@@ -130,8 +162,10 @@
     "rule  rule";
   align-items: start;
   /* the label row and the display line read as one lockup — the air that
-     separates the head from the pictures is the rule's margin, not this */
-  gap: clamp(10px, 1.4vh, 16px);
+     separates the head from the pictures is the rule's margin, not this.
+     NAMED because .headRule subtracts it; value unchanged. */
+  --head-gap: clamp(10px, 1.4vh, 16px);
+  gap: var(--head-gap);
   margin-inline: var(--blog-margin);
 }
 
@@ -194,231 +228,45 @@
 /* the hairline that closes the head and opens the pictures. Full band
    width — a rule stopping at the type's right edge reads as an underline
    of the sentence, and this is a boundary for the whole chapter. */
+/* ── 18px OFF THE DISPLAY LINE, matching .topRule's distance to the eyebrow
+   and Discover's copy of both. The head read 18px above the label and 43px
+   below the display line, so the two hairlines bracketing it sat at
+   different distances from the type they bracket.
+   The margin subtracts the head grid's own row gap — see the fuller note on
+   Discover.module.css's .headRule. */
 .headRule {
   grid-area: rule;
   display: block;
   width: 100%;
   height: 1px;
   background: var(--rule);
-  margin-top: clamp(22px, 3.4vh, 40px);
+  margin-top: calc(18px - var(--head-gap));
 }
 
-/* ═══════════ THE ARCHIVE LINK — A PILL AND A DISC THAT CLOSE ═══════════
+/* ═══════════ THE ARCHIVE LINK — THE SEAT ONLY ═══════════════════════════
 
-   ── WHAT THIS REPLACES, AND WHY THE WHOLE MECHANISM WENT ──
-   The two cells used to be fused by an SVG goo filter (#cta-merge in
-   GlassFilters.tsx): a shape layer blurred and thresholded so that two
-   overlapping bodies resolved as one with a concave fillet between them,
-   with the type laid over it unfiltered. It shipped, and it did not read
-   as designed at either end of the move:
+   THE CONTROL ITSELF HAS MOVED to components/PillCta.tsx and its
+   stylesheet, because About's "Read our story" and the closing frame's
+   "Choose a restaurant" are the same object now and a shape that exists in
+   three files is three shapes waiting to drift apart. Everything that was
+   here — the clip equation, the three-cell nesting, the goo filter it
+   replaced, the magnet's tuning — is in the banner at the top of
+   PillCta.module.css.
 
-     · AT REST the blur softened both bodies before the threshold cut them
-       back, so the pill's ends and the disc came out wobbly and slightly
-       swollen — a blob with a bump on it rather than a crisp pill beside a
-       crisp circle.
-     · ON HOVER the two never resolved into ONE pill. The fillet needs the
-       fields to overlap by better than a third of the disc to close, and
-       at anything less the threshold cuts a visible waist; what the reader
-       saw was two cells pinched together with the arrow hanging over the
-       join.
-
-   The filter is deleted (from GlassFilters.tsx too — nothing else used
-   it). The merge is now GEOMETRY, and it is exact rather than
-   approximated: at full close the pill's right cap and the disc are the
-   same circle, so the union is a mathematically perfect pill with no
-   waist, no fillet, no blur and nothing to threshold.
-
-   ── HOW IT CLOSES ──
-   Three boxes, all --cta-h tall:
-     .ctaBody   an absolutely-seated maroon pill spanning the WHOLE
-                control, clipped back on its right by (disc + gap) so at
-                rest it paints only the label's pill.
-     .ctaLabel  the type, in flow, over the body.
-     .ctaDisc   the maroon circle with the arrow, in flow, gap to its left.
-
-   ── BOTH CELLS TRAVEL, AND THE CONTROL COMPRESSES ──
-   At the user's instruction, and in three passes worth recording because
-   each one was a different answer to "what closes":
-     1. the body extended rightward onto a stationary disc — one object
-        eating another;
-     2. the disc travelled left onto a body that only GREW to meet it — so
-        the label sat still and only the arrow moved;
-     3. now BOTH move toward each other. The pill's left edge and its label
-        translate RIGHT by --cta-close, the disc translates LEFT by the
-        same, and the body's clip opens by twice it. The two ends of the
-        control walk in and the closed pill is 2 × --cta-close shorter than
-        the resting one.
-
-   ⚠️ THE THREE VALUES ARE ONE EQUATION. With the body translated `a`, the
-   disc translated `b` and the clip left with inset `R`, the union is a
-   clean pill — the body's right cap centre sitting exactly on the disc's
-   centre — if and only if `R = a + b`. Everything below is written as
-   --cta-close and 2 × --cta-close for that reason. Change one of the three
-   on its own and the join opens a seam or the cap overshoots the circle.
-
-   ⚠️ AND THE CEILING IS THE CLEARANCE, NOT THE GAP. What closes is
-   `a + b` = 2 × --cta-close, and it eats into the distance from the
-   label's ink to the arrow's own inset inside the disc — 33.9px at 1440.
-   At 9.78px of travel each way that leaves ~14px. Past ~17px each way the
-   arrow starts crossing the type, and no amount of the pill being "one
-   shape" rescues a glyph sitting on a word.
-
-   ⚠️ AND THE MOVE IS A CLIP, NOT A WIDTH. The body is full-size at all
-   times and `clip-path` is what shortens it — animating `width` or `right`
-   would re-lay-out the box every frame, where the clip is a paint the
-   compositor already has the geometry for. `inset(… round 999px)` is what
-   keeps the clipped end a semicircular cap rather than a straight cut. */
-/* THE HOST — the magnet's measuring box, and it is NEVER transformed. Its
-   border rect is the control's REST rectangle however far the pill has
-   drifted; measuring the moving element instead makes the magnet its own
-   input and it walks away from the pointer (lib/useMagnet.ts). It is the
-   grid item, so the seat in the head is unchanged: hung off the display
-   line's bottom edge at the row's right end.
-
-   `align-self: end` is what does that alignment: in the "lede cta" row the
-   lede is the tall item, so ending the pill against that row's bottom edge
+   WHAT STAYS IS THE SEAT, and only the seat. `align-self: end` is what
+   hangs the pill off the display line's bottom edge: in the "lede cta" row
+   the lede is the tall item, so ending the pill against that row's bottom
    sits it on the display line's last baseline however many lines the lede
    wraps to. Hard-coding a margin would hold only at the width it was
-   measured at, because the lede is a clamp() that rewraps. */
+   measured at, because the lede is a clamp() that rewraps.
+
+   PillCta's own `.host` brings `display: block` and `width: fit-content`
+   (the magnet has to measure the control, not the grid cell), so this rule
+   never restates them. ═══ */
 .ctaHost {
   grid-area: cta;
   align-self: end;
   justify-self: end;
-  display: block;
-  /* shrink-wrapped to the pill, so the measured rect is the control's and
-     not the grid cell's */
-  width: fit-content;
-}
-
-/* the spring lives here — transform only, never left/top/margin, so the
-   drift composites on the GPU and costs no layout */
-.ctaMagnet {
-  display: flex;
-  will-change: transform;
-}
-
-.headCta {
-  position: relative;
-  display: inline-flex;
-  align-items: center;
-  /* the disc's diameter, and the pill's height with it — one number so the
-     two cells are the same body */
-  --cta-h: clamp(34px, 2.6vw, 40px);
-  /* the air between the cells at rest */
-  --cta-gap: clamp(6px, 0.6vw, 9px);
-  /* HOW FAR THEY CLOSE — the disc's travel and the clip's remaining inset,
-     which are the same distance by construction. See the warning above:
-     one number, never two. */
-  --cta-close: calc(var(--cta-gap) / 2 + 0.42em);
-  color: var(--cream);
-  font-family: var(--font-mono);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label-mono);
-  text-transform: uppercase;
-  white-space: nowrap;
-  text-decoration: none;
-}
-
-/* THE BODY — one maroon pill covering the whole control, clipped back to
-   the label at rest. No filter, no blur, and no background on .headCta
-   itself: a fill on the anchor would sit under both cells as a third,
-   unclipped rectangle and give the join a hard outline to happen inside. */
-.ctaBody {
-  position: absolute;
-  inset: 0;
-  z-index: 0;
-  border-radius: 999px;
-  background: var(--maroon);
-  clip-path: inset(0 calc(var(--cta-h) + var(--cta-gap)) 0 0 round 999px);
-  transition:
-    clip-path 460ms var(--ease-drawer),
-    transform 460ms var(--ease-drawer);
-}
-
-/* THE TYPE — in flow over the body, and it is what sizes the control. It
-   travels with the body rather than sitting still while the arrow comes to
-   it: the label and the pill it is set on are one cell. */
-.ctaLabel {
-  position: relative;
-  z-index: 1;
-  display: inline-flex;
-  align-items: center;
-  height: var(--cta-h);
-  padding-inline: 1.3em;
-  font-weight: var(--w-regular);
-  transition: transform 460ms var(--ease-drawer);
-}
-
-/* THE DISC — its own circle, carrying the arrow. It travels left into the
-   body's opening clip; the two meet at the midpoint of the gap. */
-.ctaDisc {
-  position: relative;
-  z-index: 1;
-  flex: none;
-  display: grid;
-  place-items: center;
-  width: var(--cta-h);
-  height: var(--cta-h);
-  margin-left: var(--cta-gap);
-  border-radius: 50%;
-  background: var(--maroon);
-  transition: transform 460ms var(--ease-drawer);
-}
-
-.ctaArrow {
-  width: 55%;
-  height: 10px;
-  transition: transform 0.45s var(--ease-drawer);
-}
-
-/* ── THE CLOSE ──
-   Both cells on --ease-drawer, which is the curve every other joining move
-   on this page uses (the card lift, the photo zoom): most of the distance
-   early, then a settle. 460ms rather than the ~300 a colour change takes —
-   this is two objects travelling and being seen to travel.
-
-   THE ARROW WAITS. It only steps forward once the cells have closed most
-   of the distance, so the sequence is join-then-point rather than two
-   unrelated things moving at once. That is the 0.18s delay. */
-.headCta:hover .ctaBody,
-.headCta:focus-visible .ctaBody {
-  /* R = a + b — see the equation in the block comment above */
-  clip-path: inset(0 calc(var(--cta-close) * 2) 0 0 round 999px);
-  transform: translateX(var(--cta-close));
-}
-
-.headCta:hover .ctaLabel,
-.headCta:focus-visible .ctaLabel {
-  transform: translateX(var(--cta-close));
-}
-
-.headCta:hover .ctaDisc,
-.headCta:focus-visible .ctaDisc {
-  transform: translateX(calc(-1 * var(--cta-close)));
-}
-
-.headCta:hover .ctaArrow,
-.headCta:focus-visible .ctaArrow {
-  transform: translateX(4px);
-  transition-delay: 0.18s;
-}
-
-.headCta:focus-visible {
-  outline: 2px solid var(--maroon);
-  outline-offset: 4px;
-  border-radius: 999px;
-}
-
-/* A reader who asked for less motion gets the END STATE on hover, not the
-   journey: the cells are still one pill under the pointer, they simply
-   arrive there. (The magnet does not run at all — see lib/useMagnet.ts.) */
-@media (prefers-reduced-motion: reduce) {
-  .ctaBody,
-  .ctaLabel,
-  .ctaDisc,
-  .ctaArrow {
-    transition: none;
-  }
 }
 
 /* ═══════════════ THE BODY — the card and the rail ═══════════════════

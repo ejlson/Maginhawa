@@ -1,7 +1,6 @@
 "use client";
 
 import { useRef } from "react";
-import Link from "next/link";
 import Image from "next/image";
 import { motion, useInView, useReducedMotion } from "framer-motion";
 import styles from "./Blog.module.css";
@@ -14,9 +13,9 @@ import styles from "./Blog.module.css";
    The custom properties those rules read are declared on `.feature` in
    Blog.module.css, because a class can be imported and a variable cannot. */
 import card from "./VenueCard.module.css";
+import PillCta from "./PillCta";
 import { BLOG, type BlogEntry } from "@/lib/blog";
 import { getRestaurant } from "@/lib/restaurants";
-import { useMagnet } from "@/lib/useMagnet";
 
 // shared enter curve — the same ease the Discover reel slides in on
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -212,76 +211,6 @@ function RailRow({ post }: { post: BlogEntry }) {
   );
 }
 
-/* ═══ THE ARCHIVE LINK — a pill and a disc that close on each other, and
-   a magnet that carries the whole control toward the pointer.
-
-   THE GEOMETRY IS IN Blog.module.css and the note there is the one to
-   read: what the SVG goo filter was, why it read as a blob at rest and as
-   two pinched cells on hover, and why the merge is now an exact clip
-   instead of a blurred threshold.
-
-   THE THREE-ELEMENT NESTING IS LOAD-BEARING, not decoration:
-     .ctaHost    NEVER transformed — its border box is the control's REST
-                 rect, which is what the magnet's offset math measures
-                 from. Measuring the moving element instead makes the
-                 magnet its own input and it walks away from the pointer.
-     .ctaMagnet  carries the spring transform.
-     .headCta    the <Link>. Rides inside the transform, so the hit area
-                 and the focus ring travel with the glyphs and the control
-                 is pressable at rest and at full pull alike. ═══ */
-function ArchiveCta() {
-  /* A QUIETER MAGNET THAN THE DEFAULT, at the user's instruction. The
-     defaults in lib/useMagnet.ts are the reservations pill's — that button
-     is the last frame of the page and the only thing on its screen, where
-     this one shares a head with a display sentence it must not appear to
-     be tugging at. Halving the pull and drawing the radius in from 1.6
-     half-diagonals to 1.25 takes the peak displacement from ~14px to ~6px:
-     enough that the control is plainly alive under the pointer, not enough
-     to read as the head moving. */
-  const { hostRef, magnetic, x, y } = useMagnet<HTMLSpanElement>({
-    reach: 1.25,
-    pull: 0.38,
-    cap: 0.3,
-  });
-
-  return (
-    <span ref={hostRef} className={styles.ctaHost}>
-      {/* no style prop at all when the magnet is off, so the computed
-          transform stays `none` rather than an identity matrix */}
-      <motion.span
-        className={styles.ctaMagnet}
-        style={magnetic ? { x, y } : undefined}
-      >
-        <Link
-          href="/blog"
-          className={styles.headCta}
-          aria-label="Read all stories"
-        >
-          {/* the pill body — decoration standing in for the control's
-              background, and clipped back to the label at rest */}
-          <span className={styles.ctaBody} aria-hidden />
-          <span className={styles.ctaLabel}>Read More</span>
-          <span className={styles.ctaDisc}>
-            <svg
-              className={styles.ctaArrow}
-              viewBox="0 0 24 10"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1.2"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-              aria-hidden
-            >
-              <path d="M3 5 H17" />
-              <path d="M13 1 L17 5 L13 9" />
-            </svg>
-          </span>
-        </Link>
-      </motion.span>
-    </span>
-  );
-}
-
 /**
  * Blog chapter on the cream page — a hairline opening the chapter, the
  * head lockup (the group's mark set into a standing label, the display
@@ -356,7 +285,19 @@ export default function Blog() {
           Stories, openings, and ideas shaping the Maginhawa Group.
         </p>
 
-        <ArchiveCta />
+        {/* THE ARCHIVE LINK — the house action, shared with About's "Read
+            our story" and the closing frame's "Choose a restaurant" (see
+            components/PillCta.tsx). `styles.ctaHost` is the SEAT only: it
+            hangs the pill off the display line's bottom edge at the row's
+            right end. The label reads "Read More"; the accessible name says
+            what it actually opens, which is the whole archive. */}
+        <PillCta
+          href="/blog"
+          className={styles.ctaHost}
+          aria-label="Read all stories"
+        >
+          Read More
+        </PillCta>
 
         {/* presentational — the outline does not need a rule announced */}
         <span className={styles.headRule} aria-hidden />

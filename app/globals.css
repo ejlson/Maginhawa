@@ -555,7 +555,28 @@
      (Discover tiles, Blog plates, the About card). --radius-card is the
      larger rounding on pressable/floating UI panels. Pills stay 999px, dots
      50%, and animated radii (Hero) keep their own tokens. */
-  --radius-tile: 8px; /* photography + editorial frames — a quiet edge-soften, not an app-card curve */
+  /* ── 2px, DOWN FROM 8, at the user's instruction ──
+     The choice was between no radius at all and "a small one, like 2px",
+     and 2px is the one that keeps something rather than the one that
+     removes it: at 8px the corner turns for ~3% of a card's short edge and
+     reads as a soft UI tile; at 2px it reads as a PRINTED PLATE whose
+     corners have simply been taken off the sharp — which is the register
+     an editorial page wants, and the register the rest of this palette
+     (hairline rules, flat cream, no gradients) already sets.
+
+     WHY NOT 0. A true square corner on a photograph sitting on cream reads
+     as unfinished at the exact place two of them meet — the 12px gutter
+     between two grid cards becomes a hard cross, and any 1px seam in the
+     render shows there first. 2px is below the threshold where a reader
+     calls it "rounded" and above the one where the corner looks cut.
+
+     ⚠️ IT MOVES EVERY PHOTOGRAPH ON THE SITE, which is the point but is
+     worth knowing: the venue cards, the story band, the About prints, the
+     journal's lede card and rail thumbs, the restaurant grid and the
+     interior pages all read this token. Nothing needs re-deriving — the
+     concentric-mat arithmetic that used to depend on it went with the old
+     blog strip. */
+  --radius-tile: 2px; /* photography + editorial frames — a printed plate, not an app-card curve */
   --radius-card: 16px;  /* pressable/floating UI panels — NOT photos */
   --radius-media: 10px; /* media nested inside a rounded UI panel */
 

@@ -250,7 +250,30 @@
   align-content: center;
   justify-items: center;
   pointer-events: none;
-  padding-inline: var(--pad-x);
+  /* ── ON THE PAGE'S 12px MEASURE, at the user's instruction, and it is
+     honest to say what this does and does not change.
+
+     WHAT IT CHANGES: nothing a reader can see. The invitation is CENTRED
+     (`justify-items: center`) and its two elements are narrower than either
+     box, so this padding is a safety inset at narrow widths rather than a
+     seat — moving it from 40px to 12px only widens a margin nothing was
+     touching. It is changed anyway so the chapter's declared measure agrees
+     with Discover, About and the journal instead of being the one box still
+     naming --pad-x for no reason.
+
+     WHAT IT DOES NOT CHANGE, and this is the part that matters: the only
+     edge this chapter actually SHOWS is the departing plate — the film
+     shrinking to a rounded card as the section leaves — and that inset is
+     --pad-x by design, because it is matched to the FOOTER's content width
+     directly beneath it (see --side-inset at the top of this file). Moving
+     it to 12px would align the plate with the cream chapters and misalign
+     it with the footer it hands over to, which is a worse trade.
+
+     The page therefore still has two measures: 12px for the cream
+     chapters, --pad-x for the dark end and the footer. Closing that needs
+     --pad-x itself to move, which is a site-wide decision — /contact, /faq
+     and /about all seat on it — and not something to do from here. */
+  padding-inline: var(--grid-gutter);
 }
 /* the overlay covers the whole stage and must not eat the cursor, but its
    children must stay pressable. `auto` inherits, so one restored child
@@ -371,13 +394,23 @@
   color: var(--cream);
 }
 
-/* ---------- the one action ----------
+/* ---------- the one action: THE SEAT ONLY ----------
 
-   .magnetHost is the layout box and the MEASURING box: it is never
-   transformed, so its border rect stays the button's REST position however
-   far the pill has drifted. Reservations.tsx measures the pointer offset
-   from this element, not from the pill, or the magnet becomes its own input
-   and walks away from the cursor.
+   THE CONTROL ITSELF IS components/PillCta.tsx now, shared with the journal
+   head and the About section. Everything that used to be below — `.action`,
+   its hover swap, its two focus rings, its pressed fill, `.actionLabel` and
+   `.actionArrow` — is gone from this file. The colour arithmetic those
+   rules carried did not evaporate: it is the `.accent` variant in
+   PillCta.module.css, which is what this call site asks for and the only
+   thing it varies.
+
+   .magnetHost stays, because the SEAT is this section's business: the
+   centring and the gap below are about this lockup, not about the button.
+   It is also still the MEASURING box — never transformed, so its border
+   rect stays the button's REST position however far the pill has drifted —
+   but PillCta owns that arrangement now and brings its own
+   `display: block; width: fit-content`, so this rule states only the
+   margin.
 
    THE GAP IS THE BLOCK'S LARGEST, and that is the whole point of the order.
    With the pill in the middle of the stack it measured 43px above and 34px
@@ -388,141 +421,30 @@
    heading: better than twice the gap above it, so the action is isolated and
    the two middle elements close ranks as one sentence.
 
-   The 34px floor is not arbitrary either: the magnet's vertical ceiling is
-   half the pill's height, ~23px at every breakpoint (the pill bottoms out
-   near 46px), so a fully-pulled button still clears the support line's
-   descender band. */
+   The 34px floor was argued from a magnet that no longer runs here: "half
+   the pill's height, ~23px at every breakpoint (the pill bottoms out near
+   46px), so a fully-pulled button still clears the support line's descender
+   band." The shared control is a shorter box on a quieter magnet — ~37px
+   tall at a 0.3 cap, so ~11px of vertical throw against the 23 this floor
+   was sized for. The floor is therefore no longer the binding constraint;
+   it stays because the gap it sets is the composition's, and it now clears
+   the descenders by better than twice the margin it was given. */
 .magnetHost {
-  display: block;
-  /* shrink-wrapped to the pill, so the measured rect is the button's and not
-     the column's — which then needs auto margins to sit on the block's centre
-     line, since a fit-content box does not inherit text-align */
-  width: fit-content;
+  /* `display: block` and `width: fit-content` are PillCta's `.host` — the
+     magnet has to measure the control rather than the column. What is this
+     section's own is the margin: auto left/right to sit the fit-content box
+     on the block's centre line, since it does not inherit text-align. */
   margin: clamp(34px, 4.6vh, 60px) auto 0;
 }
 
-/* the spring lives here — transform only, never left/top/margin, so the
-   drift composites on the GPU and costs no layout */
-.magnet {
-  display: flex;
-  will-change: transform;
-}
+/* .action, its hover swap, its two focus rings and its pressed fill USED TO
+   BE HERE, ~110 lines of them, most of it measured contrast arithmetic for a
+   cream label on the accent. None of it is lost: the pair it argued for
+   (--cta-fill: var(--saffron) / --cta-ink: var(--cream), 4.55:1) is the
+   `.accent` variant in PillCta.module.css, which is where the reasoning now
+   lives next to the shape it colours. This section names the variant and
+   says why; it no longer restates the fill. */
 
-/* The closing action. Same pill grammar as the site's other UI chrome —
-   999px radius, caps, --t-button rather than --t-label because this is the
-   one button on the page's last frame rather than one of four in a list. The
-   face is Helvetica now rather than the mono, at the reader's request, and
-   it takes the same tracking step the clock above does and for the same
-   reason. The two Helvetica elements are also the two ends of this lockup,
-   so the block still reads as bracketed by one voice.
-
-   SOLID SAFFRON, and it is the only saturated thing on this screen. The 6%
-   cream fill it replaces gave the pill a body but no voice: on a full-bleed
-   photograph a hairline capsule is chrome, and the last frame of the page
-   should not close on chrome. --saffron is already the site's accent
-   (globals.css:23) and is spent nowhere else in this section, so the eye has
-   exactly one place to land.
-
-   CREAM LABEL, NOT MAROON — AND IT USED TO BE THE OTHER WAY ROUND. The note
-   here read "#2f0000 on #c97e3f measures 5.85:1; cream on the same fill is
-   2.99:1 and fails outright", which was true of a palette two swaps ago and
-   had been carried forward untouched ever since. Measured against the pair
-   that actually shipped before this pass, the ink label was 3.02:1 on the
-   accent fill (scripts/probe-palette-blastradius.mjs) — under the 4.5:1 this
-   uppercase label answers to, and it had been for some time.
-
-   THE NEW ARITHMETIC REVERSES IT OUTRIGHT. The ground deepened and the
-   accent moved three points of lightness with it (globals.css), so:
-       ink on the accent fill      2.15:1   — worse, and now hopeless
-       ground on the accent fill   4.55:1   — clears the label floor
-   The label is therefore cream. The pill still reads as the action rather
-   than as more copy, but it does it with the SATURATION now instead of with
-   an inversion: it is the only saturated thing on the screen either way. */
-.action {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.9em;
-  border-radius: 999px;
-  padding: 1em 2.1em;
-  font-family: var(--font-ui);
-  font-size: var(--t-button);
-  line-height: 1;
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  white-space: nowrap;
-  color: var(--cream);
-  background: var(--saffron);
-  /* the border is kept, matched to the fill: it holds the pill's exact
-     geometry (and its 1px of extra height) so nothing about the magnet's
-     measuring box or the hover swap moves when the colour changes */
-  border: 1px solid var(--saffron);
-  transition:
-    background-color 220ms var(--ease-out),
-    border-color 220ms var(--ease-out),
-    color 220ms var(--ease-out);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  /* Hover goes LIGHTER, not louder — cream fill, maroon label, and the pair
-     measures 9.80:1 (it was 17.5:1 on the old palette, which is the number
-     this note used to carry; the softened pair is the change, not the rule).
-     It is the same swap the pill always had, and it still reads as a state
-     change because saffron→cream is a hue jump as well as a value one. Going
-     darker on hover would have put the pressed state and the hovered state
-     on the same side of rest. */
-  .action:hover {
-    background: var(--cream);
-    border-color: var(--cream);
-    color: var(--maroon);
-  }
-  /* the arrow leads on hover; no translate on .action itself, which would
-     fight the magnet's transform for the same property */
-  .action:hover .actionArrow {
-    transform: translateX(5px);
-  }
-}
-
-/* THE TWO RINGS SWAPPED JOBS, and only the comment had to change.
-
-   A cream ring at 3px offset sits on the SCRIM, outside the pill. Against
-   the saffron it encircles it now measures 4.55:1 — it used to be 2.99:1 on
-   the old accent, which is why the note here said it "would fail the moment
-   it touched the fill" and why the inset ring existed to cover for it. The
-   deepened ground and the re-seated accent inverted that: the outer ring is
-   the PRIMARY indicator at rest now, clear of 1.4.11's 3:1 on its own.
-
-   The inset maroon ring is no longer the backstop on the rest state — it is
-   2.15:1 on the saffron, down from 3.08:1, and it cannot carry a fill by
-   itself any more. It stays because it is the only half that works on the
-   HOVER state, where the fill goes cream and the outer cream ring vanishes
-   into it: inset maroon on cream is 9.80:1. So each ring now owns one state
-   instead of both of them owning both, and the pair still leaves a legible
-   indicator against the pill AND against everything behind it, in both
-   states. */
-.action:focus-visible {
-  outline: 2px solid var(--cream);
-  outline-offset: 3px;
-  box-shadow: inset 0 0 0 2px var(--maroon);
-}
-/* PRESSED NOW GOES DARKER, WHERE IT USED TO GO LIGHTER, and the label is
-   what flipped it. This was the literal rgb(183,111,55) — a LIGHTER orange,
-   despite the note above it claiming "saffron cut 12% toward the maroon",
-   which is one more reason it is a color-mix of the token now and not a
-   frozen triplet. It went lighter because the label was maroon and a lighter
-   fill helped it; the label is cream now, so a lighter fill would fight it
-   (90% toward the ground puts the cream label at 3.87:1 and under its
-   floor). Darker helps instead.
-
-   75% accent / 25% ink, measured: the two fills are 1.25:1 apart — the same
-   step the old pair had, and above the ~1.1:1 where a value change stops
-   registering — and the cream label reads 5.69:1 on the pressed fill, better
-   than the 4.55:1 it gets at rest. The press does not open a hole in the
-   floor, it closes one. Colour only: a scale here would be a second
-   transform in the same stack as the magnet. */
-.action:active {
-  background: color-mix(in srgb, var(--saffron) 75%, var(--maroon));
-  border-color: color-mix(in srgb, var(--saffron) 75%, var(--maroon));
-}
 
 /* ---------- the supporting line ----------
 
@@ -558,16 +480,12 @@
   text-wrap: balance;
 }
 
-.actionLabel {
-  font-weight: 500;
-}
-
-.actionArrow {
-  width: clamp(26px, 2.4vw, 36px);
-  height: 10px;
-  flex: none;
-  transition: transform 0.4s var(--ease-out);
-}
+/* .actionLabel and .actionArrow went with .action. The label's weight is
+   PillCta's `--w-regular` now rather than a hard 500, and the long arrow
+   that sat OUTSIDE the pill is the disc's arrow INSIDE it — which is the
+   single most visible part of this change and the reason it was asked for:
+   the closing frame's control now behaves like the journal's instead of
+   merely resembling it. */
 
 /* ---------- small screens ----------
 

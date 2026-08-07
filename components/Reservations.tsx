@@ -8,10 +8,9 @@ import {
   useTransform,
 } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import Link from "next/link";
 import styles from "./Reservations.module.css";
 import VideoBackdrop from "./VideoBackdrop";
-import { useMagnet } from "@/lib/useMagnet";
+import PillCta from "./PillCta";
 
 /* ONE clip, not a cycle. The four that used to rotate here weigh 107MB
    combined; this is the only one the page now pays for, and VideoBackdrop
@@ -323,52 +322,30 @@ function LondonClock() {
 }
 
 /**
- * The one action on the page's closing frame — a pill that drifts toward the
- * pointer as it approaches and springs home when it leaves.
+ * The one action on the page's closing frame — and it is the house action
+ * now (components/PillCta.tsx), the same pill-and-disc the journal head and
+ * the About section carry.
  *
- * The physics lives in lib/useMagnet.ts — it is shared with the Blog
- * chapter's archive pill, which asks for the same behaviour. The three-
- * element nesting is load-bearing, not decoration:
+ * WHAT IT WAS: a capsule with a long arrow beside it, at --t-button rather
+ * than --t-label, with the arrow stepping forward on hover and the fill
+ * swapping saffron → cream. Its own object, in other words, on a page that
+ * had three of them. The whole control — nesting, magnet, clip geometry —
+ * moved to PillCta; what is left here is a call and a seat.
  *
- *   .magnetHost   NEVER transformed — its border box is the button's REST
- *                 rect, which is what the offset math has to measure from.
- *                 Measuring the moving element instead makes the magnet its
- *                 own input and it walks away from the pointer.
- *   .magnet       carries the spring transform.
- *   .action       the <Link>. Rides inside the transform, so the hit area and
- *                 the focus ring travel with the glyphs and the button is
- *                 pressable at rest and at full pull alike.
+ * `tone="accent"` is the ONE thing this call site varies, and it is not a
+ * preference. This is the only instance standing on a photograph: the
+ * default maroon fill is very nearly the film under its own scrim, so the
+ * pill would read as a hole rather than an action. The accent keeps it the
+ * one saturated thing on the screen, which is what it always was.
  */
 function MagneticCta() {
-  const { hostRef, magnetic, x, y } = useMagnet<HTMLSpanElement>();
   return (
-    <span ref={hostRef} className={styles.magnetHost}>
-      {/* no style prop at all when the magnet is off, so the computed
-          transform stays `none` rather than an identity matrix */}
-      <motion.span
-        className={styles.magnet}
-        style={magnetic ? { x, y } : undefined}
-      >
-        <Link href="/restaurants" className={styles.action}>
-          <span className={styles.actionLabel}>Choose a restaurant</span>
-          {/* the same long arrow the Blog head's CTA carries — the site's
-              grammar for "further in", as against the diagonal glyph that
-              means "off to somebody else's site" */}
-          <svg
-            className={styles.actionArrow}
-            viewBox="0 0 32 10"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden
-          >
-            <path d="M0 5 H26" />
-            <path d="M22 1 L26 5 L22 9" />
-          </svg>
-        </Link>
-      </motion.span>
-    </span>
+    <PillCta
+      href="/restaurants"
+      className={styles.magnetHost}
+      tone="accent"
+    >
+      Choose a restaurant
+    </PillCta>
   );
 }

@@ -313,53 +313,27 @@
   margin-right: 0.3em;
 }
 
-/* THE PILL, MAROON, DIRECTLY UNDER THE HEADING — the reference's shape and
-   the user's instruction. Note this is the page's THIRD filled control
-   (the reservations index and the footer both carry one); it is here
-   because it was asked for, and because this section is now the home
-   page's only route to /about, so the ask should look like an ask. */
-.pill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6em;
-  padding: 0.95em 1.7em;
-  border-radius: 999px;
-  background: var(--maroon);
-  /* 13.06:1 — the palette's own pairing, inverted */
-  color: var(--cream);
-  font-family: var(--font-sans);
-  font-weight: var(--w-medium);
-  font-size: var(--t-label);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  text-decoration: none;
-  /* the house ramp, tuned for a small raised object — the same four layers
-     the cards carry would pool a 44px cast under a 46px-tall control */
-  box-shadow: var(--shadow-control);
-  transition:
-    background-color 220ms var(--ease-state),
-    box-shadow 220ms var(--ease-state),
-    transform 220ms var(--ease-state);
-}
+/* THE PILL: DELETED, AND THE CONTROL IS SHARED NOW.
 
-@media (hover: hover) {
-  .pill:hover {
-    background: var(--maroon-soft);
-    transform: translateY(-2px);
-    /* the shadow grows with the lift, or the pill reads as sliding up a
-       wall rather than rising off the page */
-    box-shadow: var(--shadow-control-hover);
-  }
-}
+   What stood here was this section's own button — a maroon capsule in the
+   sans at --w-medium, carrying --shadow-control and lifting 2px on hover
+   with the shadow growing under it. It is replaced by <PillCta> (see
+   components/PillCta.module.css), which is the same control the journal
+   head and the closing frame carry.
 
-.pill:active {
-  transform: translateY(0);
-}
+   THE SHADOW AND THE LIFT WENT WITH IT, and that is the visible part of
+   the change rather than a detail: this section is on the cream page a
+   screen above the journal, and a reader scrolling from one to the other
+   was being shown two different ideas of what a filled control is — one
+   that rises off the page when touched, and one whose two halves close on
+   each other. They close now. Nothing here overrides the shared shape, so
+   this instance is IDENTICAL to the journal's rather than a match
+   maintained by hand.
 
-.pill:focus-visible {
-  outline: 2px solid var(--maroon);
-  outline-offset: 3px;
-}
+   NO SEAT RULE EITHER. `.lead` is a flex column at `align-items:
+   flex-start` with its own gap, and PillCta's host is already
+   `width: fit-content` — so the pill sits where it always did without this
+   file saying anything. */
 
 /* 72ch, half as wide again as the 48ch it held — the requested "50% more
    wider", matched to the heading's own widening.
@@ -492,12 +466,13 @@
   }
 }
 
+/* The pill's two entries are gone from here with the pill itself — PillCta
+   carries its own reduced-motion block, so the shared control answers for
+   itself at every call site instead of each chapter remembering to. */
 @media (prefers-reduced-motion: reduce) {
-  .pill,
   .doorFrame {
     transition: none;
   }
-  .pill:hover,
   .door:hover .doorFrame {
     transform: none;
   }

@@ -428,6 +428,7 @@ export default function Discover() {
       id="restaurants"
       data-nav-theme="light"
     >
+
       {/* 12-column editorial head seated on the inset span: display heading
           across columns 1–9 as ONE line, and the small caption closing the
           band from column 9, its right edge on the band's own right edge,
@@ -528,7 +529,7 @@ export default function Discover() {
           duration={0.65}
         />
 
-        {/* HAIRLINE 1 OF 3. It closes the head and opens the grid, which is
+        {/* THE MIDDLE HAIRLINE. It closes the head and opens the grid, which is
             the one place on this chapter a rule earns its keep: it is INSIDE
             a section, organising the section's own parts, rather than
             between two sections. globals.css records the rule for the other
@@ -598,6 +599,19 @@ export default function Discover() {
             );
           })}
         </motion.ul>
+
+      {/* THE CLOSING HAIRLINE — the partner to `.topRule` at the head of
+          this section, so the chapter is bracketed rather than opened and
+          then simply stopped. Presentational, hence aria-hidden and a div
+          rather than an <hr>.
+
+          IT SITS INSIDE THE SECTION'S BOTTOM PADDING, not on its border
+          box: the air of the seam to the statement below stays below the
+          rule, so the line belongs to the restaurants and the gap still
+          does the separating. See the stylesheet for the decision this
+          reopens (Manifesto.module.css: "Do not put the line back") and
+          what changed about the page that makes this a different case. */}
+      <div className={styles.footRule} aria-hidden />
 
       {/* the expanded detail card + backdrop — mounted only while open, so
           AnimatePresence can run the morph back into the grid on close */}

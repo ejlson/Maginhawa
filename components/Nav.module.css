@@ -14,10 +14,74 @@
 }
 
 /* ---- themes: navbar matches the section it sits over ---- */
+/* ── OVER FILM THE BLEND IS GONE, at the user's instruction ──
+   `mix-blend-mode: difference` was subtracting the bar's cream from
+   whatever the footage happened to be showing behind it, so the links held
+   on a dark frame and dissolved on a bright one — measured on the hero's
+   own clip, the right-hand three ("Careers", "Contact Us") sat over a lit
+   shop window and effectively vanished. The rule's own note called it:
+   "the defect is in the blend and it wants a scrim or a theme swap, not a
+   type value."
+
+   It gets both. The blend goes to `normal` so the ink is a known cream
+   rather than a subtraction, and the scrim below gives it a ground.
+   `.light` KEEPS difference — over cream it resolves the links to black at
+   17.61:1, which is better than anything a fixed colour would do there. */
+/* ── THE WORDMARK STANDS DOWN OVER THE HERO ──
+   See the note in Nav.tsx for why. It fades rather than switching, on the
+   bar's own theme clock, so scrolling out of the hero brings the name back
+   as a crossfade rather than a pop.
+
+   ⚠️ OPACITY AND VISIBILITY, NEVER `display: none`. The bar is
+   `justify-content: space-between` with exactly two children, so removing
+   the logo from the flow would leave the link row as an only child and
+   space-between would throw it to the LEFT margin. That would move the
+   links — and with them `--nav-links-left`, which the hero's caption and
+   its wordmark's SIZE are both derived from, so the hero would resize
+   itself every time the bar's logo hid. Keeping the box is load-bearing.
+
+   `visibility` as well as opacity so the invisible logotype is not a
+   silent click target sitting over the film; the link also drops out of
+   the tab order in Nav.tsx. */
+.logoStood {
+  opacity: 0;
+  visibility: hidden;
+}
+
+.logo {
+  transition:
+    opacity 0.45s ease,
+    visibility 0.45s;
+}
+
 .blend {
-  mix-blend-mode: difference;
+  mix-blend-mode: normal;
   color: var(--cream);
   background: transparent;
+}
+
+/* THE SCRIM — a top-down wash under the bar only where it sits on film.
+   Absolutely positioned rather than a background on .nav so it can reach
+   PAST the bar's own height: the fade needs somewhere to die, and a
+   gradient that ends at the padding edge reads as a band with a visible
+   bottom. 220% of the bar, black, dying to nothing.
+
+   Neutral black, not --maroon: the same rule the venue cards' ramp follows
+   — a scrim adds luminance and nothing else, and --maroon is a green-black
+   that would tint the footage under it. */
+.blend::before {
+  content: "";
+  position: absolute;
+  inset: 0 0 auto 0;
+  height: 220%;
+  background: linear-gradient(
+    180deg,
+    rgba(0, 0, 0, 0.55) 0%,
+    rgba(0, 0, 0, 0.3) 45%,
+    rgba(0, 0, 0, 0) 100%
+  );
+  pointer-events: none;
+  z-index: -1;
 }
 /* cream sections: no bar, no line — letters blend like the hero logo */
 .light {
@@ -96,108 +160,95 @@
 .link {
   position: relative;
   display: inline-block;
-  /* HELVETICA, IN CAPS — see --font-ui in globals.css. Since the type
-     collapse this is simply the site's face; the token stays because the
-     navbar is FURNITURE and would follow --font-ui rather than the prose
-     voice if the two ever part again.
+  /* THE DISPLAY SERIF, NOT --font-ui, AND THE MATCH IS THE POINT.
+     These five links now set in the same face as the hero's identifying
+     line — "Filipino at heart. Seven London kitchens…", Hero.module.css
+     .lede — which is --font-display: FreightBig for whoever has it, EB
+     Garamond for everyone else. The bar was the last chrome still speaking
+     in the UI face while the sentence immediately beneath it spoke in the
+     display one, and at nav scale the two read as two different sites.
 
-     WEIGHT 400, DELIBERATELY, AND NOT BECAUSE NOTHING LIGHTER EXISTS.
-     The ask was a lighter navbar, and the honest answer is split by platform.
-     macOS and iOS ship Helvetica Light (usWeightClass 300) inside
-     Helvetica.ttc, so `font-weight: var(--w-hairline)` would give Apple
-     readers a genuinely thinner, genuinely DRAWN navbar — no synthesis, and
-     the About page's kicker uses exactly that token for exactly that reason.
-     Arial and Liberation Sans have no Light, so Windows and Linux would keep
-     Regular.
+     The token comment in globals.css calls the navbar FURNITURE and expects
+     it to follow --font-ui if the two voices ever part again. That is no
+     longer the intent here: the bar is deliberately pinned to the PROSE
+     voice, so if the faces split, these links follow the hero, not the UI.
 
-     It is 400 here anyway, on two grounds. The navbar is the one control
-     present on every route and every viewport, and a control that is
-     visibly thinner on half the audience's machines is a worse outcome than
-     one that is consistently Regular. And 13px caps in Helvetica Light,
-     riding a difference blend over photography, is the exact combination the
-     contrast numbers below are already unhappy about — thinning the strokes
-     is the last thing that situation needs.
+     WEIGHT 400, ONE NOTCH UNDER THE LINE IT MATCHES. The lede runs
+     --w-medium (500) because it is --t-h2 display type over dimmed film,
+     where Garamond's 400 is a text weight and goes weedy. Chrome does not
+     want that ink: --w-regular is the same drawn cut a step lighter, which
+     keeps the navbar subordinate to the sentence it now shares a face with.
 
-     If the platform split is acceptable, this is a ONE-TOKEN change:
-     font-weight: var(--w-hairline). Read the contrast note first.
+     THE NUMBER 400 DID NOT MOVE IN THIS FILE, AND THE BAR STILL GOT
+     LIGHTER — worth spelling out, because the diff shows only a family and
+     a size changing. Lightness is ink density, not the weight keyword, and
+     the FACE carries it: Garamond's stems are thin where Figtree's are
+     even. Rasterised at their real settings and counted (canvas ink probe,
+     "Restaurants"), mean ink per pixel falls from 0.1468 at Figtree 15px to
+     0.1171 at Garamond 18px — 20.2% lighter. Total ink is unchanged at 282
+     either way: the same amount of mark, spread over a larger area. That is
+     the whole effect — lighter texture without a quieter navbar.
 
-     TRACKING 0.11em, up from --tr-label's 0.07em, AND THAT IS THE WHOLE
-     CHANGE. The perceived weight of a line of caps is its ink density, so
-     opening the letters lightens the line without touching a stroke.
-     Measured (scripts/probe-type-navfinal.mjs, INK DENSITY): mean ink per
-     pixel of the text band falls from 0.1551 to 0.1464, a 5.6% lighter line,
-     for 22.9px of extra width. The 821px breakpoint — the last width that
-     shows inline links at all — has it: the set measures 481.6px with 262.9px
-     of free lane to the logo, every link still one line, zero page overflow.
+     NOT --w-hairline, AND NOT FOR THE OLD REASON. This block used to argue
+     300 at length as a platform split — macOS Helvetica Light against an
+     Arial that had none. That argument died with Helvetica and is deleted
+     rather than kept, because it described a face these links no longer
+     use. The live constraint is the AXIS: next/font loads EB Garamond
+     variable (app/layout.tsx), whose wght runs 400–800, so a 300 clamps
+     straight back to 400 for every visitor without Freight installed —
+     lighter on one desktop and unchanged for the audience. 400 is the
+     lightest weight that is real for everyone here.
 
-     OPACITY STAYS AT 0.85, and this is the interesting part. Dropping it to
-     0.78 was tried, because colour is the other classical lever and it does
-     work: at 0.78 the line measures 9.4% lighter instead of 5.6%. It was
-     reverted because it is not free. The bar runs `mix-blend-mode:
-     difference`, so the links' contrast is |backdrop − cream| and alpha
-     scales it directly. Measured against a FROZEN background (paused video —
-     the first attempt measured the film moving between exposures and
-     produced nonsense, including a higher opacity reading lower contrast):
+     SIZE UP TO 1.125rem, AND THE NUMBER IS MEASURED RATHER THAN GUESSED.
+     A face swap at equal point size is not a swap at equal apparent size:
+     canvas-probed in the running page, EB Garamond's x-height is 0.405em
+     against Figtree's 0.500em. The old 0.9375rem Figtree set a 7.5px
+     lowercase; holding that point size on Garamond would have set 6.1px and
+     shrunk the navbar by eye while the CSS number never moved. 18px puts it
+     back at 7.29px. 1rem was tried first and read visibly dainty next to
+     the wordmark.
 
-                        0.07em/.85   0.11em/.78   0.11em/.85
-       /blog                 9.62         7.56         9.41
-       /contact              9.96         8.48         9.98
-       /join-us              9.62         7.56         9.41
-       /restaurants/belly    9.62         7.56         9.41
+     IT STILL FITS THE TIGHT CASE, and the size went UP to get there, which
+     is worth stating because it sounds like it should not. Lowercase serif
+     sets narrower than tracked caps: the set measures 443px at 1440, and at
+     821 — the last width that shows inline links at all, where the flex gap
+     has clamped down — 384.8px with 269.1px of free lane to the wordmark.
+     The caps era needed 481.6px there and left 262.9px. Nothing wraps and
+     the page does not overflow. Re-measure here if a sixth link is added;
+     that lane is the constraint, not the type size.
 
-     Tracking alone is contrast-NEUTRAL. The opacity step costs about two
-     points of ratio everywhere, to buy under four points of lightness. On a
-     control that already sits near the floor over photography (see below),
-     that is the wrong trade.
+     TRACKING STAYS NEAR ZERO. The 0.11em this file used to carry was air
+     for CAPS, which have no ascenders or descenders to separate them.
+     Lowercase serif at text size has that shape variety already and reads
+     as a stretched word if tracked.
 
-     WHAT IS NOT FIXED HERE, because it predates this change and is not a
-     type problem: over photography the difference blend puts at least one of
-     the five links on a patch whose luminance is near the cream's, and there
-     |backdrop − cream| collapses. The SAME frozen-background run measured
-     the worst link at 1.05:1 on the home hero, 2.33:1 on /about and 2.26:1
-     on /restaurants — at the OLD setting, before any of this. The floor for
-     13px text is 4.5:1. That is a real accessibility defect in the blend
-     itself and it wants a scrim or a theme swap, not a tracking value.
-
-     THE PALETTE SOFTENING CHANGED WHAT THE BLEND COMPUTES TO, and it had
-     to be re-measured rather than assumed, because `difference` subtracts
-     channels: cream against the ink used to resolve to rgb(221,203,201),
-     a mark reading 10.22:1 on that ground, and now resolves to
-     rgb(199,171,163) reading 5.86:1. Over a PAINTED ground the bar is
-     therefore still comfortably clear. Over FOOTAGE it is not, and it did
-     not get better: re-measured on /restaurants with the film frozen
-     (scripts/probe-palette-blastradius.mjs) the five links read 4.41 /
-     3.80 / 3.45 / 3.13:1 for Blog, Contact Us, About Us and Careers,
-     against 5.09 / 4.11 / 3.31 / 3.50:1 on the old pair. Same defect,
-     same cause, marginally different numbers — the worst link moved 3.31 →
-     3.13. Still the blend, still wants a scrim or a theme swap. */
-  /* SENTENCE CASE, NOT CAPS — and the tracking table above is now history
-     rather than instruction, because it was measuring a setting these links
-     no longer use. The bar was running three uppercase things at once (the
-     wordmark, these five links, and the two hero buttons below them), and
-     caps only signal while nothing else is shouting. The WORDMARK keeps
-     them; nothing else above the fold does.
-
-     Tracking drops from 0.11em to near zero with the case. Caps need the
-     air because they have no ascenders or descenders to separate them;
-     lowercase already has that shape variety, and holding 0.11em on
-     sentence case reads as a stretched word rather than a tracked label.
-     Size goes up a step for the same reason the hero buttons did —
-     lowercase carries a smaller apparent size than caps at equal points.
-
-     STILL NOT FIXED, and it is not a type problem: over photography the
+     STILL NOT FIXED, and this change does not help it. Over photography the
      difference blend puts at least one link on a patch whose luminance is
      near the cream's, where |backdrop − cream| collapses. Measured on a
-     frozen background at the OLD setting — worst link 1.05:1 on the home
-     hero, 2.33:1 on /about, 2.26:1 on /restaurants, against a 4.5:1 floor.
-     Re-measured after the palette softening, /restaurants reads 4.41 /
-     3.80 / 3.45 / 3.13:1 across the five links (worst 3.31 → 3.13). The
-     full arithmetic of what `difference` now resolves to is in the block
-     above. That is an accessibility defect in the blend and it wants a
-     scrim or a theme swap. Sentence case does not change it either way. */
-  font-family: var(--font-ui);
+     FROZEN background (a moving film between exposures produces nonsense):
+     worst link 1.05:1 on the home hero, 2.33:1 on /about, 2.26:1 on
+     /restaurants; re-measured after the palette softening, /restaurants
+     reads 4.41 / 3.80 / 3.45 / 3.13:1 across the five links against a 4.5:1
+     floor. A serif's thins are thinner than Figtree's at equal size, so if
+     anything the swap costs a little here — which is the other reason the
+     weight did not go down. The defect is in the blend and it wants a scrim
+     or a theme swap, not a type value.
+
+     OVER PAINTED GROUND IT IS FINE, and that is the half worth keeping in
+     view. On the cream pages `difference` subtracts cream from cream and
+     resolves these links to black: probed on /blog, 17.61:1. The problem
+     is film, not the bar. Note also that colour, opacity and blend mode are
+     untouched by this face swap, so every ratio above is the SAME number
+     the Figtree bar measured — what changed is stroke width, not contrast. */
+  /* ── BACK TO THE TEXT FACE, at the user's instruction ──
+     These were swapped to --font-display (the serif) to share the hero
+     lede's voice. The hero's lede is gone — the opening frame is the
+     wordmark now — so the argument for the swap went with it, and the bar
+     reads as chrome again rather than as a second display line competing
+     with the one below it. --font-sans is what it was. */
+  font-family: var(--font-sans);
   font-weight: var(--w-regular);
-  font-size: 0.9375rem;
+  font-size: 1.0625rem;
   letter-spacing: 0.005em;
   color: inherit;
   padding: 6px 0;

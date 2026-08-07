@@ -1,0 +1,271 @@
+/* ═══════════ THE HOUSE ACTION — A PILL AND A DISC THAT CLOSE ═══════════
+
+   ── WHERE THIS CAME FROM ──
+   This was `.ctaHost … .ctaArrow` in Blog.module.css, where it was built
+   for the journal's archive link. It is here because the page now wants
+   the SAME control in three places — the journal head ("Read More"), the
+   About section ("Read our story") and the page's closing frame ("Choose a
+   restaurant") — and those three used to be three different buttons: a
+   mono pill with a closing disc, a sans pill with a drop shadow and a lift,
+   and a saffron pill with a long arrow beside it. Nothing but habit made
+   them different, and three files agreeing about a shape is not the same
+   thing as one shape.
+
+   ⚠️ THE SEAT IS NOT HERE. `.host` is shrink-wrapped and nothing else; how
+   the control is placed — a grid area in the journal head, a stack item in
+   About, a centred block on the closing frame — belongs to the chapter
+   using it, which passes its own class through `className`. Putting a seat
+   in this file would mean every consumer had to unset it.
+
+   ── WHAT THIS REPLACES, AND WHY THE WHOLE MECHANISM WENT ──
+   The two cells used to be fused by an SVG goo filter (#cta-merge in
+   GlassFilters.tsx): a shape layer blurred and thresholded so that two
+   overlapping bodies resolved as one with a concave fillet between them,
+   with the type laid over it unfiltered. It shipped, and it did not read
+   as designed at either end of the move:
+
+     · AT REST the blur softened both bodies before the threshold cut them
+       back, so the pill's ends and the disc came out wobbly and slightly
+       swollen — a blob with a bump on it rather than a crisp pill beside a
+       crisp circle.
+     · ON HOVER the two never resolved into ONE pill. The fillet needs the
+       fields to overlap by better than a third of the disc to close, and
+       at anything less the threshold cuts a visible waist; what the reader
+       saw was two cells pinched together with the arrow hanging over the
+       join.
+
+   The filter is deleted (from GlassFilters.tsx too — nothing else used
+   it). The merge is now GEOMETRY, and it is exact rather than
+   approximated: at full close the pill's right cap and the disc are the
+   same circle, so the union is a mathematically perfect pill with no
+   waist, no fillet, no blur and nothing to threshold.
+
+   ── HOW IT CLOSES ──
+   Three boxes, all --cta-h tall:
+     .body   an absolutely-seated pill spanning the WHOLE control, clipped
+             back on its right by (disc + gap) so at rest it paints only
+             the label's pill.
+     .label  the type, in flow, over the body.
+     .disc   the circle with the arrow, in flow, gap to its left.
+
+   ── BOTH CELLS TRAVEL, AND THE CONTROL COMPRESSES ──
+   At the user's instruction, and in three passes worth recording because
+   each one was a different answer to "what closes":
+     1. the body extended rightward onto a stationary disc — one object
+        eating another;
+     2. the disc travelled left onto a body that only GREW to meet it — so
+        the label sat still and only the arrow moved;
+     3. now BOTH move toward each other. The pill's left edge and its label
+        translate RIGHT by --cta-close, the disc translates LEFT by the
+        same, and the body's clip opens by twice it. The two ends of the
+        control walk in and the closed pill is 2 × --cta-close shorter than
+        the resting one.
+
+   ⚠️ THE THREE VALUES ARE ONE EQUATION. With the body translated `a`, the
+   disc translated `b` and the clip left with inset `R`, the union is a
+   clean pill — the body's right cap centre sitting exactly on the disc's
+   centre — if and only if `R = a + b`. Everything below is written as
+   --cta-close and 2 × --cta-close for that reason. Change one of the three
+   on its own and the join opens a seam or the cap overshoots the circle.
+
+   ⚠️ AND THE CEILING IS THE CLEARANCE, NOT THE GAP. What closes is
+   `a + b` = 2 × --cta-close, and it eats into the distance from the
+   label's ink to the arrow's own inset inside the disc — 33.9px at 1440.
+   At 9.78px of travel each way that leaves ~14px. Past ~17px each way the
+   arrow starts crossing the type, and no amount of the pill being "one
+   shape" rescues a glyph sitting on a word.
+
+   ⚠️ AND THE MOVE IS A CLIP, NOT A WIDTH. The body is full-size at all
+   times and `clip-path` is what shortens it — animating `width` or `right`
+   would re-lay-out the box every frame, where the clip is a paint the
+   compositor already has the geometry for. `inset(… round 999px)` is what
+   keeps the clipped end a semicircular cap rather than a straight cut. */
+
+/* THE HOST — the magnet's measuring box, and it is NEVER transformed. Its
+   border rect is the control's REST rectangle however far the pill has
+   drifted; measuring the moving element instead makes the magnet its own
+   input and it walks away from the pointer (lib/useMagnet.ts). */
+.host {
+  display: block;
+  /* shrink-wrapped to the pill, so the measured rect is the control's and
+     not the cell it happens to be sitting in */
+  width: fit-content;
+}
+
+/* the spring lives here — transform only, never left/top/margin, so the
+   drift composites on the GPU and costs no layout */
+.magnet {
+  display: flex;
+  will-change: transform;
+}
+
+.cta {
+  position: relative;
+  display: inline-flex;
+  align-items: center;
+  /* the disc's diameter, and the pill's height with it — one number so the
+     two cells are the same body */
+  --cta-h: clamp(34px, 2.6vw, 40px);
+  /* the air between the cells at rest */
+  --cta-gap: clamp(6px, 0.6vw, 9px);
+  /* HOW FAR THEY CLOSE — the disc's travel and the clip's remaining inset,
+     which are the same distance by construction. See the warning above:
+     one number, never two. */
+  --cta-close: calc(var(--cta-gap) / 2 + 0.42em);
+  /* THE TWO COLOURS ARE THE ONLY THING A CONSUMER MAY VARY, and only one
+     consumer does. Cream ink on the maroon fill is the palette's own
+     pairing inverted (13.06:1); see `.accent` for the dark-ground case. */
+  --cta-fill: var(--maroon);
+  --cta-ink: var(--cream);
+  color: var(--cta-ink);
+  font-family: var(--font-mono);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label-mono);
+  text-transform: uppercase;
+  white-space: nowrap;
+  text-decoration: none;
+}
+
+/* THE ONE VARIANT — for the closing frame, which is the only place this
+   control sits on a PHOTOGRAPH rather than on the cream.
+
+   The maroon fill is #411613; over a dark film under a scrim it is very
+   nearly the ground itself, so the default pill would read there as a hole
+   rather than as an action. --saffron (the accent, a deep green despite the
+   name — see globals.css) is already the site's one saturated token and is
+   spent nowhere else on that screen, so the eye still has exactly one place
+   to land. Cream on it measures 4.55:1, clear of the 4.5 floor this
+   uppercase label answers to. */
+/* ── CREAM ON A PHOTOGRAPH ──
+   The hero sits on film, where both of the tones above are dark inks on a
+   dark ground: the label reads and the PILL disappears, so the control
+   stops being an object and becomes a floating word. Inverted, it is the
+   only opaque thing on the frame, which is what makes it the loudest
+   without any colour at all — the same argument the venue cards' primary
+   pill is built on. Ink on cream is 9.80:1. */
+.cream {
+  --cta-fill: var(--cream);
+  --cta-ink: var(--maroon);
+}
+
+.accent {
+  --cta-fill: var(--saffron);
+  --cta-ink: var(--cream);
+}
+
+/* THE BODY — one pill covering the whole control, clipped back to the
+   label at rest. No filter, no blur, and no background on `.cta` itself: a
+   fill on the anchor would sit under both cells as a third, unclipped
+   rectangle and give the join a hard outline to happen inside. */
+.body {
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  border-radius: 999px;
+  background: var(--cta-fill);
+  clip-path: inset(0 calc(var(--cta-h) + var(--cta-gap)) 0 0 round 999px);
+  transition:
+    clip-path 460ms var(--ease-drawer),
+    transform 460ms var(--ease-drawer);
+}
+
+/* THE TYPE — in flow over the body, and it is what sizes the control. It
+   travels with the body rather than sitting still while the arrow comes to
+   it: the label and the pill it is set on are one cell. */
+.label {
+  position: relative;
+  z-index: 1;
+  display: inline-flex;
+  align-items: center;
+  height: var(--cta-h);
+  padding-inline: 1.3em;
+  font-weight: var(--w-regular);
+  transition: transform 460ms var(--ease-drawer);
+}
+
+/* THE DISC — its own circle, carrying the arrow. It travels left into the
+   body's opening clip; the two meet at the midpoint of the gap. */
+.disc {
+  position: relative;
+  z-index: 1;
+  flex: none;
+  display: grid;
+  place-items: center;
+  width: var(--cta-h);
+  height: var(--cta-h);
+  margin-left: var(--cta-gap);
+  border-radius: 50%;
+  background: var(--cta-fill);
+  transition: transform 460ms var(--ease-drawer);
+}
+
+.arrow {
+  width: 55%;
+  height: 10px;
+  transition: transform 0.45s var(--ease-drawer);
+}
+
+/* ── THE CLOSE ──
+   Both cells on --ease-drawer, which is the curve every other joining move
+   on this page uses (the card lift, the photo zoom): most of the distance
+   early, then a settle. 460ms rather than the ~300 a colour change takes —
+   this is two objects travelling and being seen to travel.
+
+   THE ARROW WAITS. It only steps forward once the cells have closed most
+   of the distance, so the sequence is join-then-point rather than two
+   unrelated things moving at once. That is the 0.18s delay. */
+.cta:hover .body,
+.cta:focus-visible .body {
+  /* R = a + b — see the equation in the block comment above */
+  clip-path: inset(0 calc(var(--cta-close) * 2) 0 0 round 999px);
+  transform: translateX(var(--cta-close));
+}
+
+.cta:hover .label,
+.cta:focus-visible .label {
+  transform: translateX(var(--cta-close));
+}
+
+.cta:hover .disc,
+.cta:focus-visible .disc {
+  transform: translateX(calc(-1 * var(--cta-close)));
+}
+
+.cta:hover .arrow,
+.cta:focus-visible .arrow {
+  transform: translateX(4px);
+  transition-delay: 0.18s;
+}
+
+/* The ring is the FILL, so it is legible against whatever the control is
+   standing on rather than against one assumed ground — a maroon ring is
+   invisible on the closing frame's film, and a cream one is invisible on
+   the cream page. Offset 4px keeps it clear of the pill's own edge. */
+.cta:focus-visible {
+  outline: 2px solid var(--cta-fill);
+  outline-offset: 4px;
+  border-radius: 999px;
+}
+
+/* The accent pill is the one that stands on a photograph, and there the
+   fill-coloured ring has a second problem the cream chapters do not have:
+   the film behind it is arbitrary. A cream ring at the same offset sits on
+   the scrim and measures 4.55:1 against the accent it encircles, so it is
+   its own indicator; the inset ring is the half that survives when the
+   outer one lands on a bright frame. Each ring owns one ground. */
+.accent:focus-visible {
+  outline-color: var(--cream);
+  box-shadow: inset 0 0 0 2px var(--maroon);
+}
+
+/* A reader who asked for less motion gets the END STATE on hover, not the
+   journey: the cells are still one pill under the pointer, they simply
+   arrive there. (The magnet does not run at all — see lib/useMagnet.ts.) */
+@media (prefers-reduced-motion: reduce) {
+  .body,
+  .label,
+  .disc,
+  .arrow {
+    transition: none;
+  }
+}

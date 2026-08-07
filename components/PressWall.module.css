@@ -128,8 +128,34 @@
    ⚠️ IF A SECTION WITHOUT VERTICAL PADDING EVER FOLLOWS THIS ONE, the
    break has to come back here — this value now assumes its neighbour
    brings its own. */
+/* ── AND THE TOP OPENS BACK UP, at the user's instruction, so the lane sits
+   with the SAME air above it as below. The two sides are now symmetrical by
+   construction rather than by a tuned number, and the arithmetic is worth
+   writing down because neither gap is owned by this box alone:
+
+     above = AboutSplit's 12px bottom pad + THIS padding
+     below = this section's 12px bottom pad + the journal's own breath
+
+   AboutSplit closes on --grid-gutter and so does this section, so those two
+   terms already cancel. Setting this to the journal's own clamp makes the
+   remaining terms cancel too: 12 + 81 above against 12 + 81 below at
+   1440x900, and equal at every viewport because both sides are the same
+   clamp() rather than two values that happen to agree at one width.
+
+   ⚠️ IT IS THE JOURNAL'S NUMBER, NOT A COPY OF IT IN SPIRIT — if
+   Blog.module.css's `.section` padding moves, this has to move with it or
+   the lane goes lopsided. That is the cost of a gap that two stylesheets
+   own between them, and it is cheaper than the alternative (a wrapper
+   element around a section that has no other reason to exist).
+
+   THIS RETIRES THE "BOUND TIGHT TO ABOUT" READING above. That argument —
+   this section credentials the chapter above it, so it belongs to About —
+   bought a 24px seam up and a full break down. The lane is now equidistant
+   and reads as furniture BETWEEN the two chapters rather than as the foot
+   of the first. That is a real change of relationship and it is the one
+   that was asked for. */
 .section {
-  padding: var(--grid-gutter) var(--pad-x);
+  padding: clamp(64px, 9vh, 132px) var(--pad-x) var(--grid-gutter);
   background: none;
   color: var(--maroon);
 }

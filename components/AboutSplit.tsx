@@ -4,6 +4,7 @@ import Image from "next/image";
 import Link from "next/link";
 import { useReducedMotion } from "framer-motion";
 import styles from "./AboutSplit.module.css";
+import PillCta from "./PillCta";
 
 /**
  * The group's story, as a 50/50 split — photograph left, text right.
@@ -186,9 +187,11 @@ export default function AboutSplit() {
               {HEADING}
             </h2>
 
-            <Link href="/about" className={styles.pill}>
-              Read our story
-            </Link>
+            {/* the house action — the same control the journal head and the
+                closing frame carry (components/PillCta.tsx). No seat class:
+                `.lead` is a flex column at flex-start and the host is
+                already fit-content. */}
+            <PillCta href="/about">Read our story</PillCta>
           </div>
 
           <div className={styles.readingBlock}>

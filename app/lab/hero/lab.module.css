@@ -1,0 +1,279 @@
+/* HERO LAB — two directions on the same clip, one after the other.
+   A THROWAWAY ROUTE. Nothing here is imported by the site; when a direction
+   is picked it gets rebuilt in components/Hero.tsx against the real
+   component's scroll parallax and reduced-motion handling, and this whole
+   folder is deleted. */
+
+.page {
+  background: var(--cream);
+}
+
+/* the strip of type that names each variant — lab furniture, not design */
+.tag {
+  position: sticky;
+  top: 0;
+  z-index: 10;
+  display: flex;
+  align-items: baseline;
+  gap: 1em;
+  padding: 10px var(--grid-gutter);
+  background: var(--maroon);
+  color: var(--cream);
+  font-family: var(--font-mono);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label-mono);
+  text-transform: uppercase;
+}
+.tagNote {
+  font-family: var(--font-sans);
+  letter-spacing: 0;
+  text-transform: none;
+  opacity: 0.7;
+}
+
+/* ═══════════════════ SHARED: THE FILM AND ITS GRAIN ═══════════════════ */
+
+.film {
+  position: absolute;
+  inset: 0;
+  overflow: hidden;
+}
+
+.video {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  /* the site hero's own grade */
+  filter: brightness(0.62);
+}
+
+/* ── THE GRAIN ──
+   An SVG feTurbulence rendered once as a data URI and tiled. It is the
+   cheapest real grain available: no second video track, no canvas loop, no
+   image request — one gzipped string in the stylesheet, composited by the
+   GPU as a single layer.
+
+   `mix-blend-mode: overlay` rather than a flat opacity: overlay leaves the
+   midtones alone and works into the shadows and highlights, which is what
+   film grain does. On a flat alpha the whole frame just goes milky.
+
+   IT IS NOT ANIMATED. Moving grain reads as noise on a broken stream; still
+   grain reads as film stock. It also costs nothing per frame. */
+.grain {
+  position: absolute;
+  inset: -50%;
+  background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='180' height='180'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='3' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='180' height='180' filter='url(%23n)' opacity='0.42'/%3E%3C/svg%3E");
+  mix-blend-mode: overlay;
+  opacity: 0.55;
+  pointer-events: none;
+}
+
+/* ═══════════════════ A — THE CURRENT HERO, PLUS GRAIN ═══════════════════
+   Everything is the shipped hero: full bleed, the statement at --t-display
+   left-ranged on the 12px measure, two pills. The ONLY additions are the
+   grain above and the ramp below, which is the cheap version of the fix —
+   it answers the legibility measurement (worst ground 2.25:1) without
+   touching the layout. */
+.a {
+  position: relative;
+  height: 100svh;
+  overflow: hidden;
+  isolation: isolate;
+}
+
+/* the ramp: the venue cards' material, turned on its side. It rises from
+   the bottom-LEFT corner rather than straight up the bottom edge, because
+   that is where the type is and a full-width band would darken the whole
+   frame to protect one corner. */
+.aRamp {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    105deg,
+    color-mix(in srgb, #000 72%, transparent) 0%,
+    color-mix(in srgb, #000 52%, transparent) 26%,
+    color-mix(in srgb, #000 16%, transparent) 52%,
+    color-mix(in srgb, #000 0%, transparent) 72%
+  );
+  pointer-events: none;
+}
+
+.aLockup {
+  position: absolute;
+  inset: 0;
+  padding: 0 var(--grid-gutter) clamp(56px, 11vh, 132px);
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  justify-content: flex-end;
+}
+
+.aLede {
+  margin: 0 0 clamp(22px, 3.2vh, 40px);
+  max-width: 26ch;
+  font-family: var(--font-display);
+  font-weight: var(--w-medium);
+  font-size: var(--t-display);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tr-display);
+  color: var(--cream);
+}
+.aClause {
+  display: block;
+  text-wrap: balance;
+}
+
+/* ═══════════════════ B — THE PLATE ═══════════════════
+   The Helious reading: an inset rounded plate, the wordmark set giant along
+   the bottom and cropped by the frame, the identifying sentence demoted to
+   small type at the right, ONE action.
+
+   THE PLATE IS INSET ON THE PAGE'S OWN MEASURE (12px) and takes
+   --radius-tile, so the hero is the same object as every photograph below
+   it rather than a window the page happens to start with. */
+.b {
+  position: relative;
+  height: 100svh;
+  padding: var(--grid-gutter);
+  background: var(--cream);
+}
+
+.bPlate {
+  position: relative;
+  height: 100%;
+  overflow: hidden;
+  border-radius: var(--radius-tile);
+  isolation: isolate;
+  display: grid;
+  /* the wordmark takes the row, the copy column rides its right side */
+  grid-template-rows: 1fr auto;
+}
+
+/* the same corner ramp as A — the wordmark sits in the bottom-left and
+   needs the same ground */
+.bRamp {
+  position: absolute;
+  inset: 0;
+  background: linear-gradient(
+    100deg,
+    color-mix(in srgb, #000 74%, transparent) 0%,
+    color-mix(in srgb, #000 56%, transparent) 30%,
+    color-mix(in srgb, #000 22%, transparent) 58%,
+    color-mix(in srgb, #000 0%, transparent) 78%
+  );
+  pointer-events: none;
+}
+
+.bFoot {
+  position: relative;
+  z-index: 2;
+  display: grid;
+  grid-template-columns: 1fr auto;
+  align-items: end;
+  gap: clamp(20px, 3vw, 56px);
+  padding: clamp(18px, 2.4vw, 34px);
+}
+
+/* ── THE WORDMARK ──
+   `10.5vw` rather than a clamp, and no max: the whole point is that it is
+   sized to the FRAME, so it crops the same way at every width. At 1440 it
+   is ~151px; the word is 10 characters, which at this face and size runs
+   about two thirds of the plate.
+
+   line-height 0.78 pulls the box in to the cap height so the baseline can
+   sit near the plate's bottom edge without a band of empty leading under
+   it — the thing that makes a giant word read as SET on the frame rather
+   than as placed in a box on it. */
+.bMark {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--w-medium);
+  font-size: 10.5vw;
+  line-height: 0.78;
+  letter-spacing: -0.015em;
+  color: var(--cream);
+  white-space: nowrap;
+}
+
+/* the identifying sentence, DEMOTED. This is the move worth judging: at
+   --t-display it was the hero; at 15px it is the caption to the word, which
+   is what it always read like. Three lines, tight, ragged right. */
+.bCopy {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: clamp(14px, 1.6vw, 20px);
+  max-width: 34ch;
+  padding-bottom: 0.35em;
+}
+
+.bSentence {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: var(--w-regular);
+  font-size: clamp(0.875rem, 1.05vw, 0.9375rem);
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--cream) 88%, #000);
+}
+
+.bActions {
+  display: flex;
+  align-items: center;
+  gap: clamp(12px, 1.4vw, 20px);
+}
+
+/* the cream pill + its arrow disc — the same two-cell control the journal's
+   head carries, so the page's one loud action is an object it already owns */
+.bPill {
+  display: inline-flex;
+  align-items: center;
+  height: clamp(38px, 3vw, 46px);
+  padding-inline: 1.4em;
+  border-radius: 999px;
+  background: var(--cream);
+  color: var(--maroon);
+  font-family: var(--font-mono);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label-mono);
+  text-transform: uppercase;
+  text-decoration: none;
+  white-space: nowrap;
+}
+
+.bDisc {
+  display: grid;
+  place-items: center;
+  width: clamp(38px, 3vw, 46px);
+  aspect-ratio: 1;
+  border-radius: 50%;
+  background: var(--cream);
+  color: var(--maroon);
+}
+.bDisc svg {
+  width: 52%;
+  height: 10px;
+}
+
+/* the second action, demoted to a text link — one loud control per frame */
+.bLink {
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  color: var(--cream);
+  text-decoration: none;
+  border-bottom: 1px solid color-mix(in srgb, var(--cream) 45%, transparent);
+  padding-bottom: 2px;
+}
+
+@media (max-width: 700px) {
+  /* the wordmark stops being a full-width crop and the foot stacks —
+     10.5vw of a phone is 41px, which is not a giant word, so it takes a
+     floor and the copy goes underneath it */
+  .bMark {
+    font-size: clamp(3rem, 16vw, 8rem);
+  }
+  .bFoot {
+    grid-template-columns: 1fr;
+    align-items: start;
+    gap: 18px;
+  }
+}
