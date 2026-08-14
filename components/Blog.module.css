@@ -59,28 +59,54 @@
      heading is inside this sheet's own padding, which is where it belongs
      whether or not anything is being covered. */
   margin-top: 0;
-  /* EVENLY FRAMED, because the sheet is taller than its contents.
-     `min-height` below forces a full screen for the pin's sake, and the
-     journal only fills part of it — so the surplus used to pile up entirely
-     under the last card and then the page added --home-gap on top of it.
-     Measured at 1920x1080: 97px of air above the heading against 556px
-     below the strip. The padding is now a MINIMUM breath on both edges and
-     `justify-content: center` splits whatever is left over equally, so the
-     journal sits centred in its own sheet and the two gaps match by
-     construction at every viewport instead of by a tuned number.
-     The film below drops its own --home-gap to suit (see
-     Reservations.module.css): this sheet's bottom breath IS the gap
-     to the film now, which is the only way the two can be equal — the
-     surplus alone already exceeds the top padding. */
-  padding: clamp(64px, 9vh, 132px) 0;
-  justify-content: center;
-  /* A SHEET THAT COVERS A SCREEN HAS TO BE A SCREEN. The pinned photograph
-     is held by its containing block, which ends at THIS section's bottom —
-     so a journal shorter than the viewport runs the pin out before its own
-     top edge has finished crossing, and the photograph starts scrolling
-     again with a strip of itself still showing. At 782px it was releasing
-     118px early. Measured: probe-journal.mjs, PIN. */
-  min-height: 100svh;
+  /* ⚠️ THE TOP BREATH IS NOW A FIXED, DERIVED NUMBER, AND THE FORCED SCREEN
+     HEIGHT THAT USED TO FIGHT IT IS GONE. All three declarations below
+     changed together; they only make sense read together.
+
+     WHAT WAS ASKED FOR: the gap from the bottom of the About picture down to
+     THIS chapter's opening rule must equal the gap from AboutSplit's own
+     opening rule down to the top of that picture. That upper gap is
+     `calc(var(--grid-gutter) * 4)` — 48px, the story band's own gap (see
+     .rule in AboutSplit.module.css). AboutSplit contributes
+     var(--grid-gutter) of bottom padding on its way out, so what is left for
+     this chapter to carry is exactly THREE gutters, and that is what the top
+     padding now is. Derived from the one token, so if --grid-gutter moves,
+     both sides of the picture move with it and stay equal.
+
+     WHY min-height HAD TO GO — AND WHY THAT IS A DELETION, NOT A REGRESSION.
+     It read `min-height: 100svh`, justified as "A SHEET THAT COVERS A SCREEN
+     HAS TO BE A SCREEN … the pinned photograph is held by its containing
+     block, which ends at THIS section's bottom". THERE IS NO PIN. This
+     file's own note twenty lines above says so ("The pin is gone"), and
+     Experience.tsx says it of the whole page ("NOTHING ON THIS PAGE IS
+     PINNED"). The declaration was holding a screen open for a relationship
+     that had already been removed.
+
+     It was also the thing making the requested gap unreachable. A forced
+     900px against ~733px of content leaves a surplus, `justify-content:
+     center` split it in half, and half of any padding change was therefore
+     swallowed — the algebra puts the rule's closest possible approach at
+     ~43px from the section top when 36px was needed. Not tunable; blocked.
+
+     `justify-content: center` goes with it. With the height no longer
+     forced there is no surplus left to distribute, so centring became a
+     no-op — and an inert declaration that silently governs spacing the
+     moment someone restores a height is worse than no declaration.
+
+     WHAT IT COSTS, stated plainly: this chapter is no longer guaranteed to
+     be a full screen. At 1440x900 it barely moves (~900px → ~850px), but on
+     a tall window it is now content-height and will NOT fill the viewport
+     the way the hero and the About split still do. That is the real trade
+     for a top gap that holds its number at every viewport. The alternative —
+     keeping the forced screen and setting `justify-content: flex-start` —
+     hits 48px here but drops the entire surplus under the last card: ~311px
+     of empty cream above the marquee at 1080 tall. This was the better half
+     of that choice, not a free one.
+
+     The bottom breath is unchanged and still owns the seam below: press sits
+     directly under this chapter now and takes 0 on top, precisely because
+     this value is here (see PressWall.module.css). */
+  padding: calc(var(--grid-gutter) * 3) 0 clamp(64px, 9vh, 132px);
   display: flex;
   flex-direction: column;
   /* head → body gap on the Discover head's rhythm — the display heading
@@ -163,8 +189,10 @@
   align-items: start;
   /* the label row and the display line read as one lockup — the air that
      separates the head from the pictures is the rule's margin, not this.
-     NAMED because .headRule subtracts it; value unchanged. */
-  --head-gap: clamp(10px, 1.4vh, 16px);
+     NAMED because .headRule subtracts it; value unchanged — it now points
+     at the global --space-xs-y, which holds the same clamp this line used
+     to spell out. */
+  --head-gap: var(--space-xs-y);
   gap: var(--head-gap);
   margin-inline: var(--blog-margin);
 }
@@ -176,7 +204,7 @@
   display: flex;
   align-items: center;
   justify-content: space-between;
-  gap: 1em;
+  gap: var(--lockup-gap-lg);
   width: 100%;
 }
 
@@ -187,7 +215,7 @@
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 0.62em;
+  gap: var(--chapter-label-gap);
   font-family: var(--font-sans);
   font-weight: var(--w-medium);
   font-size: var(--t-label);
@@ -212,15 +240,17 @@
 /* THE DISPLAY LINE. It replaces `Blog.` at clamp(3rem, 7.2vw, 6.75rem) —
    a one-word title at nearly twice this size, in a grammar no other
    chapter on the page uses. Same clamp and same em measure as Discover's
-   lede and /blog's title, so the three open identically. */
+   lede and /blog's title, so the three open identically. The clamp and
+   the 1.1 leading now live in globals as --t-chapter / --lh-chapter, so
+   the three cannot drift apart. Same values, one name. */
 .lede {
   grid-area: lede;
   margin: 0;
   max-width: 17.7em;
   font-family: var(--font-display);
   font-weight: var(--w-regular);
-  font-size: clamp(2.15rem, 4.7vw, 4.1rem);
-  line-height: 1.1;
+  font-size: var(--t-chapter);
+  line-height: var(--lh-chapter);
   letter-spacing: var(--tr-display);
   color: var(--maroon);
 }
@@ -448,7 +478,7 @@
   font-weight: var(--w-medium);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label-mono);
-  line-height: 1;
+  line-height: var(--lh-flush);
   text-transform: uppercase;
   color: var(--cream);
 }
@@ -508,7 +538,7 @@
 .featureCta {
   display: inline-flex;
   align-items: center;
-  gap: 0.7em;
+  gap: var(--lockup-gap);
   flex: none;
   min-height: clamp(28px, 2.5vw, 34px);
   padding: 0 1.1em;
@@ -519,7 +549,7 @@
   font-weight: var(--w-medium);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label-mono);
-  line-height: 1;
+  line-height: var(--lh-flush);
   text-transform: uppercase;
   white-space: nowrap;
   transition: transform 400ms var(--ease-drawer);

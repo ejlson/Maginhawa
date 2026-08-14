@@ -38,6 +38,15 @@
    overhangs by 36px at 1440x900. That is the price of a centred rule and a
    full-height picture, and the picture is the thing worth keeping. */
 .section {
+  /* ONE SIZE, TWO TITLES. .caption (over the photograph) and .heading (the
+     text column) set the same clamp on purpose — "a title facing a title
+     across the split" — and each used to spell it out, which is two chances
+     to retune one without the other. Declared once here so both read it.
+     LOCAL, not a globals token: two uses in one file is a local decision
+     (the precedent is Discover/Blog's --head-gap), and it is NOT
+     --t-chapter despite 4.2 ≈ 4.1 — different min (2.4 vs 2.15) and
+     different slope (4.2vw vs 4.7vw), i.e. this chapter's own tuned curve. */
+  --split-title-size: clamp(2.4rem, 4.2vw, 4.2rem);
   background: var(--cream);
   color: var(--maroon);
   min-height: calc(100svh + var(--grid-gutter) * 3);
@@ -134,6 +143,13 @@
   height: 1px;
   background: var(--rule);
   margin-bottom: calc(var(--grid-gutter) * 4);
+  /* THE RULE DRAWS ITSELF as the chapter opens (see RULE in AboutSplit.tsx).
+     It scales from the LEFT because that is the direction the lines beneath
+     it are read in — origin `center` would make it open like a pair of
+     doors, which is a different and much louder gesture than a mark being
+     drawn. Declared here rather than passed as a Motion prop so the
+     geometry sits with the element it belongs to. */
+  transform-origin: left center;
 }
 
 .split {
@@ -219,28 +235,80 @@
   pointer-events: none;
 }
 
+/* ⚠️ FLEX, AND THE REASON IS THE CONTRAST GUARANTEE ABOVE — NOT LAYOUT.
+   Read this before changing `display` back.
+
+   The two lines are now clip windows so they can rise separately (see LINE
+   in AboutSplit.tsx), and a clip window over display type has to be padded
+   taller than its line box or it shears descenders — "Where it began." has
+   a `g`. SplitWords solves that with `padding-block: 0.3em` cancelled by
+   `margin-block: -0.3em`, which nets to zero because ITS masks sit side by
+   side on one line.
+
+   STACKED AS BLOCKS THEY DO NOT NET TO ZERO. Adjacent block siblings
+   collapse their vertical margins, and two negative margins collapse to the
+   MORE negative rather than summing — so the pair contributes −0.3em
+   against +0.6em of padding and the caption box GROWS by ~0.3em, i.e. ~20px
+   at the top of --split-title-size.
+
+   That is not cosmetic. .mediaScrim guarantees its 72% floor for the bottom
+   200px only, and this caption is ~194px tall — SIX PIXELS of headroom. A
+   20px growth pushes the top line out of the guaranteed band and back into
+   the 2.33:1 failure that stylesheet's own note records.
+
+   Flex items do not collapse margins. Both −0.3em margins apply, they
+   cancel both paddings exactly, and the box measures what it always did. */
 .mediaLine {
   position: absolute;
   left: 0;
   bottom: 0;
+  display: flex;
+  flex-direction: column;
   /* held inside the ramp's guaranteed band — see .mediaScrim */
   padding: clamp(20px, 3vw, 34px);
   max-width: 22ch;
   font-family: var(--font-display);
   font-weight: var(--w-hairline);
-  /* THE SAME SIZE AS THE HEADING OPPOSITE — literally the same clamp, so
-     the two cannot drift apart when either is tuned. The caption is now a
-     title facing a title across the split rather than a note under a
-     picture.
+  /* THE SAME SIZE AS THE HEADING OPPOSITE — both read the module's own
+     --split-title-size (declared on .section), so the two cannot drift
+     apart when either is tuned. The caption is now a title facing a title
+     across the split rather than a note under a picture.
      WATCH THE SCRIM WHEN CHANGING THIS. Two lines at 4.2rem plus this
      padding makes a caption box ~194px tall, and the scrim only guarantees
      its 72% floor for the bottom 200px (see .mediaScrim). There is 6px of
      headroom. A third line, or a larger size, puts the top line out of the
      guaranteed band and back into the 2.33:1 failure this already had once. */
-  font-size: clamp(2.4rem, 4.2vw, 4.2rem);
+  font-size: var(--split-title-size);
   line-height: 1.04;
   letter-spacing: var(--tr-display);
   color: var(--cream);
+}
+
+/* One caption line's clip window.
+
+   THE PADDING/MARGIN PAIR IS COPIED FROM SplitWords' `.mask` AND SO IS THE
+   0.3em — the 145% the line travels is derived from this number, not chosen
+   (a word has to clear a window padded taller than its own line box). Move
+   one and move the other, in both files. See .mediaLine above for why the
+   pair only cancels because the parent is flex.
+
+   THE MASKS STRETCH rather than shrink to their text, which is what keeps
+   `overflow: hidden` safe on the horizontal axis. SplitWords needed an
+   `overflow: visible clip` escape hatch because its masks hug each word and
+   a swash or a negative letter-space then overhangs the clip. These are as
+   wide as .mediaLine's 22ch measure and the longest line is ~15ch, so the
+   horizontal edges sit far from any glyph and there is nothing to shear. */
+.lineMask {
+  overflow: hidden;
+  padding-block: 0.3em;
+  margin-block: -0.3em;
+}
+
+/* the moving part. inline-block so the box hugs the text and translateY's
+   percentage resolves against the line's own height, matching SplitWords. */
+.lineInner {
+  display: inline-block;
+  will-change: transform;
 }
 
 /* ── the text column ── */
@@ -300,7 +368,7 @@
   max-width: 22ch;
   font-family: var(--font-display);
   font-weight: var(--w-regular);
-  font-size: clamp(2.4rem, 4.2vw, 4.2rem);
+  font-size: var(--split-title-size);
   line-height: 1.04;
   letter-spacing: var(--tr-display);
   color: var(--maroon);
@@ -345,7 +413,7 @@
 .readingBlock {
   display: flex;
   flex-direction: column;
-  gap: clamp(14px, 2vh, 22px);
+  gap: var(--space-sm-y);
   max-width: 72ch;
 }
 
@@ -388,7 +456,7 @@
 .door {
   display: flex;
   flex-direction: column;
-  gap: 0.7em;
+  gap: var(--lockup-gap);
   text-decoration: none;
   color: var(--maroon-soft);
 }
@@ -417,6 +485,24 @@
   transition:
     transform 260ms var(--ease-state),
     box-shadow 260ms var(--ease-state);
+}
+
+/* ⚠️ THE PRINT'S CLIP WINDOW, AND IT IS A SEPARATE ELEMENT FOR ONE HARD
+   REASON: `clip-path` clips an element's ENTIRE rendering, box-shadow
+   included, and Motion leaves the resolved value on the element as an
+   inline style once the animation rests. Running the wipe on .doorFrame
+   itself would therefore leave `inset(0% 0 0 0)` sitting there forever and
+   all three prints would quietly lose --shadow-card — a permanent visual
+   regression produced by a finished animation, which is close to
+   undiagnosable if you are looking at the motion rather than at the shadow.
+   The clip lives in here; the shadow stays out there.
+
+   `border-radius: inherit` keeps .doorImg's own `inherit` resolving to the
+   frame's --radius-tile now that this sits between them. */
+.doorClip {
+  position: absolute;
+  inset: 0;
+  border-radius: inherit;
 }
 
 .doorImg {
@@ -475,5 +561,11 @@
   }
   .door:hover .doorFrame {
     transform: none;
+  }
+  /* the caption lines never travel under reduced motion (the component
+     swaps every variant for a plain fade), so the promotion would be a
+     compositor layer held for nothing */
+  .lineInner {
+    will-change: auto;
   }
 }

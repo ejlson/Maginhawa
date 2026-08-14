@@ -33,16 +33,16 @@
 
 .name {
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   font-size: clamp(3.2rem, 9vw, 8rem);
-  line-height: 0.92;
+  line-height: var(--lh-display);
   letter-spacing: -0.02em;
   margin: 0;
 }
 
 .tagline {
   font-family: var(--font-display-sm);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   font-size: var(--t-h3);
   line-height: var(--lh-heading);
   letter-spacing: -0.005em;
@@ -72,9 +72,9 @@
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
-  font-weight: 500;
+  font-weight: var(--w-medium);
   opacity: 0.65;
-  margin-bottom: 4px;
+  margin-bottom: var(--space-4xs);
 }
 
 .actions {
@@ -87,7 +87,7 @@
 .btn {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-xs);
   padding: 12px 22px;
   border: 1px solid var(--maroon);
   background: transparent;
@@ -131,7 +131,7 @@
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: clamp(14px, 2vh, 22px);
+  gap: var(--space-sm-y);
   margin-bottom: clamp(36px, 6vh, 64px);
   max-width: 26ch;
 }
@@ -149,7 +149,7 @@
 
 .pressLeadText {
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   font-size: var(--t-h2);
   line-height: 1.08;
   letter-spacing: -0.018em;
@@ -180,19 +180,38 @@
   border-bottom: 1px solid var(--rule);
   text-decoration: none;
   color: inherit;
-  transition: background 0.25s ease, padding 0.25s ease;
+  --press-indent: 0px;
+  transition: background 0.25s ease;
 }
+
+/* THE INDENT, OFF THE LAYOUT PATH — the same move as `.roleRow` over in
+   JoinUs.module.css, and the reasoning there applies here too: animating
+   `padding-left` re-lays-out the row every frame, and on a grid it re-flows
+   the fr tracks rather than simply indenting them.
+
+   One-sided padding, so only P is taken out of the content box (not 2P) and
+   a track with `Pfx` fr ahead of it out of `S` total moves by P·(S − Pfx)/S.
+   For `1.1fr 2.4fr auto` (S = 3.5):
+
+     .pressOutlet  +P    .pressFeature  +2.4/3.5 · P    .pressArrow  0
+
+   The arrow sits in the trailing `auto` track and never moved with the
+   padding, so it is left alone — its own translateX(4px) on hover below is
+   the whole of its motion, as before.
+
+   The tint stays on the row, so it still spans the full width. */
 .pressItem:hover {
   background: rgba(47, 0, 0, 0.04);
-  padding-left: clamp(8px, 1.4vw, 18px);
+  --press-indent: clamp(8px, 1.4vw, 18px);
 }
 
 .pressOutlet {
   font-family: var(--font-display-sm);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   font-size: var(--t-h3);
   line-height: var(--lh-heading);
-  transition: color 0.28s ease;
+  translate: var(--press-indent);
+  transition: color 0.28s ease, translate 0.25s ease;
 }
 
 .pressItem:hover .pressOutlet,
@@ -205,6 +224,8 @@
   font-size: var(--t-body);
   line-height: var(--lh-body);
   opacity: 0.85;
+  translate: calc(var(--press-indent) * 2.4 / 3.5);
+  transition: translate 0.25s ease;
 }
 
 .pressArrow {
@@ -221,8 +242,11 @@
 @media (max-width: 720px) {
   .pressItem {
     grid-template-columns: 1fr;
-    gap: 6px;
+    gap: var(--space-3xs);
   }
+  /* one column, so the feature starts at the row's leading edge like the
+     outlet and takes the whole indent rather than a share of it */
+  .pressFeature { translate: var(--press-indent); }
   .pressArrow { display: none; }
   .pressHead { grid-template-columns: 1fr; }
 }
@@ -231,7 +255,7 @@
 .back {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2xs);
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);

@@ -22,9 +22,12 @@
    .lede / .headRule. Two chapters opening in the same grammar have to
    open in the same MEASUREMENTS or the rhyme reads as an approximation.
 
-   ⚠️ IF YOU RETUNE ONE, RETUNE BOTH. There is no shared token for this
-   lockup — it is a composition, not a scale — so the only thing keeping
-   the two in step is this note and the one in Discover.module.css. ═══ */
+   ⚠️ IF YOU RETUNE ONE, RETUNE BOTH. The load-bearing values are now
+   NAMED — the head gap is --space-xs-y, the label gap --chapter-label-gap,
+   the display line --t-chapter / --lh-chapter — so those four cannot
+   drift. Everything the tokens do not cover (the mark's height, the
+   17.7em measure, the head's own padding) is still a composition, and
+   this note and Discover.module.css's are still what keep it in step. ═══ */
 .head {
   display: flex;
   flex-direction: column;
@@ -32,7 +35,7 @@
   /* the gap between the label and the display line is deliberately TIGHT —
      they read as one lockup, and the air that separates the head from the
      entries is the rule's margin below, not this */
-  gap: clamp(10px, 1.4vh, 16px);
+  gap: var(--space-xs-y);
   /* .page's padding already clears the fixed nav, so the head only needs a
      small breath of its own above. The bottom is now the RULE's job — see
      .headRule's margin — rather than a pad here, which is what stops the
@@ -45,7 +48,7 @@
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 0.62em;
+  gap: var(--chapter-label-gap);
   font-family: var(--font-sans);
   font-weight: var(--w-medium);
   font-size: var(--t-label);
@@ -83,14 +86,18 @@
    width. (Discover's 17.7em is the centre of a measured window for ITS
    sentence — this is a different sentence, so the value is inherited as
    the chapter's measure, not as a wrap guarantee. The wrap here is
-   checked on the render, not asserted.) */
+   checked on the render, not asserted.)
+
+   The clamp and the 1.1 leading now live in globals as --t-chapter /
+   --lh-chapter, shared with both home chapters, so the three heads
+   cannot drift apart. Same values, one name. */
 .title {
   margin: 0;
   max-width: 17.7em;
   font-family: var(--font-display);
   font-weight: var(--w-regular);
-  font-size: clamp(2.15rem, 4.7vw, 4.1rem);
-  line-height: 1.1;
+  font-size: var(--t-chapter);
+  line-height: var(--lh-chapter);
   letter-spacing: var(--tr-display);
   color: var(--maroon);
 }
@@ -110,119 +117,56 @@
   margin-top: clamp(22px, 3.4vh, 40px);
 }
 
-/* ═══════════════════ THE CARD MATERIAL ═══════════════════════════════
-   THE GRID CARDS ONLY — the featured lede used to share every value in
-   this block and no longer does. See the note above `.featured`, which is
-   where that argument now lives; in short, the lede is one story on a
-   page of its own making and does not need an object drawn around it,
-   while the eight below are a set and do.
+/* ═══════════════════ THE ENTRY IS A PLATE, NOT A CARD ═══════════════
+   At the user's instruction, and against a reference showing one entry:
+   a tall photograph, the headline under it, a hairline, the standfirst,
+   and a plain "Read article →". Nothing is drawn around any of it.
 
-   A photograph and a body of type inside a single radius, lifted off the
-   cream on a four-stop shadow.
+   ── WHAT THIS REPLACES, AND WHY THE ARGUMENT LOST ──
+   Until now these were OBJECTS: a cream panel on a --radius-card corner
+   with a 12px mat, --shadow-card's four stops under it and a 1% lift on
+   hover, all borrowed from VenueCard so that this grid and the
+   restaurants grid would read as one system. Two grids on one page
+   agreeing about their material is a real argument and it is the one the
+   reference overrules — the restaurants grid is a set of PLACES you press
+   into, and the journal is a page of stories you read. A press-affordance
+   drawn around a paragraph promises an interaction the entry does not
+   have.
 
-   ── THE RADII ARE TOKENS NOW, at the user's instruction ("make sure the
-   rounded corners are consistent throughout"), and the note that used to
-   sit here argued the opposite. Both sides are worth keeping.
+   The mat, the panel, the shadow and the lift are therefore all gone, and
+   with them --blog-mat and this file's last use of --radius-card on a
+   card. --shadow-card survives in the filter menu, which genuinely is a
+   floating panel.
 
-   WHAT IT SAID: 28px, borrowed from VenueCard, on the grounds that a
-   radius has to spend ~10% of the short edge for the turn to begin early
-   enough to read as one continuous contour, and that "the site's radius
-   tokens are for PANELS and PHOTO FRAMES; this is neither, it is the
-   card". That reasoning is sound in isolation and it produced a NINTH
-   radius: the venue cards had meanwhile moved to --radius-tile, so the
-   home page was showing 8px restaurant cards beside 28px journal cards.
-   Two card grids on one page disagreeing by 20px is the exact thing the
-   instruction is about.
+   ── WHAT THE BOX WAS DOING FOR THE LAYOUT ──
+   Separating one entry from the next. That was also the argument for a
+   tight 12px row gap: with an edge around each card the gutter was free to
+   be small. With the edge gone the GAPS are the only separation left, so
+   both grew — see .grid, where the new numbers are derived.
 
-   WHAT IT IS NOW, and both values are the token whose stated purpose
-   matches the object:
-     · the CARD takes --radius-card (16px) — globals defines it as
-       "pressable/floating UI panels", which is precisely what a card with
-       a mat and a shadow is. It is the same token the menu and the menu
-       overlay panels take.
-     · the PHOTOGRAPH takes --radius-media (10px) — defined as "media
-       nested inside a rounded UI panel", i.e. written for this case
-       exactly and until now unused outside About.
-
-   ⚠️ WHAT IT COSTS: strict concentricity. 16px outer with a 12px mat wants
-   a 4px inner (see the note below); --radius-media is 10px, so the
-   picture's corner is rounder than its card's arc would draw. At these
-   sizes the difference is small and the tokens were preferred over the
-   geometry, deliberately. If the concentric ideal matters more than the
-   token, the fix is --blog-mat: 6px (16 − 10), NOT a new literal.
-
-   ── WHY FOUR SHADOW STOPS ──
-   Also VenueCard's, verbatim, and the count is the point. Two stops cannot
-   describe a real penumbra — light falls off continuously, and a pair
-   draws a hard little shadow with a soft halo hovering clear of it, the
-   gap between the two radii visible as a band. Four roughly-doubling radii
-   (2 / 6 / 18 / 44) with alpha falling as they widen approximate that
-   curve closely enough to read as one shadow. Ink rather than grey so it
-   belongs to the palette, and every stop but the contact one is
-   negative-spread: a wide shadow at full spread bleeds sideways and pools
-   in the 12px column gaps between neighbours.
-
-   ── WHAT THIS REPLACES ──
-   A 2px cut on the photograph, no card box at all, and a
-   `translateY(-4px)` on hover. The type sat on the page rather than on an
-   object, which is exactly why this grid and the restaurants grid read as
-   two different systems. The 2px cut is gone from this file entirely; it
-   survives elsewhere on pictures that genuinely are frames rather than
-   cards (the manifesto prints, the story deck).
+   ── THE PHOTOGRAPH TAKES --radius-tile ──
+   2px: "photography + editorial frames — a printed plate, not an app-card
+   curve", which is now exactly what this is. It is the same corner the
+   featured lede's picture takes, so the top story and the archive are cut
+   from one stock; --radius-media (10px, "media nested inside a rounded UI
+   panel") described the old panel and describes nothing here.
    ═══════════════════════════════════════════════════════════════════ */
-/* ── THE PHOTOGRAPH IS INSET, AND THE TWO RADII ARE CONCENTRIC ──
-   The picture no longer runs to the card's edge; it sits on a cream mat,
-   with its own corner cut inside the card's.
-
-   THE CONCENTRIC RULE, stated because it is what --blog-mat would be
-   solved against if the tokens ever gave way: for two rounded boxes to
-   look like one object the inner radius should be the outer minus the gap
-   between them, or the two arcs run at different centres and the corner
-   reads as two curves fighting. Here that would be 16 − 12 = 4px, and the
-   picture takes --radius-media's 10px instead — see the trade recorded in
-   the block above.
-
-   The mat is also what makes the shadow legible. A cream card whose top
-   half is a photograph has its own hard edge doing the separating; with
-   the picture pulled in, the card's silhouette is cream on cream and the
-   four-stop shadow is the only thing describing it — which is exactly the
-   job that shadow was cut for. */
 .card {
-  --blog-mat: clamp(9px, 0.85vw, 12px);
-  --blog-photo-radius: var(--radius-media);
+  --blog-photo-radius: var(--radius-tile);
   position: relative;
-  overflow: hidden;
-  border-radius: var(--radius-card);
-  padding: var(--blog-mat);
-  background: var(--cream);
   text-decoration: none;
   color: inherit;
-  box-shadow: var(--shadow-card);
-  transform: scale(1);
-  /* the drawer curve and the venue card's own 400ms — the two grids answer
-     the pointer at the same speed, on the same easing */
-  transition:
-    transform 400ms var(--ease-drawer),
-    box-shadow 400ms var(--ease-drawer);
 }
 
-/* THE LIFT — 1%, and the shadow opens with it so the move reads as height
-   rather than as growth. Keyboard gets the identical response, OUTSIDE the
-   hover query so touch hybrids with a keyboard still get it. */
-@media (hover: hover) and (pointer: fine) {
-  .card:hover {
-    transform: scale(1.01);
-    box-shadow: var(--shadow-card-hover);
-  }
-}
+/* THE KEYBOARD RING SITS FURTHER OUT than the 3px the card used, for the
+   reason .featured's does: there is no silhouette to trace, so the outline
+   is drawn around the raw grid box and a close offset would read as a frame
+   on the photograph. No transform on focus either — the lift it paired with
+   is gone. */
 .card:focus-visible {
-  transform: scale(1.01);
   outline: 2px solid var(--maroon);
-  outline-offset: 3px;
-}
-.card:active {
-  transform: scale(0.985);
-  transition-duration: 120ms;
+  outline-offset: 6px;
+  border-radius: var(--radius-tile);
 }
 
 /* THE LEDE ANSWERS WITH ITS PHOTOGRAPH, NOT WITH A LIFT. A card lifts
@@ -368,76 +312,82 @@
   max-width: 48ch;
 }
 
-/* the lede's action is THE SAME PILL the grid cards carry — see .cardBtn,
-   where .featuredBtn's override also lives. It has to be declared AFTER
-   .cardBtn: the two are both single-class selectors, so source order is
-   the only thing deciding which `margin-top` wins, and placed here it lost
-   silently — the pill dropped to the foot of a centred body and left a
-   200px hole under the excerpt. */
+/* THE LEDE'S ACTION IS THE HOUSE PILL, at the user's instruction: the same
+   PillCta the home page's journal head presses ("Read More"), magnet and
+   closing disc and all. This class is the SEAT only — PillCta.module.css
+   owns the geometry and says plainly that placement belongs to the chapter.
+
+   `margin-top` rather than the flex gap: .featuredBody's gap is the type's
+   own rhythm and a 40px control does not want the same interval a
+   paragraph does. `align-self` because .host is `width: fit-content` and a
+   stretched flex item with an explicit width is one browser bug away from
+   filling the column.
+
+   WHAT IT REPLACES: the outlined chip the grid cards used to carry, shared
+   between the lede and the archive. One control for the top story and for
+   the eight under it is precisely what made them read as equals. */
+.featuredCta {
+  align-self: flex-start;
+  margin-top: clamp(6px, 1vh, 12px);
+}
 
 /* ---- grid of remaining entries ----
-   Three columns on the site's 12px gutter — the SAME gutter the venue grid
-   runs, which is half of what makes two grids read as one page.
 
-   ── THE ROW GAP, AND WHAT SETS ITS FLOOR ──
-   40–64 → 48–72 → 20–28, and the last move is the considered one.
+   ── THE GAPS ARE THE SEPARATION NOW ──
+   12px columns / 20–28px rows was the RIGHT pair for cards: each entry was
+   a bounded object with a mat and a shadow, so its own edge drew the
+   boundary and the gutter was free to be small — and matching the venue
+   grid's 12px on both axes is what made the two grids read as one field.
 
-   The gap no longer has to SEPARATE anything. It used to: with the type
-   sitting straight on the cream, the only thing between one card's excerpt
-   and the next card's photograph was air, so the air had to be generous
-   enough to read as a break. Each card is now a bounded object with a 12px
-   mat of its own, so the boundary is drawn by the card's edge and the gap
-   is free to be what a grid gutter should be — small.
+   With the box gone (see the banner above .card) nothing but air separates
+   one entry's "Read article" from the next one's photograph, so the air has
+   to do the job the edge was doing. 12px between two bare text columns is
+   not a gutter, it is a collision.
 
-   AND IT WAS ACTIVELY WRONG AT 72px. The column gap is --grid-gutter, 12px.
-   A 72px row gap against a 12px column gap is 6:1, at which point the eye
-   stops reading a grid and starts reading three separate columns that
-   happen to be side by side. The venue grid runs 12px on both axes and
-   reads as one field, which is the whole point of the alignment.
+   THE COLUMN GAP is --space-md, 20–32px: about 1.5 lines of the standfirst
+   at any width, which is the distance at which the eye stops trying to read
+   across two columns as one line. ⚠️ IT NO LONGER MATCHES --grid-gutter,
+   and that is deliberate rather than drift — the venue grid's 12px is the
+   gap between two objects that own their edges, and this one is between two
+   columns of loose type.
 
-   THE FLOOR IS THE SHADOW, NOT TASTE. It cannot simply go to 12px to match
-   the columns: below the shadow's own throw a row's ink lands ON the card
-   beneath it — the pooling --shadow-card's negative spreads exist to
-   prevent sideways, arriving vertically instead.
+   THE ROW GAP is larger than the column gap on purpose, which is the
+   opposite of the old rule's warning about 6:1. That warning was about a
+   grid of objects; in a grid of bare type the vertical break has to be
+   plainly bigger than the internal rhythm of a card (the ~14px between the
+   headline, the rule and the standfirst) or a row's foot and the next row's
+   head read as one continuous column. 2.5–3× that rhythm is the break.
 
-   THE FLOOR IS --shadow-card-throw, 16px. It was 24px when this rule was
-   first written, and the number moved under it: the shadow stack has since
-   been tokenised in globals.css and roughly halved (the old
-   `0 28px 44px -20px` threw 30px and read as a UI card floating over a
-   document rather than as a print lying on plaster). A shallower shadow
-   buys a tighter grid, so the clamp comes down with it — 20px is the throw
-   plus a hair, and 28px at the top keeps tall viewports from crowding.
-   ⚠️ This is derived from --shadow-card-throw and is NOT written in terms
-   of it, because a row-gap wants a viewport-fluid clamp and the token is a
-   single px value. If the shadow is retuned again, re-derive this.
+   THE ENTRIES IN A ROW ARE STILL ONE HEIGHT (the grid's default `stretch`)
+   and the slack is still spent below the standfirst, where the action seats
+   itself on the foot — see .cardBtn's `margin-top: auto`. The reason has
+   changed with the material: it is no longer about shadows ending at
+   different depths, it is that four "Read article" links landing on four
+   different baselines is a ragged row of the one element a reader scans for.
 
-   THE CARDS IN A ROW ARE ONE HEIGHT (the grid's default `stretch`), and
-   for a card grid that is not a preference. Ragged-bottom TEXT COLUMNS are
-   fine — the eye reads the left edge — but ragged-bottom OBJECTS each cast
-   a shadow that ends somewhere different, and a row of them reads as
-   misaligned rather than as varied. The venue grid gets its alignment for
-   free because its type cannot vary; this type varies, so the height is
-   taken and the slack is spent below the excerpt, where the action pill
-   seats itself on the card's foot (see .cardBtn's `margin-top: auto`).
-   That slack is the price of the alignment and it is the cheaper of the
-   two. */
-/* FOUR UP, at the user's instruction — from three. It also puts this grid
-   in step with Discover's, which is four-up on the same --grid-gutter from
-   the same page margin; three-up was the last grid on the site running its
-   own column count. At 1440 the card lands ~331px wide, the same as the
-   restaurant tiles and the home strip's cards.
+   ── FOUR UP, at the user's instruction — from three. It also puts this
+   grid in step with Discover's, which is four-up from the same page margin;
+   three-up was the last grid on the site running its own column count.
 
    ⚠️ FOUR COLUMNS AND BlogIndex.tsx's PER_PAGE ARE A PAIR. The page is
    sized to fill this grid exactly — eight entries, two full rows, then the
    pagination — so a change to the column count here has to be answered
    there or the last row comes back ragged. The two live in different
-   files and neither can check the other. */
+   files and neither can check the other.
+
+   ── THE TOP PAD IS SMALL, at the user's instruction ("reduce the gap
+   between the earlier entries line and the grid of entries below"). It was
+   clamp(32px, 5vh, 56px), which stacked on .divider's own bottom pad for up
+   to 66px between the hairline and the first photograph — the caption read
+   as floating free of the list it captions. At 12–20px the total is ~30px
+   and the label plainly belongs to the grid under it. The BOTTOM pad is
+   untouched: that one separates the last row from the pagination. */
 .grid {
   display: grid;
   grid-template-columns: repeat(4, minmax(0, 1fr));
-  column-gap: var(--grid-gutter);
-  row-gap: clamp(20px, 2.4vh, 28px);
-  padding-block: clamp(32px, 5vh, 56px) clamp(40px, 6vh, 80px);
+  column-gap: var(--space-md);
+  row-gap: clamp(36px, 4.4vh, 56px);
+  padding-block: clamp(12px, 1.6vh, 20px) clamp(40px, 6vh, 80px);
 }
 
 /* ⚠️ THE ROW'S HEIGHT HAS TO BE PASSED DOWN, and this is the rule that
@@ -454,8 +404,8 @@
   min-width: 0;
 }
 
-/* the card's own layout — photograph, then body. The material (radius,
-   mat, shadow, lift) is the .card block further up. */
+/* the entry's own layout — photograph, then type. The material (or rather
+   the absence of one) is the .card block further up. */
 .card {
   flex: 1 1 auto;
   min-width: 0;
@@ -463,9 +413,17 @@
   flex-direction: column;
 }
 
+/* PORTRAIT, 4:5 — the reference's proportion, and the change that does most
+   of the work. 16/9 is a WIDESCREEN crop: on a ~331px column it made a 186px
+   letterbox with more type under it than picture, which reads as a link with
+   a thumbnail. A plate taller than it is wide is what makes the photograph
+   the entry and the type its caption.
+   ⚠️ IT IS THE PAGE'S HEIGHT BUDGET. Two rows of 4:5 at 331px is ~830px of
+   photograph before the type; if this ever goes taller than 4:5, check that
+   the pagination is still reachable without three screens of scroll. */
 .cardMedia {
   position: relative;
-  aspect-ratio: 16 / 9;
+  aspect-ratio: 4 / 5;
   overflow: hidden;
   border-radius: var(--blog-photo-radius);
   background: var(--placeholder);
@@ -485,24 +443,28 @@
     opacity 0.55s var(--ease-entrance);
 }
 
-/* the body panel — the type's ground, and the reason it is cream rather
-   than a ramp on the photograph. See the block comment in BlogIndex.tsx
-   beside the card markup for that argument in full. */
+/* the type under the plate. NO PADDING and no ground of its own — the copy
+   sits straight on the page's cream, flush to the photograph's left edge,
+   which is the whole of what "not a card" means here. It used to carry a
+   14–18px top pad and a 4–7px side pad to hold the type off the panel's
+   mat; there is no mat, and a side pad now would only push the copy out of
+   line with the picture above it.
+
+   THE GAP IS THE REFERENCE'S RHYTHM, one number for all four joins —
+   photograph→headline, headline→rule, rule→meta, meta→standfirst. A single
+   interval is what makes four stacked elements read as one block; varying
+   them would start grouping some of the four against the others. */
 .cardBody {
   /* `flex: 1` is what makes the row's shared height reach the body — the
-     card fills the grid row, the media is fixed by its aspect, and the
+     entry fills the grid row, the media is fixed by its aspect, and the
      body takes the remainder. Without it the body is content-height, the
-     slack pools UNDER the card, and .cardBtn's `margin-top: auto` has
+     slack pools UNDER the entry, and .cardBtn's `margin-top: auto` has
      nothing to push against. */
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  gap: 15px;
-  /* the card's mat already holds the type off three edges, so this is only
-     the air BETWEEN the photograph and the copy, plus a little extra under
-     the pill so it does not sit on the mat's floor */
-  padding: clamp(14px, 1.4vw, 18px) clamp(4px, 0.5vw, 7px)
-    clamp(4px, 0.5vw, 7px);
+  gap: clamp(10px, 1vw, 14px);
+  padding: clamp(12px, 1.2vw, 16px) 0 0;
 }
 
 /* ═══ THE VENUE'S MARK ON THE PHOTOGRAPH ═══
@@ -650,7 +612,7 @@
 .cardMeta {
   display: flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-xs);
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
@@ -667,13 +629,31 @@
   opacity: 0.6;
 }
 
+/* THE HEADLINE LEADS, directly under the photograph — the reference's
+   order, and the reason the meta row moved below the rule. It also sets in
+   BOLD now, which is the one weight change on the page: with no card, no
+   shadow and no mat, the headline is the only thing that can carry an
+   entry's weight, and --w-regular Contralto at this size read as another
+   paragraph. --w-bold is drawn in both families (globals.css notes it is
+   "still barely used") and this is what it is for. */
 .cardTitle {
   font-family: var(--font-display);
-  font-weight: var(--w-regular);
+  font-weight: var(--w-bold);
   font-size: var(--t-h3);
   line-height: var(--lh-heading);
   letter-spacing: var(--tr-display);
   margin: 0;
+}
+
+/* the reference's hairline, closing the headline and opening the
+   standfirst. --rule is the site's own line — the same 3.53:1 the head's
+   rule and the "Earlier Entries" row draw, so every hairline on this page
+   is one hairline. */
+.cardRule {
+  display: block;
+  width: 100%;
+  height: 1px;
+  background: var(--rule);
 }
 
 .cardExcerpt {
@@ -683,61 +663,56 @@
   opacity: 0.78;
 }
 
-/* ---- the card's action ----
-   A PILL, in the house control language: 999px, --font-mono, the ink's own
-   tracking. It replaces a caps text link, which was the one affordance
-   grammar this site did not otherwise use for a card's action — the venue
-   card presses Menu/Book, this page's own pagination presses arrows.
+/* ---- the entry's action ----
+   "Read article →", set as TYPE rather than as a control — the reference's
+   own treatment, and it replaces the outlined 999px chip this grid used to
+   carry.
 
-   MAROON OUTLINE, NOT CREAM. The venue card's pills are cream because they
-   sit on a photograph; this one sits on the cream body, where cream would
-   be invisible. The fill-on-hover behaviour is the same trade the
-   pagination arrows already make, so the two controls on this page agree.
+   THE CHIP WAS THE CARD'S AFFORDANCE, and it went with the card. A pill
+   says "press me": it belonged on an object that lifted under the pointer
+   and filled on hover. On a bare plate the only pressable thing is the
+   whole entry, and a second, smaller box inside it would be a button
+   promising something the layout no longer does. The house pill is not
+   lost from this page — the featured lede now carries the real one (see
+   .featuredCta), which is what puts the top story a rank above the
+   archive instead of level with it.
 
-   `margin-top: auto` seats it at the FOOT of the body on every card, so
-   the row of actions lines up across three cards whose excerpts run to
-   different lengths. `align-self: start` keeps it content-width — a
-   full-width control reads as a form's submit button, and a card is not a
-   form. */
+   `margin-top: auto` seats it at the FOOT of the body on every entry, so
+   the row of actions lines up across four whose standfirsts run to
+   different lengths — see .grid on why that alignment is worth its slack.
+   `align-self: flex-start` keeps it content-width: full-width would read as
+   a form's submit button. */
 .cardBtn {
   display: inline-flex;
   align-items: center;
-  justify-content: center;
-  gap: 0.55em;
+  gap: var(--lockup-gap-sm);
   align-self: flex-start;
   margin-top: auto;
-  min-height: clamp(28px, 2.4vw, 32px);
-  padding: 0 1em;
-  border: 1px solid var(--maroon);
-  border-radius: 999px;
-  background: transparent;
+  /* the body's own gap holds it off the standfirst when the entry is short;
+     this is the extra the FOOT wants once `auto` has pushed it down */
+  padding-top: clamp(6px, 0.8vw, 10px);
   color: var(--maroon);
-  font-family: var(--font-mono);
-  font-weight: var(--w-medium);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label-mono);
-  line-height: 1;
+  font-family: var(--font-sans);
+  font-weight: var(--w-regular);
+  font-size: var(--t-small);
+  line-height: var(--lh-flush);
   white-space: nowrap;
-  transition:
-    background-color 400ms var(--ease-drawer),
-    color 400ms var(--ease-drawer);
 }
 
-/* THE LEDE'S PILL DOES NOT BOTTOM-SEAT. The grid cards share a row height
-   and spend the slack under the excerpt so their actions line up; the lede
-   has one action, a centred body and no siblings to line up with, so
-   `margin-top: auto` there only opens a hole. MUST STAY BELOW .cardBtn —
-   equal specificity, so this wins on source order alone. */
-.featuredBtn {
-  align-self: flex-start;
-  margin-top: clamp(4px, 0.8vh, 10px);
+/* THE ONE HOVER SIGNAL THE TYPE CAN GIVE. With the lift, the shadow and
+   the fill all gone, an entry would otherwise answer the pointer with
+   nothing but its photograph's zoom — and the reader's cursor is usually on
+   the type, not the plate. The arrow steps forward by its own width; the
+   distance and the curve are the PillCta arrow's, so the two actions on
+   this page move alike. */
+.cardBtnArrow {
+  display: inline-block;
+  transition: transform 400ms var(--ease-drawer);
 }
 
 @media (hover: hover) and (pointer: fine) {
-  .card:hover .cardBtn,
-  .featured:hover .cardBtn {
-    background: var(--maroon);
-    color: var(--cream);
+  .card:hover .cardBtnArrow {
+    transform: translateX(4px);
   }
 }
 
@@ -749,7 +724,7 @@
 .divider {
   display: flex;
   align-items: center;
-  gap: 1em;
+  gap: var(--lockup-gap-lg);
   padding-block: clamp(20px, 3vh, 36px) clamp(4px, 0.8vh, 10px);
 }
 
@@ -806,7 +781,7 @@
 .filterTrigger {
   display: inline-flex;
   align-items: center;
-  gap: 0.55em;
+  gap: var(--lockup-gap-sm);
   padding: 0.35em 0;
   background: none;
   border: none;
@@ -858,7 +833,7 @@
   overflow-y: auto;
   display: flex;
   flex-direction: column;
-  padding: 6px;
+  padding: var(--space-3xs);
   background: var(--cream);
   /* the same pre-migration ink as the divider rule above, migrated the same
      way. The radius moves 2px → --radius-card: this is a floating UI panel,

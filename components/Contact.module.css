@@ -35,7 +35,7 @@
 
 .wordText {
   font-family: var(--font-display-big);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   letter-spacing: var(--tr-display);
   fill: var(--cream);
 }
@@ -273,78 +273,19 @@
   margin-top: clamp(2px, 0.8vh, 8px);
 }
 
-/* the submit pill — the ReadyCta "Join Us" pill recipe, copied in
-   verbatim because CSS modules don't share classes: cream fill, hairline
-   border, whisper-soft inner recess that relaxes on hover while the pill
-   widens. On the maroon contact ground the cream fill reads as the
-   section's single light moment. */
-/* Submit — the ReadyCta "Join Us" pill's proportions and typography, so the
-   site has ONE pill recipe rather than two. It previously ran at --t-h3
-   (~26px) in sentence case with a heavy inset recess, which made it the
-   loudest control anywhere on the site and read as a different design
-   language from every other button.
-   It keeps a solid cream fill (unlike ReadyCta's outline) because it is a
-   form's primary action and needs to out-rank the fields above it. */
-.submitPill {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.7em;
-  border-radius: 999px;
-  padding: 0.9em 2em;
-  font-family: var(--font-display);
-  font-weight: var(--w-medium);
-  font-size: var(--t-button);
-  line-height: 1;
-  letter-spacing: 0.16em;
-  text-transform: uppercase;
-  /* hollow at rest, fills on hover — the outline state matches the ReadyCta
-     "Join Us" pill, so both pills on the site share one resting look */
-  color: var(--cream);
-  background: transparent;
-  border: 1px solid var(--cream);
-  white-space: nowrap;
-  cursor: pointer;
-  /* colour + transform only — the old version animated padding on hover,
-     which relayouts the button (and its row) on every frame */
-  transition:
-    background-color 220ms var(--ease-out),
-    color 220ms var(--ease-out),
-    transform 180ms var(--ease-out);
-}
+/* `.submitPill`, `.pillLabel` and `.pillArrow` ARE DELETED — the submit is
+   <PillCta type="submit" tone="cream"> now, at the user's instruction, and
+   the control brings its own geometry from PillCta.module.css.
 
-@media (hover: hover) and (pointer: fine) {
-  .submitPill:hover {
-    background: var(--cream);
-    color: var(--maroon);
-    transform: translateY(-2px);
-  }
-}
-.submitPill:active {
-  transform: scale(0.97);
-}
-.submitPill:focus-visible {
-  /* keyboard focus gets the same fill as hover, so the two states match */
-  background: var(--cream);
-  color: var(--maroon);
-  transform: translateY(-2px);
-  /* cream ring — a maroon outline would vanish against this section's
-     maroon ground */
-  outline: 2px solid var(--cream);
-  outline-offset: 3px;
-}
+   WHAT WENT, so it is not rebuilt from memory: a hollow cream-outlined
+   capsule in the DISPLAY face at 0.16em tracking, filling cream and lifting
+   2px on hover, with a chevron that slid 0.24em. Its own comment called it
+   "the ReadyCta 'Join Us' pill recipe, copied in verbatim because CSS
+   modules don't share classes" — which is precisely the duplication the
+   shared component exists to end, and it had already drifted into a
+   different object from every other button on the site.
 
-.pillLabel {
-  display: inline-block;
-}
-
-.pillArrow {
-  width: 0.8em;
-  height: 0.8em;
-  display: block;
-  transition: transform 0.4s var(--ease-out);
-}
-.submitPill:hover .pillArrow,
-.submitPill:focus-visible .pillArrow {
-  transform: translateX(0.24em);
-}
+   THE SEAT STAYS HERE. `.submitRow` above is this chapter's own business —
+   PillCta's stylesheet is explicit that the seat (margin, alignment, grid
+   area) belongs to the caller and never to the control. */
 

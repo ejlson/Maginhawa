@@ -184,7 +184,7 @@ export const RESTAURANTS: Restaurant[] = [
     description:
       "Bunso — 'the youngest' — is the newest member of the Maginhawa family. Full details, menu and location coming soon.",
     location: "Kentish Town, London",
-    image: "/images/bunso-placeholder.jpg",
+    image: "/images/bunso.jpg",
     logo: "/logo/bunso.png",
     website: "https://www.bybunso.com/",
     bookable: false,

@@ -6,6 +6,7 @@ import Image from "next/image";
 import Nav from "./Nav";
 import Menu from "./Menu";
 import Reveal from "./Reveal";
+import PillCta from "./PillCta";
 import Footer from "./Footer";
 import DarkZone from "./DarkZone";
 import styles from "./BlogIndex.module.css";
@@ -419,12 +420,16 @@ function BlogIndexInner() {
      viewport. */
   const navIntentRef = useRef<null | "page" | "filter">(null);
 
-  // entrance reveal is a first-mount-only affair — pagination re-renders
-  // swap the card content in place without replaying the animation
-  const revealedOnceRef = useRef(false);
-  useEffect(() => {
-    revealedOnceRef.current = true;
-  }, []);
+  /* THE GRID DOES NOT ANIMATE IN, at the user's instruction. It used to
+     stagger its cards on the first mount — a Reveal per <li> with a
+     `(i % 6) * 0.06` delay, and a ref that latched after that mount so
+     paginating never replayed it.
+
+     The whole apparatus is gone rather than disabled: with the cards now
+     bare photographs and type (see the entry markup below) there is no
+     object arriving, and eight plates fading up in sequence read as the
+     page still loading. The head and the featured lede keep their Reveals —
+     those are one element each, not a field. */
 
   /* one place that builds the URL, so the filter and the page can never
      disagree about what the address means. Both are omitted at their default
@@ -632,6 +637,9 @@ function BlogIndexInner() {
                 href={featured.url}
                 target="_blank"
                 rel="noopener noreferrer"
+                /* drives the pill's close from the whole card — see the
+                   presentational note in PillCta.tsx */
+                data-cta-hover
               >
                 <CardMedia
                   className={styles.featuredMedia}
@@ -646,10 +654,16 @@ function BlogIndexInner() {
                   </span>
                   <h2 className={styles.featuredTitle}>{featured.title}</h2>
                   <p className={styles.featuredExcerpt}>{featured.excerpt}</p>
-                  <span className={`${styles.cardBtn} ${styles.featuredBtn}`}>
+                  {/* THE HOUSE ACTION, at the user's instruction — the same
+                      PillCta the home page's journal head presses ("Read
+                      More"), rather than the outlined chip this used to
+                      share with the grid cards below. It renders
+                      presentationally because the whole lede is the anchor;
+                      PillCta.tsx explains that mode and `data-cta-hover`
+                      above hands it the card's hover. */}
+                  <PillCta presentational className={styles.featuredCta}>
                     Read the story
-                    <span aria-hidden>→</span>
-                  </span>
+                  </PillCta>
                 </div>
               </a>
             </Reveal>
@@ -702,28 +716,31 @@ function BlogIndexInner() {
               style={{ listStyle: "none" }}
               aria-label="Blog entries"
             >
-              {posts.map((item, i) => {
-                const card = (
-                  /* ═══ THE CARD IS AN OBJECT NOW, not a photograph with a
-                     caption under it. Photograph on top, type on a cream
-                     body below, both inside ONE 28px radius and one
-                     four-stop shadow — the same material the venue cards
-                     are cut from (VenueCard.module.css), and the reason
-                     this grid and the restaurants grid now read as one
-                     system.
+              {/* ═══ THE ENTRY, AS THE USER'S REFERENCE DRAWS IT ═══
+                  A tall photograph, the headline under it, a hairline, the
+                  standfirst, and a plain "Read article →". No card.
 
-                     WHAT IT DOES NOT BORROW, deliberately: the venue
-                     card's RAMP. That card seats its type ON the
-                     photograph because its type is short and fixed —
-                     three nowrap ellipsised lines and two stats. A
-                     headline here runs two lines of Contralto and the
-                     excerpt three, over 24 uncontrolled editorial stills.
-                     VenueCard's own stylesheet spends forty lines on what
-                     it cost to hold 4.5:1 over eight KNOWN photographs,
-                     and says plainly that cream copy over an ink wash on
-                     an unknown photograph "cannot be guaranteed". So the
-                     type stays on cream, where its contrast is a constant.
-                     The material is shared; the legibility bet is not. ═══ */
+                  WHAT IT REPLACES: the object this grid carried until now —
+                  a cream panel with a 12px mat, a four-stop shadow and a
+                  1% lift, cut from the venue card's material so the two
+                  grids would read as one system. That argument was about
+                  the RESTAURANTS grid; this is the JOURNAL, and the
+                  reference is unambiguous that an entry here is a printed
+                  plate with type set under it, not a pressable tile.
+
+                  WHAT THE BOX WAS DOING, and who does it now: the panel's
+                  edge was what separated one entry from the next. With it
+                  gone the row gap and the column gap carry that on their
+                  own, which is why both grew — see .grid.
+
+                  THERE IS NO "PREVIEW." LEAD-IN, at the user's
+                  instruction. The reference bolds a category word at the
+                  head of the standfirst; the outlet and the date keep
+                  their own line under the rule instead, because on a page
+                  where every entry links OUT the masthead is the
+                  credential and it cannot be the one thing dropped. ═══ */}
+              {posts.map((item) => (
+                <li key={item.slug}>
                   <a
                     className={styles.card}
                     href={item.url}
@@ -738,44 +755,33 @@ function BlogIndexInner() {
                       <VenueMark slug={item.restaurant} />
                     </CardMedia>
                     <div className={styles.cardBody}>
-                      {/* THE OUTLET LEADS, the date follows. Both were
-                          already here, in the other order — and on a page
-                          where every entry links OUT to someone else's
-                          publication, the masthead is the credential and
-                          the thing a reader scans for. "Forbes" earns
-                          attention; "11 Feb 2026" does not. The date keeps
-                          its place in the line, just not the front of it. */}
+                      <h3 className={styles.cardTitle}>{item.title}</h3>
+                      {/* the reference's rule, and it is a real element for
+                          the reason .divider's is: it has to sit BETWEEN two
+                          things, which a ::after on the body cannot do */}
+                      <span className={styles.cardRule} aria-hidden />
+                      {/* THE OUTLET LEADS, the date follows. "Forbes" earns
+                          attention; "11 Feb 2026" does not. */}
                       <div className={styles.cardMeta}>
                         <span className={styles.cardSource}>{item.source}</span>
                         <span className={styles.cardSep} aria-hidden />
                         <span>{item.dateLabel}</span>
                       </div>
-                      <h3 className={styles.cardTitle}>{item.title}</h3>
                       <p className={styles.cardExcerpt}>{item.excerpt}</p>
-                      {/* A REAL PILL, in the house control language — the
-                          same 999px box the venue card's Menu/Book carry
-                          and the same one /blog's own pagination arrows
-                          use. It was a caps text link, which is the one
-                          affordance grammar this site does not otherwise
-                          use for a card's action. A <span>, never a nested
-                          anchor: the whole card is the link. */}
+                      {/* A <span>, never a nested anchor: the whole card is
+                          the link. The pill it used to be now belongs to the
+                          lede alone, which is what keeps the top story and
+                          the archive from reading as equals. */}
                       <span className={styles.cardBtn}>
-                        Read
-                        <span aria-hidden>↗</span>
+                        Read article
+                        <span className={styles.cardBtnArrow} aria-hidden>
+                          →
+                        </span>
                       </span>
                     </div>
                   </a>
-                );
-                // staggered reveal for the very first mount only; once the
-                // page is up, paginated cards render plain and in place
-                return revealedOnceRef.current ? (
-                  <li key={item.slug}>{card}</li>
-                ) : (
-                  <Reveal key={item.slug} as="li" delay={(i % 6) * 0.06}>
-                    {card}
-                  </Reveal>
-                );
-              })}
+                </li>
+              ))}
             </ul>
           </div>
           )}

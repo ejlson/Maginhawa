@@ -8,25 +8,24 @@
   align-items: center;
   justify-content: space-between;
   gap: clamp(16px, 3vw, 40px);
-  padding: clamp(10px, 1.4vh, 16px) var(--pad-x) clamp(4px, 0.5vh, 7px);
+  padding: var(--space-xs-y) var(--pad-x) clamp(4px, 0.5vh, 7px);
   color: var(--cream);
   transition: background-color 0.45s ease, color 0.45s ease;
 }
 
 /* ---- themes: navbar matches the section it sits over ---- */
-/* ── OVER FILM THE BLEND IS GONE, at the user's instruction ──
-   `mix-blend-mode: difference` was subtracting the bar's cream from
-   whatever the footage happened to be showing behind it, so the links held
-   on a dark frame and dissolved on a bright one — measured on the hero's
-   own clip, the right-hand three ("Careers", "Contact Us") sat over a lit
-   shop window and effectively vanished. The rule's own note called it:
-   "the defect is in the blend and it wants a scrim or a theme swap, not a
-   type value."
+/* ── THE CREAM BAR AND ITS SCRIM ARE THE HOME HERO'S ALONE ──
+   at the user's instruction, and the reason it ever spread is worth
+   stating: `blend` is not "the home hero", it is the theme EVERY film
+   section carries — the /restaurants hero, the closing invitation at
+   #book, About's pinned video. So when 477d7fb swapped this class from
+   `difference` to cream-on-a-scrim to fix the first screen, it swapped all
+   four, and the treatment that was meant to mark the opening frame turned
+   up on two other pages and again at the bottom of the home page.
 
-   It gets both. The blend goes to `normal` so the ink is a known cream
-   rather than a subtraction, and the scrim below gives it a ground.
-   `.light` KEEPS difference — over cream it resolves the links to black at
-   17.61:1, which is better than anything a fixed colour would do there. */
+   The split is now by PLACE rather than by ground: `.blend` is the
+   difference blend it was before, and `.blend.heroFilm` — added by Nav.tsx
+   only while the bar is over `#top` — carries the cream and the scrim. */
 /* ── THE WORDMARK STANDS DOWN OVER THE HERO ──
    See the note in Nav.tsx for why. It fades rather than switching, on the
    bar's own theme clock, so scrolling out of the hero brings the name back
@@ -54,13 +53,33 @@
     visibility 0.45s;
 }
 
+/* FILM, ANYWHERE BUT THE OPENING FRAME — the difference blend, as before.
+   ⚠️ THE OLD DEFECT COMES BACK WITH IT, and it is better named here than
+   rediscovered: difference subtracts the bar's cream from whatever is
+   behind it, so a link crossing a bright patch loses its ground. Measured
+   on frozen backdrops (a playing film between exposures gives nonsense),
+   /restaurants reads 4.41 / 3.80 / 3.45 / 3.13:1 across the five links
+   against a 4.5:1 floor. This is the design the bar had before the scrim
+   and the one asked for here; if it is to be fixed, the fix is a scrim on
+   the SECTION's own hero, not a third nav theme — the last attempt to
+   solve it in this file is exactly what spread to four sections. */
 .blend {
-  mix-blend-mode: normal;
+  mix-blend-mode: difference;
   color: var(--cream);
   background: transparent;
 }
 
-/* THE SCRIM — a top-down wash under the bar only where it sits on film.
+/* THE OPENING FRAME, AND ONLY IT. Cream ink on a scrim with no blend, so
+   the links are a known colour over the hero's footage rather than a
+   subtraction from it. Nav.tsx adds `heroFilm` while the bar sits over
+   `#top`; the two-class selector is deliberate, so this always outranks
+   `.blend` above regardless of the order the two rules end up in. */
+.blend.heroFilm {
+  mix-blend-mode: normal;
+  color: var(--cream);
+}
+
+/* THE SCRIM — a top-down wash under the bar, on that opening frame alone.
    Absolutely positioned rather than a background on .nav so it can reach
    PAST the bar's own height: the fade needs somewhere to die, and a
    gradient that ends at the padding edge reads as a band with a visible
@@ -68,8 +87,14 @@
 
    Neutral black, not --maroon: the same rule the venue cards' ramp follows
    — a scrim adds luminance and nothing else, and --maroon is a green-black
-   that would tint the footage under it. */
-.blend::before {
+   that would tint the footage under it.
+
+   ON `.nav` AT ZERO OPACITY, not only on the hero class, so that leaving
+   the hero FADES the wash out on the bar's own 0.45s theme clock. A
+   ::before that exists only while its class is applied cannot transition
+   away — it can only vanish on the frame the class drops, which over a
+   scroll boundary reads as the top of the page flashing lighter. */
+.nav::before {
   content: "";
   position: absolute;
   inset: 0 0 auto 0;
@@ -80,8 +105,13 @@
     rgba(0, 0, 0, 0.3) 45%,
     rgba(0, 0, 0, 0) 100%
   );
+  opacity: 0;
+  transition: opacity 0.45s ease;
   pointer-events: none;
   z-index: -1;
+}
+.blend.heroFilm::before {
+  opacity: 1;
 }
 /* cream sections: no bar, no line — letters blend like the hero logo */
 .light {
@@ -139,7 +169,7 @@
      this is a drawn weight rather than a synthesised one. */
   font-weight: 600;
   font-size: clamp(19px, 2.3vh, 26px);
-  line-height: 1;
+  line-height: var(--lh-flush);
   letter-spacing: 0.06em;
   text-transform: uppercase;
   color: currentColor;
@@ -314,6 +344,12 @@
   flex-direction: column;
   align-items: flex-end;
   justify-content: center;
+  /* NOT a scale value — the solved remainder of the icon's own geometry:
+     the box above fixes a 22×13 icon and the bars are three 1px hairlines,
+     so (13 − 3×1) / 2 = 5px is what makes the stack exactly fill it.
+     Change the icon box, re-derive the gap; a rhythm token here would
+     quietly unsolve the 13px the hit-area padding/margin pair is built
+     around. */
   gap: 5px;
   background: none;
   border: none;

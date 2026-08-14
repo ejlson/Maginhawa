@@ -60,9 +60,9 @@
 .item {
   display: inline-flex;
   align-items: center;
-  gap: 0.55em;
+  gap: var(--lockup-gap-sm);
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   font-size: var(--t-h3);
   line-height: var(--lh-heading);
   color: inherit;

@@ -43,7 +43,7 @@
 .head {
   display: flex;
   flex-direction: column;
-  gap: clamp(14px, 2vh, 22px);
+  gap: var(--space-sm-y);
 }
 
 /* deliberately NOT sticky — the rail sits at the top of the section and
@@ -61,7 +61,7 @@
 
 .title {
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   font-size: var(--t-h2);
   line-height: var(--lh-heading);
   letter-spacing: var(--tr-display);
@@ -168,7 +168,7 @@
    compete, both being Contralto at display sizes. */
 .question {
   font-family: var(--font-sans);
-  font-weight: 400;
+  font-weight: var(--w-regular);
   font-size: var(--t-body);
   letter-spacing: 0;
   line-height: var(--lh-snug);

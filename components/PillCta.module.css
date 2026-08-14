@@ -17,36 +17,51 @@
    using it, which passes its own class through `className`. Putting a seat
    in this file would mean every consumer had to unset it.
 
-   ── WHAT THIS REPLACES, AND WHY THE WHOLE MECHANISM WENT ──
-   The two cells used to be fused by an SVG goo filter (#cta-merge in
-   GlassFilters.tsx): a shape layer blurred and thresholded so that two
-   overlapping bodies resolved as one with a concave fillet between them,
-   with the type laid over it unfiltered. It shipped, and it did not read
-   as designed at either end of the move:
+   ── THE MERGE IS GEOMETRY FIRST, AND A FILLET SECOND ──
+   At full close the pill's right cap and the disc are the SAME CIRCLE, so
+   the union is a mathematically perfect pill — no waist, nothing to
+   approximate, and the end state is correct whether or not anything else
+   runs. That is the load-bearing half and it is described below.
 
-     · AT REST the blur softened both bodies before the threshold cut them
-       back, so the pill's ends and the disc came out wobbly and slightly
-       swollen — a blob with a bump on it rather than a crisp pill beside a
-       crisp circle.
-     · ON HOVER the two never resolved into ONE pill. The fillet needs the
-       fields to overlap by better than a third of the disc to close, and
-       at anything less the threshold cuts a visible waist; what the reader
-       saw was two cells pinched together with the arrow hanging over the
-       join.
+   What the geometry alone could not give is the TRANSIT. Halfway in, the
+   silhouette is a pill and a circle whose arcs cross, and a crossing is a
+   sharp concave vertex — two shapes overlapping, which is what a reader
+   sees. Two cells FUSING have a neck: a smooth concave bridge that appears
+   at contact, widens as the bodies draw in, and snaps shut a moment before
+   the bodies themselves finish. #cta-fuse (GlassFilters.tsx) is what turns
+   the vertex into that neck — the two cells' alpha is blurred into fields
+   and thresholded back at 0.5, which rounds the join and leaves every
+   other edge where it was.
 
-   The filter is deleted (from GlassFilters.tsx too — nothing else used
-   it). The merge is now GEOMETRY, and it is exact rather than
-   approximated: at full close the pill's right cap and the disc are the
-   same circle, so the union is a mathematically perfect pill with no
-   waist, no fillet, no blur and nothing to threshold.
+   ⚠️ IT IS A SECOND ATTEMPT AT A FILTER THAT WAS ONCE DELETED. #cta-merge
+   stood here, swelled the shapes at rest and left a pinched waist on
+   hover, and the note it left behind said not to bring one back without
+   reading this derivation. Read GlassFilters.tsx for how both faults are
+   answered; the short version is that its blur reached across the resting
+   gap and it was being asked to CLOSE the join, and this one is small
+   enough to do nothing at rest and is never asked to close anything.
 
    ── HOW IT CLOSES ──
-   Three boxes, all --cta-h tall:
+   Four boxes, all --cta-h tall:
+     .cells  the shape layer — absolutely seated over the whole control,
+             carrying the threshold. Holds .field, which carries the blur
+             and nothing else, and the two bodies under it.
      .body   an absolutely-seated pill spanning the WHOLE control, clipped
              back on its right by (disc + gap) so at rest it paints only
              the label's pill.
-     .label  the type, in flow, over the body.
-     .disc   the circle with the arrow, in flow, gap to its left.
+     .discCell  the circle, at the control's right edge.
+     .label  the type, in flow, over the shape layer.
+     .disc   the arrow's seat, in flow, gap to its left — the same box the
+             circle occupies, but OUTSIDE the filter.
+
+   ⚠️ THE TYPE AND THE ARROW ARE NOT IN THE SHAPE LAYER, and must not be.
+   A threshold run over a glyph erodes its thin strokes and stairs its
+   curves; the whole point of a shape layer is that it holds shapes.
+
+   ⚠️ AND .disc AND .discCell TRAVEL TOGETHER. They are one circle drawn in
+   two places — a fill inside the filter and an arrow outside it — so any
+   rule that moves one moves the other, in the same breath. They are always
+   written as a single selector list below for that reason.
 
    ── BOTH CELLS TRAVEL, AND THE CONTROL COMPRESSES ──
    At the user's instruction, and in three passes worth recording because
@@ -70,16 +85,57 @@
 
    ⚠️ AND THE CEILING IS THE CLEARANCE, NOT THE GAP. What closes is
    `a + b` = 2 × --cta-close, and it eats into the distance from the
-   label's ink to the arrow's own inset inside the disc — 33.9px at 1440.
-   At 9.78px of travel each way that leaves ~14px. Past ~17px each way the
+   label's ink to the arrow's own inset inside the disc — 35.3px at 1440.
+   At 10.5px of travel each way that leaves ~14px. Past ~17px each way the
    arrow starts crossing the type, and no amount of the pill being "one
    shape" rescues a glyph sitting on a word.
+
+   THAT ~14px IS UNCHANGED BY THE WIDER GAP, and not by luck: --cta-close
+   carries --cta-gap / 2 in its own definition, so widening the gap by 1.4px
+   widens the clearance by 1.4px and the travel by 1.4px in the same breath.
+   The two edits cancel. It is the 0.42em term that spends the budget, and
+   that is the number to touch if the arrow ever needs to travel further.
 
    ⚠️ AND THE MOVE IS A CLIP, NOT A WIDTH. The body is full-size at all
    times and `clip-path` is what shortens it — animating `width` or `right`
    would re-lay-out the box every frame, where the clip is a paint the
    compositor already has the geometry for. `inset(… round 999px)` is what
-   keeps the clipped end a semicircular cap rather than a straight cut. */
+   keeps the clipped end a semicircular cap rather than a straight cut.
+
+   ── WHAT THE READER IS ACTUALLY WATCHING, AND WHEN ──
+   Write d for the distance between the body's cap centre and the disc's
+   centre. Everything above resolves to one line:
+
+       d(p) = (--cta-h + --cta-gap) × (1 − p)
+
+   — the clip and the two translations cancel out of it entirely, which is
+   the tidiest possible confirmation that they are one equation. Then, for
+   two equal circles of radius r = --cta-h / 2, the waist between them is
+   r − √(r² − d²/4) deep. So at 1440, where h = 37.4 and gap = 10.1:
+
+       p = 0      d = 47.5   the cells are 10.1px apart
+       p = 0.10   d = 42.7   ~5px apart — the alpha fields touch and the
+                             neck appears BEFORE the bodies do
+       p = 0.21   d = 37.4   the bodies touch; waist at full depth
+       p = 0.50   d = 23.8   waist 2.9px
+       p = 0.79   d = 10.0   waist 0.3px — the fillet closes it; the union
+                             reads as one pill while the geometry is still
+                             arriving
+       p = 1      d = 0      one pill exactly
+
+   ⚠️ SO THE CURVE IS NOT A TASTE DECISION, it is a reading of that table,
+   and --ease-fuse below is written against it: the contact at p = 0.21 is
+   held back to 55% of the duration so the approach is the long, quiet part
+   and the fuse is the fast one, which is the order surface tension does it
+   in. Change --cta-gap or --cta-h enough to move p(contact) and the curve
+   wants re-fitting — the fuse would land early and read as a stumble.
+
+   .large ALREADY MOVES IT, AND THAT IS THE TOLERANCE. p(contact) is
+   gap / (gap + h), so the 52px body against the same gap contacts at
+   p = 0.163 rather than 0.213 — measured at 48% of the duration instead of
+   55%. Seven points early, the fuse still strictly after the touch, and it
+   does not read as anything. Roughly: the curve holds while p(contact)
+   stays inside 0.15–0.28, and --cta-gap is the knob that puts it back. */
 
 /* THE HOST — the magnet's measuring box, and it is NEVER transformed. Its
    border rect is the control's REST rectangle however far the pill has
@@ -106,12 +162,111 @@
   /* the disc's diameter, and the pill's height with it — one number so the
      two cells are the same body */
   --cta-h: clamp(34px, 2.6vw, 40px);
-  /* the air between the cells at rest */
-  --cta-gap: clamp(6px, 0.6vw, 9px);
+  /* THE AIR BETWEEN THE CELLS AT REST, and it is now a function of the
+     blur rather than of taste. The fields start bridging at about 1.35 ×
+     --cta-goo (≈ 0.135 × --cta-h); at rest they must be nowhere near it or
+     the control wears a permanent smear across its gap. This holds the gap
+     at roughly TWICE that distance — the alpha where the two fields meet
+     lands near 0.22, well under the 0.5 cut — which is also what gives the
+     approach something to cross before anything happens.
+
+     It was clamp(6px, 0.6vw, 9px). The extra ~1.4px at 1440 is spent on
+     the same thing at both ends: two cells that are plainly two at rest,
+     and a longer run-up. --cta-close carries the gap in its own definition
+     so the travel grows with it and the clearance below is unchanged. */
+  --cta-gap: clamp(7px, 0.7vw, 11px);
   /* HOW FAR THEY CLOSE — the disc's travel and the clip's remaining inset,
      which are the same distance by construction. See the warning above:
      one number, never two. */
   --cta-close: calc(var(--cta-gap) / 2 + 0.42em);
+  /* THE FUSION BLUR — the σ of the field each cell is smeared into before
+     #cta-fuse thresholds it back. A TENTH of the body, so the neck is the
+     same fraction of the control at every size it takes; a fixed pixel
+     value would give .large a hairline join and the small end a puddle.
+
+     IT LIVES IN CSS, NOT IN THE FILTER, for exactly that reason: an SVG
+     primitive's stdDeviation is an attribute, it cannot read a custom
+     property, and it cannot see --cta-h. So .field blurs (a CSS length,
+     responsive) and .cells thresholds (a static SVG filter). Two spans.
+
+     ⚠️ AND IT IS BOUNDED ABOVE by the shapes it is drawn on. Thresholding
+     a blurred circle of radius r at 0.5 pulls its edge in by σ²/2r, while
+     a straight edge does not move at all — so too large a σ makes the disc
+     visibly shorter than the pill it is meant to be flush with. At a tenth
+     of the height that error is 0.01 × --cta-h: 0.37px here, 0.52px on
+     .large. Both under a pixel, which is the whole budget. */
+  --cta-goo: calc(var(--cta-h) * 0.1);
+
+  /* ── HOW LONG THE FUSION TAKES ──
+     950ms, up from 460. At the user's instruction, and the geometry wanted
+     it anyway: the close now has FOUR legible moments in it (approach,
+     contact, the neck opening, the settle) where before it had one, and
+     460ms divided four ways gives each of them about a hundred
+     milliseconds — under the ~150ms at which a stage stops being a stage
+     and becomes part of a blur. At 950 the approach alone runs half a
+     second, which is what makes the contact land as an event.
+
+     It is long for a hover, and that is the trade being made knowingly:
+     this control is an object the reader is meant to watch, not a menu
+     item that must feel instant. The label and the hit area never move
+     out from under the pointer (see the clearance ceiling above), so a
+     slow close costs nothing in pointing accuracy. */
+  --cta-dur: 950ms;
+
+  /* ── THE FUSION CURVE ──
+     Two droplets do not meet at a constant speed. They drift, they touch,
+     and then surface tension opens the bridge between them far faster than
+     they were ever approaching — the fastest part of the whole event is
+     the part after contact — and the merged body relaxes into shape from
+     slightly too long. No cubic-bezier can hold a slow middle AND a late
+     overshoot, so this is a linear() sampling of that curve, fitted to the
+     table in the header comment:
+
+       0 → 55%    the approach. 21% of the distance in 55% of the time,
+                  accelerating gently the whole way, so the cells read as
+                  drawn together rather than driven. Contact lands at 55%.
+       55 → 80%   the fuse. Peak speed at ~72%, roughly six times the
+                  approach's. The neck opens and closes inside this window.
+       80 → 96%   the relax, overshooting to 1.019 — which is ~0.9px of the
+                  right cap standing proud of the disc before it draws in.
+       96 → 100%  settled.
+
+     ⚠️ THE OVERSHOOT IS SAFE ON THE JOIN, and this is not luck. Every one
+     of the three moves is start + p × (end − start) off this SAME curve,
+     and d(p) = (h + gap)(1 − p) is linear in p, so p > 1 simply carries d
+     slightly negative — the cap passes a hair beyond the disc's centre and
+     the union stays a clean pill throughout. An overshoot on any ONE of
+     the three would open a seam instantly.
+
+     ⚠️ IT IS NOT IN globals.css with the other curves, deliberately. Those
+     are general — an out-quint, a drawer, a settle — and are meant to be
+     reached for. This one is a fit to one control's measurements and means
+     nothing away from them; the header comment says what re-fits it. */
+  --ease-fuse: linear(
+    0,
+    0.006 5%,
+    0.016 10%,
+    0.03 15%,
+    0.046 20%,
+    0.064 25%,
+    0.083 30%,
+    0.103 35%,
+    0.124 40%,
+    0.147 45%,
+    0.174 50%,
+    0.212 55%,
+    0.275 60%,
+    0.372 65%,
+    0.5 70%,
+    0.648 75%,
+    0.788 80%,
+    0.898 85%,
+    0.968 90%,
+    1.011 94%,
+    1.019 96%,
+    1.004 98%,
+    1
+  );
   /* THE TWO COLOURS ARE THE ONLY THING A CONSUMER MAY VARY, and only one
      consumer does. Cream ink on the maroon fill is the palette's own
      pairing inverted (13.06:1); see `.accent` for the dark-ground case. */
@@ -124,6 +279,30 @@
   text-transform: uppercase;
   white-space: nowrap;
   text-decoration: none;
+  /* ── THE UA RESET, FOR THE <button> ARM ──
+     This selector used to dress an <a> or a <span> only, neither of which
+     brings any of its own chrome — so nothing here reset any. The contact
+     form's submit renders a real <button> (see PillCta.tsx's `type` prop),
+     and a button arrives with a UA background, border, padding, centred
+     text, its own font and a platform `appearance`. Left alone it drew a
+     grey system chip around this control.
+
+     EVERY DECLARATION BELOW IS A NO-OP FOR AN <a> OR <span> — they already
+     have no background, border, padding or margin, they already inherit
+     weight and leading, and `appearance` does not apply. So the existing
+     three call sites are untouched by construction and the button is
+     normalised onto the same body. The `inherit` pair matters as much as
+     the visible ones: a button's `font-weight: 400` and `line-height:
+     normal` would otherwise set the label on different metrics from the
+     identical pill in the journal head. */
+  background: none;
+  border: 0;
+  padding: 0;
+  margin: 0;
+  font-weight: inherit;
+  line-height: inherit;
+  appearance: none;
+  cursor: pointer;
 }
 
 /* THE ONE VARIANT — for the closing frame, which is the only place this
@@ -173,20 +352,59 @@
   --cta-ink: var(--cream);
 }
 
-/* THE BODY — one pill covering the whole control, clipped back to the
-   label at rest. No filter, no blur, and no background on `.cta` itself: a
-   fill on the anchor would sit under both cells as a third, unclipped
-   rectangle and give the join a hard outline to happen inside. */
-.body {
+/* ── THE SHAPE LAYER — the threshold half of the fusion ──
+   Everything the reader sees as "the pill" is painted in here and nowhere
+   else. No background on `.cta` itself: a fill on the anchor would sit
+   under both cells as a third, UNFILTERED rectangle and give the join a
+   hard outline to happen inside.
+
+   A DEAD `url()` IS A NO-OP, NOT A DISAPPEARANCE. Filter Effects says a
+   reference that resolves to nothing drops the whole chain rather than
+   suppressing the element, so if GlassFilters ever stops being mounted in
+   the root layout this control degrades to its crisp geometry — which is
+   the correct end state anyway, minus the fillet. */
+.cells {
   position: absolute;
   inset: 0;
   z-index: 0;
+  filter: url(#cta-fuse);
+}
+
+/* the blur half. Separate only because --cta-goo has to be a CSS length —
+   see the note on it above. It holds no geometry of its own: inset 0, so
+   the two bodies below resolve against the control's rect exactly as they
+   did when they were direct children of it. */
+.field {
+  position: absolute;
+  inset: 0;
+  filter: blur(var(--cta-goo));
+}
+
+/* THE BODY — one pill covering the whole control, clipped back to the
+   label at rest. */
+.body {
+  position: absolute;
+  inset: 0;
   border-radius: 999px;
   background: var(--cta-fill);
   clip-path: inset(0 calc(var(--cta-h) + var(--cta-gap)) 0 0 round 999px);
   transition:
-    clip-path 460ms var(--ease-drawer),
-    transform 460ms var(--ease-drawer);
+    clip-path var(--cta-dur) var(--ease-fuse),
+    transform var(--cta-dur) var(--ease-fuse);
+}
+
+/* THE DISC'S FILL — the circle, and only the circle. Its arrow is drawn
+   outside the filter in `.disc`, which occupies this exact box; the two
+   are one object and always move as one (see the header's warning). */
+.discCell {
+  position: absolute;
+  top: 0;
+  right: 0;
+  width: var(--cta-h);
+  height: var(--cta-h);
+  border-radius: 50%;
+  background: var(--cta-fill);
+  transition: transform var(--cta-dur) var(--ease-fuse);
 }
 
 /* THE TYPE — in flow over the body, and it is what sizes the control. It
@@ -200,11 +418,13 @@
   height: var(--cta-h);
   padding-inline: 1.3em;
   font-weight: var(--w-regular);
-  transition: transform 460ms var(--ease-drawer);
+  transition: transform var(--cta-dur) var(--ease-fuse);
 }
 
-/* THE DISC — its own circle, carrying the arrow. It travels left into the
-   body's opening clip; the two meet at the midpoint of the gap. */
+/* THE DISC — the arrow's seat, and the box that SIZES the right end of the
+   control. Its fill is `.discCell`, inside the shape layer; this box is
+   transparent and carries only the glyph. It travels left into the body's
+   opening clip. */
 .disc {
   position: relative;
   z-index: 1;
@@ -214,47 +434,73 @@
   width: var(--cta-h);
   height: var(--cta-h);
   margin-left: var(--cta-gap);
-  border-radius: 50%;
-  background: var(--cta-fill);
-  transition: transform 460ms var(--ease-drawer);
+  transition: transform var(--cta-dur) var(--ease-fuse);
 }
 
 .arrow {
   width: 55%;
   height: 10px;
-  transition: transform 0.45s var(--ease-drawer);
+  transition: transform 340ms var(--ease-bounce);
 }
 
-/* ── THE CLOSE ──
-   Both cells on --ease-drawer, which is the curve every other joining move
-   on this page uses (the card lift, the photo zoom): most of the distance
-   early, then a settle. 460ms rather than the ~300 a colour change takes —
-   this is two objects travelling and being seen to travel.
+/* ══════════════════════════ THE CLOSE ══════════════════════════════════
+   Four moves, one curve, one duration — see --ease-fuse and --cta-dur.
 
-   THE ARROW WAITS. It only steps forward once the cells have closed most
-   of the distance, so the sequence is join-then-point rather than two
-   unrelated things moving at once. That is the 0.18s delay. */
+   ── THREE TRIGGERS, ONE SET OF RULES ──
+   `[data-cta-hover]` is how a whole-card link drives this control from one
+   level out. A presentational pill (see PillCta.tsx) sits INSIDE such a
+   link, and `.cta:hover` there would only fire for a pointer that happened
+   to land on the pill itself — the reader hovers the CARD, the control
+   ignores them, and the card's one moving part is the part that looks
+   broken. The attribute is deliberately un-hashed (a global selector in a
+   CSS module) because the element carrying it belongs to the consumer's
+   markup; everything it reaches into is still local.
+
+   IT USED TO BE A SECOND, DUPLICATED SET OF RULES with a warning over it
+   that they must be kept in step by hand. They are one selector list now,
+   which is the same thing enforced by the parser instead of by the reader.
+
+   ── AND THE ARROW STILL WAITS ──
+   It steps forward at 74% of the close — after the neck has snapped shut
+   and while the merged body is still relaxing, so the sequence reads
+   join-then-point rather than two unrelated things moving at once.
+
+   ⚠️ THE DELAY IS DECLARED HERE, IN THE HOVER STATE, AND THAT IS WHAT
+   MAKES THE EXIT RIGHT. A transition reads its timing from the state it is
+   heading TO, so the forward move is delayed by three quarters of a second
+   and the return — heading back to `.arrow`'s own rule, which carries no
+   delay — is immediate. Move it into the base rule and the arrow hangs
+   there for three quarters of a second after the pointer has gone. */
 .cta:hover .body,
-.cta:focus-visible .body {
+.cta:focus-visible .body,
+[data-cta-hover]:hover .body {
   /* R = a + b — see the equation in the block comment above */
   clip-path: inset(0 calc(var(--cta-close) * 2) 0 0 round 999px);
   transform: translateX(var(--cta-close));
 }
 
 .cta:hover .label,
-.cta:focus-visible .label {
+.cta:focus-visible .label,
+[data-cta-hover]:hover .label {
   transform: translateX(var(--cta-close));
 }
 
+/* the circle's two halves — the fill inside the filter and the arrow's
+   seat outside it — travel as one object */
 .cta:hover .disc,
-.cta:focus-visible .disc {
+.cta:hover .discCell,
+.cta:focus-visible .disc,
+.cta:focus-visible .discCell,
+[data-cta-hover]:hover .disc,
+[data-cta-hover]:hover .discCell {
   transform: translateX(calc(-1 * var(--cta-close)));
 }
 
 .cta:hover .arrow,
-.cta:focus-visible .arrow {
+.cta:focus-visible .arrow,
+[data-cta-hover]:hover .arrow {
   transform: translateX(4px);
-  transition-delay: 0.18s;
+  transition-delay: calc(var(--cta-dur) * 0.74);
 }
 
 /* The ring is the FILL, so it is legible against whatever the control is
@@ -280,9 +526,15 @@
 
 /* A reader who asked for less motion gets the END STATE on hover, not the
    journey: the cells are still one pill under the pointer, they simply
-   arrive there. (The magnet does not run at all — see lib/useMagnet.ts.) */
+   arrive there. (The magnet does not run at all — see lib/useMagnet.ts.)
+
+   THE FILTER STAYS ON. It is not motion — it is how this control is drawn,
+   and at both ends of the move it draws exactly the geometry. Switching it
+   off here would mean a reader who asked for less motion got a subtly
+   different SHAPE, which is not what they asked for. */
 @media (prefers-reduced-motion: reduce) {
   .body,
+  .discCell,
   .label,
   .disc,
   .arrow {

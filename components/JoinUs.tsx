@@ -16,6 +16,7 @@ import Nav from "./Nav";
 import Menu from "./Menu";
 import Footer from "./Footer";
 import DarkZone from "./DarkZone";
+import PillCta from "./PillCta";
 import Reveal from "./Reveal";
 import SplitWords from "./SplitWords";
 import styles from "./JoinUs.module.css";
@@ -384,21 +385,9 @@ function Chevron() {
   );
 }
 
-function SubmitArrow() {
-  return (
-    <svg
-      viewBox="0 0 24 24"
-      fill="none"
-      stroke="currentColor"
-      strokeWidth="2"
-      strokeLinecap="round"
-      strokeLinejoin="round"
-      aria-hidden
-    >
-      <path d="M4 12h15M13 6l6 6-6 6" />
-    </svg>
-  );
-}
+/* (`SubmitArrow` lived here — a 24×24 chevron-and-shaft for this form's own
+   submit button. The submit is <PillCta> now and brings its own arrow inside
+   the closing disc, so the local one went with the button it was drawn for.) */
 
 const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 
@@ -761,30 +750,43 @@ export default function JoinUs() {
              for. ---- */}
         <section className={styles.section} data-nav-theme="light">
           <header className={styles.hero}>
-            {/* THE CORNER LABELS carry the page's furniture in the site's
-                caps voice (the nav, Blog's counter, PressWall's signpost).
-                "Careers" is one of them: it is a nav item, and a nav item at
-                7rem is a label pretending to be a headline. The right label
-                is DERIVED — a count that could go stale is worse than no
-                count. They arrive with the caption, in beat 3: at the top of
-                the sequence the composition is two lines of type in the
-                middle of an empty frame and nothing else. */}
-            <motion.div
-              className={styles.heroLabels}
-              initial={{ opacity: reduce ? 1 : 0 }}
-              animate={{ opacity: beat3 ? 1 : 0 }}
-              transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
-            >
-              <HeroLabel>Careers</HeroLabel>
-              {/* The count is gone. It was the only number on the page that
-                  went stale on its own — every posting added or filled
-                  silently rewrote the hero — and it made the header a status
-                  readout rather than a place. The roles are listed in full
-                  further down, where they can be read rather than counted. */}
-              <HeroLabel>London</HeroLabel>
-            </motion.div>
-
             <div className={styles.heroSplit}>
+              {/* THE CORNER LABELS carry the page's furniture in the site's
+                  caps voice (the nav, Blog's counter, PressWall's signpost).
+                  "Careers" is one of them: it is a nav item, and a nav item at
+                  7rem is a label pretending to be a headline. The right label
+                  is DERIVED — a count that could go stale is worse than no
+                  count. They arrive with the caption, in beat 3: at the top of
+                  the sequence the composition is two lines of type in the
+                  middle of an empty frame and nothing else.
+
+                  INSIDE `.heroSplit` NOW, and it is a positioning move rather
+                  than a semantic one: they are absolutely seated on the
+                  headline's cap line and this is the box whose top edge that
+                  is measured from (see `.heroLabels` in the stylesheet). DOM
+                  order is unchanged — labels, then the heading — so nothing
+                  about the reading order or the <h1>'s accessible name moves
+                  with them. Below 600px they drop back into this column's
+                  flow, above the top line, exactly where they used to be. */}
+              <motion.div
+                className={styles.heroLabels}
+                initial={{ opacity: reduce ? 1 : 0 }}
+                animate={{ opacity: beat3 ? 1 : 0 }}
+                transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
+              >
+                <HeroLabel>Careers</HeroLabel>
+                {/* The count is gone. It was the only number on the page that
+                    went stale on its own — every posting added or filled
+                    silently rewrote the hero — and it made the header a status
+                    readout rather than a place. The roles are listed in full
+                    further down, where they can be read rather than counted.
+                    The place is named to the street now rather than to the
+                    city: "London" is true of every group careers page there
+                    is, and the two neighbourhoods are the fact a cook deciding
+                    whether the commute works actually needs. */}
+                <HeroLabel>Kentish Town &amp; Soho, London</HeroLabel>
+              </motion.div>
+
               {/* one SplitWords per line rather than one for the whole
                   headline: the component splits on spaces and has no notion
                   of a line break, and a <br/> inside it would land in the
@@ -986,16 +988,24 @@ export default function JoinUs() {
                THE ARGUMENT, THEN THE DOOR, THEN THE ASK. The reasoning for
                this shape is in JoinUs.module.css above `.reasons`; in short,
                the three reasons finish the roles index instead of sitting
-               beside the form, a single rule is the threshold, and the form
-               itself is one narrow centred column with nothing next to it.
-               ---- */}
+               beside the form — as a full-bleed dark band, which is what
+               closes the index now that the hairline threshold under it has
+               been removed — and the form itself is one narrow centred
+               column with nothing next to it. ---- */}
           <section className={styles.form} ref={formRef} id="apply">
             {/* PILLARS, at full measure, as the LEAD-OUT of the roles index.
                 It used to be a stacked rail beside the fields — a hundred
                 words of argument aimed at someone who has already decided to
                 apply. Three columns of ~30 words is also the shape this copy
                 was written in. */}
-            <ul className={styles.reasons}>
+            {/* `data-nav-theme="dark"` because the band is now a dark ground
+                in the middle of a light page, and the navbar samples what is
+                UNDER it (Nav.tsx: elementFromPoint at 24,56 then `.closest`).
+                Without this the nearest host is `<main data-nav-theme="light">`
+                and the bar would paint maroon ink on the maroon band for the
+                whole time the band is passing beneath it. Same attribute
+                DarkZone puts on the page's other dark ground. */}
+            <ul className={styles.reasons} data-nav-theme="dark">
               {PILLARS.map((pl, i) => (
                 <Reveal as="li" key={pl.mark} className={styles.reason} delay={i * 0.07}>
                   <span className={styles.reasonMark}>{pl.mark}</span>
@@ -1005,9 +1015,13 @@ export default function JoinUs() {
               ))}
             </ul>
 
-            {/* the threshold. One hairline across the full measure, and the
-                page narrows to under half of it on the other side. */}
-            <hr className={styles.threshold} />
+            {/* (The threshold hairline stood here — one rule across the full
+                measure, with the page narrowing to 760px on the other side of
+                it. Removed on request. The narrowing does the announcing on
+                its own now, which was always the louder half of the pair; and
+                the dark band directly above is a far stronger close to the
+                roles index than a hairline was, so the section had come to
+                have two endings where it needs one.) */}
 
             <div className={styles.formShell}>
               <Reveal className={styles.formHead}>
@@ -1204,23 +1218,37 @@ export default function JoinUs() {
                           usable.
                       A third copy sits on the CV field's own hint, because
                       that is the moment the file is chosen. ---- */}
-                  <div className={styles.submitRow}>
-                    {/* Not MagneticButton: that pill widens its padding by
-                        ~0.55em on hover and scales 0.97 on press, so the
-                        control GROWS under the cursor. Footer's `.inviteCta`
-                        is the house answer — the pill never changes size, the
-                        recess just deepens — and this is that recipe on the
-                        cream page. Local markup because MagneticButton is
-                        shared with six other callers. */}
-                    <button type="submit" className={styles.submitCta}>
-                      <span className={styles.submitCtaLabel}>
-                        Send application
-                      </span>
-                      <span className={styles.submitCtaArrow} aria-hidden>
-                        <SubmitArrow />
-                      </span>
-                    </button>
-                  </div>
+                  {/* THE HOUSE ACTION, at the user's instruction — the same
+                      control the journal head carries as "Read More", and the
+                      same one About, the hero and the closing frame carry (see
+                      components/PillCta.tsx). /contact's submit was moved onto
+                      it for the same reason; this is the last form that had
+                      not been.
+
+                      WHAT IT REPLACES: this file's own `.submitCta`, a filled
+                      capsule whose only moving part was an inset shadow
+                      deepening under the pointer. It was a careful control —
+                      its stylesheet argued, correctly, that a button which
+                      GROWS under the cursor is the wrong feedback — but it
+                      argued that against MagneticButton and answered with a
+                      fourth distinct button rather than the house one. PillCta
+                      settles the same question a different way: nothing
+                      resizes, the pill and its disc simply close on each other.
+
+                      NO `tone`. The default arm is --cta-fill: var(--maroon)
+                      over --cta-ink: var(--cream), which is the cream-page
+                      pairing — the arm the journal head uses. tone="cream" is
+                      /contact's, and only because that form sits on the maroon
+                      DarkZone where a maroon pill would leave just a label.
+
+                      `.submitRow` is the SEAT and nothing else, passed through
+                      `className` exactly as PillCta's stylesheet requires: the
+                      wrapper <div> it used to be is gone, because the control's
+                      own `.host` is already shrink-wrapped and a flex row with
+                      one child in it was a box around a box. */}
+                  <PillCta type="submit" className={styles.submitRow}>
+                    Send application
+                  </PillCta>
 
                   <AnimatePresence>
                     {submitted && (

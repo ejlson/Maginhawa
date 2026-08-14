@@ -183,7 +183,7 @@ const EXTRAS: Record<string, Extras> = {
        /images/bunso-placeholder.jpg, WHICH DOES NOT EXIST in public/.
        Rather than ship a 404 into a next/image, the card takes the maroon
        field it has always had here. */
-    image: null,
+    image: "/images/bunso.jpg",
   },
 };
 

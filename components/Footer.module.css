@@ -11,7 +11,7 @@
   min-height: 100svh;
   /* full bleed minus pad-x — Contact / FAQ / ReviewUs above match this via
      the .zone :global(.container) override in DarkZone.module.css */
-  padding: clamp(24px, 4vh, 56px) var(--pad-x) clamp(10px, 1.4vh, 16px);
+  padding: clamp(24px, 4vh, 56px) var(--pad-x) var(--space-xs-y);
   /* no rule above — the page's section boundaries are carried by spacing
      alone (the home page's zero-section-rules system) */
 }
@@ -72,7 +72,7 @@
 .brandName {
   font-family: var(--font-sans);
   font-size: var(--t-small);
-  line-height: 1;
+  line-height: var(--lh-flush);
 }
 
 .blurb {
@@ -92,7 +92,7 @@
 
 .inviteTitle {
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   font-size: var(--t-h2);
   line-height: var(--lh-heading);
   letter-spacing: var(--tr-display);
@@ -108,13 +108,13 @@
 .inviteCta {
   display: inline-flex;
   align-items: center;
-  gap: 0.6em;
+  gap: var(--lockup-gap-sm);
   font-family: var(--font-sans);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   /* shares the site's button size token with the ReadyCta and Contact pills;
      it keeps its own sans/sentence-case identity, but not its own scale */
   font-size: var(--t-button);
-  line-height: 1;
+  line-height: var(--lh-flush);
   white-space: nowrap;
   color: var(--maroon);
   background: var(--cream);
@@ -216,7 +216,7 @@
 
 .brandName {
   font-family: var(--font-sans);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   font-size: var(--t-small);
   line-height: var(--lh-body);
 }
@@ -225,7 +225,7 @@
   justify-self: start;
   display: inline-flex;
   align-items: center;
-  gap: 0.5em;
+  gap: var(--lockup-gap-sm);
   background: none;
   border: none;
   color: inherit;
@@ -328,7 +328,7 @@
 
 .col h4 {
   font-family: var(--font-sans);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   font-size: var(--t-small);
   margin: 0 0 0.9em;
 }
@@ -373,7 +373,7 @@
 
 .wline {
   font-family: var(--font-display-big);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   text-transform: uppercase;
   /* no letter-spacing here — the SVG's textLength owns the letterfit, and a
      CSS value on top of it would be counted twice */
@@ -420,7 +420,7 @@
     font-size: var(--t-body);
   }
   .col ul {
-    gap: 0.55em;
+    gap: var(--lockup-gap-sm);
   }
 }
 
