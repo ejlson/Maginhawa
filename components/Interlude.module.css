@@ -99,7 +99,7 @@
 .line {
   margin: 0;
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   font-size: clamp(2rem, 4.2vw, 3.8rem);
   line-height: var(--lh-display);
   letter-spacing: var(--tr-display);

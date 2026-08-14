@@ -206,34 +206,28 @@ export default function Experience() {
               masthead rewrite, and the home page was left with no editorial
               route to the group's story at all. This is that route. */}
           <AboutSplit />
-          {/* ══════ PRESS TAKES THE INTERLUDE'S SLOT ══════
-              The full-screen photo interlude that sat here is replaced by
-              the press wall, at the user's instruction. Interlude.tsx is
-              NOT deleted; nothing imports it now, so it joins AboutIntro
-              and MaroonZone as dead code with a stay of execution.
+          {/* ══════ THE JOURNAL FOLLOWS THE ABOUT SPLIT ══════
+              It follows press's departure to the slot below — this comment
+              described press while press stood here, and the parts of it
+              that were about THIS seam are kept.
 
-              WHAT THE SWAP BUYS. The marquee's scroll-linked deceleration —
-              a useScroll ramping the lane animation's `playbackRate` 1 → 0
-              across the last 35% of the section's exit — was tuned for the
-              Featured-In → Journal seam, and this slot IS that seam: press
-              sits directly above <Blog />, exactly where it used to. The
-              one transition that lost its host in the removal pass gets it
-              back unchanged. It also returns the home page's only display
-              of third-party credibility (lib/press.ts kept feeding the
-              other routes throughout, so the data never went anywhere).
+              A PHOTOGRAPH IS STILL MISSING FROM THIS RUN. The full-screen
+              photo interlude that once sat between About and the journal was
+              replaced by press, and press has now moved on; the journal
+              inherits the gap. About-split → journal is type-under-picture
+              where it used to be broken by a second full-screen image, so
+              the page's picture count is still down one at its quietest
+              point. (Interlude.tsx is imported by nothing and remains dead
+              code with a stay of execution — see the note under PressWall.)
 
-              WHAT IT COSTS. A photograph. The interlude was a full-screen
-              picture and press is a type chapter, so the run from the About
-              split to the journal is now type → type where it used to be
-              broken by an image. The page's picture count drops by one at
-              its quietest point.
-
-              THE SEAM ABOVE IS NOT 12px, AND THAT IS DELIBERATE — see
-              PressWall.module.css's .section. AboutSplit contributes no
-              vertical padding and expects its neighbour to own the gap; the
-              interlude owned it at 12px because two photographs 12px apart
-              read as one band. Type 12px off a photograph's edge reads as a
-              caption stuck to it, so press keeps a chapter's air instead.
+              THE SEAM ABOVE IS NOT 12px, AND THAT IS DELIBERATE. AboutSplit
+              contributes no vertical air and expects its neighbour to own
+              the gap; the interlude owned it at 12px because two photographs
+              12px apart read as one band. Type 12px off a photograph's edge
+              reads as a caption stuck to it, so the chapter below it keeps a
+              chapter's air instead — Blog's own clamp(64px, 9vh, 132px) top,
+              which is the same value press was carrying when it held this
+              slot. The requirement survived the swap unchanged.
 
               NOTHING ON THIS PAGE IS PINNED, and the wrapper that used to
               bound the last pin went with it: the interlude's photograph
@@ -241,8 +235,55 @@ export default function Experience() {
               and `.pinScope` existed only because `position: sticky` is
               bounded by its containing block. The page scrolls at one rate
               from the hero to the footer. */}
-          <PressWall />
           <Blog />
+          {/* ══════ PRESS SITS BELOW THE JOURNAL NOW ══════
+              Moved from directly above <Blog /> to directly below it, at the
+              user's instruction.
+
+              ⚠️ THE COMMENT ABOVE USED TO ARGUE AGAINST THIS, AND IT WAS
+              ARGUING FROM A FACT THAT HAD STOPPED BEING TRUE. It said the
+              slot was worth having because the marquee's scroll-linked
+              deceleration — a useScroll ramping the lane's `playbackRate`
+              1 → 0 across the last 35% of the section's exit — "was tuned
+              for the Featured-In → Journal seam", and that moving press
+              here "gets it back unchanged".
+
+              It did not get it back. PressWall.tsx's own header is explicit:
+              "WHAT DID NOT COME BACK: the SCROLL-LINKED DECELERATION … It is
+              not asked for here and it is the one piece of this section that
+              was expensive; it is still in git if the seam ever wants it
+              again." Two files disagreed and the one describing its own
+              behaviour was right. There is no scroll coupling to this seam,
+              so nothing about the order was load-bearing and this move costs
+              no motion at all. The stale claim is corrected here rather than
+              left for someone to plan around.
+
+              WHAT THE MOVE DOES COST is seams, and both are paid in
+              PressWall.module.css rather than here:
+              — ABOVE. Blog's own bottom padding is clamp(64px, 9vh, 132px),
+                the SAME value press carried on top, so leaving both would
+                stack ~264px of empty cream between the journal and the
+                mastheads — two correct numbers summing to a wrong one, the
+                trap AboutSplit.module.css keeps flagging. Press now takes 0
+                on top and lets the journal own that gap.
+              — BELOW. Press used to close on --grid-gutter (12px) because
+                Blog's 132px top followed it and owned the air. What follows
+                it now is <Reservations />, which declares `margin-top: 0`
+                and no top padding at all — it owns nothing. So press has to
+                own its own bottom, and takes the chapter air there instead.
+
+              AND THE SEAM ABOVE ABOUTSPLIT SURVIVES UNTOUCHED, which is the
+              one that was genuinely tuned: AboutSplit contributes no
+              vertical air and expects its neighbour to own the gap, and its
+              new neighbour is Blog, whose top padding is clamp(64px, 9vh,
+              132px) — byte-identical to the value press was carrying. The
+              photograph still gets a chapter's air under it rather than
+              type stuck to its edge.
+
+              Interlude.tsx is still not deleted and still imported by
+              nothing — it remains dead code with a stay of execution,
+              alongside AboutIntro and MaroonZone. */}
+          <PressWall />
           {/* No open-roles index on the cream page: hiring lives behind the
               footer's Careers link, which is where someone looking for a job
               would go anyway. */}

@@ -176,7 +176,7 @@
 .title {
   margin: 0;
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   font-size: clamp(3.25rem, 9vw, 9.5rem);
   line-height: var(--lh-display);
   letter-spacing: var(--tr-display);
@@ -290,7 +290,7 @@
 .body {
   margin: 0;
   font-family: var(--font-sans);
-  font-weight: 400;
+  font-weight: var(--w-regular);
   font-size: var(--t-small);
   line-height: var(--lh-body);
   color: var(--maroon);
@@ -341,7 +341,7 @@
   margin-top: clamp(22px, 3.2vh, 40px);
   display: inline-flex;
   align-items: center;
-  gap: 0.55em;
+  gap: var(--lockup-gap-sm);
   min-height: 44px;
   padding: 0 clamp(20px, 2vw, 30px);
   border: 1px solid var(--maroon);
@@ -349,7 +349,7 @@
   background: var(--maroon);
   color: var(--cream);
   font-family: var(--font-sans);
-  font-weight: 400;
+  font-weight: var(--w-regular);
   font-size: 0.9375rem;
   letter-spacing: 0.005em;
   white-space: nowrap;

@@ -285,7 +285,7 @@
   font-size: calc(
     (var(--nav-links-left, 66vw) - var(--pad-x) - var(--hero-gap)) / 5.297
   );
-  line-height: 1;
+  line-height: var(--lh-flush);
   text-box: trim-both cap alphabetic;
   /* ── UPPERCASE, AND TRACKED LIKE THE NAVBAR'S, at the user's
      instruction ── It was title case and untracked, which is why it did not

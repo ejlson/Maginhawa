@@ -33,6 +33,7 @@
     "**/*.tsx",
     ".next-about-dev/types/**/*.ts",
     ".next-about/types/**/*.ts",
+    ".next-ac1-before/types/**/*.ts",
     ".next-cb-dev/types/**/*.ts",
     ".next-cb/types/**/*.ts",
     ".next-contact/types/**/*.ts",

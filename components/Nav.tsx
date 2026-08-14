@@ -127,6 +127,18 @@ export default function Nav({
      one reason to stand the logo down is gone and the bar should be named
      again. Same override the theme takes, one line above. */
   const hideLogo = onHero && !menuOpen;
+  /* ── AND THE CREAM BAR IS THE HERO'S TOO, at the user's instruction ──
+     `blend` is the theme every FILM section carries, not the home hero's
+     private one: the /restaurants hero, the closing invitation at #book and
+     About's pinned video all set it. So the cream-on-a-scrim treatment
+     written for the opening frame appeared on all four. It is keyed on
+     PLACE now, and `onHero` — already sampled one line up for the wordmark
+     — is that place. Everywhere else `blend` is the difference blend it
+     always was.
+
+     No `&& !menuOpen` here: `activeTheme` is forced to `light` while the
+     overlay is open, so a hero bar cannot survive the menu opening. */
+  const heroFilm = activeTheme === "blend" && onHero;
   const show = started && (menuOpen || !hidden);
 
   // route links use the page-transition curtain; in-page hashes scroll natively
@@ -149,7 +161,9 @@ export default function Nav({
 
   return (
     <motion.nav
-      className={`${styles.nav} ${styles[activeTheme]}`}
+      className={[styles.nav, styles[activeTheme], heroFilm && styles.heroFilm]
+        .filter(Boolean)
+        .join(" ")}
       initial={{ opacity: 0, y: -24 }}
       animate={show ? { opacity: 1, y: 0 } : { opacity: 0, y: -24 }}
       transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}

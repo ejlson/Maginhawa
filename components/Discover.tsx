@@ -25,7 +25,6 @@ import VenueCard from "./VenueCard";
 import { getRestaurant, primaryAction } from "@/lib/restaurants";
 import { venueCards, type VenueCardItem } from "@/lib/venueCards";
 import { lenisRef } from "@/lib/SmoothScroll";
-import SplitWords from "./SplitWords";
 
 /* ══════════════════════════════════════════════════════════════════════
    THE ASSEMBLY INTRO IS GONE, and this note is here so nobody rebuilds it
@@ -167,6 +166,7 @@ const DISPLAY: Record<string, DiscoverDisplay> = {
     location: "1a Hawley Rd, London NW1 8RP",
     blurb:
       "Bunso — 'the youngest' — is the newest member of the Maginhawa family. Full details, menu and location coming soon.",
+    clip: "/videos/bunso-bakery.mp4",
   },
 };
 
@@ -515,19 +515,24 @@ export default function Discover() {
             cue, because an observer would have been racing the step
             machine; with no step machine it takes SplitWords' own
             whileInView, like every other caller on the site. */}
-        {/* THE LINE THAT NOW CARRIES THE DISPLAY SIZE. Freight Light, two
-            lines, ranged left under the label — the Jonite arrangement.
-            It keeps SplitWords: the word-by-word build is the same grammar
-            the statement under the hero uses, and at this size it finally
-            has type worth building. */}
-        <SplitWords
-          as="p"
-          className={styles.lede}
-          text="Explore our family of restaurants and stores, where tradition is served with a modern twist."
-          amount={0.5}
-          stagger={0.03}
-          duration={0.65}
-        />
+        {/* ── THE DISPLAY LINE, AND IT NO LONGER BUILDS, at the user's
+            instruction ── It was <SplitWords>: the sentence assembled word
+            by word on the manifesto's grammar, which was the argument for
+            it ("at this size it finally has type worth building").
+
+            WHAT THAT COSTS, so it is a decision and not a regression: the
+            chapter's head now simply IS, where the statement two chapters
+            down still builds and the careers page's headline still splits.
+            The word-by-word entrance is no longer a house move, it is the
+            manifesto's alone — which is arguably the better claim, since
+            that is the one sentence on the site written to be read a word
+            at a time.
+
+            SplitWords itself is untouched and still has callers. */}
+        <p className={styles.lede}>
+          Explore our family of restaurants and stores, where tradition is
+          served with a modern twist.
+        </p>
 
         {/* THE MIDDLE HAIRLINE. It closes the head and opens the grid, which is
             the one place on this chapter a rule earns its keep: it is INSIDE

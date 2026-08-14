@@ -11,13 +11,13 @@
 .eyebrow {
   display: inline-flex;
   align-items: center;
-  gap: 0.7em;
+  gap: var(--lockup-gap);
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
   color: var(--cream);
-  margin-bottom: clamp(14px, 2vh, 22px);
+  margin-bottom: var(--space-sm-y);
 }
 .eyebrow::before {
   content: "";
@@ -31,7 +31,7 @@
 
 .sectionTitle {
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   font-size: var(--t-display);
   line-height: var(--lh-display);
   letter-spacing: var(--tr-display);
@@ -48,7 +48,7 @@
 .back {
   display: inline-flex;
   align-items: center;
-  gap: 8px;
+  gap: var(--space-2xs);
   font-family: var(--font-sans);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
@@ -142,7 +142,7 @@
      until the two-family swap; that face has not loaded in a long time. */
   font-weight: var(--w-hairline);
   font-size: clamp(1.2rem, 2.4vw, 2.2rem);
-  line-height: 1;
+  line-height: var(--lh-flush);
   color: var(--cream);
   /* above .heroScrim — see the note there. z-index stays `auto`: both are
      positioned, so tree order alone decides, and the scrim is first. */
@@ -338,7 +338,7 @@
   justify-content: center;
   white-space: nowrap;
   font-family: var(--font-display-big);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   font-size: var(--hero-display-size);
   line-height: 0.86;
   letter-spacing: -0.01em;
@@ -465,7 +465,7 @@
 .scrollCueInner {
   display: flex;
   align-items: center;
-  gap: 0.55em;
+  gap: var(--lockup-gap-sm);
   font-family: var(--font-mono);
   font-weight: var(--w-regular);
   font-size: var(--t-label);
@@ -681,7 +681,7 @@
 .heroLineTop,
 .heroLineBottom {
   font-family: var(--font-display-big);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   font-size: var(--hero-display-size);
   line-height: 0.86;
   letter-spacing: -0.01em;
@@ -1320,7 +1320,7 @@
   font-family: var(--font-display-small);
   font-weight: var(--w-regular);
   font-size: clamp(3.2rem, 5.5vw, 5.6rem);
-  line-height: 1;
+  line-height: var(--lh-flush);
   letter-spacing: var(--tr-display);
   /* THE ONE STRANDED LITERAL ON THIS PAGE THAT IS TYPE, AND THE ONLY ONE HERE
      WHOSE ALPHA MOVED. It was `rgba(250, 247, 241, 0.4)` — #faf7f1, the cream
@@ -1460,7 +1460,7 @@
   display: block;
   margin-top: 0.5rem;
   font-size: 0.5em;
-  line-height: 1;
+  line-height: var(--lh-flush);
   opacity: 0.75;
 }
 
@@ -1708,7 +1708,7 @@
      a right-hung note, which needs a title wide enough to hang off */
   .coverageHead {
     grid-template-columns: 1fr;
-    row-gap: 10px;
+    row-gap: var(--space-xs);
   }
   .coverageCount {
     justify-self: start;
@@ -1889,6 +1889,13 @@
   opacity: 0.78;
   display: flex;
   flex-direction: column;
+  /* 2px is a lockup, not a scale step: these stacked lines are ONE entry's
+     restaurant list, and the inherited 1.4 leading already opens ~5px of
+     air between 13px label lines. 2px on top keeps the optical gap (~7px)
+     under the cap height, so the stack reads as one cell of the coverage
+     row; at the scale's 4px floor it reaches cap height and the list
+     starts reading as more rows of the table instead. Measured per object,
+     like VenueCard's 3px stat gap. */
   gap: 2px;
 }
 
@@ -1984,8 +1991,8 @@
 @media (max-width: 720px) {
   .coverageGroup {
     grid-template-columns: 1fr;
-    gap: 8px;
-    padding-block: clamp(10px, 1.4vh, 16px);
+    gap: var(--space-2xs);
+    padding-block: var(--space-xs-y);
   }
 
   .coverageOutlet {
@@ -1994,7 +2001,7 @@
 
   .coverageRow {
     grid-template-columns: 1fr;
-    gap: 4px;
+    gap: var(--space-4xs);
     padding-block: clamp(8px, 1.2vh, 14px);
   }
 

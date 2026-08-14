@@ -1,4 +1,5 @@
 import styles from "./Contact.module.css";
+import PillCta from "./PillCta";
 import Reveal from "./Reveal";
 import { CONTACT } from "@/lib/contact";
 
@@ -144,23 +145,39 @@ export default function Contact({ standalone = false }: ContactProps) {
                 />
               </div>
               <div className={styles.submitRow}>
-                {/* submit wears the ReadyCta "Join Us" pill — the one
-                    light moment on the maroon contact ground */}
-                <button type="submit" className={styles.submitPill}>
-                  <span className={styles.pillLabel}>Submit</span>
-                  <svg
-                    className={styles.pillArrow}
-                    viewBox="0 0 24 24"
-                    fill="none"
-                    stroke="currentColor"
-                    strokeWidth="1.5"
-                    strokeLinecap="round"
-                    strokeLinejoin="round"
-                    aria-hidden
-                  >
-                    <path d="M9 6l6 6-6 6" />
-                  </svg>
-                </button>
+                {/* THE HOUSE ACTION, at the user's instruction — the same
+                    control the journal head carries as "Read More", and
+                    the same one About and the closing frame carry (see
+                    components/PillCta.tsx).
+
+                    WHAT IT REPLACES: this form's own `.submitPill`, whose
+                    stylesheet described it as "the ReadyCta 'Join Us' pill
+                    recipe, copied in verbatim because CSS modules don't
+                    share classes". That copy is exactly the duplication
+                    PillCta exists to end — it had drifted into a different
+                    object from the site's other buttons (a hollow capsule
+                    in the DISPLAY face that filled on hover, against this
+                    control's filled pill and closing disc in the mono
+                    face). It is one object now, so a reader who has learned
+                    what the pill does in the journal head knows this one
+                    before reading it.
+
+                    tone="cream" IS THE CREAM BACKGROUND ASKED FOR, and it
+                    is a variant the control already had rather than a local
+                    override: --cta-fill: var(--cream) over --cta-ink:
+                    var(--maroon). It is the right arm on this ground for
+                    the same reason the hero uses it — the default fill is
+                    maroon, which on this section's maroon would leave the
+                    pill invisible and only its label showing. Cream also
+                    keeps the old design's intent, which the stylesheet put
+                    as "the section's single light moment".
+
+                    type="submit" rather than an href: this posts the form.
+                    See the note on Props in PillCta.tsx for why that is a
+                    separate arm of the union rather than an `as` prop. */}
+                <PillCta type="submit" tone="cream">
+                  Submit
+                </PillCta>
               </div>
             </form>
           </Reveal>

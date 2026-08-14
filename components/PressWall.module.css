@@ -154,8 +154,40 @@
    and reads as furniture BETWEEN the two chapters rather than as the foot
    of the first. That is a real change of relationship and it is the one
    that was asked for. */
+/* ⚠️ THE VERTICAL PADDING IS INVERTED FROM WHAT IT WAS, because the section
+   moved. It read `clamp(64px, 9vh, 132px) var(--pad-x) var(--grid-gutter)`
+   — chapter air on top, 12px underneath — and both halves of that were
+   correct for a slot this section no longer occupies.
+
+   WHERE IT USED TO SIT: directly under AboutSplit and directly above Blog.
+   The top owned the gap because AboutSplit contributes no vertical air and
+   type 12px off a photograph's edge reads as a caption stuck to it. The
+   bottom could be 12px because Blog's own clamp(64px, 9vh, 132px) top
+   followed immediately and owned that side.
+
+   WHERE IT SITS NOW: directly under Blog and directly above Reservations.
+   Both of those facts reverse.
+
+   TOP IS 0 BECAUSE THE JOURNAL ALREADY PAID. Blog's bottom padding is
+   clamp(64px, 9vh, 132px) — the very same expression. Keeping a matching
+   value here would stack the two into ~264px of empty cream at 1440, which
+   is the "two correct values summing to a wrong one" failure AboutSplit's
+   stylesheet keeps catching. One of them has to yield and it is this one:
+   the journal's padding is symmetric with its own top and should stay that
+   way.
+
+   BOTTOM OWNS THE WHOLE GAP BECAUSE RESERVATIONS OWNS NOTHING. It declares
+   `margin-top: 0` and no top padding at all — it is the film, and it starts
+   at its own first pixel. Left at --grid-gutter the mastheads would sit 12px
+   off the film's edge, which is the caption-stuck-to-a-picture reading again
+   with the picture on the other side.
+
+   NET: the marquee keeps a chapter's air on both sides, one paid by the
+   journal above and one by itself below. If either neighbour changes, this
+   is the declaration to re-derive — it is a statement about who its
+   neighbours are, not a free-standing choice. */
 .section {
-  padding: clamp(64px, 9vh, 132px) var(--pad-x) var(--grid-gutter);
+  padding: 0 var(--pad-x) clamp(64px, 9vh, 132px);
   background: none;
   color: var(--maroon);
 }

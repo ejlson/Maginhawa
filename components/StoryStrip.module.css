@@ -132,7 +132,7 @@
      to equal the gap between the photographs, and with a default ~1.5
      line-height half of that measurement would be invisible leading rather
      than the space the eye actually reads. */
-  line-height: 1;
+  line-height: var(--lh-flush);
 }
 
 .mark:nth-child(2) {

@@ -38,6 +38,11 @@
      also the floor on the ceiling that keeps them apart during the split —
      see SPLIT_AIR in JoinUs.tsx — so it may not go to zero. */
   --band-air: clamp(18px, 2.6vh, 34px);
+  /* HOISTED OUT OF `.heroLineTop/.heroLineBot`, where it was written inline,
+     because the corner labels' seat is now a fraction of it — see the cap-top
+     arithmetic in `.heroLabels`. One declaration, so the labels cannot be left
+     aligned to a size the headline no longer has. */
+  --hero-title-size: clamp(2.5rem, 7vw, 6.5rem);
 }
 
 /* THE CORNER LABELS — the site's furniture voice (Nav, Blog's counter,
@@ -50,18 +55,54 @@
    An explicit tone rather than an opacity, for the same reason as the helper
    text below: a composited alpha is a contrast you have to compute instead of
    one you can read. Re-measured after the face change
-   (scripts/probe-join-contrast.mjs). */
+   (scripts/probe-join-contrast.mjs).
+
+   ---- THEY SIT ON THE HEADLINE'S CAP LINE, NOT ABOVE IT ----
+   They used to be a band in the flow above `.heroSplit`. Now they are lifted
+   out of it and seated so that the top of "CAREERS" is level with the top of
+   the "W" in "Where craft", which is what was asked for.
+
+   IT CANNOT BE `top: 0`, AND THAT IS THE WHOLE PROBLEM. `top: 0` would align
+   the two LINE BOXES, and neither line's ink starts at its box: the headline
+   runs `line-height: 0.98` with the word masks padding themselves out on top
+   of that, and the label is 13px of Figtree at 1.4. Two different faces at
+   two different sizes have two different distances from box to cap.
+
+   SO BOTH ARE MEASURED, AND BOTH ARE RATIOS rather than pixels, which is what
+   makes this hold while the headline moves through a 2.5rem→6.5rem clamp:
+
+     0.212em  headline cap top below `.heroSplit`'s top edge. Measured at
+              0.2133 / 0.2115 / 0.2125 at 1440 / 1920 / 390 — constant to
+              ±0.001em, i.e. ±0.1px at the largest size the clamp reaches,
+              because every term in it (the mask's 0.30em padding, the 0.98
+              line-height's half-leading, the face's ascender-to-cap) is
+              itself proportional to the font size.
+     0.327em  the label's own cap top below THIS box's top edge, in the
+              label's em. `--t-label` is a fixed 0.8125rem, so this one is a
+              flat 4.24px at every width; it is written as a ratio anyway so
+              that retuning the token cannot silently drop the labels 4px.
+
+   Measured with a zero-height inline-block strut to find each baseline and
+   canvas `actualBoundingBoxAscent` for the cap height — NOT off a screenshot,
+   and not off the line boxes, which are the thing that is wrong here.
+
+   ⚠️ THE HEADLINE MOVED UP by the ~42px this row used to occupy in the flow.
+   That is the composition tightening, not a regression: `.hero`'s note says
+   every measurement here was tightened so the third beat closes above the
+   fold at 1440x900, and this gives 42px back to that budget. */
 .heroLabels {
+  position: absolute;
+  inset-inline: 0;
+  top: calc(0.212 * var(--hero-title-size) - 0.327 * var(--t-label));
   display: flex;
   align-items: baseline;
   justify-content: space-between;
   gap: 16px;
-  margin-bottom: clamp(18px, 2.6vh, 34px);
 }
 
 .heroLabel {
   font-family: var(--font-ui);
-  font-weight: 400;
+  font-weight: var(--w-regular);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
@@ -84,6 +125,16 @@
   display: flex;
   flex-direction: column;
   align-items: stretch;
+  /* THE CORNER LABELS' CONTAINING BLOCK, and it has to be this box rather
+     than `.hero`: the top line is this flex column's first item, so this
+     box's top edge IS the headline's line box top and the labels' seat is
+     one measured offset from it rather than an offset plus whatever padding
+     `.hero` happens to carry.
+     Safe to position — every absolute box already inside the hero
+     (`.heroFrame`, `.heroPan`, `.heroScrim`) resolves to `.heroBand` or to
+     `.heroFrame`, both of which are positioned and both of which are nested
+     deeper than this. Nothing re-parents. */
+  position: relative;
 }
 
 .heroTitle {
@@ -99,7 +150,7 @@
   display: block;
   text-align: center;
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   /* 7rem, up from 5.6rem. The ceiling here has always been the FOLD and not
      taste — the caption is the third beat of the entrance and it lives inside
      the photograph, so the headline can only be as tall as the window has
@@ -119,7 +170,9 @@
      fallback platforms do not widen this — but a copy edit would.) Checked
      by probe-join-head.mjs, which counts rendered line boxes rather than
      assuming the hand break is the only break. */
-  font-size: clamp(2.5rem, 7vw, 6.5rem);
+  /* the clamp itself now lives on `.hero` as --hero-title-size, because the
+     corner labels' seat is a fraction of it */
+  font-size: var(--hero-title-size);
   line-height: 0.98;
   /* size-specific tracking: display type this large reads loose at 0 */
   letter-spacing: -0.028em;
@@ -329,6 +382,36 @@
   }
 }
 
+/* ---- THE CAP-LINE SEAT HAS A FLOOR, AND IT IS THE LONG LABEL'S ----
+   Seating the labels on the headline's cap line puts them in the SAME BAND of
+   the page as a CENTRED headline, so from that point on the two are competing
+   for one horizontal strip and the only thing keeping them apart is the
+   gutter either side of the type. That gutter is a fraction of the viewport
+   (the headline runs at 7vw, so its ink is roughly the middle 31% of the
+   screen) while "KENTISH TOWN & SOHO, LONDON" is a FIXED 236px — `--t-label`
+   is a flat 0.8125rem and does not shrink with the window. So the clearance
+   closes as the screen narrows, and it closes fast.
+
+   MEASURED, not estimated: 222px of clearance at 1440, 38px at 861, and at
+   700 the label OVERLAPS the "t" of "craft" by 14px. Below ~860 there is no
+   longer room for both, so the labels give up the cap line and go back into
+   the flow above the headline, where they have the full measure to
+   themselves and cannot collide with anything.
+
+   860 rather than the 742 where the overlap actually starts: 742 is the width
+   at which they touch, and a breakpoint set at the touching point ships a
+   layout that is one copy edit from broken. 860 leaves 38px, and it is a
+   breakpoint this stylesheet already uses.
+
+   This is only the SEAT. The row is unchanged here — it stays one line with
+   the two labels at opposite ends, exactly as it was before any of this. */
+@media (max-width: 860px) {
+  .heroLabels {
+    position: static;
+    margin-bottom: clamp(18px, 2.6vh, 34px);
+  }
+}
+
 @media (max-width: 600px) {
   /* 1.65, up from 1.4 (and from the 1.16 tried before that). Same argument
      one step further: 1.4 put the image box at 1.25:1 and threw away 30% of
@@ -342,12 +425,19 @@
   .heroImg {
     object-position: 52% 45%;
   }
-  /* two mono labels will not sit on one 358px line without truncating, and
-     a truncated label is worse than a stacked pair */
+  /* two labels will not sit on one 358px line without truncating, and a
+     truncated label is worse than a stacked pair. The longer location makes
+     this emphatic rather than marginal: "KENTISH TOWN & SOHO, LONDON" is
+     236px on its own, so the pair wants 307px of a 358px measure and the two
+     would be all but touching.
+
+     THE SEAT IS ALREADY GONE by this width — the 860px block above put the
+     row back in the flow, and `position: static` is inherited from there
+     rather than repeated. This block only turns the row into a column. */
   .heroLabels {
     flex-direction: column;
     align-items: flex-start;
-    gap: 6px;
+    gap: var(--space-3xs);
   }
   .heroStand {
     max-width: none;
@@ -372,7 +462,7 @@
 
 .sectionTitle {
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   font-size: var(--t-display);
   line-height: var(--lh-display);
   letter-spacing: var(--tr-display);
@@ -427,8 +517,12 @@
    nearly-identical set of rules for the same three paragraphs.) */
 
 /* ---- Open roles list ---- */
+/* NO BOTTOM PADDING. The gap under this index is the dark band's top gap, and
+   the band owns both of its gaps from one token — see `--strip-gap` on
+   `.form`. Leaving --section-y here would add to it and put the band's two
+   sides back out of step, which is the exact thing that was wrong. */
 .roles {
-  padding-block: var(--section-y);
+  padding-block: var(--section-y) 0;
 }
 
 .rolesHead {
@@ -498,21 +592,47 @@
   color: inherit;
   text-align: left;
   cursor: pointer;
-  transition: padding 0.32s ease, background-color 0.32s ease;
+  --role-indent: 0px;
+  transition: background-color 0.32s ease;
 }
+
+/* THE INDENT, OFF THE LAYOUT PATH. This used to animate `padding-inline`,
+   which re-lays-out the row on every frame of the 0.32s. It also never was
+   a plain indent: padding shrinks the content box by 2P and the three fr
+   tracks re-flow into what is left, so each cell lands somewhere different
+   — the title moves right by the full P, the chevron moves *left* by P, and
+   the two labels between them drift a little. Whole-row transform would
+   have sent the chevron 20px the wrong way, out past the row's edge.
+
+   So the cells carry the indent individually. The displacement is a fixed
+   multiple of P at every viewport: a track with `Pfx` fr ahead of it, out
+   of `S` fr total, moves by P·(S − 2·Pfx)/S. For the `2.2fr 1.4fr 1fr auto`
+   above (S = 4.6) that is exactly
+
+     .roleTitle  +P              .roleType  −2.6/4.6 · P
+     .roleMeta   +0.2/4.6 · P    .roleChev  −P
+
+   which is why those four numbers are written as their fractions rather
+   than resolved — change the track list and they change with it.
+
+   `translate`, not `transform`: the chevron already spends its `transform`
+   on the open/close rotation, and that rotation keeps its own 0.36s
+   entrance curve while the indent runs at the row's 0.32s. */
 .roleRow:hover,
 .roleRow:focus-visible {
   background: rgba(47, 0, 0, 0.04);
-  padding-inline: clamp(8px, 1.4vw, 20px);
+  --role-indent: clamp(8px, 1.4vw, 20px);
   outline: none;
 }
 
 .roleTitle {
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   font-size: var(--t-h3);
   line-height: var(--lh-heading);
   letter-spacing: -0.005em;
+  translate: var(--role-indent);
+  transition: translate 0.32s ease;
 }
 
 .roleMeta {
@@ -520,16 +640,20 @@
   font-size: var(--t-small);
   line-height: var(--lh-snug);
   opacity: 0.82;
+  translate: calc(var(--role-indent) * 0.2 / 4.6);
+  transition: translate 0.32s ease;
 }
 
 .roleType {
   font-family: var(--font-display-xs);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   font-size: var(--t-label);
   letter-spacing: 0.1em;
   text-transform: uppercase;
   opacity: 0.62;
   white-space: nowrap;
+  translate: calc(var(--role-indent) * -2.6 / 4.6);
+  transition: translate 0.32s ease;
 }
 
 .roleChev {
@@ -539,7 +663,9 @@
   display: grid;
   place-items: center;
   opacity: 0.7;
-  transition: transform 0.36s var(--ease-entrance), opacity 0.3s ease;
+  translate: calc(var(--role-indent) * -1);
+  transition: translate 0.32s ease, transform 0.36s var(--ease-entrance),
+    opacity 0.3s ease;
 }
 .roleChev svg { width: 14px; height: 14px; }
 .roleChevOpen { transform: rotate(180deg); opacity: 1; }
@@ -566,7 +692,7 @@
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
   color: var(--saffron);
-  margin: 0 0 clamp(10px, 1.4vh, 16px);
+  margin: 0 0 var(--space-xs-y);
 }
 
 .roleDetailList {
@@ -581,7 +707,7 @@
 .roleDetailItem {
   display: grid;
   grid-template-columns: 14px 1fr;
-  gap: 10px;
+  gap: var(--space-xs);
   font-family: var(--font-sans);
   font-size: var(--t-small);
   line-height: var(--lh-body);
@@ -605,7 +731,7 @@
 .roleApplyBtn {
   display: inline-flex;
   align-items: center;
-  gap: 10px;
+  gap: var(--space-xs);
   padding: 0.6em 1.4em;
   border: 1px solid var(--maroon);
   background: transparent;
@@ -687,11 +813,34 @@
         page (cream, warm band, maroon footer) for a section whose job is to
         be quiet enough to type into.
 
-   The rule at the top of `.formShell` is A, doing the one thing A was good
-   at: it is the threshold, and the narrowing is what happens on the other
-   side of it. */
+   A shipped too, as a hairline threshold above the column — and has since
+   been removed on request. See the note where `.threshold` used to stand.
+
+   POSTSCRIPT: C IS BACK, FOR THE REASONS ONLY. Asked for directly, and the
+   objection above does not survive the narrowing: C was rejected as a band
+   under the FORM, where it would have been a third ground on the last screen
+   of a page whose job there is to be quiet enough to type into. As a band
+   under the ROLES INDEX it is the opposite — it closes the argument, and the
+   760px column still does the announcing on the form's own side. The
+   footer-merge worry does not apply either: there is a full screen of cream
+   between this band and the DarkZone.
+
+   AND THE BAND IS WHY LOSING THE RULE COSTS NOTHING. B's structure needed a
+   threshold because a narrowing alone is a soft edge — the reader has to
+   notice a width change to notice the section change. A full-bleed dark band
+   immediately above is not a soft edge, so the section now has a stronger
+   close than the hairline ever was, and two of them would be one too many. */
 .form {
-  padding-block: var(--section-y-sm) var(--section-y-lg);
+  /* THE BAND'S OUTER GAP, ONE TOKEN, BOTH SIDES. It used to sit ~170px below
+     the roles index and 72px above the threshold — the top gap being the sum
+     of two owners (`.roles`' --section-y bottom plus this section's
+     --section-y-sm top) against `.reasons`' margin-bottom alone at the
+     bottom. Two owners for one pair of gaps is how they drifted apart. The
+     band now owns both from here, so they cannot: `.roles` gives up its
+     bottom padding and this is the top one. The value is the gap the band
+     already had underneath it, which is the side that was right. */
+  --strip-gap: clamp(56px, 8vh, 104px);
+  padding-block: var(--strip-gap) var(--section-y-lg);
 }
 
 /* ---- THE THREE REASONS, AS THE LEAD-OUT OF THE ROLES INDEX ----
@@ -700,11 +849,30 @@
    beside the form. This is the copy back in the shape it was written in, at
    the one place on the page where it is the natural next sentence: you have
    just read six jobs, and before you are asked to apply you are told why the
-   job is worth having. Nothing sits beside the form after this. */
+   job is worth having. Nothing sits beside the form after this.
+
+   AND IT IS A FULL-BLEED DARK BAND. PILLARS was written for a full-width
+   three-up, and this is that shape with a ground under it — the one place on
+   the page where a change of surface is an ending rather than an
+   interruption. The band is what the reader crosses between the index and
+   the ask.
+
+   FULL-BLEED BY ESCAPING THE CONTAINER, NOT BY 100vw. `.container` is
+   `width: 100%` with `padding-inline: var(--grid-margin)`, so pulling exactly
+   that margin back on each side lands the band on the viewport edges by
+   construction. `width: 100vw` would include the classic scrollbar on
+   Windows and hang the band 7–8px past both — the trap the deleted
+   `.threshold` rule was written to avoid, and `.page` only has
+   `overflow-x: clip` to catch it, which would hide the overhang rather than
+   fix it. This is now the only rule in the file that depends on it. The padding
+   then puts the columns back on the page's own content edges, so the three
+   reasons still line up with the roles above them. */
 .reasons {
   list-style: none;
-  margin: 0 0 clamp(56px, 8vh, 104px);
-  padding: 0;
+  margin: 0 calc(var(--grid-margin) * -1) var(--strip-gap);
+  padding: clamp(48px, 6.5vh, 88px) var(--grid-margin);
+  background: var(--maroon);
+  color: var(--cream);
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(28px, 4vw, 64px);
@@ -717,19 +885,30 @@
 }
 
 /* the mark is a numeral in the display face at heading scale — the same
-   treatment the cut band used, and the only saffron in the section */
+   treatment the cut band used, and the only accent in the section.
+   THE ACCENT CANNOT BE RAW ON THIS GROUND. --saffron on --maroon measures
+   2.02:1, and globals.css says so in the token's own note: "nothing may set
+   raw accent type on the maroon." It went onto the band unchanged in the
+   first pass and the numerals all but disappeared. Mixed 45% into the cream
+   it measures 6.39:1 — within a hundredth of the 6.46:1 the accent makes on
+   the cream page, so the mark carries the same weight on the band as it did
+   off it. Mixed toward the CREAM rather than faded toward the ground,
+   because the point is that it is still green: a mark that mixes toward
+   maroon is just a quieter maroon, and then it is not an accent. */
 .reasonMark {
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   font-size: var(--t-h2);
-  line-height: 1;
+  line-height: var(--lh-flush);
   letter-spacing: -0.012em;
-  color: var(--saffron);
+  color: color-mix(in srgb, var(--saffron) 45%, var(--cream));
 }
 
+/* the title takes the band's own `color: var(--cream)` by inheritance —
+   13.06:1, the palette's headline pair */
 .reasonTitle {
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   font-size: var(--t-h3);
   line-height: var(--lh-heading);
   letter-spacing: -0.005em;
@@ -738,36 +917,26 @@
 
 /* an explicit tone, not `opacity: 0.85` — the same correction the two helper
    lines on this page got. A composited alpha is a contrast you have to
-   compute; this one is measured (scripts/probe-join-contrast.mjs). */
+   compute; this one is measured.
+   RE-DERIVED FOR THE DARK GROUND, and by its RATIO rather than by its old
+   channels. The tone was rgba(47, 0, 0, 0.78), which composited to 8.97:1 on
+   the cream; 82% cream in the maroon measures 9.16:1 on the band. Carrying
+   the hex across would have been carrying a contrast that no longer existed
+   — the same mistake --rule was written to stop making. */
 .reasonBody {
   font-family: var(--font-sans);
   font-size: var(--t-small);
   line-height: var(--lh-body);
-  color: rgba(47, 0, 0, 0.78);
+  color: color-mix(in srgb, var(--cream) 82%, var(--maroon));
   margin: 0;
   max-width: 42ch;
 }
 
-/* ---- THE THRESHOLD ----
-   One hairline at the FULL measure. It is a sibling of the column rather
-   than a border on it, and that is the whole point: the line has to be as
-   wide as the thing it closes (the index and the reasons), so that the
-   narrowing is visible AGAINST it. A 620px rule over a 620px column is a box
-   lid, and a box lid is the plate again.
-
-   A real element rather than a `::before` with `width: 100vw` and a negative
-   offset, because 100vw includes the classic scrollbar on Windows and the
-   rule would then hang 7–8px past the measure at both ends. As a child of
-   `.form`, which is inside `.container`, it is the container's width by
-   construction and cannot drift. `<hr>` rather than a div: this IS a
-   thematic break — the argument ends and the ask begins. */
-.threshold {
-  width: 100%;
-  height: 1px;
-  margin: 0;
-  border: none;
-  background: var(--rule);
-}
+/* (`.threshold` lived here — one hairline at the full measure, a sibling of
+   the column rather than a border on it so that the narrowing would be
+   visible AGAINST it. Removed on request, along with its <hr>. The note it
+   carried about `width: 100vw` and the Windows scrollbar has been moved up to
+   `.reasons`, which is now the rule that depends on it.) */
 
 /* ---- THE COLUMN ----
    760px, up from 620. The column was a single stack of eight controls, which
@@ -780,11 +949,19 @@
 
    It is still the narrowing that announces the section — 56% of the 1360px
    measure above it, against 46% before. The shape change survives; the
-   scroll does not. */
+   scroll does not.
+
+   NO TOP PADDING ANY MORE. It was clamp(44px, 6vh, 76px) and it was the air
+   BELOW THE RULE — the far side of the threshold, which is why it was on the
+   column rather than on the section. The rule is gone, so its clearance has
+   nothing left to clear, and leaving it in would have quietly undone the gap
+   symmetry set one change earlier: with the <hr> removed this padding stacks
+   straight onto `.reasons`' --strip-gap, so the band would have measured 72px
+   of air above it and 138px below at 1440x900. The band's two gaps are the
+   token's, and only the token's. */
 .formShell {
   max-width: 760px;
   margin-inline: auto;
-  padding-top: clamp(44px, 6vh, 76px);
 }
 
 .formHead {
@@ -800,7 +977,7 @@
 .formTitle {
   font-size: clamp(1.9rem, 3.2vw, 3.1rem);
   max-width: none;
-  margin-bottom: clamp(10px, 1.4vh, 16px);
+  margin-bottom: var(--space-xs-y);
   /* centred type is only as good as its breaks — `balance` evens the two
      lines instead of leaving a one-word second line hanging under a full
      first one. Progressive: browsers without it get the greedy break they
@@ -961,7 +1138,7 @@
 .field {
   display: flex;
   flex-direction: column;
-  gap: 6px;
+  gap: var(--space-3xs);
 }
 
 /* THE LABEL IS THE STRONGEST OF THE THREE LINES IN A FIELD. It was
@@ -1103,13 +1280,19 @@
   color: rgba(47, 0, 0, 0.66);
 }
 
+/* THE SUBMIT'S SEAT, AND ONLY ITS SEAT — this class now goes straight onto
+   <PillCta> via `className`, which is the contract its stylesheet states:
+   "`.host` is shrink-wrapped and nothing else; how the control is placed
+   belongs to the chapter using it."
+   The flex row is gone with the wrapper <div> it described. It was carrying a
+   `gap` and a `flex-wrap` for the aside that used to sit beside the button
+   (the mailto warning, moved onto the control's own label and the success
+   card), so by now it was a flex container with one child — and `.host` is
+   already `width: fit-content`, so the shrink-wrapping the flex row was
+   providing was being provided twice. What is left is the two things the grid
+   actually needs: the full-row span and the air above it. */
 .submitRow {
   grid-column: 1 / -1;
-  display: flex;
-  align-items: center;
-  flex-wrap: wrap;
-  gap: clamp(12px, 1.6vw, 22px);
-  justify-content: flex-start;
   margin-top: clamp(8px, 1.4vh, 16px);
 }
 
@@ -1123,80 +1306,22 @@
    JoinUs.tsx: this is the one thing that must not be deleted outright, since
    nothing here posts to a server. */
 
-/* ---- SUBMIT — Footer's `.inviteCta`, on cream ----
-   The rule this exists to enforce: the pill never changes SIZE. Hovering and
-   pressing only deepen the recess, so the control reads as being pushed
-   further in rather than growing. (MagneticButton, which used to sit here,
-   widens its padding by ~0.55em on hover and scales 0.97 on press.)
+/* (`.submitCta`, `.submitCtaLabel`, `.submitCtaArrow` and their hover, focus
+   and active states lived here — around sixty lines describing a filled
+   capsule on a faint maroon tint whose only moving part was an inset shadow
+   deepening under the pointer, with the arrow leaning 2px.
 
-   The recess is present — faintly — at rest, so hover only DEEPENS it; a
-   shadow that appears from nothing pops instead of easing. */
-.submitCta {
-  display: inline-flex;
-  align-items: center;
-  gap: 0.6em;
-  font-family: var(--font-sans);
-  font-weight: 500;
-  /* the site's shared button size token */
-  font-size: var(--t-button);
-  line-height: 1;
-  white-space: nowrap;
-  color: var(--maroon);
-  /* the footer's pill is cream on maroon; this is its inverse on the cream
-     page — a whisper of maroon tint, so the recess has a surface to sink into */
-  background: rgba(47, 0, 0, 0.05);
-  border: none;
-  border-radius: 999px;
-  padding: 0.95em 1.9em;
-  cursor: pointer;
-  -webkit-tap-highlight-color: transparent;
-  box-shadow: inset 0 2px 12px rgba(47, 0, 0, 0.12);
-  /* the recess is the ONLY thing that moves — no layout, no transform */
-  transition: box-shadow 320ms var(--ease-out);
-}
+   THE RULE IT ENFORCED IS WORTH KEEPING EVEN THOUGH THE BUTTON IS GONE: the
+   control must never change SIZE. It was written against MagneticButton,
+   which widens its padding by ~0.55em on hover and scales 0.97 on press, so
+   the control grows under the cursor. PillCta obeys the same rule by a
+   different mechanism — the pill and its disc translate toward each other
+   inside a rect that never moves — which is why the swap costs nothing here.
 
-.submitCtaLabel {
-  display: inline-block;
-}
-
-.submitCtaArrow {
-  display: grid;
-  place-items: center;
-  flex: none;
-}
-.submitCtaArrow svg {
-  width: 1.05em;
-  height: 1.05em;
-  display: block;
-  transition: transform 0.4s var(--ease-out);
-}
-
-/* HOVER: deeper recess, and the arrow leans — the only 2px of travel here */
-@media (hover: hover) and (pointer: fine) {
-  .submitCta:hover {
-    box-shadow: inset 0 4px 18px rgba(47, 0, 0, 0.26);
-  }
-  .submitCta:hover .submitCtaArrow svg {
-    transform: translateX(2px);
-  }
-}
-
-/* keyboard focus gets the same state */
-.submitCta:focus-visible {
-  outline: 2px solid var(--maroon);
-  outline-offset: 4px;
-  box-shadow: inset 0 4px 18px rgba(47, 0, 0, 0.26);
-}
-.submitCta:focus-visible .submitCtaArrow svg {
-  transform: translateX(2px);
-}
-
-/* press feedback — the recess goes deeper still, and quickly: the surface
-   is being pushed in under the finger */
-.submitCta:active {
-  box-shadow: inset 0 6px 24px rgba(47, 0, 0, 0.4);
-  transition: box-shadow 120ms var(--ease-out);
-}
+   Deleted rather than left in place: this was a fourth distinct button on a
+   site that has spent several changes collapsing onto one, and a set of
+   rules that no element carries is how the next person ends up with a fifth.
+   See the note at the submit in JoinUs.tsx.) */
 
 .successCard {
   grid-column: 1 / -1;
@@ -1212,8 +1337,8 @@
   display: block;
   font-family: var(--font-display);
   font-size: var(--t-h3);
-  margin-bottom: 6px;
-  font-weight: 500;
+  margin-bottom: var(--space-3xs);
+  font-weight: var(--w-medium);
 }
 
 /* ---- Responsive ---- */
@@ -1252,6 +1377,12 @@
   .roleChev { grid-column: 2; grid-row: 1; }
   .roleMeta { grid-column: 1 / -1; grid-row: 2; }
   .roleType { grid-column: 1 / -1; grid-row: 3; }
+  /* The tracks changed, so the indent's coefficients change with them: the
+     meta and the type now start at the row's leading edge like the title,
+     not part-way across it, so all three move the full P. The chevron is
+     still the trailing `auto` track and still pulls the other way. */
+  .roleMeta,
+  .roleType { translate: var(--role-indent); }
   .roleDetail {
     grid-template-columns: 1fr;
   }

@@ -215,8 +215,8 @@
   bottom: clamp(18px, 4vh, 40px);
   z-index: 5;
   display: flex;
-  gap: 4px;
-  padding: 4px;
+  gap: var(--space-4xs);
+  padding: var(--space-4xs);
   border: 1px solid color-mix(in srgb, var(--cream) 31%, transparent);
   border-radius: 999px;
   background: rgba(18, 0, 0, 0.42);
@@ -484,7 +484,7 @@
      the space back so the wheel column doesn't grow */
   height: 22px;
   box-sizing: content-box;
-  padding-block: 8px;
+  padding-block: var(--space-2xs);
   margin-block: -8px;
   /* paint above the adjacent scroller so the padded area actually taps */
   position: relative;
@@ -610,7 +610,7 @@
   outline-offset: 4px;
 }
 .nameActive {
-  font-weight: 500;
+  font-weight: var(--w-medium);
 }
 
 /* ---- per-restaurant actions beside the wheel ---- */
@@ -624,7 +624,7 @@
 .actBtn {
   display: inline-flex;
   align-items: center;
-  gap: 0.5em;
+  gap: var(--lockup-gap-sm);
   padding: 0.6em 1.3em;
   /* the pill's edge is the only thing drawing this button — background is
      `none` — so it is the boundary 1.4.11 means. 0.5 -> 0.56 on the same

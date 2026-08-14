@@ -489,6 +489,24 @@
   --t-hero: clamp(3.4rem, 13vw, 13rem); /* giant Maginhawa wordmark   */
   --t-display: clamp(2.4rem, 6vw, 5rem); /* page titles / statements   */
   --t-h2: clamp(1.7rem, 3.4vw, 3rem); /* section headings           */
+  /* THE CREAM CHAPTER HEAD — the sentence that opens each of the three
+     cream editorial chapters: Discover's lede and the journal's lede on the
+     home page, and /blog's title. All three shipped this exact clamp as
+     copy-paste literals, each carrying a comment cross-referencing the
+     other two and warning against retuning one without the others — the
+     name is what actually enforces that. It sits BETWEEN --t-display and
+     --t-h2 in size, and it is the scale's missing rung rather than a fifth
+     opinion: 4.1rem is one Perfect Fourth above --t-h2's 3rem
+     (3 × 1.333 = 4.0), which is why three components fell into the same
+     hole. (Caveat: 4.1 → --t-display's 5rem is only 1.22, so this is an
+     argument about where the value sits, not a proof.) Neither neighbour
+     could take the role — --t-h2 would shrink a chapter head 27%,
+     --t-display would make three chapters shout as loud as About's page
+     statements. The value itself is Discover's MEASUREMENT, adopted by the
+     other two: it was tuned against the rendered element, whose SplitWords
+     inline-block masks wrap differently from flowed text (a plain-string
+     probe predicted a 17em measure; the real element gave three lines). */
+  --t-chapter: clamp(2.15rem, 4.7vw, 4.1rem);
   --t-h3: clamp(1.25rem, 2vw, 1.6rem); /* card / sub headings        */
   --t-lead: clamp(1.1rem, 1.5vw, 1.4rem); /* intros / pull quotes       */
   --t-body: 1rem; /* never below 16px           */
@@ -504,15 +522,68 @@
      sentence case, which should take --t-small at minimum. */
   --t-label: 0.8125rem;
 
-  /* line-heights: tight display → airy body. Four-tier scale; every
-     component should pick one of these tokens rather than hard-coding. */
+  /* line-heights: tight display → airy body. Six-tier scale; every
+     component should pick one of these tokens rather than hard-coding.
+     WHY SIX, NOT FOUR. The scale shipped as four tiers and 22 shipped
+     sites hard-coded around it, because for two real roles none of the
+     four fit: nineteen flush-settings wanted exactly 1, and the three
+     cream chapter heads wanted 1.1 — at --t-chapter's 4.1rem,
+     --lh-heading's 1.2 adds 6.6px to every line and rewraps the
+     composition Discover's lede comment spends nine lines measuring.
+     Adding the two tiers honours the instruction above; forcing those 22
+     onto the existing four would retune measured compositions to protect
+     a count. */
   --lh-display: 0.92;   /* huge wordmark / hero type */
+  --lh-flush: 1;        /* flush-set: the box equals the type. Counters,
+                           wordmark lines, single-line labels whose
+                           separation is done by gap/padding rather than
+                           leading — names the literal 1 that 19 shipped
+                           declarations carried (audited; see the six-tier
+                           note above) */
+  --lh-chapter: 1.1;    /* the cream chapter head — the leading half of
+                           --t-chapter, used by exactly its three sites.
+                           Tighter than --lh-heading because at 4.1rem each
+                           0.1 of leading is 6.6px per line, enough to
+                           rewrap Discover's measured three-line lede */
   --lh-heading: 1.2;    /* section titles, sub-headings */
   --lh-snug: 1.35;      /* leads, captions, attribution lines */
   --lh-body: 1.5;       /* body paragraphs */
 
   /* paragraph rhythm — vertical gap between consecutive body paragraphs */
   --para-gap: 0.9em;
+
+  /* THE LOCKUP FAMILY — em-relative gaps for objects made of type.
+     The rule that splits this file's two spacing systems: the px scale
+     (--space-*, below) spaces the LAYOUT; the lockup family spaces objects
+     made of type — an eyebrow above its heading, a label beside its arrow —
+     where the right gap is a function of the element's own font-size and
+     must scale with it, which the px scale cannot express. The system was
+     already on the site but had no name: audited, 21 sites across 12 files
+     re-typed the same handful of em values by hand (0.55em ×6
+     byte-identical plus five more within 0.05em of it, 0.7em ×6, 1em ×3).
+     --para-gap above is a member of this family in everything but its
+     name; renaming it is a separate mechanical change, deliberately not
+     done here — the same swap-first-rename-second discipline as
+     --cream/--maroon/--saffron.
+       --lockup-gap-sm   tight: label/icon rows, meta lines. 0.55em won the
+                         0.5–0.62 band as its most-used member (6 exact
+                         uses) and its median; the 0.5s and 0.6s migrated
+                         ±0.05em, ≈0.7px at a 13px label.
+       --lockup-gap      standard: 0.7em, 6 byte-identical uses. Not a near
+                         duplicate of the small step — 27% larger, a real
+                         second rung.
+       --lockup-gap-lg   open: 1em, 3 byte-identical uses. */
+  --lockup-gap-sm: 0.55em;
+  --lockup-gap: 0.7em;
+  --lockup-gap-lg: 1em;
+  /* HELD OUT OF THE SMALL STEP ON PURPOSE. All three uses of 0.62em are
+     .chapterLabel in the three cream chapters (Discover, Blog, BlogIndex) —
+     the same component whose comments carry the "retuning one of the three
+     without the others" warning. It belongs to the chapter-head family
+     (--t-chapter / --lh-chapter), not to the lockup band: folding it into
+     --lockup-gap-sm would be exactly the retune those comments forbid, so
+     the measured 0.62em keeps its own name and moves nowhere. */
+  --chapter-label-gap: 0.62em;
 
   /* tracking: negative on big display, open on small caps */
   --tr-display: -0.015em;
@@ -643,7 +714,26 @@
      (see Blog's .strip) instead of guessing at it. */
   --shadow-card-throw: 16px;
 
-  /* fluid spacing scale — shared rhythm for gaps & section padding */
+  /* fluid spacing scale — shared rhythm for gaps & section padding.
+
+     TWO MICRO STEPS, NAMED RATHER THAN MERGED. The audited distribution of
+     fixed gaps below the fluid steps has three clusters two pixels apart —
+     6px ×6 uses, 8px ×7, 10px ×6 — which is three real modes, not one mode
+     with noise. Collapsing 6/8/10 onto one floor would retune a dozen
+     tight icon rows by ±2px (33% of a 6px gap — visible inside an inline
+     control): a design decision, not a consistency fix. So 4 and 6 join
+     the scale at values the site already uses, byte-identical, and the
+     fixed 10s point at --space-xs, whose floor is already exactly 10px.
+
+     THE SCALE STOPS AT 4PX ON PURPOSE. Below that a gap is no longer
+     spacing a layout, it is setting a LOCKUP: the value is a function of
+     the two objects being locked, not of page rhythm. The model is
+     VenueCard's stat row (gap: 3px — "the icon is 11px and the value is
+     12px; at 3px they read as one object"): measured per object, with its
+     own reason line where it lives. A missing token down there is the
+     system's edge, not a hole in it. */
+  --space-4xs: 4px; /* micro step — the site's two 4px gaps and a segmented control's padding sat exactly here */
+  --space-3xs: 6px; /* micro step — six shipped gaps sat exactly here */
   --space-2xs: 8px;
   --space-xs: clamp(10px, 1.2vw, 14px);
   --space-sm: clamp(14px, 1.6vw, 20px);
@@ -652,6 +742,17 @@
   --space-xl: clamp(48px, 6vw, 88px);
   --space-2xl: clamp(72px, 9vw, 128px);
   --space-3xl: clamp(112px, 14vw, 200px);
+  /* the VERTICAL siblings of --space-xs and --space-sm — same floors, but
+     the fluid middle is measured against viewport HEIGHT, the axis a
+     head-gap or a nav's vertical padding actually breathes with (the same
+     axis --section-y reads). Not duplicates of the vw pair: a wide, short
+     window wants generous column gaps and tight vertical ones, and a vw
+     clamp cannot say that. Named because the site had already agreed on
+     both by copy-paste — the xs clamp appeared 10 times across 7 files and
+     the sm clamp 4 times across 4, every use byte-identical, including the
+     local --head-gap that Discover and Blog each derive from it. */
+  --space-xs-y: clamp(10px, 1.4vh, 16px);
+  --space-sm-y: clamp(14px, 2vh, 22px);
 
   /* vertical section rhythm — three semantic tiers, used by every section's
      padding-block. The gap between two adjacent sections is the sum of their
@@ -945,7 +1046,7 @@ html::-webkit-scrollbar {
    so it keeps the brand's Contralto voice (big optical cut) */
 .wordmark {
   font-family: var(--font-display-big);
-  font-weight: 400;
+  font-weight: var(--w-regular);
   line-height: 0.82;
   letter-spacing: -0.01em;
   text-transform: uppercase;

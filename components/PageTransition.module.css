@@ -38,9 +38,9 @@
   bottom: clamp(20px, 3.2vh, 40px);
   display: flex;
   align-items: center;
-  gap: 0.7em;
+  gap: var(--lockup-gap);
   font-family: var(--font-ui);
-  font-weight: 400;
+  font-weight: var(--w-regular);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;

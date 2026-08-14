@@ -176,8 +176,9 @@
      they read as one lockup, and the air that separates the head from the
      grid is the rule's margin below, not this.
      NAMED because .headRule subtracts it — see the note there. Value
-     unchanged. */
-  --head-gap: clamp(10px, 1.4vh, 16px);
+     unchanged: it now points at the global --space-xs-y, which holds the
+     same clamp this line used to spell out. */
+  --head-gap: var(--space-xs-y);
   gap: var(--head-gap);
 }
 
@@ -186,7 +187,7 @@
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 0.62em;
+  gap: var(--chapter-label-gap);
   font-family: var(--font-sans);
   font-weight: var(--w-medium);
   font-size: var(--t-label);
@@ -268,14 +269,18 @@
 
    Below ~732px the font-size clamp hits its 2.15rem floor while the band
    keeps narrowing, so this wraps past two lines on phones. That is correct:
-   two lines is a desktop composition, not an invariant. */
+   two lines is a desktop composition, not an invariant.
+
+   The clamp and the 1.1 leading now live in globals as --t-chapter /
+   --lh-chapter, shared with the journal's lede and /blog's title, so the
+   three chapter heads cannot drift apart. Same values, one name. */
 .lede {
   margin: 0;
   max-width: 17.7em;
   font-family: var(--font-display);
   font-weight: var(--w-regular);
-  font-size: clamp(2.15rem, 4.7vw, 4.1rem);
-  line-height: 1.1;
+  font-size: var(--t-chapter);
+  line-height: var(--lh-chapter);
   letter-spacing: var(--tr-display);
   color: var(--maroon);
 }
@@ -655,7 +660,7 @@
   flex-direction: column;
   align-items: center;
   justify-content: center;
-  gap: clamp(10px, 1.4vh, 16px);
+  gap: var(--space-xs-y);
   /* dead centre of the expansion's plate */
   padding: 8% 10%;
   text-align: center;
@@ -668,7 +673,7 @@
   display: flex;
   flex-direction: column;
   align-items: center;
-  gap: clamp(10px, 1.4vh, 16px);
+  gap: var(--space-xs-y);
   /* stretch to the plate's width — the logo mask below is %-sized, and a
      content-sized flex parent would give it a collapsed-to-zero
      percentage basis */
@@ -691,9 +696,9 @@
 /* typographic fallback for tiles with no mark yet (Bunso) */
 .wordmark {
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   font-size: clamp(2.6rem, 4vw, 4.4rem);
-  line-height: 1;
+  line-height: var(--lh-flush);
   letter-spacing: -0.025em;
   color: var(--cream);
 }
@@ -704,7 +709,7 @@
 .viewLink {
   margin-top: 0.35em;
   font-family: var(--font-sans);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   font-size: var(--t-small);
   line-height: var(--lh-snug);
   color: var(--maroon);
@@ -848,10 +853,10 @@
   border: 1px solid color-mix(in srgb, var(--cream) 48%, transparent);
   background-color: var(--saffron);
   font-family: var(--font-mono);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label-mono);
-  line-height: 1;
+  line-height: var(--lh-flush);
   white-space: nowrap;
   color: var(--cream);
   text-decoration: none;
@@ -1028,14 +1033,14 @@
   display: flex;
   align-items: baseline;
   justify-content: space-between;
-  gap: 1em;
+  gap: var(--lockup-gap-lg);
   flex-wrap: wrap;
 }
 
 .expandName {
   margin: 0;
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   font-size: clamp(1.6rem, 2.6vw, 2.2rem);
   line-height: var(--lh-display);
   letter-spacing: var(--tr-display);
@@ -1044,7 +1049,7 @@
 
 .expandTag {
   font-family: var(--font-mono);
-  font-weight: 400;
+  font-weight: var(--w-regular);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label-mono);
   text-transform: uppercase;
@@ -1056,7 +1061,7 @@
   margin: 0;
   max-width: 56ch;
   font-family: var(--font-sans);
-  font-weight: 400;
+  font-weight: var(--w-regular);
   font-size: var(--t-small);
   line-height: var(--lh-body);
   color: var(--maroon);
@@ -1068,9 +1073,9 @@
   margin: 0;
   display: flex;
   align-items: center;
-  gap: 0.7em;
+  gap: var(--lockup-gap);
   font-family: var(--font-sans);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   font-size: var(--t-small);
   line-height: var(--lh-snug);
   color: var(--maroon);
@@ -1086,7 +1091,7 @@
 .expandLocation {
   margin: 0;
   font-family: var(--font-sans);
-  font-weight: 400;
+  font-weight: var(--w-regular);
   font-size: var(--t-small);
   line-height: var(--lh-snug);
   color: var(--maroon);

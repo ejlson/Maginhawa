@@ -137,26 +137,68 @@ export default function GlassFilters() {
           </filter>
         ))}
 
-        {/* ═══ #cta-merge IS GONE, and this note is what is left of it.
-            It was a goo filter — a blur that turned each shape's alpha into
-            a soft field, then a steep colour-matrix ramp that thresholded
-            the sum, so two overlapping bodies resolved as one with a
-            concave fillet between them. Its one caller was the home
-            journal's "Read More" control.
+        {/* ═══ #cta-fuse — THE HOUSE ACTION'S MENISCUS ═══════════════════
+            The pill and the disc in PillCta close on each other; this is
+            what makes the join between them read as two cells FUSING
+            rather than as two shapes overlapping. Where the arcs cross,
+            the raw silhouette has a sharp concave vertex. Blurring the
+            alpha and thresholding it back rounds that vertex into a
+            smooth neck, and the neck snaps shut just before the geometry
+            does — which is exactly the signature of surface tension
+            closing a bridge.
 
-            IT DID NOT SURVIVE CONTACT WITH THE DESIGN IT WAS BUILT FOR. At
-            rest the blur swelled and wobbled both bodies before the
-            threshold cut them back, so the control read as a blob with a
-            bump rather than as a crisp pill beside a crisp disc; on hover
-            the fields never overlapped far enough to close, so the fillet
-            came out as a pinched waist with the arrow hanging over it.
+            THIS IS A SECOND ATTEMPT. `#cta-merge` stood here, did the same
+            thing, and was deleted; the note it left behind said not to
+            bring one back without reading the derivation first. Both of
+            its failures were real and both are answered here:
 
-            The merge is geometry now: the pill is a clipped body whose
-            round cap lands exactly on the disc's centre at full close, so
-            the union IS a pill — nothing to blur, nothing to threshold and
-            no fillet to approximate. See the derivation in
-            Blog.module.css's archive-link block. Do not reintroduce a goo
-            filter here without reading it first. */}
+              · IT SWELLED AND WOBBLED AT REST. It thresholded a blur wide
+                enough to reach across the gap while the cells were still
+                apart, and it re-composited the crisp source on top of the
+                result, so every edge was drawn twice. Here the blur is
+                --cta-goo — a TENTH of the control's height, so at rest the
+                two alpha fields fall to ~0.22 where they meet, well under
+                the 0.5 cut, and each shape is simply re-traced at its own
+                edge. Nothing is composited back over it.
+              · IT LEFT A PINCHED WAIST ON HOVER. It was being asked to
+                CLOSE the gap. It is not, now: the geometry already lands
+                the body's cap exactly on the disc's centre at full close
+                (the R = a + b equation in PillCta.module.css), so the end
+                state is a mathematically clean pill whatever this filter
+                does. The filter only has the transit to render.
+
+            THE THRESHOLD IS CENTRED ON 0.5 — alpha_out = 20a − 10, so it
+            cuts at 0.5 and saturates at 0.55. A blurred straight edge
+            crosses 0.5 at its ORIGINAL position, which is why the pill's
+            flat sides do not move; a blurred circle of radius r crosses it
+            σ²/2r inside, which at σ = 0.1h is under half a pixel at every
+            size this control takes. The old matrix cut at 9/19 = 0.474,
+            i.e. below half, which is a dilation — the swelling.
+
+            THE 0.05-WIDE RAMP IS THE ANTI-ALIASING, not sloppiness. Alpha
+            falls about 0.4/σ per pixel across a blurred edge, so the ramp
+            resolves to roughly two thirds of a pixel of soft edge. A hard
+            step (a much steeper matrix) would give the neck a stair.
+
+            sRGB, NOT linearRGB. The default filter colour space would
+            blur and threshold in linear light, which moves the 0.5 contour
+            off the shape's edge and shifts the fill's colour with it. */}
+        <filter
+          id="cta-fuse"
+          x="-15%"
+          y="-60%"
+          width="130%"
+          height="220%"
+          colorInterpolationFilters="sRGB"
+        >
+          <feColorMatrix
+            type="matrix"
+            values="1 0 0 0 0
+                    0 1 0 0 0
+                    0 0 1 0 0
+                    0 0 0 20 -10"
+          />
+        </filter>
       </defs>
     </svg>
   );

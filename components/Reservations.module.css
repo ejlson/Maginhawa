@@ -339,7 +339,7 @@
   margin: 0 0 clamp(9px, 1.6vh, 18px);
   font-family: var(--font-ui);
   font-size: var(--t-label);
-  line-height: 1;
+  line-height: var(--lh-flush);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
   /* 0.88, not full cream: enough of a step down from the heading that the two
@@ -400,7 +400,7 @@
      owns no vertical margin of its own in either direction */
   margin: 0;
   font-family: var(--font-display);
-  font-weight: 500;
+  font-weight: var(--w-medium);
   font-size: var(--t-display);
   line-height: var(--lh-display);
   letter-spacing: var(--tr-display);
