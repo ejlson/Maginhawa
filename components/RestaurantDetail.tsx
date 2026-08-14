@@ -11,6 +11,7 @@ import { useRouteTransition } from "./PageTransition";
 import styles from "./RestaurantDetail.module.css";
 import type { Restaurant } from "@/lib/restaurants";
 import { pressForRestaurant } from "@/lib/press";
+import { asset } from "@/lib/media";
 
 export default function RestaurantDetail({
   restaurant,
@@ -111,7 +112,7 @@ export default function RestaurantDetail({
 
             <Reveal className={styles.heroImage} delay={0.1}>
               {/* eslint-disable-next-line @next/next/no-img-element */}
-              <img src={restaurant.image} alt={restaurant.name} />
+              <img src={asset(restaurant.image)} alt={restaurant.name} />
             </Reveal>
           </section>
 

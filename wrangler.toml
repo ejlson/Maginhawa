@@ -1,0 +1,53 @@
+# ═══════════ WHAT CLOUDFLARE PUBLISHES ═══════════════════════════════════════
+# The first deploy failed with "Pages only supports files up to 25 MiB in size
+# — assets/menu/cafe_mama/wall-panel-40-2017-Corona.pdf is 30.5 MiB". That PDF
+# was never meant to be on the web. The real fault was two lines earlier in the
+# same log:
+#
+#     No Wrangler configuration file found. Continuing.
+#     No build command specified. Skipping build step.
+#
+# With no build and no asset directory, Cloudflare published the REPOSITORY
+# ROOT — the source tree, the design files in assets/, everything — and hit the
+# size ceiling on the way through. Even had the PDF been small enough, that
+# deploy would have "succeeded" and served no website, because there is no
+# index.html at the root of this repository.
+#
+# ⚠️ THIS IS A **WORKERS** PROJECT, NOT A PAGES PROJECT, AND THE TWO TAKE
+# DIFFERENT KEYS. The dashboard's Build settings show `npx wrangler deploy` as
+# the deploy command and `npx wrangler versions upload` as the version command,
+# and the project has Bindings / Runtime / Trigger events tabs — all of which
+# are Workers, not Pages. So the directory is declared as `[assets]` below.
+# `pages_build_output_dir`, which an earlier pass here used, is a PAGES-ONLY
+# key: `wrangler deploy` rejects a config carrying it. If this ever moves back
+# to a real Pages project, that key returns and this block goes.
+#
+# `directory` points at `out/`, which is what `output: "export"` in
+# next.config.mjs produces.
+#
+# `not_found_handling = "404-page"` serves out/404.html for an unknown path.
+# Do NOT use "single-page-application" — that returns index.html with a 200 for
+# every miss, which would hand crawlers the home page under every wrong URL and
+# bury the real 404.
+#
+# ⚠️ THE BUILD COMMAND CANNOT LIVE HERE. Wrangler config has no key for it; it
+# is a dashboard setting. Settings → Build → Build command: `npm run build`.
+# (Already set correctly as of 2026-08-14.)
+#
+# ⚠️ AND NEITHER CAN THE CLOUDINARY VARIABLE. `NEXT_PUBLIC_*` is inlined by
+# Next AT BUILD TIME, so it must be a **build** variable —
+# Settings → Build → "Build variables and secrets" — NOT the runtime
+# "Variables and secrets" section further up the same page. Cloudflare states
+# plainly that runtime variables are not available during the build, so one set
+# there is read by nothing and every photograph silently stays local.
+#
+#     NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME = mmia7qfr
+#
+# Per-file ceiling here is the same 25 MiB as Pages. The largest file in the
+# build is now videos/bintang-hero.mp4 at 18.6MB — see CLOUDINARY.md.
+name = "maginhawa"
+compatibility_date = "2026-08-14"
+
+[assets]
+directory = "./out"
+not_found_handling = "404-page"

@@ -30,6 +30,7 @@ import styles from "./About.module.css";
 import cursor from "./CustomCursor.module.css";
 import { FEATURED_OUTLETS, PRESS } from "@/lib/press";
 import { getRestaurant } from "@/lib/restaurants";
+import { asset } from "@/lib/media";
 
 const OUTLET_PRIORITY = new Map(FEATURED_OUTLETS.map((o, i) => [o.name, i]));
 const priorityOf = (name: string) => OUTLET_PRIORITY.get(name) ?? Infinity;
@@ -1216,8 +1217,8 @@ export default function About() {
               <video
                 ref={videoRef}
                 className={styles.heroVideo}
-                src="/videos/belly-hero.mp4"
-                poster="/images/belly.jpg"
+                src={asset("/videos/belly-hero.mp4")}
+                poster={asset("/images/belly.jpg")}
                 muted
                 loop
                 playsInline
@@ -1652,7 +1653,7 @@ export default function About() {
                               {row.image && (
                                 <img
                                   className={styles.coverageThumb}
-                                  src={row.image}
+                                  src={asset(row.image)}
                                   alt=""
                                   aria-hidden
                                   loading="lazy"

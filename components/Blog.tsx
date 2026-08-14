@@ -16,6 +16,7 @@ import card from "./VenueCard.module.css";
 import PillCta from "./PillCta";
 import { BLOG, type BlogEntry } from "@/lib/blog";
 import { getRestaurant } from "@/lib/restaurants";
+import { asset } from "@/lib/media";
 
 // shared enter curve — the same ease the Discover reel slides in on
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -95,7 +96,7 @@ function VenueMark({ slug }: { slug?: string }) {
       <span className={card.cardLogo} role="img" aria-label={venue.name}>
         <span
           className={card.cardLogoMark}
-          style={{ "--ov-logo-url": `url(${venue.logo})` } as React.CSSProperties}
+          style={{ "--ov-logo-url": `url(${asset(venue.logo)})` } as React.CSSProperties}
         />
       </span>
     </div>

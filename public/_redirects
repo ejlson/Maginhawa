@@ -1,0 +1,24 @@
+# ── /join-us → /careers ────────────────────────────────────────────────────
+# The nav item has always read CAREERS and the URL said something else, which
+# is a contradiction a reader can see in the status bar. The route moved; this
+# keeps every link that was ever printed, bookmarked, emailed or indexed
+# working.
+#
+# PERMANENT (308), not a temporary redirect: the old path is not coming back,
+# and a 301/308 is what tells a crawler to transfer the page's history to the
+# new URL rather than to keep both and pick one. The hash forms (#open-roles,
+# #apply, and the per-job #ids in the page's JobPosting JSON-LD) survive for
+# free — a fragment is never sent to the server, so the browser reapplies it
+# to the redirect target.
+#
+# ── WHY HERE AND NOT IN next.config.mjs ──
+# This lived in `redirects()` until the build moved to `output: "export"`.
+# A redirect is something a server does, and an exported build has no server:
+# Next prints a notice and silently drops the rule. Cloudflare Pages reads
+# this file out of the published directory instead, and `public/` is copied
+# into `out/` verbatim by the export — so this is the copy that is in force.
+#
+# Order matters: the first match wins, so the exact path is listed before the
+# splat. `:splat` is Cloudflare's spelling of what Next wrote as `:path*`.
+/join-us      /careers          308
+/join-us/*    /careers/:splat   308

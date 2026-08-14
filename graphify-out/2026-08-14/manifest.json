@@ -460,8 +460,8 @@
     "semantic_hash": ""
   },
   "public/images/omar.jpg": {
-    "mtime": 1786723313.89801,
-    "ast_hash": "4a0576eaef1a7477083bae88c4e1b286",
+    "mtime": 1785756410.272816,
+    "ast_hash": "a079ab8ba605ca12503ee7aac5e57100",
     "semantic_hash": ""
   },
   "public/images/ramo.jpg": {
@@ -560,8 +560,8 @@
     "semantic_hash": ""
   },
   "public/menu/cafemama/page-1.png": {
-    "mtime": 1786723314.362052,
-    "ast_hash": "ecc40a00ca21a59793777b7c0d4de8ef",
+    "mtime": 1782210242.7815654,
+    "ast_hash": "4434ff74600ae1b39fcb50f5aa413793",
     "semantic_hash": ""
   },
   "public/menu/cafemama/page-2.png": {
@@ -800,8 +800,8 @@
     "semantic_hash": ""
   },
   "public/images/mamasons.jpg": {
-    "mtime": 1786723313.6709206,
-    "ast_hash": "917d88fa1199f86852537f193176da1a",
+    "mtime": 1785748989.8666983,
+    "ast_hash": "46d9b62b57fa0990fe52360d0ccb77af",
     "semantic_hash": ""
   },
   "public/images/omarshah.jpeg": {
@@ -810,8 +810,8 @@
     "semantic_hash": ""
   },
   "public/images/belly3.jpg": {
-    "mtime": 1786723313.4022305,
-    "ast_hash": "cdb1045fb863e790d98234557ada4cd4",
+    "mtime": 1785756410.1885686,
+    "ast_hash": "2b20ebd520c16575b14562303b97f466",
     "semantic_hash": ""
   },
   "public/images/blog/post-cny-web.jpg": {
@@ -1475,18 +1475,18 @@
     "semantic_hash": ""
   },
   "lib/media.ts": {
-    "mtime": 1786723495.3250413,
-    "ast_hash": "bfd37469929d13a1c09004ecf30efed1",
+    "mtime": 1786719644.903761,
+    "ast_hash": "f652f1174e97945cc7036f2fbac03824",
     "semantic_hash": ""
   },
   "scripts/cloudinary-upload.mjs": {
-    "mtime": 1786723511.461813,
-    "ast_hash": "217d9926704e0dc7db95f89fbe403469",
+    "mtime": 1786719484.7430797,
+    "ast_hash": "4a458d6f64ded0ae9ba32d0d347c3484",
     "semantic_hash": ""
   },
   "CLOUDINARY.md": {
-    "mtime": 1786723844.2945654,
-    "ast_hash": "c1fa553a6ba17ffcf71ee2691773d367",
+    "mtime": 1786719957.9074748,
+    "ast_hash": "bcd388bd27cc3d30d143eb3542f79556",
     "semantic_hash": ""
   },
   "public/images/bunso.jpg": {
@@ -1507,81 +1507,6 @@
   "scripts/compress-media.mjs": {
     "mtime": 1786720968.239948,
     "ast_hash": "a112f4370c8e78af20dec3817ee567aa",
-    "semantic_hash": ""
-  },
-  "cloudinary-manifest.json": {
-    "mtime": 1786723383.900186,
-    "ast_hash": "75abb64955eabc29a02a926b2f7e1792",
-    "semantic_hash": ""
-  },
-  "public/videos/belly-hero.mp4": {
-    "mtime": 1786723464.3608348,
-    "ast_hash": "f7eb1e9fc1598dcf6c2ba41826bc39b6",
-    "semantic_hash": ""
-  },
-  "public/videos/bintang-hero.mp4": {
-    "mtime": 1786723488.8243642,
-    "ast_hash": "90fc31b4a60e448193d03b6365371f11",
-    "semantic_hash": ""
-  },
-  "public/videos/bunso-bakery.mp4": {
-    "mtime": 1786723493.7923052,
-    "ast_hash": "a302addb275860136dbb62b5eec14914",
-    "semantic_hash": ""
-  },
-  "public/videos/forpilot1.mp4": {
-    "mtime": 1786723502.839138,
-    "ast_hash": "6c3d04e1c5c00fbe62355ca1a28b79ad",
-    "semantic_hash": ""
-  },
-  "public/videos/guanabana.mp4": {
-    "mtime": 1786723505.1752014,
-    "ast_hash": "ed5525260d4937f779ff0f97ff9c908c",
-    "semantic_hash": ""
-  },
-  "public/videos/hero-cafemama.mp4": {
-    "mtime": 1786723513.351218,
-    "ast_hash": "40d2998a8f50058f0590ce6fa71f3f19",
-    "semantic_hash": ""
-  },
-  "public/videos/hero-draft3-1080.mp4": {
-    "mtime": 1786723532.741076,
-    "ast_hash": "93c162329415503336c8e9012ac47b7c",
-    "semantic_hash": ""
-  },
-  "public/videos/hero-ramo.mp4": {
-    "mtime": 1786723541.5045571,
-    "ast_hash": "ac8cd544f92af5e703a70231aebd498a",
-    "semantic_hash": ""
-  },
-  "public/videos/mamasons-hero.mp4": {
-    "mtime": 1786723553.0944164,
-    "ast_hash": "cc9fa60eddc977f12568cabb7cb1e463",
-    "semantic_hash": ""
-  },
-  "public/videos/tile-bintang.mp4": {
-    "mtime": 1786723553.5572379,
-    "ast_hash": "71d5dcd20dc94475bfb83acf43699106",
-    "semantic_hash": ""
-  },
-  "public/videos/tile-cafemama.mp4": {
-    "mtime": 1786723555.829469,
-    "ast_hash": "140031768fc9f0b5af600a705a6f6214",
-    "semantic_hash": ""
-  },
-  "public/videos/tile-guanabana.mp4": {
-    "mtime": 1786723556.370557,
-    "ast_hash": "dfbad0579ae0fddde7e2b9997e05aff9",
-    "semantic_hash": ""
-  },
-  "public/videos/tile-mamasons.mp4": {
-    "mtime": 1786723557.198816,
-    "ast_hash": "e454d5c844ee48e876709028bfeef1c4",
-    "semantic_hash": ""
-  },
-  "public/videos/tile-ramo.mp4": {
-    "mtime": 1786723559.0836716,
-    "ast_hash": "c76a189b125d7f1bc2a6c1d22e833062",
     "semantic_hash": ""
   }
 }

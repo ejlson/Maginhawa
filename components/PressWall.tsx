@@ -3,6 +3,7 @@
 import { motion, useReducedMotion } from "framer-motion";
 import styles from "./PressWall.module.css";
 import { FEATURED_OUTLETS } from "@/lib/press";
+import { asset } from "@/lib/media";
 
 // shared enter curve — the same rise the other chapters use
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -127,7 +128,9 @@ export default function PressWall() {
                 {/* eslint-disable-next-line @next/next/no-img-element */}
                 <img
                   className={styles.logo}
-                  src={outlet.logo}
+                  // most of these marks are SVG, which `asset()` returns
+                  // untouched by design — see its note on SVG delivery
+                  src={asset(outlet.logo)}
                   alt={copy === 0 ? outlet.name : ""}
                   draggable={false}
                 />

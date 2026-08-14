@@ -3,6 +3,7 @@
 import { useEffect, useRef } from "react";
 import { AnimatePresence, motion } from "framer-motion";
 import styles from "./MenuOverlay.module.css";
+import { asset } from "@/lib/media";
 
 // Full-screen modal that displays a restaurant's menu pages as a vertically
 // scrollable stack of images. Closes on Esc, on backdrop click, or via the
@@ -85,7 +86,7 @@ export default function MenuOverlay({
                 <li key={src} className={styles.pageItem}>
                   {/* eslint-disable-next-line @next/next/no-img-element */}
                   <img
-                    src={src}
+                    src={asset(src)}
                     alt={`${restaurantName} menu — page ${i + 1} of ${pages.length}`}
                     draggable={false}
                   />

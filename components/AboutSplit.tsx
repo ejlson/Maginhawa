@@ -5,6 +5,7 @@ import Link from "next/link";
 import { motion, useReducedMotion, type Variants } from "framer-motion";
 import styles from "./AboutSplit.module.css";
 import PillCta from "./PillCta";
+import { asset } from "@/lib/media";
 
 /**
  * The group's story, as a 50/50 split — photograph left, text right.
@@ -351,8 +352,12 @@ export default function AboutSplit() {
                fullscreen. */
             <video
               className={styles.mediaVideo}
-              src={VIDEO}
-              poster={PORTRAIT}
+              /* the film from the CDN when one is configured; the poster
+                 stays the hand-picked portrait rather than becoming a
+                 rendered frame, because this one was CHOSEN — see the
+                 chapter's own note on PORTRAIT */
+              src={asset(VIDEO)}
+              poster={asset(PORTRAIT)}
               autoPlay
               muted
               loop

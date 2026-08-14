@@ -11,6 +11,7 @@ import { lenisRef } from "@/lib/SmoothScroll";
 import { useRouteTransition } from "./PageTransition";
 import styles from "./Hero.module.css";
 import PillCta from "./PillCta";
+import { asset } from "@/lib/media";
 
 // Lenis owns the scroll, so a raw scrollIntoView is pulled straight back —
 // same hand-off the footer's "Back to top" uses. The native path is the
@@ -101,7 +102,9 @@ export default function Hero({ started }: { started: boolean }) {
               videoRefs.current[i] = el;
             }}
             className={styles.video}
-            src={src}
+            // resolved at the attribute only — `key` and the CLIPS table
+            // stay on the raw path (see the banner in lib/media.ts)
+            src={asset(src)}
             autoPlay={i === 0}
             muted
             playsInline

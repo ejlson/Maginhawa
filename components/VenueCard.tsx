@@ -7,6 +7,7 @@ import { motion, useReducedMotion, type MotionProps } from "framer-motion";
 import styles from "./VenueCard.module.css";
 import { getRestaurant, primaryAction } from "@/lib/restaurants";
 import type { VenueCardItem } from "@/lib/venueCards";
+import { asset } from "@/lib/media";
 
 /* ═══════════════════════ THE VENUE CARD ═══════════════════════════════
    ONE CARD, NOT TWO OBJECTS. This design started as a photograph with a
@@ -243,7 +244,9 @@ export default function VenueCard({
         v.style.setProperty("--wipe-y", `${((e.clientY - r.top) / r.height) * 100}%`);
       }
     }
-    if (!v.src) v.src = clip!;
+    // the CDN URL when one is configured; `clip` itself stays the raw
+    // path, since it is also what `filmable` and the record are keyed on
+    if (!v.src) v.src = asset(clip!);
     void v.play().catch(() => {});
   };
   const onLeave = () => {
@@ -382,7 +385,7 @@ export default function VenueCard({
           <span className={styles.cardLogo} role="img" aria-label={item.name}>
             <span
               className={styles.cardLogoMark}
-              style={{ "--ov-logo-url": `url(${item.logo})` } as React.CSSProperties}
+              style={{ "--ov-logo-url": `url(${asset(item.logo)})` } as React.CSSProperties}
             />
           </span>
         ) : (

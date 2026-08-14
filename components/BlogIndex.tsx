@@ -13,6 +13,7 @@ import styles from "./BlogIndex.module.css";
 import { BLOG, type BlogEntry } from "@/lib/blog";
 import { RESTAURANTS, getRestaurant } from "@/lib/restaurants";
 import { lenisRef } from "@/lib/SmoothScroll";
+import { asset } from "@/lib/media";
 
 /* page 1 = the featured latest + the next PER_PAGE posts; every following
    page shows PER_PAGE more. Unfiltered, 24 entries → 1+8 / 8 / 7.
@@ -152,7 +153,9 @@ function CardMedia({
       {/* eslint-disable-next-line @next/next/no-img-element */}
       <img
         ref={imgRef}
-        src={src}
+        // the CDN URL; `src` itself stays raw because the loaded-state
+        // latch above compares against it
+        src={asset(src)}
         alt={alt}
         onLoad={() => setLoadedSrc(src)}
         // a broken file must still retire the skeleton, or the card shimmers
@@ -191,7 +194,7 @@ function VenueMark({ slug }: { slug?: string }) {
     <span className={styles.cardMark} role="img" aria-label={venue.name}>
       <span
         className={styles.cardMarkInk}
-        style={{ "--ov-logo-url": `url(${venue.logo})` } as React.CSSProperties}
+        style={{ "--ov-logo-url": `url(${asset(venue.logo)})` } as React.CSSProperties}
       />
     </span>
   );
