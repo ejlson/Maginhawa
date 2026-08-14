@@ -20,6 +20,7 @@
  * Excluded from the nav and the sitemap; it is only reachable by URL.
  */
 import styles from "./lab.module.css";
+import { asset } from "@/lib/media";
 
 export const metadata = { robots: { index: false, follow: false } };
 
@@ -32,7 +33,7 @@ function Film() {
       {/* eslint-disable-next-line jsx-a11y/media-has-caption */}
       <video
         className={styles.video}
-        src={CLIP}
+        src={asset(CLIP)}
         autoPlay
         muted
         loop

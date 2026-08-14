@@ -25,6 +25,7 @@ import VenueCard from "./VenueCard";
 import { getRestaurant, primaryAction } from "@/lib/restaurants";
 import { venueCards, type VenueCardItem } from "@/lib/venueCards";
 import { lenisRef } from "@/lib/SmoothScroll";
+import { asset } from "@/lib/media";
 
 /* ══════════════════════════════════════════════════════════════════════
    THE ASSEMBLY INTRO IS GONE, and this note is here so nobody rebuilds it
@@ -207,12 +208,19 @@ const ITEMS: DiscoverItem[] = venueCards().map((v) => {
    left the photograph a 110px-tall strip on the 4-up column and the card
    stopped being a picture.
 
-   DO NOT WRITE THE RATIO ANYWHERE BUT HERE. TWO places consume it:
+   DO NOT WRITE THE RATIO ANYWHERE BUT HERE. ONE place consumes it:
      · the grid tile   (.tileMedia's padding-top, still written inline —
        see below for why it does not simply live in the stylesheet)
-     · the expansion   (.expandMedia's aspect-ratio, set inline — a
-       layoutId morph between two boxes of different aspect is a two-axis
-       stretch, and the photograph would visibly deform mid-flight)
+
+   THE EXPANSION WAS THE SECOND CONSUMER AND IS NOT ANY MORE. It carried
+   this same fraction as an inline aspect-ratio precisely so the layoutId
+   morph could not deform the photograph — a flight between two rects of
+   different shape is a two-axis stretch. The expansion is now a 3:4
+   PORTRAIT by design (the user's instruction; see the banner on
+   ExpandedCard), so the shapes differ on purpose and the deformation is
+   answered where it happens instead: `.expandFrame` is a projection node
+   of its own and re-crops through the flight. Changing this number no
+   longer touches the expansion at all.
 
    THERE WAS A THIRD, and it is worth recording what it wanted, because it
    is the strictest constraint this number ever had: the retired assembly
@@ -240,10 +248,10 @@ const ITEMS: DiscoverItem[] = venueCards().map((v) => {
    to fit. 3.8 gives 274×347 — still portrait, still taller than the square
    the /restaurants grid uses, and considerably kinder to the crop.
 
-   ONE SOURCE, THREE CONSUMERS. The same fraction sizes the tile seat, the
-   expansion's media plate and the CSS fallback in Discover.module.css; a
-   ratio stated in more than one place is a ratio that drifts, and a drifted
-   ratio deforms the expand morph rather than merely looking wrong. */
+   ONE SOURCE, TWO CONSUMERS TODAY: the tile seat and the CSS fallback in
+   Discover.module.css. (It was three — the expansion's media plate was the
+   third until that plate went portrait; see the paragraph above.) A ratio
+   stated in more than one place is a ratio that drifts. */
 /* SHALLOWER, so the chapter can fit one screen — from 3.8 / 3 (1.267).
    THE ARITHMETIC, because this number is not a taste decision and cannot be
    nudged without redoing it. Measured at 1440 wide, four-up:
@@ -771,7 +779,47 @@ function Tile({
    from the tile's bounds to the card's — transform-only, spring-driven,
    interruptible — while the body content fades up a beat behind. Closing
    (backdrop, ×, or Escape) runs the same morph in reverse. Reduced motion
-   swaps the morph for a plain crossfade. */
+   swaps the morph for a plain crossfade.
+
+   ═══ THE EXPANSION IS ONE PORTRAIT OBJECT NOW, at the user's instruction.
+   It was a TRANSPARENT COLUMN: a 1.32 landscape photo plate with a separate
+   cream sheet tucked under it carrying the name, the story, the address and
+   the two controls — a picture and then a caption, which is the exact
+   arrangement the CARD itself stopped being two passes ago (see the banner
+   in VenueCard.tsx). The expansion is the card OPENED, so it is now the
+   same object at size: a tall 3:4 portrait, the venue's film running
+   full-bleed edge to edge, a ramp seated in the bottom edge, and every word
+   and both controls standing ON that ramp.
+
+   WHAT THAT CHANGES STRUCTURALLY, and each one is load-bearing:
+
+   · THE SEAT IS `.expandCard`, NOT THE PLATE. The card is sized from the
+     VIEWPORT'S HEIGHT (see the stylesheet) because a portrait card's
+     constraint is vertical; the plate is now `inset: 0` inside it. The
+     plate used to carry an inline aspect-ratio from PLATE_RATIO so the
+     morph could not deform the photograph — that guarantee is gone
+     DELIBERATELY, because the two rectangles are now different shapes on
+     purpose. See `.expandFrame` for what replaces it.
+
+   · THE MORPH IS AN ASPECT CHANGE, so the media takes `layout` of its own.
+     A framer layout projection scales its whole subtree by (sx, sy); from a
+     1.32 landscape tile to a 0.75 portrait card those differ by a factor of
+     ~1.8, and an uncorrected flight would squash the picture flat and let
+     it spring back. `.expandFrame` is a projection node in its own right,
+     so it re-renders into the interpolated box each frame and the film
+     simply re-crops through the flight instead of stretching.
+
+   · NOTHING THE READER READS IS INSIDE THE MORPH. The ramp, the mark and
+     the whole block are siblings of the plate, at the card's FINAL
+     rectangle from the first frame, fading up behind it. Put any of them
+     inside `.expandMedia` and they would be scaled by the same (sx, sy) —
+     type flying in at 1.8:1 and correcting itself.
+
+   · THE RAMP'S TWO LAYERS TAKE THE FADE SEPARATELY, for the reason the
+     card's do: `backdrop-filter` samples its nearest backdrop ROOT and any
+     ancestor with opacity < 1 becomes one, so a wrapper carrying the fade
+     would leave the blur sampling nothing and the colour would snap in at
+     the end. They are siblings. Do not wrap them. ═══ */
 function ExpandedCard({
   item,
   onClose,
@@ -787,6 +835,14 @@ function ExpandedCard({
     const r = getRestaurant(item.slug);
     return r ? primaryAction(r) : null;
   })();
+
+  /* THE FULL-BLEED FILM. The same clip the tile wipes open under the
+     pointer — one asset, two presentations — and it is not hover furniture
+     here: opening the card IS the request for it, so it needs no
+     pointer-capability test. Reduced motion declines it and keeps the
+     still; a venue with no clip on file (Hoodwood today) does the same.
+     Seven of the eight carry one, so this is the ordinary path. */
+  const film = !reduce && item.clip ? item.clip : null;
 
   // modal housekeeping: hold the page still underneath, close on Escape,
   // and land keyboard focus on the close control
@@ -807,14 +863,27 @@ function ExpandedCard({
     };
   }, [onClose]);
 
+  /* ── THE FURNITURE'S ARRIVAL ──
+     One clock for the ramp, the mark, the close and the block, so the card
+     "develops" as one thing rather than in four unrelated fades. Only the
+     block adds a rise on top of it. The delay lands them just after the
+     spring has done most of its travel; the exit is quicker than the
+     entrance and carries no delay at all — the system responding, not
+     deciding. */
+  const furniture = {
+    initial: { opacity: 0 },
+    animate: { opacity: 1 },
+    exit: { opacity: 0, transition: { duration: 0.18, ease: "easeOut" } },
+    transition: {
+      duration: 0.34,
+      ease: EASE,
+      delay: reduce ? 0 : 0.16,
+    },
+  } as const;
+
   // PORTALED to <body>: the section lives inside .afterHero's z-index: 1
   // stacking context, which would trap ANY overlay underneath the fixed
   // nav (z 80) no matter its own z-index. The portal escapes the trap.
-  //
-  // Only the MEDIA plate carries the layoutId morph — tile and expansion
-  // are both 3:2, so the FLIP is pure scale + translate with zero content
-  // distortion. The cream body sheet fades up beneath it a beat later,
-  // echoing the tile's own plate-above-caption grammar at full size.
   return createPortal(
     <div
       className={styles.expandRoot}
@@ -833,166 +902,199 @@ function ExpandedCard({
       />
 
       <div className={styles.expandCard}>
+        {/* ── THE PLATE. The ONLY thing that morphs, and it fills the card:
+            the seat above owns the 3:4, this is `inset: 0` inside it. ── */}
         <motion.div
           className={styles.expandMedia}
           layoutId={reduce ? undefined : `card-${item.slug}`}
-          /* the SAME aspect as the tile, from the same constant — a morph
-             between two rects of different aspect is a two-axis stretch
-             that visibly deforms the photograph mid-flight. Written from
-             PLATE_RATIO rather than left to the stylesheet's 4/5 so the
-             pair provably cannot drift; the stylesheet value is the
-             fallback for a stylesheet-only render. */
           style={{
             /* the same token the tile's .cardSurface takes — the morph
                lands on this box, and a flight that changes radius mid-air
                reads as the corner "growing" independently of the card */
             borderRadius: "var(--radius-tile)",
-            aspectRatio: String(1 / PLATE_RATIO),
           }}
           transition={EXPAND_SPRING}
           initial={reduce ? { opacity: 0 } : undefined}
           animate={reduce ? { opacity: 1 } : undefined}
           exit={reduce ? { opacity: 0 } : undefined}
         >
-          {item.image ? (
-            <Image
-              // `card`, not `styles` — see the import note: the photograph's
-              // rule belongs to the card and moved to its stylesheet
-              className={card.photo}
-              style={item.focal ? { objectPosition: item.focal } : undefined}
-              src={item.image}
-              alt=""
-              fill
-              sizes="(max-width: 780px) 100vw, 720px"
-            />
-          ) : (
-            <div className={card.fallback} aria-hidden />
-          )}
-          <div className={styles.scrim} aria-hidden />
-          <div className={styles.center}>
-            <div className={styles.brandGroup}>
-              {item.logo ? (
-                <span
-                  className={styles.logo}
-                  style={
-                    {
-                      "--ov-logo-url": `url(${item.logo})`,
-                    } as React.CSSProperties
-                  }
-                  role="img"
-                  aria-label={item.name}
-                />
-              ) : (
-                <span className={styles.wordmark}>{item.name}</span>
-              )}
-            </div>
-          </div>
-          {item.badge ? (
-            <span className={card.stickerBadge}>
+          {/* THE COUNTER-PROJECTION. See the banner: tile and expansion are
+              deliberately different shapes now, so the flight is a
+              two-axis scale and everything inside it would squash. This
+              box is a projection node of its own, so it lands in the
+              interpolated rectangle each frame and the picture RE-CROPS
+              through the flight rather than deforming.
+              `layout` is dropped under reduced motion because there is no
+              morph to correct — the plate crossfades. */}
+          <motion.div className={styles.expandFrame} layout={!reduce}>
+            {item.image ? (
               <Image
-                src={item.badge}
+                // `card`, not `styles` — see the import note: the
+                // photograph's rule belongs to the card and moved to its
+                // stylesheet
+                className={card.photo}
+                style={item.focal ? { objectPosition: item.focal } : undefined}
+                src={item.image}
                 alt=""
-                width={128}
-                height={128}
-                sizes="128px"
-                draggable={false}
+                fill
+                // the card is height-driven; at its tallest it is ~640px
+                // wide on desktop and the full column on a phone
+                sizes="(max-width: 700px) 100vw, 680px"
+                priority
               />
-            </span>
-          ) : null}
-          <button
-            ref={closeRef}
-            type="button"
-            className={styles.expandClose}
-            onClick={onClose}
-            aria-label="Close"
-          >
-            <svg viewBox="0 0 16 16" aria-hidden focusable="false">
-              <path
-                d="M3 3 L13 13 M13 3 L3 13"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
+            ) : (
+              <div className={card.fallback} aria-hidden />
+            )}
+
+            {/* THE FILM, FULL BLEED — the same muted clip the tile wipes
+                open under the pointer, running edge to edge behind
+                everything. It sits OVER the photograph rather than
+                replacing it, and reveals itself on `playing` and not a
+                moment before: the morph starts from a tile showing the
+                still, so cutting to an unbuffered <video> would blank the
+                card on the exact frame it opens. A clip that never loads
+                simply never appears and the photograph is what shipped.
+                No React state anywhere in that — this subtree is inside a
+                layout projection and a re-render mid-flight is a
+                re-measure mid-flight. */}
+            {film ? (
+              <video
+                className={styles.expandFilm}
+                // the CDN URL when one is configured; `film` stays the raw
+                // path, which is what the record carries and what the tile's
+                // hover clip is keyed on
+                src={asset(film)}
+                autoPlay
+                muted
+                loop
+                playsInline
+                preload="auto"
+                onPlaying={(e) => {
+                  e.currentTarget.dataset.playing = "true";
+                }}
               />
-            </svg>
-          </button>
+            ) : null}
+          </motion.div>
         </motion.div>
 
-        <motion.div
-          className={styles.expandBody}
-          initial={{ opacity: 0, transform: "translateY(14px)" }}
-          animate={{ opacity: 1, transform: "translateY(0px)" }}
-          exit={{
-            opacity: 0,
-            transform: "translateY(8px)",
-            transition: { duration: 0.2, ease: "easeOut" },
-          }}
-          transition={{
-            duration: 0.4,
-            ease: EASE,
-            // the body lands a beat after the morph has mostly settled
-            delay: reduce ? 0 : 0.14,
-          }}
-        >
-          <div className={styles.expandHeadRow}>
-            <h3 className={styles.expandName}>{item.name}</h3>
-            <span className={styles.expandTag}>
-              {item.est ? `Est. ${item.est} · ` : null}
-              {item.tag}
-              {item.priceRange ? ` · ${item.priceRange}` : null}
-            </span>
-          </div>
-          <p className={styles.expandBlurb}>{item.blurb}</p>
-          {item.badge ? (
-            <p className={styles.expandCredential}>
-              <Image
-                className={styles.expandCredentialMark}
-                src={item.badge}
-                alt=""
-                width={64}
-                height={64}
-                sizes="64px"
-                draggable={false}
-              />
-              {item.badgeLabel}
-            </p>
-          ) : null}
-          <p className={styles.expandLocation}>{item.location}</p>
-          <div className={styles.expandActions}>
-            {action ? (
-              <a
-                href={action.href}
-                {...(action.external
-                  ? { target: "_blank", rel: "noopener noreferrer" }
-                  : {})}
-                /* .panelAction, the tile panel's own control — the
-                   expansion IS the tile opened, so the two must not
-                   disagree. They no longer sit on the same ground
-                   (the tile's panel is ink now, this sheet is still
-                   cream), which is exactly why the class carries its
-                   hover target as custom properties and this block
-                   overrides them: the RESTING annatto pill is identical
-                   on both, and only the inversion differs.
-                   This was .pillBook, which the caption-on-photo era
-                   inverted to a cream ring with cream text: correct
-                   over a photograph, INVISIBLE on this cream sheet
-                   (measured: ring and label both var(--cream) on
-                   var(--cream)). That failure is the reason the hover
-                   colour here is not simply hard-coded to cream. */
-                className={styles.panelAction}
-              >
-                {/* the expansion has room for the longer form of the same
-                    action the tile abbreviates */}
-                {action.label === "Book" ? "Book a Table" : action.label}
-              </a>
+        {/* ── EVERYTHING THE READER READS. Outside the morph, at the card's
+            final rectangle from the first frame — see the banner. Clipped
+            to the card's own corner so the ramp cannot square off the
+            plate's curve underneath it. ── */}
+        <div className={styles.expandOverlay} aria-hidden={false}>
+          {/* the ramp's two layers, faded SEPARATELY — a shared wrapper
+              with an opacity on it would starve the blur's backdrop */}
+          <motion.div className={styles.expandRampBlur} aria-hidden {...furniture} />
+          <motion.div className={styles.expandRampScrim} aria-hidden {...furniture} />
+
+          {/* the crown, exactly as the unpressed card wears it: the venue's
+              own lettering top-left on the picture, the credential stuck
+              on at the top-right. The close control is the third corner
+              object, so the sticker keeps clear of it (see the rule). */}
+          <motion.div className={styles.expandCrown} {...furniture}>
+            {item.logo ? (
+              <span className={styles.expandMark} role="img" aria-label={item.name}>
+                <span
+                  className={styles.expandMarkInk}
+                  style={
+                    { "--ov-logo-url": `url(${asset(item.logo)})` } as React.CSSProperties
+                  }
+                />
+              </span>
+            ) : (
+              // no mark on file (Bunso): the venue's name in the display
+              // face does the same job
+              <span className={styles.expandWordmark}>{item.name}</span>
+            )}
+
+            {item.badge ? (
+              <span className={styles.expandSticker} title={item.badgeLabel}>
+                <Image
+                  src={item.badge}
+                  alt={item.badgeLabel ?? ""}
+                  width={128}
+                  height={128}
+                  sizes="128px"
+                  draggable={false}
+                />
+              </span>
             ) : null}
-            <Link
-              href={`/restaurants/${item.slug}`}
-              className={styles.viewLink}
-            >
-              View Restaurant
-            </Link>
-          </div>
-        </motion.div>
+          </motion.div>
+
+          {/* THE BLOCK, standing on the ramp. Same order as the card's:
+              who this is, then where, then what to do. */}
+          <motion.div
+            className={styles.expandBody}
+            {...furniture}
+            initial={{ opacity: 0, transform: "translateY(16px)" }}
+            animate={{ opacity: 1, transform: "translateY(0px)" }}
+            exit={{
+              opacity: 0,
+              transform: "translateY(8px)",
+              transition: { duration: 0.18, ease: "easeOut" },
+            }}
+          >
+            <div className={styles.expandHeadRow}>
+              <h3 className={styles.expandName}>{item.name}</h3>
+              <span className={styles.expandTag}>
+                {item.est ? `Est. ${item.est} · ` : null}
+                {item.tag}
+                {item.priceRange ? ` · ${item.priceRange}` : null}
+              </span>
+            </div>
+            <p className={styles.expandBlurb}>{item.blurb}</p>
+            <p className={styles.expandLocation}>{item.location}</p>
+            <div className={styles.expandActions}>
+              {action ? (
+                <a
+                  href={action.href}
+                  {...(action.external
+                    ? { target: "_blank", rel: "noopener noreferrer" }
+                    : {})}
+                  /* .panelAction, the tile panel's own control — the
+                     expansion IS the tile opened, so the two must not
+                     disagree. They now stand on the SAME ground again (a
+                     photo-derived ramp), which is why the `.expandActions`
+                     inversion that used to sit in the stylesheet is gone:
+                     the class's own cream-on-hover is right here, exactly
+                     as it is on the card. */
+                  className={styles.panelAction}
+                >
+                  {/* the expansion has room for the longer form of the same
+                      action the tile abbreviates */}
+                  {action.label === "Book" ? "Book a Table" : action.label}
+                </a>
+              ) : null}
+              <Link
+                href={`/restaurants/${item.slug}`}
+                className={styles.viewLink}
+              >
+                View Restaurant
+              </Link>
+            </div>
+          </motion.div>
+        </div>
+
+        {/* the close control — a sibling of the plate rather than a child
+            of it, so it is neither scaled by the morph nor buried under
+            the overlay's pointer-transparent layer */}
+        <motion.button
+          ref={closeRef}
+          type="button"
+          className={styles.expandClose}
+          onClick={onClose}
+          aria-label="Close"
+          {...furniture}
+        >
+          <svg viewBox="0 0 16 16" aria-hidden focusable="false">
+            <path
+              d="M3 3 L13 13 M13 3 L3 13"
+              stroke="currentColor"
+              strokeWidth="1.6"
+              strokeLinecap="round"
+            />
+          </svg>
+        </motion.button>
       </div>
     </div>,
     document.body,

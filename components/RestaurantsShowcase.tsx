@@ -1108,8 +1108,39 @@ export default function RestaurantsShowcase() {
                      the gutters and the sheet's padding; getting this
                      wrong is a 4032px decode on a 220px box. */
                   sizes="(max-width: 460px) calc(100vw - 32px), (max-width: 700px) 46vw, (max-width: 980px) 31vw, 24vw"
-                  onPress={() => navigate(`/restaurants/${v.slug}`)}
-                  pressLabel={`Open ${v.name}`}
+                  /* THE PRESS GOES TO THE VENUE'S OWN SITE, at the user's
+                     instruction — the same destination the card's Visit
+                     pill and the wheel's Visit action already carry, so
+                     the whole card and the control inside it now agree.
+                     It USED to open /restaurants/[slug]; that page is
+                     still reachable from the footer and from anywhere
+                     else that links a venue, it is simply no longer what
+                     a press on the picture means.
+
+                     THE INTERNAL PAGE IS THE FALLBACK, not a second
+                     behaviour: a venue with no `website` on file still
+                     has somewhere to go, and it goes there through the
+                     route transition rather than a bare push.
+
+                     A NEW TAB, because every other external destination
+                     on this site opens in one (the wheel's Visit, the
+                     card's own pill, every booking link) and a card that
+                     silently replaced the page the grid lives on would be
+                     the one exception. `noopener` with it — window.open
+                     without it hands the opened site a live reference to
+                     this one. */
+                  onPress={() => {
+                    const site = getRestaurant(v.slug)?.website;
+                    if (site) window.open(site, "_blank", "noopener,noreferrer");
+                    else navigate(`/restaurants/${v.slug}`);
+                  }}
+                  /* names the DESTINATION, since the press no longer opens
+                     a page on this site */
+                  pressLabel={
+                    getRestaurant(v.slug)?.website
+                      ? `Visit ${v.name} — opens their website in a new tab`
+                      : `Open ${v.name}`
+                  }
                   /* passed unconditionally: the card itself is what knows
                      whether there is a menu behind the control, so the
                      rule lives in one place for both grids */

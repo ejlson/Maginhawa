@@ -1,6 +1,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { asset } from "@/lib/media";
 
 type Clip = { src: string; rotate: number };
 
@@ -65,11 +66,17 @@ export default function VideoBackdrop({
     });
   }, [src, rotate]);
 
+  /* `key` AND THE CROSSFADE BOOKKEEPING STAY ON THE RAW PATH; only the
+     `src` attribute is resolved. The path is the clip's IDENTITY — it is
+     what the effect above compares to decide whether anything changed, and
+     what React remounts on — and running it through `asset()` first would
+     make both depend on a CDN configuration that can differ between
+     environments. See the banner in lib/media.ts. */
   const layer = (c: Clip, show: boolean) =>
     c.src ? (
       <video
         key={c.src}
-        src={c.src}
+        src={asset(c.src)}
         className={className}
         autoPlay
         muted

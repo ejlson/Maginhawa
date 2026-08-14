@@ -78,10 +78,25 @@
    rect — it crops the disc springing inside it so nothing shows past the
    boundary. clip-path clips descendants, so the absolutely-placed disc is cut
    at the zone edge. */
+/* z 300 — ABOVE EVERY MODAL, and it has to be stated rather than inherited.
+   The disc was on 200, which is also the home grid's expansion
+   (Discover.module.css .expandRoot) and the menu overlay
+   (MenuOverlay.module.css). Both are PORTALED to <body> and therefore
+   painted after this layer, so on an equal z-index the later sibling wins
+   and the disc was drawn UNDERNEATH the open card. That is not merely a
+   cosmetic loss: html.glass-cursor hides the native cursor wherever the
+   glass one is live, and the expansion is a full-bleed photograph — so the
+   resolve() below reports "zone", the native pointer goes away, and the disc
+   that replaces it is behind the thing the reader is pointing at. The
+   pointer simply vanished for as long as the card was open.
+   300 clears both modals and stays under the two decorative fixed layers in
+   globals.css (the paper grain at 2000, the dev grid at 9999) — which are
+   pointer-events: none washes that are MEANT to sit over everything,
+   including this. */
 .clip {
   position: fixed;
   inset: 0;
-  z-index: 200;
+  z-index: 300;
   pointer-events: none;
 }
 

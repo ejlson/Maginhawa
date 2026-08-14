@@ -210,8 +210,23 @@
      this control is an object the reader is meant to watch, not a menu
      item that must feel instant. The label and the hit area never move
      out from under the pointer (see the clearance ceiling above), so a
-     slow close costs nothing in pointing accuracy. */
-  --cta-dur: 950ms;
+     slow close costs nothing in pointing accuracy.
+
+     ── 760ms NOW, DOWN FROM 950, at the user's instruction ──
+     A speed-up rather than a rewrite: the curve below is a normalised
+     linear() so every stage keeps its SHARE of the clock, and 760 is the
+     shortest value at which all four still clear the ~150ms floor the
+     paragraph above sets:
+       approach  0 → 55%    418ms
+       fuse     55 → 80%    190ms
+       relax    80 → 96%    122ms   ← the tightest, and it is a settle
+                                       rather than a stage the eye tracks
+       settled  96 → 100%    30ms
+     Below about 700ms the relax stops reading as surface tension and starts
+     reading as a bounce, which is the thing the zero-overshoot spring
+     everywhere else on this site is written to avoid. Do not go under it
+     without re-fitting linear() itself. */
+  --cta-dur: 760ms;
 
   /* ── THE FUSION CURVE ──
      Two droplets do not meet at a constant speed. They drift, they touch,
