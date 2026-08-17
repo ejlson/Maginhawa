@@ -80,12 +80,12 @@ export default function RestaurantDetail({
                   <strong>Cuisine</strong>
                   {restaurant.cuisine}
                 </span>
-                {restaurant.priceRange && (
-                  <span className={styles.fact}>
-                    <strong>Price</strong>
-                    {restaurant.priceRange}
-                  </span>
-                )}
+                {/* A "Price" fact stood between Cuisine and Bookings and is
+                    gone with `Restaurant.priceRange` — the group publishes no
+                    price band anywhere now. The row is three facts rather
+                    than four; it was already variable, since the price fact
+                    was conditional and four of the eight venues never set
+                    the field. */}
                 <span className={styles.fact}>
                   <strong>Bookings</strong>
                   {restaurant.bookable ? "Reservations welcome" : "Walk-in / takeaway"}

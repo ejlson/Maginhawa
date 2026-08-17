@@ -81,7 +81,13 @@ export function RestaurantJsonLd({ restaurant }: { restaurant: Restaurant }) {
     areaServed: { "@type": "City", name: "London" },
     acceptsReservations: restaurant.bookable,
   };
-  if (restaurant.priceRange) data.priceRange = restaurant.priceRange;
+  /* Schema.org's `priceRange` was emitted here from `Restaurant.priceRange`
+     and is gone with the field. It is an OPTIONAL property on Restaurant —
+     omitting it is valid structured data, not an incomplete record — and
+     Google treats it as a rich-result enhancement rather than a
+     requirement, so nothing here becomes ineligible. Search may stop
+     showing a price band for these venues; that is the intended effect of
+     no longer publishing one. */
   if (mentions.length) {
     data.subjectOf = mentions.map((p) => ({
       "@type": "NewsArticle",

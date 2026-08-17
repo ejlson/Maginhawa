@@ -220,7 +220,6 @@ Useful fields in `lib/restaurants.ts`:
   menuLabel: "February 2026",                // small caption above the menu
   bookable: true,                            // false = walk-in only
   bookingUrl: "https://booking.resdiary.com/...",
-  priceRange: "££",
   googleReviewUrl: "...",                    // optional; falls back to a Maps search
   comingSoon: true,                          // not open yet — see below
 },
@@ -347,7 +346,7 @@ Also in [components/JoinUs.tsx](components/JoinUs.tsx):
 ```ts
 export const CONTACT = {
   phone: "+44 01234 5678",
-  email: "hello@maginhawa.group",
+  email: "info@mgnhw.com",
   officeHours: { days: "Mon – Fri", time: "09:00 – 17:00" },
 };
 ```
@@ -636,7 +635,7 @@ Things that are visibly wrong on the live site and need real values.
 | What | Where | Note |
 | --- | --- | --- |
 | Phone number `+44 01234 5678` | [lib/contact.ts:9](lib/contact.ts#L9) | Not a real number. Shown on the contact page and in the footer. |
-| Email `hello@maginhawa.group` | [lib/contact.ts:11](lib/contact.ts#L11) | Not a real inbox. Careers mail goes to `hr@mgnhw.com`, which is real. |
+| Email `info@mgnhw.com` | [lib/contact.ts:11](lib/contact.ts#L11) | Not a real inbox. Careers mail goes to `hr@mgnhw.com`, which is real. |
 | Office hours | [lib/contact.ts:16](lib/contact.ts#L16) | Assumed, not confirmed. |
 | LinkedIn & Facebook | [lib/contact.ts:31](lib/contact.ts#L31) | Blank, so they show as plain text. Add URLs to make them links. |
 | Contact form doesn't send | [components/Contact.tsx:88](components/Contact.tsx#L88) | Submitting does nothing and says nothing — a reader can fill it in, press Send, and reasonably believe the message arrived. Needs a form service connected. |
