@@ -187,7 +187,13 @@ export const RESTAURANTS: Restaurant[] = [
     description:
       "Bunso — 'the youngest' — is the newest member of the Maginhawa family. Full details, menu and location coming soon.",
     location: "Kentish Town, London",
-    image: "/images/bunso.jpg",
+    /* `-shopfront`, because Cloudinary public ids drop the extension: this
+       was /images/bunso.jpg, which collided with the /images/bunso.png
+       wordmark About.tsx uses and resolved to the same
+       `maginhawa/images/bunso`. The PNG held the id, so every surface
+       asking for the photo got a 670x141 wordmark instead. See the longer
+       note on the same field in lib/venueCards.ts. */
+    image: "/images/bunso-shopfront.jpg",
     logo: "/logo/bunso.png",
     website: "https://www.bybunso.com/",
     bookable: false,

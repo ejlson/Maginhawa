@@ -174,16 +174,25 @@ const EXTRAS: Record<string, Extras> = {
       road: "1a Hawley Rd",
       city: "London NW1 8RP",
     },
-    /* NO hours AND NO priceRange — it has not opened, so its block prints
-       the address alone and the stats do not render at all. That is the
-       card being uniform, not failing: a venue with neither datum gives
-       the whole measure to its address.
+    /* NO hours — it has not opened, so its block prints the address alone
+       and the stat does not render. That is the card being uniform, not
+       failing: a venue with no datum gives the whole measure to its
+       address. (This note also described a `priceRange` that no longer
+       exists on the type, and an `image: null` pointing at a
+       /images/bunso-placeholder.jpg that was never in public/ — both were
+       describing a state this entry had already left.)
 
-       image: null — the canonical record points at
-       /images/bunso-placeholder.jpg, WHICH DOES NOT EXIST in public/.
-       Rather than ship a 404 into a next/image, the card takes the maroon
-       field it has always had here. */
-    image: "/images/bunso.jpg",
+       ⚠️ `-shopfront`, AND THE SUFFIX IS LOAD-BEARING. This read
+       /images/bunso.jpg and the card rendered a 670x141 wordmark strip
+       blown up to fill it. Nothing was wrong here: Cloudinary public ids
+       DROP THE EXTENSION (publicIdFor, scripts/cloudinary-upload.mjs), so
+       /images/bunso.jpg and /images/bunso.png — the wordmark About.tsx
+       asks for — both resolved to `maginhawa/images/bunso`, and the PNG
+       was the one that got uploaded there. Bunso was the only such
+       collision in public/images. Renaming the PHOTO rather than the
+       wordmark is what keeps About.tsx pointing at an asset that is
+       already live. */
+    image: "/images/bunso-shopfront.jpg",
   },
 };
 
