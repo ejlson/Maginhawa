@@ -1,13 +1,12 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import {
   AnimatePresence,
   motion,
   useReducedMotion,
 } from "framer-motion";
-import { Fragment, useCallback, useEffect, useRef, useState } from "react";
+import { useCallback, useEffect, useRef, useState } from "react";
 import { createPortal } from "react-dom";
 import styles from "./Discover.module.css";
 /* THE CARD'S OWN STYLESHEET, imported beside this chapter's — TWO modules
@@ -19,10 +18,11 @@ import styles from "./Discover.module.css";
    top-right corner — `.photo`, `.fallback` and `.stickerBadge` are card
    rules and they live over there now. Importing the card's sheet is the
    honest way to keep using them; copying the three back here would be the
-   duplication this whole pass deletes. */
+   duplication this whole pass deletes. `.blockLarge` is the fourth: the
+   expansion prints the card's BLOCK now, and the block's larger type scale
+   belongs beside the block it scales. */
 import card from "./VenueCard.module.css";
-import VenueCard from "./VenueCard";
-import { getRestaurant, primaryAction } from "@/lib/restaurants";
+import VenueCard, { VenueBlock } from "./VenueCard";
 import { venueCards, type VenueCardItem } from "@/lib/venueCards";
 import { lenisRef } from "@/lib/SmoothScroll";
 import { asset } from "@/lib/media";
@@ -74,21 +74,38 @@ import { asset } from "@/lib/media";
    WHAT IS LEFT IS THIS CHAPTER'S PRESENTATION COPY — five fields the card
    record does not carry because nothing but the homepage prints them:
 
-     tag        the one-line descriptor in the expansion's head row
-     est        the founding year, likewise. The card's block stopped
-                printing it two passes ago (it prints an address and two
-                stats); the expansion still wants it.
      location   the address as ONE line, which is the expansion's form of
-                it. IT IS NOT DERIVED from the card's three lines, and
-                Mamasons is why: its block splits two sites across lines 2
-                and 3 ("91 Kentish Town Rd" / "& 32 Newport, Chinatown"),
-                while the expansion prints the single line the canonical
-                record words as "91 Kentish Town Rd · 32 Newport China
-                Town". Joining road and city with a comma would be right
-                for seven venues and wrong for that one, which is the same
-                trap the three-line address itself was written to avoid.
-     blurb      the story: the card's hover copy and the expansion's body
+                it. IT IS NOT DERIVED from the card's two lines, and
+                Mamasons is why: its block splits two sites across them
+                ("91 Kentish Town Rd" / "& 32 Newport, Chinatown"), while
+                the expansion prints the single line the canonical record
+                words as "91 Kentish Town Rd · 32 Newport China Town".
+                Joining road and city with a comma would be right for seven
+                venues and wrong for that one, which is the same trap the
+                split address itself was written to avoid.
+     blurb      the story: the card's hover copy, and the expansion's own
+                row above the hairline
      clip       the muted film that wipes open under the pointer
+
+   ⚠️ TWO FIELDS ARE NO LONGER PRINTED ANYWHERE, and they are kept rather
+   than deleted because they are CONTENT and only this file holds them:
+
+     tag        a one-line descriptor. It was the expansion's, in a mono
+                "EST. 1987 · FILIPINO FUSION RESTAURANT · ££" strip; the
+                expansion wears the card's block now, and the card's block
+                prints the canonical `tagline` from lib/restaurants.ts. The
+                two had ALREADY DRIFTED, which is the argument for the
+                shared block in one line: this table says Mamasons is
+                "London's First Filipino Ice Cream Parlor" and the record
+                says "Filipino Ice Cream Parlour". Delete `tag` when
+                somebody has confirmed the record's wording is the one to
+                keep for all eight.
+     est        the founding year, in the same strip. There is no slot for
+                it in the card's block, and inventing one would be the
+                second design of the block this pass exists to delete. Note
+                that four of these years (2007, 2017, 2018 and Bintang's
+                1987) exist NOWHERE ELSE in the repo — deleting the field
+                loses them.
 
    ⚠️ THE `hours` WARNING MOVED WITH THE DATA. Every venue still carries an
    invented "12–11" and no real opening times exist anywhere in this repo.
@@ -829,12 +846,11 @@ function ExpandedCard({
 }) {
   const reduce = useReducedMotion();
   const closeRef = useRef<HTMLButtonElement>(null);
-  // same derived action as the tile — the expansion is the tile opened, so
-  // the two must never disagree about what a reader can do here
-  const action = (() => {
-    const r = getRestaurant(item.slug);
-    return r ? primaryAction(r) : null;
-  })();
+
+  /* THE ACTION IS NOT DERIVED HERE ANY MORE. It was a local `getRestaurant`
+     + `primaryAction()` read, with a comment saying the expansion and the
+     tile must never disagree about what a reader can do — which is a rule a
+     comment cannot enforce. <VenueBlock> does the read once for both. */
 
   /* THE FULL-BLEED FILM. The same clip the tile wipes open under the
      pointer — one asset, two presentations — and it is not hover furniture
@@ -1021,10 +1037,30 @@ function ExpandedCard({
             ) : null}
           </motion.div>
 
-          {/* THE BLOCK, standing on the ramp. Same order as the card's:
-              who this is, then where, then what to do. */}
+          {/* ── THE BLOCK, AND IT IS THE CARD'S BLOCK ──
+              <VenueBlock> is the same component the tile prints, so the
+              expansion cannot disagree with the card it opened out of: the
+              venue's name at 700 with its tagline under it, price and hours
+              closing that row, the hairline, then the address and the same
+              two pills. It used to be a SECOND design of the same facts —
+              the name in the display face, a mono "EST. 1987 · FILIPINO
+              FUSION RESTAURANT · ££" strip, no stats, no hairline, a green
+              pill and an underlined text link — and the two had already
+              drifted apart on the copy (see the banner over there).
+
+              WHAT THIS CARD PASSES THAT THE TILE DOES NOT, and both are the
+              extra HEIGHT being spent:
+                · `story`, printed as a row ON TOP OF THE RULE. The tile has
+                  no room for it and shows the same copy on hover.
+                · ONE address line rather than two. `location` is this
+                  chapter's single-line form of the address and exists
+                  precisely because the card's two-line split is a
+                  consequence of a ~163px column, which this card is not.
+              `.blockLarge` is the third: the block's own stylesheet carries
+              the larger type scale, so the two sizes stay one description
+              of one block. */}
           <motion.div
-            className={styles.expandBody}
+            className={`${styles.expandBody} ${card.blockLarge}`}
             {...furniture}
             initial={{ opacity: 0, transform: "translateY(16px)" }}
             animate={{ opacity: 1, transform: "translateY(0px)" }}
@@ -1034,44 +1070,15 @@ function ExpandedCard({
               transition: { duration: 0.18, ease: "easeOut" },
             }}
           >
-            <div className={styles.expandHeadRow}>
-              <h3 className={styles.expandName}>{item.name}</h3>
-              <span className={styles.expandTag}>
-                {item.est ? `Est. ${item.est} · ` : null}
-                {item.tag}
-                {item.priceRange ? ` · ${item.priceRange}` : null}
-              </span>
-            </div>
-            <p className={styles.expandBlurb}>{item.blurb}</p>
-            <p className={styles.expandLocation}>{item.location}</p>
-            <div className={styles.expandActions}>
-              {action ? (
-                <a
-                  href={action.href}
-                  {...(action.external
-                    ? { target: "_blank", rel: "noopener noreferrer" }
-                    : {})}
-                  /* .panelAction, the tile panel's own control — the
-                     expansion IS the tile opened, so the two must not
-                     disagree. They now stand on the SAME ground again (a
-                     photo-derived ramp), which is why the `.expandActions`
-                     inversion that used to sit in the stylesheet is gone:
-                     the class's own cream-on-hover is right here, exactly
-                     as it is on the card. */
-                  className={styles.panelAction}
-                >
-                  {/* the expansion has room for the longer form of the same
-                      action the tile abbreviates */}
-                  {action.label === "Book" ? "Book a Table" : action.label}
-                </a>
-              ) : null}
-              <Link
-                href={`/restaurants/${item.slug}`}
-                className={styles.viewLink}
-              >
-                View Restaurant
-              </Link>
-            </div>
+            <VenueBlock
+              item={item}
+              story={item.blurb}
+              addressLines={[item.location]}
+              /* the venue's own page, which opens the same pages through
+                 <MenuOverlay> — the tile sends the reader to exactly the
+                 same place, for the reasons set out where it does so. */
+              menuHref={`/restaurants/${item.slug}`}
+            />
           </motion.div>
         </div>
 

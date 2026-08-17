@@ -1,6 +1,6 @@
 "use client";
 
-import { useEffect, useState } from "react";
+import { useEffect, useMemo, useState } from "react";
 import Loader from "./Loader";
 import Nav from "./Nav";
 import Menu from "./Menu";
@@ -93,6 +93,21 @@ export default function Experience() {
       <main data-nav-theme="light">
         <Hero started={started} />
 
+        {/* ── THE STATIC BODY RENDERS ONCE ──
+            Nothing inside this div takes props or state from Experience, but
+            written inline it was re-reconciled on EVERY state flip here — and
+            the flip that ends the intro re-reconciled this entire subtree in
+            the same frame that unmounts the loader's full-viewport layer and
+            starts the hero's entrance. Measured (rAF probe on the handoff),
+            that pile-up is the intro's one long frame: 25-55ms, landing at
+            the exact instant the page appears; with this memo the same
+            probe's handoff frames sit inside the normal budget. The useMemo
+            keeps the element's identity stable so React bails out of the
+            whole subtree on the intro flip (and on menu toggles and the
+            scroll unlock, for free). The children's own state, effects and
+            scroll listeners are untouched — this only skips re-RENDERING
+            them from here, which was always a no-op re-render. */}
+        {useMemo(() => (
         <div className="afterHero">
           {/* NOTHING ON THIS PAGE IS PINNED ANY MORE.
               Two chapters used to be held on their last screen while the
@@ -304,6 +319,7 @@ export default function Experience() {
             <Footer />
           </DarkZone>
         </div>
+        ), [])}
       </main>
 
       {intro && <Loader insets={insets} onDone={() => setIntro(false)} />}

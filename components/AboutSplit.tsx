@@ -86,7 +86,7 @@ const PORTRAIT_LINE = ["Where it began.", "Camden, 1987."];
 const PARA_LEAD =
   "We cook the food we grew up on, for people we treat like family. A table you are not hurried from, a room that is easy to be in, and a plate that tastes like somebody's home. It is the only way we have ever known how to do this, and it is the reason the same faces come back year after year.";
 const PARA_FINE =
-  "From one Camden kitchen in 1987 to a family of dining rooms across North London — Filipino, Filipino-Japanese and Caribbean, each with its own character — still run by the same family, and still led by Chef Omar. Every room keeps its own menu, its own regulars and its own way of doing things. What they share is the standard they are held to, and the people who set it.";
+  "From one Camden kitchen in 1987 to a family of dining rooms across North London - Filipino, Filipino-Japanese and Caribbean, each with its own character - still run by the same family, and still led by Chef Omar. Every room keeps its own menu, its own regulars and its own way of doing things. What they share is the standard they are held to, and the people who set it.";
 
 /* ══════════ THE THREE PRINTS DO SOMETHING NOW ══════════
    They were decorative. Each one is now a door into one of the three
@@ -154,14 +154,14 @@ const FADE: Variants = {
   shown: { opacity: 1, transition: { duration: 0.4, ease: "easeOut" } },
 };
 
-/* THE RULE DRAWS. It is the chapter's opening mark (see .rule in the
-   stylesheet, which records the argument for and against it existing at
-   all), so it is the thing that goes first — a hairline drawing itself is
-   the cheapest possible curtain-up and costs one composited transform. */
-const RULE: Variants = {
-  hidden: { scaleX: 0 },
-  shown: { scaleX: 1, transition: { duration: 0.7, ease: EASE, delay: 0 } },
-};
+/* THE RULE NO LONGER DRAWS. It used to be the chapter's curtain-up — a
+   `scaleX: 0 → 1` from the left edge, first thing in the sequence — and it
+   is removed at the user's instruction: the hairline simply IS there, like
+   the photograph beneath it and the band's own pictures above it. The
+   variant is deleted rather than left as an identity, and the element is a
+   plain <div> again (a motion.div with no variants would still be a
+   projection node for nothing). `transform-origin` went from .rule with it;
+   see the note there. */
 
 /* THE CAPTION'S TWO LINES, each out of its own clip.
    145% is not a round number — it is derived from the 0.3em the mask is
@@ -300,7 +300,13 @@ export default function AboutSplit() {
           announces it, which would double up on the heading already doing
           that job. There was a matching one at the bottom; it is removed at
           the user's instruction. */}
-      <motion.div className={styles.rule} variants={pick(RULE)} aria-hidden />
+      {/* A PLAIN DIV, AND NO VARIANT ON IT. It used to draw itself from the
+          left as the chapter opened; that is removed at the user's
+          instruction, and with nothing to animate it does not need to be a
+          motion element. Note that the section above is `initial="hidden"`,
+          which reaches motion CHILDREN only — this element is simply
+          painted, at full width, from the first frame. */}
+      <div className={styles.rule} aria-hidden />
       <div className={styles.split}>
         {/* ── LEFT: the picture, and its line ── */}
         <figure className={styles.media}>

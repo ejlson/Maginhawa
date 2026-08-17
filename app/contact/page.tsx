@@ -1,7 +1,6 @@
 import type { Metadata } from "next";
 import ContactPage from "@/components/ContactPage";
-
-const SITE_URL = "https://maginhawa.group";
+import { SITE_URL } from "@/lib/site";
 
 const jsonLd = {
   "@context": "https://schema.org",

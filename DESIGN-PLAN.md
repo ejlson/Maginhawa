@@ -442,8 +442,10 @@ work.
 
 ## What already exists and should be reused
 
-- `Restaurant.addresses`, `menuPages`, `bookable`, `priceRange` in
+- `Restaurant.addresses`, `menuPages`, `bookable` in
   `lib/restaurants.ts` — the hours work needs one new field, not a new model.
+  (`priceRange` was on this list and has since been removed from the model
+  entirely — the group publishes no price band.)
 - The live London clock in `Reservations` — already computing time; open/closed
   needs no new machinery.
 - The token layer in `app/globals.css` — the display-face decision is one

@@ -1,8 +1,7 @@
 import type { Metadata } from "next";
 import JoinUs from "@/components/JoinUs";
 import { JOBS } from "@/lib/jobs";
-
-const SITE_URL = "https://maginhawa.group";
+import { SITE_URL } from "@/lib/site";
 
 // Schema.org ItemList of open JobPostings — Google can lift this into the
 // careers job search panel and AI search summaries.

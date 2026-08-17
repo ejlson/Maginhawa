@@ -1,20 +1,34 @@
 "use client";
 
-import { motion } from "framer-motion";
 import { useEffect, useState } from "react";
 import styles from "./Menu.module.css";
-import Placeholder from "./Placeholder";
 import { useRouteTransition } from "./PageTransition";
 import { getNavTheme } from "./Nav";
+import { lenisRef } from "@/lib/SmoothScroll";
+import { CONTACT } from "@/lib/contact";
 
+/* ── NO "HOME" ROW ──
+   The old list opened with one, which is a link back to the page the
+   reader is already looking at four times out of five. The wordmark in the
+   bar is the home link and it survives every route; Nav.tsx closes this
+   sheet when it is pressed. Five items is also what the composition was
+   drawn against — a sixth eats the void the footer is pinned against. */
 const ITEMS = [
-  { label: "Home", href: "/" },
   { label: "Restaurants", href: "/restaurants" },
   { label: "Blog", href: "/blog" },
   { label: "About Us", href: "/about" },
   { label: "Careers", href: "/careers" },
   { label: "Contact Us", href: "/contact" },
 ];
+
+/* ── THE ENQUIRIES INBOX, NOT THE INSTAGRAM ──
+   This slot held "Follow / Instagram" at the user's instruction and now
+   holds the group's address. Read from lib/contact.ts rather than written
+   out here: that file is the single source of truth the footer, the
+   Contact page and the structured data all draw on, and it still carries a
+   PLACEHOLDER marker — when the real inbox lands there, this sheet updates
+   with it instead of quietly keeping the old one. */
+const EMAIL = CONTACT.email;
 
 export default function Menu({
   open,
@@ -23,19 +37,49 @@ export default function Menu({
   open: boolean;
   onClose: () => void;
 }) {
-  const [active, setActive] = useState(0);
-  // match the panel to the section it opens over (dark over hero/maroon)
+  // match the sheet to the section it opens over (maroon over dark chapters)
   const [dark, setDark] = useState(false);
   const navigate = useRouteTransition();
 
   useEffect(() => {
     if (!open) return;
-    // cream over light + video/hero sections; red only over the maroon section
     setDark(getNavTheme() === "dark");
   }, [open]);
 
-  // route links (e.g. "/restaurants") run through the page-transition curtain;
-  // in-page hashes (#about-us) keep their default anchor behaviour
+  useEffect(() => {
+    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [onClose]);
+
+  /* ── THE SHEET COVERS THE PAGE, SO THE PAGE MUST STOP MOVING ──
+     The old panel left the page visible beside it and scrolling underneath
+     was harmless. A full-bleed sheet hides the scroll entirely, so a stray
+     wheel or touch moves the reader somewhere they never saw — and worse,
+     it moves the section under the bar, which is what `dark` above was
+     sampled from.
+
+     LENIS OWNS THE SCROLL AND `overflow: hidden` DOES NOT STOP IT. Lenis
+     keeps its own target and drives the window each frame regardless of
+     what the body's overflow says; stop() is what parks it. The overflow
+     lock stays as well, for the reduced-motion case where SmoothScroll
+     never instantiates Lenis at all and lenisRef.current is null.
+
+     Every stop() is paired with a start() in the same cleanup. */
+  useEffect(() => {
+    if (!open) return;
+    const lenis = lenisRef.current;
+    lenis?.stop();
+    const prevOverflow = document.body.style.overflow;
+    document.body.style.overflow = "hidden";
+    return () => {
+      lenis?.start();
+      document.body.style.overflow = prevOverflow;
+    };
+  }, [open]);
+
+  // route links run through the page-transition curtain; the sheet closes
+  // first either way so it is never the thing the curtain lifts on
   const onItemClick = (e: React.MouseEvent, href: string) => {
     onClose();
     if (href.startsWith("/")) {
@@ -44,68 +88,63 @@ export default function Menu({
     }
   };
 
-  useEffect(() => {
-    const onKey = (e: KeyboardEvent) => e.key === "Escape" && onClose();
-    window.addEventListener("keydown", onKey);
-    return () => window.removeEventListener("keydown", onKey);
-  }, [onClose]);
-
   return (
-    <>
-      {/* dim the page behind the menu */}
-      <motion.div
-        className={styles.backdrop}
-        initial={false}
-        animate={{ opacity: open ? 1 : 0 }}
-        transition={{ duration: 0.4 }}
-        style={{ pointerEvents: open ? "auto" : "none" }}
-        onClick={onClose}
-        aria-hidden
-      />
-
-      <motion.aside
-        className={`${styles.panel} ${dark ? styles.dark : ""}`}
-        initial={false}
-        animate={{ x: open ? "0%" : "118%", opacity: open ? 1 : 0 }}
-        transition={{ duration: 0.55, ease: [0.76, 0, 0.24, 1] }}
-        style={{ pointerEvents: open ? "auto" : "none" }}
-        /* The closed panel is parked off-screen by a transform, which does
-           NOT take it out of the tab order — its six links stayed reachable
-           on every route, sending the focus ring off the right edge for six
-           presses. `inert` removes it from the tab order and the a11y tree
-           together, so no separate aria-hidden: inert already implies it, and
-           the pair (focusable + aria-hidden) was the worst of both — links a
-           screen reader announces as nothing. */
-        inert={!open}
-      >
-        <nav className={styles.list}>
+    <aside
+      className={`${styles.sheet} ${dark ? styles.dark : ""}`}
+      data-open={open ? "true" : "false"}
+      /* The closed sheet is hidden by opacity and visibility, and
+         `visibility: hidden` already drops it from the tab order — but only
+         once the 400ms fade-out delay has elapsed. `inert` removes it from
+         the tab order and the a11y tree immediately, and covers the frames
+         in between. Carried over from the old panel, which needed it for
+         the same reason. */
+      inert={!open}
+      aria-label="Site menu"
+    >
+      <nav className={styles.list}>
+        <ul>
           {ITEMS.map((it, i) => (
-            <a
-              key={it.label}
-              href={it.href}
-              className={`${styles.item} ${active === i ? styles.itemActive : ""}`}
-              onMouseEnter={() => setActive(i)}
-              onFocus={() => setActive(i)}
-              onClick={(e) => onItemClick(e, it.href)}
-            >
-              {it.label}
-            </a>
+            <li key={it.label}>
+              <a
+                className={styles.item}
+                href={it.href}
+                style={{ "--i": i } as React.CSSProperties}
+                onClick={(e) => onItemClick(e, it.href)}
+              >
+                {it.label}
+              </a>
+            </li>
           ))}
-        </nav>
+        </ul>
+      </nav>
 
-        <span className={styles.divider} aria-hidden />
+      <div className={styles.foot}>
+        <a
+          className={styles.action}
+          href="/restaurants"
+          onClick={(e) => onItemClick(e, "/restaurants")}
+        >
+          View all our restaurants
+        </a>
 
-        <div className={styles.thumb}>
-          <motion.div
-            key={active}
-            initial={{ opacity: 0, scale: 1.04 }}
-            animate={{ opacity: 1, scale: 1 }}
-            transition={{ duration: 0.4, ease: [0.22, 1, 0.36, 1] }}
-          >
-            <Placeholder ratio="3 / 4" label={ITEMS[active].label} />
-          </motion.div>
+        <span className={styles.rule} aria-hidden />
+
+        <div className={styles.legal}>
+          {/* the year is read at render, so it is one value on the build
+              server and another in the browser for exactly one day a year —
+              suppressed rather than frozen, because a stale copyright is
+              the worse failure */}
+          <span className={styles.dim} suppressHydrationWarning>
+            &copy; {new Date().getFullYear()} Maginhawa
+          </span>
+
+          {EMAIL && (
+            <a className={styles.mail} href={`mailto:${EMAIL}`}>
+              {EMAIL}
+            </a>
+          )}
         </div>
-      </motion.aside>
-    </>
+      </div>
+    </aside>
   );
 }

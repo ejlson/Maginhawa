@@ -5,6 +5,7 @@ import CustomCursor from "@/components/CustomCursor";
 import GlassFilters from "@/components/GlassFilters";
 import SmoothScroll from "@/lib/SmoothScroll";
 import { OrganizationJsonLd, WebSiteJsonLd } from "@/lib/jsonld";
+import { SITE_URL } from "@/lib/site";
 import { EB_Garamond, Figtree } from "next/font/google";
 
 /* TWO next/font LOADERS: the DISPLAY voice and, for the first time in a
@@ -77,8 +78,6 @@ const textFace = Figtree({
   display: "swap",
   variable: "--font-text-loaded",
 });
-
-const SITE_URL = "https://maginhawa.group";
 
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),

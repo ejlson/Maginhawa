@@ -26,7 +26,7 @@ const PILLARS = [
   {
     mark: "01",
     title: "A family kitchen.",
-    body: "Belly, Bintang, Mamasons, Ramo, Guanabana, Café Mama & Sons, Hoodwood — seven kitchens that train together, eat together, and lean on each other when service gets tight.",
+    body: "Belly, Bintang, Mamasons, Ramo, Guanabana, Café Mama & Sons, Hoodwood - seven kitchens that train together, eat together, and lean on each other when service gets tight.",
   },
   {
     mark: "02",
@@ -717,7 +717,7 @@ export default function JoinUs() {
       .filter(Boolean)
       .join("\n");
 
-    const mailto = `mailto:hr@mgnhw.com?subject=${encodeURIComponent(
+    const mailto = `mailto:careers@mgnhw.com?subject=${encodeURIComponent(
       subject
     )}&body=${encodeURIComponent(body)}`;
 
@@ -1262,8 +1262,8 @@ export default function JoinUs() {
                         <strong>Attach your CV, then send.</strong>
                         Your email client is opening with the application
                         filled in. The file you chose is named in it but is
-                        not attached — add it before you press send. If no
-                        draft opened, write to hr@mgnhw.com and we&apos;ll get
+                        not attached - add it before you press send. If no
+                        draft opened, write to careers@mgnhw.com and we&apos;ll get
                         it either way. We reply within five working days.
                       </motion.div>
                     )}

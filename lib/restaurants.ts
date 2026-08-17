@@ -22,7 +22,14 @@ export type Restaurant = {
   website?: string;
   bookable: boolean;
   bookingUrl?: string;
-  priceRange?: string;
+  /* `priceRange` stood here and is gone at the user's instruction — the
+     group does not publish a price band anywhere on the site now. It fed
+     three places, all removed with it: the Price fact on the detail page,
+     the `priceRange` key in the Restaurant structured data (lib/jsonld),
+     and — earlier, via its own copy on VenueCardItem — the price stat on
+     the venue cards. Re-adding it means re-adding all three; a field that
+     only the type knows about is what left a dangling read in VenueCard
+     and broke a production build. */
   // Optional Google "write a review" deep link — usually
   // https://search.google.com/local/writereview?placeid=<PLACE_ID>
   // If absent, the UI falls back to a Google Maps search for the restaurant.
@@ -60,7 +67,6 @@ export const RESTAURANTS: Restaurant[] = [
     ],
     menuLabel: "February 2026",
     bookable: true,
-    priceRange: "££",
     bookingUrl: "https://www.opentable.co.uk/booking/restref/availability?lang=en-GB&correlationId=6b35518d-aef1-43a2-8dcc-ad4ef5dc8053&restRef=324126&otSource=Restaurant%20website",
   },
   {
@@ -78,7 +84,6 @@ export const RESTAURANTS: Restaurant[] = [
     logo: "/logo/guanabana.png",
     website: "https://www.guanabanarestaurant.com/",
     bookable: true,
-    priceRange: "££",
     bookingUrl: "https://www.opentable.co.uk/guanabana-reservations-london?restref=79453&lang=en-GB&ot_source=Restaurant%20website",
   },
   {
@@ -118,7 +123,6 @@ export const RESTAURANTS: Restaurant[] = [
     menuLabel: "February 2026",
     bookable: true,
     bookingUrl: "https://www.sevenrooms.com/reservations/ramosoho/",
-    priceRange: "££",
   },
   {
     slug: "hoodwood",
@@ -174,7 +178,6 @@ export const RESTAURANTS: Restaurant[] = [
     menuLabel: "February 2026",
     bookable: true,
     bookingUrl: "https://booking.resdiary.com/widget/Standard/BELLYBISTRO/65884",
-    priceRange: "££",
   },
   {
     slug: "bunso",
@@ -184,7 +187,13 @@ export const RESTAURANTS: Restaurant[] = [
     description:
       "Bunso — 'the youngest' — is the newest member of the Maginhawa family. Full details, menu and location coming soon.",
     location: "Kentish Town, London",
-    image: "/images/bunso.jpg",
+    /* `-shopfront`, because Cloudinary public ids drop the extension: this
+       was /images/bunso.jpg, which collided with the /images/bunso.png
+       wordmark About.tsx uses and resolved to the same
+       `maginhawa/images/bunso`. The PNG held the id, so every surface
+       asking for the photo got a 670x141 wordmark instead. See the longer
+       note on the same field in lib/venueCards.ts. */
+    image: "/images/bunso-shopfront.jpg",
     logo: "/logo/bunso.png",
     website: "https://www.bybunso.com/",
     bookable: false,

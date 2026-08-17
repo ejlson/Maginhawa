@@ -244,7 +244,7 @@ export default function Footer() {
       </div>
 
       <div className={styles.bottomRow}>
-        <span>© 2026 Maginhawa Group</span>
+        <span>Maginhawa Group</span>
         <div>
           <span>By </span>
           <span className={styles.developer}>(EJ)</span>

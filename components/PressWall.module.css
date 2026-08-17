@@ -307,6 +307,14 @@
   display: flex;
   align-items: center;
   width: max-content;
+  /* ── THE ONE SIZE KNOB, DECLARED HERE SO TWO RULES CAN READ IT ──
+     It was written out inside `.logoSeat`'s height and NOT available to
+     `.logo`'s cap, which is how the two came to disagree — see the cap's
+     own note. The seat multiplies it by the mark's measured `scale`, the
+     cap multiplies it by the widest aspect the set contains. One
+     declaration, so a change to the lane's size cannot move one and leave
+     the other behind. */
+  --press-base: clamp(18px, 2vw, 36px);
   gap: clamp(28px, 4vw, 72px);
   padding-right: clamp(28px, 4vw, 72px);
   animation: pressDrift 72s linear infinite;
@@ -347,7 +355,7 @@
    is safe only while nothing wraps. */
 .logoSeat {
   flex: none;
-  height: calc(clamp(18px, 2vw, 36px) * var(--s, 1));
+  height: calc(var(--press-base) * var(--s, 1));
 }
 
 /* ── THE MARKS ARE AT FULL STRENGTH AND IN THEIR OWN COLOUR, at the user's
@@ -400,21 +408,99 @@
    the smallest the lane already had. Equalising upward was not possible
    until this number moved.
 
-   WHERE IT IS NOW, AND WHY IT CANNOT BITE. With the ink on a common height
-   the widest mark is The Independent at inkRatio 0.695 and 10.32:1, i.e.
-   base x 14.85. Against the base above that is 237.6px below 889px wide,
-   26.7vw through the fluid band, and 475.1px above 1778px. This clamp clears
-   all three by roughly 4-5%: 248px / 28vw / 496px. It stays a guard rail
-   against some future mark with a pathological frame — it is not deleted —
-   but no logo in the current set reaches it at any viewport. If a new logo
-   ever looks squashed, check it here first. */
+   ⚠️ THE HAND-WRITTEN CLAMP THAT REPLACED IT WAS BITING ON MOBILE, and the
+   arithmetic that set it is one substitution out. It read
+   `clamp(248px, 28vw, 496px)`, argued from "the widest mark is The
+   Independent at inkRatio 0.695 and 10.32:1, i.e. base x 14.85 … that is
+   237.6px below 889px wide". 237.6 is 16 x 14.85 — but the BASE'S FLOOR IS
+   18px, not 16, so the real demand below 900px is 267.3px against a 248px
+   floor. Measured at 390: The Independent renders in a 248x24 box where the
+   seat asked for 267x25.9, i.e. the one mark the equalisation works hardest
+   on is the one being squashed ~7% below the common ink height, on the
+   viewport where that is most visible. The note above it said the cap could
+   not bite. It could.
+
+   SO IT IS DERIVED NOW, NOT WRITTEN OUT. `--press-base * 15.6` is the same
+   14.85 the paragraph above computes plus 5% of headroom, read off the one
+   declaration the seat also reads. It cannot fall out of step with the base
+   again, at any viewport, because it is the base.
+
+   IT IS STILL A GUARD RAIL and still not deleted: 15.6 is the widest
+   scale x aspect the current set contains, so a future mark with a more
+   pathological frame than The Independent's 10.32:1 is still caught here.
+   If a new logo ever looks squashed, it is this number it exceeded. */
 .logo {
   height: 100%;
   width: auto;
-  max-width: clamp(248px, 28vw, 496px);
+  max-width: calc(var(--press-base) * 15.6);
   object-fit: contain;
   display: block;
   user-select: none;
+}
+
+/* ═══════════ THE LANE ON A PHONE ═══════════════════════════════════════
+   At the user's instruction — the marquee is there on mobile and hard to
+   read. It is not a rendering fault; it is three numbers that were all set
+   against a desktop lane and are all wrong at 390px. Measured before this
+   block, at 390x844:
+
+     · THE FADES ATE THE MARKS. 10% of the lane is a proportion, so it
+       reads the same at every width — but the MARKS do not scale with the
+       viewport, they scale with --press-base. At 1440 the two 144px fades
+       flank a 1152px clear window that holds three or four whole marks; at
+       390 the two 39px fades flank a 312px window and the widest mark is
+       267px. A mark was fading in at one end while the next faded out at
+       the other, and there was rarely a whole one in clear view.
+     · THE PACE WAS DOUBLE. Both lanes run one 72s pass, but the mobile
+       track is 3775px against the desktop's 6411 — so mobile drifts at
+       26px/s and desktop at 44.5. Against their own viewports that is a
+       screen crossed every 15s on the phone and every 32s on the desktop.
+       The phone was sweeping the marks past at twice the relative speed,
+       on the screen with the least room to read them in.
+     · THE MARKS WERE AT THEIR FLOOR. --press-base bottoms out at 18px and
+       2vw stops moving below 900px, so a 390px phone and a 900px laptop
+       were given identically-sized mastheads.
+
+   WHAT THIS BLOCK DOES, in that order: opens the clear window from 312 to
+   343px, slows the pass so a mark dwells about as long as it does on
+   desktop, and puts 11% more ink on each mark. It changes NO colour, NO
+   spacing between marks and nothing about the lane's construction — the
+   doubled track and the exact -50% wrap are untouched.
+
+   ⚠️ THE THREE ARE ONE SETTING. --press-base drives the mark widths, which
+   drives the track's length, which is what the duration is a speed for.
+   Move one and re-measure the other two; the widest mark must stay inside
+   the clear window (base × 15.6 ≤ 0.88 × 100vw) or the fades start eating
+   it again, which is the defect this block exists to fix. */
+@media (max-width: 700px) {
+  .lane {
+    -webkit-mask-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      #000 6%,
+      #000 94%,
+      transparent 100%
+    );
+    mask-image: linear-gradient(
+      90deg,
+      transparent 0%,
+      #000 6%,
+      #000 94%,
+      transparent 100%
+    );
+  }
+  .track {
+    /* 20px, up from the 18px floor. The widest mark is then 20 × 15.6 =
+       312px against a 343px clear window — a whole masthead with air on
+       both sides, which is the thing that was not true before. Do not push
+       this further without re-checking that inequality. */
+    --press-base: 20px;
+    /* one pass in 120s rather than 72. The track grows to ~4100px with the
+       larger marks, so this is ~17px/s — a screen crossed every 23s
+       against the desktop lane's 32s, close enough that the two read as
+       the same drift rather than as two different speeds. */
+    animation-duration: 120s;
+  }
 }
 
 /* ── REDUCED MOTION: THE LANE HOLDS STILL ──

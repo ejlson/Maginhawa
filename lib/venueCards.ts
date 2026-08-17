@@ -67,7 +67,7 @@ export type VenueCardItem = {
    *  rather than read. */
   tagline?: string;
   address: VenueAddress;
-  priceRange?: string;
+  // priceRange?: string;
   hours?: string;
   /** secondary credential mark — the Michelin sticker, top-right */
   badge?: string;
@@ -82,7 +82,7 @@ type Extras = {
   hours?: string;
   /** ONLY where the canonical record has no price, or disagrees with what
    *  the card has shipped — see the note on `price` in venueCards() */
-  priceRange?: string;
+  // priceRange?: string;
   focal?: string;
   badge?: string;
   badgeLabel?: string;
@@ -97,7 +97,7 @@ const EXTRAS: Record<string, Extras> = {
       road: "93 Kentish Town Rd",
       city: "London NW1 8NY",
     },
-    hours: "12–11",
+    hours: "12-11",
   },
   guanabana: {
     address: {
@@ -105,7 +105,7 @@ const EXTRAS: Record<string, Extras> = {
       road: "85 Kentish Town Rd",
       city: "London NW1 8NY",
     },
-    hours: "12–11",
+    hours: "12-11",
   },
   mamasons: {
     /* THE ONE VENUE WITH TWO SITES, and the reason these are eight
@@ -122,8 +122,8 @@ const EXTRAS: Record<string, Extras> = {
       road: "91 Kentish Town Rd",
       city: "& 32 Newport, Chinatown",
     },
-    hours: "12–11",
-    priceRange: "£",
+    hours: "12-11",
+    // priceRange: "£",
     /* the shopfront is 4032x6048 (2:3); `cover` scales it to the card's
        width and crops the height, and the MAMASONS fascia sits high in
        the frame. 40% opens the window above the default centre so the
@@ -132,7 +132,7 @@ const EXTRAS: Record<string, Extras> = {
   },
   ramo: {
     address: { area: "Soho", road: "28 Brewer St", city: "London W1F 0SR" },
-    hours: "12–11",
+    hours: "12-11",
   },
   hoodwood: {
     address: {
@@ -140,8 +140,8 @@ const EXTRAS: Record<string, Extras> = {
       road: "81 Kentish Town Rd",
       city: "London NW1 8NY",
     },
-    hours: "12–11",
-    priceRange: "£",
+    hours: "12-11",
+    // priceRange: "£",
   },
   cafemama: {
     address: {
@@ -150,7 +150,7 @@ const EXTRAS: Record<string, Extras> = {
       city: "London NW1 8NY",
     },
     hours: "12–11",
-    priceRange: "£",
+    // priceRange: "£",
   },
   belly: {
     address: {
@@ -158,13 +158,13 @@ const EXTRAS: Record<string, Extras> = {
       road: "157 Kentish Town Rd",
       city: "London NW1 8PD",
     },
-    hours: "12–11",
+    hours: "12-11",
     /* ⚠️ THE CANONICAL RECORD SAYS `££` AND THE CARD HAS SHIPPED `£££`.
        This keeps what the signed-off card prints rather than silently
        re-pricing a Michelin-selected bistro on two pages at once. One of
        the two is wrong and it is a question for the group, not for a
        stylesheet — fix lib/restaurants.ts and delete this line. */
-    priceRange: "£££",
+    // priceRange: "£££",
     badge: "/logo/michelin-2026-round.png",
     badgeLabel: "Michelin Selected Restaurant 2026",
   },
@@ -174,16 +174,25 @@ const EXTRAS: Record<string, Extras> = {
       road: "1a Hawley Rd",
       city: "London NW1 8RP",
     },
-    /* NO hours AND NO priceRange — it has not opened, so its block prints
-       the address alone and the stats do not render at all. That is the
-       card being uniform, not failing: a venue with neither datum gives
-       the whole measure to its address.
+    /* NO hours — it has not opened, so its block prints the address alone
+       and the stat does not render. That is the card being uniform, not
+       failing: a venue with no datum gives the whole measure to its
+       address. (This note also described a `priceRange` that no longer
+       exists on the type, and an `image: null` pointing at a
+       /images/bunso-placeholder.jpg that was never in public/ — both were
+       describing a state this entry had already left.)
 
-       image: null — the canonical record points at
-       /images/bunso-placeholder.jpg, WHICH DOES NOT EXIST in public/.
-       Rather than ship a 404 into a next/image, the card takes the maroon
-       field it has always had here. */
-    image: "/images/bunso.jpg",
+       ⚠️ `-shopfront`, AND THE SUFFIX IS LOAD-BEARING. This read
+       /images/bunso.jpg and the card rendered a 670x141 wordmark strip
+       blown up to fill it. Nothing was wrong here: Cloudinary public ids
+       DROP THE EXTENSION (publicIdFor, scripts/cloudinary-upload.mjs), so
+       /images/bunso.jpg and /images/bunso.png — the wordmark About.tsx
+       asks for — both resolved to `maginhawa/images/bunso`, and the PNG
+       was the one that got uploaded there. Bunso was the only such
+       collision in public/images. Renaming the PHOTO rather than the
+       wordmark is what keeps About.tsx pointing at an asset that is
+       already live. */
+    image: "/images/bunso-shopfront.jpg",
   },
 };
 
@@ -205,7 +214,6 @@ export function venueCard(slug: string): VenueCardItem | null {
     logo: r.logo,
     address: x.address,
     // the extras win where they speak at all — see belly's note
-    priceRange: x.priceRange ?? r.priceRange,
     hours: x.hours,
     badge: x.badge,
     badgeLabel: x.badgeLabel,

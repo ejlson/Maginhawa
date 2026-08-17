@@ -663,7 +663,7 @@ const STATEMENT_PARTS: { w: string; em?: boolean }[] = [
   { w: "run.", em: true },
 ];
 const STATEMENT_TEXT =
-  "Maginhawa is Tagalog for comfortable — a life of ease. Comfort is the thread through every kitchen we run.";
+  "Maginhawa is Tagalog for comfortable - a life of ease. Comfort is the thread through every kitchen we run.";
 
 /** how much of the block's range one word takes to complete — Manifesto's
  *  PART_SPAN, and the reason the rise reads as a wave rather than as twenty
@@ -1387,7 +1387,7 @@ export default function About() {
                       <div className={styles.heroBottomRow}>
                         <div className={styles.heroAside}>
                           <p className={styles.heroLede}>
-                            A London family of restaurants — from a Camden
+                            A London family of restaurants - from a Camden
                             kitchen in 1987 to seven distinct dining
                             destinations today. Made with heritage and{" "}
                             <em className={styles.emItalic}>
@@ -1483,7 +1483,7 @@ export default function About() {
 
                         <p className={styles.chefBody}>
                           Omar Shah founded the Maginhawa Group. The first
-                          restaurant was his parents&rsquo; — Bintang, opened on
+                          restaurant was his parents&rsquo; - Bintang, opened on
                           Kentish Town Road in 1987, feeding the neighbourhood
                           he grew up in. What carried over was not a recipe but
                           a way of receiving people, which is why the group is
