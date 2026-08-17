@@ -66,29 +66,12 @@ import { asset } from "@/lib/media";
    visible label under the value and a title on the <svg> would announce
    the icon rather than the datum. `currentColor` throughout, so both
    inherit the value's colour and there is one place to change it. */
-function PriceGlyph() {
-  return (
-    <svg
-      className={styles.statIcon}
-      viewBox="0 0 12 12"
-      fill="none"
-      aria-hidden
-      focusable="false"
-    >
-      {/* a coin: the price datum is £/££/£££, so the glyph says "money"
-          rather than "£" — a £ sign next to "££" is the same mark twice */}
-      <circle cx="6" cy="6" r="4.6" stroke="currentColor" strokeWidth="1.1" />
-      <path
-        d="M4.6 6.15h2.6M6.9 3.9a1.35 1.35 0 0 0-2.1 1.15v2.05c0 .5-.3.9-.3.9h3.7"
-        stroke="currentColor"
-        strokeWidth="1.1"
-        strokeLinecap="round"
-        strokeLinejoin="round"
-      />
-    </svg>
-  );
-}
-
+/* PriceGlyph — a coin, drawn rather than a "£" so it did not repeat the
+   "££" beside it — stood here and went with `priceRange`. It is deleted
+   rather than left unused: nothing renders it now, and a dead 400-byte
+   inline SVG on a card that already ships a photograph is exactly the
+   weight the note above argues against. It is in git if the datum ever
+   comes back. */
 function HoursGlyph() {
   return (
     <svg
@@ -519,19 +502,24 @@ export function VenueBlock({
       ? { label: "Visit", href: rest.website }
       : null;
 
-  /* THE TWO STATS, right of the name. Each is an icon and a value and
-     NOTHING ELSE — no "Per head", no "Today" beneath them. Those labels
-     were 40–55px of type sitting under two values on the one side of the
-     block that could afford to give width back to the address, and
-     "Today" claimed live opening data this codebase does not have.
-     A venue with neither datum renders no stats at all and the name
-     takes the whole measure. */
-  const stats = (
-    [
-      ["price", item.priceRange],
-      ["hours", item.hours],
-    ] as ["price" | "hours", string | undefined][]
-  ).filter((s): s is ["price" | "hours", string] => Boolean(s[1]));
+  /* THE STAT, right of the name — an icon and a value and NOTHING ELSE.
+     No "Per head", no "Today" beneath it: those labels were 40–55px of
+     type on the one side of the block that could afford to give width
+     back to the address, and "Today" claimed live opening data this
+     codebase does not have. A venue with no datum renders no stats at all
+     and the name takes the whole measure.
+
+     ⚠️ IT WAS A PAIR — price and hours — AND THE LIST SHAPE IS KEPT ON
+     PURPOSE. `priceRange` is gone from VenueCardItem (commented out in
+     lib/venueCards.ts, type and data together), and the reference left
+     here failed the production type-check and blocked the Cloudflare
+     build. Collapsing this to a bare conditional would also throw away
+     the separator and the `data-stat` targeting the narrow-card rule
+     depends on, so the list stays and the price row leaves. Add a second
+     datum back and the map, the rule between them and the CSS all still
+     work. */
+  const stats = ([["hours", item.hours]] as ["hours", string | undefined][])
+    .filter((s): s is ["hours", string] => Boolean(s[1]));
 
   return (
     <>
@@ -594,15 +582,14 @@ export function VenueBlock({
                 {si > 0 ? (
                   <span className={styles.statRule} aria-hidden />
                 ) : null}
-                {/* data-stat, not a position: the narrow card sheds one
-                    of these and the pair is conditional, so a venue with
-                    no price makes hours the FIRST child and a positional
-                    rule would take the wrong one. */}
+                {/* data-stat, not a position: the narrow card sheds a
+                    stat by NAME, so a list that grows or shrinks can never
+                    leave the rule taking the wrong one. Kept keyed rather
+                    than hardcoded now that hours is the only datum, for
+                    the reason stated on `stats` above. */}
                 <span className={styles.stat} data-stat={key}>
-                  {key === "price" ? <PriceGlyph /> : <HoursGlyph />}
-                  <span className={styles.srOnly}>
-                    {key === "price" ? "Price range " : "Opening hours "}
-                  </span>
+                  <HoursGlyph />
+                  <span className={styles.srOnly}>Opening hours </span>
                   <span className={styles.statValue}>{value}</span>
                 </span>
               </Fragment>

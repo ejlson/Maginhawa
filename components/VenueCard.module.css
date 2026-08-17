@@ -1601,11 +1601,21 @@
        floors here (12px and 11px); below that they stop being readable at
        arm's length on a laptop.
    Dropping `hours` costs 47px of row and buys the address 123px against
-   the 105 it needs — it is the only lever that pays for itself. It is
-   also the RIGHT fact to lose: the price is real data and `hours` is a
-   placeholder. The rule is targeted by `[data-stat]`, not by position: a
-   venue with no price would make hours the FIRST child, and `:last-child`
-   would silently take the price off every other card instead.
+   the 105 it needs — it is the only lever that pays for itself.
+
+   ⚠️ IT USED TO DROP ONE STAT OF TWO AND NOW DROPS THE ONLY ONE. This
+   read "it is also the RIGHT fact to lose: the price is real data and
+   `hours` is a placeholder" — an argument that needed a price to fall
+   back on, and `priceRange` is gone from VenueCardItem. The rule still
+   earns its place, because the 123px it buys the address was always the
+   point and hours was always the fact being spent; but below 250px the
+   block now carries no stats at all rather than one. If a second datum
+   ever returns, re-read this: dropping hours becomes a choice again
+   rather than the whole row.
+
+   Still targeted by `[data-stat]`, not by position, and that matters more
+   now, not less: the list is one item long, so `:last-child` would match
+   it and take the stats off every card at every width.
 
    250px is the card width at which the column stops being cramped. */
 @container card (max-width: 250px) {
