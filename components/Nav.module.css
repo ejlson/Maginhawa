@@ -330,40 +330,121 @@
   transform: scaleX(1);
 }
 
-/* ---- hamburger button (3 lines -> X) — mobile only ---- */
+/* ---- the disc (3 lines -> cross) — mobile only ---- */
+/* ── A RING WHEN CLOSED, A FILLED DISC WHEN OPEN, AND THE BLEND IS WHY ──
+   The design this came from draws a solid white circle over the page. It
+   cannot be one here while the bar is closed: `.nav` carries
+   `mix-blend-mode: difference`, and a blend on a parent composites the
+   whole element as a group — a child cannot opt out of it. A cream-filled
+   disc would therefore be SUBTRACTED from whatever footage sits behind it,
+   giving a circle whose colour changes shot to shot, and the bars inside
+   it would resolve to (cream − maroon), a pale green.
+
+   So the fill is spent where it is affordable: `.sheetOpen` below drops
+   the blend entirely (the sheet under the bar is a known, painted ground),
+   and only then does the disc fill. Closed, it is a 1px ring in
+   currentColor — the same ink the three bars were already drawn in, so it
+   is no less legible than the burger it replaces, with more visual mass.
+
+   44px, which is the iOS target floor and also, at this size, simply the
+   right diameter for a 17px glyph. */
 .burger {
   position: relative;
-  /* 22×13 icon padded out to a ≥44px hit area; the negative margins hand
-     the padding back so the lines sit exactly where they always did */
-  width: 22px;
-  height: 13px;
-  box-sizing: content-box;
-  padding: 16px 11px;
-  margin: -16px -11px;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-end;
-  justify-content: center;
-  /* NOT a scale value — the solved remainder of the icon's own geometry:
-     the box above fixes a 22×13 icon and the bars are three 1px hairlines,
-     so (13 − 3×1) / 2 = 5px is what makes the stack exactly fill it.
-     Change the icon box, re-derive the gap; a rhythm token here would
-     quietly unsolve the 13px the hit-area padding/margin pair is built
-     around. */
-  gap: 5px;
-  background: none;
-  border: none;
+  width: 44px;
+  height: 44px;
+  border-radius: 50%;
+  box-sizing: border-box;
+  padding: 0;
+  display: grid;
+  place-items: center;
+  /* ⚠️ `appearance: none` IS LOAD-BEARING, not boilerplate. The burger this
+     replaced set `border: none`, which is enough for Chrome to drop the
+     native control look; this one draws a real border, which puts the
+     button back into its default appearance and paints the platform's
+     button backdrop as a SQUARE behind the disc — outside the
+     border-radius, so it reads as a pale tile under the circle. Caught on
+     a mobile screenshot; invisible in the computed styles. */
+  -webkit-appearance: none;
+  appearance: none;
+  background: transparent;
+  border: 1px solid currentColor;
   color: inherit;
   flex: none;
+  cursor: pointer;
+  transition:
+    background-color 0.32s var(--ease-entrance),
+    border-color 0.32s var(--ease-entrance);
 }
 
-.burger span {
+/* the disc is a filled control once open, so it needs a focus ring that
+   reads against its own fill rather than against the page */
+.burger:focus-visible {
+  outline: 2px solid currentColor;
+  outline-offset: 3px;
+}
+
+.glyph {
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* NOT a scale value — the solved remainder of the icon's own geometry:
+     a 17×11 glyph of three 1px hairlines leaves (11 − 3×1) / 2 = 4px.
+     The 4px is also what Nav.tsx's ±5 rotation offsets are derived from
+     (one bar height + one gap): change the gap and re-derive both. */
+  gap: 4px;
+  width: 17px;
+  height: 11px;
+}
+
+.glyph span {
   display: block;
-  width: 22px;
+  width: 17px;
   height: 1px;
   background: currentColor;
   transform-origin: center;
   will-change: transform, opacity;
+}
+
+/* ── THE BAR WHILE THE SHEET IS OPEN ──
+   Two-class selector on purpose, and last in the file: it has to outrank
+   `.blend`, `.light` and `.dark` above regardless of which one the theme
+   sampler left applied underneath it.
+
+   The blend goes off because there is no longer any footage to blend
+   with — Menu.module.css has painted the viewport a known cream or maroon
+   — and because it is the only way the disc can carry a fill. Ink is set
+   explicitly to the sheet's own, so the wordmark and the disc read as part
+   of the sheet rather than as chrome floating over it. */
+.nav.sheetOpen {
+  mix-blend-mode: normal;
+  background: transparent;
+  color: var(--maroon);
+}
+
+.nav.sheetOpen.sheetDark {
+  color: var(--cream);
+}
+
+.nav.sheetOpen .burger {
+  background: currentColor;
+  border-color: transparent;
+}
+
+/* the glyph is the sheet's GROUND, so the cross reads as cut out of the
+   disc rather than drawn on top of it */
+.nav.sheetOpen .glyph span {
+  background: var(--cream);
+}
+
+.nav.sheetOpen.sheetDark .glyph span {
+  background: var(--maroon);
+}
+
+/* the hairline belongs to a scrolled page; there is no page to divide from
+   while the sheet is over it */
+.nav.sheetOpen .rule {
+  opacity: 0 !important;
 }
 
 /* ---- responsive: inline links on desktop, burger on mobile ---- */

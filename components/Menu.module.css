@@ -1,124 +1,204 @@
-/* dims the page behind the menu and catches outside clicks */
-.backdrop {
+/* ── THE MENU IS A SHEET NOW, NOT A CARD ──
+   This was a 440px panel parked in the top-right corner with the page
+   still visible beside it under a scrim, and a hover-driven preview
+   thumbnail that touch could never reach. The replacement is full-bleed:
+   the list sits high, the footer is pinned to the bottom edge, and the
+   emptiness between them is the composition rather than leftover room.
+
+   ⚠️ THE VOID IS LOAD-BEARING. `margin-top: auto` on .foot is what
+   creates it, and it absorbs whatever the item count leaves over — five
+   links on a tall phone leave ~315px, on a 667px screen ~138px. Do not
+   replace it with a fixed gap; a fixed gap either collapses on a small
+   screen or strands the footer mid-sheet on a large one.
+
+   ⚠️ AND IT SITS UNDER THE BAR, NOT OVER IT. z-index 70 against the
+   navbar's 80, so the wordmark and the disc stay on top and the disc can
+   be the thing that closes what it opened. */
+.sheet {
   position: fixed;
   inset: 0;
-  z-index: 74;
-  background: rgba(12, 0, 0, 0.55);
-}
-
-/* panel near the top-right corner (a small gap from the screen edges) */
-.panel {
-  --m-pad-t: clamp(40px, 5.5vh, 56px);
-  --m-pad-x: clamp(14px, 1.6vw, 20px);
-  --m-pad-b: clamp(16px, 2.2vh, 24px);
-  position: fixed;
-  top: clamp(6px, 1vh, 10px);
-  right: clamp(6px, 1vw, 10px);
-  z-index: 76;
-  width: min(440px, calc(100vw - 16px));
-  /* list on the left, portrait image resting bottom-right */
+  z-index: 70;
   display: flex;
-  align-items: stretch;
-  /* matches the background of the section it opens over (light by default) */
+  flex-direction: column;
+  /* the deep top pad clears the bar and starts the list low — half the
+     reason the composition reads as composed rather than centred */
+  padding: clamp(96px, 15vh, 124px) var(--grid-margin) clamp(20px, 3.2vh, 26px);
   background: var(--cream);
   color: var(--maroon);
-  border-radius: var(--radius-card);
-  corner-shape: squircle; /* Figma-style corner smoothing (superellipse); falls back to plain rounding */
-  box-shadow: -10px 28px 70px -28px rgba(18, 0, 0, 0.5);
-  padding: var(--m-pad-t) var(--m-pad-x) var(--m-pad-b);
-  transform-origin: top right;
-  overflow: hidden;
-  will-change: transform, opacity;
+  opacity: 0;
+  visibility: hidden;
+  /* visibility is delayed out so the fade can finish before the sheet
+     leaves the a11y tree; on the way in it flips immediately */
+  transition:
+    opacity 0.4s linear,
+    visibility 0s linear 0.4s;
 }
 
-/* over the hero / maroon sections */
-.panel.dark {
+.sheet[data-open="true"] {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity 0.4s linear,
+    visibility 0s;
+}
+
+/* over the maroon chapters the sheet inverts — Nav.tsx's theme sampler is
+   the single source for which ground is in play, read once on open */
+.dark {
   background: var(--maroon);
   color: var(--cream);
 }
 
+/* ---- the list ---- */
 .list {
-  flex: 1 1 auto;
-  display: flex;
-  flex-direction: column;
-  align-items: flex-start;
-  justify-content: center;
-  gap: clamp(1px, 0.3vh, 5px);
+  flex: none;
 }
 
-/* vertical rule between the list and the image — sits closer to the image */
-.divider {
-  flex: none;
-  align-self: stretch;
-  width: 1px;
-  background: currentColor;
-  opacity: 0.22;
-  margin-left: clamp(18px, 3vw, 34px);
-  margin-right: clamp(8px, 1.2vw, 13px);
+.list ul {
+  list-style: none;
+  margin: 0;
+  padding: 0;
 }
 
 .item {
-  display: inline-flex;
+  display: flex;
   align-items: center;
-  gap: var(--lockup-gap-sm);
+  /* the 48dp target floor, held explicitly. The type already exceeds it
+     here, but a shorter label must never produce an under-sized row. */
+  min-height: 48px;
   font-family: var(--font-display);
-  font-weight: var(--w-medium);
-  font-size: var(--t-h3);
-  line-height: var(--lh-heading);
+  font-weight: var(--w-regular);
+  /* ~41px on a 390px column. The leading is the design: below ~1.4 this
+     becomes a list of buttons, above ~1.7 the fifth item stops fitting on
+     a 667px screen. */
+  font-size: clamp(1.95rem, 10.5vw, 2.9rem);
+  line-height: 1.5;
+  letter-spacing: -0.015em;
   color: inherit;
-  opacity: 0.4;
-  transition: opacity 0.3s ease;
+  opacity: 0;
+  transform: translateY(15px);
+  transition:
+    opacity 0.42s var(--ease-entrance),
+    transform 0.55s var(--ease-entrance);
+  /* --i is set per item in Menu.tsx; the sheet's own fade runs 400ms, so
+     the first link lands just after it and the last at ~350ms */
+  transition-delay: calc(var(--i) * 58ms + 120ms);
 }
 
-/* leading vertical line marks the selected item (space reserved so text
-   doesn't shift) */
-.item::before {
-  content: "";
-  flex: none;
-  width: 1px;
-  height: 1em;
-  background: currentColor;
-  transform: scaleY(0);
-  transform-origin: center;
-  transition: transform 0.35s var(--ease-entrance);
-}
-
-.item:hover,
-.itemActive {
+.sheet[data-open="true"] .item {
   opacity: 1;
-}
-.itemActive::before {
-  transform: scaleY(1);
-}
-/* gate the hover-reveal so a tap on touch doesn't leave a stuck marker line */
-@media (hover: hover) and (pointer: fine) {
-  .item:hover::before {
-    transform: scaleY(1);
-  }
+  transform: none;
 }
 
-/* portrait image resting in the bottom-right, padded off the panel edges */
-.thumb {
-  flex: none;
-  align-self: flex-end;
-  width: clamp(116px, 32%, 150px);
-  border-radius: var(--radius-tile);
-  overflow: hidden;
+/* NO RESTING DIM, and that is the fix rather than a style choice. The old
+   panel set every item to `opacity: 0.4` and lifted one on :hover or on an
+   `active` index moved by mouseenter/focus. Neither fires on a touchscreen,
+   so `active` stayed at its initial 0 for the whole session and five of six
+   links sat at 40% on the only device that can open this menu. */
+.item:active {
+  opacity: 0.6;
+}
+
+/* ---- the footer, pinned to the bottom edge ---- */
+.foot {
+  margin-top: auto;
+  display: flex;
+  flex-direction: column;
+  /* THE FOOTER STAYS IN THE TEXT FACE while the links above are display.
+     Not an oversight: --font-display is a high-contrast serif whose thins
+     are hairlines, and at 11–12px it stops being readable. Two faces on
+     one sheet is the correct answer here. */
+  font-family: var(--font-ui);
+  opacity: 0;
+  transform: translateY(10px);
+  transition:
+    opacity 0.5s var(--ease-entrance) 0.42s,
+    transform 0.6s var(--ease-entrance) 0.42s;
+}
+
+.sheet[data-open="true"] .foot {
+  opacity: 1;
+  transform: none;
+}
+
+.action {
+  align-self: flex-start;
+  font-weight: var(--w-bold);
+  font-size: 0.75rem;
+  letter-spacing: 0.012em;
+  text-transform: uppercase;
+  line-height: 1;
+  color: inherit;
+  /* AN OFFSET RULE, NOT text-decoration. A border sits a fixed distance
+     below the box rather than riding the baseline, so it clears descenders
+     and runs the full width of the phrase.
+     The 22px top pad is invisible and exists only to take the tap target
+     to 44px (22 + 12 text + 9 + 1.5 rule) without moving the rule away
+     from the words. */
+  padding-top: 22px;
+  padding-bottom: 9px;
+  border-bottom: 1.5px solid currentColor;
+  margin-bottom: 26px;
+}
+
+.rule {
+  height: 1px;
+  background: currentColor;
+  opacity: 0.18;
+  margin-bottom: 13px;
+}
+
+.legal {
+  display: flex;
+  justify-content: space-between;
+  /* both columns are single lines now, so this reads the same as baseline
+     alignment — kept explicit because the row is composed around its LAST
+     line, and a second line on either side must not push the other up */
+  align-items: flex-end;
+  gap: 12px;
+  font-size: 0.6875rem;
+  font-weight: var(--w-bold);
+  letter-spacing: 0.02em;
+  line-height: 1.7;
+  text-transform: uppercase;
+}
+
+.mail {
   position: relative;
+  text-align: right;
+  color: inherit;
+  /* the address is set in lowercase in contact.ts and the row is uppercase
+     furniture; forcing the case here rather than in the data keeps the
+     mailto and the label the same string */
+  text-transform: uppercase;
 }
 
-/* touch: the preview pane is hover-driven, so it never updates — drop it
-   (and its rule) to hand the whole panel to the link list, and open the
-   item pitch up a touch for fingers */
-@media (hover: none), (pointer: coarse) {
-  .divider,
-  .thumb {
-    display: none;
-  }
-  .list {
-    gap: clamp(4px, 0.8vh, 8px);
-  }
-  .item {
-    padding-block: 0.18em;
+/* ⚠️ THE TARGET IS GROWN BY A PSEUDO-ELEMENT, NOT BY PADDING. 11px type
+   gives a ~19px box, well under the 44px floor — but padding on this
+   anchor would push its text off the baseline it shares with the
+   copyright opposite, and the whole row is aligned on that baseline. An
+   absolutely positioned overlay adds the hit area without touching
+   layout. */
+.mail::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 44px;
+  transform: translateY(-50%);
+}
+
+.dim {
+  opacity: 0.45;
+}
+
+/* ---- reduced motion: arrive, don't perform ---- */
+@media (prefers-reduced-motion: reduce) {
+  .sheet,
+  .item,
+  .foot {
+    transition-duration: 0.01ms;
+    transition-delay: 0ms;
   }
 }

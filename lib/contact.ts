@@ -18,7 +18,7 @@ export const CONTACT = {
    */
   phone: null as string | null,
   /** PLACEHOLDER — replace with the real enquiries inbox. */
-  email: "hello@maginhawa.group",
+  email: "info@mgnhw.com",
   /**
    * PLACEHOLDER — head-office hours, not restaurant service hours. Each
    * restaurant keeps its own opening times on its detail page.

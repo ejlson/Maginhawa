@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { usePathname } from "next/navigation";
 import styles from "./Nav.module.css";
+import { lenisRef } from "@/lib/SmoothScroll";
 
 /* ── THE NAV PUBLISHES WHERE ITS LINKS BEGIN ──
    The hero's caption column is seated on the same x as the first nav link
@@ -71,6 +72,8 @@ export default function Nav({
   onMenuToggle: () => void;
 }) {
   const linksRef = useLinksLeft();
+  // the bar measures itself so the theme probe can sample just under it
+  const barRef = useRef<HTMLElement>(null);
   // Scrolling DOWN hides the navbar; scrolling UP reveals it.
   const [hidden, setHidden] = useState(false);
   // Navbar adopts the theme of the section currently behind it.
@@ -90,11 +93,49 @@ export default function Nav({
   const navigate = useRouteTransition();
   const pathname = usePathname();
 
+  /* ── THE PROBE MUST NOT SAMPLE THE SHEET ──
+     A ref rather than the prop because the listener below is installed once
+     with `[]` deps and would close over a stale `menuOpen` forever.
+
+     THE BUG THIS FIXES, because it is not obvious from the guard: the open
+     sheet is `position: fixed; inset: 0`, so it covers the probe point. Any
+     scroll or resize event while it is up — and a phone fires `resize`
+     every time the URL bar slides — made `elementFromPoint` return the
+     SHEET, which carries no `data-nav-theme`, so the theme collapsed to the
+     `"blend"` default mid-session. The bar then re-inked itself for a cream
+     sheet while the sheet stayed maroon, and the wordmark and disc went
+     maroon-on-maroon: invisible until you closed it again.
+
+     Freezing the sample also keeps Nav and Menu in lockstep. Menu snapshots
+     `getNavTheme()` once when it opens; this guarantees the value it
+     snapshotted is still the value `sheetDark` is derived from here. */
+  const menuOpenRef = useRef(menuOpen);
+  menuOpenRef.current = menuOpen;
+
   useEffect(() => {
     let last = window.scrollY;
     const sampleTheme = () => {
-      // read the section sitting just below the navbar
-      const el = document.elementFromPoint(24, 56);
+      // the sheet is over the probe point and is not a section — hold the
+      // theme that was live when it opened
+      if (menuOpenRef.current) return;
+      /* ── SAMPLE BELOW THE BAR, AND MEASURE WHERE THAT IS ──
+         This read `elementFromPoint(24, 56)` — a constant chosen when the
+         bar was shorter than 56px. It is not any more: the wordmark is
+         `clamp(19px, 2.3vh, 26px)` plus `--space-xs-y` of padding, which
+         measures 59px at 375×812. So the probe was landing on the NAVBAR
+         ITSELF, `closest("[data-nav-theme]")` returned null, and every
+         sample on a phone fell through to the `"blend"` default — which is
+         why the bar never went dark over the maroon chapters and why the
+         menu sheet never picked up its maroon ground.
+
+         `offsetHeight` rather than `getBoundingClientRect().bottom`: the
+         bar is translated by up to -24px as it hides and reveals, and a
+         sample point that moves with that animation would flicker themes
+         mid-transition. offsetHeight is the layout box, which the
+         transform does not touch, and the bar is `position: fixed; top: 0`
+         so its untransformed bottom edge IS its height. */
+      const y = (barRef.current?.offsetHeight ?? 56) + 4;
+      const el = document.elementFromPoint(24, y);
       const host = el?.closest<HTMLElement>("[data-nav-theme]");
       const t = (host?.dataset.navTheme as Theme) || "blend";
       latestTheme = t;
@@ -119,8 +160,19 @@ export default function Nav({
     };
   }, []);
 
-  // While the menu is open the bar sits on the cream overlay → light theme.
+  // While the menu is open the bar sits on a painted sheet, not on the page.
   const activeTheme: Theme = menuOpen ? "light" : theme;
+  /* ── AND THE SHEET'S GROUND DECIDES THE BAR'S INK ──
+     Menu.tsx paints itself maroon over the dark chapters and cream
+     everywhere else, sampling `getNavTheme()` — which is this component's
+     own `theme`, published through the module-level `latestTheme`. Reading
+     it here rather than passing it down keeps ONE decision: if these two
+     ever disagree the disc ends up the same colour as the sheet behind it.
+
+     Safe to read live rather than snapshot on open: Menu locks the scroll
+     (Lenis stop() + overflow) while it is up, so nothing can move a new
+     section under the bar and flip `theme` mid-sheet. */
+  const sheetDark = theme === "dark";
   /* ⚠️ AND THE MENU IS NOT THE HERO. `onHero` is sampled from what sits
      under the bar, which is still the film when the overlay is open — but
      the reader is looking at a cream sheet with no wordmark on it, so the
@@ -152,16 +204,43 @@ export default function Nav({
   // logo: scroll to top when already home, otherwise route through the curtain
   const onLogoClick = (e: React.MouseEvent) => {
     e.preventDefault();
-    if (pathname === "/") {
-      window.scrollTo({ top: 0, behavior: "smooth" });
-    } else {
+    /* THE WORDMARK IS THE SHEET'S HOME ROW. Menu.tsx dropped its "Home"
+       item — it was a link to the page the reader was already on four
+       times out of five — so this is the only way back, and it has to
+       dismiss the sheet it is sitting on top of. */
+    if (menuOpen) onMenuToggle();
+
+    if (pathname !== "/") {
       navigate("/");
+      return;
+    }
+
+    /* Menu parks Lenis while it is open and releases it in a cleanup that
+       runs after this commit, so a scroll issued now would be swallowed by
+       a still-stopped instance. Release it here too — start() is
+       idempotent — and drive the scroll THROUGH Lenis, because a raw
+       window.scrollTo is pulled straight back to Lenis's own target on the
+       next frame. The fallback is for reduced motion, where SmoothScroll
+       never instantiates Lenis at all. */
+    const lenis = lenisRef.current;
+    if (lenis) {
+      lenis.start();
+      lenis.scrollTo(0);
+    } else {
+      window.scrollTo({ top: 0, behavior: "smooth" });
     }
   };
 
   return (
     <motion.nav
-      className={[styles.nav, styles[activeTheme], heroFilm && styles.heroFilm]
+      ref={barRef}
+      className={[
+        styles.nav,
+        styles[activeTheme],
+        heroFilm && styles.heroFilm,
+        menuOpen && styles.sheetOpen,
+        menuOpen && sheetDark && styles.sheetDark,
+      ]
         .filter(Boolean)
         .join(" ")}
       initial={{ opacity: 0, y: -24 }}
@@ -211,18 +290,25 @@ export default function Nav({
         aria-label={menuOpen ? "Close menu" : "Open menu"}
         aria-expanded={menuOpen}
       >
-        <motion.span
-          animate={menuOpen ? { rotate: 45, y: 6 } : { rotate: 0, y: 0 }}
-          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-        />
-        <motion.span
-          animate={menuOpen ? { opacity: 0 } : { opacity: 1 }}
-          transition={{ duration: 0.2 }}
-        />
-        <motion.span
-          animate={menuOpen ? { rotate: -45, y: -6 } : { rotate: 0, y: 0 }}
-          transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
-        />
+        {/* ±5 is one bar height plus one gap (1 + 4), the distance each
+            outer hairline travels to meet the middle one — see the gap
+            note in Nav.module.css. The middle bar fades on the way rather
+            than after it, so the three are never visible as a cross with a
+            line through it. */}
+        <span className={styles.glyph} aria-hidden>
+          <motion.span
+            animate={menuOpen ? { rotate: 45, y: 5 } : { rotate: 0, y: 0 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          />
+          <motion.span
+            animate={menuOpen ? { opacity: 0 } : { opacity: 1 }}
+            transition={{ duration: 0.2 }}
+          />
+          <motion.span
+            animate={menuOpen ? { rotate: -45, y: -5 } : { rotate: 0, y: 0 }}
+            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+          />
+        </span>
       </button>
 
       <span
