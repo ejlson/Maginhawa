@@ -160,7 +160,7 @@ export const PRESS_INDEX: {
   {
     outlet: "The Times",
     year: "2025",
-    quote: "Giles Coren reviews Belly — Filipino flavour through a French bistro lens.",
+    quote: "Giles Coren reviews Belly - Filipino flavour through a French bistro lens.",
     url: "https://www.thetimes.com/life-style/food-drink/article/giles-coren-belly-restaurant-review-rvt2qpzs2",
   },
   {
@@ -196,7 +196,7 @@ export const PRESS_INDEX: {
   {
     outlet: "City AM",
     year: "2026",
-    quote: "Hoodwood — among London's eleven best pies.",
+    quote: "Hoodwood - among London's eleven best pies.",
     url: "https://www.cityam.com/the-11-best-pies-in-london-to-eat-during-british-pie-week/",
   },
   {
@@ -213,7 +213,7 @@ export const PRESS: PressMention[] = [
     outlet: "The Times",
     feature: "Giles Coren review",
     quote:
-      "Giles Coren reviews Belly — a Kentish Town newcomer reading Filipino flavour through a French bistro lens.",
+      "Giles Coren reviews Belly - a Kentish Town newcomer reading Filipino flavour through a French bistro lens.",
     date: "—",
     url: "https://www.thetimes.com/life-style/food-drink/article/giles-coren-belly-restaurant-review-rvt2qpzs2",
     restaurants: ["belly"],
@@ -221,7 +221,7 @@ export const PRESS: PressMention[] = [
   {
     outlet: "Michelin Guide",
     feature: "Added to the Michelin Guide",
-    quote: "Belly added to the Michelin Guide — Kentish Town, London.",
+    quote: "Belly added to the Michelin Guide - Kentish Town, London.",
     date: "—",
     url: "https://www.hamhigh.co.uk/news/25825878.kentish-town-restaurant-belly-added-michelin-guide/",
     restaurants: ["belly"],
@@ -271,7 +271,7 @@ export const PRESS: PressMention[] = [
   },
   {
     outlet: "Square Meal",
-    feature: "Belly — full review",
+    feature: "Belly - full review",
     date: "—",
     url: "https://www.squaremeal.co.uk/restaurants/belly_27399",
     restaurants: ["belly"],
@@ -300,7 +300,7 @@ export const PRESS: PressMention[] = [
   },
   {
     outlet: "The Arcadia",
-    feature: "Belly, Kentish Town — Filipino soul with bistro swagger",
+    feature: "Belly, Kentish Town - Filipino soul with bistro swagger",
     quote: "Filipino soul with bistro swagger.",
     date: "01.12.25",
     url: "https://www.thearcadiaonline.com/belly-kentish-town-filipino-soul-with-bistro-swagger/",
@@ -354,7 +354,7 @@ export const PRESS: PressMention[] = [
   // ---------- Hoodwood ----------
   {
     outlet: "City AM",
-    feature: "The 11 best pies in London — British Pie Week",
+    feature: "The 11 best pies in London - British Pie Week",
     quote: "Named among London's eleven best pies for British Pie Week.",
     date: "—",
     url: "https://www.cityam.com/the-11-best-pies-in-london-to-eat-during-british-pie-week/",

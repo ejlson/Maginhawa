@@ -143,11 +143,16 @@ export default function Hero({ started }: { started: boolean }) {
               is the page's subject stated at 150px. And the word is the one
               the Manifesto three chapters down stops to translate — showing
               it here is what makes that payoff land. */}
+          {/* THE DELAYS BELOW ARE A BREATH, NOT A WAIT. `started` flips the
+              moment the loader unmounts, and the loader now hands off ~100ms
+              after its reveal completes — the old 1.25s/1.45s delays dated
+              from a slower hand-off and left film + nav sitting alone for
+              well over a second before the name arrived. */}
           <motion.h1
             className={styles.mark}
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: started ? 1 : 0, y: started ? 0 : 14 }}
-            transition={{ duration: 0.9, ease: "easeOut", delay: 1.25 }}
+            transition={{ duration: 0.9, ease: "easeOut", delay: 0.25 }}
           >
             Maginhawa
           </motion.h1>
@@ -156,7 +161,7 @@ export default function Hero({ started }: { started: boolean }) {
             className={styles.copy}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: started ? 1 : 0, y: started ? 0 : 10 }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 1.45 }}
+            transition={{ duration: 0.8, ease: "easeOut", delay: 0.45 }}
           >
             {/* the identifying sentence, as one paragraph rather than three
                 clause spans: at 15px it sets as a caption and the clause
@@ -187,7 +192,7 @@ export default function Hero({ started }: { started: boolean }) {
                 payoff that chapter exists to deliver. The hero shows the
                 word, the Manifesto explains it. */}
             <p className={styles.sentence}>
-              Seven rooms across North London — Filipino, Filipino-Japanese
+              Seven rooms across North London - Filipino, Filipino-Japanese
               and Caribbean. It began with one Camden kitchen in 1987 and it
               is still the same family cooking, room by room, night after
               night.

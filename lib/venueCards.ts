@@ -97,7 +97,7 @@ const EXTRAS: Record<string, Extras> = {
       road: "93 Kentish Town Rd",
       city: "London NW1 8NY",
     },
-    hours: "12–11",
+    hours: "12-11",
   },
   guanabana: {
     address: {
@@ -105,7 +105,7 @@ const EXTRAS: Record<string, Extras> = {
       road: "85 Kentish Town Rd",
       city: "London NW1 8NY",
     },
-    hours: "12–11",
+    hours: "12-11",
   },
   mamasons: {
     /* THE ONE VENUE WITH TWO SITES, and the reason these are eight
@@ -122,7 +122,7 @@ const EXTRAS: Record<string, Extras> = {
       road: "91 Kentish Town Rd",
       city: "& 32 Newport, Chinatown",
     },
-    hours: "12–11",
+    hours: "12-11",
     // priceRange: "£",
     /* the shopfront is 4032x6048 (2:3); `cover` scales it to the card's
        width and crops the height, and the MAMASONS fascia sits high in
@@ -132,7 +132,7 @@ const EXTRAS: Record<string, Extras> = {
   },
   ramo: {
     address: { area: "Soho", road: "28 Brewer St", city: "London W1F 0SR" },
-    hours: "12–11",
+    hours: "12-11",
   },
   hoodwood: {
     address: {
@@ -140,7 +140,7 @@ const EXTRAS: Record<string, Extras> = {
       road: "81 Kentish Town Rd",
       city: "London NW1 8NY",
     },
-    hours: "12–11",
+    hours: "12-11",
     // priceRange: "£",
   },
   cafemama: {
@@ -158,7 +158,7 @@ const EXTRAS: Record<string, Extras> = {
       road: "157 Kentish Town Rd",
       city: "London NW1 8PD",
     },
-    hours: "12–11",
+    hours: "12-11",
     /* ⚠️ THE CANONICAL RECORD SAYS `££` AND THE CARD HAS SHIPPED `£££`.
        This keeps what the signed-off card prints rather than silently
        re-pricing a Michelin-selected bistro on two pages at once. One of

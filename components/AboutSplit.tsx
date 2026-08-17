@@ -86,7 +86,7 @@ const PORTRAIT_LINE = ["Where it began.", "Camden, 1987."];
 const PARA_LEAD =
   "We cook the food we grew up on, for people we treat like family. A table you are not hurried from, a room that is easy to be in, and a plate that tastes like somebody's home. It is the only way we have ever known how to do this, and it is the reason the same faces come back year after year.";
 const PARA_FINE =
-  "From one Camden kitchen in 1987 to a family of dining rooms across North London — Filipino, Filipino-Japanese and Caribbean, each with its own character — still run by the same family, and still led by Chef Omar. Every room keeps its own menu, its own regulars and its own way of doing things. What they share is the standard they are held to, and the people who set it.";
+  "From one Camden kitchen in 1987 to a family of dining rooms across North London - Filipino, Filipino-Japanese and Caribbean, each with its own character - still run by the same family, and still led by Chef Omar. Every room keeps its own menu, its own regulars and its own way of doing things. What they share is the standard they are held to, and the people who set it.";
 
 /* ══════════ THE THREE PRINTS DO SOMETHING NOW ══════════
    They were decorative. Each one is now a door into one of the three
