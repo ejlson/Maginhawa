@@ -628,223 +628,40 @@
    `.expandCrown::before` and is the same technique the card uses. One
    fewer full-plate layer over the film. */
 
-/* quiet underlined text link into the detail page — a real 1px underline
-   (not the CTA's draw), colour-only hover. Never `transition: all`.
+/* ---------- RETIRED WITH THE EXPANSION'S BLOCK ----------
+   TWO CONTROLS AND THEIR WHOLE ARGUMENT WENT FROM HERE: `.viewLink`, a
+   quiet cream underline into the venue's page, and `.panelAction`, a
+   34px annatto pill with a cream label, a lit hairline, a cream-and-ink
+   hover inversion carried on three custom properties, and a retired
+   `.expandActions` override of those properties for when the block still
+   stood on a cream sheet.
 
-   CREAM, NOT MAROON, AND THE GROUND IS WHY. This link stands beside the
-   annatto pill on the expansion's block, and that block used to sit on a
-   cream SHEET; it now stands on the ramp, over the venue's film. Maroon on
-   a photograph is the failure the retired `.pillBook` is on record for,
-   mirrored: measured against the ramp's deepest stop the old colour came
-   out around 1.4:1, i.e. a link nobody can find. Cream on the same stop is
-   the pair every other word on this block is set in. */
-.viewLink {
-  margin-top: 0.35em;
-  font-family: var(--font-sans);
-  font-weight: var(--w-medium);
-  font-size: var(--t-small);
-  line-height: var(--lh-snug);
-  color: var(--cream);
-  text-decoration: underline;
-  text-decoration-thickness: 1px;
-  text-underline-offset: 3px;
-  transition: color 200ms ease;
-}
-.viewLink:hover,
-.viewLink:focus-visible {
-  color: var(--saffron);
-}
+   THEY ARE GONE BECAUSE THE EXPANSION PRINTS THE CARD'S BLOCK NOW, and the
+   card's block has its own pair — `.cardBtn` with `.cardBtnGhost` /
+   `.cardBtnFill` in VenueCard.module.css. That is the point of the change:
+   the expansion is the card OPENED, and it was answering the same two
+   questions ("see the menu", "book a table") with a differently-shaped,
+   differently-coloured, differently-sized set of controls.
 
-/* ---------- retired here: the card's `.actionRow` padding ----------
-   It was `flex: none; padding-top: clamp(2px, 0.4vw, 5px)` — a breath of
-   air over the metadata strip. The card's action row is declared once,
-   with the rest of the block, further UP this file; a second .actionRow
-   here would have won on source order and re-added a padding the block's
-   own gap already provides. It is deleted rather than merged, because
-   the row it described (one annatto pill, hard against a strip of facts)
-   no longer exists.
+   THE ONE CONCLUSION WORTH CARRYING FORWARD, because it is the reason the
+   pills are cream rather than chromatic and it was expensive to arrive at:
+   the ramp under these controls is PHOTO-DERIVED, so its hue moves from
+   venue to venue, and the annatto fill measured 2.15:1 against the softened
+   ink — below the 3:1 WCAG 1.4.11 asks of the visual information
+   identifying a control. It needed a 48% cream hairline to be findable at
+   all. The cream fill is 9.80:1 on the same ground and needs nothing. The
+   full derivation is in the `.cardBtnFill` / `.cardBtnGhost` notes, which
+   are now the only place these controls are described.
 
-   ---------- the EXPANSION's control ---------- */
-/* .panelAction below is now the EXPANSION'S ONLY. The card's two pills
-   are .cardBtn / .cardBtnGhost / .cardBtnFill, declared with the block.
-   The two were one class until this pass and splitting them is a real
-   decision, not a refactor: the card's ramp is photo-derived and takes a
-   different hue on every venue, and the expansion's sheet is cream. One
-   resting colour cannot be right on both any more.
-   Everything below this line, including the `.expandActions` inversion,
-   describes the pill on the expansion's cream sheet. */
-
-/* THE ACTION — FILLED, not a ring. The reference cards carry a solid pill
-   at the bottom of the dark panel and it is the one confident thing on the
-   card; an outline on ink reads as a disabled state.
-
-   ANNATTO FILL, CREAM LABEL, and the choice is decided by measurement
-   rather than by taste:
-     · cream on annatto             4.55:1 — clears 4.5:1 for this 13px
-                                             label. This is what ships. It
-                                             read 4.54:1 before the palette
-                                             softened; the accent was moved
-                                             three points precisely so this
-                                             number would survive intact.
-     · maroon on annatto            2.15:1 — fails, and fails harder than
-                                             the 3.08:1 it used to. So the
-                                             label CANNOT be maroon, which
-                                             is what the fill used to flip
-                                             it to on hover.
-     · cream fill, maroon label     9.80:1 — the safest number available
-                                             (14.00:1 on the old pair),
-                                             and rejected anyway: it would
-                                             delete the annatto from the
-                                             card entirely, and on an ink
-                                             panel a cream pill sits at the
-                                             same luminance as the venue
-                                             name and the metadata, so the
-                                             one control would stop being
-                                             the distinct thing and become
-                                             the third cream object. The
-                                             annatto is the only chromatic
-                                             element on the card; it is what
-                                             makes this read as the thing to
-                                             press. Food on the leaf, spent
-                                             exactly once, as before.
-
-   NOTE FOR ANYONE CHECKING THE OLD NUMBERS: the comment this replaces said
-   "cream on saffron is a failing 3.0:1" and "maroon on saffron is 5.8:1".
-   Both were true of the RETIRED saffron and neither survived the palette
-   swap to annatto — globals.css says as much in the --saffron-ink note.
-   Recomputed from today's hexes, the two have essentially traded places.
-
-   BIGGER, TOWARD THE REFERENCE'S WEIGHT. The reference card's CTA is a
-   large filled pill and the one confident thing on it; this was a 26px
-   chip. It goes to 34px with 1.15em of side padding (27px / 0.95em on the
-   narrow column), which is the reference's presence in the reference's
-   proportion — about 44% of the card's width at 1440.
-
-   IT STAYS ANNATTO, and the reference's LIGHT pill is deliberately not
-   copied. The old note rejected a cream fill partly because "on an ink
-   panel a cream pill sits at the same luminance as the venue name and the
-   metadata" — and half of that argument has just been deleted along with
-   the name. What replaces it is stronger, not weaker: the name's removal
-   makes a cream pill the ONLY large light object on the panel, so it would
-   stop reading as a control and start reading as the headline the panel no
-   longer has. And it would spend the card's single chromatic note on
-   nothing. The reference gets away with a light pill because it has a
-   large light title above it to be subordinate to. We do not have one.
-   The cream pill is not lost, either — it is the hover and focus state
-   below, which is now a genuine reward rather than a colour swap.
-
-   THE HAIRLINE IS NO LONGER LOAD-BEARING, and it stays anyway. It was put
-   there because annatto against the frosted panel measured 2.4:1, under
-   the 3:1 WCAG 1.4.11 asks of the visual information identifying a
-   control. Against the NEAR-SOLID panel the same fill computed to 3.08:1
-   — the fill cleared the bar on its own, which was a quiet dividend of
-   dropping brightness(0.7) and the thin tint with it.
-
-   ⚠️ THAT DIVIDEND IS SPENT. The palette softening lifted the ink and
-   darkened the accent, and the accent on the ink is now 2.15:1 — BELOW the
-   3:1 bar. The fill no longer identifies the control on its own, so the
-   hairline is load-bearing again, exactly as it was before. It is a good
-   thing nobody deleted it. The hairline is kept
-   as the same lit-edge language as the panel's own top hairline, which is
-   what keeps the control looking like it is made of the card, and as the
-   margin that stops a photograph-dependent number from being the only
-   thing between this control and a failure.
-
-   HOVER/FOCUS INVERT. The resting state is already filled, so the old
-   "fill on hover" reward has nowhere to go; the pill flips to the
-   cream-and-ink pair instead (9.80:1, and 14.00:1 before the palette
-   softened), which is a real change of state and
-   is the reference's white pill. The swell rides the drawer curve; press
-   snaps down quick. Specific properties only — never `all`.
-
-   THE HOVER TARGET IS A PAIR OF PROPERTIES, NOT A COLOUR, because this one
-   class is worn by TWO controls standing on two different grounds: the
-   card's ink panel and the expansion's cream sheet. The resting state is
-   identical on both and must stay that way — the expansion is the tile
-   opened. The hover state cannot be: a cream pill on the cream sheet is
-   invisible, which is the exact failure the retired .pillBook is on record
-   for (see the note at its use site in Discover.tsx). So the ground names
-   its own inversion and the rule below stays single. */
-.panelAction {
-  --action-hover-bg: var(--cream);
-  --action-hover-fg: var(--maroon);
-  --action-ring: var(--cream);
-  display: inline-flex;
-  align-items: center;
-  justify-content: center;
-  min-height: 34px;
-  padding: 0 1.15em;
-  border-radius: 999px;
-  /* 42% → 48%, AND IT IS THE ONLY THING IDENTIFYING THIS CONTROL NOW.
-     The accent fill on the panel fell from 3.08:1 to 2.15:1 when the
-     palette softened, so the fill no longer meets 1.4.11's 3:1 on its own
-     and this hairline is the whole boundary. At 42% cream it measured
-     3.61:1 against the old panel and 3.05:1 against the new one — a pass
-     with five hundredths in it, which is not a margin, it is a coincidence.
-     48% restores 3.51:1. */
-  border: 1px solid color-mix(in srgb, var(--cream) 48%, transparent);
-  background-color: var(--saffron);
-  font-family: var(--font-mono);
-  font-weight: var(--w-medium);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label-mono);
-  line-height: var(--lh-flush);
-  white-space: nowrap;
-  color: var(--cream);
-  text-decoration: none;
-  transition:
-    background-color 400ms var(--ease-drawer),
-    border-color 400ms var(--ease-drawer),
-    transform 400ms var(--ease-drawer),
-    color 400ms var(--ease-drawer);
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .panelAction:hover {
-    background-color: var(--action-hover-bg);
-    border-color: var(--action-hover-bg);
-    color: var(--action-hover-fg);
-    transform: scale(1.03);
-  }
-}
-
-/* keyboard gets the same reward as hover. The ring is a property too — a
-   maroon outline on a 94% maroon panel is an outline nobody can see, and a
-   cream one on the expansion's cream sheet is the same failure mirrored. */
-.panelAction:focus-visible {
-  background-color: var(--action-hover-bg);
-  border-color: var(--action-hover-bg);
-  color: var(--action-hover-fg);
-  outline: 2px solid var(--action-ring);
-  outline-offset: 2px;
-}
-
-.panelAction:active {
-  transform: scale(0.97);
-  transition-duration: 120ms;
-}
-
-/* ---------- THE `.expandActions .panelAction` INVERSION IS RETIRED ----------
-   It read:
-     .expandActions .panelAction {
-       --action-hover-bg: var(--maroon);
-       --action-hover-fg: var(--cream);
-       --action-ring:     var(--maroon);
-     }
-   — because the expansion's block stood on a CREAM sheet, where the class's
-   own cream-on-hover would have been a cream pill on cream (the exact
-   failure the retired `.pillBook` is on record for). The block stands on the
-   ramp now, over the venue's film, which is the same ground the card's own
-   controls stand on. So the two agree without an override, and the ground
-   named by `.panelAction` itself is the right one again.
-
-   THE MECHANISM STAYS, and deliberately: `.panelAction` still carries its
-   hover target as three custom properties rather than as literal colours,
-   which is what made this reversal a deletion instead of a rewrite. The next
-   surface that stands this control on cream sets the three and nothing
-   else. */
-
-
+   ---------- also retired: the expansion's own block rules ----------
+   `.expandHeadRow`, `.expandName`, `.expandTag`, `.expandBlurb`,
+   `.expandLocation` and `.expandActions`. They set the venue's name in the
+   DISPLAY face over a mono "EST. 1987 · FILIPINO FUSION RESTAURANT · ££"
+   strip, with no stats and no hairline anywhere in the block — a second
+   design of the facts the card already prints, which had drifted from the
+   card's on the copy as well as on the form. The block's every rule is
+   VenueCard.module.css's now, and `.blockLarge` there is the one size up
+   this card wears. */
 
 /* ══════════════ THE EXPANSION — ONE PORTRAIT CARD ══════════════════════
    Read the banner on ExpandedCard in Discover.tsx first; this file is the
@@ -1009,9 +826,15 @@
 
    55% OF THE CARD. The number that matters is where the block's top edge
    lands inside the gradient — f = (rampH − blockH) / rampH, the same
-   quantity the card's own ramp is tuned on. At 814px tall the ramp is 448px
-   and the block measures ~230px, so f ≈ 0.49: the venue's name sits about
-   halfway down the gradient rather than at its thin beginning.
+   quantity the card's own ramp is tuned on. Re-measured after the block
+   became the CARD'S block (<VenueBlock> at `.blockLarge`): at 1440×900 the
+   card is 610×814, the ramp 447px and the block 233px, so f = 0.48 — the
+   venue's name sits about halfway down the gradient rather than at its thin
+   beginning. It held at 0.48/0.47 on a tall desktop and a short laptop and
+   fell to 0.39 on a 390×844 phone, where the story takes a third line;
+   the card's own ramp runs at 0.37, so all four have more ink under the
+   first line than the card does. The story's 3-line clamp is what keeps
+   the phone figure a floor rather than a variable.
 
    DEEPER STOPS THAN THE CARD'S (.26/.60/.78/.86 against .22/.52/.68/.76),
    because the ground is MOVING. A still can be checked; a clip puts a
@@ -1267,13 +1090,40 @@
   outline-offset: 2px;
 }
 
-/* ---------- the block: the type that stands ON the ramp ---------- */
-/* IT HAS NO MATERIAL OF ITS OWN, and this is the same rule the card's block
+/* ---------- the block's SEAT ---------- */
+/* THE BOX ONLY. Everything INSIDE it — the name and its tagline, the two
+   stats, the story, the hairline, the address and the two pills — is
+   <VenueBlock>, the card's own block, and every rule that paints it lives
+   in VenueCard.module.css beside the card that shares it. This file states
+   where the block sits and how much air it gets, which is the one thing
+   that genuinely differs between a 346px card and a 610px one.
+
+   IT HAS NO MATERIAL OF ITS OWN, and this is the same rule the card's block
    keeps: the ramp above is the ground, and a second one stacked here would
    put back the one thing the ramp exists to remove — a locatable edge. It
    used to BE a material (a cream sheet with its own radius, tucked 16px
    under the plate); that sheet is what this redesign deletes.
-   `pointer-events: auto` takes the clicks back from the overlay layer. */
+   `pointer-events: auto` takes the clicks back from the overlay layer.
+
+   THE INSET AND THE GAP ARE THE CARD'S, IN PROPORTION rather than in
+   pixels: the card runs 12px of padding and 8px of gap on a 346px card,
+   i.e. 3.5% and 2.3% of its width, and this card is 610px. The 34px of
+   padding here before the block was shared was the OLD arrangement's,
+   sized for a display-face headline that no longer sits in this box.
+   vh rather than vw, like everything else on this card — the card's size
+   comes from the window's HEIGHT.
+
+   ⚠️ `container-type: inline-size` IS NOT DECORATION, and deleting it
+   breaks the block silently. Every size in `.blockLarge`
+   (VenueCard.module.css) is a `min()` of a vh term and a cqi term, and the
+   cqi term is what stops the block being drawn at desktop sizes inside a
+   phone-width card — below 700px this modal fills the stage and is no wider
+   than a grid card, while the window still has 844px of height for the vh
+   terms to read at their ceilings. cqi resolves against the nearest
+   ancestor CONTAINER and this is the only one on the expansion; without the
+   declaration it falls back to the small viewport, which is ~4× this box on
+   desktop. `inline-size`, never `size`: the block's HEIGHT has to stay its
+   content's. */
 .expandBody {
   position: absolute;
   left: 0;
@@ -1282,84 +1132,10 @@
   z-index: 3;
   display: flex;
   flex-direction: column;
-  gap: clamp(8px, 1.2vh, 14px);
-  padding: clamp(20px, 3vw, 34px);
+  gap: clamp(8px, 1.5vh, 14px);
+  padding: clamp(16px, 2.4vh, 24px);
+  container-type: inline-size;
   pointer-events: auto;
-}
-
-/* STACKED, NOT A BASELINE ROW. The name and the descriptor sat side by side
-   with the row space-betweening them, which is a landscape arrangement: on a
-   610px-wide portrait card "Est. 2017 · London's First Filipino Ice Cream
-   Parlor · £" is longer than the name beside it and wrapped to two ragged
-   lines against the card's right edge. Stacked, the descriptor is a
-   standfirst under the name, which is what it reads as anyway. */
-.expandHeadRow {
-  display: flex;
-  flex-direction: column;
-  gap: 0.35em;
-}
-
-.expandName {
-  margin: 0;
-  font-family: var(--font-display);
-  font-weight: var(--w-medium);
-  /* vh rather than vw, like everything else on this card — the card's size
-     comes from the window's height */
-  font-size: clamp(1.9rem, 3.6vh, 2.8rem);
-  line-height: var(--lh-display);
-  letter-spacing: var(--tr-display);
-  color: var(--cream);
-}
-
-.expandTag {
-  font-family: var(--font-mono);
-  font-weight: var(--w-regular);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label-mono);
-  text-transform: uppercase;
-  color: var(--cream);
-  /* 0.6 on the retired cream sheet; the ground is a moving picture now and
-     every opacity on this block is raised for it */
-  opacity: 0.74;
-}
-
-.expandBlurb {
-  margin: 0;
-  max-width: 46ch;
-  font-family: var(--font-sans);
-  font-weight: var(--w-regular);
-  font-size: var(--t-small);
-  line-height: var(--lh-body);
-  color: var(--cream);
-  opacity: 0.92;
-  /* CLAMPED. This is content-length copy in a box whose height comes from
-     the window: on a short viewport the longest blurb would push the
-     controls off the ramp and into the picture. Three lines and an ellipsis
-     reads as an excerpt; a fourth line cut by `overflow: hidden` reads as a
-     bug. Nothing is lost — the whole story is on the venue's own page,
-     which is where "View Restaurant" beneath this goes. */
-  display: -webkit-box;
-  -webkit-box-orient: vertical;
-  -webkit-line-clamp: 3;
-  line-clamp: 3;
-  overflow: hidden;
-}
-
-.expandLocation {
-  margin: 0;
-  font-family: var(--font-sans);
-  font-weight: var(--w-regular);
-  font-size: var(--t-small);
-  line-height: var(--lh-snug);
-  color: var(--cream);
-  opacity: 0.75;
-}
-
-.expandActions {
-  display: flex;
-  align-items: center;
-  gap: clamp(14px, 2vw, 22px);
-  margin-top: clamp(6px, 1.2vh, 12px);
 }
 
 /* ── THE PHONE. The 3:4 stops being right well before the layout does: on a
@@ -1376,24 +1152,20 @@
   }
 }
 
-/* ---------- reduced motion ---------- */
-/* No zoom (transforms pinned), no entrance translate — colour/opacity-only
-   hovers survive.
-   THE CARD'S HALF OF THIS BLOCK MOVED WITH THE CARD. `.cardSurface`, the
-   two `.cell:*` lifts, `.photo`, `.hoverBlurb` and the `.cardBtn` family
-   are all answered by VenueCard.module.css's own reduced-motion block now.
-   What is left here is the expansion's single control, which is the one
-   piece of this chapter's motion the card does not own. */
-@media (prefers-reduced-motion: reduce) {
-  /* the expansion's action keeps its colour shift only — no swell, no
-     press scale. */
-  .panelAction,
-  .panelAction:hover,
-  .panelAction:active {
-    transform: none;
-    transition:
-      background-color 200ms ease,
-      border-color 200ms ease,
-      color 200ms ease;
-  }
-}
+/* ---------- reduced motion: NOTHING IS LEFT FOR IT HERE ----------
+   This chapter's whole reduced-motion block is now answered elsewhere, and
+   the file is better for it. `.cardSurface`, the two `.cell:*` lifts,
+   `.photo`, `.hoverBlurb` and the `.cardBtn` family went with the card, to
+   VenueCard.module.css's own reduced-motion block. The last rule standing
+   here pinned the transform on `.panelAction` — the expansion's annatto
+   pill — and that control is retired: the expansion wears the card's two
+   pills now, so the card's block answers for it along with everything else
+   it paints. The expansion's own motion is declined in the COMPONENT, off
+   `useReducedMotion` — the morph is swapped for a crossfade and the
+   furniture's delay drops to zero — because it is spring and variant work
+   rather than anything a stylesheet can pin.
+   ⚠️ ONE THING IS NOT DECLINED, and it predates this pass: the block's
+   16px entrance rise is stated inline on `.expandBody` and is NOT gated on
+   `reduce`. Small, but it is motion under a preference that asked for
+   none. Gate it in the component, not with a rule here — an inline
+   `transform` from framer beats any stylesheet. */

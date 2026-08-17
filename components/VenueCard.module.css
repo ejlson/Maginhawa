@@ -1161,6 +1161,42 @@
   background: color-mix(in srgb, var(--cream) 24%, transparent);
 }
 
+/* ---------- the story, printed above the rule ---------- */
+/* THE EXPANSION'S ROW, and only ever the expansion's: the card shows the
+   same copy on hover, over the picture (.hoverBlurb above), because a card
+   at 346px has no height to spend on it. Pass `story` and it becomes a real
+   row of the block's flex column — the hairline and the foot below simply
+   move down.
+
+   CLAMPED TO THREE LINES. This is content-length copy in a block whose
+   height is a share of a card whose height comes from the window: on a
+   short viewport the longest blurb would push the controls off the ramp and
+   into the picture. Three lines and an ellipsis reads as an excerpt; a
+   fourth line cut by `overflow: hidden` reads as a bug. Nothing is lost —
+   the whole story is on the venue's own page, which is where the pill under
+   this goes.
+
+   NO MEASURE CAP. Every other line in this block runs the block's own
+   width, and a paragraph stopping short of a hairline drawn under it reads
+   as a mistake rather than as a measure. The block is ~558px on the
+   expansion, i.e. ~65 characters at this size — wide for body copy, and
+   acceptable for three lines of it. */
+.blockStory {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-weight: var(--w-regular);
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
+  /* full cream, where the tagline above is mixed down: this is the line the
+     reader is actually here to read */
+  color: var(--cream);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+}
+
 /* ---------- the block's hairline ---------- */
 /* It closes the facts and opens the controls. A REAL ELEMENT rather than
    a border on the action row: the row below is the last child of a flex
@@ -1177,9 +1213,11 @@
 }
 
 /* ---------- the controls ---------- */
-/* TWO SMALL PILLS, SIZED TO CONTENT. They do not stretch: a full-width
-   control on a 242px block reads as a form's submit button, and the card
-   is not a form. */
+/* UP TO THREE SMALL PILLS, SIZED TO CONTENT. They do not stretch: a
+   full-width control on a 242px block reads as a form's submit button, and
+   the card is not a form. Below a 340px card the ROW stretches — see the
+   container query at the foot of this file — but the pills inside it never
+   do; the row is stretched to seat the group, not the buttons. */
 .actionRow {
   display: flex;
   align-items: center;
@@ -1236,10 +1274,12 @@
     color 400ms var(--ease-drawer);
 }
 
-/* THE SECONDARY — a cream OUTLINE. It is the "Menu" control and it only
-   exists on the venues that carry `menuPages`; the others render NOTHING
-   in this slot, because a "Menu" pill on a venue with no menu on file is
-   the dead control this design forbids.
+/* THE SECONDARIES — a cream OUTLINE, and there are now two of them:
+   "Menu", which exists only on the venues that carry `menuPages`, and
+   "Visit", which exists only where the primary action is not already the
+   venue's own site (see the derivation in VenueCard.tsx). Neither renders
+   where it has nothing behind it, because a control that goes nowhere — or
+   twice to the same place — is the dead control this design forbids.
    42% is the weight at which an outline reads as a control rather than as
    a disabled state: below ~35% on this ramp it stops being a boundary and
    starts being a smudge. Its own label is at full cream, which is what
@@ -1294,6 +1334,129 @@
 .cardBtn:active {
   transform: scale(0.97);
   transition-duration: 120ms;
+}
+
+/* ---------- the block, one size up ---------- */
+/* ═══ THE SAME BLOCK ON A CARD TWICE THE SIZE, and it is a scale and
+   NOTHING ELSE. Every colour, weight, tracking, ellipsis and flex
+   relationship above is the one description of this block; what follows
+   restates the SIZES and not one other property. Add a colour here and
+   there are two blocks again, which is the thing this whole pass deleted.
+
+   WHO WEARS IT: the home page's expansion — press a card and it morphs into
+   a 610 × 814 portrait modal carrying this block (Discover.module.css,
+   `.expandBody`). Nothing else. The card wears the rules above at their
+   ceilings.
+
+   ⚠️ IT IS A DESCENDANT SELECTOR ON PURPOSE, and it has to be. Both this
+   and the rules it overrides are single-class selectors, so with a bare
+   `.blockLarge` variant the winner would be decided by which of two CSS
+   modules the bundler happened to emit second — i.e. by import order in a
+   file neither stylesheet can see. `.blockLarge .venueName` is (0,2,0)
+   against (0,1,0) and cannot lose.
+
+   THE UNIT IS `min(vh, cqi)`, AND BOTH TERMS ARE LOAD-BEARING. The card
+   above is sized against a COLUMN, so its type is sized in cqi against its
+   own container. The expansion is sized against the WINDOW'S HEIGHT
+   (`height: min(100%, 860px)`, the width falling out of the aspect), so vh
+   is the term that tracks it — but vh ALONE is wrong on a phone, and this
+   shipped wrong once: below 700px the expansion stops being a 3:4 box and
+   fills the stage (358px on a 390×844 window, i.e. no wider than the grid
+   card), while 844px of viewport height held every vh term at its ceiling.
+   The block was drawn at desktop sizes on a card-width column, and the
+   tagline and the address both lost their tails to the ellipsis the card
+   only has because its column is ~163px. `min()` lets the SMALLER
+   constraint win: the block grows with the window's height until its own
+   measure says no. The cqi terms are set so that at the phone's ~326px
+   measure each line lands back on the CARD'S size, which is the size that
+   is known to fit there.
+
+   ⚠️ THE cqi IS THE BLOCK'S OWN, and it only resolves because
+   `.expandBody` declares `container-type: inline-size` (Discover.module.css).
+   The card's `.cardSurface` is a container too, but no `.blockLarge` ever
+   renders inside one, so the two never compete for the nearest ancestor.
+   Drop that declaration and every cqi term below resolves against the small
+   viewport instead — silently, and wrongly, since the viewport is ~4× the
+   block on desktop.
+
+   THE CEILINGS ARE ~1.4× THE CARD'S, which is the ratio of the two cards'
+   widths less a little: the block should read as the same object one size
+   up, not as a poster.
+
+   ⚠️ THE RAMP IS TUNED ON THIS BLOCK'S HEIGHT. The number that matters is
+   f = (rampH − blockH) / rampH — how much of the gradient sits under the
+   block's FIRST line, and therefore how much ink the venue's name has. The
+   card's own is 0.37. Measured against the expansion's 55% ramp with the
+   sizes below: 0.48 at 1440×900 (block 233px in a 447px ramp), 0.48 at
+   1440×1440, 0.47 at 1280×720, and 0.47 on a 390×844 phone, where the story
+   takes a third line. The block holds ~29% of the card at all four, which
+   is the `min()` above doing its job — before the cqi term it was 34% on
+   the phone and f fell to 0.39. Grow any size here, or let the story run to
+   a fourth line, and re-measure. ═══ */
+.blockLarge .venueName {
+  font-size: clamp(1.125rem, min(2.7vh, 5.2cqi), 1.625rem);
+}
+
+.blockLarge .venueTag {
+  font-size: clamp(0.8125rem, min(2vh, 4cqi), 1.1875rem);
+}
+
+/* a step BELOW the tagline above it, not above: the tagline is the
+   standfirst and this is the copy under it. They are told apart by colour
+   as well — the tagline is mixed down, this is full cream. */
+.blockLarge .blockStory {
+  font-size: clamp(0.8125rem, min(1.9vh, 4.1cqi), 1.0625rem);
+}
+
+.blockLarge .addrLine,
+.blockLarge .statValue {
+  font-size: clamp(0.75rem, min(1.85vh, 3.7cqi), 1.0625rem);
+}
+
+/* THE ADDRESS MAY WRAP HERE, AND ONLY HERE. The card forbids it outright —
+   a line that reflows makes one card in the grid a row taller than the
+   seven beside it, which is worse than a lost tail. Nothing shares this
+   card's height: it is one modal on a backdrop. So on the narrow card,
+   where the expansion prints the whole address on ONE line (`location`,
+   the chapter's single-line form) in a column no wider than the grid
+   card's, the line takes a second row instead of losing its postcode. */
+.blockLarge .addrLine {
+  white-space: normal;
+}
+
+.blockLarge .statIcon {
+  width: clamp(11px, min(1.7vh, 3.4cqi), 15px);
+  height: clamp(11px, min(1.7vh, 3.4cqi), 15px);
+}
+
+.blockLarge .stat {
+  gap: clamp(3px, 0.9cqi, 5px);
+}
+
+.blockLarge .statRule {
+  height: clamp(10px, min(1.8vh, 3.7cqi), 16px);
+  margin: 0 clamp(5px, min(1.1vh, 2.2cqi), 10px);
+}
+
+.blockLarge .cardBtn {
+  min-height: clamp(26px, min(4.6vh, 9.2cqi), 44px);
+  font-size: clamp(0.6875rem, min(1.7vh, 3.7cqi), 1rem);
+}
+
+/* the two lockups open up with everything else — at 1px the leading of the
+   larger type closes them back into one line */
+.blockLarge .blockWho,
+.blockLarge .addr {
+  row-gap: clamp(1px, 0.4cqi, 2px);
+}
+
+.blockLarge .blockHead,
+.blockLarge .blockFoot {
+  gap: clamp(8px, min(1.8vh, 3.7cqi), 18px);
+}
+
+.blockLarge .actionRow {
+  gap: clamp(6px, min(1.2vh, 2.5cqi), 12px);
 }
 
 /* ---------- visually hidden ---------- */
@@ -1360,6 +1523,64 @@
    declaration to `.square` for anything this block also sets —
    `.square .glass` (0,2,0) would beat `.glass` (0,1,0) in here and the
    narrow card would silently lose its override. ═══ */
+
+/* ---------- the foot STACKS before the card is narrow ---------- */
+/* ═══ THREE CONTROLS DO NOT FIT BESIDE AN ADDRESS, AND THEY STOP FITTING
+   LONG BEFORE THE CARD IS "NARROW" ═══
+
+   The foot's job above this query is address at the left, controls at the
+   right. That survived two controls and does not survive three: with
+   "Visit" now on the bookable venues the widest row is Menu + Visit +
+   Book, which measures 163px plus two gaps at the base pill size. The
+   block's measure is the card's width less its two 16px insets, so:
+
+     card 345 (1440, 4-up)   foot 321   addr gets 130   ✓ 111 needed
+     card 320                foot 296   addr gets 105   the exact edge
+     card 285 (1200, 4-up)   foot 261   addr gets  71   "93 Kentish …"
+     card 264 (860, 3-up)    foot 240   addr gets  74   "London NW1 …"
+
+   — i.e. every width from about 320px down loses the street the card is
+   supposed to be printing. 340 IS THE THRESHOLD AND NOT 250: the query
+   below it exists for a card so small the type and the sticker have to
+   come down too, and this has nothing to do with that. Two questions, two
+   queries. (250 is inside 340, so a card that small stacks as well and
+   then also shrinks; the two blocks set disjoint properties, so their
+   order between themselves does not matter.)
+
+   STACKING COSTS A ROW, AND IT IS THE ONLY LEVER THAT PAYS HERE. The
+   alternatives were measured and refused: shrinking the pills to fit needs
+   ~39px off three of them, which is 0.55em of side padding and turns them
+   into chips (the note on .cardBtn is explicit that they stay pills); and
+   letting the address ellipsise is the defect being fixed.
+
+   ⚠️ IT IS UNCONDITIONAL, AND THAT IS THE POINT. Only three venues carry
+   three pills, and stacking only those three would put the hairline and
+   the control row at two different heights across one grid — the masonry
+   the card was rebuilt to end. Every venue has at least one control, so
+   every card gains exactly one row and the eight stay identical. Do not
+   make this `:has()` on the row's child count. */
+@container card (max-width: 340px) {
+  .blockFoot {
+    flex-direction: column;
+    align-items: stretch;
+  }
+  /* THE GROUP STAYS FLUSH RIGHT, on the block's own padding — where the
+     controls sit at every other width, and where the stats above close
+     their row too. The stacked foot is full-width, so `justify-content` is
+     what seats it. */
+  .actionRow {
+    justify-content: flex-end;
+  }
+  /* AND THE AUTO MARGIN HAS TO GO WITH IT. `margin-left: auto` on the
+     primary is what pushes it clear of its siblings while the row is
+     content-sized; on a full-width row it has real free space to eat and
+     it would tear the group in two — Menu and Visit against the left edge,
+     Book against the right. The extra selector is only to outrank the base
+     rule further up the file. */
+  .blockFoot .actionRow > :last-child:not(:first-child) {
+    margin-left: 0;
+  }
+}
 
 /* ---------- the block on a NARROW card ---------- */
 /* THE 4-UP COLUMN IS THE HARD CASE. At the 981px breakpoint the home card

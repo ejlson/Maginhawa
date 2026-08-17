@@ -92,7 +92,7 @@ await s(600);
 
 const before = await state();
 await page.mouse.move(box.aim.x, box.aim.y);
-await s(1600); // past --cta-dur (950ms) and the arrow's 74% delay + 340ms
+await s(1600); // past --cta-dur (700ms) and the arrow's 74% delay + 340ms
 const after = await state();
 
 console.log("aimed at", box.aim, "— pill is at", box.pill);

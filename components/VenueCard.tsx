@@ -171,35 +171,12 @@ export default function VenueCard({
 }: VenueCardProps) {
   const reduce = useReducedMotion();
 
-  /* ONE read of the canonical record for the card's one ACTION. It comes
-     from the data rather than from the page, which is the whole point of
-     primaryAction(): a parlour does not get a Book pill and does not get
-     nothing either. */
-  const rest = getRestaurant(item.slug);
-  const action = rest ? primaryAction(rest) : null;
-
-  /* THE SECOND CONTROL, and it renders only where there is something
-     behind it — both a menu on file AND somewhere for the page to send
-     it. Half the venues carry `menuPages`; the rest render one control
-     and that asymmetry costs nothing structurally, because both pills are
-     the same height and the block's height is identical either way (the
-     probe asserts the eight heights agree to within a pixel). */
-  const hasMenu = Boolean(item.menuPages && item.menuPages.length > 0);
-  const menu = hasMenu && (onMenu || menuHref) ? "Menu" : null;
-
-  /* THE TWO STATS, right of the address. Each is an icon and a value and
-     NOTHING ELSE — no "Per head", no "Today" beneath them. Those labels
-     were 40–55px of type sitting under two values on the one side of the
-     block that could afford to give width back to the address, and
-     "Today" claimed live opening data this codebase does not have.
-     A venue with neither datum renders no stats at all and the address
-     takes the whole measure. */
-  const stats = (
-    [
-      ["price", item.priceRange],
-      ["hours", item.hours],
-    ] as ["price" | "hours", string | undefined][]
-  ).filter((s): s is ["price" | "hours", string] => Boolean(s[1]));
+  /* THE BLOCK'S OWN DERIVATIONS — the action, the menu control and the two
+     stats — MOVED INTO <VenueBlock> with the markup that prints them. The
+     home page's expansion renders that block too now, and a derivation left
+     up here would have had to be done a second time over there, which is
+     exactly how the expansion came to disagree with the card in the first
+     place. See the banner on VenueBlock. */
 
   /* ── HOVER FILM ──
      NOTHING HERE MAY RE-RENDER THIS CARD. On the home grid the seat above
@@ -435,114 +412,256 @@ export default function VenueCard({
           Pointer-transparent so the card underneath stays pressable; the
           controls inside take their clicks back. */}
       <motion.div className={styles.glass} {...glassMotion}>
-        {/* THE STORY, on hover/focus — cream copy seated just above this
-            block's top edge, over the hover shade's band. A child of the
-            BLOCK rather than of .cardTop, so `bottom: calc(100% + …)`
-            measures from the block's top edge with nothing having to know
-            how tall the block is. That is what lets one rule serve a
-            portrait card and a square one. */}
-        {blurb ? (
-          <span className={styles.hoverBlurb} aria-hidden>
-            {blurb}
+        <VenueBlock
+          item={item}
+          hoverBlurb={blurb}
+          /* TWO LINES, and they are the CARD'S form of the address: each is
+             nowrap+ellipsis on a ~163px column, so a line too long loses its
+             tail rather than reflowing the block to an extra row and
+             breaking the grid's shared card height. The expansion passes ONE
+             line, because it has the measure for the full address. */
+          addressLines={[item.address.road, item.address.city]}
+          onMenu={onMenu}
+          menuHref={menuHref}
+          actionMotion={actionMotion}
+        />
+      </motion.div>
+    </div>
+  );
+}
+
+/* ═══════════════════ THE BLOCK, AND BOTH OBJECTS WEAR IT ═══════════════
+   The type that stands ON the ramp: who this is, the two facts about it, a
+   hairline, then where it is and what to do. It carries NO material of its
+   own — the ramp above is the ground, and a second one stacked here would
+   put back the one thing the ramp exists to remove, a locatable edge.
+
+   IT IS A COMPONENT BECAUSE THE HOME PAGE'S EXPANSION RENDERS IT TOO. Press
+   a card on the home grid and it morphs into a portrait modal; that modal
+   used to print a SECOND, unrelated design of the same facts — the venue's
+   name in the display face, a mono "EST. 1987 · FILIPINO FUSION RESTAURANT
+   · ££" strip, no stats, no hairline, a green pill and an underlined text
+   link. Two designs of one object, and the drift showed: the expansion's
+   descriptor came from a per-page copy table that had gone stale against
+   the canonical `tagline` on two venues. The expansion is the card OPENED,
+   so it is now the card's block at the card's proportions, one size up.
+
+   IT RETURNS A FRAGMENT, NOT A WRAPPER. `.hoverBlurb` is seated with
+   `bottom: calc(100% + …)` against the BLOCK'S top edge, and the two rows
+   are flex children of it — an element in between would break both. The
+   page owns the box: the card's is `.glass`, the expansion's is
+   `.expandBody`, and the expansion adds `.blockLarge` for the scale.
+
+   THE THREE DERIVATIONS BELOW ARE THE WHOLE REASON THIS IS SHARED. The
+   action comes from the canonical record rather than from the page (that is
+   what primaryAction() is for), the menu control renders only where there
+   is both a menu on file and somewhere to send it, and the stats drop out
+   individually. Done twice, they are two chances to disagree. */
+export function VenueBlock({
+  item,
+  hoverBlurb,
+  story,
+  addressLines,
+  onMenu,
+  menuHref,
+  actionMotion = {},
+}: {
+  item: VenueCardItem;
+  /** the story ON HOVER, seated above the block over the shade's band —
+   *  the card's form of it. The expansion has the height to print it
+   *  outright and passes `story` instead. */
+  hoverBlurb?: string;
+  /** the story PRINTED, as a row above the hairline. The expansion only:
+   *  the card has no room for it and shows it on hover. */
+  story?: string;
+  /** the address, one entry per line. Every line is nowrap+ellipsis. */
+  addressLines: string[];
+  onMenu?: () => void;
+  menuHref?: string;
+  actionMotion?: MotionProps;
+}) {
+  /* ONE read of the canonical record for the block's one ACTION. It comes
+     from the data rather than from the page, which is the whole point of
+     primaryAction(): a parlour does not get a Book pill and does not get
+     nothing either. */
+  const rest = getRestaurant(item.slug);
+  const action = rest ? primaryAction(rest) : null;
+
+  /* THE SECOND CONTROL, and it renders only where there is something
+     behind it — both a menu on file AND somewhere for the page to send
+     it. Half the venues carry `menuPages`; the rest render one control
+     and that asymmetry costs nothing structurally, because both pills are
+     the same height and the block's height is identical either way (the
+     probe asserts the eight heights agree to within a pixel). */
+  const hasMenu = Boolean(item.menuPages && item.menuPages.length > 0);
+  const menu = hasMenu && (onMenu || menuHref) ? "Menu" : null;
+
+  /* THE VENUE'S OWN SITE, AS A CONTROL OF ITS OWN, at the user's
+     instruction: every card offers a way through to the restaurant's
+     website, not just the four that primaryAction() happens to resolve
+     `Visit` for.
+
+     IT IS DERIVED, NOT DUPLICATED, and the condition is the whole point.
+     primaryAction() ALREADY sends four of the eight to `r.website` — the
+     three walk-in rooms as "Visit" and Bunso as "Opening soon" — so an
+     unconditional pill would put two controls with one destination on half
+     the grid, which is the dead-control rule this block already keeps for
+     "Menu". Comparing the HREF rather than the label is what makes that
+     hold when the labels change: the note on primaryAction() says "Visit"
+     is a holding label and the intended words are "Order" and "Find us",
+     and on the day those land this line still suppresses the duplicate.
+
+     So in practice it renders on the four BOOKABLE venues, which are
+     exactly the ones whose one action was a booking host and whose own
+     site was unreachable from the card. */
+  const visit =
+    rest?.website && rest.website !== action?.href
+      ? { label: "Visit", href: rest.website }
+      : null;
+
+  /* THE TWO STATS, right of the name. Each is an icon and a value and
+     NOTHING ELSE — no "Per head", no "Today" beneath them. Those labels
+     were 40–55px of type sitting under two values on the one side of the
+     block that could afford to give width back to the address, and
+     "Today" claimed live opening data this codebase does not have.
+     A venue with neither datum renders no stats at all and the name
+     takes the whole measure. */
+  const stats = (
+    [
+      ["price", item.priceRange],
+      ["hours", item.hours],
+    ] as ["price" | "hours", string | undefined][]
+  ).filter((s): s is ["price" | "hours", string] => Boolean(s[1]));
+
+  return (
+    <>
+      {/* THE STORY, on hover/focus — cream copy seated just above this
+          block's top edge, over the hover shade's band. A child of the
+          BLOCK rather than of .cardTop, so `bottom: calc(100% + …)`
+          measures from the block's top edge with nothing having to know
+          how tall the block is. That is what lets one rule serve a
+          portrait card and a square one. */}
+      {hoverBlurb ? (
+        <span className={styles.hoverBlurb} aria-hidden>
+          {hoverBlurb}
+        </span>
+      ) : null}
+
+      {/* ═══ THE ADDRESS AND THE STATS, SIDE BY SIDE.
+
+          THE MEASURE IS THE WHOLE PROBLEM. On the narrowest 4-up column
+          the block's measure is ~163px and the address lines run to 19
+          characters ("157 Kentish Town Rd"). What closed it, in the
+          order each is worth:
+            1. the PRICE datum — the real `££` rather than an invented
+               `£25–40`: ~27px, and it cost nothing.
+            2. the stats' own gutters, both halved.
+            3. `min-width: 0` on the address column. THE SILENT KILLER: a
+               flex item's `min-width` is `auto`, i.e. its content's
+               min-content size, so without it the column refuses to
+               shrink and pushes the stats off the block. Every ellipsis
+               below is inert without it.
+            4. the labels, which go anyway.
+          The per-venue proof is the clip table in
+          scripts/probe-square-cards.mjs. ═══ */}
+      {/* ═══ ABOVE THE RULE: WHO THIS IS ═══
+          The name, and under it what the room actually is. At the user's
+          instruction, and it is the change that stops eight cards reading
+          as one address printed eight times: `tagline` is a per-venue
+          line that already existed in lib/restaurants.ts and was only
+          ever shown in the home grid's hover expansion, so a reader on
+          touch — or anyone who did not hover — met a set of near-identical
+          Kentish Town addresses with no way to tell a ramen bar from an
+          ice cream parlour. */}
+      <div className={styles.blockHead}>
+        <span className={styles.blockWho}>
+          <span className={styles.venueName}>{item.name}</span>
+          {item.tagline ? (
+            <span className={styles.venueTag}>{item.tagline}</span>
+          ) : null}
+        </span>
+
+        {/* THE STATS STAY ABOVE THE RULE AND CLOSE THE ROW, at the user's
+            instruction: price and hours are FACTS about the room, so they
+            belong with its name rather than with its address. It also
+            keeps the block short — carried under the address they added a
+            third row to the left column and pushed the block to 55% of
+            the card. */}
+        {stats.length > 0 ? (
+          <span className={styles.stats}>
+            {stats.map(([key, value], si) => (
+              <Fragment key={key}>
+                {si > 0 ? (
+                  <span className={styles.statRule} aria-hidden />
+                ) : null}
+                {/* data-stat, not a position: the narrow card sheds one
+                    of these and the pair is conditional, so a venue with
+                    no price makes hours the FIRST child and a positional
+                    rule would take the wrong one. */}
+                <span className={styles.stat} data-stat={key}>
+                  {key === "price" ? <PriceGlyph /> : <HoursGlyph />}
+                  <span className={styles.srOnly}>
+                    {key === "price" ? "Price range " : "Opening hours "}
+                  </span>
+                  <span className={styles.statValue}>{value}</span>
+                </span>
+              </Fragment>
+            ))}
           </span>
         ) : null}
+      </div>
 
-        {/* ═══ THE ADDRESS AND THE STATS, SIDE BY SIDE.
+      {/* THE STORY, PRINTED — and it sits ON TOP OF THE RULE, at the user's
+          instruction. The card has no room for it and shows it on hover
+          over the picture (`hoverBlurb` above); the expansion is the same
+          block on a card twice the height, and the height it gains is spent
+          here. It is a row of the block's own flex column rather than
+          anything absolutely seated, so the hairline and the foot simply
+          move down by however many lines the copy runs to. */}
+      {story ? <p className={styles.blockStory}>{story}</p> : null}
 
-            THE MEASURE IS THE WHOLE PROBLEM. On the narrowest 4-up column
-            the block's measure is ~163px and the address lines run to 19
-            characters ("157 Kentish Town Rd"). What closed it, in the
-            order each is worth:
-              1. the PRICE datum — the real `££` rather than an invented
-                 `£25–40`: ~27px, and it cost nothing.
-              2. the stats' own gutters, both halved.
-              3. `min-width: 0` on the address column. THE SILENT KILLER: a
-                 flex item's `min-width` is `auto`, i.e. its content's
-                 min-content size, so without it the column refuses to
-                 shrink and pushes the stats off the block. Every ellipsis
-                 below is inert without it.
-              4. the labels, which go anyway.
-            The per-venue proof is the clip table in
-            scripts/probe-square-cards.mjs. ═══ */}
-        {/* ═══ ABOVE THE RULE: WHO THIS IS ═══
-            The name, and under it what the room actually is. At the user's
-            instruction, and it is the change that stops eight cards reading
-            as one address printed eight times: `tagline` is a per-venue
-            line that already existed in lib/restaurants.ts and was only
-            ever shown in the home grid's hover expansion, so a reader on
-            touch — or anyone who did not hover — met a set of near-identical
-            Kentish Town addresses with no way to tell a ramen bar from an
-            ice cream parlour. */}
-        <div className={styles.blockHead}>
-          <span className={styles.blockWho}>
-            <span className={styles.venueName}>{item.name}</span>
-            {item.tagline ? (
-              <span className={styles.venueTag}>{item.tagline}</span>
-            ) : null}
-          </span>
+      {/* the hairline. A real element rather than a border on the row
+          below it, because that row is the last child of a flex column
+          and a border would travel with it, leaving the rule against the
+          controls instead of closing the facts. */}
+      <span className={styles.blockRule} aria-hidden />
 
-          {/* THE STATS STAY ABOVE THE RULE AND CLOSE THE ROW, at the user's
-              instruction: price and hours are FACTS about the room, so they
-              belong with its name rather than with its address. It also
-              keeps the block short — carried under the address they added a
-              third row to the left column and pushed the block to 55% of
-              the card. */}
-          {stats.length > 0 ? (
-            <span className={styles.stats}>
-              {stats.map(([key, value], si) => (
-                  <Fragment key={key}>
-                    {si > 0 ? (
-                    <span className={styles.statRule} aria-hidden />
-                  ) : null}
-                    {/* data-stat, not a position: the narrow card sheds one
-                        of these and the pair is conditional, so a venue with
-                        no price makes hours the FIRST child and a positional
-                        rule would take the wrong one. */}
-                  <span className={styles.stat} data-stat={key}>
-                      {key === "price" ? <PriceGlyph /> : <HoursGlyph />}
-                    <span className={styles.srOnly}>
-                        {key === "price" ? "Price range " : "Opening hours "}
-                      </span>
-                    <span className={styles.statValue}>{value}</span>
-                    </span>
-                  </Fragment>
-                ))}
-              </span>
-          ) : null}
-        </div>
+      {/* ═══ BELOW THE RULE: WHERE IT IS, AND WHAT TO DO ═══
+          Address at the left, controls at the right, at the user's
+          instruction. The two used to sit on opposite sides of the rule —
+          facts above, actions below — and this puts them on one line
+          instead, which is what lets the name and its description own the
+          whole of the block's top half. */}
+      <div className={styles.blockFoot}>
+        <p className={styles.addr}>
+          {/* THE PAGE DECIDES HOW MANY LINES. The card splits the postal
+              address in two because its column is ~163px wide; the
+              expansion passes the single line its own record words (the
+              one venue with two sites is why that line is written out
+              rather than joined from the address). Either way each line is
+              `white-space: nowrap` with its own ellipsis — a line too long
+              loses its tail rather than reflowing the block to an extra row
+              and breaking the grid's shared card height. */}
+          {addressLines.map((line) => (
+            <span key={line} className={styles.addrLine}>
+              {line}
+            </span>
+          ))}
+        </p>
 
-        {/* the hairline. A real element rather than a border on the row
-            below it, because that row is the last child of a flex column
-            and a border would travel with it, leaving the rule against the
-            controls instead of closing the facts. */}
-        <span className={styles.blockRule} aria-hidden />
-
-        {/* ═══ BELOW THE RULE: WHERE IT IS, AND WHAT TO DO ═══
-            Address at the left, controls at the right, at the user's
-            instruction. The two used to sit on opposite sides of the rule —
-            facts above, actions below — and this puts them on one line
-            instead, which is what lets the name and its description own the
-            whole of the block's top half. */}
-        <div className={styles.blockFoot}>
-          <p className={styles.addr}>
-            {/* TWO LINES NOW, NOT THREE: the venue's name has moved above
-                the rule, so this is the postal address alone. Each line is
-                still `white-space: nowrap` with its own ellipsis — a line
-                too long for the card loses its tail rather than reflowing
-                the block to an extra row and breaking the grid's shared
-                card height. */}
-            <span className={styles.addrLine}>{item.address.road}</span>
-            <span className={styles.addrLine}>{item.address.city}</span>
-          </p>
-
-        {/* THE CONTROLS — two small pills, and NO ANNATTO ANYWHERE ON THE
-            CARD. The ramp under these is photo-derived, so its hue moves
-            from card to card and a fixed chromatic fill sat wrong on half
-            the grid. Cream is the one ink that reads on every one.
-            Secondary (outline) left, primary (fill) right; the primary is
+        {/* THE CONTROLS — up to three small pills, and NO ANNATTO ANYWHERE
+            ON THE CARD. The ramp under these is photo-derived, so its hue
+            moves from card to card and a fixed chromatic fill sat wrong on
+            half the grid. Cream is the one ink that reads on every one.
+            Secondaries (outline) left, primary (fill) right; the primary is
             pushed right by `margin-left: auto` ONLY when it has a sibling
-            (see the rule). */}
-        {action || menu ? (
+            (see the rule).
+
+            ⚠️ THREE OF THESE DO NOT FIT BESIDE THE ADDRESS below about a
+            320px card, so the foot stacks from 340 down — see the container
+            query in VenueCard.module.css. Add a fourth control and that
+            threshold has to be re-measured, not guessed. */}
+        {action || menu || visit ? (
           <motion.div className={styles.actionRow} {...actionMotion}>
             {menu ? (
               menuHref ? (
@@ -564,6 +683,24 @@ export default function VenueCard({
                 </button>
               )
             ) : null}
+            {/* THE SITE, BETWEEN THE MENU AND THE BOOKING. A second OUTLINE
+                pill, not a second fill: the row still has exactly one thing
+                in it a reader is meant to press first, and two cream fills
+                on one ramp would be two primaries. Its place in the order is
+                the reading order of the decision — what's on, where it is,
+                then book it. Always external, because the only href it can
+                ever carry is the venue's own site. */}
+            {visit ? (
+              <a
+                href={visit.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${styles.cardBtn} ${styles.cardBtnGhost}`}
+                aria-label={`Visit ${item.name}'s website`}
+              >
+                {visit.label}
+              </a>
+            ) : null}
             {action ? (
               <a
                 href={action.href}
@@ -578,8 +715,7 @@ export default function VenueCard({
             ) : null}
           </motion.div>
         ) : null}
-        </div>
-      </motion.div>
-    </div>
+      </div>
+    </>
   );
 }

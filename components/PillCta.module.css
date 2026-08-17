@@ -225,8 +225,22 @@
      Below about 700ms the relax stops reading as surface tension and starts
      reading as a bounce, which is the thing the zero-overshoot spring
      everywhere else on this site is written to avoid. Do not go under it
-     without re-fitting linear() itself. */
-  --cta-dur: 760ms;
+     without re-fitting linear() itself.
+
+     ── 700ms NOW, DOWN FROM 760, at the user's instruction ──
+     The same speed-up-not-a-rewrite move a second time, and this lands ON
+     the floor the paragraph above names rather than through it. The curve
+     is untouched, so every stage keeps its share of the clock:
+       approach  0 → 55%    385ms
+       fuse     55 → 80%    175ms
+       relax    80 → 96%    112ms
+       settled  96 → 100%    28ms
+     THIS IS THE END OF THE ROAD FOR A BARE NUMBER CHANGE. 700 is the value
+     the note above was written to protect; the next request for a faster
+     merge has to re-fit linear() so the relax keeps its milliseconds while
+     the approach gives up more of its own, and that is a different edit
+     from this one. Do not simply type a smaller number here. */
+  --cta-dur: 700ms;
 
   /* ── THE FUSION CURVE ──
      Two droplets do not meet at a constant speed. They drift, they touch,

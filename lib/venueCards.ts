@@ -67,7 +67,7 @@ export type VenueCardItem = {
    *  rather than read. */
   tagline?: string;
   address: VenueAddress;
-  priceRange?: string;
+  // priceRange?: string;
   hours?: string;
   /** secondary credential mark — the Michelin sticker, top-right */
   badge?: string;
@@ -82,7 +82,7 @@ type Extras = {
   hours?: string;
   /** ONLY where the canonical record has no price, or disagrees with what
    *  the card has shipped — see the note on `price` in venueCards() */
-  priceRange?: string;
+  // priceRange?: string;
   focal?: string;
   badge?: string;
   badgeLabel?: string;
@@ -123,7 +123,7 @@ const EXTRAS: Record<string, Extras> = {
       city: "& 32 Newport, Chinatown",
     },
     hours: "12–11",
-    priceRange: "£",
+    // priceRange: "£",
     /* the shopfront is 4032x6048 (2:3); `cover` scales it to the card's
        width and crops the height, and the MAMASONS fascia sits high in
        the frame. 40% opens the window above the default centre so the
@@ -141,7 +141,7 @@ const EXTRAS: Record<string, Extras> = {
       city: "London NW1 8NY",
     },
     hours: "12–11",
-    priceRange: "£",
+    // priceRange: "£",
   },
   cafemama: {
     address: {
@@ -150,7 +150,7 @@ const EXTRAS: Record<string, Extras> = {
       city: "London NW1 8NY",
     },
     hours: "12–11",
-    priceRange: "£",
+    // priceRange: "£",
   },
   belly: {
     address: {
@@ -164,7 +164,7 @@ const EXTRAS: Record<string, Extras> = {
        re-pricing a Michelin-selected bistro on two pages at once. One of
        the two is wrong and it is a question for the group, not for a
        stylesheet — fix lib/restaurants.ts and delete this line. */
-    priceRange: "£££",
+    // priceRange: "£££",
     badge: "/logo/michelin-2026-round.png",
     badgeLabel: "Michelin Selected Restaurant 2026",
   },
@@ -205,7 +205,6 @@ export function venueCard(slug: string): VenueCardItem | null {
     logo: r.logo,
     address: x.address,
     // the extras win where they speak at all — see belly's note
-    priceRange: x.priceRange ?? r.priceRange,
     hours: x.hours,
     badge: x.badge,
     badgeLabel: x.badgeLabel,

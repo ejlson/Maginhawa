@@ -5,7 +5,7 @@
    HOW IT SAMPLES. It stretches --cta-dur to 12s on the control itself,
    hovers, and then waits for each frame BY READING THE CLIP-PATH rather
    than by counting milliseconds. The easing is a function of the fraction,
-   so a shape caught at p is the true shape at that point of the real 950ms
+   so a shape caught at p is the true shape at that point of the real 760ms
    move — 12× the slack on every sample.
 
    ⚠️ IT MUST NOT PACE OFF THE WALL CLOCK, and that is the whole reason

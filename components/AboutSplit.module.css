@@ -143,13 +143,12 @@
   height: 1px;
   background: var(--rule);
   margin-bottom: calc(var(--grid-gutter) * 4);
-  /* THE RULE DRAWS ITSELF as the chapter opens (see RULE in AboutSplit.tsx).
-     It scales from the LEFT because that is the direction the lines beneath
-     it are read in — origin `center` would make it open like a pair of
-     doors, which is a different and much louder gesture than a mark being
-     drawn. Declared here rather than passed as a Motion prop so the
-     geometry sits with the element it belongs to. */
-  transform-origin: left center;
+  /* NO `transform-origin` ANY MORE. It was here because the rule drew
+     itself from the left as the chapter opened (`scaleX: 0 → 1`); that
+     animation is removed at the user's instruction, so the property was
+     geometry for a transform nothing applies. Restore both together or
+     neither — an origin without the variant is dead, and the variant
+     without the origin opens the line like a pair of doors. */
 }
 
 .split {
@@ -174,6 +173,27 @@
 /* ── the picture ── */
 .media {
   position: relative;
+  /* ⚠️ THIS IS WHAT KEEPS THE SHADOW BELOW WHOLE, and it is not decoration.
+     --shadow-card throws --shadow-card-throw (16px) below its box; this
+     section gives the picture a 12px bottom mount and then ENDS. The next
+     element in the page is Blog's `.section`, which is `position: relative`
+     with `isolation: isolate` and an OPAQUE cream background — a positioned,
+     isolated box paints above a static one whatever the tree order, so it
+     was painting over the last 4px of the fade and cutting it with a hard
+     horizontal line the full width of the picture. A soft gradient stopped
+     dead is far more visible than the 4px it loses.
+
+     ONE z-index ON THE PICTURE, NOT ON THE SECTION. Raising the whole
+     section would put every one of its children above the journal; this
+     lifts the single element whose paint actually leaves the box. It sits
+     in the root stacking context (nothing between here and <main> creates
+     one), so z-index 1 clears Blog's `auto` while staying under
+     Reservations' 4 and the fixed nav.
+
+     Do NOT "fix" this by padding the section instead — all four sides of
+     this picture are --grid-gutter at the user's instruction, and a 28px
+     bottom to clear the shadow is the one thing that requirement forbids. */
+  z-index: 1;
   margin: 0;
   overflow: hidden;
   border-radius: var(--radius-tile);
