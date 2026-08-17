@@ -7,7 +7,7 @@ import type { Restaurant } from "./restaurants";
 import { RESTAURANTS } from "./restaurants";
 import { PRESS, pressForRestaurant } from "./press";
 
-const SITE_URL = "https://maginhawa.group"; // update if the production origin differs
+import { SITE_URL } from "./site";
 
 const orgSameAs = [
   "https://www.instagram.com/maginhawagroup/",
