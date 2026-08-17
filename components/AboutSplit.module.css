@@ -494,7 +494,15 @@
      room. Below ~1180px the vw term is what governs and they shrink with
      the column rather than overflowing it. */
   width: clamp(112px, 12.2vw, 180px);
-  aspect-ratio: 4 / 3;
+  /* 3:2, DOWN FROM 4:3, at the user's instruction — a little less tall.
+     THE WIDTH IS DELIBERATELY UNTOUCHED, so this is a change of CROP and
+     not of size: the three prints keep the row width the note above solves
+     for (3 × 180 + 2 × 12 = 564px inside a ~660px reading column at 1440)
+     and simply lose 11% of their height — 135px to 120px at the top of the
+     clamp. `object-fit: cover` on .doorImg means the photographs are
+     recropped rather than squashed, which is why the ratio is the right
+     knob here and a `height` would not be. */
+  aspect-ratio: 3 / 2;
   overflow: hidden;
   border-radius: var(--radius-tile);
   background: var(--placeholder);
@@ -502,9 +510,9 @@
      wide 28/44 cast the cards carry would pool under them rather than
      lift them */
   box-shadow: var(--shadow-card);
-  transition:
-    transform 260ms var(--ease-state),
-    box-shadow 260ms var(--ease-state);
+  /* NO `transition` HERE ANY MORE. It carried the hover lift and nothing
+     else; with that removed (see below) it was a declaration animating two
+     properties that never change. */
 }
 
 /* ⚠️ THE PRINT'S CLIP WINDOW, AND IT IS A SEPARATE ELEMENT FOR ONE HARD
@@ -530,17 +538,26 @@
   border-radius: inherit;
 }
 
-/* `.doorLabel` IS DELETED with the captions under the prints, at the user's
-   instruction. It was the only sighted affordance marking these as links —
-   see the note in AboutSplit.tsx. The hover lift below is now doing that
-   job alone, and it cannot do it on touch. */
+/* ── THE HOVER LIFT IS REMOVED, at the user's instruction ──
+   It was `translateY(-4px)` plus --shadow-card-hover on .doorFrame under
+   `@media (hover: hover)`, with the transition above driving it. The prints
+   now hold still under the pointer, like the chapter's photograph beside
+   them and the story band's frames above.
 
-@media (hover: hover) {
-  .door:hover .doorFrame {
-    transform: translateY(-4px);
-    box-shadow: var(--shadow-card-hover);
-  }
-}
+   ⚠️ SAY WHAT THIS COSTS, because it is the second affordance these links
+   have lost and the note it replaces predicted it. `.doorLabel` — the
+   caption under each print — was deleted earlier at the user's instruction,
+   and the comment here recorded that "the hover lift below is now doing
+   that job alone, and it cannot do it on touch". That job is now done by
+   nothing visual: the three prints are anchors into /restaurants/<slug>
+   with no caption, no lift and no other mark saying so. What is left is the
+   pointer cursor on hover and the focus ring below on keyboard — real, but
+   invisible to a reader who is simply looking at the page.
+
+   If these turn out to go unclicked, the LABEL is the thing to put back
+   rather than this lift; AboutSplit.tsx says the same beside DOORS. */
+
+
 
 .door:focus-visible {
   outline: 2px solid var(--maroon);
