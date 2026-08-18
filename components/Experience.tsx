@@ -7,6 +7,7 @@ import Menu from "./Menu";
 import Hero from "./Hero";
 import Manifesto from "./Manifesto";
 import AboutSplit from "./AboutSplit";
+import Passage from "./Passage";
 import Discover from "./Discover";
 import PressWall from "./PressWall";
 import Reservations from "./Reservations";
@@ -197,12 +198,15 @@ export default function Experience() {
               deliberately — do not treat this comment as a reason to keep
               it forever.
 
-              THE BAND THAT REPLACED IT IS NOT A SIBLING HERE. StoryStrip is
-              rendered INSIDE <Manifesto> so the statement and the
-              photographs can share one full-height screen — the claim
-              centred, the evidence on the bottom edge. Two sections cannot
-              divide one viewport between them without one knowing the
-              other's height, so the chapter owns both halves.
+              THE BAND THAT REPLACED IT IS NOW GONE TOO, at the user's
+              instruction. StoryStrip was rendered INSIDE <Manifesto> so the
+              statement and the photographs could share one full-height
+              screen — the claim centred, the evidence on the bottom edge —
+              because two sections cannot divide one viewport between them
+              without one knowing the other's height. The chapter is one
+              half now: the statement, centred in the whole screen. Like the
+              component above it, StoryStrip is in the tree and imported by
+              nobody; the same warning applies.
 
               ══════════ "FEATURED IN" IS BACK ══════════
               PressWall was removed in the same pass and is RESTORED, at the
@@ -221,7 +225,32 @@ export default function Experience() {
               masthead rewrite, and the home page was left with no editorial
               route to the group's story at all. This is that route. */}
           <AboutSplit />
-          {/* ══════ THE JOURNAL FOLLOWS THE ABOUT SPLIT ══════
+          {/* ══════ THE HANDOVER INTO THE JOURNAL ══════
+              Two lines of display type on an empty screen. It exists to
+              carry a change of REGISTER that the page previously made with
+              no transition at all: the split above closes on who the group
+              is, in the present tense with no date on it, and <Blog> opens
+              on "Stories, openings, and ideas", where everything happened on
+              a particular day. Those two ran into each other across 48px —
+              AboutSplit's 12px gutter plus Blog's 36px top — which is less
+              air than Blog keeps between its own label and its lede.
+
+              IT OWNS BOTH OF ITS SEAMS, which is the one thing to know
+              before moving it. AboutSplit contributes no vertical air and
+              expects its neighbour to own the gap; Blog brings 36px of its
+              own top, and Passage.module.css SUBTRACTS that 36px by hand
+              rather than letting two correct numbers sum to a wrong one.
+              Move this section and both halves of that arithmetic move
+              with it.
+
+              THE SEAM THAT USED TO BE HERE IS UNCHANGED IN KIND. The
+              comment below still describes About → Journal as a run with a
+              photograph missing from it. That is still true — this is type,
+              not a picture, and the page's picture count at its quietest
+              point is still down one. What it fixes is the register jump,
+              not the image count. */}
+          <Passage />
+          {/* ══════ THE JOURNAL FOLLOWS THE HANDOVER ══════
               It follows press's departure to the slot below — this comment
               described press while press stood here, and the parts of it
               that were about THIS seam are kept.

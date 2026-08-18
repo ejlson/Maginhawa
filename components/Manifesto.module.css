@@ -43,52 +43,73 @@
      a new chapter. "Not by too much" is what stopped here.
      The bottom pad is HALF what it was (was 48/8vh/120): it stacks with
      whatever follows the statement. */
-  /* ══════════ ONE SCREEN: STATEMENT IN THE MIDDLE, BAND AT THE BOTTOM ═══
-     The chapter is now a full viewport tall and holds BOTH halves — the
-     statement centred in the room left above the band, and the band of
-     photographs sitting on the bottom edge.
+  /* ══════════ ONE SCREEN, ONE THING IN THE MIDDLE OF IT ══════════
+     The chapter is a full viewport tall and the statement sits in the
+     middle of it. It used to hold two halves — the sentence centred in the
+     room left above a band of photographs on the bottom edge — and the band
+     is gone at the user's instruction (see <Manifesto>), so the centring
+     now divides the whole screen rather than the part above the pictures.
 
      `min-height`, NOT `height`. On a short viewport (a 1440×600 laptop, or
-     a phone in landscape) the statement plus the band genuinely need more
-     than a screen, and a fixed height would crop the pictures rather than
-     let the page grow. "Fits one screen" is true at every ordinary window
-     and degrades by scrolling, which is the correct failure.
+     a phone in landscape) the sentence can genuinely want more than a
+     screen once it wraps to five or six lines, and a fixed height would
+     clip it. "Fits one screen" is true at every ordinary window and
+     degrades by scrolling, which is the correct failure.
 
-     THE HISTORY MATTERS HERE, because this file has been round this loop
-     once already. `min-height: 100svh` was REMOVED from this section in an
-     earlier pass: with the statement centred and nothing else on the sheet,
-     it produced 394px of empty cream between the last restaurant card and
-     the first word — a third of a screen of nothing. The reason it is safe
-     to bring back is that the section is no longer nearly empty. It now
-     carries the band as well, so the centring divides real content instead
-     of padding out a void.
+     ⚠️ THIS FILE HAS BEEN ROUND THIS LOOP TWICE AND THE COST IS KNOWN.
+     `min-height: 100svh` was REMOVED once, measured: with the statement
+     centred and nothing else on the sheet it put 394px of empty cream
+     between the last restaurant card and the first word — a third of a
+     screen of nothing, and the section's own box went from 419px to 900px.
+     It came back when the band arrived, because the centring then divided
+     real content instead of padding out a void. The band has now gone and
+     the sheet is nearly empty again, so THE SEAM ABOVE WILL OPEN BACK UP —
+     roughly a third of a screen at 1440×900. That is not a regression that
+     slipped through; it is the direct consequence of "centre it in the
+     middle of the section", which was the instruction, and it is written
+     down here so the next person does not fix it by accident.
+     IF THE SEAM MATTERS MORE THAN THE CENTRING, this `min-height` is the
+     lever — drop it and the section sizes to its content again.
 
-     THE TOP PAD IS SMALL ON PURPOSE, down from clamp(150px, 21vh, 300px).
-     With a forced screen and `flex: 1` centring, a large pad no longer buys
-     air — it pushes the total past 100svh and breaks the single screen. The
-     seam is now produced by the CENTRING rather than by padding: measured
-     at 1440×900, the statement's first ink sits 194px below the last
-     restaurant card.
+     THE PADDING IS SYMMETRIC NOW, and it has to be. It read
+     `clamp(24px, 4vh, 56px) var(--pad-x) 0` — no bottom pad at all, because
+     the band carried its own and the space under the last row of
+     photographs had to equal the space between them (--band-gap, a number
+     only StoryStrip knew). With no band, a top pad and no bottom one is an
+     asymmetric content box, and `justify-content: center` centres inside
+     THAT box — so the sentence would sit half the top pad low and the
+     "properly centred" this was changed for would be off by ~28px at
+     1440×900. Equal pads, real centre. */
+  /* ── 92svh, DOWN FROM 100, at the user's instruction: "bring the About
+     section closer" ── The distance between this chapter's statement and the
+     next one's photograph is this section's own bottom half, so shortening
+     the section is the only thing that closes it. 90svh takes ~90px out at
+     1440×900, split by the bias below into ~45px off each end — so the seam
+     ABOVE closes too, which is the other instruction this file is carrying.
 
-     THAT IS A REAL REDUCTION AND IT IS A TRADE, not a free win. The seam
-     was opened to 243px at the user's request an hour before this; holding
-     one screen costs ~49px of it, because the statement can only be as far
-     down as the band above the fold allows. 194px is still comfortably
-     past the 153px that read as crowded, and the single screen was the
-     later and more specific instruction — but if the seam matters more
-     than the screen, this padding is the lever, and `min-height: 100svh`
-     is what has to give.
+     ⚠️ IT CANNOT GO MUCH FURTHER, AND THE FLOOR IS NOT A TASTE JUDGEMENT.
+     The band below the statement is where AboutSplit's heading perches
+     before it flies (HEAD_LIFT there), and that perch is fixed against the
+     WINDOW, not against this section: the heading's top lands at ~0.71·vh
+     whatever this section does. So the statement's bottom edge has to stay
+     above that, with air:
 
-     THERE IS NO BOTTOM PAD, and that is deliberate. The space under the
-     last row of photographs has to equal the space BETWEEN them, and only
-     the band knows that number (--band-gap, see StoryStrip.module.css).
-     Custom properties inherit downward, so a `var(--band-gap)` here could
-     not read a value declared on a child — it would silently fall back and
-     the two gaps would differ by however wrong the fallback was. The band
-     carries its own bottom padding instead, which keeps the one number in
-     the one file that owns it. */
-  min-height: 100svh;
-  padding: clamp(24px, 4vh, 56px) var(--pad-x) 0;
+         band below  ≥  vh − perchTop + clearance  ≈  315px at 1440×900
+
+     Measured before this change the band was 402px with 151px of clearance.
+     90svh was tried first and spends too much of it: the clearance fell to
+     52px at 1440×900 and 31px at 1440×800, where the heading is 189px tall
+     in a 251px band and the two lines start reading as one crowded block.
+     92svh keeps most of the gain and roughly 75px of air at both.
+
+     ⚠️ THE 1440×800 CASE IS THE ONE THAT BINDS, not the common one — a short
+     window makes the heading WRAP TALLER while giving it less room to sit
+     in, so it is squeezed from both ends at once. Check it before taking
+     another percent off this number. And if the gap still reads as too wide,
+     the lever is HEAD_LIFT — perch the heading lower and this floor comes
+     down with it — not this number on its own. */
+  min-height: 92svh;
+  padding: clamp(24px, 4vh, 56px) var(--pad-x);
   /* NO CLOSING RULE. A full-width hairline used to sit on this section's
      bottom border box, between the statement and Our Restaurants. It was
      drawing a boundary the page does not have: the statement and the
@@ -101,17 +122,71 @@
 }
 
 /* stacked flow below the breakpoint; the page's 12-column grid above it */
-/* THE STATEMENT TAKES ALL THE ROOM THE BAND DOES NOT, AND CENTRES IN IT.
-   `flex: 1` claims the leftover height of the 100svh section; the centring
-   puts the sentence in the middle of that space. This is what produces the
-   "text in the middle, pictures at the bottom" reading, and it is also what
-   now creates the seam to the restaurants grid above — see .section. */
+/* THE STATEMENT TAKES THE WHOLE SCREEN AND CENTRES IN IT.
+   `flex: 1` claims the section's height; the centring puts the eyebrow and
+   the sentence — one lockup, `gap` between them — in the middle of it. It
+   used to claim only the room the band did not, and the band is gone.
+   THIS IS ALSO WHAT CREATES THE SEAM to the restaurants grid above, and
+   with nothing else on the sheet that seam is now about a third of a
+   screen. See .section, which carries the measurement and the lever. */
 .inner {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: clamp(18px, 2.6vh, 32px);
+  /* ══ BIASED ABOVE CENTRE, at the user's instruction ══
+     "Reduce the gap between this section and the one above." That gap is
+     not padding — it is half the free space in a full-screen section with
+     its content in the middle, so the only way to take from the top is to
+     give to the bottom. Padding the BOX and leaving the centring alone does
+     exactly that: `justify-content: center` still centres, inside a content
+     box that is 26vh shorter at the bottom, so the lockup rides 13vh above
+     the true middle. Measured at 1440×900 the seam from the last restaurant
+     card to the eyebrow goes 306px → ~190px.
+
+     ⚠️ THE TWO BANDS ARE ONE BAND, AND THIS IS WHY IT COULD NOT SIMPLY BE
+     SHORTENED. The obvious fix is to drop `min-height` below 100svh — and
+     it makes things worse, because the empty band BELOW the statement is
+     where AboutSplit's heading perches before it flies (see HEAD_LIFT
+     there). Shrink the section and the statement's bottom edge moves down
+     the screen into that perch: at 80svh the statement would end at y 752
+     with the heading sitting at 630, i.e. straight through it. Taking from
+     the top and giving to the bottom is the one move that improves both —
+     the seam closes AND the heading gets more clearance (43px → ~130px at
+     1440×900, and 24px → ~100px at the 1440×800 case that was tightest).
+
+     vh AND NOT A CLAMP, because the quantity being divided is itself a
+     fraction of the window: at 1080 the same 26vh takes 140px off a 426px
+     seam, which is the same proportion of the same problem. */
+  /* ⚠️ 26vh → 14vh, AT THE USER'S INSTRUCTION, AND IT IS A TRADE.
+     The note above is about the seam ABOVE this section and it is still
+     correct: this padding buys that seam by giving the space to the bottom.
+     The new instruction is about the gap BELOW — "reduce the gap between
+     the about us section and the manifesto" — and those two are the same
+     pot of free space. Taking 12vh back from the bottom moves the statement
+     down, which closes the lower gap and re-opens part of the upper one.
+     Measured at 1440×900, both seams ink-to-ink and at rest — the trade is
+     one-for-one because it is the same free space moving:
+       statement → About heading    143px →  89px   (closed 54px)
+       last card → eyebrow          190px → 244px   (opened 54px)
+     The 190px is the number the note above recorded for 26vh, which is what
+     makes these comparable rather than two different measurements.
+
+     ⚠️ MEASURE THE RESTING GAP, NOT A MID-SCROLL ONE. AboutSplit's heading
+     is scroll-driven, so its distance from the statement is different at
+     every scroll position; a sample taken while the flight is running reads
+     ~253px at 1440×900 and means nothing. Seat the page at 0 first.
+
+     WHY 14 AND NOT LOWER. Clearance to the heading falls with it, and the
+     window that runs out first is a short laptop, not a wide one:
+       1440×900  89px      1440×800  63px      1280×720  56px
+     1280×720 is the floor case and 56px still clears — but it is the number
+     to watch if this goes any further, and 43px is already on record in this
+     file as too tight. There is NO blank screen at any value tested between
+     26vh and 10vh: the two chapters always overlap on screen somewhere, so
+     "a screen of nothing" is not what this lever is fixing. */
+  padding-bottom: 14vh;
 }
 
 @media (min-width: 981px) {
@@ -128,6 +203,53 @@
        the top, which is the bug this replaces — it read `start`. */
     align-content: center;
   }
+}
+
+/* ══════════ THE FOUR PICTURES IN THE SENTENCE ══════════
+   A small photograph set inline after four of the sentence's nouns — see
+   INLINE in Manifesto.tsx for which four and why.
+
+   SIZED IN em, SO IT IS THE TYPE THAT DECIDES. The statement's own font-size
+   is a clamp against the viewport, so a px height would be a different
+   proportion at every breakpoint — large enough to break the line at 2.4rem
+   and lost in it at 5.2rem. 0.62em holds the picture between the x-height
+   and the cap height of the line it sits in, at every size, which is the
+   proportion that reads as punctuation rather than as an inserted object.
+
+   THE ASPECT IS FIXED AND THE CROP IS `cover`, because the four source
+   photographs are not the same shape and four different rectangles in one
+   sentence would read as an accident. 4:3 landscape: a portrait would sit
+   taller than the cap height and push the line box open.
+
+   `vertical-align` IS OPTICAL AND NOT A BASELINE. Sitting the box ON the
+   baseline leaves it looking hung above the words, because the words have
+   descenders below that line and the picture does not. -0.06em drops it to
+   where the eye reads the two as level.
+
+   THE RADIUS IS --radius-tile — the same 2px printed-plate corner the
+   restaurant cards and the About panel carry. A softer corner here would be
+   the only rounded thing on the page. */
+.inlineImage {
+  display: inline-block;
+  height: 0.62em;
+  aspect-ratio: 4 / 3;
+  vertical-align: -0.06em;
+  margin-inline: 0.1em;
+  border-radius: var(--radius-tile);
+  background-color: var(--placeholder);
+  background-size: cover;
+  background-position: center;
+  /* the tone the frame holds while its photograph decodes, same as every
+     other frame on the site */
+}
+
+/* THE PICTURE'S MASK. `.wordMask` already clips and already sits in the
+   line; this only has to stop the mask's own text metrics from adding
+   leading around a box that has no text in it. `line-height: 0` on the
+   mask would collapse it, so the height comes from the picture and the mask
+   simply wraps it. */
+.imageMask {
+  line-height: 1;
 }
 
 /* ---------- the statement ---------- */

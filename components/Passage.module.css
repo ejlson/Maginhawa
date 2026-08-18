@@ -1,0 +1,124 @@
+/* The handover between the story split and the journal — two lines of
+   display type on an otherwise empty screen. See Passage.tsx for what it is
+   for and why it carries no eyebrow, label, control or picture. */
+
+.section {
+  background: var(--cream);
+  color: var(--maroon);
+
+  display: flex;
+  flex-direction: column;
+  /* THE AIR BETWEEN THE TWO LINES, and it is the section's only internal
+     measurement. Big enough that the two lines are never read as a stanza —
+     they are two sentences a beat apart, and the beat is the point. */
+  gap: clamp(88px, 14vh, 180px);
+
+  /* ══════════ THE TWO SEAMS, AND NEITHER IS THE DECLARED NUMBER ══════════
+     This section owns BOTH of its gaps, because its neighbours do not.
+
+     ABOVE. <AboutSplit> contributes no vertical air of its own — its
+     section padding is a flat `var(--grid-gutter)` (12px) and it expects
+     whatever follows to own the seam. So the top pad here is the whole
+     chapter boundary, less that 12px. --home-gap-chapter is the widest step
+     on the home page's spacing scale and this is what it is for: the reader
+     has just finished the group's story and should cross real distance
+     before a new voice starts.
+
+     BELOW. <Blog> declares `padding: calc(var(--grid-gutter) * 3) 0 …`, so
+     it brings 36px of its own top air — and 36px is NOT negligible against
+     a gap this size when the whole trap on this page is two correct numbers
+     summing to a wrong one (see the same warning in AboutSplit.module.css
+     and Experience.tsx). The subtraction is explicit rather than hopeful.
+
+     ⚠️ IF BLOG'S TOP PADDING CHANGES, CHANGE THE 36px HERE WITH IT. There
+     is no token shared between the two files; this is a hardcoded read of
+     another stylesheet and the only thing keeping it honest is this note. */
+  padding: calc(var(--home-gap-chapter) - var(--grid-gutter)) var(--pad-x)
+    calc(var(--home-gap) - 36px);
+}
+
+/* ══════════ THE LINES ══════════
+   Set SMALLER than the manifesto's statement — clamp(2.4rem, 5.35vw,
+   5.2rem) there against clamp(1.7rem, 3.2vw, 3.2rem) here — and that
+   difference is load-bearing rather than cosmetic. The manifesto is the
+   page's statement and has to be the largest type on the cream; a handover
+   set at the same size reads as a second statement and picks a fight the
+   chapter above it has already won. This is the page's second voice, and it
+   is quieter. */
+.line {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--w-regular);
+  font-size: clamp(1.7rem, 3.2vw, 3.2rem);
+  /* NOT --lh-display (0.92). That value is for the wordmark and the
+     statement, where the type is big enough that 0.92 still clears the
+     descenders; at this size, and wrapped to two lines on a phone, it
+     collides. 1.04 is the smallest leading that does not. */
+  line-height: 1.04;
+  letter-spacing: var(--tr-display);
+  color: var(--maroon);
+  /* the measure, not the column — a line allowed to run the full 1440 stops
+     reading as a sentence and starts reading as a banner */
+  max-width: 16ch;
+}
+
+/* ONE LINE LEFT, ONE LINE RIGHT. The eye has to travel across the page as
+   well as down it, which takes longer to read than a stacked pair and is
+   the cheapest pacing device in the file. `text-align` as well as
+   `align-self` because the lines wrap on narrow windows and a right-seated
+   block of left-aligned text has a ragged LEFT edge against the margin. */
+.lineA {
+  align-self: flex-start;
+  text-align: left;
+}
+
+.lineB {
+  align-self: flex-end;
+  text-align: right;
+}
+
+/* ══════════ THE MASK AND THE WORD ══════════
+   Lifted from Manifesto.module.css, deliberately, so the two chapters
+   reveal with identical mechanics: the mask clips, the word travels out of
+   it, nothing fades.
+
+   THE PADDING/MARGIN PAIR IS NOT DECORATION. `overflow: hidden` on a box
+   sized to the line box clips the parts of a glyph that legitimately sit
+   outside it — a descender below the baseline, an italic's overhang at the
+   right. The padding grows the clip box to cover them and the equal
+   negative margin takes the growth back out of the layout, so the words
+   still set on their true metrics. Change one and change the other. */
+.mask {
+  display: inline-block;
+  overflow: hidden;
+  padding: 0.06em 0.07em 0.22em;
+  margin: -0.06em -0.07em -0.22em;
+  vertical-align: bottom;
+}
+
+.word {
+  display: inline-block;
+}
+
+/* On a phone the two lines are nearly the width of the screen, so the
+   left/right alternation stops reading as alternation and just looks like
+   inconsistent ragging. Both lines go left, and the gap between them
+   carries the pacing on its own. */
+@media (max-width: 640px) {
+  .line {
+    max-width: none;
+  }
+
+  .lineB {
+    align-self: flex-start;
+    text-align: left;
+  }
+}
+
+/* Reduced motion gets the sentences plainly, fully inked, with the same air
+   around them — the pacing is padding, not animation, so it survives. */
+@media (prefers-reduced-motion: reduce) {
+  .word {
+    transform: none !important;
+  }
+}
