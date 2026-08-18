@@ -33,8 +33,26 @@
      ⚠️ IF BLOG'S TOP PADDING CHANGES, CHANGE THE 36px HERE WITH IT. There
      is no token shared between the two files; this is a hardcoded read of
      another stylesheet and the only thing keeping it honest is this note. */
+  /* ⚠️ THE HORIZONTAL PADDING IS ASYMMETRIC AND EACH SIDE IS MEASURED.
+     It was `var(--pad-x)` (40px) on both, which left this chapter off the
+     left edge every other chapter on the page shares — Discover, AboutSplit
+     and Blog all seat their content on --grid-gutter (12px), and a reader
+     coming down the page saw the passage start 28px inboard of the journal
+     head directly beneath it.
+
+     It cannot simply become 12px on both, because the two ends align to
+     DIFFERENT neighbours and those neighbours are not symmetric:
+       RIGHT 40px  → line A's right ink lands at 1400, and AboutSplit's copy
+                     column ends its paragraphs at 1399. The passage picks up
+                     exactly where the story left off.
+       LEFT  12px  → line B's left ink lands at 12, which is Blog's label and
+                     lede to the pixel. The passage hands off exactly where
+                     the journal begins.
+     Measured at 1440×900. Both numbers are reads of another stylesheet, so
+     if AboutSplit's copy column or Blog's --blog-margin moves, re-measure
+     rather than assuming these still land. */
   padding: calc(var(--home-gap-chapter) - var(--grid-gutter)) var(--pad-x)
-    calc(var(--home-gap) - 36px);
+    calc(var(--home-gap) - 36px) var(--grid-gutter);
 }
 
 /* ══════════ THE LINES ══════════
@@ -62,19 +80,33 @@
   max-width: 16ch;
 }
 
-/* ONE LINE LEFT, ONE LINE RIGHT. The eye has to travel across the page as
-   well as down it, which takes longer to read than a stacked pair and is
-   the cheapest pacing device in the file. `text-align` as well as
-   `align-self` because the lines wrap on narrow windows and a right-seated
-   block of left-aligned text has a ragged LEFT edge against the margin. */
+/* ══════════ RIGHT FIRST, THEN LEFT — AND THAT ORDER IS THE POINT ══════════
+   The eye still travels across the page as well as down it, which takes
+   longer to read than a stacked pair and is the cheapest pacing device in
+   this file. What changed is WHICH WAY, and it halves the number of
+   traverses the reader makes through this stretch of page.
+
+   It ran left-then-right, which put three full-width jumps back to back:
+     AboutSplit's copy ends RIGHT (1399) → line A far LEFT (40)
+     → line B far RIGHT (1400) → Blog's head far LEFT (12)
+   Three crossings in a row is a pinball, not a device. Reversed, there is
+   exactly ONE crossing and both of its ends land on a real edge:
+     AboutSplit RIGHT (1399) → line A RIGHT (1400) → crosses once
+     → line B LEFT (12) → Blog's head LEFT (12)
+   The passage now begins on the column the story ended in and finishes on
+   the column the journal starts in, so it reads as the bridge it is.
+
+   `text-align` as well as `align-self` because the lines wrap on narrow
+   windows, and a right-seated block of left-aligned text has a ragged LEFT
+   edge against the margin. */
 .lineA {
-  align-self: flex-start;
-  text-align: left;
+  align-self: flex-end;
+  text-align: right;
 }
 
 .lineB {
-  align-self: flex-end;
-  text-align: right;
+  align-self: flex-start;
+  text-align: left;
 }
 
 /* ══════════ THE MASK AND THE WORD ══════════
@@ -109,7 +141,7 @@
     max-width: none;
   }
 
-  .lineB {
+  .lineA {
     align-self: flex-start;
     text-align: left;
   }

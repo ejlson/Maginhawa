@@ -229,10 +229,17 @@
    THE RADIUS IS --radius-tile — the same 2px printed-plate corner the
    restaurant cards and the About panel carry. A softer corner here would be
    the only rounded thing on the page. */
+/* ══════════ THE PICTURES HAVE A DECISIVE ORIENTATION ══════════
+   3 / 2 AND NOT 4 / 3. At 0.62em the old 1.33 read as neither portrait nor
+   landscape — a square-ish chip rather than a photograph set in the line.
+   3:2 is the aspect two of the four sources already are, and it is the SAME
+   aspect as the three door prints in AboutSplit.module.css, so the two
+   places on the home page that set a small photograph into type now cut
+   them from the same stock. */
 .inlineImage {
   display: inline-block;
   height: 0.62em;
-  aspect-ratio: 4 / 3;
+  aspect-ratio: 3 / 2;
   vertical-align: -0.06em;
   margin-inline: 0.1em;
   border-radius: var(--radius-tile);
@@ -250,6 +257,34 @@
    simply wraps it. */
 .imageMask {
   line-height: 1;
+}
+
+/* ══════════ THE PORTRAIT FRAME ══════════
+   One of the four (see INLINE in Manifesto.tsx). 2 / 3 is belly-web.jpg's
+   own aspect — 240×360 exactly — so it is uncropped rather than centre-cut.
+
+   ⚠️ THE HEIGHT IS THE WHOLE PROBLEM AND 0.86em IS ITS SOLUTION. A portrait
+   picture only reads as portrait if it is taller than it is wide, and an
+   inline-block taller than the line it sits in GROWS that line's box — which
+   would leave the lines holding a picture further apart than the lines
+   without one, in the largest type on the page. The statement's leading is
+   --lh-display (0.92), so the line box is 0.92em; at 0.86em this frame stays
+   under it and the leading is untouched. Measured at 1440×900 the statement
+   is 302px tall before and after.
+
+   THAT CEILING IS WHY THIS IS NOT BIGGER. If a portrait picture ever needs
+   more presence than 0.86em, the leading has to be opened FIRST and every
+   line pays for it — do not raise this number on its own and expect the
+   paragraph to absorb it. */
+.portrait {
+  height: 0.86em;
+  aspect-ratio: 2 / 3;
+}
+
+/* The clip the picture travels out of has to be as tall as the picture, or
+   the reveal would uncover only the bottom two thirds of it and rest there. */
+.portraitMask {
+  height: 0.86em;
 }
 
 /* ---------- the statement ---------- */

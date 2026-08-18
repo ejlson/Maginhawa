@@ -110,8 +110,14 @@
   display: flex;
   flex-direction: column;
   /* head → body gap on the Discover head's rhythm — the display heading
-     needs the same air over the photography. NAMED because .topRule
-     subtracts it; the value is unchanged. */
+     needs the same air over the photography.
+
+     ⚠️ IT IS STILL NAMED, and the reason it was named is gone: .topRule
+     subtracted this value so the opening hairline could sit 18px off the
+     head regardless of it. Nothing subtracts it now. The name is kept
+     because the head→body distance is worth being able to point at, and
+     because anything that wants a distance to the head OTHER than this gap
+     has to do the same subtraction — see the note where .topRule was. */
   --sec-gap: clamp(22px, 2.7vh, 34px);
   gap: var(--sec-gap);
   background: var(--cream);
@@ -122,37 +128,19 @@
   overflow-x: clip;
 }
 
-/* ── THE OPENING RULE, at the user's instruction ──
-   A hairline across the band ABOVE the chapter, so the head sits between
-   two rules rather than starting out of open cream: this one opens the
-   chapter, .headRule closes its head and opens the pictures.
+/* ── .topRule IS DELETED, at the user's instruction ──
+   The chapter's opening hairline: 1px on --rule, inset to --blog-margin,
+   carrying `margin-bottom: calc(18px - var(--sec-gap))` so it sat exactly
+   18px off the head no matter what the section's gap was.
 
-   IT IS THE FIRST FLEX CHILD, NOT A LINE AT THE SECTION'S TOP EDGE. The
-   sheet is a full screen with its contents centred in it, so a rule seated
-   at `top: 0` would float a couple of hundred pixels clear of the type,
-   reading as an unrelated line in the air between two chapters rather than
-   as this chapter's own opening. As a child it takes the section's own gap
-   and belongs to the lockup.
+   That negative margin is the only thing worth carrying forward if it ever
+   comes back. The gap it subtracted also sets the head→body distance and
+   must not move, so a rule that wants a different distance to the head has
+   to take it out of its own margin rather than out of --sec-gap. The fuller
+   version of that argument is in Discover.module.css, whose copy of this
+   rule was removed before this one.
 
-   Same 1px on --rule as .headRule — two hairlines of different weights in
-   one chapter reads as one of them being a mistake. */
-/* ── AND IT SITS 18px OFF THE HEAD, matching Discover's copy of this rule.
-   It was riding the section's own gap (24px here, 34px there), so the
-   signature the two chapters are supposed to share did not measure the same
-   in either one — and a rule equidistant between the chapter above and the
-   head below reads as a divider rather than as an opening. A rule belongs
-   to what it introduces.
-
-   The negative margin subtracts the section's gap; see the fuller note on
-   Discover.module.css's .topRule for why it cannot simply take a smaller
-   gap (the same gap sets the head→body distance and must not move). */
-.topRule {
-  display: block;
-  height: 1px;
-  background: var(--rule);
-  margin-inline: var(--blog-margin);
-  margin-bottom: calc(18px - var(--sec-gap));
-}
+   .headRule is untouched — it closes the head and opens the pictures. */
 
 /* ---------- head row — display heading on the left, the archive pill
    hung off the display line's bottom edge at the far right ---------- */

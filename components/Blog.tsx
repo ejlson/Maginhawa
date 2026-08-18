@@ -254,10 +254,27 @@ export default function Blog() {
       id="blog"
       data-nav-theme="light"
     >
-      {/* the chapter's opening rule — presentational, so it is not
-          announced; see .topRule for why it is a child of the section and
-          not a line at its top edge */}
-      <span className={styles.topRule} aria-hidden />
+      {/* ── THE OPENING RULE IS GONE, at the user's instruction ──
+          A 1px hairline on --rule used to stand here, inset to
+          --blog-margin, so the head sat between two rules: this one opened
+          the chapter and .headRule closed the head.
+
+          IT FOLLOWS DISCOVER'S. That chapter's own .topRule was removed
+          earlier and its .footRule after it, so this was the last opening
+          hairline on the home page and the two chapters that are supposed
+          to share a lockup had stopped sharing it. The head now starts out
+          of open cream in both.
+
+          .headRule STAYS — it closes the head and opens the pictures, which
+          is a different job. One hairline in the chapter, not two.
+
+          THE HEAD RISES ~19px AND THAT IS THE WHOLE OF THE SPACING CHANGE.
+          The rule was 1px plus a negative margin that pulled the head to
+          18px off it, against the section's own gap; with the span gone the
+          head is simply the first flex child and sits on the section's
+          padding-top, which is unchanged at 36px. Nothing outside this file
+          moves — <Passage> subtracts Blog's 36px by hand and that number is
+          still 36. */}
 
       {/* ═══ THE CHAPTER HEAD — Discover's three-part lockup: the group's
           mark set into a standing label, the display sentence under it,
