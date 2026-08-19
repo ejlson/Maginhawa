@@ -11,11 +11,11 @@ import styles from "./FAQ.module.css";
 const ITEMS: { q: string; a: string }[] = [
   {
     q: "Do I need to book a table?",
-    a: "Belly, Bintang, Guanabana and Ramo Ramen all take reservations — you'll find a booking link on each restaurant's page. Café Mama & Sons, Mamasons and Hoodwood run as walk-in or takeaway, so come as you are.",
+    a: "Belly, Bintang, Guanabana and Ramo Ramen all take reservations - you'll find a booking link on each restaurant's page. Café Mama & Sons, Mamasons and Hoodwood run as walk-in or takeaway, so come as you are.",
   },
   {
     q: "Can you cater for dietary requirements?",
-    a: "Every kitchen has vegetarian, vegan and gluten-free options, and we're happy to adapt where we can. Add a note to your booking or ask your server when you sit down — we'll point you to the dishes we can adjust.",
+    a: "Every kitchen has vegetarian, vegan and gluten-free options, and we're happy to adapt where we can. Add a note to your booking or ask your server when you sit down - we'll point you to the dishes we can adjust.",
   },
   {
     q: "Do you do private hire or large groups?",
@@ -31,15 +31,15 @@ const ITEMS: { q: string; a: string }[] = [
   },
   {
     q: "Do you offer takeaway or delivery?",
-    a: "Several of our kitchens — including Café Mama & Sons, Mamasons and Hoodwood — run takeaway, and most of the group is on the major delivery apps. Check your favourite restaurant's page for what's available near you.",
+    a: "Several of our kitchens - including Café Mama & Sons, Mamasons and Hoodwood - run takeaway, and most of the group is on the major delivery apps. Check your favourite restaurant's page for what's available near you.",
   },
   {
     q: "What does “Maginhawa” mean?",
-    a: "Maginhawa is Tagalog for “comfortable” — a life of ease. It's also the name of Quezon City's most famous food street, and comfort is the thread that runs through everything we cook.",
+    a: "Maginhawa is Tagalog for “comfortable” - a life of ease. It's also the name of Quezon City's most famous food street, and comfort is the thread that runs through everything we cook.",
   },
   {
     q: "How do I apply to work at Maginhawa Group?",
-    a: "We hire across our kitchens, front of house, brand, events and operations. Browse the open roles and apply directly on our careers page — we read every application.",
+    a: "We hire across our kitchens, front of house, brand, events and operations. Browse the open roles and apply directly on our careers page - we read every application.",
   },
 ];
 

@@ -1,8 +1,8 @@
 "use client";
 
-import { useRef } from "react";
+import { type CSSProperties, useRef } from "react";
 import Image from "next/image";
-import { motion, useInView, useReducedMotion } from "framer-motion";
+import { useInView } from "framer-motion";
 import styles from "./Blog.module.css";
 /* THE VENUE CARD'S MATERIAL, IMPORTED RATHER THAN COPIED. The lede card
    below wears the restaurant cards' ramp (a 34px backdrop blur that hands
@@ -18,8 +18,24 @@ import { BLOG, type BlogEntry } from "@/lib/blog";
 import { getRestaurant } from "@/lib/restaurants";
 import { asset } from "@/lib/media";
 
-// shared enter curve — the same ease the Discover reel slides in on
-const EASE = [0.22, 1, 0.36, 1] as const;
+/* ── THE FIRST ROW'S SEAT IN THE CASCADE ──
+   One beat runs down the chapter, mark to last story, and every element's
+   place in it is declared in Blog.module.css beside the rules that read
+   it — except these four, whose seats are `RAIL_BEAT + index` and so have
+   to be computed. The cadence itself is --cascade-beat over there; this is
+   only a position in it, carried as --i exactly the way Discover carries
+   --tw-i.
+
+   ⚠️ THE ROWS CONTINUE THE HEAD'S COUNT rather than starting their own.
+   The head occupies seats 0-4 (see the beat map in the stylesheet), so
+   adding a head element means moving this number too, not just adding a
+   line over there.
+
+   The enter curve that used to live here as a tuple went with the Motion
+   variants: it is --ease-entrance now, which is the same four numbers
+   this file was restating. */
+const RAIL_BEAT = 5;
+const seat = (i: number) => ({ "--i": i }) as CSSProperties;
 
 /* THE HOME JOURNAL IS A CHOSEN FEW, not the newest twelve.
 
@@ -185,13 +201,17 @@ function LedeCard({ post }: { post: BlogEntry }) {
 }
 
 /* a rail row — thumbnail, headline, meta. The whole row is the link. */
-function RailRow({ post }: { post: BlogEntry }) {
+function RailRow({ post, beat }: { post: BlogEntry; beat: number }) {
   return (
     <a
       className={styles.row}
       href={post.url}
       target="_blank"
       rel="noopener noreferrer"
+      /* the seat is declared once on the row and INHERITED by both halves,
+         so the thumbnail's sweep and the headline's descent cannot drift
+         apart — they are two moves on one beat, not two beats. */
+      style={seat(beat)}
     >
       <span className={styles.thumb}>
         <Image
@@ -202,10 +222,19 @@ function RailRow({ post }: { post: BlogEntry }) {
           sizes="(max-width: 900px) 22vw, 8vw"
         />
       </span>
-      <span className={styles.rowText}>
-        <h3 className={styles.rowTitle}>{post.title}</h3>
-        <span className={styles.rowMeta}>
-          {post.dateLabel} · {post.source}
+      {/* THE MASK IS A WRAPPER BECAUSE IT HAS TO BE. A clip on .rowText
+          itself would travel with the type it is meant to be hiding — the
+          same two-element arrangement SplitWords uses (a mask span plus an
+          inline-block word) and for the same reason. The row's own box is
+          not tight enough to serve: it is taller than its text by the
+          --rail-air padding, so a descending block would show a sliver
+          above the row's top edge before the clip caught it. */}
+      <span className={styles.rowTextMask}>
+        <span className={styles.rowText}>
+          <h3 className={styles.rowTitle}>{post.title}</h3>
+          <span className={styles.rowMeta}>
+            {post.dateLabel} · {post.source}
+          </span>
         </span>
       </span>
     </a>
@@ -227,25 +256,32 @@ function RailRow({ post }: { post: BlogEntry }) {
  * strip: there is nothing left on this chapter to drag.
  */
 export default function Blog() {
-  const reduce = useReducedMotion();
   const sectionRef = useRef<HTMLElement>(null);
-  const inView = useInView(sectionRef, { once: true, amount: 0.1 });
+  /* ⚠️ THE OBSERVER WATCHES THE HEAD, NOT THE SECTION, AND THAT IS A FIX FOR
+     A REAL BREAKAGE. It read `useInView(sectionRef, { amount: 0.1 })` — 10%
+     of the SECTION BOX — which worked only because the head used to sit 36px
+     inside that box: the trigger fired when 82px of section was showing and
+     the label appeared 36px in, so the two were 46px of scroll apart and the
+     entrance effectively played as the label arrived.
 
-  // the two columns arrive together and a beat apart — the card first,
-  // because it is the thing the chapter is presenting. Reduced motion
-  // takes the fade and none of the travel.
-  const enter = (delay: number) =>
-    reduce
-      ? {
-          initial: { opacity: 0 },
-          animate: inView ? { opacity: 1 } : undefined,
-          transition: { duration: 0.4, ease: "easeOut" as const, delay },
-        }
-      : {
-          initial: { opacity: 0, y: 26 },
-          animate: inView ? { opacity: 1, y: 0 } : undefined,
-          transition: { duration: 0.85, ease: EASE, delay },
-        };
+     THE TOP PADDING IS NOW 336px (it has to clear AboutSplit's descending
+     plate — see Blog.module.css), so a threshold measured against the box
+     fired with the label still 199px BELOW THE FOLD: measured at 1440×900,
+     data-in went on at 0.57 of AboutSplit's transit and the label did not
+     cross the fold until 0.69, 216px of scroll later. `once: true` means the
+     0.7–1.4s cascade would have run and finished off-screen, and the reader
+     would have met a chapter that had already introduced itself.
+
+     WATCHING THE HEAD MAKES THE TRIGGER TRACK THE INK INSTEAD OF THE BOX, so
+     it cannot drift again the next time the padding above it moves — which
+     is the whole failure being fixed. The 12% bottom margin grows the
+     observer root DOWNWARD, so it fires while the head is still 12vh (108px
+     at 900) below the fold and the entrance is already running when the head
+     rises into view. Default `amount` ("some") is right on an element this
+     size; an `amount` fraction here would re-introduce exactly the
+     box-relative coupling this replaces. */
+  const headRef = useRef<HTMLDivElement>(null);
+  const inView = useInView(headRef, { once: true, margin: "0px 0px 12% 0px" });
 
   return (
     <section
@@ -253,6 +289,12 @@ export default function Blog() {
       className={styles.section}
       id="blog"
       data-nav-theme="light"
+      /* THE ONE SWITCH. Everything the cascade does hangs off this
+         attribute, and it never comes back off — useInView is `once`, so
+         a reader scrolling back up does not replay the chapter.
+         `undefined` rather than "off" so the parked rules can be written
+         as :not([data-in]) and the released state needs no selector. */
+      data-in={inView ? "on" : undefined}
     >
       {/* ── THE OPENING RULE IS GONE, at the user's instruction ──
           A 1px hairline on --rule used to stand here, inset to
@@ -272,9 +314,13 @@ export default function Blog() {
           The rule was 1px plus a negative margin that pulled the head to
           18px off it, against the section's own gap; with the span gone the
           head is simply the first flex child and sits on the section's
-          padding-top, which is unchanged at 36px. Nothing outside this file
-          moves — <Passage> subtracts Blog's 36px by hand and that number is
-          still 36. */}
+          padding-top. ⚠️ THAT PADDING IS NO LONGER 36px AND NOTHING
+          SUBTRACTS IT ANY MORE. <Passage> used to sit underneath and
+          subtract 36 by hand; it has moved down the page, AboutSplit's
+          descending plate is now directly above, and this section's top
+          padding is sized to clear that plate — see the derivation on
+          `.section` in Blog.module.css. The head still sits on the
+          padding-top, whatever it currently is. */}
 
       {/* ═══ THE CHAPTER HEAD — Discover's three-part lockup: the group's
           mark set into a standing label, the display sentence under it,
@@ -284,7 +330,7 @@ export default function Blog() {
           THE MARK IS DECORATIVE, hence alt="". 1024×1024 is the file's
           real size — maginhawa.png is a SQUARE mark, not a horizontal
           lockup; see the same note in Discover.tsx. ═══ */}
-      <div className={styles.head}>
+      <div className={styles.head} ref={headRef}>
         <div className={styles.labelRow}>
           <h2 className={styles.chapterLabel}>
             <Image
@@ -295,13 +341,30 @@ export default function Blog() {
               height={1024}
               aria-hidden
             />
-            Blog
+            {/* the word is wrapped because it has to be masked separately
+                from the mark beside it: the lockup's own box is as tall as
+                the 2.6em mark, so a clip on <h2> would be nowhere near the
+                word's line box and the descent would show above it. */}
+            <span className={styles.labelWordMask}>
+              <span className={styles.labelWord}>Blog</span>
+            </span>
           </h2>
         </div>
 
-        <p className={styles.lede}>
-          Stories, openings, and ideas shaping the Maginhawa Group.
-        </p>
+        {/* ⚠️ THIS ONE SWEEPS, IT DOES NOT DESCEND, and the measurement
+            that decided it is worth keeping: the lede is two lines from
+            768 up (breaking before "Maginhawa") and FIVE at 390, where
+            the chapter's 12px margin binds before the 17.7em measure
+            does. A descending block has to travel its own height, so
+            that is a 189px fall on a phone next to a 20px one on the
+            label. Authored lines were the other way out and are worse —
+            the break is not stable enough to hard-code. See the note over
+            blogSettle in Blog.module.css. */}
+        <div className={styles.ledeMask}>
+          <p className={styles.lede}>
+            Stories, openings, and ideas shaping the Maginhawa Group.
+          </p>
+        </div>
 
         {/* THE ARCHIVE LINK — the house action, shared with About's "Read
             our story" and the closing frame's "Choose a restaurant" (see
@@ -309,6 +372,13 @@ export default function Blog() {
             hangs the pill off the display line's bottom edge at the row's
             right end. The label reads "Read More"; the accessible name says
             what it actually opens, which is the whole archive. */}
+        {/* ⚠️ THE SWEEP GOES ON THE HOST, WHICH IS WHAT `className` LANDS
+            ON — never on the magnet inside it. PillCta writes the cursor
+            spring's x/y to `.magnet`'s inline style, so anything this file
+            put there would be overwritten every frame without erroring.
+            The clip is also why the animation fills `backwards`: once it
+            ends the host is unclipped again, and the magnet's travel and
+            the focus ring travel with it. */}
         <PillCta
           href="/blog"
           className={styles.ctaHost}
@@ -321,19 +391,24 @@ export default function Blog() {
         <span className={styles.headRule} aria-hidden />
       </div>
 
+      {/* ── NO MOTION WRAPPERS LEFT ──
+          The two columns used to arrive as two <motion.div>s fading up
+          26px, 120ms apart, and everything else in the chapter stood
+          still. The cascade animates thirteen elements, which is more
+          projection nodes than this static subtree should be carrying —
+          so it runs on CSS off a single attribute instead, the way
+          Discover's title and SplitWords' CSS path already do. */}
       <div className={styles.body}>
-        {FEATURED ? (
-          <motion.div {...enter(0)}>
-            <LedeCard post={FEATURED} />
-          </motion.div>
-        ) : null}
+        {FEATURED ? <LedeCard post={FEATURED} /> : null}
 
-        <motion.div className={styles.rail} {...enter(0.12)}>
-          <p className={styles.railLabel}>Latest</p>
-          {RAIL.map((post) => (
-            <RailRow key={post.slug} post={post} />
+        <div className={styles.rail}>
+          <div className={styles.railLabelMask}>
+            <p className={styles.railLabel}>Latest</p>
+          </div>
+          {RAIL.map((post, i) => (
+            <RailRow key={post.slug} post={post} beat={RAIL_BEAT + i} />
           ))}
-        </motion.div>
+        </div>
       </div>
     </section>
   );

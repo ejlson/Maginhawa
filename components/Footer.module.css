@@ -364,6 +364,26 @@
   margin-top: auto;
 }
 
+/* The mask layer. Purely a box for the clip to live in — it takes no space of
+   its own, and it exists ONLY because the clip cannot go on the wrapper above:
+   Chromium hands an element's own clip-path to IntersectionObserver, so a
+   wrapper clipped to nothing measures as unseen and the entrance never fires.
+   See the note beside markIn in Footer.tsx. */
+.wordmarkMask {
+  display: block;
+  width: 100%;
+  /* ⚠️ THE CLIP-PATH CANNOT DO THIS JOB, and the failure looks nothing like
+     a masking bug. `clip-path` changes what an element PAINTS; it does not
+     take the element out of the document's scrollable overflow. The svg in
+     here starts 30% of its own height low, which is ~90px at desktop, and
+     ~52px of that hangs below the footer's last row — so the page measured
+     52px taller than its own content and the reader arriving at the footer
+     landed in a strip of bare cream under it. `overflow: clip` is what
+     bounds the scroll extent. It clips nothing at rest: the svg fills this
+     box exactly and comes home to translateY(0). */
+  overflow: clip;
+}
+
 /* single-line wordmark, natural proportions (not squished), full bleed width */
 .wordmark {
   flex: none;

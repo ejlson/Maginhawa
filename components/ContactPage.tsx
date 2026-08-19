@@ -108,7 +108,7 @@ export default function ContactPage() {
                         <span className={styles.visitAddr}>
                           {a.street}, {a.postcode}
                         </span>
-                        <span className="sr-only">— open in Google Maps</span>
+                        <span className="sr-only">- open in Google Maps</span>
                       </a>
                     </li>
                   ))}

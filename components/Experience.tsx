@@ -225,35 +225,39 @@ export default function Experience() {
               masthead rewrite, and the home page was left with no editorial
               route to the group's story at all. This is that route. */}
           <AboutSplit />
-          {/* ══════ THE HANDOVER INTO THE JOURNAL ══════
-              Two lines of display type on an empty screen. It exists to
-              carry a change of REGISTER that the page previously made with
-              no transition at all: the split above closes on who the group
-              is, in the present tense with no date on it, and <Blog> opens
-              on "Stories, openings, and ideas", where everything happened on
-              a particular day. Those two ran into each other across 48px —
-              AboutSplit's 12px gutter plus Blog's 36px top — which is less
-              air than Blog keeps between its own label and its lede.
+          {/* ══════ THE JOURNAL FOLLOWS THE STORY AGAIN ══════
+              It no longer follows the handover: <Passage /> has moved down
+              to sit above <Reservations />, so AboutSplit runs straight into
+              the journal exactly as it did before the handover was
+              introduced. This comment has now outlived two neighbours —
+              press stood here first, then the handover — and the parts of it
+              that were about THIS seam are what keep being kept.
 
-              IT OWNS BOTH OF ITS SEAMS, which is the one thing to know
-              before moving it. AboutSplit contributes no vertical air and
-              expects its neighbour to own the gap; Blog brings 36px of its
-              own top, and Passage.module.css SUBTRACTS that 36px by hand
-              rather than letting two correct numbers sum to a wrong one.
-              Move this section and both halves of that arithmetic move
-              with it.
+              ⚠️ THE REGISTER JUMP THE HANDOVER WAS BUILT TO COVER IS BACK.
+              The split above closes on who the group is, present tense with
+              no date on it, and this section opens on "Stories, openings,
+              and ideas", where everything happened on a particular day.
+              Passage was inserted precisely because those two ran into each
+              other with no transition. If the register jump reads badly
+              again, that is the argument the handover was won on, not a new
+              problem.
 
-              THE SEAM THAT USED TO BE HERE IS UNCHANGED IN KIND. The
-              comment below still describes About → Journal as a run with a
-              photograph missing from it. That is still true — this is type,
-              not a picture, and the page's picture count at its quietest
-              point is still down one. What it fixes is the register jump,
-              not the image count. */}
-          <Passage />
-          {/* ══════ THE JOURNAL FOLLOWS THE HANDOVER ══════
-              It follows press's departure to the slot below — this comment
-              described press while press stood here, and the parts of it
-              that were about THIS seam are kept.
+              ⚠️ AND THE SEAM HAS BEEN REWRITTEN TWICE, BOTH AT THE USER'S
+              INSTRUCTION. It used to have to CLEAR A MOVING PLATE:
+              AboutSplit's picture descended 150px on its way out — the
+              handover absorbed that, and once the handover moved, this
+              chapter had to hold it off on its own (`calc(var(
+              --home-gap-tight) + 150px - var(--grid-gutter))`, 336px at
+              1440×900, derived after a sweep measured the plate 102px OVER
+              this chapter's label).
+              The picture no longer moves at all, so that term is gone; and
+              the seam is now HALF a tight chapter gap with a HAIRLINE
+              CENTRED IN IT — 49.5px of cream, the line, 49.5px of cream at
+              1440×900. The line is what separates the two chapters now, and
+              the whitespace was halved because of it. Derivation and the
+              rule itself are in Blog.module.css (`--about-seam`,
+              `.section::before`); the picture's side of it is the note where
+              `blockY` was, in AboutSplit.tsx.
 
               A PHOTOGRAPH IS STILL MISSING FROM THIS RUN. The full-screen
               photo interlude that once sat between About and the journal was
@@ -311,10 +315,15 @@ export default function Experience() {
                 trap AboutSplit.module.css keeps flagging. Press now takes 0
                 on top and lets the journal own that gap.
               — BELOW. Press used to close on --grid-gutter (12px) because
-                Blog's 132px top followed it and owned the air. What follows
-                it now is <Reservations />, which declares `margin-top: 0`
-                and no top padding at all — it owns nothing. So press has to
-                own its own bottom, and takes the chapter air there instead.
+                Blog's 132px top followed it and owned the air. It then took
+                the chapter air itself because <Reservations /> followed and
+                owns nothing. ⚠️ NEITHER IS WHO IS UNDER IT NOW: <Passage />
+                is. The VALUE is unchanged and still right — a chapter's air
+                under the mastheads — but it is now the TOP HALF of Passage's
+                seam rather than the whole of the film's, and Passage
+                subtracts it by hand rather than stacking a second break on
+                it. PressWall.module.css still names Reservations in its own
+                note and wants correcting; see the note above <Passage />.
 
               AND THE SEAM ABOVE ABOUTSPLIT SURVIVES UNTOUCHED, which is the
               one that was genuinely tuned: AboutSplit contributes no
@@ -328,6 +337,56 @@ export default function Experience() {
               nothing — it remains dead code with a stay of execution,
               alongside AboutIntro and MaroonZone. */}
           <PressWall />
+          {/* ══════ THE HANDOVER, AND IT NO LONGER HANDS OVER TO THE JOURNAL ══════
+              Two lines of display type on an empty screen. MOVED HERE from
+              between <AboutSplit /> and <Blog />, at the user's instruction.
+
+              ⚠️ WHAT IT WAS FOR IS NOT WHAT IT IS FOR NOW, and the old
+              comment is not worth keeping because every clause of it named a
+              neighbour that has gone. It existed to carry a change of
+              REGISTER: the story split closed on who the group is, present
+              tense with no date on it, and <Blog> opened on "Stories,
+              openings, and ideas", where everything happened on a particular
+              day. Those two ran into each other across 48px. They now run
+              into each other directly again — see the note above <Blog />,
+              which inherits that seam back.
+
+              WHAT IT CARRIES HERE IS THE TURN OUT OF THE PAGE. Above it the
+              mastheads are the page's last piece of evidence — other
+              people's words about the group. Below it <Reservations /> is
+              the page's only transaction. The handover now sits between
+              being told about the group and being asked to book it, which
+              is a bigger turn than the one it was built for and the copy
+              already fits it: line A concedes the group is several
+              different rooms, line B answers that they hold one standard.
+              That is the last thing said before a booking form.
+
+              ⚠️ IT OWNS ONE SEAM NOW, NOT TWO, AND THAT IS THE REVERSAL.
+              Its stylesheet used to subtract Blog's 36px top from its own
+              bottom and take the whole chapter break on top because
+              AboutSplit contributed nothing. BOTH FACTS INVERT HERE:
+              — ABOVE, <PressWall /> pays. Its bottom is
+                clamp(64px, 9vh, 132px) and its own note says that value
+                exists because "Reservations owns nothing" — which is no
+                longer who is under it. That air is now the top of this
+                seam, so Passage.module.css SUBTRACTS it rather than
+                stacking a second chapter break on top of it.
+              — BELOW, nothing pays. <Reservations /> declares
+                `margin-top: 0` and no top padding at all; it is the film and
+                it starts at its own first pixel. So the bottom pad here is
+                the entire cream→film seam with nothing subtracted from it.
+              Move this section again and both halves of that arithmetic move
+              with it — the numbers are derived in Passage.module.css and
+              each one names the neighbour it was measured against.
+
+              ⚠️ AND PressWall.module.css NOW DESCRIBES THE WRONG NEIGHBOUR.
+              Its bottom-padding note is headed "BOTTOM OWNS THE WHOLE GAP
+              BECAUSE RESERVATIONS OWNS NOTHING". The value is still right —
+              a chapter's air under the mastheads — but the reason named is
+              not, because what follows it is this section. Left unfixed,
+              the next person to move either one will derive from a
+              neighbour that is not there. */}
+          <Passage />
           {/* No open-roles index on the cream page: hiring lives behind the
               footer's Careers link, which is where someone looking for a job
               would go anyway. */}

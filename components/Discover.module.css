@@ -43,15 +43,43 @@
      borrowing the next chapter's air. 22px of this chapter's own padding
      plus the statement's 36px is more cream than the cards ever had
      between their own rows. */
+  /* ── AND THE BOTTOM PAD GOES BACK OUT, at the user's instruction: more
+     air between the grid and the statement. The paragraph above is kept
+     because its argument is still the right one — it is the CONCLUSION
+     that is being overridden, not the reasoning, and the seam it equalised
+     against is the number to re-read if this ever needs undoing.
+
+     WHAT WAS ACTUALLY THERE, measured ink to ink at 1440 × 900 by
+     scripts/probe-home-spacing.mjs rather than added up from stylesheets:
+     55px. (The ~93 the note above quotes was a differently-drawn
+     measurement of the same seam; the probe is the one to trust, and it is
+     what the number below was set against.)
+
+     clamp(64px, 9vh, 132px) is 81px at 900 and takes the seam to 114px —
+     roughly double, which is what "a bit more" asks for on a seam this
+     tight, and still well inside --home-gap-tight (168px at its floor), the
+     token the system reserves for a full-bleed block meeting cream. This is
+     two cream chapters, so it should not reach that scale.
+
+     THE VALUE IS BORROWED, NOT INVENTED. clamp(64px, 9vh, 132px) is Blog's
+     own top and bottom padding — the one chapter-scale air measure this
+     page already keeps, and the one Experience.tsx's seam notes cite when
+     they reason about who owns a gap. Re-using it means this seam is on a
+     measure the page has rather than on a number chosen for it alone.
+
+     IT COSTS THE CARDS NOTHING. The padding is BELOW the grid, so no card
+     moves; only the section box grows, from 886px to ~945px at 1440 × 900.
+     That worsens only the "whole section on one screen" test, which
+     PLATE_RATIO's note already records as given up and already false above
+     1440. The test that matters — all eight cards on screen — is measured
+     from the last card's bottom edge and is untouched. */
   /* ── THE HEAD COMES UP THE SHEET, at the user's instruction ──
      The top was clamp(36px, 6vh, 96px) — 54px at 900 — and with the
      opening rule deleted above it there is nothing left in that air to
      justify it: the chapter simply began 54px down a cream field. At
      clamp(16px, 2.6vh, 40px) it is 23px, so the mark and eyebrow sit
-     close under the seam and the chapter starts where the cream does.
-     The bottom is unchanged; it is doing the seam arithmetic to the
-     statement below (see its own note). */
-  padding: clamp(16px, 2.6vh, 40px) var(--pad-x) clamp(16px, 2.4vh, 36px);
+     close under the seam and the chapter starts where the cream does. */
+  padding: clamp(16px, 2.6vh, 40px) var(--pad-x) clamp(64px, 9vh, 132px);
   /* THE HEAD'S AIR BEFORE THE GRID, and it is the section's only gap —
      .head and .grid are its two in-flow children (the assembly stage is an
      absolutely-positioned overlay and does not participate).
@@ -91,10 +119,9 @@
    what is given up here; the journal keeps its opening rule and this
    chapter now starts on open cream.
 
-   ⚠️ .footRule STILL CLOSES THE CHAPTER and its note calls the two "a
-   matched pair bracketing the whole chapter". They are not a pair any
-   more. Read that comment as describing what the bottom rule does on its
-   own, not as a claim about a rule above it. */
+   .footRule, which closed the chapter under the last row, has since gone
+   the same way. The chapter now carries ONE rule — .headRule, dividing the
+   head from the pictures — and no edge of its own at either end. */
 
 @media (min-width: 981px) {
   .section {
@@ -287,14 +314,13 @@
 
 /* THE MIDDLE HAIRLINE — closes the head, opens the grid.
 
-   ⚠️ IT USED TO SAY "HAIRLINE 1 OF 3" and the count had been wrong through
-   at least two passes, so the rules are NAMED here rather than numbered.
-   The chapter carries three, and each one is doing a different job:
-     .topRule   opens the chapter, above the head
-     .headRule  THIS ONE — divides the head from the pictures
-     .footRule  closes the chapter, under the last row
-   topRule and footRule are a matched pair bracketing the whole chapter;
-   this one is the internal division. Full band width, so it
+   ⚠️ IT IS THE CHAPTER'S ONLY RULE NOW, and the count in this note has
+   been wrong through several passes, so what is left is stated rather than
+   numbered. There were three: `.topRule` opened the chapter above the
+   head, `.footRule` closed it under the last row, and this one divided the
+   head from the pictures. Both of the outer pair are deleted (see their
+   notes), so nothing draws an edge AROUND the chapter and this is purely
+   an internal division. Full band width, so it
    stretches rather than fitting the type above it: a rule that stops at the
    text's right edge reads as an underline of the sentence, and this one is
    a boundary for the whole chapter. --rule is the site's hairline token
@@ -319,40 +345,25 @@
   margin-top: calc(18px - var(--head-gap));
 }
 
-/* THE CLOSING HAIRLINE, at the user's instruction — the partner to
-   `.topRule`, so the chapter is bracketed rather than merely started.
+/* ── .footRule IS GONE, at the user's instruction ──
+   It was the closing hairline under the last row of pictures, added as the
+   partner to `.topRule` so the chapter read as bracketed. `.topRule` was
+   deleted first (see the note near .section), which left this one closing
+   a shape that no longer had an opening edge — a single unmatched line
+   between two cream sections, which is exactly what the note it argued
+   with called out. That note is Manifesto.module.css's: "NO CLOSING RULE.
+   A full-width hairline used to sit on this section's bottom border box…
+   It was drawing a boundary the page does not have… The gap is the
+   separator. Do not put the line back." It stands again, for both
+   sections, and this one has now been put back and taken away once.
 
-   ⚠️ IT REOPENS A DECISION THAT WAS WRITTEN DOWN, and the note it argues
-   with is worth reading before this one is ever moved again.
-   Manifesto.module.css carries: "NO CLOSING RULE. A full-width hairline
-   used to sit on this section's bottom border box… It was drawing a
-   boundary the page does not have… The gap is the separator. Do not put
-   the line back."
+   .headRule is untouched and is not the same case: it divides the head
+   from the grid INSIDE the chapter rather than drawing an edge around it.
 
-   WHAT HAS CHANGED SINCE, and why the instruction is not simply that
-   decision being undone:
-     · THE ORDER INVERTED. That rule sat under the STATEMENT, which is a
-       single centred sentence on open cream — a line under it read as the
-       page being cut in half, because there was nothing above the line but
-       air. This one sits under a GRID of eight photographs, where it is
-       the bottom edge of a block that already has a hard top edge (the
-       head's own hairline). It closes a shape rather than dividing a page.
-     · IT IS NOW A PAIR, NOT A STRAY. `.topRule` already opens this
-       chapter; this shuts it, so the whole thing is bracketed rather than
-       started and then abandoned. A single unmatched line between two
-       sections was the thing that read wrong, and this is the opposite of
-       that — it is the second half of a rule that already existed.
+   It also bought the grid ~1px plus whatever the seam's air made of it,
+   which is not why it went but does not hurt — see PLATE_RATIO's fit
+   arithmetic in Discover.tsx. */
 
-   SEATED INSIDE THE CHAPTER'S PADDING, not on the section's border box —
-   the section's bottom padding stays below it, so the rule belongs to the
-   restaurants and the air belongs to the seam. It ends where the grid ends
-   because it is a child of the same padded box, which is why there is no
-   margin-inline here to keep in step with anything. */
-.footRule {
-  width: 100%;
-  height: 1px;
-  background: var(--rule);
-}
 
 
 /* Each word of the heading is a CLIP it climbs out of — the manifesto's
@@ -372,6 +383,17 @@
    ≥981px grew from six columns to nine (see .title in the media block
    below for the measured arithmetic), because the two words side by side
    need the room the stack never did. */
+/* ONE FLEX ITEM HOLDING BOTH MASKS, and it is not optional. `.chapterLabel`
+   is a flex row with a `gap` sized for the standing mark beside the words;
+   put the two masks in as flex children and that gap lands BETWEEN "Our"
+   and "restaurants" as well, blowing the word space out to the mark's
+   measure and stranding `.titleLine`'s own 0.28em margin. Wrapped, the
+   words are one item to the flex container and ordinary inline content
+   inside it, which is what the margin and the real U+0020 below expect. */
+.titleText {
+  display: inline-block;
+}
+
 .titleLine {
   display: inline-block;
   overflow: hidden;
@@ -427,10 +449,68 @@
    token instead of a hex literal duplicated into the component. The delay
    is the beat after the last plate settles; the curve commits quickly and
    then eases off, the way a hand does. */
-.titleRise {
+/* THE WORD ITSELF, parked ABOVE its mask until the chapter arrives.
+
+   ⚠️ IT DESCENDS, at the user's instruction — "the same swipe down the blog
+   header has". It used to rise out of the bottom of the clip; the sign on
+   the park is the whole of the change, and it is the sign that matters,
+   because it is what makes this lockup and Blog's read as one gesture. Over
+   there the chapter word parks at translateY(-110%) out of `.labelWordMask`
+   and every other piece of type in the chapter follows it down
+   (`blogDescend`, Blog.module.css). This chapter's head had been the last
+   one on the cream page still travelling the other way.
+
+   115%, NOT 100%. `.titleLine` is padded 0.1em taller than the word's line
+   box so the clip does not shave descenders at rest (see that rule) — the
+   pad is symmetric (`padding-block`), so the word has that much further to
+   travel before it is fully hidden whichever edge it hides behind. The two
+   numbers are one setting written twice — move the padding and move this.
+   SplitWords makes the same derivation at 145% from a 0.30em pad.
+
+   A CSS TRANSITION RATHER THAN A FRAMER VARIANT, because the thing that
+   knows the chapter has arrived is `inView`, a boolean this component
+   already keeps for the grid. Driving the word from the same flag is what
+   welds the heading and the plates to ONE arrival; giving the word its own
+   `whileInView` is the documented way to get this wrong — an observer
+   intersects its target against the clip rect of every ancestor, so a word
+   parked outside an `overflow: hidden` line reports a zero ratio forever and
+   never moves at all. The observer belongs on the section, and it is there. */
+.titleWord {
   display: inline-block;
+  transform: translateY(-115%);
+  /* the second word leaves a beat after the first — one declaration, with
+     each mask carrying its own index, rather than a rule per word */
+  transition: transform 0.85s var(--ease-entrance)
+    calc(var(--tw-i, 0) * 0.09s);
   will-change: transform;
-  transition: color 0.8s var(--ease-state) 0.3s;
+}
+
+.titleWord[data-on="on"] {
+  transform: translateY(0);
+}
+
+/* NAMING THE CHAPTER. "Restaurants." warms from maroon to saffron once
+   everything else in the chapter has stopped moving — the chapter signing
+   its own name last.
+
+   `--saffron-ink` rather than `--saffron`: the display saffron measured
+   ~3.0:1 on cream when this was written, which is the large-text floor
+   with nothing spare, and this is the one word on the page carrying the
+   section's name. THE ACCENT HAS MOVED TWICE SINCE and now measures 4.55:1
+   on the softened ground, so the original margin argument no longer holds
+   the way it did — but --saffron-ink still reads 5.91:1 (it was 6.66:1),
+   which is the brighter margin of the two, and it reads as the same colour
+   at this size. Keeping it.
+
+   A transition on `color`, not a framer animation: it is one property on
+   one word, changed once, and keeping it in CSS means the value stays a
+   token instead of a hex literal duplicated into the component. The delay
+   is the beat after the last plate settles; the curve commits quickly and
+   then eases off, the way a hand does. */
+.titleRise {
+  transition:
+    transform 0.85s var(--ease-entrance) calc(var(--tw-i, 0) * 0.09s),
+    color 0.8s var(--ease-state) 0.75s;
 }
 
 .titleRise[data-lit="on"] {
@@ -438,6 +518,13 @@
 }
 
 @media (prefers-reduced-motion: reduce) {
+  /* the word is simply standing — no rise, no promoted layer, and no
+     dependence on `inView` ever becoming true */
+  .titleWord {
+    transform: none;
+    transition: none;
+    will-change: auto;
+  }
   .titleRise {
     transition: none;
   }
@@ -571,11 +658,94 @@
   position: relative;
 }
 
+/* THE WIPE'S WINDOW, and it exists ONLY while the cell is opening.
+
+   The clip is behind an attribute rather than standing on `.cell` because a
+   resting `clip-path: inset(0%)` is not a no-op — it is the cell's border
+   box, and VenueCard's hover lifts, scales and shadows OUTSIDE that box, so
+   a permanent clip shears the lift and the whole of --shadow-card-hover off
+   at the edge. Tile drops `data-wiping` the moment the wipe lands and the
+   cell goes back to having no clip at all.
+
+   THE FALLBACK IS 0%, NOT 100%, and that is a deliberate failure mode. If
+   the script never runs, framer never writes --wipe and the cell renders
+   fully open: no animation, but eight readable cards. A 100% fallback would
+   fail the other way, leaving an empty grid on any page where hydration
+   died. The parked state comes from framer's own `initial="hidden"`, which
+   is emitted into the server's HTML, so the honest first paint is still a
+   closed card.
+
+   `round` IS ABSENT ON PURPOSE — the visible corner belongs to
+   .cardSurface inside this box, so a square clip only ever cuts at or
+   outside a corner the reader can see. */
+.cell[data-wiping="on"] {
+  clip-path: inset(0% 0% var(--wipe, 0%) 0%);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* belt to the component's brace: it never sets the attribute under this
+     query, and if it somehow did, the cell still would not clip */
+  .cell[data-wiping="on"] {
+    clip-path: none;
+  }
+}
+
+/* ── THE SHELF STEPS BACK ──
+   While a card is open the grid behind it scales down and dims, in a wave
+   travelling outward from the tile that was pressed. It is the other half of
+   the response — .expandBackdrop drops the room lights, this moves the
+   furniture — and neither half works alone: the dim on its own flattens the
+   grid into wallpaper, the recede on its own leaves eight bright photographs
+   arguing with the one the reader chose.
+
+   THE PRESSED CELL IS EXEMPT, AND THAT IS A CORRECTNESS RULE RATHER THAN A
+   TASTE ONE. Framer re-measures this exact cell when the expansion unmounts,
+   to fly the plate back into it. A transform on the cell at that moment is a
+   transform on the measured box, and the card would land scaled-down and
+   offset — the same class of bug this file already records once, from when
+   the hover lift lived on a <button> wrapping the plate. `[data-open]`
+   carries no style; existing is its whole job.
+
+   THE TRANSITION IS ON `.cell` UNCONDITIONALLY so the return journey is
+   animated too — a transition declared only inside the dimmed state applies
+   going in and snaps coming out. The delay is per-cell (--recede-delay,
+   written inline by Tile) on the way IN and zeroed on the way OUT: a wave
+   that stepped back in sequence should come back all at once, because by
+   then the reader is looking at the card, not at the grid.
+
+   NO BLUR, and the omission is deliberate — see the note on RECEDE_STEP_S in
+   Discover.tsx. Eight full-bleed photographs, several of them running video,
+   is not a subtree to put an animated `filter` on for an effect a 55% dim
+   already swallows. */
+.cell {
+  transition:
+    transform 420ms var(--ease-entrance) 0ms,
+    opacity 420ms var(--ease-entrance) 0ms;
+}
+
+.grid[data-dimmed="on"] .cell:not([data-open]) {
+  transform: scale(0.94);
+  opacity: 0.42;
+  transition-delay: var(--recede-delay, 0s);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  /* the backdrop does the whole job here. Nothing moves, and nothing has to
+     be un-moved on the way back either. */
+  .cell {
+    transition: none;
+  }
+  .grid[data-dimmed="on"] .cell:not([data-open]) {
+    transform: none;
+    opacity: 1;
+  }
+}
+
 /* ---------- tile: the layout seat ---------- */
 /* Height via the padding-top percentage technique: the box is height 0 and
    its padding-top sets the aspect.
 
-   THE 76% HERE IS ONLY THE FALLBACK — the real padding-top arrives
+   THE 82% HERE IS ONLY THE FALLBACK — the real padding-top arrives
    inline from PLATE_RATIO in Discover.tsx, because the same fraction must
    also size the intro deck seat and the expansion, and a ratio stated
    here AND there is a ratio that drifts (a drifted ratio stretches the
@@ -600,7 +770,7 @@
   position: relative;
   width: 100%;
   height: 0;
-  padding-top: 76%;
+  padding-top: 82%;
   /* clipping, radius and shadow all live on .cardSurface inside; this box
      stays visible so the hover lift can breathe past its edge by 1% */
   overflow: visible;
@@ -679,11 +849,26 @@
    REASON:
      .expandCard     the SEAT. The only place the card's shape is stated.
      .expandMedia    the plate, `inset: 0` in the seat. The only thing that
-                     morphs.
-     .expandOverlay  everything the reader reads, at the FINAL rect from
+                     morphs — and the RAMP rides inside it now, so the
+                     card's own material travels with the picture instead
+                     of waiting for it at the destination.
+     .expandOverlay  everything the reader READS, at the FINAL rect from
                      frame one, clipped to the card's corner.
      .expandClose    a third sibling, so it is neither scaled by the morph
                      nor buried under the overlay.
+
+   ⚠️ THE RAMP WAS IN .expandOverlay UNTIL THIS PASS and the line above used
+   to say so. The reasoning it was moved for, kept because it is the thing
+   that must not be undone: the overlay sits at the card's FINAL rectangle
+   from frame one, so a ramp inside it was a full-width slab of dark laid
+   over the DIMMED GRID while the plate was still small. Measured at
+   1440×900 on Belly, ramp visible at t≈147ms with the plate 0.57 of the way
+   across and the ramp 265px WIDER than it; 42% of the ramp's own area was
+   painted on the backdrop rather than on the photograph, and it stayed ≥20px
+   wider at ≥0.5 opacity until t≈340ms. .expandRampBlur made that worse than
+   a dark slab: where it overhung, its backdrop was the dimmed grid, so the
+   filter smeared NEIGHBOURING TILES into a pale floating panel. Inside the
+   plate the ramp is over the film on every frame and neither can happen.
    ══════════════════════════════════════════════════════════════════════ */
 
 /* Fixed stage PORTALED to <body> (never inside .afterHero's z-index: 1
@@ -695,8 +880,23 @@
   inset: 0;
   z-index: 200;
   display: grid;
+  /* THE TRACKS ARE STATED, and they have to be. With the implicit `auto`
+     track this grid had, the column sized itself to the CARD — so the card's
+     own `max-width: 100%` was measuring against a track the card had just
+     defined, i.e. it was self-referential and could never bind. That was
+     invisible while the card was portrait (it never wanted more width than
+     the stage had) and became a card hanging off both edges of a tablet the
+     moment it went landscape. `minmax(0, 1fr)` pins both tracks to the
+     padded stage, which is what the percentage was always meant to mean. */
+  grid-template-columns: minmax(0, 1fr);
+  grid-template-rows: minmax(0, 1fr);
   place-items: center;
-  padding: clamp(16px, 3vw, 48px);
+  /* ONE number for the stage's inset, because .expandCard's height has to
+     subtract it from the viewport to work out how wide it is allowed to be
+     — see the third term of its `min()`. An inset stated twice is an inset
+     that drifts. */
+  --stage-pad: clamp(16px, 3vw, 48px);
+  padding: var(--stage-pad);
 }
 
 /* deep ink dim — the room lights dropping, not a grey veil. Mixed from
@@ -708,35 +908,59 @@
   background: color-mix(in srgb, var(--maroon) 50%, transparent);
 }
 
-/* ── THE SEAT, AND IT IS HEIGHT-DRIVEN ──
-   A portrait card's binding constraint is vertical, so the height is stated
-   and the width follows from the aspect. Driving it the other way (a width
-   clamp with the height derived) puts the card's bottom edge off screen on
-   any window shorter than 4/3 of the width it happened to choose, and the
-   block — which is the whole reason the card is tall — is the part that
-   goes.
+/* ── THE SEAT, AND IT IS STILL HEIGHT-DRIVEN ──
+   THE SHAPE IS 16 : 9 NOW, not the 3 : 4 portrait this card shipped with.
+   The two things that changed with it are worth stating together, because
+   the second is the reason the first is worth doing:
 
-   `min(100%, 860px)`: 100% of the grid AREA, which .expandRoot's padding
-   has already inset from the viewport, so the card can never touch an edge.
-   The 860 cap is not a fit constraint, it is a print one — on a 1440p
-   monitor the uncapped card is a 1300px-tall photograph, and past about 860
-   the reader is scanning the picture rather than reading the card.
+     · THE BLOCK READS UPWARD. Story, then place and room, then a hairline,
+       then the venue's name sharing one baseline with its controls. That
+       arrangement wants MEASURE, not height — see the `plate` prop in
+       VenueCard.tsx.
+     · THE MORPH STOPS BEING A TWO-AXIS SCALE. The tile is 1.32 landscape;
+       the old destination was 0.75 portrait, so the flight scaled x and y
+       by factors ~1.8 apart and .expandFrame's counter-projection was
+       load-bearing the whole way across. 1.78 against 1.32 is a far smaller
+       divergence. .expandFrame STAYS — the two are not equal and a card
+       under a moving film has no margin for a squash — but it is now
+       correcting a small error instead of a large one.
 
-   3:4 IS THE SHAPE, and it is NOT PLATE_RATIO's inverse or anything else
-   derived from the tile. The tile is 1.32 landscape and this is 0.75
-   portrait: the two disagree on purpose (that is the change), the morph
-   between them is a two-axis scale, and .expandFrame below is what stops
-   that scale from deforming the film.
+   HEIGHT-DRIVEN, EVEN THOUGH THE SHAPE IS WIDE, and that is deliberate: a
+   stated height with the width derived from the aspect keeps 16 : 9 exactly
+   under vertical pressure, where a stated width would hold its width and let
+   the ratio break. THE THREE TERMS OF THE `min()` ARE THREE DIFFERENT
+   CONSTRAINTS and all three bind on some real window:
 
-   `max-width: 100%` is the escape hatch, and it BREAKS the aspect when it
-   fires — deliberately. On a window narrower than 3/4 of its height the
-   choice is between a card that overflows the stage and one that is taller
-   than 3:4, and the second is merely a shape. Below 700px the media query
+     100%          the padded stage's height. Binds on a short laptop —
+                   1280×720 gives 643, and the card comes out 1144 × 643.
+     552px         the PRINT cap, 980px expressed as a height (980 ÷ 16 × 9).
+                   Binds on any ordinary desktop. It came down from 1180 on
+                   the note that the card was too wide; at 980 the story sets
+                   to a comfortable measure instead of running the whole way
+                   across a monitor.
+     the third     the padded stage's WIDTH, converted to a height through
+                   the aspect (× 9/16). Binds on a TABLET — 834×1112 has
+                   plenty of height and only 784 of width, and without this
+                   term the card asked for 980 and hung off both edges.
+
+   Viewport units in that third term rather than a percentage, because a
+   percentage height resolves against the container's HEIGHT and the quantity
+   needed here is its width. Safe from scrollbar error: the component sets
+   `overflow: hidden` on the documentElement for as long as this card exists,
+   so there is no scrollbar for 100vw to disagree with.
+
+   `max-width: 100%` is the last escape hatch and it BREAKS the aspect when
+   it fires — deliberately, and in the right direction: a card TALLER than
+   16 : 9 has more room for the block, not less. Below 700px the media query
    at the foot of this block stops pretending and lets the card fill. */
 .expandCard {
   position: relative;
-  height: min(100%, 860px);
-  aspect-ratio: 3 / 4;
+  height: min(
+    100%,
+    552px,
+    calc((100vw - 2 * var(--stage-pad)) * 0.5625)
+  );
+  aspect-ratio: 16 / 9;
   width: auto;
   max-width: 100%;
   /* the block inherits it, and every word on this card is cream — the
@@ -764,10 +988,22 @@
    landscape tile and the portrait card, and a framer projection scales its
    entire subtree. Left alone the film would squash flat at the start of the
    flight and spring back at the end. This box takes `layout` in the
-   component, which makes it a projection node of its own: it renders into
-   the interpolated rectangle each frame instead of being scaled into it, so
-   `object-fit: cover` simply re-crops the whole way across. It needs no
-   radius of its own — the plate above clips it. */
+   component, which makes it a projection node of its own, so `object-fit:
+   cover` simply re-crops the whole way across. It needs no radius of its
+   own — the plate above clips it.
+
+   ⚠️ HOW IT DOES THAT, MEASURED, because the mechanism decides what may and
+   may not live in here. This note used to say the box "renders into the
+   interpolated rectangle each frame instead of being scaled into it". It
+   does not: at 1440×900 the plate's matrix and this box's are exact
+   reciprocals (scale 0.356 against 2.808 at t=30ms, product 1.000), so this
+   box paints at its FINAL 981×552 and the PLATE'S `overflow: hidden` crops
+   it. For the photograph the two descriptions are indistinguishable — a
+   crop cannot squash, which is all this rule was ever asked for. For
+   anything anchored to an EDGE they are not: a bottom-anchored child in
+   here is pinned to the bottom of the full-size box, and that edge is off
+   the crop while the plate is small. That is why the ramp is a SIBLING of
+   this box and not a child of it. */
 .expandFrame {
   position: absolute;
   inset: 0;
@@ -793,24 +1029,35 @@
   opacity: 1;
 }
 
-/* ── EVERYTHING THE READER READS, at the card's FINAL rectangle from the
-   first frame. It is a sibling of the plate rather than a child for the
-   reason in the component's banner: a child would be scaled by the morph,
-   so the type would fly in at 1.8:1 and correct itself.
-   It clips to the same corner as the plate, or the ramp's bottom edge would
-   square off the curve underneath it. Pointer-transparent as a layer; the
-   block inside takes its own clicks back. */
-.expandOverlay {
-  position: absolute;
-  inset: 0;
-  z-index: 2;
-  border-radius: var(--radius-tile);
-  overflow: hidden;
-  pointer-events: none;
-}
-
 /* ── THE RAMP — the card's bottom material, and the type's whole contrast
-   budget. Two stacked layers, the same construction as the card's (see
+   budget. INSIDE .expandMedia, i.e. inside the plate and inside the morph,
+   which is the one structural thing about it that is not the card's.
+   Everything the reader READS is still outside (see .expandOverlay); the
+   ramp is not read, it is the ground the reading stands on, and a ground
+   belongs to the picture. Three consequences, all wanted:
+     · it is drawn at the plate's CURRENT rectangle every frame, so it can
+       never be wider than the picture it is meant to be sitting in;
+     · the blur therefore samples the FILM at every moment of the flight,
+       never the dimmed grid behind the card;
+     · the plate's `overflow: hidden` + radius clips its bottom edge, so the
+       corner is answered by the same rule that answers the picture's.
+
+   A SIBLING OF .expandFrame AND NOT A CHILD OF IT. The frame counter-scales
+   the plate rather than re-projecting into the interpolated box — measured
+   at 1440×900, the two matrices are exact reciprocals (0.356 × 2.808 =
+   1.000), so the frame paints at its FINAL 981×552 and the plate crops it.
+   Inside the frame this ramp would be pinned to the bottom of a box that is
+   nearly all outside that crop: 36px of a 304px gradient visible at t=30ms,
+   and all of it the transparent beginning. Out here it takes the plate's own
+   (sx, sy), and a gradient is the one thing on this card that may be scaled
+   — it has no intrinsic size, so a vertical ramp scaled non-uniformly is the
+   same vertical ramp over the same box.
+   THE HEIGHT IS UNCHANGED AND SO IS THE RESTING PICTURE — 55% of the plate
+   is 55% of the card once the plate has landed `inset: 0` in the seat.
+   Measured either side of the move at 1440×900 on Belly: card 981×552,
+   ramp 303.6px, block 162.7px, f = 0.464 both times.
+
+   Two stacked layers, the same construction as the card's (see
    .rampBlur in VenueCard.module.css): layer one samples the FILM through a
    backdrop blur and hands its colour back, so the ramp is warm on a warm
    venue and green on a green one; layer two is a neutral black scrim that
@@ -822,7 +1069,27 @@
    wrapper carrying the entrance fade would leave the blur sampling nothing
    for the whole of it and the colour would snap in at the end. Each takes
    the fade on its own opacity, which is composited after its own filter.
-   The component passes them the same `furniture` object for that reason.
+   The component passes them the same `rampFade` object for that reason.
+
+   THE MOVE PUT AN OPACITY BETWEEN THEM AND THE PAGE, AND IT WAS MEASURED
+   RATHER THAN ASSUMED. A `layoutId` morph is a CROSSFADE: framer writes an
+   inline opacity on .expandMedia — the new plate's own ancestor — that ramps
+   0.26 → 1 over roughly the first 130ms of the 550ms flight (sampled per
+   frame at 1440×900; .expandFrame is never given one). So .expandMedia IS a
+   backdrop root for that window. It is harmless here, and the distinction is
+   the one the paragraph above turns on: a backdrop root starves the blur
+   only when there is nothing painted UNDER the blurred element inside it.
+   .expandMedia contains the photograph and the film, which is precisely what
+   this ramp is meant to be sampling — so the root simply narrows the sample
+   to the picture. Belt and braces anyway: `rampFade` opens at 0.12s and the
+   crossfade is over at ~0.15s, so the ramp is still at ~1% opacity when the
+   plate goes fully opaque.
+   ⚠️ THE BLUR RADIUS IS SCALED WITH THE PLATE and that is accepted, not
+   overlooked: a backdrop-filter under a transformed ancestor rasterises in
+   that ancestor's space, so 40px reads as ~14px at the start of the flight
+   and resolves to exactly 40px once the transform is gone. The ground it is
+   blurring is scaled by the same factor, so the ramp reads the same at every
+   size — which is the whole reason a gradient is safe in here.
 
    55% OF THE CARD. The number that matters is where the block's top edge
    lands inside the gradient — f = (rampH − blockH) / rampH, the same
@@ -911,6 +1178,28 @@
       rgba(0, 0, 0, 0.9) 100%
     );
   }
+}
+
+
+/* ── EVERYTHING THE READER READS, at the card's FINAL rectangle from the
+   first frame. It is a sibling of the plate rather than a child for the
+   reason in the component's banner: a child would be scaled by the morph,
+   so the type would fly in at 1.8:1 and correct itself.
+   IT NO LONGER HOLDS THE RAMP. The clip stays, and the reason it stays has
+   changed: it used to be there because the ramp's bottom edge would
+   otherwise square off the plate's curve underneath it, and the ramp now
+   answers that with the plate's own `overflow: hidden`. What still needs it
+   is .expandCrown::before — the wash reaches out past the crown's insets to
+   the card's own edges, so without the clip it would end on a cut at the top
+   corners. Pointer-transparent as a layer; the block inside takes its own
+   clicks back. */
+.expandOverlay {
+  position: absolute;
+  inset: 0;
+  z-index: 2;
+  border-radius: var(--radius-tile);
+  overflow: hidden;
+  pointer-events: none;
 }
 
 /* ── THE CROWN — the card's top corner furniture, exactly as the unpressed
@@ -1135,15 +1424,27 @@
   gap: clamp(8px, 1.5vh, 14px);
   padding: clamp(16px, 2.4vh, 24px);
   container-type: inline-size;
+  /* NAMED `card`, WHICH IT WAS NOT BEFORE, and that is a fix as much as a
+     feature. VenueCard.module.css's narrow-block rules are written
+     `@container card (…)`; this container had a type and no name, so a
+     NAMED query could never match it and the expansion has never once got
+     the stacked foot the grid card gets below 365px. On a phone the modal
+     fills the stage and its block is ~318px wide — squarely inside that
+     threshold — so the rules were being written for a case that then went
+     unstyled. Naming it is what makes the expansion measured on the same
+     table as the card, rather than on a second one invented for it. */
+  container-name: card;
   pointer-events: auto;
 }
 
-/* ── THE PHONE. The 3:4 stops being right well before the layout does: on a
-   390×844 window a 3:4 box centred in the stage is 358×477 with 335px of
-   backdrop under it, i.e. more air than card. Below 700px the card simply
-   fills the stage, which is what a modal on a phone is, and the ramp does
-   the same job over a taller picture. The cap keeps it off a tablet's full
-   height. */
+/* ── THE PHONE, AND 16 : 9 IS EVEN LESS SURVIVABLE HERE THAN 3 : 4 WAS. On a
+   390×844 window the stage is ~358 wide; a 16 : 9 card in it is 358×201, and
+   the block alone — story, where-line, rule, name and controls — is taller
+   than that before the photograph gets a pixel. Below 700px the card fills
+   the stage, which is what a modal on a phone is, the ramp does the same job
+   over a taller picture, and the plate's own foot stacks (see the container
+   query at the foot of VenueCard.module.css). The cap keeps it off a
+   tablet's full height. */
 @media (max-width: 700px) {
   .expandCard {
     width: 100%;

@@ -391,13 +391,71 @@
     grid-template-columns: 1fr;
     align-items: start;
     gap: 18px;
-    padding: clamp(14px, 4vw, 20px);
+    /* THE PAGE MARGIN HORIZONTALLY, same as the two-column layout above —
+       a local clamp here put the hero's left edge at 15.6px where every
+       cream chapter below it opens at --pad-x (16px at 390). One edge. */
+    padding: 0 var(--pad-x) clamp(20px, 3vh, 40px);
   }
   .mark {
     font-size: clamp(2.75rem, 15vw, 7rem);
   }
+  /* ⚠️ THE WIDTH CALC IS A TWO-COLUMN RULE AND HAS TO BE DROPPED HERE.
+     `width: calc(100vw - var(--nav-links-left) - var(--pad-x))` seats the
+     caption's LEFT edge on the navbar's first link, which is the whole
+     point of it — but the link row is `display: none` below 820px, so
+     Nav.tsx measures its first child at x0 and writes
+     `--nav-links-left: 0px`. The column then asks for 100vw − --pad-x,
+     which is WIDER than the padded track it sits in, and `justify-self:
+     end` pushes the overflow off the LEFT of the screen: measured at 390,
+     the caption and the pill both started at x0.4 with their first glyph
+     under the bezel. Stacked there is no second column to align to, so the
+     column simply takes the track. */
   .copy {
     max-width: none;
+    width: 100%;
+    justify-self: stretch;
+  }
+}
+
+/* ── PHONE: THE WORDMARK TAKES THE WHOLE MEASURE, AND THE ACTION GOES TO
+      THE OPPOSITE CORNER ──
+   at the user's instruction, and 820px is the navbar's own breakpoint
+   (Nav.module.css) rather than a new number — below it the links are gone,
+   the bar is a burger, and the hero is a single column.
+
+   THE SIZE IS SOLVED, NOT CLAMPED, exactly as the desktop rule is: 5.297 is
+   the measured width of this string in this face at this tracking, per font
+   size unit (see .mark), so dividing the available measure by it is the
+   largest size that fits it EXACTLY. `clamp(2.75rem, 15vw, 7rem)` left the
+   word at 310px of a 358px measure — a phone-sized word floating in the
+   frame — where this fills the line edge to edge at every phone width with
+   nothing to tune by hand.
+
+   ⚠️ NO CROP HERE, and that is the one place mobile departs from the desktop
+   composition. Up there the word is deliberately sized past the plate and
+   let `overflow: hidden` cut it; a crop needs frame to be cropped BY, and a
+   390px screen has none to spare — a cut wordmark on a phone reads as a
+   layout bug, not as a cover. Full measure, both ends visible. */
+@media (max-width: 820px) {
+  .lockup {
+    /* the caption and the action need more air between them than the
+       wordmark needs from the caption — see .copy's own gap below */
+    gap: clamp(12px, 3.2vw, 18px);
+  }
+  .mark {
+    font-size: calc((100vw - 2 * var(--pad-x)) / 5.297);
+  }
+  .copy {
+    gap: clamp(16px, 4.4vw, 24px);
+  }
+  /* THE ACTION IN THE BOTTOM-RIGHT CORNER, at the user's instruction. The
+     caption stays left-ranged on the page margin with the wordmark above
+     it; the pill and its disc cross to the other end of the same row, so
+     the hero's last screen reads left-to-right and ends on the control.
+     `align-self` rather than a margin: the column is a flex box, so this is
+     the one property that moves the child without touching its siblings. */
+  .cta {
+    align-self: flex-end;
   }
 }
 
@@ -406,4 +464,27 @@
    `none`, which is what keeps the film draggable behind the type. */
 .cta {
   pointer-events: auto;
+}
+
+/* ── THE INTRO'S ZOOM WRAPPER ──
+   The film, its ramp and its grain as one object, so the intro can scale the
+   whole picture rather than uncover it. lib/introWindow.ts drives this with a
+   raw `element.animate()`; everything here is the RESTING state it returns to.
+
+   THE TRANSFORM IS NOT `none`, AND THAT IS THE POINT. Promoting four
+   full-viewport cream panels plus this layer at the moment the animation
+   starts measured a 100‑137ms hitch on EVERY run — the compositor building
+   five new layers inside one frame. A real transform plus `will-change` from
+   mount promotes them during stage 0, where there are 2.6 seconds of split-flap
+   idle to hide it in: measured, first 150ms max interval 16.9ms against 37.5ms.
+   `scale(1) translateZ(0)` is identity, so it costs nothing visually, and it
+   is exactly the reveal's final keyframe — the hand-off has nothing to snap.
+   `will-change` is cleared by releaseIntroFilm() once the intro is over, so
+   the page does not carry a promoted full-viewport layer for the session. */
+.zoom {
+  position: absolute;
+  inset: 0;
+  transform: scale(1) translateZ(0);
+  transform-origin: 50% 50%;
+  will-change: transform;
 }

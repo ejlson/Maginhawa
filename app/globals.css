@@ -693,6 +693,20 @@
 
      SHADOWS ARE MEASURED IN --maroon, never black or an rgba() literal. The
      ink is a warm red-brown; a neutral shadow under it greys the cream. */
+  /* ⚠️ AN ALPHA MULTIPLIER WAS TRIED HERE AND CANNOT WORK — worth recording,
+     because it looks like it should and it fails silently.
+     The idea was `--shadow-a: 1` at :root with each layer written
+     `calc(6% * var(--shadow-a))`, so any element could fade the whole
+     four-layer stack by setting one number on itself. It does nothing: a
+     var() INSIDE a custom property is substituted when that property is
+     computed on the element that DECLARES it — here, :root — so every
+     consumer inherits an already-resolved string and a --shadow-a set
+     further down the tree is read by nobody. The computed box-shadow came
+     back with the full alphas and the element it was set on looked
+     identical.
+     An element that needs this shadow to ARRIVE rather than to simply be
+     there fades a shadow-only box instead; AboutSplit's .mediaShadow is the
+     worked example. */
   --shadow-card:
     0 1px 2px color-mix(in srgb, var(--maroon) 6%, transparent),
     0 3px 6px -2px color-mix(in srgb, var(--maroon) 8%, transparent),

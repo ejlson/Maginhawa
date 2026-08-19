@@ -4,41 +4,96 @@
   z-index: 100;
   overflow: hidden;
   pointer-events: none;
-  /* easing matching the SMOOTH cubic-bezier used by the TSX motion */
-  --ease-smooth: cubic-bezier(0.62, 0, 0.2, 1);
+  /* NO --ease-* mirror here. This block used to redeclare the loader's three
+     curves so a reader could find them from either file; nothing in this
+     stylesheet ever consumed them, and when the reveal's curves changed the
+     mirror silently kept asserting the old ones (including EASE_DRAWER, which
+     was deleted for putting 60% of the window's travel into a 200ms burst).
+     Every curve in the intro is driven from JS — see the EASING block in
+     Loader.tsx, which is the only copy. */
 }
 
-/* Full-viewport cream overlay. A rounded-rect hole is punched out of it with
-   an animated `clip-path: path()` (fill-rule: evenodd); as the hole grows it
-   reveals the hero video sitting behind the overlay. Only `clip-path` (and
-   `opacity` on the cross-fade paths) animates, so the reveal stays GPU
-   composited. */
-.reveal {
+/* ── THE WINDOW: FOUR SHUTTERS ──
+   This replaced a single full-viewport cream sheet with an animated
+   `clip-path: path()` hole in it. The comment that used to sit here claimed
+   "only clip-path animates, so the reveal stays GPU composited". THAT WAS
+   WRONG, and it is the reason this stylesheet now carries the correction:
+   `clip-path: path()` is NOT a compositor-accelerated property. It cost a full
+   BeginMainFrame → UpdateLayoutTree → PrePaint → Layerize → Paint → Commit →
+   Activate → Draw on EVERY displayed frame — 7.4‥8.2ms of paint against
+   full-viewport paint records, ~1261 RasterTasks over the grow-out, and only
+   8 of 97 frames compositor-animated. Zero headroom, which is exactly why it
+   measured clean on an idle machine and stuttered on a real one.
+
+   Each shutter is a full-viewport cream sheet pinned to one edge by its
+   transform-origin and squashed toward that edge, so together they leave a
+   centred aperture. Only `transform` animates. See lib/introWindow.ts. */
+.shutter {
   position: absolute;
   inset: 0;
   background: var(--cream);
-  will-change: clip-path;
+  /* PROMOTED FROM MOUNT, NOT FROM ANIMATION START. Paired with the inline
+     `scale*(0.5)` the loader renders at stage 0: building these four layers at
+     the moment the reveal begins measured a 100‑137ms hitch on every run. */
+  will-change: transform;
 }
 
-/* the whole word "MGNHW" is centred as one unit; the two groups sit
-   adjacent and only split apart during the reveal */
+/* The origins are the whole trick. Anchored to its own edge, a panel scaled
+   toward 0 retreats off the screen instead of shrinking about its middle —
+   which is what lets one shared scale value open a centred hole. */
+.shutterTop {
+  transform-origin: 50% 0%;
+}
+.shutterBottom {
+  transform-origin: 50% 100%;
+}
+.shutterLeft {
+  transform-origin: 0% 50%;
+}
+.shutterRight {
+  transform-origin: 100% 50%;
+}
+
+/* The SHORT path's cream sheet — repeat visit and prefers-reduced-motion. It
+   never opens a window; it is one plain full-viewport sheet that cross-fades
+   its opacity away, so it wants no transform, no origin and no promotion
+   beyond the fade. Kept separate from .shutter precisely so that tuning the
+   reveal cannot reach the path that skips the reveal. */
+.sheet {
+  position: absolute;
+  inset: 0;
+  background: var(--cream);
+  will-change: opacity;
+}
+
+/* A CREAM SHEET WITH NO CLIP, sitting between the overlay and the board.
+   Against the cream overlay it is invisible; the only thing it can veil is
+   what shows through the window, which is exactly the job — see the note on
+   the element in Loader.tsx for why the film must not appear from a point. */
+.veil {
+  position: absolute;
+  inset: 0;
+  background: var(--cream);
+  will-change: opacity;
+}
+
+/* the whole word "MGNHW", centred as one unit and leaving as one unit */
 .letters {
   position: absolute;
   inset: 0;
   display: flex;
   align-items: center;
   justify-content: center;
+  will-change: transform, opacity;
 }
 
-.group,
-.center {
+.board {
   display: flex;
   font-family: var(--font-display-big);
   font-weight: var(--w-regular);
   font-size: clamp(2.6rem, 8vw, 5.5rem);
   line-height: var(--lh-display);
   color: var(--maroon);
-  will-change: transform, opacity;
 }
 
 /* fixed-width cells so cycling characters don't shift the layout (board feel),

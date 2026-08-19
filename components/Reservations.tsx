@@ -7,7 +7,7 @@ import {
   useScroll,
   useTransform,
 } from "framer-motion";
-import { useEffect, useRef, useState } from "react";
+import { useEffect, useRef } from "react";
 import styles from "./Reservations.module.css";
 import VideoBackdrop from "./VideoBackdrop";
 import PillCta from "./PillCta";
@@ -24,33 +24,6 @@ import PillCta from "./PillCta";
    web-sized derivative of this clip is the fix, not a different restaurant —
    the choice of room is editorial and belongs to the page. */
 const CLIP = "/videos/mamasons-hero.mp4";
-
-/* ---------- the live clock ----------
-
-   EUROPE/LONDON, never the visitor's zone. A reader in Manila told "it's
-   4:12am" about a London restaurant group has been handed a fact about
-   themselves, not about us; the whole point of the device is that it is
-   addressed to the reader ABOUT this place, now.
-
-   24-HOUR, and that is a layout decision as much as a register one. `h23`
-   always yields five characters (`00:07`, `16:12`), so the token's box never
-   changes width between one minute and the next — where a 12-hour clock
-   swings between `4:12 pm` (7) and `12:34 pm` (8) and would jiggle the
-   sentence around it twice a day. en-GB reads 24-hour natively anyway.
-
-   Built once at module scope: an Intl formatter is expensive to construct
-   (~0.1ms) and this one is stateless, so re-making it every tick would be
-   pure waste. */
-const LONDON_CLOCK = new Intl.DateTimeFormat("en-GB", {
-  timeZone: "Europe/London",
-  hour: "2-digit",
-  minute: "2-digit",
-  hourCycle: "h23",
-});
-// What the SERVER renders. It must be the same five-character shape as a real
-// value (see `.clockTime`'s reserved box) so the sentence does not reflow when
-// the real time lands after mount.
-const CLOCK_PLACEHOLDER = "--:--";
 
 export default function Reservations() {
   const ref = useRef<HTMLElement>(null);
@@ -165,13 +138,25 @@ export default function Reservations() {
             the bookable four here as well would be the same restaurants a
             third time, and the third telling loses hardest.
 
-            Four elements now, and the line above the heading is back — but
-            it is a different KIND of thing from the "Reservations" eyebrow
-            that was removed. That label captioned a sentence which already
-            said what it was; a live London clock states something the page
-            could not otherwise know, changes every minute, and is addressed
-            to whoever is reading at that minute. A static label earns its
-            line once; this one earns it continuously.
+            TWO elements, at the user's instruction, and what went was a
+            live London clock above the heading and a support line under it
+            ("Seven rooms. Different worlds. One table."). Both had earned
+            their place by argument — the clock said something the page could
+            not otherwise know and renewed itself every minute; the support
+            line said why the choice was worth making rather than listing the
+            menu. Neither was wrong. What they cost was the close: four
+            elements make a stack a reader parses, and this frame is meant to
+            ask one question and hand over one door.
+
+            ⚠️ IF EITHER IS EVER WANTED BACK, they are in git rather than
+            commented out here — a four-element lockup carried in comments is
+            a fifth thing to keep true. The clock was Europe/London and h23
+            (five characters always, so its box could not reflow on the
+            minute) and rendered a "--:--" placeholder on the server, because
+            a real time in SSR guarantees a hydration mismatch and React 19
+            answers one by re-rendering this whole animation-heavy subtree.
+            Anyone restoring it needs that placeholder, not just the
+            formatter.
 
             ONE direct child by design. `.cta` is pointer-events: none with
             `.cta > *` restoring auto (it covers the whole stage and must not
@@ -181,143 +166,22 @@ export default function Reservations() {
             rule or its links would silently stop being clickable. */}
         <div className={styles.cta}>
           <div className={styles.book}>
-            <LondonClock />
             {/* A QUESTION, and that is what makes the button an answer.
                 "Pull up a chair." was a second invitation stacked on the one
-                the pill already makes; "Where will you start?" is resolved by
-                "Choose a restaurant" directly beneath it, so the lockup asks
-                and answers instead of inviting twice. */}
+                the pill already makes; "Where will you start?" is resolved
+                by "Pick a restaurant" directly beneath it, so the lockup asks
+                and answers instead of inviting twice.
+
+                IT IS NOW THE WHOLE LOCKUP. With the clock and the support
+                line gone the question and its answer are the only two things
+                on the frame, which is the arrangement this note always
+                described and now literally is. */}
             <h2 className={styles.title}>Where will you start?</h2>
-            {/* ON the centre line, deliberately — NOT splayed into the bottom
-                corners the way the reference CTA does it. That reference can
-                afford corners because its wash is uniform; ours is a centred
-                pool that releases toward the edges (see `.locScrim`), so copy
-                in the corners would drag the dark back out to the frame edges
-                and undo the one change that gives the photograph back.
-
-                ABOVE the pill, not below it. Measured at 1920x1080 the block
-                ran 17 / 43 / 34px between its four elements, which left the
-                button with 43px over it and 34px under — near-symmetrical, so
-                it read as centred INSIDE the lockup rather than as its last
-                move, and the section ended on an explanation after handing the
-                reader the action. Ordering it context → hook → why → action
-                puts the stack's largest gap under the heading where it belongs
-                and gives the pill the bottom of the block to itself.
-
-                The punctuation is load-bearing too: as one 470.4px
-                (--measure-tight) em-dashed sentence this broke INSIDE the
-                clause, splitting "Caribbean," from "ramen, ice cream". A full
-                stop after the first claim gives the line a natural place to
-                turn.
-
-                THREE THINGS CAME OUT OF THIS LINE, each for its own reason.
-
-                "across London" went because the clock directly above already
-                says IN LONDON, and the heading is now a question about WHICH
-                OF OURS. Naming the city twice in a four-element stack answered
-                a question nobody asked at the expense of the one that was. The
-                claim is still true and still made — once, by the element whose
-                whole job is to make it.
-
-                "Seven kitchens" went because the Interlude, two sections up
-                this same page, is the line "One family, seven kitchens." A
-                support line opening on the same two words read as an echo of a
-                heading the reader had just passed. "Rooms" is the site's own
-                other word for them — the About intro runs "seven distinct
-                dining rooms" — so it is a synonym the page already owns rather
-                than a new coinage.
-
-                THE EIGHTH WENT BY INSTRUCTION, not by argument: no forthcoming
-                opening is to be mentioned here. Bunso is still surfaced on the
-                page — the Discover grid and /restaurants both carry it as a
-                coming-soon card — so nothing is being hidden; this line simply
-                no longer previews it. If it is ever to be announced again, the
-                claim is `comingSoon: true` on Bunso (lib/restaurants.ts L191).
-
-                IT IS NO LONGER AN INVENTORY. The line used to list the four
-                cuisines, which answered "where will you start?" by handing the
-                reader the menu. This answers it by saying why the choice is
-                worth making at all — three short sentences that widen and then
-                close: seven of them, each unlike the others, all the same
-                family. The turn from "different" to "one" is the whole line.
-
-                What that costs is the cuisine names, which were this block's
-                most concrete claim; what it buys is a line that reads as the
-                group's voice rather than as a specification. If the concrete
-                version is ever wanted back, it was: "Filipino, Caribbean,
-                ramen, ice cream." — all four checkable at lib/restaurants.ts
-                L45/101/160/183, L70/127, L101 and L88.
-
-                "Seven rooms" is still the checkable one and still true: seven
-                trading, with Bunso (L181) carrying `comingSoon: true` (L191)
-                and deliberately not counted here. Every `location` is a London
-                one (L48, 73, 91, 104, 130, 143, 163, 186), which is what lets
-                the clock above carry the city alone. For reference the four
-                cuisines are
-                Bintang/Ramo/Belly/Bunso "Filipino" (L45, 101, 160, 183),
-                Guanabana/Hoodwood "Caribbean" (L70, 127), Ramo "Ramen"
-                (L101) and Mamasons "Ice Cream Parlour" (L88). No founding
-                year, no covers count, no award — the Michelin line is
-                already carried five times higher up this page. */}
-            <p className={styles.support}>
-              Seven rooms. Different worlds. One table.
-            </p>
             <MagneticCta />
           </div>
         </div>
       </div>
     </section>
-  );
-}
-
-/**
- * The live line above the invitation: "IT'S 16:12 IN LONDON".
- *
- * It says the TIME and nothing else. `lib/restaurants.ts` carries no opening
- * hours — only `bookable`, `bookingUrl`, `addresses` and `comingSoon` — so any
- * sentence about a kitchen being open, still serving, or holding a table
- * tonight would be invented. The time itself is the one temporal fact this
- * repo can actually stand behind, and it is enough: it makes the close read as
- * addressed to a person who is here now rather than to nobody in particular.
- *
- * HYDRATION. The server's clock is not the reader's, so rendering a real time
- * during SSR guarantees a text mismatch on hydration — and React 19 recovers
- * from one by re-rendering the whole subtree client-side, which on a section
- * this animation-heavy is a visible blank. So the server renders a placeholder
- * of the SAME character count and the real value only ever arrives in an
- * effect. Nothing about the markup differs between the two passes except the
- * five characters inside a box that is sized to hold them either way.
- */
-function LondonClock() {
-  const [clock, setClock] = useState(CLOCK_PLACEHOLDER);
-
-  useEffect(() => {
-    let timer = 0;
-    const tick = () => {
-      setClock(LONDON_CLOCK.format(new Date()));
-      // Re-arm ON the next minute boundary rather than polling every 60s from
-      // mount: a fixed interval starts wherever the page happened to load, so
-      // half the time the displayed minute would be up to 59s stale. Chasing
-      // the boundary keeps it under a second wrong, for the same one wake-up
-      // per minute. The 250ms cushion covers timer coarsening — firing a hair
-      // EARLY would format the minute we are leaving and then sit on it for
-      // another full minute.
-      timer = window.setTimeout(tick, 60_000 - (Date.now() % 60_000) + 250);
-    };
-    tick();
-    return () => window.clearTimeout(timer);
-  }, []);
-
-  return (
-    <p className={styles.clock}>
-      {/* Not a <time> element: its `datetime` attribute would have to be
-          absent (or wrong) for the placeholder, and a valid <time> demands a
-          parseable machine value, which "--:--" is not. The live region is
-          also deliberately absent — a clock that announced itself to a screen
-          reader every sixty seconds would interrupt the page for a fact
-          nobody asked for. */}
-      It’s <span className={styles.clockTime}>{clock}</span> in London
-    </p>
   );
 }
 

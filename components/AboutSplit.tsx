@@ -56,24 +56,30 @@ const PORTRAIT = "/images/careers-hero.jpg";
 /* THE PANEL IS A LOOPING CLIP NOW, with the photograph kept as its poster
    and as the reduced-motion still.
 
-   tile-guanabana.mp4 IS 2.8MB — chosen on weight, and the choice matters
-   here more than usual. public/videos holds thirteen clips from 2.5MB to
-   44MB (bintang-hero), and this page already carries eight band prints and
-   three doors. The `tile-*` clips are the small hover loops, which is
-   exactly why they are light; the `*-hero` clips would look no better at
-   this size and would cost ten to twenty times as much.
-   If this ever needs to be a specific room, pick from the tile set first
-   and check the weight before the content. */
-/* mamasons-hero.mp4 IS 25.6MB, at the user's instruction, and that is worth
-   stating plainly rather than shipping quietly: it is roughly NINE TIMES
-   the clip it replaces (tile-guanabana, 2.8MB) and by far the heaviest
-   thing on this page, which already carries eight band prints and three
-   doors. `preload="metadata"` keeps it off the critical path — the browser
-   fetches headers, not frames, until it decides to play — but a visitor who
-   reaches this section on a phone connection will pay for it.
-   A compressed derivative (~3–5MB at this display size) would look identical
-   in a 660px frame. That is the fix if the page ever feels heavy here. */
-const VIDEO = "/videos/mamasons-hero.mp4";
+   WEIGHT IS THE STANDING CONSTRAINT ON THIS SLOT, whatever fills it. The
+   panel has held three films now — tile-guanabana.mp4 (2.8MB), then
+   mamasons-hero.mp4 (25.6MB), now this — on a page that already carries
+   eight band prints and three doors. Whatever comes fourth: check the
+   megabytes before the content, and run anything over ~5MB through
+   scripts/compress-media.mjs first. */
+/* about-big.mp4 IS THE PANEL'S FILM, at the user's instruction — and it is a
+   COMPRESSED DERIVATIVE, not the file that was handed over.
+   The source is public/videos/aboutbig.mov: 12.9MB, h264 1080×1920, with a
+   pcm_s24le audio track. That track is 3.5MB of uncompressed sound shipped
+   to an element that is `muted`, and Chromium ships no decoder for PCM in a
+   QuickTime container — so pointing at the .mov directly is a gamble the
+   weight argument already told us not to take.
+   Through the house recipe (scripts/compress-media.mjs: `-an`, scale to a
+   1920 long edge, x264 preset slow crf 24, +faststart) it is 5.0MB, and
+   1080 wide still has room over a frame that renders around 660.
+   THIS IS THE DERIVATIVE THE PREVIOUS NOTE ASKED FOR. The panel was
+   mamasons-hero.mp4 at 25.6MB — "by far the heaviest thing on this page",
+   with "a compressed derivative (~3–5MB at this display size)" named as the
+   fix. It is now a fifth of that, and no longer this page's heaviest asset.
+   ⚠️ THE .mov IS STILL IN public/videos AND STILL DEPLOYS. Nothing reads
+   it; move it out of `public/` and the page stops shipping 12.9MB nobody
+   fetches. */
+const VIDEO = "/videos/about-big.mp4";
 
 /* TWO LINES, DELIBERATELY. The caption was one sentence ("One room in
    Camden, 1987."); it is now a statement and its location, set larger, so
@@ -153,6 +159,18 @@ const DOORS = [
 // read the other's spelling (the precedent is SplitWords' EASE/EASE_CSS).
 const EASE = [0.22, 1, 0.36, 1] as const;
 
+/* WHEN THE PICTURE STARTS, and the one place to change it.
+   The panel's arrival is four animations, not one — the mask (MEDIA), the
+   counter-drift under it (DRIFT), the card shadow around it (MOUNT) and the
+   caption's two line masks (LINE) — and the last two are timed AGAINST the
+   sweep rather than against the gate. Their notes derive +0.4s and +0.55s
+   from where the front-loaded curve has uncovered the frame, so those two
+   offsets are the load-bearing numbers and this is only where the cluster
+   begins. Moving it late (0.1 → 0.45, at the user's instruction: the
+   picture was arriving on top of the gate) carries all four together and
+   keeps every derivation intact. Change this, not the four call sites. */
+const MEDIA_IN = 0.45;
+
 /* REDUCED MOTION IS ONE VARIANT FOR EVERYTHING, and deliberately carries no
    delays. The house pattern is Reveal's 0.4s fade, which keeps its `delay` —
    correct there, because Reveal is one element answering for itself. Here a
@@ -177,10 +195,11 @@ const FADE: Variants = {
    145% is not a round number — it is derived from the 0.3em the mask is
    padded by to protect descenders ("Where it began." has a `g`), exactly as
    SplitWords derives it. Move one and move the other.
-   0.65s IS A HAND-OFF, and it is the number the sweep's direction buys. The
-   mask runs 1.15s from a 0.1s delay on --ease-entrance, which is heavily
-   front-loaded: measured on the real render it has uncovered 90% of the
-   frame by 0.45s, so the band this caption sits in — the bottom fifth — is
+   +0.55s AFTER THE SWEEP IS A HAND-OFF, and it is the offset the sweep's
+   direction buys. The mask runs 1.15s from MEDIA_IN on --ease-entrance,
+   which is heavily front-loaded: measured on the real render it has
+   uncovered 90% of the frame 0.35s in, so the band this caption sits in —
+   the bottom fifth — is
    clear well before this fires. Both lines land onto a picture that is
    already there, with no clip edge to ride and none to avoid, while the
    sweep's tail and the drift's settle are both still visibly moving.
@@ -191,7 +210,7 @@ const LINE: Variants = {
   hidden: { transform: "translateY(145%)" },
   shown: (i: number) => ({
     transform: "translateY(0%)",
-    transition: { duration: 0.7, ease: EASE, delay: 0.65 + i * 0.08 },
+    transition: { duration: 0.7, ease: EASE, delay: MEDIA_IN + 0.55 + i * 0.08 },
   }),
 };
 
@@ -247,7 +266,7 @@ const MEDIA: Variants = {
   hidden: { clipPath: "inset(0% 0 100% 0)" },
   shown: {
     clipPath: "inset(0% 0 0% 0)",
-    transition: { duration: 1.15, ease: EASE, delay: 0.1 },
+    transition: { duration: 1.15, ease: EASE, delay: MEDIA_IN },
   },
 };
 
@@ -301,7 +320,15 @@ const MEDIA: Variants = {
    quantity a `useLayoutEffect` would go and fetch is already constant to
    within a percent. Re-measure it if the copy column's top padding changes;
    nothing else moves it. */
-const LIFT_VH = 0.38;
+/* ── S₀ MOVED 0.74 → 0.80, AT THE USER'S INSTRUCTION: "increase the gap
+   from where the heading appears and the manifesto" ──
+   The air ABOVE the perch was the tight side of this derivation, never the
+   fold below it: 60px at 1440×900 and only 36px at 1440×800, against 124px
+   and 156px of unused room underneath. Six points of vh moves the heading
+   down into room that was already there and roughly doubles the gap the
+   reader judges, without touching a clearance that was never the problem.
+   LIFT is (1 − S₀) + H/vh = 0.20 + 0.12. */
+const LIFT_VH = 0.32;
 const HEAD_LIFT = `-${LIFT_VH * 100}vh`;
 
 /* WHERE THE PICTURE IS TOLD TO GO — the moment the heading's top edge and
@@ -350,6 +377,36 @@ const GATE_LEAD = 140;
    dead band travels with the trigger. */
 const GATE_HYSTERESIS = 48;
 
+/* ══════════ THE STACK BREAKPOINT, READ FROM HERE AS WELL ══════════
+   AboutSplit.module.css collapses the split to one column at 900px and, in
+   the same block, kills the lockup's travel outright — stacked, the heading
+   sits BELOW the picture, so a 32vh flight would carry it back up over the
+   photograph it is meant to caption. See the stylesheet's note.
+
+   ⚠️ THE GATE HAS TO KNOW, because the rule it enforces stops existing.
+   `swept` opens when the heading's top edge reaches the picture's — a
+   comparison between two columns standing side by side. With one column and
+   no flight the heading is permanently hundreds of pixels PAST the picture's
+   top, so the comparison is true from the first frame and the sweep would
+   fire while the whole chapter is still below the fold, finishing unseen.
+   Stacked, the picture answers to its own arrival instead (see the gate).
+
+   MEDIA QUERY RATHER THAN A WIDTH READ, so the number lives in the
+   stylesheet and this only asks the question. Cached in a ref: this is
+   consulted on every scroll frame and `matchMedia` allocates.
+   ⚠️ 900 IS DUPLICATED FROM THE STYLESHEET. There is no way to read a CSS
+   breakpoint from script; change one and change the other. */
+const STACKED = "(max-width: 900px)";
+
+/* the two ends of the stacked gate's dead band, as fractions of the window:
+   the picture opens once its top edge is 80% of the way up the screen and
+   closes again only at 95%, so a reader parked on the boundary — or Lenis's
+   own inertial wobble — cannot re-trigger a 1.15s entrance on every frame.
+   Same job as GATE_HYSTERESIS, expressed in the units this branch measures
+   in. */
+const STACK_OPEN = 0.8;
+const STACK_SHUT = 0.95;
+
 /* THE MOUNT — the card shadow's arrival, and nothing else.
    The picture's box used to sit on the cream as a filled rectangle wearing a
    shadow for the whole of the sweep that uncovers it, which read as a frame
@@ -365,8 +422,9 @@ const GATE_HYSTERESIS = 48;
    bringing it up from t=0 would put a half-strength shadow around a
    mostly-empty box, which is the same defect at 50% rather than at 100%.
    --ease-entrance is heavily front-loaded: measured on the real render the
-   mask has uncovered ~88% of the frame by 0.5s. Starting there means the
-   shadow only ever traces an edge with a picture behind it.
+   mask has uncovered ~88% of the frame 0.4s after it starts, which is why
+   this is MEDIA_IN + 0.4 and not a number of its own. Starting there means
+   the shadow only ever traces an edge with a picture behind it.
 
    PLAIN OPACITY, so `pick()`'s reduced-motion swap needs no special case:
    FADE animates exactly this property and the shadow simply arrives. */
@@ -374,7 +432,7 @@ const MOUNT: Variants = {
   hidden: { opacity: 0 },
   shown: {
     opacity: 1,
-    transition: { duration: 0.7, ease: EASE, delay: 0.5 },
+    transition: { duration: 0.7, ease: EASE, delay: MEDIA_IN + 0.4 },
   },
 };
 
@@ -390,7 +448,7 @@ const DRIFT: Variants = {
   shown: {
     y: "0%",
     scale: 1,
-    transition: { duration: 1.7, ease: DRAWER, delay: 0.1 },
+    transition: { duration: 1.7, ease: DRAWER, delay: MEDIA_IN },
   },
 };
 
@@ -405,7 +463,7 @@ const DRIFT: Variants = {
    whole chapter earlier than the caption, in the manifesto's empty band, and
    arrives here under its own scroll-bound travel — so the two titles cannot
    share a beat, because they no longer share a trigger or even a section.
-   The caption keeps its 0.65s behind the sweep; the heading answers to
+   The caption keeps its +0.55s behind the sweep; the heading answers to
    HEAD_LIFT. If the flight is ever reverted, this variant and that pairing
    come back together.
 
@@ -626,6 +684,32 @@ export default function AboutSplit() {
      the heading is parked in the manifesto above the range and sitting in its
      own layout below it */
   const headY = useTransform(chapter, [0, 1], [HEAD_LIFT, "0vh"]);
+
+  /* ══════════ THE READING COLUMN FOLLOWS THE HEADING DOWN ══════════
+     At the user's instruction: the paragraph, the three doors and the fine
+     print "start up higher and then, once they are seen at the bottom of the
+     screen, move down into place following the scroll and the heading above
+     it."
+
+     ⚠️ IT TRAVELS LESS THAN THE HEADING, AND THAT IS WHAT KEEPS THEM APART.
+     `.lead` runs the full LIFT (32vh) over [0, 1]; this runs 16vh over
+     [0.1, 1]. Because the heading sits ABOVE this block in the layout and is
+     lifted FURTHER, the two spread apart during the flight rather than
+     colliding — at chapter 0.5 the heading is at −16vh against this block's
+     −8.9vh, i.e. 7.1vh MORE clearance than the stylesheet gives them at rest.
+     Give this block a larger lift than the heading and that sign flips: the
+     paragraph climbs into the underside of the lockup.
+
+     BOTH LAND ON 0 AT chapter = 1, which is not a nicety. `useTransform`
+     clamps, so anything that has not reached 0 by the end of the range is
+     parked off its layout position for the whole time the chapter is read.
+
+     THE PER-ELEMENT CASCADE STILL RUNS UNDERNEATH. `.readingBlock` carries no
+     variant of its own — it is a pure orchestrator for PARA / DOOR_ROW /
+     DOOR_IN — so this transform has the element to itself, and the two
+     compose the way the picture's entrance and scrub do: outer box travels,
+     inner boxes ink in. */
+  const bodyY = useTransform(chapter, [0.1, 1], ["-16vh", "0vh"]);
   const headOpacity = useTransform(chapter, HEAD_IN, [0, 1]);
   const headBlur = useTransform(
     chapter,
@@ -668,6 +752,7 @@ export default function AboutSplit() {
   const [swept, setSwept] = useState(false);
   const headRef = useRef<HTMLHeadingElement>(null);
   const leadRef = useRef<HTMLDivElement>(null);
+  const stackedMq = useRef<MediaQueryList | null>(null);
   useMotionValueEvent(chapter, "change", (p) => {
     const head = headRef.current;
     const frame = mediaRef.current;
@@ -675,6 +760,25 @@ export default function AboutSplit() {
 
     const lead = leadRef.current;
     if (!lead) return;
+
+    /* ── STACKED: THE PICTURE ANSWERS TO ITS OWN ARRIVAL ──
+       and the branch comes FIRST because the crossing rule below cannot even
+       be evaluated here: with the flight overridden to `transform: none`,
+       `getComputedStyle(lead).transform` reads the string "none", which
+       DOMMatrixReadOnly refuses to parse. See STACKED for why the rule is
+       wrong on this layout as well as unmeasurable.
+       Still a state and still reversing, exactly as the wide gate is — the
+       picture is open precisely while it is up the screen, so scrolling back
+       puts it away and approaching it again plays the sweep. */
+    stackedMq.current ??= window.matchMedia(STACKED);
+    if (stackedMq.current.matches) {
+      const top = frame.getBoundingClientRect().top;
+      const vh = window.innerHeight;
+      setSwept((open) =>
+        open ? top < vh * STACK_SHUT : top < vh * STACK_OPEN
+      );
+      return;
+    }
 
     /* ⚠️ THE RECT IS ONE FRAME STALE AND THE LAG IS CANCELLED, NOT AVOIDED.
        TWO WRONG VERSIONS SHIPPED BEFORE THIS ONE; both are worth keeping.
@@ -718,34 +822,30 @@ export default function AboutSplit() {
     );
   });
 
-  const { scrollYProgress } = useScroll({
-    target: mediaRef,
-    /* the panel's whole transit, from its top edge entering at the bottom of
-       the window to its bottom edge leaving at the top */
-    offset: ["start end", "end start"],
-  });
-  /* ⚠️ THE PARALLAX RUNS DOWNWARD, at the user's instruction, and the sign
-     is the whole of it. It read ["4%", "-4%"] — the plate rose as the page
-     scrolled, which is the ordinary parallax direction and made the panel
-     drift AWAY from the section beneath it.
+  /* ══════════ THE PANEL DOES NOT MOVE WITH THE PAGE ══════════
+     Both scroll-linked travels are gone, at the user's instruction: the
+     picture is to be still as the reader passes the chapter.
 
-     Reversed, the plate lags the page instead: it sinks through its own
-     frame as the reader leaves the chapter, so the photograph is still
-     moving down as <Passage>'s first line writes itself underneath. That
-     hand-off is what this is for — the copy column has settled and stopped
-     by then, so the picture is the only thing still moving, and it is moving
-     toward the thing the reader is about to read.
+     WHAT WENT, so nobody reconstructs half of it:
+       · `blockY` — the whole plate (frame, shadow and caption) sank 0 → 150px
+         across the last 45% of the section's transit, so it was still
+         descending as the journal wrote itself underneath. That hand-off was
+         the point of it, and it is what the reader asked to stop.
+       · `scrubY` — a −3/0/+7% crop shift on the photograph inside the mask,
+         with a permanent `scale: 1.15` on `.mediaScrub` paid to cover it.
+     With the travel gone the scale has no job, so it goes too and the
+     picture is uncropped again. `.mediaScrub` itself is deleted — it existed
+     only because the entrance settle and the scroll scrub were two authors
+     of one `y`, and there is one author left.
 
-     ⚠️ THE MAGNITUDE MUST NOT GROW WITHOUT THE SCALE GROWING WITH IT. The
-     plate fills its frame exactly, so the 1.08 scale beside this is what
-     hides the travel: overhang = (S − 1) / 2 = 4%, which is exactly this 4%.
-     Push the translate past 4% and a strip of --placeholder appears at one
-     edge for the whole of the move. Same arithmetic as DRIFT's note. */
-  const scrubY = useTransform(
-    scrollYProgress,
-    [0, 0.55, 1],
-    ["-3%", "0%", "7%"]
-  );
+     ⚠️ AND THE SEAM BELOW WAS SIZED FOR THE TRAVEL. Blog.module.css held
+     `calc(var(--home-gap-tight) + 150px - var(--grid-gutter))` on its top
+     padding purely to keep the sinking plate off its label. That 150px is
+     removed in the same pass — see the note there. Nothing else reads this.
+
+     The `useScroll` on `sectionRef` went with them; the chapter's OTHER
+     scroll reader (`chapter`, above) is the text column's flight and is
+     untouched — this change is the picture only. */
 
   /* One switch for the whole choreography. Reduced motion gets the same
      content in the same order and none of the travel. */
@@ -789,6 +889,10 @@ export default function AboutSplit() {
           rule was carrying and where it moved to. */}
       <div className={styles.split}>
         {/* ── LEFT: the picture, and its line ── */}
+        {/* A PLAIN <figure> AGAIN. It was a motion.figure for one reason —
+            `blockY` wrote a scroll-linked `y` on it — and that travel is
+            gone (see the note where it was defined). Nothing here animates,
+            so nothing here needs to be a projection node. */}
         <figure className={styles.media} ref={mediaRef}>
           {/* THE SHADOW, ON A BOX OF ITS OWN AND OUTSIDE THE MASK. It is the
               second half of "the ground is clear until the picture arrives":
@@ -820,7 +924,7 @@ export default function AboutSplit() {
             className={styles.mediaFrame}
             variants={pick(MEDIA)}
             /* ⚠️ THE CLIP'S PLAYBACK HANGS OFF THIS, AND IT IS NOT A
-               FLOURISH. mamasons-hero.mp4 is 25.6MB; `preload="metadata"`
+               FLOURISH. about-big.mp4 is 5.0MB; `preload="metadata"`
                keeps the frames off the wire until something asks to play,
                and starting that decode on the same frames the mask and the
                drift are animating drops both of them on a laptop. So the
@@ -836,23 +940,19 @@ export default function AboutSplit() {
             }}
           >
             <motion.div className={styles.mediaDrift} variants={pick(DRIFT)}>
-              {/* THE SCRUB, and it is a separate box from the drift above it
-                  on purpose — both animate `y`, and sharing an element means
-                  sharing one transform. See the note on `scrubY`.
-                  REDUCED MOTION GETS NO STYLE AT ALL rather than a frozen
-                  one: with no inline transform the box is not a projection
-                  node, the picture is not cropped by the 15% the scrub needs,
-                  and there is nothing bound to the scroll position. */}
-              <motion.div
-                className={styles.mediaScrub}
-                style={reduce ? undefined : { y: scrubY, scale: 1.15 }}
-              >
+              {/* .mediaScrub IS GONE WITH THE SCRUB IT CARRIED. It was a
+                  third box for one reason: the entrance settle and the
+                  scroll scrub both wrote `y`, and one element cannot hold
+                  two authors of one transform. There is one author left, so
+                  the picture hangs directly off the drift — and the 1.15
+                  scale that box paid to cover the scrub's excursion goes
+                  with it, uncropping 15% of the photograph. */}
               {reduce ? (
                 /* REDUCED MOTION GETS THE STILL, not a paused video. A
                    <video> with autoplay suppressed shows its poster, which
                    would be the same picture — but it would also download the
                    clip to do it. Rendering the image outright means the
-                   25.6MB never ships to a reader who asked for less
+                   5.0MB never ships to a reader who asked for less
                    movement. `pick()` has already swapped both variants above
                    for the chapter's plain FADE, so this box neither masks
                    nor drifts; it just arrives. */
@@ -886,7 +986,6 @@ export default function AboutSplit() {
                   aria-hidden
                 />
               )}
-              </motion.div>
             </motion.div>
 
             {/* THE SCRIM IS INSIDE THE MASK AND OUTSIDE THE DRIFT, and that
@@ -997,6 +1096,9 @@ export default function AboutSplit() {
               always shorter than a viewport, so the ratio is reachable. */}
           <motion.div
             className={styles.readingBlock}
+            /* REDUCED MOTION GETS NO TRANSFORM AT ALL — the same rule the
+               picture's scrub and the plate's travel follow. */
+            style={reduce ? undefined : { y: bodyY }}
             initial="hidden"
             whileInView="shown"
             /* 0.2 AND NOT 0.4, at the user's instruction ("start up a bit
