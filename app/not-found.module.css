@@ -2,13 +2,33 @@
    page that borrows a section's stylesheet is a section that can no longer
    be changed without checking the error page. */
 
+/* ---- ONE SCREEN, NO SCROLL ----
+   The page is exactly the viewport tall and its two blocks divide it: the
+   hero takes whatever is left after the doors, and the doors sit on the
+   bottom edge. Nothing here may grow past `100svh` — that is the whole
+   requirement, and the two things that threatened it are the numeral (sized
+   off `vw`, so a wide short window made it enormous) and the door rows,
+   which stack on a phone. Both are capped against the HEIGHT below.
+
+   `svh` rather than `vh`: on a phone `vh` is the toolbar-RETRACTED height,
+   so a `100vh` page is taller than the screen for as long as the address bar
+   is showing — which on a 404 the reader has just arrived at is the entire
+   time they are looking at it.
+
+   `height`, not `min-height`: min-height would let a short window scroll,
+   which is the thing being fixed. Everything inside is sized so it fits;
+   `overflow: hidden` is the backstop that keeps a fallback font or a
+   translated string from turning a near-miss into a scrollbar. */
 .page {
+  height: 100svh;
+  display: flex;
+  flex-direction: column;
   background: var(--cream);
   color: var(--maroon);
   /* the nav is fixed and overlays the page; this is the clearance every
      other route gives it */
   padding-top: clamp(56px, 7vh, 92px);
-  overflow-x: clip;
+  overflow: hidden;
 }
 
 /* THE HERO OWNS THE FIRST SCREEN and centres in it, the same arrangement
@@ -16,8 +36,13 @@
    the middle of the window rather than crowding the nav. `svh` because on a
    phone `vh` is the toolbar-retracted height, which is not the height the
    reader is looking at. */
+/* THE HERO IS THE REMAINDER. `flex: 1` and `min-height: 0` — without the
+   second one a flex item refuses to shrink below its content's intrinsic
+   height, which is exactly how a "fixed height" column ends up overflowing
+   anyway. */
 .hero {
-  min-height: calc(100svh - clamp(56px, 7vh, 92px));
+  flex: 1 1 auto;
+  min-height: 0;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -57,7 +82,12 @@
   margin: 0;
   font-family: var(--font-display-big);
   font-weight: 600;
-  font-size: clamp(5rem, 14vw, 11rem);
+  /* BOUNDED ON BOTH AXES. 14vw alone is a width rule, and on a short wide
+     window (1440x700, a laptop with a browser's worth of chrome) it drew a
+     202px numeral into a 600px page. `min()` hands the smaller of the two
+     to the clamp, so the digits shrink with the window in whichever
+     direction is actually tight. */
+  font-size: clamp(3.4rem, min(14vw, 17vh), 11rem);
   line-height: 0.95;
   letter-spacing: -0.02em;
   /* SOFTER THAN THE TYPE IT SITS OVER, deliberately. It is the largest thing
@@ -92,19 +122,32 @@
 }
 
 /* ---- THE DOORS — the nav, restated as destinations ----
-   A row on desktop, a stack on a phone. Hairline-separated rather than
-   carded: this is a list of places, and eight boxes on an error page is a
-   dashboard. */
+   Five across on desktop, stacking down to one on a phone. Hairline-
+   separated rather than carded: this is a list of places, and five boxes on
+   an error page is a dashboard.
+
+   `flex: 0 0 auto` — the doors are the fixed term in the page's height and
+   the hero is the remainder, not the other way round. A reader who has
+   landed on an error page needs the way out to be the thing that is
+   guaranteed to be on screen. */
 .doors {
-  padding: clamp(48px, 8vh, 96px) var(--grid-margin) clamp(56px, 9vh, 110px);
+  flex: 0 0 auto;
+  padding: 0 var(--grid-margin) clamp(20px, 3.4vh, 44px);
 }
 
 .doorList {
   display: grid;
-  /* auto-fit rather than a fixed count so the five doors reflow without a
-     breakpoint per column count; 15rem is the measure at which the longest
-     note ("Openings, press and recognitions") stops taking three lines */
-  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  /* auto-fit rather than a fixed count, so the five doors reflow without a
+     breakpoint per column count */
+  /* `min(100%, 15rem)` rather than a bare 15rem, and the wrapper is what
+     makes the narrow end safe: below 15rem of available column the bare
+     form overflows its own track — the row keeps its 240px and pushes past
+     the screen edge — where `min(100%, …)` drops cleanly to one across.
+     15rem is the measure the longest note ("Openings, press and
+     recognitions") stops taking three lines at; at a 358px phone that is
+     one column and five rows, which still clears the bottom of a 568px
+     screen by 20px (scripts/probe-404.mjs, `clipped`). */
+  grid-template-columns: repeat(auto-fit, minmax(min(100%, 15rem), 1fr));
   gap: 0;
   margin: 0 auto;
   padding: 0;
@@ -115,8 +158,8 @@
 
 .door {
   display: block;
-  padding: clamp(16px, 2.2vh, 24px) clamp(12px, 1.4vw, 20px)
-    clamp(16px, 2.2vh, 24px) 4px;
+  padding: clamp(10px, 1.8vh, 20px) clamp(12px, 1.4vw, 20px)
+    clamp(10px, 1.8vh, 20px) 4px;
   border-bottom: 1px solid var(--rule);
   color: inherit;
   text-decoration: none;

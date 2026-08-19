@@ -3,7 +3,6 @@
 import { useState } from "react";
 import Nav from "@/components/Nav";
 import Menu from "@/components/Menu";
-import Footer from "@/components/Footer";
 import PillCta from "@/components/PillCta";
 import styles from "./not-found.module.css";
 
@@ -30,7 +29,16 @@ import styles from "./not-found.module.css";
    itself out of results while the paths that resolve to it stay eligible to
    be dropped on their own terms. Metadata cannot be exported from a "use
    client" module, so it is set on the <head> by the layout's defaults and
-   the noindex is carried by the meta tag below. ---- */
+   the noindex is carried by the meta tag below.
+
+   ⚠️ NO <Footer />, AND THAT IS THE PRICE OF FITTING ON ONE SCREEN. The
+   whole page is meant to be readable without scrolling, and the site footer
+   is ~900px on its own — an invitation panel, a photograph, the address
+   block, the social row. It cannot share a viewport with anything.
+   What the footer would have carried that this page still needs is the way
+   out, and there are six of those above the fold: the home CTA and the five
+   doors, which are the nav restated. What is lost is the contact block and
+   the legal line, and Contact Us is one of the five doors. ---- */
 
 const DOORS = [
   { href: "/restaurants", label: "Restaurants", note: "All eight rooms, with menus" },
@@ -105,8 +113,6 @@ export default function NotFound() {
             ))}
           </ul>
         </nav>
-
-        <Footer />
       </main>
     </>
   );
