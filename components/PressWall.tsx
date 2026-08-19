@@ -133,6 +133,24 @@ export default function PressWall() {
                   src={asset(outlet.logo)}
                   alt={copy === 0 ? outlet.name : ""}
                   draggable={false}
+                  /* ⚠️ DEPRIORITISED, NOT LAZY, AND THE DIFFERENCE MATTERS
+                     HERE. These marks are Figma exports and they are not
+                     small — thesundaytimes.svg alone is 869KB — and this
+                     band sits thousands of pixels down the page, so on a
+                     phone they were competing with the hero's own film for
+                     the first screen's bandwidth: ~1.2MB of mastheads
+                     nobody could see yet.
+                     `loading="lazy"` is the obvious answer and it is the
+                     wrong one for a MARQUEE. The track holds the line twice
+                     and translates -50% forever; the second copy sits a few
+                     thousand pixels to the right of the rail, outside every
+                     viewport check the browser makes, so those images would
+                     defer until the transform carried them in and then pop
+                     into a lane that is supposed to be seamless.
+                     `fetchPriority` changes only the ORDER — every mark
+                     still loads eagerly, behind the things on screen. */
+                  fetchPriority="low"
+                  decoding="async"
                 />
               </li>
             )),

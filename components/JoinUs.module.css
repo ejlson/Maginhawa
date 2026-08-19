@@ -827,8 +827,9 @@
 
    AND THE BAND IS WHY LOSING THE RULE COSTS NOTHING. B's structure needed a
    threshold because a narrowing alone is a soft edge — the reader has to
-   notice a width change to notice the section change. A full-bleed dark band
-   immediately above is not a soft edge, so the section now has a stronger
+   notice a width change to notice the section change. A full-bleed band
+   immediately above is not a soft edge — the horizontal is what does that
+   work, not the depth of the ground (see `.reasons`) — so the section now has a stronger
    close than the hairline ever was, and two of them would be one too many. */
 .form {
   /* THE BAND'S OUTER GAP, ONE TOKEN, BOTH SIDES. It used to sit ~170px below
@@ -851,11 +852,34 @@
    just read six jobs, and before you are asked to apply you are told why the
    job is worth having. Nothing sits beside the form after this.
 
-   AND IT IS A FULL-BLEED DARK BAND. PILLARS was written for a full-width
+   AND IT IS A FULL-BLEED BAND. PILLARS was written for a full-width
    three-up, and this is that shape with a ground under it — the one place on
    the page where a change of surface is an ending rather than an
    interruption. The band is what the reader crosses between the index and
    the ask.
+
+   THE GROUND IS A SURFACE STEP, NOT A DARK PLATE. It shipped as solid
+   --maroon and was asked down to something nearer the page's own ground:
+   see-through rather than opaque, and greyer than the cream. 10% of the ink
+   mixed into the cream is exactly what a see-through maroon would composite
+   to over the page, so the mix says the same thing as an alpha and says it
+   without a second value to keep in step. It measures 1.21:1 against the
+   cream — within five hundredths of the 1.26:1 step --placeholder already
+   holds, so the band reads as the same family of surface the frames do,
+   one step down rather than a different material.
+
+   THE STEP IS WHAT MAKES IT A BAND, AND IT IS ENOUGH. A full-bleed edge is
+   read from its horizontal, not from its depth: the band runs the whole
+   viewport, and both its gaps come from one token, so the reader crosses a
+   line whether or not the ground behind it is dark. What the depth bought
+   was emphasis, and emphasis is the thing that was too loud here.
+
+   EVERY TONE ON IT IS RE-DERIVED, BY RATIO, NOT CARRIED. The band's three
+   text colours were tuned against a 13.06:1 dark ground; flipping the
+   ground and keeping the hexes would have kept three contrasts that no
+   longer exist. Each one below is re-measured against the new surface and
+   set to the RELATIONSHIP it held before, which is the same correction
+   --rule was written to stop this file from needing again.
 
    FULL-BLEED BY ESCAPING THE CONTAINER, NOT BY 100vw. `.container` is
    `width: 100%` with `padding-inline: var(--grid-margin)`, so pulling exactly
@@ -868,11 +892,15 @@
    then puts the columns back on the page's own content edges, so the three
    reasons still line up with the roles above them. */
 .reasons {
+  /* the ground, named once so the tones below can be mixed INTO it rather
+     than guessed against it — the three of them all read this */
+  --band: color-mix(in srgb, var(--maroon) 10%, var(--cream));
+
   list-style: none;
   margin: 0 calc(var(--grid-margin) * -1) var(--strip-gap);
   padding: clamp(48px, 6.5vh, 88px) var(--grid-margin);
-  background: var(--maroon);
-  color: var(--cream);
+  background: var(--band);
+  color: var(--maroon);
   display: grid;
   grid-template-columns: repeat(3, minmax(0, 1fr));
   gap: clamp(28px, 4vw, 64px);
@@ -886,26 +914,29 @@
 
 /* the mark is a numeral in the display face at heading scale — the same
    treatment the cut band used, and the only accent in the section.
-   THE ACCENT CANNOT BE RAW ON THIS GROUND. --saffron on --maroon measures
-   2.02:1, and globals.css says so in the token's own note: "nothing may set
-   raw accent type on the maroon." It went onto the band unchanged in the
-   first pass and the numerals all but disappeared. Mixed 45% into the cream
-   it measures 6.39:1 — within a hundredth of the 6.46:1 the accent makes on
-   the cream page, so the mark carries the same weight on the band as it did
-   off it. Mixed toward the CREAM rather than faded toward the ground,
-   because the point is that it is still green: a mark that mixes toward
-   maroon is just a quieter maroon, and then it is not an accent. */
+   THE WORKAROUND IS GONE WITH THE DARK GROUND. On the maroon this was
+   `--saffron` mixed 45% into the cream, because raw accent on the ink
+   measures 2.02:1 and globals.css forbids it outright. A light ground lifts
+   that constraint, so the accent can be a token again — and it is
+   --saffron-ink rather than --saffron, by the number: the ink measures
+   6.45:1 on the band where the accent proper makes 5.33:1. 6.45 is within a
+   hundredth of BOTH the 6.46:1 the accent makes on the cream page and the
+   6.39:1 the mixed mark made on the dark band, so the numerals carry the
+   weight they have carried through both grounds. */
 .reasonMark {
   font-family: var(--font-display);
   font-weight: var(--w-medium);
   font-size: var(--t-h2);
   line-height: var(--lh-flush);
   letter-spacing: -0.012em;
-  color: color-mix(in srgb, var(--saffron) 45%, var(--cream));
+  color: var(--saffron-ink);
 }
 
-/* the title takes the band's own `color: var(--cream)` by inheritance —
-   13.06:1, the palette's headline pair */
+/* the title takes the band's own `color: var(--maroon)` by inheritance —
+   10.78:1. It was 13.06:1 as cream on the ink, the palette's headline pair;
+   the ink on a ground one step down is the same pair with the step taken
+   out of it, which is the whole cost of the lighter band and it is nowhere
+   near any floor. */
 .reasonTitle {
   font-family: var(--font-display);
   font-weight: var(--w-medium);
@@ -918,16 +949,19 @@
 /* an explicit tone, not `opacity: 0.85` — the same correction the two helper
    lines on this page got. A composited alpha is a contrast you have to
    compute; this one is measured.
-   RE-DERIVED FOR THE DARK GROUND, and by its RATIO rather than by its old
-   channels. The tone was rgba(47, 0, 0, 0.78), which composited to 8.97:1 on
-   the cream; 82% cream in the maroon measures 9.16:1 on the band. Carrying
-   the hex across would have been carrying a contrast that no longer existed
-   — the same mistake --rule was written to stop making. */
+   RE-DERIVED TWICE NOW, and both times by RATIO rather than by channels.
+   It was rgba(47, 0, 0, 0.78) on the cream (8.97:1), then 82% cream in the
+   maroon (9.16:1) when the band went dark. What that pair actually said was
+   "70% of the title's ratio" — 9.16 against the title's 13.06 — and that is
+   the quantity carried across, not either hex. 85% of the ink mixed into
+   the band measures 7.52:1 against the title's 10.78:1: the same 70%, so
+   the softening reads at the same strength on a ground with less room in
+   it. Comfortably over the 4.5:1 the size needs either way. */
 .reasonBody {
   font-family: var(--font-sans);
   font-size: var(--t-small);
   line-height: var(--lh-body);
-  color: color-mix(in srgb, var(--cream) 82%, var(--maroon));
+  color: color-mix(in srgb, var(--maroon) 85%, var(--band));
   margin: 0;
   max-width: 42ch;
 }

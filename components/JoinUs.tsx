@@ -21,6 +21,7 @@ import Reveal from "./Reveal";
 import SplitWords from "./SplitWords";
 import styles from "./JoinUs.module.css";
 import { JOBS } from "@/lib/jobs";
+import { lenisRef } from "@/lib/SmoothScroll";
 
 const PILLARS = [
   {
@@ -148,12 +149,20 @@ const HERO_WORDS = HERO_LINES.join(" ").split(/\s+/).length;
    this is the line the whole page is named for, and it has to be READ before
    it becomes a mechanism.
 
-   So the words are now allowed to land in full, and then held. 1.1s is a
-   comfortable beat on a five-word line — long enough to finish it and register
-   it, short enough that the page does not feel stalled. The split still opens
-   from a settled couplet rather than from a moving one, which is what makes
-   the parting read as a second gesture instead of a continuation. */
-const HERO_HOLD = 1.1;
+   So the words are now allowed to land in full, and then held. The split
+   still opens from a settled couplet rather than from a moving one, which is
+   what makes the parting read as a second gesture instead of a continuation.
+
+   0.6s, DOWN FROM 1.1s, AND IT IS THE SCROLL HOLD THAT PAID FOR IT. This
+   beat is dead air by design — nothing moves during it — so it is the one
+   term in the sequence that can be spent without losing a gesture. Since
+   INTRO_ENDS_AT is derived from SPLIT_AT, and SPLIT_AT from this, every
+   500ms taken off here comes off the hold one for one: 4.17s → 3.67s. It is
+   still a beat rather than a hand-off — the couplet is complete and still
+   for six tenths of a second before anything touches it, which is what the
+   note above was protecting. Under it the parting starts while the eye is
+   still on the last word and the two gestures merge again. */
+const HERO_HOLD = 0.6;
 // the last word starts at HEAD_DELAY + (n-1) * stagger and takes WORD_DURATION
 const SPLIT_AT =
   HEAD_DELAY + (HERO_WORDS - 1) * WORD_STAGGER + WORD_DURATION + HERO_HOLD;
@@ -165,6 +174,42 @@ const SPLIT_AT =
 const SPLIT_SPRING = { type: "spring" as const, duration: 1.5, bounce: 0 };
 const SPLIT_MS = 1500;
 const CAPTION_AT = SPLIT_AT + (SPLIT_MS / 1000) * 0.72;
+/* Beat 3's own stagger and word duration, HOISTED OUT OF THE JSX where they
+   were written inline. Nothing about the caption's motion changes; they are
+   constants now because the scroll hold below has to know when the last word
+   of the sequence lands, and a hold timed against a copy of those numbers is
+   a hold that silently desyncs the first time either is retuned. */
+const STAND_STAGGER = 0.012;
+const STAND_DURATION = 0.6;
+const STAND_WORDS = HERO_STAND.split(/\s+/).filter(Boolean).length;
+
+/* ---- THE ENTRANCE OWNS THE SCROLL UNTIL IT HAS FINISHED ------------------
+   THE SEQUENCE WAS TRIVIALLY SCROLLABLE PAST. Six wheel notches at t = 1.5s —
+   before the split has even opened — put the reader at the roles index with
+   the whole hero above them, and the three beats then played to nobody. A
+   composition that assembles itself over four seconds cannot also be the
+   thing standing between the reader and the page; either it is held, or it
+   is not really an entrance.
+
+   THE HOLD IS DERIVED, NOT TYPED, and it is the LATER of the two things that
+   are still moving at the end:
+
+     the split   SPLIT_AT + the spring's own 1.5s.
+     the caption CAPTION_AT + the last word's delay + its duration.
+
+   They land within 60ms of each other today, which is not a fact worth
+   depending on — a copy edit to HERO_STAND moves the second one and nothing
+   else. `Math.max` is what makes the hold mean "when the last thing stops"
+   rather than "3.7 seconds".
+
+   ~4.2s IS A LONG TIME TO HOLD A READER STILL, and it is the length of the
+   sequence rather than a choice; shortening the hold means shortening the
+   entrance. See the guards on the effect for the three cases that are NOT
+   held at all. */
+const SPLIT_ENDS_AT = SPLIT_AT + SPLIT_MS / 1000;
+const STAND_ENDS_AT =
+  CAPTION_AT + (STAND_WORDS - 1) * STAND_STAGGER + STAND_DURATION;
+const INTRO_ENDS_AT = Math.max(SPLIT_ENDS_AT, STAND_ENDS_AT);
 
 /* ---- THE PULL ------------------------------------------------------------
    The photograph's size IS the split's progress, so the lines read as
@@ -660,19 +705,108 @@ export default function JoinUs() {
     clamp01((clamp01(p) - SPLIT_DAWN) / (SPLIT_LIT - SPLIT_DAWN)),
   );
 
-  // release any dark backdrop another route may have set
+  // release any dark backdrop another route may have set.
+  // `is-loading` USED TO BE REMOVED HERE and is not any more: the hold below
+  // owns that class for the length of the entrance and then hands it back.
+  // Two owners for one class is how it would come off a frame after the hold
+  // put it on.
   useEffect(() => {
     const html = document.documentElement;
     const prevHtml = html.style.backgroundColor;
     const prevBody = document.body.style.backgroundColor;
     html.style.backgroundColor = "";
     document.body.style.backgroundColor = "";
-    document.body.classList.remove("is-loading");
     return () => {
       html.style.backgroundColor = prevHtml;
       document.body.style.backgroundColor = prevBody;
     };
   }, []);
+
+  /* ---- THE HOLD ----------------------------------------------------------
+     Scroll is parked until the entrance has finished — see INTRO_ENDS_AT for
+     what "finished" is derived from.
+
+     BOTH LOCKS, AND THEY ARE NOT REDUNDANT. Menu.tsx states the rule this
+     follows: Lenis keeps its own scroll target and drives the window every
+     frame regardless of what the body's overflow says, so `stop()` is the
+     one that parks the smooth scroller — and `body.is-loading` (overflow
+     hidden, the class the loader already uses) is the one that covers the
+     path where SmoothScroll never instantiated Lenis at all, plus keyboard
+     paging and the native touch surface, which this app leaves to the OS
+     (`syncTouch: false`). Either alone is a lock with a hole in it.
+
+     THREE CASES ARE NOT HELD, and each is a case where holding would be the
+     bug rather than the fix:
+
+       reduced motion   nothing is animating — `split` is parked at 1 and no
+                        timer is ever armed — so there is no entrance to
+                        protect and a four-second freeze would be pure harm.
+       a deep link      /careers#apply and /careers#open-roles are addresses
+                        of places further down the page. Holding the reader
+                        at the top for four seconds while the browser wants
+                        to be somewhere else is a fight the entrance should
+                        not pick.
+       a restored scroll  a back-navigation that lands mid-page must not be
+                        yanked to the top; `is-loading` is `height: 100vh`
+                        and would do exactly that.
+
+     AND IT ALWAYS COMES OFF. The timer is the ordinary release; the cleanup
+     is the one that matters, because it runs on unmount, on a route change
+     mid-entrance, and on the reduced-motion query flipping — so no path out
+     of this component can leave the page unscrollable.
+
+     ONE EFFECT, NO STATE. Written as `useState` + a second effect this had a
+     one-paint hole in it: `is-loading` is already on <body> from the server,
+     the first pass of the applying effect would see the initial `false` and
+     take it OFF, and only the re-render put it back. A passive effect runs
+     after paint, so that is a real frame. Nothing here needs to be state —
+     no render reads it — so the lock is applied where it is decided.
+
+     AND LENIS DOES NOT EXIST YET WHEN THIS RUNS. Child effects run before
+     parent effects, and SmoothScroll — which constructs Lenis and fills
+     `lenisRef` — is an ancestor, so `lenisRef.current` is null on this
+     component's mount and a `stop()` here would be a no-op on the one page
+     that needs it. The rAF is what waits for that ancestor: by the first
+     frame after commit the ref is filled. It retries for a bounded number
+     of frames rather than forever, because under reduced motion Lenis is
+     never constructed at all and a loop with no floor would run for the
+     life of the page. */
+  useEffect(() => {
+    let raf = 0;
+    let stopped = false;
+
+    const release = () => {
+      cancelAnimationFrame(raf);
+      if (stopped) lenisRef.current?.start();
+      stopped = false;
+      document.body.classList.remove("is-loading");
+    };
+
+    if (reduce || window.location.hash || window.scrollY > 4) {
+      release();
+      return release;
+    }
+
+    document.body.classList.add("is-loading");
+    // ~1s of frames: long enough for the ancestor's effect, short enough
+    // that a page without Lenis is not polling for the rest of the session
+    let tries = 60;
+    const parkLenis = () => {
+      if (lenisRef.current) {
+        lenisRef.current.stop();
+        stopped = true;
+      } else if (tries-- > 0) {
+        raf = requestAnimationFrame(parkLenis);
+      }
+    };
+    raf = requestAnimationFrame(parkLenis);
+
+    const t = setTimeout(release, INTRO_ENDS_AT * 1000);
+    return () => {
+      clearTimeout(t);
+      release();
+    };
+  }, [reduce]);
 
   // click "Apply" on a role → pre-fill the position field + scroll to form
   const applyFor = (jobTitle: string, restaurant: string) => {
@@ -872,8 +1006,8 @@ export default function JoinUs() {
                 text={HERO_STAND}
                 on={beat3}
                 delay={0}
-                stagger={0.012}
-                duration={0.6}
+                stagger={STAND_STAGGER}
+                duration={STAND_DURATION}
               />
             </div>
           </header>
@@ -998,14 +1132,18 @@ export default function JoinUs() {
                 words of argument aimed at someone who has already decided to
                 apply. Three columns of ~30 words is also the shape this copy
                 was written in. */}
-            {/* `data-nav-theme="dark"` because the band is now a dark ground
-                in the middle of a light page, and the navbar samples what is
-                UNDER it (Nav.tsx: elementFromPoint at 24,56 then `.closest`).
-                Without this the nearest host is `<main data-nav-theme="light">`
-                and the bar would paint maroon ink on the maroon band for the
-                whole time the band is passing beneath it. Same attribute
-                DarkZone puts on the page's other dark ground. */}
-            <ul className={styles.reasons} data-nav-theme="dark">
+            {/* `data-nav-theme="light"`, and it is STATED rather than
+                inherited. The band was a dark ground and carried "dark" for
+                it — the navbar samples what is UNDER the bar (Nav.tsx:
+                elementFromPoint at 24,56 then `.closest`), so on the maroon
+                it had to be told to stop painting maroon ink. The ground is
+                a step off the cream now (see `.reasons`), so the bar's own
+                light treatment is the correct one and "dark" would have
+                painted cream ink on a near-cream band — the same failure
+                the attribute was added to prevent, pointing the other way.
+                Left explicit rather than deleted so the next change of
+                ground has the sampler's rule in front of it. */}
+            <ul className={styles.reasons} data-nav-theme="light">
               {PILLARS.map((pl, i) => (
                 <Reveal as="li" key={pl.mark} className={styles.reason} delay={i * 0.07}>
                   <span className={styles.reasonMark}>{pl.mark}</span>

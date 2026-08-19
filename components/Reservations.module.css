@@ -4,7 +4,7 @@
    settle plays during the departure itself as the block rides off
    toward the maroon DarkZone below. */
 .section {
-  /* The clock and the CTA pill below read in --font-ui, the interface voice
+  /* The CTA pill below reads in --font-ui, the interface voice
      the navbar also takes. This carried a duplicate local stack while the nav
      work was in flight; the shared token has landed, so the copy is gone —
      two declarations of one family is how they drift apart. Note the token is
@@ -171,8 +171,8 @@
                                              than the wash it replaces, which
                                              is what stops the saffron pill
                                              dissolving into warm footage)
-     heading ink     0.749   at r 0.28
-     support copy    0.746   at r 0.38  — every text node clears the 0.62 floor
+     heading ink     0.749   at r 0.28  — the only text node left, and it
+                                          clears the 0.62 floor
      frame side edge 0.358   at mid-height, r 0.86 — the terrace's outer thirds
                                                     are readable again
      frame corner    0.140                  (was 0.826)
@@ -183,14 +183,22 @@
    WHY THE BREAKPOINT. The radii are percentages of the element, and the
    element is the viewport, so the HORIZONTAL half-width is always 50% — a 58%
    x-radius therefore releases at the frame's left and right edges (0.86 of the
-   way out) at every desktop width. But the COPY does not scale that way: at
-   1920 the support line is 480px inside a 1920 frame (0.22 of the radius), on
-   a 390 phone it is 350px inside a 390 frame (0.43 of a radius that is now
-   only 226px), i.e. it lands at 0.86 — exactly where the desktop pool is
-   releasing. Measured, the phone support line came back at 3.84:1 against the
-   desktop shape. So the phone gets its own pool: near full-bleed horizontally
-   (105%, since there are no outer thirds left to give back at that width) and
-   a shorter 32% vertically, which is what keeps the corners at 0.14 anyway. */
+   way out) at every desktop width. But the COPY does not scale that way: a
+   line that sits well inside the radius at 1920 lands out where the desktop
+   pool is already releasing once the frame is only 390 wide, because the
+   radius shrinks with the element and the type does not. So the phone gets
+   its own pool: near full-bleed horizontally (105%, since there are no outer
+   thirds left to give back at that width) and a shorter 32% vertically, which
+   is what keeps the corners at 0.14 anyway.
+
+   ⚠️ THIS BREAKPOINT WAS DERIVED AGAINST A LINE THAT NO LONGER EXISTS. The
+   binding case was the support line — 350px inside a 390 frame, landing at
+   0.86 of the radius and measuring 3.84:1 under the desktop shape. That line
+   has been removed, and the widest remaining text node is the HEADING, which
+   at the 2.4rem floor occupies a similar band and is why the override stays.
+   The 3.84 figure is kept here only as the reason the override was written;
+   it is NOT a measurement of what is on the frame today. Re-measure against
+   the heading before retuning either pool. */
 .locScrim {
   position: absolute;
   inset: 0;
@@ -292,103 +300,6 @@
   color: var(--cream);
 }
 
-/* ---------- the live line ----------
-
-   HELVETICA caps, at the reader's request. This line used to be mono, and
-   the mono was not arbitrary: globals.css reserves that voice for "labels,
-   pills, counters and indicators only", a clock is an indicator, and a
-   monospaced line cannot have its words shifted by its own digits. The
-   fixed-width guarantee is the one thing lost, and `.clockTime` below
-   already replaced it with something stronger (a reserved 5ch box), so the
-   sentence still cannot reflow on the minute.
-
-   Tracking moves with the face, from --tr-label-mono (0.03em) to --tr-label
-   (0.07em). DM Mono's advances are wide before any tracking is added;
-   Helvetica's caps are tight and closed, and at 13px the mono value leaves
-   them looking set solid. 0.07em is the site's own caps tracking for
-   proportional faces, so this is the pairing the scale already expects.
-
-   NO lozenge, no border, no pill radius. The reference boxes its token, but
-   the reference has no button underneath it; here a bordered capsule 100px
-   above an actual bordered capsule would read as two buttons, one of which
-   does nothing.
-
-   The 14px floor on the gap is the heading's own optical breath: at 1440 the
-   line box is 15.6px tall (--t-label 13px, line-height 1) against the
-   heading's 73.6px, so anything tighter than ~14px reads as the clock sitting
-   ON the H rather than above it. */
-.clock {
-  /* Was 1.6vh, which measured 17.2px at 1920x1080 and read as jammed: a 13px
-     line box sitting under an 80px display line whose cap band is enormous,
-     so the optical distance is far smaller than the geometric one. 2.6vh puts
-     it at 28.1 / 23.4 / 22px at 1920 / 1440 / 390 — clear of the H without
-     detaching from it. */
-  /* ── TIGHTER TO THE HEADING, and the rhythm is the reason ──
-     Measured at 1440x900 the lockup read 23 / 20 / 41: the clock 23px above
-     the heading, the support line 20px below it, the action 41px under
-     that. The first two are the same distance, so an EYEBROW and a
-     STANDFIRST — which belong to opposite sides of the line between them —
-     were bound to it equally, and the block read as three loose lines
-     rather than as a question with an introduction and an answer.
-
-     14 / 26 / 41 now: each step is bigger than the last as the relationship
-     gets looser. The clock belongs to the heading it introduces, so it sits
-     closest; the support line is a separate statement, so it sits further;
-     the action is isolated, which is the argument the magnet's own note
-     already makes for the largest gap. */
-  margin: 0 0 clamp(9px, 1.6vh, 18px);
-  font-family: var(--font-ui);
-  font-size: var(--t-label);
-  line-height: var(--lh-flush);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  /* 0.88, not full cream: enough of a step down from the heading that the two
-     read as different weights, small enough a step that the line still clears
-     the floor where the pool is thinnest under it.
-
-     THE LITERAL WAS #faf7f1, THE CREAM FROM TWO PALETTES AGO. This line and
-     .support below were the two highest-impact of some thirty such strandings
-     across the components — the only two carrying TYPE rather than a hairline.
-     88% of the token now.
-
-     THE ALPHA DID NOT MOVE, AND THAT IS MEASURED, NOT ASSUMED. Re-read at both
-     widths with the old literal still in place, via
-     scripts/probe-palette-blastradius.mjs: this line 9.41:1 at 1440 and 9.21:1
-     at 390; .support 8.71:1 and 8.53:1. Against a 4.5 floor that is roughly
-     double, and 88% of the CURRENT cream composites near 7.9:1 — still three
-     quarters clear of the bar. Holding the old RATIO instead would have taken
-     a ≈ 0.98, which is full cream in all but name, and would have collapsed
-     the very heading-to-label separation this alpha exists to draw. The floor
-     is 4.5:1, not 9.41:1, and it is held with room to spare.
-
-     THE NUMBER THAT USED TO BE IN THIS COMMENT IS GONE BECAUSE IT WAS STALE.
-     It read "0.82 was the first try and measured 3.84:1 on the phone's support
-     line", and .support's note claimed 5.4:1 there. Both were true of a
-     composition that has since changed underneath them — .support moved up
-     between the heading and the pill, and .locScrim became a centred pool —
-     so this copy now sits far deeper in the dark than when those readings were
-     taken. Measured today it is 8.53:1, not 5.4:1. */
-  color: color-mix(in srgb, var(--cream) 88%, transparent);
-}
-
-/* The five characters that change. This box used to be belt-and-braces over
-   a monospaced face; off mono it is the whole mechanism, and it still works
-   unchanged. `ch` is the advance of a "0", so 5ch reserves five digits —
-   wider than "16:12" (four digits and a narrow colon) and far wider than
-   "--:--", so BOTH strings sit centred inside a box neither of them fills
-   and the words on either side never move. tabular-nums keeps the digits
-   themselves from changing width minute to minute; Helvetica's lining
-   figures are tabular by default, but the fallback stack's need not be. */
-.clockTime {
-  display: inline-block;
-  min-width: 5ch;
-  text-align: center;
-  font-variant-numeric: tabular-nums;
-  /* the one word in the line at full cream — it is the part that is true only
-     for this minute, and the eye should find it first */
-  color: var(--cream);
-}
-
 /* the display heading — same grammar as "Our Restaurants." and "Blog.", one
    line, normal flow. Deliberately NOT the stretched-SVG treatment the
    footer's MAGINHAWA carries twelve hundred pixels below: firing that device
@@ -396,8 +307,10 @@
    stretch means off Contralto too — --font-display-big is reserved for
    wordmark moments (globals.css), and everything else is the grotesk. */
 .title {
-  /* the clock above carries the gap on its own margin-bottom, so the heading
-     owns no vertical margin of its own in either direction */
+  /* Nothing sits above the heading any more — the live clock that used to
+     carry the gap on its own margin-bottom is gone — and the pill below
+     carries the only gap left, so this owns no vertical margin in either
+     direction. */
   margin: 0;
   font-family: var(--font-display);
   font-weight: var(--w-medium);
@@ -425,29 +338,40 @@
    `display: block; width: fit-content`, so this rule states only the
    margin.
 
-   THE GAP IS THE BLOCK'S LARGEST, and that is the whole point of the order.
-   With the pill in the middle of the stack it measured 43px above and 34px
-   below — near-symmetrical, so it read as centred INSIDE the lockup rather
-   than as its last move, and the section handed the reader an action and then
-   went on explaining. Last in the flow, 4.6vh (49.7 / 41.4 / 38.8px at 1920 /
-   1440 / 390) against the 2.2vh that binds the support line up to the
-   heading: better than twice the gap above it, so the action is isolated and
-   the two middle elements close ranks as one sentence.
+   THE GAP IS NOW THE LOCKUP'S ONLY INTERNAL MEASUREMENT, and that is why it
+   had to be re-derived rather than inherited. It used to be 4.6vh, argued as
+   "better than twice" the 2.2vh binding a support line up to the heading — a
+   ratio between two gaps, in a stack of four elements. Both of the other
+   elements are gone, so the comparison that justified the number went with
+   them, and the gap now answers to the heading alone.
 
-   The 34px floor was argued from a magnet that no longer runs here: "half
-   the pill's height, ~23px at every breakpoint (the pill bottoms out near
-   46px), so a fully-pulled button still clears the support line's descender
-   band." The shared control is a shorter box on a quieter magnet — ~37px
-   tall at a 0.3 cap, so ~11px of vertical throw against the 23 this floor
-   was sized for. The floor is therefore no longer the binding constraint;
-   it stays because the gap it sets is the composition's, and it now clears
-   the descenders by better than twice the margin it was given. */
+   ⚠️ MEASURED AGAINST THE HEADING IT WAS BADLY WRONG AT THE PHONE END. A vh
+   gap does not scale with the type, and the type stops at its own 2.4rem
+   floor while the viewport keeps going. Measured before this change, the gap
+   against the heading's line box:
+       1920   49.7 / 73.6   0.68
+       1440   41.4 / 73.6   0.56
+       1280   36.8 / 70.6   0.52
+        390   38.8 / 35.3   1.10   <- the gap is TALLER than the heading
+   On a phone the pill had drifted a full line away from the question it
+   answers while on a desktop it sat at half that. Nothing at 390 changed to
+   cause it: the two removed elements had been absorbing the mismatch.
+
+   SO IT IS A FRACTION OF THE HEADING, not of the window. Both terms now come
+   from --t-display, so the ratio is constant at every width by construction
+   rather than by luck, and --t-display is itself a clamp so this inherits its
+   floor and ceiling and needs no clamp of its own.
+
+   The old 34px floor is deliberately NOT carried forward. It was argued from
+   a magnet that no longer runs here — half a pill height, ~23px of throw,
+   against the ~11px the shared PillCta actually travels at a 0.3 cap — and as
+   a floor it is exactly what held the phone gap up at 1.10 of its heading. */
 .magnetHost {
   /* `display: block` and `width: fit-content` are PillCta's `.host` — the
      magnet has to measure the control rather than the column. What is this
      section's own is the margin: auto left/right to sit the fit-content box
      on the block's centre line, since it does not inherit text-align. */
-  margin: clamp(34px, 4.6vh, 60px) auto 0;
+  margin: calc(var(--t-display) * 0.58) auto 0;
 }
 
 /* .action, its hover swap, its two focus rings and its pressed fill USED TO
@@ -458,42 +382,6 @@
    lives next to the shape it colours. This section names the variant and
    says why; it no longer restates the fill. */
 
-
-/* ---------- the supporting line ----------
-
-   Centred under the pill, on the block's own centre line. NOT splayed to the
-   bottom corners: `.locScrim` is now a centred pool that releases toward the
-   frame edges, and text in the corners would demand the dark be dragged back
-   out there — which is precisely the thing that was just undone.
-
-   --measure-tight (60ch = ~74 real characters) breaks the sentence into two
-   near-even lines at every desktop width; text-wrap: balance keeps the second
-   from ending up a two-word orphan under a full first line. */
-.support {
-  /* Now sits BETWEEN the heading and the pill, so this gap binds it UPWARD to
-     the line it explains. It is deliberately the block's smallest gap (2.2vh
-     = 23.8 / 19.8 / 18.6px at 1920 / 1440 / 390) — smaller than both the
-     clock's 2.6vh above the heading and the 4.6vh below, which is what makes
-     the middle two elements read as one sentence and leaves the pill alone at
-     the bottom. */
-  /* a step wider than the eyebrow's gap above the heading — see the
-     note there for the 14 / 26 / 41 rhythm */
-  margin: clamp(17px, 2.9vh, 34px) auto 0;
-  max-width: var(--measure-tight);
-  font-size: var(--t-small);
-  line-height: var(--lh-body);
-  /* same 88% of the cream as the clock — the two quiet lines bracket the
-     heading and the pill at one weight, so the block reads as two loud things
-     and two soft ones rather than four competing ones.
-
-     Same stranded #faf7f1 as .clock, migrated the same way and for the reasons
-     set out there. Worst measured case is still this line rather than the
-     clock, but the old "5.4:1" was taken before .support moved up into the
-     deep part of the pool: measured today it is 8.53:1 at 390 and 8.71:1 at
-     1440, against a 4.5 floor. */
-  color: color-mix(in srgb, var(--cream) 88%, transparent);
-  text-wrap: balance;
-}
 
 /* .actionLabel and .actionArrow went with .action. The label's weight is
    PillCta's `--w-regular` now rather than a hard 500, and the long arrow
@@ -510,11 +398,9 @@
    .cta pulled back into normal flow to stop the stage collapsing to zero and
    taking the film with it.
 
-   Four elements measure 206px stacked at 390px (measured: clock 13, gap 14,
-   heading 35 at the 2.4rem floor, gap 34, pill 48, gap 27, support copy 2
-   lines at 21) inside 125svh = 1055px — a fifth of the box, and the block is
-   centred in it, so the copy clears the top edge by 425px and the bottom by
-   213px.
+   TWO elements now, where four measured 206px stacked at 390px. They sit
+   inside 125svh = 1055px with the block centred in it, so there is an order
+   of magnitude more room than the box needs at the narrowest width.
    There is nothing left to overflow, so the fixed height stays — which also
    keeps --settle's departure distance identical at every breakpoint instead
    of stretching with the content. Below 981px the base .cta rule's

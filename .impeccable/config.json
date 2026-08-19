@@ -17,6 +17,12 @@
         ],
         "createdAt": "2026-07-29T16:26:31.030Z",
         "reason": "User-specified hover-grow: tile must grow in flow and push the row below down; transform cannot reflow siblings. padding-top is the deliberate animated property, hover/pointer-gated, disabled under reduced motion."
+      },
+      {
+        "rule": "overused-font",
+        "value": "helvetica",
+        "createdAt": "2026-08-18T13:12:28.009Z",
+        "reason": "Maginhawa --font-ui stack; mockups must match the site"
       }
     ]
   }

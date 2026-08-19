@@ -43,52 +43,73 @@
      a new chapter. "Not by too much" is what stopped here.
      The bottom pad is HALF what it was (was 48/8vh/120): it stacks with
      whatever follows the statement. */
-  /* ══════════ ONE SCREEN: STATEMENT IN THE MIDDLE, BAND AT THE BOTTOM ═══
-     The chapter is now a full viewport tall and holds BOTH halves — the
-     statement centred in the room left above the band, and the band of
-     photographs sitting on the bottom edge.
+  /* ══════════ ONE SCREEN, ONE THING IN THE MIDDLE OF IT ══════════
+     The chapter is a full viewport tall and the statement sits in the
+     middle of it. It used to hold two halves — the sentence centred in the
+     room left above a band of photographs on the bottom edge — and the band
+     is gone at the user's instruction (see <Manifesto>), so the centring
+     now divides the whole screen rather than the part above the pictures.
 
      `min-height`, NOT `height`. On a short viewport (a 1440×600 laptop, or
-     a phone in landscape) the statement plus the band genuinely need more
-     than a screen, and a fixed height would crop the pictures rather than
-     let the page grow. "Fits one screen" is true at every ordinary window
-     and degrades by scrolling, which is the correct failure.
+     a phone in landscape) the sentence can genuinely want more than a
+     screen once it wraps to five or six lines, and a fixed height would
+     clip it. "Fits one screen" is true at every ordinary window and
+     degrades by scrolling, which is the correct failure.
 
-     THE HISTORY MATTERS HERE, because this file has been round this loop
-     once already. `min-height: 100svh` was REMOVED from this section in an
-     earlier pass: with the statement centred and nothing else on the sheet,
-     it produced 394px of empty cream between the last restaurant card and
-     the first word — a third of a screen of nothing. The reason it is safe
-     to bring back is that the section is no longer nearly empty. It now
-     carries the band as well, so the centring divides real content instead
-     of padding out a void.
+     ⚠️ THIS FILE HAS BEEN ROUND THIS LOOP TWICE AND THE COST IS KNOWN.
+     `min-height: 100svh` was REMOVED once, measured: with the statement
+     centred and nothing else on the sheet it put 394px of empty cream
+     between the last restaurant card and the first word — a third of a
+     screen of nothing, and the section's own box went from 419px to 900px.
+     It came back when the band arrived, because the centring then divided
+     real content instead of padding out a void. The band has now gone and
+     the sheet is nearly empty again, so THE SEAM ABOVE WILL OPEN BACK UP —
+     roughly a third of a screen at 1440×900. That is not a regression that
+     slipped through; it is the direct consequence of "centre it in the
+     middle of the section", which was the instruction, and it is written
+     down here so the next person does not fix it by accident.
+     IF THE SEAM MATTERS MORE THAN THE CENTRING, this `min-height` is the
+     lever — drop it and the section sizes to its content again.
 
-     THE TOP PAD IS SMALL ON PURPOSE, down from clamp(150px, 21vh, 300px).
-     With a forced screen and `flex: 1` centring, a large pad no longer buys
-     air — it pushes the total past 100svh and breaks the single screen. The
-     seam is now produced by the CENTRING rather than by padding: measured
-     at 1440×900, the statement's first ink sits 194px below the last
-     restaurant card.
+     THE PADDING IS SYMMETRIC NOW, and it has to be. It read
+     `clamp(24px, 4vh, 56px) var(--pad-x) 0` — no bottom pad at all, because
+     the band carried its own and the space under the last row of
+     photographs had to equal the space between them (--band-gap, a number
+     only StoryStrip knew). With no band, a top pad and no bottom one is an
+     asymmetric content box, and `justify-content: center` centres inside
+     THAT box — so the sentence would sit half the top pad low and the
+     "properly centred" this was changed for would be off by ~28px at
+     1440×900. Equal pads, real centre. */
+  /* ── 92svh, DOWN FROM 100, at the user's instruction: "bring the About
+     section closer" ── The distance between this chapter's statement and the
+     next one's photograph is this section's own bottom half, so shortening
+     the section is the only thing that closes it. 90svh takes ~90px out at
+     1440×900, split by the bias below into ~45px off each end — so the seam
+     ABOVE closes too, which is the other instruction this file is carrying.
 
-     THAT IS A REAL REDUCTION AND IT IS A TRADE, not a free win. The seam
-     was opened to 243px at the user's request an hour before this; holding
-     one screen costs ~49px of it, because the statement can only be as far
-     down as the band above the fold allows. 194px is still comfortably
-     past the 153px that read as crowded, and the single screen was the
-     later and more specific instruction — but if the seam matters more
-     than the screen, this padding is the lever, and `min-height: 100svh`
-     is what has to give.
+     ⚠️ IT CANNOT GO MUCH FURTHER, AND THE FLOOR IS NOT A TASTE JUDGEMENT.
+     The band below the statement is where AboutSplit's heading perches
+     before it flies (HEAD_LIFT there), and that perch is fixed against the
+     WINDOW, not against this section: the heading's top lands at ~0.71·vh
+     whatever this section does. So the statement's bottom edge has to stay
+     above that, with air:
 
-     THERE IS NO BOTTOM PAD, and that is deliberate. The space under the
-     last row of photographs has to equal the space BETWEEN them, and only
-     the band knows that number (--band-gap, see StoryStrip.module.css).
-     Custom properties inherit downward, so a `var(--band-gap)` here could
-     not read a value declared on a child — it would silently fall back and
-     the two gaps would differ by however wrong the fallback was. The band
-     carries its own bottom padding instead, which keeps the one number in
-     the one file that owns it. */
-  min-height: 100svh;
-  padding: clamp(24px, 4vh, 56px) var(--pad-x) 0;
+         band below  ≥  vh − perchTop + clearance  ≈  315px at 1440×900
+
+     Measured before this change the band was 402px with 151px of clearance.
+     90svh was tried first and spends too much of it: the clearance fell to
+     52px at 1440×900 and 31px at 1440×800, where the heading is 189px tall
+     in a 251px band and the two lines start reading as one crowded block.
+     92svh keeps most of the gain and roughly 75px of air at both.
+
+     ⚠️ THE 1440×800 CASE IS THE ONE THAT BINDS, not the common one — a short
+     window makes the heading WRAP TALLER while giving it less room to sit
+     in, so it is squeezed from both ends at once. Check it before taking
+     another percent off this number. And if the gap still reads as too wide,
+     the lever is HEAD_LIFT — perch the heading lower and this floor comes
+     down with it — not this number on its own. */
+  min-height: 92svh;
+  padding: clamp(24px, 4vh, 56px) var(--pad-x);
   /* NO CLOSING RULE. A full-width hairline used to sit on this section's
      bottom border box, between the statement and Our Restaurants. It was
      drawing a boundary the page does not have: the statement and the
@@ -101,17 +122,71 @@
 }
 
 /* stacked flow below the breakpoint; the page's 12-column grid above it */
-/* THE STATEMENT TAKES ALL THE ROOM THE BAND DOES NOT, AND CENTRES IN IT.
-   `flex: 1` claims the leftover height of the 100svh section; the centring
-   puts the sentence in the middle of that space. This is what produces the
-   "text in the middle, pictures at the bottom" reading, and it is also what
-   now creates the seam to the restaurants grid above — see .section. */
+/* THE STATEMENT TAKES THE WHOLE SCREEN AND CENTRES IN IT.
+   `flex: 1` claims the section's height; the centring puts the eyebrow and
+   the sentence — one lockup, `gap` between them — in the middle of it. It
+   used to claim only the room the band did not, and the band is gone.
+   THIS IS ALSO WHAT CREATES THE SEAM to the restaurants grid above, and
+   with nothing else on the sheet that seam is now about a third of a
+   screen. See .section, which carries the measurement and the lever. */
 .inner {
   flex: 1;
   display: flex;
   flex-direction: column;
   justify-content: center;
   gap: clamp(18px, 2.6vh, 32px);
+  /* ══ BIASED ABOVE CENTRE, at the user's instruction ══
+     "Reduce the gap between this section and the one above." That gap is
+     not padding — it is half the free space in a full-screen section with
+     its content in the middle, so the only way to take from the top is to
+     give to the bottom. Padding the BOX and leaving the centring alone does
+     exactly that: `justify-content: center` still centres, inside a content
+     box that is 26vh shorter at the bottom, so the lockup rides 13vh above
+     the true middle. Measured at 1440×900 the seam from the last restaurant
+     card to the eyebrow goes 306px → ~190px.
+
+     ⚠️ THE TWO BANDS ARE ONE BAND, AND THIS IS WHY IT COULD NOT SIMPLY BE
+     SHORTENED. The obvious fix is to drop `min-height` below 100svh — and
+     it makes things worse, because the empty band BELOW the statement is
+     where AboutSplit's heading perches before it flies (see HEAD_LIFT
+     there). Shrink the section and the statement's bottom edge moves down
+     the screen into that perch: at 80svh the statement would end at y 752
+     with the heading sitting at 630, i.e. straight through it. Taking from
+     the top and giving to the bottom is the one move that improves both —
+     the seam closes AND the heading gets more clearance (43px → ~130px at
+     1440×900, and 24px → ~100px at the 1440×800 case that was tightest).
+
+     vh AND NOT A CLAMP, because the quantity being divided is itself a
+     fraction of the window: at 1080 the same 26vh takes 140px off a 426px
+     seam, which is the same proportion of the same problem. */
+  /* ⚠️ 26vh → 14vh, AT THE USER'S INSTRUCTION, AND IT IS A TRADE.
+     The note above is about the seam ABOVE this section and it is still
+     correct: this padding buys that seam by giving the space to the bottom.
+     The new instruction is about the gap BELOW — "reduce the gap between
+     the about us section and the manifesto" — and those two are the same
+     pot of free space. Taking 12vh back from the bottom moves the statement
+     down, which closes the lower gap and re-opens part of the upper one.
+     Measured at 1440×900, both seams ink-to-ink and at rest — the trade is
+     one-for-one because it is the same free space moving:
+       statement → About heading    143px →  89px   (closed 54px)
+       last card → eyebrow          190px → 244px   (opened 54px)
+     The 190px is the number the note above recorded for 26vh, which is what
+     makes these comparable rather than two different measurements.
+
+     ⚠️ MEASURE THE RESTING GAP, NOT A MID-SCROLL ONE. AboutSplit's heading
+     is scroll-driven, so its distance from the statement is different at
+     every scroll position; a sample taken while the flight is running reads
+     ~253px at 1440×900 and means nothing. Seat the page at 0 first.
+
+     WHY 14 AND NOT LOWER. Clearance to the heading falls with it, and the
+     window that runs out first is a short laptop, not a wide one:
+       1440×900  89px      1440×800  63px      1280×720  56px
+     1280×720 is the floor case and 56px still clears — but it is the number
+     to watch if this goes any further, and 43px is already on record in this
+     file as too tight. There is NO blank screen at any value tested between
+     26vh and 10vh: the two chapters always overlap on screen somewhere, so
+     "a screen of nothing" is not what this lever is fixing. */
+  padding-bottom: 14vh;
 }
 
 @media (min-width: 981px) {
@@ -130,6 +205,159 @@
   }
 }
 
+/* ══════════ THE FOUR PICTURES IN THE SENTENCE ══════════
+   A small photograph set inline after four of the sentence's nouns — see
+   INLINE in Manifesto.tsx for which four and why.
+
+   SIZED IN em, SO IT IS THE TYPE THAT DECIDES. The statement's own font-size
+   is a clamp against the viewport, so a px height would be a different
+   proportion at every breakpoint — large enough to break the line at 2.4rem
+   and lost in it at 5.2rem. 0.62em holds the picture between the x-height
+   and the cap height of the line it sits in, at every size, which is the
+   proportion that reads as punctuation rather than as an inserted object.
+
+   THE ASPECT IS FIXED AND THE CROP IS `cover`, because the four source
+   photographs are not the same shape and four different rectangles in one
+   sentence would read as an accident. 4:3 landscape: a portrait would sit
+   taller than the cap height and push the line box open.
+
+   `vertical-align` IS OPTICAL AND NOT A BASELINE. Sitting the box ON the
+   baseline leaves it looking hung above the words, because the words have
+   descenders below that line and the picture does not. -0.06em drops it to
+   where the eye reads the two as level.
+
+   THE RADIUS IS --radius-tile — the same 2px printed-plate corner the
+   restaurant cards and the About panel carry. A softer corner here would be
+   the only rounded thing on the page. */
+/* ══════════ THE PICTURES HAVE A DECISIVE ORIENTATION ══════════
+   3 / 2 AND NOT 4 / 3. At 0.62em the old 1.33 read as neither portrait nor
+   landscape — a square-ish chip rather than a photograph set in the line.
+   3:2 is the aspect two of the four sources already are, and it is the SAME
+   aspect as the three door prints in AboutSplit.module.css, so the two
+   places on the home page that set a small photograph into type now cut
+   them from the same stock. */
+.inlineImage {
+  display: inline-block;
+  height: 0.62em;
+  aspect-ratio: 3 / 2;
+  /* the mask hugs this box and owns both the seat in the line and the gap
+     beside it — see .imageMask. `top` because the mask's line box is zero
+     high and this simply fills it. */
+  vertical-align: top;
+  border-radius: var(--radius-tile);
+  background-color: var(--placeholder);
+  background-size: cover;
+  background-position: center;
+  /* the tone the frame holds while its photograph decodes, same as every
+     other frame on the site */
+}
+
+/* THE PICTURE'S MASK, AND IT HUGS THE PICTURE.
+
+   ⚠️ IT DID NOT, AND THAT WAS A REAL DEFECT rather than a tuning nicety.
+   The rule here read `line-height: 1` with a note claiming the height came
+   from the picture and the mask "simply wraps it". It did not: `line-height:
+   1` puts a FULL EM OF STRUT in the mask's line box, so a 0.62em photograph
+   sat in a 1em box, and with `.wordMask`'s 0.06em/0.22em padding on top the
+   painted clip measured 1.28em. Against this paragraph's 0.92 leading that
+   is 0.36em of clip standing outside its own line — measured at 1440×900,
+   a line holding a landscape picture painted 92.4px into the line above it,
+   which is where a travelling photograph was being drawn over live type.
+   (A text-only pair overlaps by 0.28em / 21.5px, which is the descender
+   padding and is the leading's business, not this rule's.)
+
+   So the mask now states its height, drops the strut, and drops the block
+   padding with it — a photograph has no descenders to protect, which is the
+   only thing that padding was ever for. 0.62em landscape, 0.86em portrait,
+   both under the 0.92em line box, so a picture can no longer paint outside
+   its own line whatever it is doing.
+
+   ⚠️ THE MASK NOW CARRIES THE BASELINE SEAT. `.wordMask` is
+   `vertical-align: bottom`, which for an `overflow: hidden` inline-block
+   means "bottom margin edge on the line box bottom" — correct for a word,
+   wrong for a picture that used to be seated on the BASELINE by
+   `.inlineImage`'s own `vertical-align: -0.06em` inside a strutted box.
+   With the strut gone the mask has to say it: -0.06em puts the mask's
+   bottom edge, and so the picture's, 0.06em under the baseline exactly as
+   before.
+
+   ⚠️ AND THIS CORRECTS THE PORTRAIT ONE, which was never seated the same
+   way. Its mask already had a fixed height, so it inherited `bottom` and
+   hung 0.32em below the text box while the three landscape frames sat on
+   the baseline — two seats for four pictures in one sentence. All four are
+   now on the same rule.
+
+   The inline margin moves here with the height: a margin on the inner span
+   would sit INSIDE a clip that now hugs the picture exactly, and would push
+   the photograph out of its own window. */
+/* ⚠️ THE SELECTOR IS COMPOUND BECAUSE `.wordMask` IS DECLARED LATER.
+   Both classes land on the same element and both are one class' worth of
+   specificity, so the file's ORDER decides — and `.wordMask` sits ~200 lines
+   below, which means every property the two share was silently going to it.
+   Measured while this rule read plain `.imageMask`: display resolved to
+   `inline-block`, vertical-align to `bottom`, and the padding/margin pair
+   back to the word's, i.e. none of the four declarations below applied and
+   the picture was clipped by 4.6px at the top while hanging the same amount
+   out of the bottom of its own window. Compound rather than reordered, so a
+   later tidy-up that moves these blocks around cannot re-break it. */
+.wordMask.imageMask {
+  /* ⚠️ inline-flex, NOT inline-block, AND THE REASON IS ALIGNMENT.
+     An inline-block mask lays its picture out in a LINE BOX, and a line box
+     positions its content by baseline — so even at `line-height: 0` the
+     picture landed 0.06em below the mask it is supposed to fill: clipped by
+     that much at the top, hanging out of the clip by the same at the bottom
+     (measured 4.6px at 1440). A flex container has no line box; the item
+     stretches to the cross size and the picture IS the mask, which is the
+     only arrangement in which "the clip hugs the picture" is true rather
+     than nearly true. */
+  display: inline-flex;
+  line-height: 0;
+  height: 0.62em;
+  /* both shorthands, because `.wordMask` sets both as shorthands and a
+     longhand here would only cancel the half it names */
+  padding: 0;
+  /* ⚠️ THE INLINE METRIC IS UNCHANGED AND HAS TO BE. `.wordMask` pads 0.07em
+     each side and pulls the same back with a negative margin, so a word's
+     advance is exactly the word. Setting a positive `margin-inline` here
+     REPLACES that negative one, so leaving the padding in place would widen
+     each picture by 0.14em — enough to re-wrap the sentence (measured: eight
+     lines became seven). A photograph has no side bearings to protect, so
+     the padding goes to zero and the 0.1em gap the picture always carried
+     moves out here untouched: advance = picture + 0.2em, as before. */
+  margin: 0 0.1em;
+  vertical-align: -0.06em;
+}
+
+/* ══════════ THE PORTRAIT FRAME ══════════
+   One of the four (see INLINE in Manifesto.tsx). 2 / 3 is belly-web.jpg's
+   own aspect — 240×360 exactly — so it is uncropped rather than centre-cut.
+
+   ⚠️ THE HEIGHT IS THE WHOLE PROBLEM AND 0.86em IS ITS SOLUTION. A portrait
+   picture only reads as portrait if it is taller than it is wide, and an
+   inline-block taller than the line it sits in GROWS that line's box — which
+   would leave the lines holding a picture further apart than the lines
+   without one, in the largest type on the page. The statement's leading is
+   --lh-display (0.92), so the line box is 0.92em; at 0.86em this frame stays
+   under it and the leading is untouched. Measured at 1440×900 the statement
+   is 302px tall before and after.
+
+   THAT CEILING IS WHY THIS IS NOT BIGGER. If a portrait picture ever needs
+   more presence than 0.86em, the leading has to be opened FIRST and every
+   line pays for it — do not raise this number on its own and expect the
+   paragraph to absorb it. */
+.portrait {
+  height: 0.86em;
+  aspect-ratio: 2 / 3;
+}
+
+/* The clip the picture travels out of has to be as tall as the picture, or
+   the reveal would uncover only the bottom two thirds of it and rest there.
+   It is now the only thing the portrait mask has to say — the seat, the gap
+   and the missing strut are all on .imageMask above. */
+.wordMask.portraitMask {
+  height: 0.86em;
+}
+
 /* ---------- the statement ---------- */
 /* display voice, a step below the section titles — a spoken line, not a
    heading */
@@ -144,7 +372,35 @@
      what gets locked — the line count is a measured result. Re-check it if
      this moves again. */
   font-size: clamp(2.4rem, 5.35vw, 5.2rem);
-  line-height: var(--lh-display);
+  /* ══════════ 1.25, NOT --lh-display (0.92) ══════════
+     ⚠️ THIS IS THE ONLY THING THAT STOPS THE WORDS OVERLAPPING, and it was
+     arrived at by measurement rather than taste. A word mid-descent is only
+     half inside its clip and the visible half is drawn at the TOP of that
+     clip; at 0.92 the line above's ink is already in that space, so every
+     travelling word was painted across the line it was arriving under.
+     Measured worst ink collision over the whole scrub, before:
+
+         1440×900   17.2px   'A' over 'we'
+          768×1024   9.1px   'A' over 'every'
+          390×844    8.0px   'every' over 'meal'
+
+     ⚠️ THE MASK'S BLOCK PADDING IS THE OTHER HALF — see .wordMask. The two
+     are ONE setting: the collision band is (2 × pad) − (leading − ink
+     height), so padding buys itself back in leading at 1:1 and neither value
+     can be read on its own. Sweeping both, ink height measures ~1.22em on
+     this face, and 1.25 / 0.02em is the first pair reading 0px collision AND
+     0px shaved at all three widths. Leading alone, with the old padding,
+     would have needed 1.36 — body-copy leading on a display line.
+
+     ⚠️ MEASURED ON THE FACE THAT RENDERED, which is the local FreightBig /
+     Times fallback rather than the Adobe-served one: a headless check shows
+     the kit loading contralto-big and nothing else. If the served italic has
+     deeper tails than the fallback, the lever is the 0.02em, not this.
+
+     THE COST IS VISIBLE AND IS THE TRADE: the statement is a third taller
+     and reads as an airier block than the tight display setting it was.
+     Putting it back is this one line — and brings the 17px graze with it. */
+  line-height: 1.25;
   letter-spacing: var(--tr-display);
   color: var(--maroon);
   /* CENTRED — the lines on a common axis, and the block on the page's.
@@ -295,9 +551,15 @@
    `will-change: clip-path` held a ≈1440×470 layer, and it is recorded
    below as one of the reasons that mechanism was worth deleting); there is
    no reason to keep paying it here for a property that composites anyway. */
-/* ── THE MASK: what the word rises from behind ──
+/* ── THE MASK: what the word comes down from behind ──
    `overflow: hidden` on a box the size of the word, with the word inside
-   it starting a full 110% below. That is the whole reveal.
+   it starting a full 110% ABOVE. That is the whole reveal.
+
+   ⚠️ THE PADDING IS ASYMMETRIC AND THE DESCENT USES THE SHALLOW SIDE.
+   0.06em above the word against 0.22em below, so the word hides behind the
+   TOP edge sooner than it ever hid behind the bottom one — which is why
+   flipping the sign on Manifesto.tsx's -110% needed no change to the
+   magnitude. Deepen the top pad and that stops being true.
 
    ⚠️ THE PADDING IS NOT OPTIONAL AND THE NEGATIVE MARGIN CANCELS IT.
    A clip tight to the line box shaves descenders — this sentence carries
@@ -315,8 +577,28 @@
 .wordMask {
   display: inline-block;
   overflow: hidden;
-  padding: 0.06em 0.07em 0.22em;
-  margin: -0.06em -0.07em -0.22em;
+  /* ⚠️ THE BLOCK PADDING IS 0.02em NOW, DOWN FROM 0.06em/0.22em, and it is
+     the other half of the leading change on .statement — read the two
+     together or neither makes sense. The old numbers protected descenders
+     that OVERFLOWED the line box, which is what a 0.92 leading guarantees:
+     the box was shorter than the ink, so the clip had to be padded past it.
+     At 1.25 the ink sits INSIDE its own box and there is nothing hanging out
+     to protect, so the padding's justification went with the setting that
+     created it.
+
+     It could not simply stay, either. Everything the mask pads is a band in
+     which one line's ink and the next line's window overlap, and a
+     travelling word is drawn into exactly that band — so the padding IS the
+     collision, at 1:1 against the leading. 0.28em of it was 21.5px at 1440.
+     0.02em is a hair of insurance against a served italic with deeper tails
+     than the face measured here: it costs 1.4px of collision at 1440, 0px at
+     390, against 0px shaved anywhere.
+
+     THE INLINE 0.07em IS UNTOUCHED — that one is about side bearings and
+     negative tracking, has nothing to do with leading, and its own note
+     still holds. */
+  padding: 0.02em 0.07em;
+  margin: -0.02em -0.07em;
   vertical-align: bottom;
 }
 
@@ -346,9 +628,47 @@
    colour already makes these words the only non-maroon ink on the sheet.
    If it looks like too much, deleting the `color` line here leaves a clean
    italic-only accent and nothing else has to change. */
+/* ══════════ THE ACCENT ARRIVES LAST ══════════
+   comfort / quiet / welcome hold the statement's own maroon through the
+   whole wave and warm to the accent only once the last piece has landed —
+   the chapter naming what it is about after it has finished saying it, which
+   is the move "restaurants" makes one screen up (Discover.module.css,
+   `.titleRise[data-lit]`), on the same curve and the same duration.
+
+   ⚠️ IT WAS NOT A GESTURE BEFORE, IT WAS A FACT. The three words simply
+   arrived already green, so the emphasis was a label the reader met at the
+   same instant as the word rather than a conclusion the line reaches.
+   Same three words, same colour, same italic; only WHEN moved.
+
+   A TRANSITION ON `color`, NOT A SCRUBBED VALUE, and Manifesto.tsx's INK_AT
+   records the measurement behind that: the scroll left after the wave ends
+   is ~35px, so a scrubbed warm finished inside one wheel notch. A latch plus
+   a fixed 0.8s reads the same however fast the reader is moving.
+
+   0.2s OF DELAY IS THE BEAT. The threshold is the exact progress at which
+   the last piece lands, so without it the colour would start moving on the
+   same frame the sentence stops — which is "during", not "after".
+
+   BOTH ENDS ARE TOKENS AND BOTH STAY IN CSS. Interpolating them in TSX would
+   mean two hex literals in a component with no business knowing the palette,
+   and this palette has moved twice (--saffron names a green now). */
 .key {
-  color: var(--saffron-ink);
   font-style: italic;
+  color: var(--maroon);
+  transition: color 0.8s var(--ease-state) 0.2s;
+}
+
+.statement[data-lit="on"] .key {
+  color: var(--saffron-ink);
+}
+
+/* the reader who asked for less: the accent is simply there. The still
+   branch already renders with data-lit set, so this only has to stop the
+   colour crossing on its own. */
+@media (prefers-reduced-motion: reduce) {
+  .key {
+    transition: none;
+  }
 }
 
 /* NO BRAND-FACE RULE HERE, and the reason is worth keeping. "Maginhawa

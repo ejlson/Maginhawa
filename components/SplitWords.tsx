@@ -98,6 +98,7 @@ export default function SplitWords({
   amount = 0.6,
   on,
   css,
+  down,
   em,
   emClassName,
   maskClassName,
@@ -114,6 +115,23 @@ export default function SplitWords({
   on?: boolean;
   /** drive the same animation from CSS rather than Motion — see above */
   css?: boolean;
+  /** BUILD DOWNWARD: the words come down out of the top of their clips
+   *  instead of up out of the bottom. One sign on the park, and nothing else
+   *  about the gesture moves — same 145%, same duration, same stagger, same
+   *  curve, same masks.
+   *
+   *  145% IS SIGN-AGNOSTIC AND THAT IS NOT LUCK: `.mask`'s `padding-block` is
+   *  0.3em on BOTH edges (it is one `padding-block`, not a top and a bottom),
+   *  so the word has exactly as far to travel to clear the top of the window
+   *  as it ever had to clear the bottom. If that padding is ever split into
+   *  two different values, this stops being true and the two directions need
+   *  two magnitudes.
+   *
+   *  A PROP RATHER THAN A FLIP IN HERE, because this component is the site's
+   *  shared word-mask grammar — /about's hero, /careers and the deck's nine
+   *  chapter bodies all speak it, and they still build upward. Only the
+   *  callers that ask, descend. */
+  down?: boolean;
   /** An exact phrase inside `text` whose words take `emClassName` — the
    *  About hero's "served with heart" is the only caller. Matched as a run of
    *  whole words rather than by index so a copy edit cannot silently emphasise
@@ -195,7 +213,7 @@ export default function SplitWords({
         {words.map((word, i) => (
           <Fragment key={i}>
             <span className={maskClass(i)} aria-hidden>
-              {/* THE RESTING STATE IS RISEN, not hidden, and the direction
+              {/* THE RESTING STATE IS SEATED, not hidden, and the direction
                   matters. `.cssWord` alone is translateY(0) — where the word
                   belongs — and the animation only exists while the block is
                   `on`, running 145% -> 0 with `both` so the from-state holds
@@ -204,7 +222,9 @@ export default function SplitWords({
                   word back down, which the caller's outgoing block would show
                   for the length of its fade. */}
               <span
-                className={styles.cssWord}
+                className={`${styles.cssWord}${
+                  down ? ` ${styles.cssDown}` : ""
+                }`}
                 style={{ "--w": i } as CSSProperties}
               >
                 {word}
@@ -243,8 +263,12 @@ export default function SplitWords({
               variants={{
                 // 145%, not ~110%: the clip window is padded taller than the
                 // word's line box to protect descenders (see the stylesheet),
-                // so the word has further to travel to clear it
-                hidden: { transform: "translateY(145%)" },
+                // so the word has further to travel to clear it. The SIGN is
+                // the `down` prop's whole effect — see its note above for why
+                // the magnitude does not change with it.
+                hidden: {
+                  transform: `translateY(${down ? "-145%" : "145%"})`,
+                },
                 show: {
                   transform: "translateY(0%)",
                   transition: { duration, ease: EASE },

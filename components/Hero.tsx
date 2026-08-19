@@ -12,6 +12,7 @@ import { useRouteTransition } from "./PageTransition";
 import styles from "./Hero.module.css";
 import PillCta from "./PillCta";
 import { asset } from "@/lib/media";
+import { registerIntroFilm } from "@/lib/introWindow";
 
 // Lenis owns the scroll, so a raw scrollIntoView is pulled straight back —
 // same hand-off the footer's "Back to top" uses. The native path is the
@@ -49,9 +50,32 @@ function scrollToSection(hash: string, pass = 0) {
 
 // the kitchens take turns behind the wordmark — each clip plays through
 // to its end, then the next one starts on a clean hard cut. BOTH videos
-// stay mounted and preloaded the whole time; the swap only flips
-// visibility, so there's no loading gap or flash between clips.
+// stay mounted the whole time; the swap only flips visibility, so there's
+// no loading gap or flash between clips.
+//
+// ⚠️ ONLY THE FIRST ONE IS PRELOADED, AND ON A PHONE THAT IS THE DIFFERENCE
+// BETWEEN A PAGE AND A DOWNLOAD. Both carried `preload="auto"`, which fetches
+// each file in full: 9.3MB + 7.4MB = 16.7MB pulled down the wire before the
+// reader has scrolled a pixel, on a first screen that can only ever show one
+// of them. Measured on a 390px walk of the whole page, the two hero clips
+// were 70% of its entire 24MB.
+//
+// THE SECOND IS PROMOTED PART-WAY THROUGH THE FIRST, which is what makes
+// this a deferral rather than a trade. belly-hero.mp4 runs 22.3s and the cut
+// cannot happen before it ends, so starting the second fetch at WARM_AT
+// leaves 14 seconds to move 7.4MB — far more than it needs — while keeping
+// those bytes off the first screen entirely.
+//
+// ⚠️ NOT `onPlaying`. That was the first attempt and it fires about a second
+// in, which puts the second clip's whole download back inside the opening
+// screen and buys nothing. The trigger has to be a POSITION IN THE FIRST
+// CLIP, not the fact that it started.
 const CLIPS = ["/videos/belly-hero.mp4", "/videos/mamasons-hero.mp4"];
+
+// seconds into the first clip before its successor is fetched — see above.
+// It is a floor, not a schedule: `timeupdate` fires roughly four times a
+// second and the warm is a one-shot.
+const WARM_AT = 8;
 
 export default function Hero({ started }: { started: boolean }) {
   const [clip, setClip] = useState(0);
@@ -77,6 +101,19 @@ export default function Hero({ started }: { started: boolean }) {
     clamp: true,
   });
 
+  /* the second clip's fetch, started WARM_AT seconds into the first — see the
+     note on CLIPS. Idempotent, and it has to be: `timeupdate` keeps firing
+     for the rest of the clip, and `load()` on an element already loading
+     would restart the fetch from zero every quarter second. */
+  const warmNext = () => {
+    const first = videoRefs.current[0];
+    if (!first || first.currentTime < WARM_AT) return;
+    const el = videoRefs.current[1];
+    if (!el || el.preload === "auto") return;
+    el.preload = "auto";
+    el.load();
+  };
+
   const advance = () => {
     const next = (clip + 1) % CLIPS.length;
     const el = videoRefs.current[next];
@@ -95,6 +132,28 @@ export default function Hero({ started }: { started: boolean }) {
       data-cursor="glass"
     >
       <div className={styles.panel}>
+        {/* ═══ THE ZOOM WRAPPER ═══
+            The intro's window is one scalar `k`: four cream panels open a
+            centred k·vw × k·vh aperture and THIS BOX scales by k about the
+            viewport centre, so the picture itself grows into the hole instead
+            of merely being uncovered. See lib/introWindow.ts for the whole
+            mechanism and for the two approaches that were built, measured and
+            rejected before it.
+
+            THE RAMP AND THE GRAIN ARE INSIDE IT, so the hero picture zooms as
+            ONE object; a ramp left outside would sit at full size over a
+            postcard-sized film and read as a black band, not as shading.
+
+            THE LOCKUP IS DELIBERATELY OUTSIDE IT, as a SIBLING. `lockupY` is a
+            scroll-linked transform on that element; nesting it here would
+            MULTIPLY the two and the wordmark would ride the intro's scale as
+            well as the scroll. As siblings they compose and neither knows
+            about the other.
+
+            Its resting transform is identity (see .zoom), which is also the
+            reveal's last keyframe — that is what makes the hand-off, and the
+            short path that never animates at all, snap-free. */}
+        <div className={styles.zoom} ref={registerIntroFilm} aria-hidden={false}>
         {CLIPS.map((src, i) => (
           <video
             key={src}
@@ -108,7 +167,8 @@ export default function Hero({ started }: { started: boolean }) {
             autoPlay={i === 0}
             muted
             playsInline
-            preload="auto"
+            preload={i === 0 ? "auto" : "none"}
+            onTimeUpdate={i === 0 ? warmNext : undefined}
             onEnded={i === clip ? advance : undefined}
             style={{ visibility: i === clip ? "visible" : "hidden" }}
           />
@@ -125,6 +185,7 @@ export default function Hero({ started }: { started: boolean }) {
         <div className={styles.ramp} aria-hidden />
         {/* the grain goes OVER the ramp as well as the film — see its note */}
         <div className={styles.grain} aria-hidden />
+        </div>
 
         <motion.div
           className={styles.lockup}

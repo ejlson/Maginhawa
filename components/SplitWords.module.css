@@ -8,11 +8,51 @@
    rest. Padding the window out and pulling the same amount back with
    negative margins widens the clip without moving the text. */
 .mask {
+  /* natural word spacing between adjacent masks */
+  --mask-gap: 0.24em;
+
+  /* ---- THE INLINE AXIS IS CLIPPED TOO, AND IT WAS BEING SHAVED ----
+     The block axis below has been padded out since the beginning; the inline
+     axis never was, so `overflow: hidden` cut every glyph whose INK reaches
+     past its advance width. Two independent causes, both measured on
+     /careers' "Where craft":
+
+       side bearings   a display face's outer serifs and terminals overhang
+                       the advance. The 'W' of "Where" lost 0.8px off its
+                       top-left serif and the 'ft' of "craft" 2.5px off the
+                       t's terminal, at 1440. Visible at 1x, obvious at 4x.
+       negative tracking  CSS applies `letter-spacing` after the LAST
+                       character too, so a negative value pulls the mask's
+                       right edge INTO the final glyph. The hero headline
+                       runs -0.028em, which is 2.8px of that 2.5px on its
+                       own — i.e. the tighter the type is set, the more of it
+                       is cut.
+
+     0.1em, and it is bounded on both sides rather than picked. The FLOOR is
+     the worst ink overhang measured across every SplitWords caller on the
+     site (/, /about, /careers, at 1440 and 390): 0.0688em, the 'f' of "of"
+     on the home page, with 0.005em the worst on the left. The CEILING is
+     half the word gap — past 0.12em two neighbouring clip windows would
+     overlap, and although each window only ever clips its own word, windows
+     that overlap is a thing to reason about rather than a thing to allow.
+     0.1em clears the measured worst by 45% and sits under the ceiling.
+
+     THE GAP AND THE ADVANCE ARE BOTH UNCHANGED, which is the whole trick and
+     the reason this could not simply be `margin-inline: -0.1em`: that sets
+     the RIGHT margin too and would eat the word gap. The left margin pulls
+     the padding back so the word's ink starts exactly where it always did,
+     and the right margin carries the gap MINUS the same padding, so every
+     mask's margin box measures word + gap as before. Nothing re-wraps,
+     nothing re-centres, and the two callers whose measures were tuned
+     against 0.24em keep it to the pixel. */
+  --mask-pad-x: 0.1em;
+
   display: inline-block;
   overflow: hidden;
   vertical-align: bottom;
-  /* natural word spacing between adjacent masks */
-  margin-right: 0.24em;
+  padding-inline: var(--mask-pad-x);
+  margin-left: calc(var(--mask-pad-x) * -1);
+  margin-right: calc(var(--mask-gap) - var(--mask-pad-x));
   /* 0.30em, not 0.14em. The old value cleared the UPRIGHT face's descenders
      and nothing more, so any caller setting a saffron italic run inside a
      mask — the About hero lede's "served with heart.", the statement band —
@@ -24,8 +64,11 @@
   margin-block: -0.3em;
 }
 
+/* the final gap is cancelled, but the final padding still has to be pulled
+   back or the line would measure 0.1em wide of its type — the reason this is
+   no longer plain `margin-right: 0` */
 .mask:last-child {
-  margin-right: 0;
+  margin-right: calc(var(--mask-pad-x) * -1);
 }
 
 /* THE WORD GAP IS A MARGIN; THIS IS THE WORD GAP'S MEANING.
@@ -99,6 +142,34 @@
        further to travel before it clears. Derived from the padding, not
        chosen — move one and move the other. */
     transform: translateY(145%);
+  }
+  to {
+    transform: translateY(0%);
+  }
+}
+
+/* ---- the same block, coming DOWN (SplitWords `down` prop) ----
+   One sign, and it is a keyframe rather than a `reverse` direction because
+   `animation-direction: reverse` would run the CURVE backwards too — a block
+   that decelerates into place would accelerate out of the mask instead, which
+   is a different gesture wearing the same numbers.
+
+   THE MAGNITUDE IS THE SAME 145% AS THE RISE, and it is allowed to be:
+   `.mask`'s clip is padded by a single `padding-block`, so the window sits
+   0.30em proud of the line box at the TOP exactly as it does at the bottom.
+   See the `down` prop's note in the component.
+
+   ⚠️ THE SELECTOR HAS TO OUT-SPECIFY `.cssOn .cssWord`, which sets the
+   `animation` SHORTHAND and therefore re-sets `animation-name: swRise` with
+   two classes' worth of specificity. A bare `.cssDown` loses that cascade
+   silently — the block still builds, upward, and nothing errors. */
+.cssOn .cssWord.cssDown {
+  animation-name: swDescend;
+}
+
+@keyframes swDescend {
+  from {
+    transform: translateY(-145%);
   }
   to {
     transform: translateY(0%);

@@ -55,46 +55,58 @@
      that the ramp, the wash and the block stay ONE description of one
      card with two shapes. */
 
-  /* THE RAMP'S HEIGHT, as a share of the CARD's height. See .rampBlur for
-     what the ramp is and .square for how the square's number was derived.
+  /* THE RAMP'S HEIGHT. See .rampBlur for what the ramp is.
 
-     ── 78%, UP FROM 58%, AND IT IS FORCED BY THE BLOCK'S NEW HEIGHT ──
-     The number that matters is not this one, it is where the block's TOP
-     EDGE lands inside the gradient: f = (rampH − blockH) / rampH, which is
-     how much ink sits under the block's first line and therefore every
-     contrast figure this card was signed off on. This file's own table
-     records f = 0.41 as the value the readings were taken at.
+     ── IT IS NO LONGER A BARE PERCENTAGE OF THE CARD, AND THE REASON IS
+     THAT THE BLOCK STOPPED BEING ONE ──
+     The number that has always mattered is not this one, it is where the
+     block's TOP EDGE lands inside the gradient:
 
-     The block restructured — the venue's name and a tagline above the rule,
-     the address and the controls sharing one row below it — and grew from
-     ~110px to 144px on a 262px card. At 58% the ramp was 152px, so f fell
-     to (152 − 144) / 152 = 0.05: the first line of type was sitting where
-     the gradient is still almost transparent, on an unblurred photograph.
-     That is a legibility regression, not a cosmetic one.
+         f = (rampH − blockH) / rampH
 
-     THEN THE STATS WENT BACK ABOVE THE RULE and the block got most of its
-     height back: price and hours closing the head row instead of stacking
-     under the address takes a whole row off the left column. Re-measured,
-     the block is 124px, so 76% of the card (199px) puts f at 0.377.
+     i.e. how much ink sits under the block's first line, and therefore
+     every contrast figure this card was signed off on. This file's table
+     records f = 0.41 as the value the readings were taken at, and the old
+     68% was simply the percentage that produced it against a 124px block.
 
-     THEN THE BLOCK WAS TIGHTENED and the ramp came down with it, at the
-     user's instruction: the inset and the gaps lost 12px between them, so
-     68% of the card holds the SAME f the 76% ramp held against the taller
-     block, and gives 8% of the card back to the photograph. That is the
-     relationship to keep in view — f is the number, this percentage is
-     only ever a consequence of it.
+     THE BLOCK IS ~63px NOW, HALF WHAT IT WAS, at the user's instruction:
+     the address, the opening-hours stat and the hairline are off the card
+     and the venue's name and tagline moved down into the one row that is
+     left (see <VenueBlock> in VenueCard.tsx). So the ramp comes down with
+     it — that is the "reduce the gradient behind the text" half of the same
+     instruction, and it is not cosmetic: a 68% ramp over a 63px block is
+     f = 0.65, two thirds of the gradient carrying nothing, which reads as a
+     dark band sitting on the photograph rather than as the photograph
+     ending.
 
-     f STILL LANDS SHORT OF THE 0.41 THE TABLE WAS TAKEN AT, and the honest
-     reason not to chase it: the last of the distance costs photograph and
-     nothing else. What sits at the block's top edge is the venue's NAME at
-     FULL cream — the loudest line on the card and the one with the most
-     headroom — while the address pair at 84% sits further down where the
-     ramp is deep. The thinnest part of the gradient is carrying the most
-     robust line. It briefly sat at 78% when the block was 144px tall.
+     WHY A PERCENTAGE ALONE CANNOT DO IT ANY MORE. Every line in the block
+     is clamped, so above about a 270px card the block's height is
+     CONSTANT (~63px) while the card's height still scales with its column.
+     One percentage therefore hits a different f at every breakpoint — 29%
+     is 110px on the 1920 4-up card and 44px on the 981 one, and the second
+     of those is SHORTER THAN THE BLOCK. That was survivable when the block
+     was 45% of the card at every width; it is not survivable now.
+
+     SO: a percentage with a PIXEL FLOOR, and the floor is what actually
+     binds on every narrow column. 100px against a ~63px block is f = 0.37,
+     which is the f the wide card reads and the f this file's table was
+     re-derived at. `min(100%, …)` caps it on the shortest cards, where the
+     floor would otherwise run the gradient off the top edge and end it on
+     a visible cut.
+
+     Measured with this value, portrait and square alike:
+       card w × h      block   ramp    f
+       463 × 363       63px    110px   0.43   (1920, 4-up)
+       345 × 271       63px    100px   0.37   (1440, 4-up)
+       325 × 325       63px    100px   0.37   (/restaurants, square)
+       222 × 222       51px    100px   0.49   (/restaurants, narrow)
+     THE STACKED FOOT IS THE ONE CASE THIS DOES NOT COVER — below a 340px
+     card the block takes a second row and the ramp is overridden to match,
+     in the container query at the foot of this file.
 
      THE PROBE IS scripts/probe-square-cards.mjs. Re-run it if the block
-     gains a row again; f is the number to watch, not this percentage. */
-  --vc-ramp-h: 68%;
+     gains a row again; f is the number to watch, not this expression. */
+  --vc-ramp-h: min(100%, max(29%, 100px));
 
   /* THE MARK'S CORNER WASH — its box height, i.e. the vertical radius of
      the ellipse, and the ellipse's stop list. Both move together: the
@@ -257,7 +269,14 @@
    from a higher starting ink, so it is broken into three legs instead of
    two to keep the falloff smooth. */
 .square {
-  --vc-ramp-h: 70%;
+  /* NO `--vc-ramp-h` HERE ANY MORE. It was 70% against the portrait's 68%,
+     because a square card is shorter than a portrait one of the same width
+     and the same block therefore needed a larger share of it. The base
+     value is a pixel floor now rather than a share, and a pixel floor does
+     not care what shape the card is: 100px of ramp under a ~63px block is
+     f = 0.37 on a 325px square exactly as it is on a 345px portrait. Two
+     numbers that must be kept in step are one number too many; see the
+     derivation on .cardSurface. */
   --vc-wash-h: clamp(64px, 34cqi, 122px);
   --vc-wash-stops:
     color-mix(in srgb, var(--maroon) 74%, transparent) 0%,
@@ -268,10 +287,35 @@
     color-mix(in srgb, var(--maroon) 0%, transparent) 100%;
 }
 
+/* TWO SEPARATE TRANSFORM PROPERTIES, NOT ONE `transform`, and that is the
+   whole reason this rule looks unusual.
+
+   The pointer zoom below wants a 700ms ease. The parallax pan wants to
+   track the scroll with NO transition at all. Written the obvious way —
+   `transform: translateY(...) scale(...)` — those two are one property and
+   share one timing, so the pan inherits the zoom's 700ms and the picture
+   slides late behind its own frame on every scroll frame. `scale` and
+   `translate` are independent animatable properties, so each keeps its own
+   clock: the zoom transitions, the pan does not.
+
+   BOTH VARIABLES DEFAULT TO A NO-OP. `--photo-pan` and `--photo-base` are
+   written per card by whoever owns the grid — Discover drives them off
+   scroll — and /restaurants sets neither, so RestaurantsShowcase renders
+   byte-identically to before. The base is that owner's overscan: the pan
+   moves the picture inside a box that clips it, so without a scale above 1
+   the travel drags the frame's own edge into view. Discover's constants
+   carry the arithmetic tying the two together. */
 .photo {
   object-fit: cover;
-  transform: scale(1);
-  transition: transform 700ms var(--ease-drawer);
+  scale: var(--photo-base, 1);
+  /* THE WHOLE VALUE COMES FROM THE VARIABLE, defaulting to `none` — not
+     `0 var(--photo-pan, 0px)`, which resolves to a real `translate: 0px` on
+     a card nobody is panning. A non-none translate is not free: it creates
+     a stacking context and a containing block, so /restaurants would be
+     carrying a layout consequence for an effect it does not use. `none`
+     leaves that page byte-identical. */
+  translate: var(--photo-translate, none);
+  transition: scale 700ms var(--ease-drawer);
 }
 
 /* pointer zoom — hover-capable, fine-pointer devices only. Touch gets a
@@ -286,8 +330,12 @@
    plate seat and the card surface are one box, and every focusable on the
    card is inside this element. */
 @media (hover: hover) and (pointer: fine) {
+  /* the zoom MULTIPLIES the overscan rather than replacing it — a flat
+     `scale: 1.03` here would snap a parallaxing card back to 1.03 from its
+     1.07 base the moment the pointer arrived, which reads as the picture
+     jolting outward. Times the base, the zoom is the same 3% on both grids. */
   .cardSurface:hover .photo {
-    transform: scale(1.03);
+    scale: calc(var(--photo-base, 1) * 1.03);
   }
   .cardSurface:hover .hoverShade {
     opacity: 1;
@@ -302,7 +350,7 @@
    response. OUTSIDE the hover media query so keyboards on touch hybrids
    still get it. */
 .cardSurface:focus-within .photo {
-  transform: scale(1.03);
+  scale: calc(var(--photo-base, 1) * 1.03);
 }
 .cardSurface:focus-within .hoverShade {
   opacity: 1;
@@ -719,8 +767,18 @@
   /* shrink before the sticker does */
   min-width: 0;
   flex: 0 1 auto;
-  height: clamp(30px, 3.1vw, 38px);
-  height: clamp(30px, 13.9cqi, 38px);
+  /* ── ONE STEP LARGER, at the user's instruction: 38 → 48px at the
+     ceiling, 30 → 38 at the floor, i.e. ×1.26 on both ends, and the cqi
+     term moves with them so the mark keeps the same share of the card at
+     every width (13.9 → 17.5cqi). BOTH BOXES MOVE TOGETHER or the mark
+     simply letterboxes inside the one that did not: the mask is
+     `contain`, so the drawn size is whichever of this height and
+     .cardLogoMark's width binds first, and the two clamps were solved as
+     a pair against the source PNGs' 3.7–4.0% of transparent padding.
+     THE WASH STILL COVERS IT: the mark's box now ends at 16 + 48 = 64px
+     from the card's top, against a wash that is 96px at its floor. ── */
+  height: clamp(38px, 3.9vw, 48px);
+  height: clamp(38px, 17.5cqi, 48px);
 }
 
 /* THE MARK ITSELF — a mask, so it takes the palette rather than whatever
@@ -747,8 +805,8 @@
   display: block;
   /* vw first as the fallback, cqi second because it wins where container
      units exist — see the sizing note on .cardLogo */
-  width: clamp(72px, 7.6vw, 104px);
-  width: clamp(72px, 38cqi, 104px);
+  width: clamp(90px, 9.6vw, 132px);
+  width: clamp(90px, 48cqi, 132px);
   max-width: 100%;
   height: 100%;
   min-width: 0;
@@ -766,9 +824,16 @@
    pressed on at a slight tilt, the way a guide sticker rides a
    restaurant's window. A flex item of .cardCrown rather than an
    absolutely-seated corner; `flex: none` is what makes the venue mark the
-   one that gives up width when the column is narrow. The 8° rotation
-   grows the square's bounding box by ~2.8px per side, which the crown's
-   inset absorbs — and the card's clip would take the difference anyway.
+   one that gives up width when the column is narrow.
+
+   ── IT IS UPRIGHT NOW, at the user's instruction. It carried
+   `transform: rotate(8deg)` for the pressed-on-the-window reading; the
+   credential reads as a credential rather than as a prop without it, and
+   the mark it sits opposite is aligned to the crown's inset on the other
+   side, so a tilt on one corner and a hard top-left origin on the other
+   was the grid's only piece of deliberate crookedness. The rotation also
+   grew the square's bounding box by ~2.8px per side, which the crown's
+   inset was absorbing; upright, that inset is exact.
 
    `position: relative` for the same reason .cardLogo carries it: the
    crown's wash is an absolutely-positioned ::before and a static flex
@@ -784,8 +849,6 @@
      bare img's intrinsic size decide) is what lets it be served at 128px
      instead of decoded at its native 2965² */
   aspect-ratio: 1;
-  transform: rotate(8deg);
-  transform-origin: center;
   user-select: none;
   pointer-events: none;
 }
@@ -1459,6 +1522,68 @@
   gap: clamp(6px, min(1.2vh, 2.5cqi), 12px);
 }
 
+/* ═══════════════ THE PLATE FORM ═══════════════
+   The home grid's expansion. The block is READ UPWARD here — story, place,
+   hairline, then the name lockup beside the controls — instead of down from
+   a name lockup. See the `plate` prop in VenueCard.tsx for why that order is
+   the design.
+
+   THERE IS ONE RULE ON THIS SURFACE AND IT IS ALL OF THEM: A PRESSED CARD
+   MUST LOOK LIKE THE CARD THAT WAS PRESSED. Same faces, same sizes, same
+   weights, same colours. So the foot is `.blockFoot` carrying `who` and
+   `controls` — the tile's own markup reaching the tile's own rules — the
+   address is `.addr` / `.addrLine`, and the story is `.blockStory`. Every
+   one of those is a class the grid already paints. Nothing here is restated
+   at a size of its own, which is why this block is four rules long instead
+   of fourteen.
+
+   TWO THINGS STOOD HERE FOR ONE PASS AND ARE DELETED, recorded because the
+   idea will come back: a `.plateFoot` that seated the venue's name against
+   the pills on a shared baseline, and a `.plateName` that set that name in
+   FreightBig at up to 3.25rem. They read well on their own and they were the
+   wrong answer to this brief — a card that re-sets its own name in a
+   different face at three times the size is a different card ARRIVING, not
+   the card the reader pressed OPENING. The expansion earns its extra room by
+   printing MORE (the story, the address, the hours), never by printing the
+   same two lines louder.
+
+   `.blockLarge` IS NOT APPLIED TO THIS FORM EITHER — see .expandBody in
+   Discover.module.css. That variant exists to scale the block up on a large
+   modal, which is precisely the thing this surface must not do.
+
+   ⚠️ THE MEASURE IS THE CONSTRAINT, NOT THE HEIGHT, which is the reverse of
+   the portrait card this replaced. .blockStory keeps its 3-line clamp, and
+   on a landscape plate three lines is already generous — the ramp under it
+   is tuned for a block of roughly this height, and a story that ran longer
+   would push the hairline up into the subject of the photograph. Grow the
+   story and re-measure the ramp; do not just let it wrap. */
+
+/* WHERE IT IS, with the hours stat closing the row — the same job the stat
+   does beside the name in the full form. `baseline`, not `center`: the
+   address and the hours value are the same size and the same weight, and
+   aligning their boxes instead of their baselines leaves the glyph's optical
+   centre a pixel or two off the line of type beside it. */
+.plateWhere {
+  display: flex;
+  align-items: baseline;
+  justify-content: space-between;
+  gap: clamp(10px, 3cqi, 22px);
+  min-width: 0;
+}
+
+.plateWhere .addr {
+  min-width: 0;
+}
+
+/* THE ADDRESS MAY WRAP HERE, AND ONLY HERE — the same licence
+   `.blockLarge .addrLine` grants and for the same reason, restated because
+   the plate deliberately does not carry that variant. The card forbids it
+   outright: a line that reflows makes one tile in the grid a row taller than
+   the seven beside it. Nothing shares THIS card's height. */
+.plateWhere .addrLine {
+  white-space: normal;
+}
+
 /* ---------- visually hidden ---------- */
 /* The stats' values are announced with the word that makes them mean
    something. "££" and "12–11" read aloud on their own are noise, the
@@ -1525,49 +1650,150 @@
    narrow card would silently lose its override. ═══ */
 
 /* ---------- the foot STACKS before the card is narrow ---------- */
-/* ═══ THREE CONTROLS DO NOT FIT BESIDE AN ADDRESS, AND THEY STOP FITTING
-   LONG BEFORE THE CARD IS "NARROW" ═══
+/* ═══ THREE CONTROLS DO NOT FIT BESIDE THE NAME LOCKUP, AND THEY STOP
+   FITTING LONG BEFORE THE CARD IS "NARROW" ═══
 
-   The foot's job above this query is address at the left, controls at the
-   right. That survived two controls and does not survive three: with
-   "Visit" now on the bookable venues the widest row is Menu + Visit +
-   Book, which measures 163px plus two gaps at the base pill size. The
-   block's measure is the card's width less its two 16px insets, so:
+   The foot's job above this query is facts at the left, controls at the
+   right. That survives two controls and does not survive three: with
+   "Visit" on the bookable venues the widest row is Menu + Visit + Book.
 
-     card 345 (1440, 4-up)   foot 321   addr gets 130   ✓ 111 needed
-     card 320                foot 296   addr gets 105   the exact edge
-     card 285 (1200, 4-up)   foot 261   addr gets  71   "93 Kentish …"
-     card 264 (860, 3-up)    foot 240   addr gets  74   "London NW1 …"
+   ⚠️ THE THRESHOLD IS 365 NOW, UP FROM 340, AND IT WAS RE-MEASURED
+   RATHER THAN NUDGED. The old number was solved against the ADDRESS,
+   which needed 111px to print "157 Kentish Town Rd" without losing its
+   street. The address is off the card (see <VenueBlock>) and what stands
+   in its place is the venue's NAME over its TAGLINE, and the tagline is
+   the longer of the two: "Filipino Fusion Restaurant" measures 149px at
+   the ceiling size against the address's 111.
 
-   — i.e. every width from about 320px down loses the street the card is
-   supposed to be printing. 340 IS THE THRESHOLD AND NOT 250: the query
-   below it exists for a card so small the type and the sticker have to
-   come down too, and this has nothing to do with that. Two questions, two
-   queries. (250 is inside 340, so a card that small stacks as well and
-   then also shrinks; the two blocks set disjoint properties, so their
-   order between themselves does not matter.)
+   MEASURED ON THE REAL RENDER, three pills wide (Menu + Visit + Book) at
+   the base size with their gaps is 180px, not the 157 an arithmetic pass
+   guessed. The block's measure is the card less its two 12px insets, so
+   the lockup gets `card − 24 − 180 − 12` = `card − 216`:
 
-   STACKING COSTS A ROW, AND IT IS THE ONLY LEVER THAT PAYS HERE. The
-   alternatives were measured and refused: shrinking the pills to fit needs
-   ~39px off three of them, which is 0.55em of side padding and turns them
-   into chips (the note on .cardBtn is explicit that they stay pills); and
-   letting the address ellipsise is the defect being fixed.
+     card 465 (1920, 4-up)   lockup 249   ✓
+     card 400                lockup 184   ✓
+     card 365                lockup 149   the exact edge
+     card 345 (1440, 4-up)   lockup 129   ✗ "Filipino Fusion Restaur…"
+
+   345 IS THE WIDTH THAT FORCED THE CHANGE. At 340 the 1440 desktop grid
+   sat one width above the threshold and clipped two of the eight
+   descriptions mid-word — Bintang's and Ramo Ramen's. 365 puts that grid
+   on the stacked foot, where the lockup has the block's whole measure and
+   nothing truncates at any width in the set.
+
+   SHRINKING THE TAGLINE INSTEAD WAS MEASURED AND REFUSED. Dropping its
+   clamp ceiling far enough to fit 345 means 11px, its floor — and at 11px
+   the same line measures 126px against the 125 a 341px card gives it, i.e.
+   it fails again one pixel inside the band it was meant to rescue. A lever
+   that buys 20px of a 24px problem is not a lever.
+
+   STACKING COSTS A ROW, AND IT IS STILL THE ONLY LEVER THAT PAYS.
+   Shrinking the pills to fit needs ~39px off three of them, which is
+   0.55em of side padding and turns them into chips (the note on .cardBtn
+   is explicit that they stay pills).
 
    ⚠️ IT IS UNCONDITIONAL, AND THAT IS THE POINT. Only three venues carry
-   three pills, and stacking only those three would put the hairline and
-   the control row at two different heights across one grid — the masonry
-   the card was rebuilt to end. Every venue has at least one control, so
-   every card gains exactly one row and the eight stay identical. Do not
-   make this `:has()` on the row's child count. */
-@container card (max-width: 340px) {
+   three pills, and stacking only those three would put the control row at
+   two different heights across one grid — the masonry the card was rebuilt
+   to end. Every venue has at least one control, so every card gains
+   exactly one row and the eight stay identical. Do not make this `:has()`
+   on the row's child count.
+
+   ⚠️ THE THRESHOLD MOVED FROM 365px TO 315px, AND THE PARAGRAPH ABOVE IS
+   THE RECORD OF WHY IT WAS 365 — kept, because the arithmetic has not
+   changed, only the judgement about what to spend on it. The foot must read
+   as one line at the widths people actually browse at, and it was stacking
+   on both grids at 1440: the home card is 345px there (block 321) and the
+   /restaurants square is 325px (block 301), so every card in that screenshot
+   was wearing the two-row foot.
+
+   WHAT IT COSTS, MEASURED RATHER THAN ESTIMATED. Forcing the row and
+   measuring what the lockup then needs against what it has, at 1440:
+
+       venue        block 321 (home)   block 301 (/restaurants)
+       Bintang           −20px               −39px
+       Ramo Ramen        −16px               −35px
+       Belly               0                 −17px
+       the other five      0                   0
+
+   Only the three-pill venues are short, and the deepest hole is the 39px
+   this file already named. It is paid for in the band below, out of three
+   places at once rather than out of the pills alone — which is what the old
+   note was right to refuse, since 39px of side padding really would have
+   turned them into chips. */
+@container card (max-width: 365px) {
+  /* ── PAYING FOR THE ROW, PART ONE: THE PILLS ──
+     0.9em → 0.66em of side padding and the font to its clamp floor. Across
+     three controls that is ~19px, and they are still pills: the min-height
+     does not move, so the shape is the same object at a tighter measure
+     rather than a chip. */
+  .cardBtn {
+    padding: 0 0.66em;
+    font-size: 0.6875rem;
+  }
+
+  /* ── PART TWO: THE GAPS ── ~9px more, between the three pills and between
+     the lockup and the group. */
+  .actionRow {
+    gap: 5px;
+  }
+  .blockFoot {
+    gap: 10px;
+  }
+
+  /* ── PART THREE: THE TAGLINE ──
+     The lockup's width is `max(name, tagline)`, and on every venue that is
+     short it is the TAGLINE that sets it — "Filipino Fusion Restaurant" is
+     149px where "Bintang" is 60. Capping it at 11.5px instead of 13px takes
+     ~17px off the longest of them. The floor is untouched at 11px, so this
+     is a smaller move than the clamp already makes on a 4-up column.
+     The NAME does not move: it is the line that has to stay a heading. */
+  .venueTag {
+    font-size: clamp(0.6875rem, 4.6cqi, 0.71875rem);
+  }
+
+  /* THE PLATE'S WHERE-LINE STACKS HERE, and it reaches this block because
+     `.expandBody` names its container `card` — so the expansion is measured
+     on the table that was measured for the grid rather than on a second one
+     invented for it. On a 390px phone the plate's block is ~318px, the
+     address takes two lines and the hours value has nowhere to sit beside
+     it. It stacks at 365 rather than at 290 because unlike the foot it has
+     no width to reclaim: an address is as long as the address is. */
+  .plateWhere {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-3xs);
+  }
+}
+
+/* ---------- the foot gives up and stacks ---------- */
+/* 315px IS WHERE THE ROW STARTS TO TRUNCATE, and the number is the measured
+   edge rather than a round one. Sweeping the home grid card by card with the
+   band above in force: 417, 363, 345 and 327px all print the row with every
+   tagline whole; 305px is the first width where one does not, and it clips
+   Bintang by 5px and Ramo by 2. So the threshold belongs between 305 and
+   327, and 315 is the middle of that gap.
+
+   BELOW IT THERE IS NOTHING LEFT TO RECLAIM. The band above buys ~45px and
+   the three-pill venues need ~39 of it at a 325px card; at 260 they need 80,
+   and the tagline would lose half its words to an ellipsis. Two rows and a
+   whole tagline beats one row and a truncated one, so from here down the
+   foot stacks exactly as it did before.
+
+   ⚠️ IT IS UNCONDITIONAL, AND THAT IS THE POINT. Only three venues carry
+   three pills, and stacking only those three would put the control row at
+   two different heights across one grid — the masonry the card was rebuilt
+   to end. Every venue has at least one control, so every card gains exactly
+   one row and the eight stay identical. Do not make this `:has()` on the
+   row's child count. */
+@container card (max-width: 315px) {
   .blockFoot {
     flex-direction: column;
     align-items: stretch;
   }
   /* THE GROUP STAYS FLUSH RIGHT, on the block's own padding — where the
-     controls sit at every other width, and where the stats above close
-     their row too. The stacked foot is full-width, so `justify-content` is
-     what seats it. */
+     controls sit at every other width. The stacked foot is full-width, so
+     `justify-content` is what seats it. */
   .actionRow {
     justify-content: flex-end;
   }
@@ -1580,55 +1806,57 @@
   .blockFoot .actionRow > :last-child:not(:first-child) {
     margin-left: 0;
   }
+
+  /* ⚠️ AND THE RAMP GOES DEEPER, BECAUSE THE BLOCK JUST GAINED A ROW. It
+     travels with the stacking and not with the old 365px threshold, which
+     is the whole reason these are two blocks now: leave it up there and
+     every card between 290 and 365 would carry a gradient sized for a
+     second row it no longer has.
+
+     This is the one case the base expression on .cardSurface cannot cover
+     on its own: everywhere else the block is a single ~63px row, and here
+     it is ~101px (the lockup, the block's gap, then the pill row). Left at
+     the base 100px floor, f = (100 − 101) / 100 is NEGATIVE — the block
+     would be taller than the gradient carrying it, with its first line
+     sitting on bare photograph. 160px puts f back at 0.37, which is the
+     value every other width reads.
+
+     ⚠️ IT IS SET ON THE TWO RAMP LAYERS AND NOT ON .cardSurface, AND THAT
+     IS NOT A STYLE CHOICE: .cardSurface IS the query container, and a
+     container query never matches its own container. `@container card {
+     .cardSurface { … } }` is not an error, it is simply inert — it parsed,
+     it shipped, and the computed ramp never moved. The variable has to be
+     declared on a DESCENDANT, and the two elements that read it are the
+     obvious ones. `min(100%, …)` caps it on the shortest cards, where
+     160px would run the gradient off the top edge and end it on a cut. */
+  .rampBlur,
+  .rampScrim {
+    --vc-ramp-h: min(100%, max(52%, 160px));
+  }
 }
 
 /* ---------- the block on a NARROW card ---------- */
 /* THE 4-UP COLUMN IS THE HARD CASE. At the 981px breakpoint the home card
-   is 183px wide and the /restaurants square is 222px; both leave the
-   block a measure that has to hold three non-wrapping address lines, the
-   longest of which is "157 Kentish Town Rd", beside the stats. At the
-   base sizes the stats take ~98px of a 163px row and leave the address
-   ~56px against the ~105px that line needs.
+   is 183px wide and the /restaurants square is 222px, and the block has to
+   hold the venue's name over its tagline with a row of pills under it (the
+   foot stacked 90px of card ago).
 
-   THE HOURS STAT GOES, AND THE OTHER TWO CANDIDATES WERE REFUSED:
-     · STACKING the stats under the address gives the address the full
-       measure — and adds a whole row to the block, taking it from 43% to
-       52% of the card. The 4-up is the width where that matters most, so
-       the fix that costs height is the wrong fix at exactly the width it
-       is needed. On a SQUARE card, where the block is already the larger
-       share of a shorter card, it is wronger still.
-     · SHRINKING THE ADDRESS further. The lines are already at their clamp
-       floors here (12px and 11px); below that they stop being readable at
-       arm's length on a laptop.
-   Dropping `hours` costs 47px of row and buys the address 123px against
-   the 105 it needs — it is the only lever that pays for itself.
-
-   ⚠️ IT USED TO DROP ONE STAT OF TWO AND NOW DROPS THE ONLY ONE. This
-   read "it is also the RIGHT fact to lose: the price is real data and
-   `hours` is a placeholder" — an argument that needed a price to fall
-   back on, and `priceRange` is gone from VenueCardItem. The rule still
-   earns its place, because the 123px it buys the address was always the
-   point and hours was always the fact being spent; but below 250px the
-   block now carries no stats at all rather than one. If a second datum
-   ever returns, re-read this: dropping hours becomes a choice again
-   rather than the whole row.
-
-   Still targeted by `[data-stat]`, not by position, and that matters more
-   now, not less: the list is one item long, so `:last-child` would match
-   it and take the stats off every card at every width.
+   ⚠️ THIS BLOCK USED TO SHED THE HOURS STAT HERE, AND THAT RULE IS GONE
+   WITH THE STAT. It read: the stats took ~98px of a 163px row and left the
+   address ~56px against the ~105px "157 Kentish Town Rd" needs, so
+   `[data-stat="hours"]` and its separator were hidden to buy the address
+   123px. The card prints neither an address nor a stat any more (see
+   <VenueBlock> in VenueCard.tsx), so the rule targeted nothing — and left
+   behind, it was a rule whose selector still matched inside the expansion's
+   block if that block were ever rendered in a `card` container. Deleted
+   rather than kept as documentation. If a stat ever returns to the CARD,
+   the measure argument above is why it will need this rule back.
 
    250px is the card width at which the column stops being cramped. */
 @container card (max-width: 250px) {
   .glass {
     gap: var(--space-3xs);
     padding: 8px 10px 10px;
-  }
-  /* the stats lose the hours pair — the value, its glyph and the rule
-     that divided them. All three go together or the block is left with a
-     hairline dividing one stat from nothing. */
-  .stats [data-stat="hours"],
-  .stats .statRule {
-    display: none;
   }
   .blockFoot {
     gap: var(--space-2xs);
@@ -1662,68 +1890,25 @@
      under it, against the 3:1 a graphical object answers to. THAT WAS THE
      OLD CREAM (L 0.872). Re-solved for the softened one (L 0.768) on the
      same unchanged photograph, it is 3.97:1 — still over the bar with
-     room, and still no override needed here.
+     room, and still no override needed here. The mark is one step larger
+     than when that was measured, which moves it further INTO the wash's
+     deep end, not out of it.
 
-     ── THE SQUARE'S RAMP GOES DEEPER ON A NARROW CARD: 70% → 78% ──
-     ⚠️ IT IS SET ON THE TWO RAMP LAYERS AND NOT ON `.square`, AND THAT
-     IS NOT A STYLE CHOICE. `.square` IS `.cardSurface`, i.e. the QUERY
-     CONTAINER — and a container query never matches its own container.
-     `@container card { .square { … } }` is not an error, it is simply
-     inert: it parsed, it shipped, and the computed ramp on a 222px card
-     stayed at exactly 70.0% while the probe went on reporting the same
-     three contrast failures. The variable therefore has to be declared on
-     a DESCENDANT, and the two elements that read it are the obvious ones.
-     Anything else this block ever needs to change about the square card's
-     material must be written the same way.
-     (`.square .rampBlur` is (0,2,0) against the base rule's (0,1,0), so
-     this wins on specificity and not on order — it would still work if
-     the file were reordered, which the rest of this block cannot claim.)
-
-     WHY. The block's height does not shrink with the card anything like
-     as fast as the card does: at 222px the block is 103px, i.e. 46.5% of
-     a square card against 41.3% at 325px. So the band of ramp ABOVE the
-     block — which is the entire contrast budget for the block's first
-     line — is squeezed from both ends, and at 70% it left the block's top
-     edge only 33.5% of the way into the gradient. Measured there, three
-     lines fell under the 4.5:1 this 11–12px type needs:
-
-       venue        line   at 70%   at 78%
-       Belly        road    4.32     5.09
-       Guanabana    name    4.34     6.04
-       Hoodwood     road    4.55     5.16
-
-     (Both columns are measured, not modelled — the brightest composited
-     pixel inside each line's own band on the real render, with the type
-     hidden so a cream glyph cannot be read as its own ground. The whole
-     table moves, not just the three: the worst reading on the column goes
-     4.32 → 5.09 and the best 12.4 → 12.5.)
-
-     ⚠️ THE TABLE ABOVE WAS TAKEN AT A TYPE COLOUR THAT NO LONGER EXISTS.
-     Both columns assume the address pair at `--cream 78%`, which was
-     L 0.498 when they were measured. The ground token has since deepened
-     and the pair was re-derived to `--cream 84%` (L 0.521) to hold its
-     floor — see .addrLine's own note. The RAMP conclusion is unaffected,
-     because 70% vs 78% is a statement about how deep the gradient is under
-     the block and not about the type on it; the absolute figures in the
-     right-hand column are ~4% conservative now. Re-run the ramp probe
-     before quoting them as current.
-
-     78% puts the block's top edge at 40.3% into the ramp — the same depth
-     the wide square card reads (41.0%) and the same the home portrait
-     card reads at its own 4-up width. The alternative was to brighten the
-     address pair from 78% cream, and it was refused: the type colours are
-     part of what "the same card" means, and the ramp's share of a square
-     card is the number this variant exists to re-derive.
-
-     WHAT IT COSTS: the photograph's clean band on this column falls to
-     22% of the card, 49px, and the mark's box bottom sits at 44.5px — so
-     the mark now ends about where the ramp begins. That is survivable
-     because the ramp's first tenth carries under 8% of ink; it is checked
-     by the flat-ground edge scan rather than asserted here. */
-  .square .rampBlur,
-  .square .rampScrim {
-    --vc-ramp-h: 78%;
-  }
+     ⚠️ THE SQUARE'S RAMP OVERRIDE THAT STOOD HERE IS GONE, and so is the
+     contrast table that justified it. It read 70% → 78% on `.square
+     .rampBlur/.rampScrim`, because the square block did not shrink with
+     the card anything like as fast as the card did (46.5% of a 222px card
+     against 41.3% at 325px), which squeezed the band of ramp above the
+     block from both ends and put three lines under 4.5:1. Two things
+     retired it: the block is one row now and roughly constant in height,
+     and the base `--vc-ramp-h` is a PIXEL FLOOR rather than a share, so it
+     does not shrink with the card at all — 100px on a 222px square is
+     f = 0.49, deeper than the 0.40 the 78% override bought. The three
+     lines it was rescuing (Belly's road, Guanabana's name, Hoodwood's
+     road) were two address lines and a name at the OLD block sizes; only
+     the name is still printed, and it is the full-cream 17px line with the
+     most headroom on the card. Re-run scripts/probe-square-cards.mjs
+     before adding any ramp override back. */
 }
 
 /* ---------- reduced motion ---------- */
@@ -1746,6 +1931,17 @@
     transform: none;
     transition: none;
   }
+  /* `transform: none` NO LONGER REACHES THE PHOTO'S ZOOM OR PAN — both moved
+     onto the independent `scale`/`translate` properties above, which this
+     declaration does not touch. Reset them by name or a reduced-motion
+     reader keeps the parallax. Discover already skips the scroll loop under
+     the same query, so --photo-pan never updates; this is the belt to that
+     brace, and it is what makes the stylesheet correct on its own. */
+  .photo {
+    scale: 1;
+    translate: none;
+    transition: none;
+  }
   .photo,
   .hoverShade,
   .hoverBlurb {
@@ -1760,3 +1956,4 @@
     transition: none;
   }
 }
+

@@ -1,0 +1,413 @@
+/* The handover between the press wall and the booking film — four rows of
+   display type on an otherwise empty screen. See Passage.tsx for what it is
+   for and why it carries no eyebrow, label, control or picture.
+
+   ⚠️ IT USED TO SIT BETWEEN <AboutSplit> AND <Blog>, and every measurement
+   in this file was derived against those two. It moved, and all four
+   paddings were re-derived against <PressWall> above and <Reservations>
+   below. If you are reading an old commit's numbers, none of them apply. */
+
+.section {
+  background: var(--cream);
+  color: var(--maroon);
+
+  /* the two knobs every row shares, declared once so the quiet row and the
+     hand-off's pull can be expressed as fractions of them rather than as
+     second copies of a clamp. --passage-fs is the passage size (see .line
+     for why it is smaller than the manifesto's); --passage-beat is the air
+     between the SENTENCES (see gap below). */
+  --passage-fs: clamp(1.7rem, 3.2vw, 3.2rem);
+  --passage-beat: clamp(118px, 19vh, 280px);
+
+  /* ══════════ THE TWO SEAMS, RE-DERIVED AFTER THE MOVE ══════════
+     This section sits between <PressWall /> and <Reservations /> now. Both
+     seams were measured against AboutSplit and Blog, and BOTH INVERTED.
+
+     ABOVE — THE NEIGHBOUR PAYS, SO THIS SUBTRACTS. It used to be the whole
+     chapter boundary less 12px, because AboutSplit contributes no vertical
+     air of its own. PressWall does: `padding: 0 var(--pad-x) clamp(64px,
+     9vh, 132px)` — 81px at 1440×900 — and its own note says that bottom
+     exists so the mastheads are not stuck to the edge of whatever follows.
+     Leaving a chapter break on top of it would stack 81 + 330 = 411px of
+     cream, which is the "two correct numbers summing to a wrong one" trap
+     AboutSplit.module.css keeps flagging. So the token is --home-gap rather
+     than --home-gap-chapter — PressWall and this section share the cream
+     ground, which is what --home-gap is defined for — and PressWall's own
+     bottom comes off it. 270 − 81 = 189px at 1440×900.
+
+     ⚠️ THE SUBTRAHEND IS A COPY OF PressWall's OWN EXPRESSION, character for
+     character, and there is no token shared between the two files. If
+     PressWall.module.css's bottom padding changes, change it here with it.
+     Same warning as the one this replaced, repointed at a different file.
+
+     BELOW — NOTHING PAYS, SO THIS OWNS ALL OF IT. It used to subtract 36px
+     of Blog's top. Blog is not down there any more; <Reservations /> is, and
+     it declares `margin-top: 0` with no top padding — measured rather than
+     assumed: computed margin-top 0px, padding-top 0px. It is the film and it
+     starts at its own first pixel, so there is nothing to subtract and no
+     hardcoded read of another stylesheet left on this side at all.
+
+     THE TOKEN BELOW IS --home-gap-tight, AND THE SCALE PICKED IT. That
+     token's own definition is "a full-bleed colour/photo block adjoins the
+     cream", which is exactly what Reservations is: a 125svh film plate
+     starting hard against this section's last pixel. 198px at 1440×900.
+
+     AND THE PAIR CAME OUT VERY NEARLY CENTRED, WHICH IS THE POINT. The old
+     seams were 330 above against 234 below, so the content sat (330 − 234)/2
+     = 48px BELOW the section's own centre, and no value of `gap` could move
+     it — the content term cancels out of that difference. The new ones are
+     189 against 198, so it sits 4.5px ABOVE centre at 1440×900. That is not
+     a happy accident, it is what happens when both seams come from the
+     scale instead of from one neighbour's leftovers, and it holds across the
+     clamp: 0px at 600 tall, 4.5 at 900, 6.5 at 1300, 12 at 1600 — inside
+     half a line of this type at every height. */
+  /* ══════════ THE FOUR SEATS ══════════
+     Row A flush right, row B pushed in off the left, row C pulled well in
+     off the right, row D centred. The eye crosses the page once inside the
+     first sentence, finds the landing SHORT of the margin it has just
+     learned to expect — which is the whole of why row C is not flush — and
+     then closes on the centre axis. Each seat is nearer the axis than the
+     one before: a funnel closing on exactly the spot where
+     <Reservations>'s "Where will you start?" appears a moment later.
+
+     WHAT THE NEIGHBOURS ACTUALLY OFFER, measured at 1440×900 off the
+     rendered ink rather than read off their stylesheets:
+       PressWall — ONE edge, and it is on the left. Its "As featured in"
+                   label inks at x = 39: the page margin (--pad-x, 40px) less
+                   the glyph's own left sidebearing. Its mastheads are no use
+                   — the lane runs `margin-inline: calc(-1 * var(--pad-x))`
+                   and bleeds 0 → 1440, so it offers no right edge and no
+                   left one either.
+       Reservations — NO EDGE, ONE AXIS. Every line in it is centred on 720:
+                   the heading inks 409.3 → 1030.7, "Seven rooms. Different
+                   worlds." 590.3 → 849.7, the clock 642.3 → 797.6. Its
+                   computed padding-inline is 0.
+
+     So row A takes the right margin (its right ink at 1400 is the mirror
+     of --pad-x, the same margin the press label above is seated on), and
+     every row after it steps IN from an edge: row B comes 5.4% in off the
+     left margin, row C 18% in off the right (see .rowB/.rowC for both
+     derivations), and row D takes Reservations' axis — which is the page's
+     own centre, because this section's padding is symmetric. Margin, in a
+     little, in more, centre: each seat is nearer the axis than the one
+     before, so the passage reads as a funnel closing on exactly the spot
+     where the film's heading appears — rather than as a zigzag bouncing
+     off both page edges, which is what a flush-left row B produced.
+
+     ⚠️ DO NOT "RESTORE" the old 12px left. It was Blog's number. Nothing
+     below this section sits at 12 any more. */
+  padding: calc(var(--home-gap) - clamp(64px, 9vh, 132px)) var(--pad-x)
+    var(--home-gap-tight);
+}
+
+/* ══════════ THE DRIFTING GROUND ══════════
+   Every row and the ring live inside this wrapper, and Passage.tsx eases
+   it from +0.125em to −0.125em of the display size across the whole scrub
+   — the ambient layer, running opposite to the descending words. See
+   DRIFT_EM in Passage.tsx for why it exists and, more importantly, why it
+   is an INNER wrapper: the section is the element useScroll measures, and
+   a transform on the measured element is a progress feedback loop.
+
+   IT CARRIES THE FLEX COLUMN AND THE BEAT, which used to sit on .section —
+   they moved with the rows, because a wrapper between a flex parent and
+   its items would otherwise have collapsed the seats (align-self reads the
+   nearest flex container). A transform never affects layout, so the
+   section's height and both seams are identical with the drift in;
+   measured, not assumed — see probe-passage-setting.mjs.
+
+   font-size is the em anchor for the drift's transform: translateY in em
+   resolves against THIS element's font, and without the declaration the
+   wrapper would inherit the root size and the drift would be a third of
+   what it reads. (The same class of bug hid in the pair gap once — see
+   .pair.) Rows are unaffected; each sets its own size.
+
+   THE AIR BETWEEN THE SENTENCES — the gap — is between the A+B pair and
+   row C, and (less its pull-back, see .rowD) between row C and the
+   hand-off. It is NOT the air between rows A and B: those are one sentence
+   broken across two rows and sit a leading apart inside .pair. The beat is
+   the pause a reader takes at a full stop, and it is the point of the
+   section.
+
+   ⚠️ THE BEAT WAS clamp(112px, 18vh, 280px) AND WAS WIDENED ONE STEP TO
+   19vh — +5.6% at every stop where the coefficient binds: 162px → 171px at
+   900 tall, 234 → 247 at 1300 — and the motion study confirmed the wider
+   figure (its proof sheet runs the equivalent 12.5cqw). The floor moved
+   112 → 118 with it, derived by holding the clamp's knee where it was: the
+   old floor bound below 112/0.18 = 622px of height, and 0.19 × 622 =
+   118.2, so the floor still takes over at the same 622px rather than
+   drifting the knee downward.
+
+   ⚠️ THE CEILING IS THE SEAMS, NOT THE VIEWPORT. The two pads either side
+   are SEAMS — one is PressWall's air less its own contribution, the other
+   is the whole cream→film boundary — so widening the beat has to come out
+   of the middle, never out of them, AND the beat must stay clearly
+   smaller than both, or the pair stops reading as one unit two beats long
+   and starts reading as separate things evenly spaced down the section.
+   At 19vh it clears that at every stop: 171 against seams of 189/198 at
+   900 tall, 247 against 273/286 at 1300, 118 against 168/168 at 600 — and
+   at 90% of the smaller seam it is also as far as the rule allows: another
+   step (20vh = 180 against 189 at 900) would leave 9px between beat and
+   seam, which is not "clearly smaller", it is a coin toss.
+
+   THE 280px CAP IS THAT RULE AT THE TOP END and not a round number: the
+   top pad's own cap is (420 − 132) = 288px, so 288 is where an uncapped
+   beat would draw level with the seam above it — at 1516px of height now
+   (288/0.19), where it was 1600 (288/0.18); the cap itself binds from
+   1474 (280/0.19) instead of 1556. 280 keeps the beat under the seam at
+   every height a browser can report, same as before, with the margin
+   thinned from 8px over a shorter run of heights. Raise the coefficient
+   again and re-derive this cap against 288 with it. */
+.drift {
+  display: flex;
+  flex-direction: column;
+  gap: var(--passage-beat);
+  font-size: var(--passage-fs);
+}
+
+/* rows A and B are ONE SENTENCE broken across two rows, so they sit a
+   LEADING apart, not a beat apart — the wrapper exists so the ground's gap
+   never opens between them.
+
+   ⚠️ THE FIGURE IS 0.5 OF THE DISPLAY SIZE, AND ITS HISTORY IS A UNIT BUG.
+   The prototype set the gap in a bare em on an element that carried the
+   ROOT font size, so every figure it proofed was a third of what it read —
+   "0.36em" was rendering ~7.5px while reading as 16, which is why three
+   rounds of widening moved the rendered gap two or three pixels at a time.
+   The calc pins the em to the display size, where 0.5 measures 23.0px at
+   1440×900 — 0.135 of the 171px beat, unmistakably a leading and not a
+   beat, so the pair keeps reading as one sentence with two seats rather
+   than as two lines of a list. Keep it under about 0.7: past that the two
+   rows drift far enough apart that the reader has to re-join them, which
+   defeats the deliberate break. (0.02em was also proofed — row A's
+   descenders nearly on row B's ascenders, reading as a wrap.) */
+.pair {
+  display: flex;
+  flex-direction: column;
+  gap: calc(var(--passage-fs) * 0.5);
+}
+
+/* ══════════ THE ROWS ══════════
+   Set SMALLER than the manifesto's statement — clamp(2.4rem, 5.35vw,
+   5.2rem) there against clamp(1.7rem, 3.2vw, 3.2rem) here — and that
+   difference is load-bearing rather than cosmetic. The manifesto is the
+   page's statement and has to be the largest type on the cream; a handover
+   set at the same size reads as a second statement and picks a fight the
+   chapter above it has already won. This is the page's second voice, and it
+   is quieter. */
+.line {
+  margin: 0;
+  /* the seat for the ink mark's <svg>, which is absolutely positioned and
+     therefore out of flow — see .ink. Nothing else in this file positions
+     against it. */
+  position: relative;
+  font-family: var(--font-display);
+  font-weight: var(--w-regular);
+  font-size: var(--passage-fs);
+  /* NOT --lh-display (0.92). That value is for the wordmark and the
+     statement, where the type is big enough that 0.92 still clears the
+     descenders; at this size it collides. 1.04 is the smallest leading that
+     does not. */
+  line-height: 1.04;
+  letter-spacing: var(--tr-display);
+  color: var(--maroon);
+
+  /* ⚠️ NO MEASURE, AND NO WRAP — AND THE TWO ARE ONE DECISION. This rule
+     used to carry `max-width: 16ch` (and the landing later grew its own
+     18ch guard), whose one real job was deciding where the first sentence
+     broke. The rows are AUTHORED now — the break after "rooms," is the
+     setting's whole point, putting the two "seven"s at opposite margins —
+     so there is nothing left for a measure to decide, and a measure that
+     decides nothing is a trap for the next reader. `nowrap` is the other
+     half of the same decision: a row that may not wrap must be PROVEN to
+     fit instead, because it cannot relieve itself by breaking — it will
+     overflow the section, and an ancestor's clip can make that overflow
+     vanish rather than visibly break.
+
+     PROVEN, measured off the rendered ink against the content width
+     (viewport − 2 × --pad-x), zero horizontal overflow at all six stops.
+     Row C is the widest row (216.6px at the clamp floor, against A's 215.6
+     and B's 213.3) and it also carries the 18% pull, so it is the binding
+     case everywhere:
+       1920  row C ink 407.7 + pull 331.2 = 738.9 of 1840
+       1440  row C ink 366.9 + pull 244.8 = 611.7 of 1360
+       1280  row C ink 326.2 + pull 217.5 = 543.7 of 1208.3
+       1024  row C ink 260.9 + pull 174.0 = 434.9 of 966.7
+        768  row C ink 216.6 + pull 130.5 = 347.1 of 725.0
+        390  row C ink 216.6 + pull  64.4 = 281.0 of 358.0
+     The tightest is row C at 390: 77px (21.5%) of room, its left ink
+     sitting 76.9px clear of the left margin. If a future copy does not
+     clear, THE FIX IS THIS CLAMP'S LOWER BOUND — not letting the rows
+     wrap, and not cutting the user's words. */
+  white-space: nowrap;
+}
+
+.rowA {
+  align-self: flex-end;
+}
+
+/* PUSHED IN OFF THE LEFT MARGIN, the mirror of row C's pull MUCH
+   shallower — the proof sheet sets 5cqw against the landing's 17cqw, and
+   the gap between the two figures is deliberate: row B is still part of
+   the accumulating sentence, and only the landing has earned the middle
+   (it was proofed at 11cqw first and pulled back — that deep, the second
+   row started competing with the landing for the axis). Flush left, the
+   first sentence read as a full-width zigzag bouncing off both page
+   edges; brought in, the rows describe a shape that closes toward the
+   centre (see the seats note above). 5.4% by the same conversion as
+   .rowC's 18%: the prototype's cqw was of its stage's full width and its
+   rows lived inside 3.4cqw of padding each side, so 5cqw of stage =
+   5/93.2 = 5.4% of the box the rows occupied, and a percentage margin
+   here resolves against the section's content width. At 390 the push is
+   19.3px against row B's 213.3px of ink — 125.4px of room, so the narrow
+   case stays clear (row C remains the binding row; see .line). */
+.rowB {
+  align-self: flex-start;
+  margin-left: 5.4%;
+}
+
+/* ══════════ THE LANDING, PULLED IN FROM THE MARGIN ══════════
+   Row C seats right like row A but stops well short of the margin, nearer
+   the section's own axis than either edge. It breaks the column the first
+   two rows set up, which is what makes the last sentence read as a
+   different KIND of statement rather than as a third line — the proof
+   sheet's "toward the middle" setting, chosen over flush, a word short, and
+   fully centred.
+
+   18%, DERIVED FROM THE PROTOTYPE'S 17cqw RATHER THAN COPIED FROM IT. Its
+   unit was the stage's full width; a percentage margin on a flex item
+   resolves against the containing block's CONTENT width, and the
+   prototype's rows lived inside 3.4cqw of padding each side, so 17cqw of
+   stage = 17/93.2 = 18.2% of the box the rows actually occupied. 18% is
+   that, expressed in the unit this section has. A fraction and not a px
+   value because a fixed pull that reads well at 1440 puts the row off the
+   page at 390: at 1440 this is 244.8px, at 390 it is 64.4px — and row C's
+   left ink still sits 55.4px clear of the left margin there (measured:
+   ink 238.2px + pull 64.4 against 358 of content width). */
+.rowC {
+  align-self: flex-end;
+  margin-right: 18%;
+}
+
+/* ══════════ THE HAND-OFF ══════════
+   "So…" is not a fourth statement, it is the sentence that walks the reader
+   over the seam into <Reservations>, whose every line is centred on the
+   page axis. So it is centred too — see the seats note above — and it is
+   set QUIETER than the passage (0.66 of the size, in the softer maroon)
+   because a connective that matches the statement's weight reads as a third
+   claim. It is pulled TIGHTER to row C than the beat — the section's gap
+   less 0.42 of it, so the air above it is 0.58 of a beat — because it
+   belongs to the line above it, not to the air below: a full beat here
+   would read as a fourth entry in a list, and the row is a trailing-off,
+   not an entry. */
+.rowD {
+  align-self: center;
+  font-size: calc(var(--passage-fs) * 0.66);
+  margin-top: calc(var(--passage-beat) * -0.42);
+  color: var(--maroon-soft);
+}
+
+/* ══════════ THE MASK AND THE WORD ══════════
+   Lifted from Manifesto.module.css, deliberately, so the two chapters
+   reveal with identical mechanics: the mask clips, the word travels out of
+   it, nothing fades.
+
+   THE PADDING/MARGIN PAIR IS NOT DECORATION. `overflow: hidden` on a box
+   sized to the line box clips the parts of a glyph that legitimately sit
+   outside it — a descender below the baseline, an italic's overhang at the
+   right. The padding grows the clip box to cover them and the equal
+   negative margin takes the growth back out of the layout, so the words
+   still set on their true metrics. Change one and change the other — and
+   the .dot rules below assume the 0.07em side pair; change it and change
+   them. */
+.mask {
+  display: inline-block;
+  overflow: hidden;
+  padding: 0.06em 0.07em 0.22em;
+  margin: -0.06em -0.07em -0.22em;
+  vertical-align: bottom;
+}
+
+.word {
+  display: inline-block;
+}
+
+/* THE DOTS CARRY THEIR OWN AIR — row D has no word gaps (Passage.tsx emits
+   no spaces there), because an ellipsis sits hard against the word it
+   trails from and the spacing between dots is punctuation-sized, not
+   word-sized. 0.15em of INK gap, in row D's own em.
+
+   TWO RULES BECAUSE THE DOT CLASS LANDS ON TWO ELEMENTS. Animating, it is
+   on the .mask, whose 0.07em left padding/−0.07em margin pair is
+   metric-neutral — the ink sits 0.07em inside the border edge — so the
+   margin that puts the INK 0.15em out is 0.15 − 0.07 = 0.08em. Under
+   reduced motion there is no mask and the class is on the bare .word,
+   which has no padding, so there the margin is the plain 0.15em. Same ink
+   gap, both paths. */
+.mask.dot {
+  margin-left: calc(0.15em - 0.07em);
+}
+
+.word.dot {
+  margin-left: 0.15em;
+}
+
+/* ══════════ THE INK MARK AROUND "one standard." ══════════
+   Geometry — which row, which words, the ring's radii, the outline itself,
+   the scrubbed reveal — is generated in Passage.tsx from the measured
+   type; nothing in this file names a row. This file owns only what the ink
+   is painted with and where the svg sits.
+
+   ⚠️ ONE FILLED OUTLINE, NOT A STROKE, AND NOT THREE OF THEM. A stroked
+   path has one width for its whole length, so a pen quality had to be faked
+   here by stacking three strokes (bleed/body/core) and pushing them off
+   true with an feTurbulence + feDisplacementMap pair — and at full size
+   that read as PIXELATED: the filter shoved three separate edges a pixel or
+   two each, a line breaking up rather than a hand. The replacement computes
+   the width along the ring in Passage.tsx (ringOutline) and emits a single
+   closed shape. No filter is involved at all, so there is nothing left to
+   break the edge up — and everything that existed to serve the stack (the
+   .defs filters, the dash-offset draw, the bleed's blur, the pool) is gone
+   with it. The reveal is the path's own regenerated arc length, driven by
+   the scrub — there is no transition and no clip here to switch off. */
+
+/* NO viewBox ON THIS ELEMENT, DELIBERATELY. A viewBox introduces a fit —
+   and `preserveAspectRatio="none"`, the obvious way to make a stretched
+   viewBox line up, turns a curve into a DIFFERENT curve at every viewport
+   width. With width/height set in px from the measurement and no viewBox,
+   one user unit is one CSS pixel forever and there is no aspect ratio to
+   preserve. `overflow: visible` because the ring clears the letterforms on
+   all four sides and so reaches outside the line box top and bottom.
+
+   ABSOLUTELY POSITIONED AND pointer-events: none — the mark can neither
+   take space in the section nor feed back into the line box that buildMark
+   measures (the same property that lets its ResizeObserver watch the line
+   safely). ⚠️ The svg is a DIRECT child of the marked <p>: svg is phrasing
+   content and legal there, and the block wrapper an earlier draft used was
+   a live hydration error — see the note on <InkMark> in Passage.tsx. */
+.ink {
+  position: absolute;
+  left: 0;
+  top: 0;
+  overflow: visible;
+  pointer-events: none;
+}
+
+/* the outline is a closed shape and the maroon fills it; there is no stroke
+   anywhere in the mark any more. */
+.ink path {
+  fill: var(--maroon);
+  stroke: none;
+}
+
+/* Reduced motion gets the four rows plainly, with the same air around them
+   — the pacing is padding, not animation, so it survives. The words render
+   without masks (Passage.tsx), this rule catches any framer inline
+   transform that landed before the preference was read, and the ring is
+   rendered at its full arc and never touched: it is static texture, not
+   animation, so a reader who has asked for less motion still gets the
+   drawn mark rather than nothing. */
+@media (prefers-reduced-motion: reduce) {
+  .word {
+    transform: none !important;
+  }
+}

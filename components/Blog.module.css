@@ -103,15 +103,86 @@
      of empty cream above the marquee at 1080 tall. This was the better half
      of that choice, not a free one.
 
+     ⚠️⚠️ THE TOP BREATH IS NO LONGER THAT NUMBER EITHER, AND EVERYTHING
+     ABOVE IS KEPT AS HISTORY. `calc(var(--grid-gutter) * 3)` was a real
+     symmetry and the derivation is worth reading; what follows is what
+     replaced it, twice.
+
+     ROUND ONE — THE PLATE USED TO TRAVEL. <Passage> once sat between
+     AboutSplit and this chapter; it moved down the page, so AboutSplit's
+     photographic plate became the neighbour — and that plate did not stand
+     still. `blockY` sank it 0 → 150px across the last 45% of its transit,
+     which put it ON this chapter's label: measured against the journal glyph
+     (the topmost ink, not the section box) the clearance ran +48px at rest
+     and −102px at full travel, going negative at 0.70 of the transit,
+     identically at 800, 900, 1080 and 1600 tall. The answer was a padding
+     derived from the overhang rather than from the page's scale:
+     `calc(var(--home-gap-tight) + 150px - var(--grid-gutter))` — a chapter
+     gap PLUS the travel it had to hold clear.
+
+     ROUND TWO — THE TRAVEL IS GONE, at the user's instruction, and so is the
+     150px that answered it. AboutSplit's picture no longer moves as the
+     reader passes it (the note where `blockY` was carries the full account),
+     so there is no overhang to clear: the plate's bottom is where its own
+     box says it is, at every scroll position.
+
+     AND THE SEAM IS CUT TWICE, both times at the user's instruction, because
+     a hairline now sits in it (see .section::before). The line is what
+     separates the two chapters, so the whitespace no longer has to do that
+     job alone — and a full chapter gap with a rule floating in the middle of
+     it reads as an orphaned line rather than as a boundary.
+
+         --about-seam = --home-gap-tight / 2   →   / 3
+
+     DERIVED, NOT PICKED: a fraction of the token that means "a full-bleed
+     colour or photo block adjoins the cream", which is exactly what adjoins
+     this chapter — so it still scales with the viewport, which the old
+     +150px term could not. The halving came first (99px at 1440×900); the
+     third followed when the picture still read as too far off the line.
+
+     WHERE THE THIRD LANDS, and it is the reason this fraction and not some
+     other. The line stands 18px off the head (see .section::before), so what
+     a reader sees between the photograph and the line is `seam − 18`:
+
+         66 − 18 = 48px at 1440×900 — FOUR --grid-gutters exactly, which is
+         the same 48px the chapter's own opening rule used to hold, and the
+         gutter is the number every edge in AboutSplit is already set to.
+
+     The coincidence is not load-bearing (this is derived from the chapter
+     scale, not from the gutter) but it is a good sign: 168/3 = 56px on a
+     short window and 312/3 = 104px on a tall one, i.e. 38px and 86px of
+     cream above the line. For the record, the run of clearances between the
+     photograph and the journal's first ink: 348px at rest before any of
+     this, then 198, then 99, now 66.
+
+     THE PADDING IS THAT SEAM LESS AboutSplit's OWN BOTTOM GUTTER, because
+     the two are consecutive air and both are real: that section closes on
+     `padding: var(--grid-gutter)` all round, so 12px of the seam is already
+     spent before this box starts.
+
+     ⚠️ --about-seam IS NAMED BECAUSE THE RULE READS IT. .section::before
+     hangs off this token — the seam LESS the gutter LESS 18px, which puts
+     the line 18px above the head, the same distance .headRule stands below
+     it. Change the seam and the line follows it down; hard-code either one
+     and they drift apart.
+
      The bottom breath is unchanged and still owns the seam below: press sits
      directly under this chapter now and takes 0 on top, precisely because
      this value is here (see PressWall.module.css). */
-  padding: calc(var(--grid-gutter) * 3) 0 clamp(64px, 9vh, 132px);
+  --about-seam: calc(var(--home-gap-tight) / 3);
+  padding: calc(var(--about-seam) - var(--grid-gutter)) 0
+    clamp(64px, 9vh, 132px);
   display: flex;
   flex-direction: column;
   /* head → body gap on the Discover head's rhythm — the display heading
-     needs the same air over the photography. NAMED because .topRule
-     subtracts it; the value is unchanged. */
+     needs the same air over the photography.
+
+     ⚠️ IT IS STILL NAMED, and the reason it was named is gone: .topRule
+     subtracted this value so the opening hairline could sit 18px off the
+     head regardless of it. Nothing subtracts it now. The name is kept
+     because the head→body distance is worth being able to point at, and
+     because anything that wants a distance to the head OTHER than this gap
+     has to do the same subtraction — see the note where .topRule was. */
   --sec-gap: clamp(22px, 2.7vh, 34px);
   gap: var(--sec-gap);
   background: var(--cream);
@@ -122,37 +193,86 @@
   overflow-x: clip;
 }
 
-/* ── THE OPENING RULE, at the user's instruction ──
-   A hairline across the band ABOVE the chapter, so the head sits between
-   two rules rather than starting out of open cream: this one opens the
-   chapter, .headRule closes its head and opens the pictures.
+/* ═══ THE SEAM'S OWN LINE ─ the boundary between About Us and the journal.
+   Asked for by the user in the same breath as the tightened seam above, and
+   the two are one decision: the gap was halved BECAUSE a line now does the
+   separating, and the line is bearable BECAUSE the gap is no longer a full
+   chapter's worth of cream with something floating in it.
 
-   IT IS THE FIRST FLEX CHILD, NOT A LINE AT THE SECTION'S TOP EDGE. The
-   sheet is a full screen with its contents centred in it, so a rule seated
-   at `top: 0` would float a couple of hundred pixels clear of the type,
-   reading as an unrelated line in the air between two chapters rather than
-   as this chapter's own opening. As a child it takes the section's own gap
-   and belongs to the lockup.
+   THIS IS A REVERSAL, AND IT IS THE USER'S TO MAKE. Three hairlines were
+   removed from this seam and its neighbours over previous passes, each time
+   with the same objection recorded — Manifesto.module.css's "the gap is the
+   separator, do not put the line back". That reasoning applied to lines that
+   sat inside a full chapter gap and had no partner; this one is a stated
+   requirement and it comes with the tighter seam that gives it a job.
 
-   Same 1px on --rule as .headRule — two hairlines of different weights in
-   one chapter reads as one of them being a mistake. */
-/* ── AND IT SITS 18px OFF THE HEAD, matching Discover's copy of this rule.
-   It was riding the section's own gap (24px here, 34px there), so the
-   signature the two chapters are supposed to share did not measure the same
-   in either one — and a rule equidistant between the chapter above and the
-   head below reads as a divider rather than as an opening. A rule belongs
-   to what it introduces.
+   A PSEUDO-ELEMENT, NOT A FLEX ITEM. .section is a flex column whose `gap`
+   also sets the head→body distance, so a real child would take --sec-gap
+   underneath it and the old .topRule had to carry a NEGATIVE margin to undo
+   that (its note is below). Positioned absolutely, this one is outside the
+   layout entirely: it cannot move the head, and it cannot be pushed by
+   anything the chapter does.
 
-   The negative margin subtracts the section's gap; see the fuller note on
-   Discover.module.css's .topRule for why it cannot simply take a smaller
-   gap (the same gap sets the head→body distance and must not move). */
-.topRule {
-  display: block;
+   ⚠️ IT IS 18px OFF THE HEAD, NOT CENTRED IN THE SEAM — at the user's
+   instruction, and 18px is not a new number. `.headRule` closes this same
+   head with `margin-top: calc(18px - var(--head-gap))`, i.e. exactly 18px
+   below the display line, and Discover's rules do the same off their
+   eyebrow. Both of this head's hairlines now stand the house distance off
+   the type, so the label, the display line and the two rules read as one
+   bracketed lockup rather than as a divider that happens to be nearby.
+
+   IT WAS CENTRED IN THE SEAM FIRST — half of --about-seam, 49.5px of cream
+   to the photograph above and 49.5px to the head below — and that is the
+   line worth recording, because it is what "reduce the gap between the head
+   and the line above it" was measured against: 49.5px above the head
+   against 18px below it, near enough three to one, and the pair did not
+   read as a pair. The cream ABOVE the line was then cut in its own pass —
+   81px to 48px — by tightening --about-seam rather than by touching this,
+   which is what the derivation below is for.
+
+   THE MEASUREMENT IS FROM THE HEAD'S BOX, and it can be, because at the top
+   the head's box edge IS its ink: `.labelRow`'s tallest child is the drawn
+   mark, whose box is the drawing (measured — head top and mark top are the
+   same 3660.1). At the bottom the display line's box bottom sits within a
+   pixel of the glyphs' ink, and the pill lands flush with it (measured — the
+   CTA and the lede share a bottom to 0.1px). So 18px means the same thing at
+   both ends, which is the whole point of matching them.
+
+   WHAT IT COSTS: the seam is no longer symmetrical. 48px of cream from the
+   photograph down to the line and 18px from the line to the head at
+   1440×900 — the 18px is fixed at every viewport, the 48px scales with the
+   seam (38px on a short window, 86px on a tall one). The line belongs to the chapter under it now, not to the gap.
+
+   INSET TO --blog-margin, which is --grid-gutter, so it starts and ends
+   exactly where the picture above it and the cards below it do. */
+.section::before {
+  content: "";
+  position: absolute;
+  /* the section's own padding-top, less the house 18px — see above. Written
+     against --about-seam rather than against `padding-top` because there is
+     no way to read a longhand back in a calc(): if the seam moves, this
+     follows it and the 18px holds. */
+  top: calc(var(--about-seam) - var(--grid-gutter) - 18px);
+  left: var(--blog-margin);
+  right: var(--blog-margin);
   height: 1px;
   background: var(--rule);
-  margin-inline: var(--blog-margin);
-  margin-bottom: calc(18px - var(--sec-gap));
+  pointer-events: none;
 }
+
+/* ── .topRule IS DELETED, at the user's instruction ──
+   The chapter's opening hairline: 1px on --rule, inset to --blog-margin,
+   carrying `margin-bottom: calc(18px - var(--sec-gap))` so it sat exactly
+   18px off the head no matter what the section's gap was.
+
+   That negative margin is the only thing worth carrying forward if it ever
+   comes back. The gap it subtracted also sets the head→body distance and
+   must not move, so a rule that wants a different distance to the head has
+   to take it out of its own margin rather than out of --sec-gap. The fuller
+   version of that argument is in Discover.module.css, whose copy of this
+   rule was removed before this one.
+
+   .headRule is untouched — it closes the head and opens the pictures. */
 
 /* ---------- head row — display heading on the left, the archive pill
    hung off the display line's bottom edge at the far right ---------- */
@@ -243,8 +363,11 @@
    lede and /blog's title, so the three open identically. The clamp and
    the 1.1 leading now live in globals as --t-chapter / --lh-chapter, so
    the three cannot drift apart. Same values, one name. */
-.lede {
+.ledeMask {
   grid-area: lede;
+}
+
+.lede {
   margin: 0;
   max-width: 17.7em;
   font-family: var(--font-display);
@@ -594,8 +717,13 @@
    so the column's top edge was being stated twice, 27px apart. The label's
    bottom margin is kept — the air that the padding and the rule occupied
    is what now separates the header from the first story. */
-.railLabel {
+.railLabelMask {
   margin: 0 0 clamp(12px, 1.5vh, 20px);
+}
+
+.railLabel {
+  display: block;
+  margin: 0;
   font-family: var(--font-sans);
   font-weight: var(--w-medium);
   font-size: var(--t-label);
@@ -702,6 +830,7 @@
    caption's date line, whose 0.65 fell to 3.8:1 when the ground
    deepened. */
 .rowMeta {
+  display: block;
   font-family: var(--font-sans);
   font-weight: var(--w-regular);
   font-size: var(--t-small);
@@ -758,6 +887,220 @@
   color: var(--saffron);
 }
 
+/* ═══════════════ THE ENTRANCE — one edge running down the chapter ══════
+
+   Every reveal travels downward and everything that moves arrives from
+   above, on a single beat from the chapter mark to the last story.
+
+   DOWNWARD INVERTS THE HOUSE DEFAULT, deliberately, and there is exactly
+   one precedent — AboutSplit's photograph, the only mask on the site that
+   runs against Reveal's bottom-up wipe. Its stated reason is the caption
+   on its bottom edge: "a downward sweep uncovers the room first and the
+   words last and the caption's own line masks land on a picture that has
+   finished arriving." The lede card carries its headline on the bottom
+   edge for exactly that reason, so the argument transfers unchanged.
+
+   TWO MOVES, EACH DOING THE JOB IT WAS WRITTEN FOR:
+     · type DESCENDS out of a mask  — SplitWords / AboutSplit's LINE, mirrored
+     · pictures SWEEP OPEN downward — Reveal's clip wipe, mirrored
+   Nothing fades. Reveal's note is the reason: a hard edge travelling reads
+   as a cut, and fading a clipped box softens it into a dissolve.
+
+   -110%, NOT -145%. 145% is derived from the 0.3em of BOTTOM bleed a
+   RISING line needs to clear its descenders. Travelling the other way that
+   bleed sits behind the type rather than in front of it, so the mirrored
+   number is smaller. Move a mask's padding and move this with it.
+
+   ⚠️ `backwards`, NOT `both`, AND IT IS LOAD-BEARING. With `both` the
+   animation keeps winning the cascade after it ends, which would pin
+   .featurePhoto's transform forever and silently kill
+   `.feature:hover .featurePhoto` — the CSS form of the trap PillCta's
+   magnet sets in JS. `backwards` holds the from-state through the delay
+   and then hands the property back to the stylesheet, and every keyframe
+   here ends exactly where the stylesheet already sits (no transform, no
+   clip), so there is nothing to hand back but the value that was there.
+   It is also what frees .ctaHost's clip, which would otherwise crop the
+   magnet's travel and the focus ring with it.
+
+   THE BEAT IS ONE NUMBER. --cascade-beat is the whole cadence and --i is
+   each element's place in it, the same arrangement as Discover's --tw-i.
+   At 70ms the last thumbnail finishes ~1.46s in; 55ms is the tighter
+   alternative if that reads long.
+
+   ⚠️ THE PARKED STATE LIVES IN CSS, so a reader whose JS never runs sees
+   the type parked rather than seated. That is the trade Discover's title
+   already makes — .titleWord parks at translateY(-115%) unconditionally —
+   and the text is still in the DOM for find-in-page, selection and AT.
+   ══════════════════════════════════════════════════════════════════════ */
+
+.section {
+  --cascade-beat: 70ms;
+}
+
+.labelWordMask,
+.railLabelMask,
+.rowTextMask {
+  display: block;
+  min-width: 0;
+  clip-path: inset(0 -0.6em -0.3em -0.12em);
+}
+
+/* the rail row's text is a flex child before it is a mask, and it takes
+   the seat .rowText used to hold — default flex, min-width: 0 (see the
+   note on .rowText for why that one is not a tidy-up) */
+
+@keyframes blogSweepDown {
+  from {
+    clip-path: inset(0 0 100% 0);
+  }
+  to {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+@keyframes blogDescend {
+  from {
+    transform: translateY(-110%);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+/* THE PLATE MOVES AGAINST THE MASK and outlasts it, which is the half of
+   AboutSplit's pair that makes the panel settle rather than stop. The
+   scale is solved against the travel, not chosen: the photograph fills its
+   frame exactly, so a bare translate would pull its bottom edge clear and
+   show --placeholder underneath. overhang = (S - 1) / 2 must be >= the
+   translate — 1.1 gives 5% against a 4% move. */
+@keyframes blogDrift {
+  from {
+    transform: translateY(-4%) scale(1.1);
+  }
+  to {
+    transform: translateY(0) scale(1);
+  }
+}
+
+/* THE DISPLAY LINE DOES NOT DESCEND, AND THE REASON IS ITS LINE COUNT.
+   A block hidden behind a top-tight mask has to travel its own full
+   height, and this one's height is not knowable: measured on the real
+   render it is two lines from 768 up (breaking before "Maginhawa") and
+   FIVE at 390, where the 12px chapter margin is the binding constraint
+   rather than the 17.7em measure. That is a 189px fall on a phone for a
+   gesture that is 20px on the label beside it.
+
+   So the lede takes the OTHER downward pair instead — the mask sweeps and
+   the type drifts against it, the same two-element arrangement
+   AboutSplit's photograph uses. The travel is 0.22em whatever the line
+   count, and the reveal edge still runs down.
+
+   THE RULE THIS SETS, for anything added to the head later: type descends
+   when its travel is bounded by a line or two (the chapter word, a rail
+   headline under its 2-line clamp); type sweeps when its height is a
+   function of the measure. */
+@keyframes blogSettle {
+  from {
+    transform: translateY(-0.22em);
+  }
+  to {
+    transform: translateY(0);
+  }
+}
+
+@keyframes blogFade {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
+/* ── THE BEAT MAP ──
+   Seats 0-4 are the head and the card; the four rail rows continue the
+   same count from 5, and because those are computed they are set inline
+   from Blog.tsx (RAIL_BEAT). The row declares --i once and both halves
+   inherit it, so a thumbnail's sweep and its headline's descent cannot
+   drift apart.
+
+   The two small framed objects in the head open faster than the
+   photographs do — 900ms on a 34px mark reads as a stall, not a reveal. */
+.labelMark {
+  --i: 0;
+  --enter-d: 700ms;
+}
+.labelWord {
+  display: block;
+  --i: 1;
+}
+.ledeMask {
+  --i: 2;
+}
+.lede {
+  --i: 2;
+}
+.ctaHost {
+  --i: 3;
+  --enter-d: 700ms;
+}
+.feature,
+.featurePhoto,
+.railLabel {
+  --i: 4;
+}
+.railLabel {
+  --enter-d: 600ms;
+}
+
+/* THE SWEEP — every photograph, plus the two framed objects in the head */
+.section:not([data-in]) .labelMark,
+.section:not([data-in]) .ledeMask,
+.section:not([data-in]) .ctaHost,
+.section:not([data-in]) .feature,
+.section:not([data-in]) .thumb {
+  clip-path: inset(0 0 100% 0);
+}
+.section[data-in] .labelMark,
+.section[data-in] .ledeMask,
+.section[data-in] .ctaHost,
+.section[data-in] .feature,
+.section[data-in] .thumb {
+  animation: blogSweepDown var(--enter-d, 900ms) var(--ease-entrance)
+    calc(var(--i, 0) * var(--cascade-beat)) backwards;
+}
+
+/* THE DESCENT — every piece of type, each out of its own mask */
+.section:not([data-in]) .labelWord,
+.section:not([data-in]) .railLabel,
+.section:not([data-in]) .rowText {
+  transform: translateY(-110%);
+}
+.section[data-in] .labelWord,
+.section[data-in] .railLabel,
+.section[data-in] .rowText {
+  animation: blogDescend var(--enter-d, 700ms) var(--ease-entrance)
+    calc(var(--i, 0) * var(--cascade-beat)) backwards;
+}
+
+/* the display line, drifting against its own mask and outlasting it */
+.section:not([data-in]) .lede {
+  transform: translateY(-0.22em);
+}
+.section[data-in] .lede {
+  animation: blogSettle 1000ms var(--ease-drawer)
+    calc(var(--i, 0) * var(--cascade-beat)) backwards;
+}
+
+/* THE PLATE, moving against its own mask and outlasting it */
+.section:not([data-in]) .featurePhoto {
+  transform: translateY(-4%) scale(1.1);
+}
+.section[data-in] .featurePhoto {
+  animation: blogDrift 1400ms var(--ease-drawer)
+    calc(var(--i, 0) * var(--cascade-beat)) backwards;
+}
+
 /* ---------- responsive ---------- */
 /* ONE COLUMN under 900px. The card keeps the full measure and the rail
    falls beneath it — a half-width rail on a phone is a thumbnail beside
@@ -806,5 +1149,45 @@
   .feature:focus-visible {
     transform: none !important;
     transition: none;
+  }
+
+  /* ONE VARIANT FOR EVERYTHING, AND DELIBERATELY NO DELAYS. The house
+     pattern is Reveal's 0.4s fade; a preserved stagger would replay the
+     whole cascade as a sequence of fades, i.e. the reader who asked for
+     less movement still waits out the choreography. Everything simply
+     arrives. Same reasoning as the FADE variant in Discover.tsx.
+
+     The masks are released too — with nothing translating, a clip on the
+     type is a crop for no reason. */
+  .labelWordMask,
+  .railLabelMask,
+  .rowTextMask {
+    clip-path: none;
+  }
+  .section:not([data-in]) .labelMark,
+  .section:not([data-in]) .labelWord,
+  .section:not([data-in]) .ledeMask,
+  .section:not([data-in]) .lede,
+  .section:not([data-in]) .ctaHost,
+  .section:not([data-in]) .feature,
+  .section:not([data-in]) .featurePhoto,
+  .section:not([data-in]) .railLabel,
+  .section:not([data-in]) .thumb,
+  .section:not([data-in]) .rowText {
+    clip-path: none;
+    transform: none;
+    opacity: 0;
+  }
+  .section[data-in] .labelMark,
+  .section[data-in] .labelWord,
+  .section[data-in] .ledeMask,
+  .section[data-in] .lede,
+  .section[data-in] .ctaHost,
+  .section[data-in] .feature,
+  .section[data-in] .featurePhoto,
+  .section[data-in] .railLabel,
+  .section[data-in] .thumb,
+  .section[data-in] .rowText {
+    animation: blogFade 400ms ease-out backwards;
   }
 }

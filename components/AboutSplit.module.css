@@ -49,7 +49,17 @@
   --split-title-size: clamp(2.4rem, 4.2vw, 4.2rem);
   background: var(--cream);
   color: var(--maroon);
-  min-height: calc(100svh + var(--grid-gutter) * 3);
+  /* ONE SCREEN, EXACTLY. It read `calc(100svh + var(--grid-gutter) * 3)`,
+     and those three extra gutters were not a design value: they were the
+     difference between the opening rule's original one-gutter bottom margin
+     and the four-gutter one it grew when the rule was re-centred against the
+     story band, added so the picture kept its height while the rule took
+     more room. Rule and band are both gone, so the compensation goes with
+     them and the section is a screen again — which is what every other note
+     in this file already assumes it is. Net effect on the picture: it was
+     100svh + 3g − (1px + 4g) − 1g and it is now 100svh − 2g, i.e. the same
+     height to within the rule's own hairline. */
+  min-height: 100svh;
   display: flex;
   flex-direction: column;
   /* SIDES, PLUS THE BOTTOM. Not the top.
@@ -69,87 +79,47 @@
      while its other three sides sit in a 12px mount does not read as a
      deliberate bleed, it reads as a crop.
 
-     AND THE TOP IS STILL ZERO EVEN THOUGH A RULE NOW SITS THERE. The rule
-     is the section's first child with no margin above it, so it lands on
-     the section's top edge and the band's --band-gap is still the only
-     thing between the last band photograph and it. The rule then carries
-     --grid-gutter beneath itself, which is what gives the picture its top
-     inset. Putting padding here as well would seam twice.
+     ── AND THE TOP IS OURS AGAIN NOW, WHICH IS A REVERSAL WORTH READING ──
+     It was zero for two stacked reasons, and BOTH have gone in one pass:
+     the story band above closed on a --band-gap bottom padding that already
+     put --grid-gutter between the last band photograph and this video, so
+     adding 12px here would have seamed twice; and the opening rule was the
+     first child, carrying --grid-gutter beneath ITSELF, which is what gave
+     the picture its top inset. The band is no longer rendered and the rule
+     is deleted, so nothing above supplies either number and a zero top
+     padding would butt the video against the chapter above it.
+     One gutter, on all four sides, stated once.
 
-     `box-sizing: border-box` with `min-height: 100svh` means none of this
-     costs page height: the section is still exactly one screen. ALL FOUR
-     SIDES OF THE PICTURE ARE --grid-gutter — 12px to the left screen edge,
-     12px up to the rule, 12px down to the fold — which is the same number
-     as the gap between the band's photographs, and the requirement the
-     user set. */
-  padding: 0 var(--grid-gutter) var(--grid-gutter);
+     `box-sizing: border-box` means none of this costs page height. ALL FOUR
+     SIDES OF THE PICTURE ARE --grid-gutter — 12px to each screen edge and
+     12px down to the fold — which was the same number as the gap between
+     the band's photographs, and the requirement the user set. */
+  padding: var(--grid-gutter);
 }
 
-/* ── THE RULE THAT OPENS THE CHAPTER ───────────────────────────────────
-   Added at the user's instruction. THERE IS A PRECEDENT AGAINST IT and it
-   should be read before this is extended: Manifesto.module.css records a
-   full-width hairline being REMOVED from the statement's bottom edge, on
-   the grounds that the home page's chapters share one cream ground and one
-   column seat, so a rule "read as the page being divided in two rather
-   than as one continuous editorial scroll" — signed off "The gap is the
-   separator. Do not put the line back."
+/* ── THE OPENING RULE IS GONE, at the user's instruction ──
+   A full-width hairline sat on this section's top edge, added at the user's
+   instruction some passes ago and argued about at length in the comment this
+   replaces. Two things retired it in the same pass and both are worth the
+   line each:
 
-   THIS WAS A PAIR AND IS NOW ONE. A matching rule closed the chapter, and
-   the two together read as a frame rather than as a division, which was
-   the argument for having them at all. The closing rule is removed at the
-   user's instruction, so that argument no longer applies: what is left is
-   a single hairline on a seam, which is the exact thing the Manifesto note
-   warns about. It is kept because it was asked for, and it is recorded
-   here so the next person does not rediscover the objection as a bug.
+     · ITS PARTNER WAS ALREADY GONE. It was one of a pair — a matching rule
+       closed the chapter — and the pair was the argument for having either:
+       two lines read as a frame, one reads as a divider on a seam. The
+       closing rule went first, then this one, and the objection recorded on
+       both was always Manifesto.module.css's: "It was drawing a boundary the
+       page does not have… The gap is the separator. Do not put the line
+       back." It stands, for the third time.
+     · THE THING IT WAS MEASURED AGAINST NO LONGER EXISTS. Its whole
+       geometry — `margin-bottom: calc(var(--grid-gutter) * 4)`, chosen so
+       the line sat CENTRED between the story band's four-gutter bottom
+       padding and the picture below — was a relationship with StoryStrip,
+       and StoryStrip is no longer rendered (see <Manifesto>). A rule
+       centred against a neighbour that is not there is just a rule with an
+       arbitrary 48px under it.
 
-   IT IS THE CONTENT'S WIDTH, NOT THE VIEWPORT'S. `width: 100%` inside the
-   section's --grid-gutter side padding puts it at 12px → 1428px at 1440,
-   exactly the video's left edge and the reading column's right edge. A
-   full-bleed rule would frame the window; this frames the picture and the
-   text, which is what is being framed.
-
-   ── THE RULE IS NOW CENTRED, at the user's instruction, AND THIS REVERSES
-   A DOCUMENTED DECISION. Say so plainly rather than leaving two files
-   disagreeing.
-
-   WHAT WAS HERE: `margin-bottom: var(--grid-gutter)`, i.e. 12px below the
-   rule against the four gutter units (48px) the story band pads above it.
-   StoryStrip.module.css argues for exactly that asymmetry — "the rule
-   needs air on the side facing the band and none on the side facing
-   About, because that asymmetry is what makes it read as ABOUT'S opening
-   rule rather than as a divider belonging to neither chapter" — and signs
-   off "THE GAP BELOW THE RULE ... MUST STAY 12px".
-
-   AND THE COMMENT THAT USED TO SIT HERE WAS SIMPLY WRONG: it claimed the
-   rule was "centred in a 12 / 12 gap". Measured at 1440x900 it was 48
-   above and 12 below (scripts' seam probe), so the file asserting symmetry
-   and the file arguing for asymmetry were describing the same rule and
-   only one of them was right. It is genuinely centred now.
-
-   WHAT THE CHANGE COSTS, so it is not rediscovered as a bug: the rule no
-   longer leans toward About. Centred between two large photographic masses
-   it reads as a boundary between the band and the chapter rather than as
-   the chapter's own opening mark — which is the reading StoryStrip's note
-   was written to avoid. That is the trade the instruction makes.
-
-   FOUR UNITS, NOT A LITERAL 48. `--band-gap` is declared on StoryStrip's
-   `.band` and custom properties inherit DOWNWARD, so it does not reach
-   this sibling section — but --band-gap IS --grid-gutter, so multiplying
-   the gutter by the same four reproduces the band's own derivation. If the
-   gutter moves, both sides of this rule move together and it stays
-   centred. Do not replace this with 48px. */
-.rule {
-  flex: none;
-  height: 1px;
-  background: var(--rule);
-  margin-bottom: calc(var(--grid-gutter) * 4);
-  /* NO `transform-origin` ANY MORE. It was here because the rule drew
-     itself from the left as the chapter opened (`scaleX: 0 → 1`); that
-     animation is removed at the user's instruction, so the property was
-     geometry for a transform nothing applies. Restore both together or
-     neither — an origin without the variant is dead, and the variant
-     without the origin opens the line like a pair of doors. */
-}
+   Its margin was also the picture's top inset, which is why removing it
+   moves the section's own padding — see .section. */
 
 .split {
   display: grid;
@@ -195,14 +165,102 @@
      bottom to clear the shadow is the one thing that requirement forbids. */
   z-index: 1;
   margin: 0;
-  overflow: hidden;
+  /* ⚠️ NO overflow, NO radius, NO background AND NO SHADOW ON THIS BOX, and
+     all four moved for the same reason: at rest, before the sweep, this
+     element must paint NOTHING. It used to paint a --placeholder rectangle
+     wearing a four-layer card shadow, sitting on the cream for the whole of
+     the animation that is supposed to be uncovering the picture — a box
+     waiting for its photograph rather than a photograph arriving.
+       · the radius and the overflow went DOWN to .mediaFrame, which is
+         clipped anyway and can round the picture just as well;
+       · the background went down with them, so the decode tone can only be
+         seen where the sweep has already passed;
+       · the shadow went SIDEWAYS to .mediaShadow, which fades in.
+     What is left here is a positioning box and a stacking order. */
+}
+
+/* THE SHADOW, AS AN ELEMENT OF ITS OWN, AND EVERY OTHER ROUTE WAS TRIED.
+   The requirement is a shadow that arrives with the picture, which means
+   something about it has to animate. It cannot be:
+     · a shadow on .mediaFrame — `clip-path` clips an element's entire
+       rendering, box-shadow included, so the mask would erase it;
+     · an alpha multiplier inside --shadow-card — a var() inside a custom
+       property resolves on the element that DECLARES it, i.e. at :root, so
+       a multiplier set down here is read by nobody. This was implemented and
+       measured: the computed shadow came back at full strength. The note is
+       in globals.css so the next person does not repeat it;
+     · opacity on .media — that would fade the picture with it.
+   So: an empty box, the shadow token unchanged, and a plain opacity fade.
+   AN OUTER box-shadow IS CLIPPED TO OUTSIDE THE BORDER BOX by the spec, so
+   a transparent element casts a clean halo and paints nothing inside its own
+   rectangle — which is exactly the shape wanted and the reason this can be a
+   sibling of the picture rather than something behind it.
+   ⚠️ IT ONLY WORKS BECAUSE .media NO LONGER CLIPS. An `overflow: hidden`
+   parent would cut this shadow off at the box it is meant to fall outside
+   of. That is why the overflow moved down rather than staying here. */
+.mediaShadow {
+  position: absolute;
+  inset: 0;
   border-radius: var(--radius-tile);
-  /* the tone every frame on this site holds while its photograph decodes */
-  background: var(--placeholder);
   /* the house ramp, same as the restaurant cards and the story band — a
      shadow is a light source, and the page may only have one */
   box-shadow: var(--shadow-card);
+  pointer-events: none;
 }
+
+/* ══════════ THE TWO BOXES THE ENTRANCE NEEDS ══════════
+   Both were here, both were deleted when the panel was made still, and both
+   come back with it. Neither carries a single visual property — no
+   background, no radius, no shadow — because .media already carries all
+   three and a second copy is a second thing to keep in step.
+
+   ⚠️ .mediaFrame IS THE ONLY ELEMENT THE CLIP MAY TOUCH. `clip-path` clips
+   an element's ENTIRE rendering, box-shadow included, and it stays on the
+   element as an inline style once the animation rests — so a clip on .media
+   would take the card shadow off this picture permanently, and nothing
+   about that failure looks like an animation bug. Both of this file's
+   wiping animations are written this way; see DOOR_WIPE's note too.
+
+   BOTH ARE `position: absolute; inset: 0` FOR THE SAME REASON .mediaVideo
+   is: .media's height is governed by the grid row, and a box in normal flow
+   in here would start contributing to it. */
+.mediaFrame {
+  position: absolute;
+  inset: 0;
+  /* THE PICTURE'S CORNER AND ITS CLIP, both moved down from .media so that
+     box can paint nothing at rest — see the note there. Rounding the box
+     that is already being clip-pathed costs nothing: `clip-path` and
+     `border-radius` compose, the inset mask cuts the top edge and the radius
+     keeps the corners. */
+  overflow: hidden;
+  border-radius: var(--radius-tile);
+  /* THE TONE EVERY FRAME ON THIS SITE HOLDS WHILE ITS PHOTOGRAPH DECODES,
+     moved down for the same reason. It still does its job — a frame whose
+     picture has not decoded shows this rather than a hole — but it can only
+     ever be seen where the sweep has already passed. */
+  background: var(--placeholder);
+}
+
+/* ⚠️ THE DRIFT IS A SEPARATE BOX FROM THE MASK, and the scrim sitting
+   between them is the reason. The picture has to move without the scrim
+   moving with it: the scrim's contrast guarantee is stated in PIXELS from
+   the frame's bottom edge (see .mediaScrim), and a scrim that slid up 4%
+   and scaled 10% with the photograph would carry that 200px band away from
+   the caption it is guaranteeing. So the mask holds both, and only this box
+   moves. */
+.mediaDrift {
+  position: absolute;
+  inset: 0;
+}
+
+/* .mediaScrub IS DELETED. It was the scroll-bound drift's own box — a third
+   box rather than a property on .mediaDrift, because the entrance settle and
+   the scroll scrub both wrote `y` and one element cannot hold two authors of
+   one transform. The scrub is gone at the user's instruction (the picture is
+   to be still as the reader passes the chapter), so there is one author left
+   and the box has nothing to own. The 1.15 scale it carried inline went with
+   it, which gives the photograph back the 15% of itself the excursion was
+   costing. See the note where `scrubY` was, in AboutSplit.tsx. */
 
 .mediaImg {
   object-fit: cover;
@@ -386,6 +444,17 @@
 .heading {
   margin: 0;
   max-width: 22ch;
+  /* ⚠️ POSITIONED, AND ONLY BECAUSE IT LEAVES ITS OWN SECTION.
+     The heading is lifted up to 38vh above this slot by a scroll-bound
+     transform (see HEAD_LIFT in AboutSplit.tsx), which paints it over the
+     manifesto chapter's box for the whole of the travel. A static child
+     paints in an earlier layer than a positioned ancestor, so this is what
+     guarantees the heading sits ABOVE the neighbouring section rather than
+     depending on that section happening to be unpositioned today.
+     1, not 2: the picture's own frame already claims 1 and they never
+     overlap horizontally — this only has to clear a background. */
+  position: relative;
+  z-index: 1;
   font-family: var(--font-display);
   font-weight: var(--w-regular);
   font-size: var(--split-title-size);
@@ -582,10 +651,69 @@
   }
   .copy {
     gap: clamp(28px, 5vh, 48px);
+    /* ── THE HEADING COMES UP UNDER THE PICTURE, at the user's instruction ──
+       The top value is the one that changes and it is the only one: side by
+       side, `clamp(40px, 8vh, 104px)` is what DROPS the heading clear of the
+       photograph's top edge (see the rule's own note) — a relationship
+       between two things standing next to each other. Stacked, the same
+       number is dead air between a picture and the line underneath it, and
+       it stacks on top of `.split`'s own gutter: measured at 390x844 the
+       heading sat 79px below the frame. 3vh puts it at 37px, which reads as
+       a caption belonging to the picture rather than as the start of an
+       unrelated block.
+       THE OTHER THREE SIDES ARE UNCHANGED. They are the reading column's
+       inset from the window and have nothing to do with the split. */
+    padding-top: clamp(20px, 3vh, 36px);
   }
   .readingBlock,
   .heading {
     max-width: none;
+  }
+  /* ══ THE LOCKUP AND THE READING COLUMN STAY WHERE THEY ARE ══
+     at the user's instruction, and stacked they have nowhere to fly FROM.
+     The flight (HEAD_LIFT in AboutSplit.tsx) perches the heading ~32vh up in
+     the manifesto's empty band and rides it down into this slot, which is a
+     gesture about two columns standing side by side: the heading arrives at
+     the picture's top edge. Stacked, the heading is BELOW the picture, so
+     the same transform lifts it back over the photograph it is supposed to
+     be captioning and then drops it — 32vh of travel on a 844px screen is
+     270px of the type sliding over the frame on every scroll.
+
+     `!important` BECAUSE THE AUTHOR IS AN INLINE STYLE. framer-motion writes
+     the scroll-linked `y` straight onto the element's `style` attribute, and
+     a stylesheet declaration cannot outrank an inline one without it. This
+     is a static override, not a value being cleared mid-animation — the
+     failure mode Hero/Manifesto both document (framer silently rewriting a
+     property you reset in a callback) needs a fight over time, and there is
+     none here: below 900px this transform is simply never the author.
+
+     THE GATE KNOWS. AboutSplit.tsx reads the same breakpoint and swaps the
+     heading-crosses-the-picture rule for the picture's own arrival — see the
+     note on `swept`. Change 900 here and change it there. */
+  .lead,
+  .readingBlock {
+    transform: none !important;
+  }
+  /* ── THE THREE PRINTS SHARE THE ROW INSTEAD OF CLAIMING 112px EACH ──
+     The width clamp's floor is 112px, which is a DESKTOP floor: three of
+     them plus two gutters come to 360px, and the reading column at a 360px
+     window is 328px. Measured, the third print ran to x388 and gave the
+     whole document 28px of horizontal scroll — the page could be dragged
+     sideways on the narrowest phones. Splitting the row three ways fits by
+     construction at every width; `aspect-ratio` keeps the crop. */
+  /* ⚠️ THE FLEX ITEM IS THE <li>, NOT THE <a>. `.door` is the link, and the
+     link is a flex CONTAINER (column: frame, then label) sitting inside a
+     list item that is itself the child of `.doors`. Putting `flex: 1` on
+     `.door` therefore lands on a box whose parent is not a flex container:
+     it is ignored, the frame's `width: auto` resolves against a shrink-to-
+     fit chain with nothing definite in it, and all three prints collapse to
+     0x0 — measured exactly that way before this was corrected. */
+  .doors > li {
+    flex: 1;
+    min-width: 0;
+  }
+  .doorFrame {
+    width: auto;
   }
 }
 
