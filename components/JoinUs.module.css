@@ -1,6 +1,10 @@
 .section {
   position: relative;
-  padding: clamp(12px, 1.6vw, 22px) var(--pad-x) 0;
+  /* NAMED because `.hero` subtracts it — see the `min-height` there. Two
+     copies of this clamp would let the hero's first-screen box drift out of
+     agreement with the chrome above it. */
+  --sec-top: clamp(12px, 1.6vw, 22px);
+  padding: var(--sec-top) var(--pad-x) 0;
   background: transparent;
 }
 
@@ -12,7 +16,12 @@
      1440x900 window the third beat of the sequence plays where nobody can
      see it. Every measurement from here to the frame was tightened for that
      one reason — this was clamp(80px, 10vh, 120px). */
-  padding-top: clamp(56px, 7vh, 92px);
+  /* clamp(44px, 5vh, 72px), down from clamp(56px, 7vh, 92px). The headline
+     is now on About's ramp and the whole composition has to fit ONE screen,
+     so ~20px of the standing chrome above it went back into the budget.
+     Named for the same reason as `--sec-top`. */
+  --page-top: clamp(44px, 5vh, 72px);
+  padding-top: var(--page-top);
   overflow-x: clip;
 }
 
@@ -33,16 +42,58 @@
    Transform and opacity only, on three promoted elements (two lines and the
    frame). No clip-path animation, no layout animation, no filter. */
 .hero {
-  padding-top: clamp(4px, 1.6vh, 20px);
+  /* ---- THE HERO IS THE FIRST SCREEN, AND IT CENTRES ITSELF IN IT ----
+     It used to be a plain block that started under the chrome and ended
+     wherever its content ended, which left the composition sitting high with
+     the slack all at the bottom — and the slack GREW with the window, so the
+     taller the screen the more top-heavy it read. Now the box is exactly the
+     screen minus the chrome above it and the stack is centred inside it, so
+     the air is split evenly above and below at every height.
+
+     `svh`, not `vh`: on mobile `vh` is the LARGEST viewport (toolbars
+     retracted), so a `vh`-sized first screen is taller than the screen
+     actually is while the address bar is showing — which is exactly the
+     moment the reader is looking at it.
+
+     min-height rather than height: on a short window the stack is taller
+     than the screen and this box has to grow rather than overflow. The
+     centring is then a no-op, which is the correct degradation. */
+  min-height: calc(100svh - var(--page-top) - var(--sec-top));
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   /* the air between each line's ink and the photograph when settled. It is
      also the floor on the ceiling that keeps them apart during the split —
-     see SPLIT_AIR in JoinUs.tsx — so it may not go to zero. */
-  --band-air: clamp(18px, 2.6vh, 34px);
+     see SPLIT_AIR in JoinUs.tsx — so it may not go to zero.
+
+     clamp(10px, 1.4vh, 20px), roughly halved. Asked for directly — the
+     headline should sit ON the photograph's edge rather than float near it —
+     and the bigger type is what makes it affordable: at About's ramp the two
+     lines are ~40% taller than they were, so the seam between type and
+     picture reads as tight rather than as cramped. */
+  --band-air: clamp(10px, 1.4vh, 20px);
   /* HOISTED OUT OF `.heroLineTop/.heroLineBot`, where it was written inline,
      because the corner labels' seat is now a fraction of it — see the cap-top
      arithmetic in `.heroLabels`. One declaration, so the labels cannot be left
      aligned to a size the headline no longer has. */
-  --hero-title-size: clamp(2.5rem, 7vw, 6.5rem);
+  /* ---- ABOUT'S SCALE, WITH ONE TERM CHANGED AND THE REASON MEASURED ----
+     `.openTitle` in About.module.css is clamp(3.4rem, 12vw, 12rem) and the
+     rate and the ceiling are copied verbatim. THE FLOOR IS NOT, and it is
+     not taste: About sets TWO WORDS on one nowrap line in a full-height
+     panel of its own; this hero sets "FINDS ITS PLACE." above a photograph
+     in a 358px column at 390px. At 3.4rem that line renders 379px of ink and
+     takes a SECOND LINE BOX — which is not a cosmetic wrap here, it is the
+     split choreography being handed three line boxes to open a seam between
+     when its whole geometry assumes two.
+
+     2.4rem is the measured headroom, not a guess: the caps setting runs
+     6.96px of ink per px of font size on the longer line, so 358px of column
+     buys 51.4px and the narrowest phone still in use (320px, a 288px column)
+     buys 41.4px. 2.4rem is 38.4px and clears the 320px case by 21px. Above
+     ~347px viewport width the 12vw term wins anyway and the floor never
+     applies — so at every real phone width this IS About's ramp.
+     scripts/probe-join-hero-face.mjs counts the line boxes. */
+  --hero-title-size: clamp(2.4rem, min(12vw, 13.5vh), 12rem);
 }
 
 /* THE CORNER LABELS — the site's furniture voice (Nav, Blog's counter,
@@ -77,6 +128,17 @@
               because every term in it (the mask's 0.30em padding, the 0.98
               line-height's half-leading, the face's ascender-to-cap) is
               itself proportional to the font size.
+
+              ⚠️ ONE OF THOSE TERMS IS THE FACE, AND THE FACE HAS CHANGED
+              ONCE — the headline moved from FreightBig mixed-case to
+              Contralto caps. Re-measured rather than assumed
+              (scripts/probe-join-hero-face.mjs, `labelCapDelta`, which is
+              the signed gap between the headline's ink top and the label's):
+              0.59px at 1440, 0.66px at 1920, 0.06px at 900, against
+              0.15 / -0.54 / -0.21 for the face it replaced. Same order of
+              error, all of it sub-pixel, so 0.212 is KEPT. If a third face
+              ever lands here, re-run that probe before trusting this line —
+              a drifting seat is a defect nothing throws on.
      0.327em  the label's own cap top below THIS box's top edge, in the
               label's em. `--t-label` is a fixed 0.8125rem, so this one is a
               flat 4.24px at every width; it is written as a ratio anyway so
@@ -93,7 +155,7 @@
 .heroLabels {
   position: absolute;
   inset-inline: 0;
-  top: calc(0.212 * var(--hero-title-size) - 0.327 * var(--t-label));
+  top: calc(0.221 * var(--hero-title-size) - 0.327 * var(--t-label));
   display: flex;
   align-items: baseline;
   justify-content: space-between;
@@ -149,8 +211,36 @@
 .heroLineBot {
   display: block;
   text-align: center;
-  font-family: var(--font-display);
-  font-weight: var(--w-medium);
+  /* THE DISPLAY-BIG FACE, IN CAPS — the same setting the About page's
+     "ABOUT US" carries (`.openTitle` in About.module.css): Contralto on
+     --font-display-big, uppercase, --w-medium. This hero was the last big
+     headline still set in --font-display (FreightBig, mixed case), which
+     made /careers the one landing page whose opening voice was a different
+     typeface from every other one's.
+
+     LETTER-SPACING MOVED WITH IT: -0.01em, About's figure. -0.028em was a
+     mixed-case setting, and caps carry their own sidebearings — at 6.5rem
+     the tighter value starts closing the counters.
+
+     THE TWO THINGS THIS COULD HAVE BROKEN SILENTLY WERE BOTH RE-MEASURED
+     (scripts/probe-join-hero-face.mjs) AND BOTH HELD:
+       the labels' seat  `.heroLabels` seats the corner labels on the ink
+                         top of "WHERE", via a 0.212em constant that is a
+                         function of the FACE's ascender-to-cap. Contralto's
+                         lands within 0.7px of FreightBig's at every width
+                         the seat applies to, so the constant is unchanged —
+                         see the re-measure logged in its note.
+       the line count    caps are ~15% wider than the mixed case they
+                         replaced; the wrap floor below is the check. */
+  font-family: var(--font-display-big);
+  /* 600 — THE WORDMARK'S WEIGHT, not About's --w-medium. Asked for
+     explicitly, and Contralto's big cut carries a real drawn 600 (see the
+     font block in globals.css and `.logoWord` in Nav.module.css), so this is
+     a cut rather than a synthesised weight. --w-medium is 500, which font
+     matching resolves DOWN to the 400 in this family — the visible gap
+     between the hero and MAGINHAWA in the bar above it. */
+  font-weight: 600;
+  text-transform: uppercase;
   /* 7rem, up from 5.6rem. The ceiling here has always been the FOLD and not
      taste — the caption is the third beat of the entrance and it lives inside
      the photograph, so the headline can only be as tall as the window has
@@ -159,23 +249,27 @@
      that room spent on the type. probe-join-fold.mjs re-measures the
      clearance at all four viewports rather than trusting the arithmetic.
 
-     The 2.5rem floor is not cosmetic either: at 390px the container is 358px
-     and "Every trial shift here" is the longest line, and a wrap here is not
-     a cosmetic problem — it would put THREE lines of type around a
-     photograph that opens between exactly two, and the split's measured
-     geometry would then be opening a seam in the middle of a line.
-     2.7rem measured at 354px of 358 — a 4px margin, which is not a margin,
-     it is luck. 2.5rem measures 328px and leaves 30. (Arial and Liberation
-     Sans are metrically compatible with Helvetica to the pixel, so the
-     fallback platforms do not widen this — but a copy edit would.) Checked
-     by probe-join-head.mjs, which counts rendered line boxes rather than
-     assuming the hand break is the only break. */
+     The 2.5rem floor is not cosmetic either: at 390px the container is
+     358px, and a wrap here is not a cosmetic problem — it would put THREE
+     lines of type around a photograph that opens between exactly two, and
+     the split's measured geometry would then be opening a seam in the
+     middle of a line.
+
+     RE-MEASURED FOR THE CAPS SETTING, because caps are the wider case and
+     this floor was set against the mixed one. "FINDS ITS PLACE." is the
+     longer of the two lines and renders 270px of the 358px column at the
+     floor — 88px of margin, against the 158px the mixed-case setting had.
+     Still the widest breakpoint-relative margin on the page, and there is
+     no width at which either line takes a second line box.
+     scripts/probe-join-hero-face.mjs counts rendered line boxes at all four
+     viewports (`topLines`/`botLines`) rather than assuming the hand break
+     is the only break — a copy edit is what would spend the 88px. */
   /* the clamp itself now lives on `.hero` as --hero-title-size, because the
      corner labels' seat is a fraction of it */
   font-size: var(--hero-title-size);
   line-height: 0.98;
-  /* size-specific tracking: display type this large reads loose at 0 */
-  letter-spacing: -0.028em;
+  /* the About title's tracking, and it moved WITH the face — see above */
+  letter-spacing: -0.01em;
   color: var(--maroon);
   /* each line is pushed ~230px by the split at 1440 — promoted for the
      duration, and the promotion is cheap because nothing else on the page is
@@ -337,7 +431,22 @@
      probe-join-fold.mjs, which reported it at y 158 with the title at 222.
      Anything added to this composition needs a number. */
   order: 4;
-  margin: clamp(14px, 1.9vh, 26px) auto 0;
+  /* THE AIR ABOVE IT, ROUGHLY TRIPLED — 14/26px became 44/76px. The old
+     figure was set when the payoff line was mixed-case FreightBig, whose
+     descenders reached down into the gap and made it read fuller than it
+     measured. Caps have no descenders: the same 17px under "FINDS ITS
+     PLACE." read as the standfirst being stuck to the headline's baseline,
+     and the two are different voices — the sentence ends, THEN the
+     paragraph explains it.
+
+     Still vh-tracked rather than flat, because this is the last beat above
+     the fold and it is the clearance, not taste, that bounds it. 4.6vh is
+     where those two meet: 5.6vh reads better in isolation and closes the
+     standfirst only 29px above the fold at 1920x1080, which is beat 3
+     finishing on the fold line rather than inside it. 4.6vh holds ~40px at
+     1920 and ~49px at 1440 while still roughly 2.4x the old air.
+     scripts/probe-join-hero-face.mjs reports both as `standGap`/`foldClear`. */
+  margin: clamp(24px, 3.4vh, 44px) auto 0;
   max-width: 72ch;
   text-align: center;
   font-family: var(--font-sans);
@@ -376,7 +485,16 @@
    so it was cropping the picture sideways — 14% of its width gone. 2.05
    lands the box at ~1.83:1, a hair wider than the source, so the tablet now
    keeps essentially all of the width and ~97% of the height. */
-@media (max-width: 1100px) {
+/* ⚠️ THE STEP IS GATED ON SHAPE, NOT WIDTH ALONE, AND THE HERO'S ONE-SCREEN
+   BUDGET IS WHY. 2.05 is the right ratio for a NARROW window — a portrait
+   tablet or a small laptop with room to spare below — and the wrong one for a
+   SHORT one. iPad landscape is 1024x768: on width alone it took the 2.05 step
+   and the band became 471px of a 713px first screen, which left ~57px for a
+   headline the type ramp wants to set at 104. Measured as foldClear -93.5 by
+   scripts/probe-join-hero-face.mjs before this gate existed.
+   5/4 rather than 4/3 because 1024x768 IS 4/3 exactly, and a breakpoint that
+   lands on the device it is being written for is a coin toss. */
+@media (max-width: 1100px) and (max-aspect-ratio: 5 / 4) {
   .heroBand {
     aspect-ratio: 2.05;
   }
@@ -405,7 +523,7 @@
 
    This is only the SEAT. The row is unchanged here — it stays one line with
    the two labels at opposite ends, exactly as it was before any of this. */
-@media (max-width: 860px) {
+@media (max-width: 1279px), (max-aspect-ratio: 3 / 2) {
   .heroLabels {
     position: static;
     margin-bottom: clamp(18px, 2.6vh, 34px);

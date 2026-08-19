@@ -149,5 +149,7 @@
   "147": "probe-doors.mjs",
   "148": "probe-mobile-audit.mjs",
   "149": "probe-overflow-mobile.mjs",
+  "150": "probe-blog-feature.mjs",
+  "151": "probe-blog-shot.mjs",
   "178": "JoinUs.tsx"
 }

@@ -23,10 +23,14 @@
                        t's terminal, at 1440. Visible at 1x, obvious at 4x.
        negative tracking  CSS applies `letter-spacing` after the LAST
                        character too, so a negative value pulls the mask's
-                       right edge INTO the final glyph. The hero headline
-                       runs -0.028em, which is 2.8px of that 2.5px on its
-                       own — i.e. the tighter the type is set, the more of it
-                       is cut.
+                       right edge INTO the final glyph. The hero headline ran
+                       -0.028em when this was measured, which is 2.8px of
+                       that 2.5px on its own — i.e. the tighter the type is
+                       set, the more of it is cut. (That headline has since
+                       gone to -0.01em with the Contralto caps setting, so
+                       it now asks LESS of this padding than the figure
+                       below was sized for. The floor is unchanged: it is
+                       the worst case across every caller, not this one.)
 
      0.1em, and it is bounded on both sides rather than picked. The FLOOR is
      the worst ink overhang measured across every SplitWords caller on the

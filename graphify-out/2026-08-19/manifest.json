@@ -45,8 +45,8 @@
     "semantic_hash": ""
   },
   "components/Blog.tsx": {
-    "mtime": 1787143021.9519145,
-    "ast_hash": "916509591963f08db9e2ee5c2e58e54b",
+    "mtime": 1787153374.736648,
+    "ast_hash": "028df60a653a5bd78fd32190eb22390a",
     "semantic_hash": ""
   },
   "components/BlogIndex.tsx": {
@@ -100,8 +100,8 @@
     "semantic_hash": ""
   },
   "components/Hero.tsx": {
-    "mtime": 1787152169.1789443,
-    "ast_hash": "2ad5e218525a219fbcd66ecbd98d96c7",
+    "mtime": 1787152559.4360597,
+    "ast_hash": "0819025e33f96ccb1c718229d8e4abff",
     "semantic_hash": ""
   },
   "components/JoinUs.tsx": {
@@ -695,8 +695,8 @@
     "semantic_hash": ""
   },
   "components/PressWall.tsx": {
-    "mtime": 1786725527.5028725,
-    "ast_hash": "2dcb5c3692adbcfce4c431aca6435d92",
+    "mtime": 1787152559.4350543,
+    "ast_hash": "ae63d0cf3925d323896b1a58142e2af8",
     "semantic_hash": ""
   },
   "components/Manifesto.tsx": {
@@ -1787,6 +1787,36 @@
   "scripts/probe-overflow-mobile.mjs": {
     "mtime": 1787151616.5232217,
     "ast_hash": "1951f41ab90ecbc8bfe0e091f1950235",
+    "semantic_hash": ""
+  },
+  "scripts/probe-backdrop-warm.mjs": {
+    "mtime": 1787152602.9481764,
+    "ast_hash": "ace34a7745aa2ef38335a0ae07d06b99",
+    "semantic_hash": ""
+  },
+  "scripts/probe-mobile-firstscreen.mjs": {
+    "mtime": 1787152481.0321155,
+    "ast_hash": "4e7d87ef2abde9bd9a44af6b79a549b8",
+    "semantic_hash": ""
+  },
+  "scripts/probe-mobile-shots.mjs": {
+    "mtime": 1787152724.7517102,
+    "ast_hash": "13e8260df459d260c4f5fb65a66b7c77",
+    "semantic_hash": ""
+  },
+  "scripts/probe-preload-attrs.mjs": {
+    "mtime": 1787152438.9865742,
+    "ast_hash": "e97ac28761a8f1b68d0b75383b6a42b9",
+    "semantic_hash": ""
+  },
+  "scripts/probe-blog-feature.mjs": {
+    "mtime": 1787152996.6030135,
+    "ast_hash": "b3b5f42fc7a24a604e20496556b9e9fd",
+    "semantic_hash": ""
+  },
+  "scripts/probe-blog-shot.mjs": {
+    "mtime": 1787152834.4825373,
+    "ast_hash": "0c4e20a7d18f9d31572096a135240ef7",
     "semantic_hash": ""
   }
 }
