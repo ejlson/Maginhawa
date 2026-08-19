@@ -22,3 +22,21 @@
 # splat. `:splat` is Cloudflare's spelling of what Next wrote as `:path*`.
 /join-us      /careers          308
 /join-us/*    /careers/:splat   308
+
+# ── /restaurants/<slug> → /restaurants ─────────────────────────────────────
+# The per-venue detail pages are gone. Every surface that used to link one now
+# points at the restaurant's own website instead, and there is no page here
+# for Belly, Bintang, Ramo or any of the others.
+#
+# 308 TO THE INDEX RATHER THAN A 404, and the difference matters to the eight
+# URLs Google has already indexed (they are sitelinks on the brand query). A
+# 404 makes a reader who clicks one a dead end and makes the crawler drop the
+# path with nothing to inherit it; a permanent redirect sends both to the page
+# that now holds everything those pages held — the grid of all eight, each
+# card carrying the menu and the venue's own site.
+#
+# THE SPLAT COVERS PATHS THAT NEVER EXISTED HERE, and one of them is why this
+# is a splat: /restaurants/maginhawa is indexed and was never a route in this
+# codebase, so it has been serving the 404 all along. It goes to the index
+# with the rest rather than being listed by hand.
+/restaurants/*    /restaurants    308

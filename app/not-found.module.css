@@ -1,0 +1,170 @@
+/* The 404's own sheet. Nothing here is shared with another route — an error
+   page that borrows a section's stylesheet is a section that can no longer
+   be changed without checking the error page. */
+
+.page {
+  background: var(--cream);
+  color: var(--maroon);
+  /* the nav is fixed and overlays the page; this is the clearance every
+     other route gives it */
+  padding-top: clamp(56px, 7vh, 92px);
+  overflow-x: clip;
+}
+
+/* THE HERO OWNS THE FIRST SCREEN and centres in it, the same arrangement
+   /careers uses: there is one short block of type here and it should sit in
+   the middle of the window rather than crowding the nav. `svh` because on a
+   phone `vh` is the toolbar-retracted height, which is not the height the
+   reader is looking at. */
+.hero {
+  min-height: calc(100svh - clamp(56px, 7vh, 92px));
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  /* the numeral is a wash behind the sentence and the two are the closest
+     pair on the page; 1.4vh let the title's ascenders climb to within ~12px
+     of the digits' feet at 1440, which reads as a collision even though the
+     boxes clear. Measured with scripts/probe-404.mjs. */
+  gap: clamp(24px, 3.2vh, 40px);
+  padding: 0 var(--grid-margin);
+  text-align: center;
+}
+
+.label {
+  margin: 0;
+  font-family: var(--font-ui);
+  font-weight: var(--w-regular);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--maroon) 68%, transparent);
+}
+
+/* THE NUMERAL. The wordmark's face at the wordmark's weight — Contralto's
+   big cut carries a drawn 600 — so the one large object on the page is in
+   the same voice as the name in the bar above it.
+
+   ⚠️ NO NEGATIVE MARGINS AND NO SUB-0.9 LINE-HEIGHT, and the first draft of
+   this block had both. At 22vw the digits' ink is TALLER than a 0.78 line
+   box, so the overflow sat over the sentence below and a negative margin
+   under it pulled the sentence up into the overflow as well — the headline
+   rendered through the middle of the 0. A line box that contains its own ink
+   is what keeps the flex `gap` meaning what it says.
+   14vw rather than 22: at 22 the numeral was 317px at 1440 and the page read
+   as a number with a caption. It is the page's texture, not its message. */
+.numeral {
+  margin: 0;
+  font-family: var(--font-display-big);
+  font-weight: 600;
+  font-size: clamp(5rem, 14vw, 11rem);
+  line-height: 0.95;
+  letter-spacing: -0.02em;
+  /* SOFTER THAN THE TYPE IT SITS OVER, deliberately. It is the largest thing
+     on the page and it is not the message — the sentence under it is. Full
+     --maroon at 15rem turns the page into a number with a caption. */
+  color: color-mix(in srgb, var(--maroon) 22%, transparent);
+  user-select: none;
+}
+
+.title {
+  margin: 0;
+  max-width: 20ch;
+  font-family: var(--font-display);
+  font-weight: var(--w-medium);
+  font-size: var(--t-display);
+  line-height: var(--lh-display);
+  letter-spacing: var(--tr-display);
+}
+
+.lede {
+  margin: 0;
+  max-width: 52ch;
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  line-height: 1.5;
+  color: color-mix(in srgb, var(--maroon) 82%, transparent);
+  text-wrap: pretty;
+}
+
+.cta {
+  margin-top: clamp(14px, 2vh, 26px);
+}
+
+/* ---- THE DOORS — the nav, restated as destinations ----
+   A row on desktop, a stack on a phone. Hairline-separated rather than
+   carded: this is a list of places, and eight boxes on an error page is a
+   dashboard. */
+.doors {
+  padding: clamp(48px, 8vh, 96px) var(--grid-margin) clamp(56px, 9vh, 110px);
+}
+
+.doorList {
+  display: grid;
+  /* auto-fit rather than a fixed count so the five doors reflow without a
+     breakpoint per column count; 15rem is the measure at which the longest
+     note ("Openings, press and recognitions") stops taking three lines */
+  grid-template-columns: repeat(auto-fit, minmax(15rem, 1fr));
+  gap: 0;
+  margin: 0 auto;
+  padding: 0;
+  max-width: 1200px;
+  list-style: none;
+  border-top: 1px solid var(--rule);
+}
+
+.door {
+  display: block;
+  padding: clamp(16px, 2.2vh, 24px) clamp(12px, 1.4vw, 20px)
+    clamp(16px, 2.2vh, 24px) 4px;
+  border-bottom: 1px solid var(--rule);
+  color: inherit;
+  text-decoration: none;
+  transition: background-color 0.25s var(--ease-entrance);
+}
+
+.door:hover,
+.door:focus-visible {
+  background: color-mix(in srgb, var(--maroon) 5%, transparent);
+}
+
+/* label and arrow on one baseline, the arrow immediately after the word */
+.doorHead {
+  display: flex;
+  align-items: baseline;
+  gap: 8px;
+}
+
+.doorLabel {
+  font-family: var(--font-display);
+  font-weight: var(--w-medium);
+  font-size: clamp(1.15rem, 1.8vw, 1.5rem);
+  line-height: 1.1;
+}
+
+.doorNote {
+  display: block;
+  margin-top: 4px;
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  line-height: 1.4;
+  color: color-mix(in srgb, var(--maroon) 66%, transparent);
+}
+
+.doorArrow {
+  font-size: 1rem;
+  color: color-mix(in srgb, var(--maroon) 55%, transparent);
+  transition: transform 0.25s var(--ease-entrance);
+}
+
+.door:hover .doorArrow,
+.door:focus-visible .doorArrow {
+  transform: translateX(4px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .door,
+  .doorArrow {
+    transition: none;
+  }
+}

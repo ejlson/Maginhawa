@@ -1818,5 +1818,10 @@
     "mtime": 1787152834.4825373,
     "ast_hash": "0c4e20a7d18f9d31572096a135240ef7",
     "semantic_hash": ""
+  },
+  "scripts/probe-join-hero-face.mjs": {
+    "mtime": 1787155367.7905514,
+    "ast_hash": "1955675d382cf657157e37c0478068d3",
+    "semantic_hash": ""
   }
 }

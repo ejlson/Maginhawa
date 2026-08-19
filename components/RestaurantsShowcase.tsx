@@ -5,7 +5,6 @@ import { motion, useAnimationControls } from "framer-motion";
 import styles from "./RestaurantsShowcase.module.css";
 import Nav from "./Nav";
 import Menu from "./Menu";
-import { useRouteTransition } from "./PageTransition";
 import VideoBackdrop from "./VideoBackdrop";
 // THE GRID VIEW'S CARD, shared with the home page's Discover grid. It is
 // the same object at a different aspect — see the derivation in
@@ -232,7 +231,6 @@ export default function RestaurantsShowcase() {
   const [view, setView] = useState<"wheel" | "cards">("wheel");
   // slug of the restaurant whose menu modal is currently open (or null)
   const [menuFor, setMenuFor] = useState<string | null>(null);
-  const navigate = useRouteTransition();
 
   // helper: open the menu overlay for a given display name, but only if the
   // restaurant actually has menu pages set in lib/restaurants.ts
@@ -975,9 +973,17 @@ export default function RestaurantsShowcase() {
             </div>
 
             <div className={styles.actions}>
-              {/* Visit → the restaurant's own site in a new tab; the
-                  internal detail page (footer-linked) is the fallback */}
-              {getWebsite(item.name) ? (
+              {/* VISIT → THE RESTAURANT'S OWN SITE, IN A NEW TAB, OR NOTHING.
+                  There used to be a `<button>` fallback here that pushed to
+                  `/restaurants/<slug>`, this site's own page for the venue.
+                  That route is gone, so the fallback would be a pill labelled
+                  "Visit Belly" that goes nowhere in particular — and the wheel
+                  still has Book a Table beside it for the bookable rooms, so a
+                  venue with no site of its own is not left with an empty row so
+                  much as with one honest control instead of two.
+                  Every venue on file has a `website` today; this is the shape
+                  the slot takes the day one does not. */}
+              {getWebsite(item.name) && (
                 <motion.a
                   custom={0}
                   initial={{ opacity: 0, y: 10 }}
@@ -990,21 +996,6 @@ export default function RestaurantsShowcase() {
                   <span className={styles.actLabel}>Visit {item.name}</span>
                   <span aria-hidden>→</span>
                 </motion.a>
-              ) : (
-                <motion.button
-                  custom={0}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={actionsCtl}
-                  type="button"
-                  className={`${styles.actBtn} ${styles.actBtnSolid}`}
-                  onClick={() => {
-                    const slug = SLUG_BY_NAME[item.name];
-                    if (slug) navigate(`/restaurants/${slug}`);
-                  }}
-                >
-                  <span className={styles.actLabel}>Visit {item.name}</span>
-                  <span aria-hidden>→</span>
-                </motion.button>
               )}
               {getBookingUrl(item.name) && (
                 <motion.a
@@ -1112,15 +1103,17 @@ export default function RestaurantsShowcase() {
                      instruction — the same destination the card's Visit
                      pill and the wheel's Visit action already carry, so
                      the whole card and the control inside it now agree.
-                     It USED to open /restaurants/[slug]; that page is
-                     still reachable from the footer and from anywhere
-                     else that links a venue, it is simply no longer what
-                     a press on the picture means.
+                     It USED to open /restaurants/[slug], and that route
+                     has since been removed outright, so the venue's own
+                     site is no longer the PREFERRED destination — it is
+                     the only one.
 
-                     THE INTERNAL PAGE IS THE FALLBACK, not a second
-                     behaviour: a venue with no `website` on file still
-                     has somewhere to go, and it goes there through the
-                     route transition rather than a bare push.
+                     A VENUE WITH NO `website` FALLS BACK TO THE MENU,
+                     which is an overlay this page already mounts, rather
+                     than to a page that does not exist. It is the one
+                     thing a picture of a restaurant can still open in
+                     place, and if there are no menu pages either the
+                     card prints no press at all — `hasMenu` gates it.
 
                      A NEW TAB, because every other external destination
                      on this site opens in one (the wheel's Visit, the
@@ -1132,14 +1125,14 @@ export default function RestaurantsShowcase() {
                   onPress={() => {
                     const site = getRestaurant(v.slug)?.website;
                     if (site) window.open(site, "_blank", "noopener,noreferrer");
-                    else navigate(`/restaurants/${v.slug}`);
+                    else setMenuFor(v.slug);
                   }}
                   /* names the DESTINATION, since the press no longer opens
                      a page on this site */
                   pressLabel={
                     getRestaurant(v.slug)?.website
                       ? `Visit ${v.name} — opens their website in a new tab`
-                      : `Open ${v.name}`
+                      : `${v.name} menu`
                   }
                   /* passed unconditionally: the card itself is what knows
                      whether there is a menu behind the control, so the

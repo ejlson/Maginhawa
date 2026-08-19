@@ -3,9 +3,8 @@
 // Perplexity, Google AI Overviews, Bing) ingest reliably. Inject via
 // <script type="application/ld+json"> in a Server Component.
 
-import type { Restaurant } from "./restaurants";
 import { RESTAURANTS } from "./restaurants";
-import { PRESS, pressForRestaurant } from "./press";
+import { PRESS } from "./press";
 
 import { SITE_URL } from "./site";
 
@@ -27,11 +26,25 @@ export function OrganizationJsonLd() {
     foundingLocation: { "@type": "Place", name: "London, United Kingdom" },
     areaServed: { "@type": "City", name: "London" },
     sameAs: orgSameAs,
+    /* ---- THE DEPARTMENTS POINT AT THE VENUES' OWN SITES ----
+       They used to point at `${SITE_URL}/restaurants/<slug>`, and those
+       pages are gone (see `public/_redirects`). A `url` that 308s to an
+       index is a worse signal than no page at all: the crawler is told
+       "this restaurant lives here", follows it, and lands on a grid of
+       eight.
+
+       So `url` is now the venue's OWN website, which is the canonical page
+       for that restaurant on the web and always was. The `@id` stays on
+       this site — it is an identifier, not a destination, and it is what
+       the group's own pages join their records on — but it is now a
+       fragment of the surviving /restaurants index rather than of a URL
+       that no longer resolves. A venue with no site of its own keeps the
+       index as its url, which is the truest page there is for it. */
     department: RESTAURANTS.map((r) => ({
       "@type": r.bookable ? "Restaurant" : "FoodEstablishment",
-      "@id": `${SITE_URL}/restaurants/${r.slug}#restaurant`,
+      "@id": `${SITE_URL}/restaurants#${r.slug}`,
       name: r.name,
-      url: `${SITE_URL}/restaurants/${r.slug}`,
+      url: r.website ?? `${SITE_URL}/restaurants`,
     })),
   };
   return (
@@ -60,52 +73,21 @@ export function WebSiteJsonLd() {
   );
 }
 
-export function RestaurantJsonLd({ restaurant }: { restaurant: Restaurant }) {
-  const mentions = pressForRestaurant(restaurant.slug);
-  const data: Record<string, unknown> = {
-    "@context": "https://schema.org",
-    "@type": restaurant.bookable ? "Restaurant" : "FoodEstablishment",
-    "@id": `${SITE_URL}/restaurants/${restaurant.slug}#restaurant`,
-    name: restaurant.name,
-    url: `${SITE_URL}/restaurants/${restaurant.slug}`,
-    image: `${SITE_URL}${restaurant.image}`,
-    logo: `${SITE_URL}${restaurant.logo}`,
-    description: restaurant.description,
-    servesCuisine: restaurant.cuisine,
-    parentOrganization: { "@id": `${SITE_URL}/#organization` },
-    address: {
-      "@type": "PostalAddress",
-      addressLocality: restaurant.location.split(",")[0].trim(),
-      addressCountry: "GB",
-    },
-    areaServed: { "@type": "City", name: "London" },
-    acceptsReservations: restaurant.bookable,
-  };
-  /* Schema.org's `priceRange` was emitted here from `Restaurant.priceRange`
-     and is gone with the field. It is an OPTIONAL property on Restaurant —
-     omitting it is valid structured data, not an incomplete record — and
-     Google treats it as a rich-result enhancement rather than a
-     requirement, so nothing here becomes ineligible. Search may stop
-     showing a price band for these venues; that is the intended effect of
-     no longer publishing one. */
-  if (mentions.length) {
-    data.subjectOf = mentions.map((p) => ({
-      "@type": "NewsArticle",
-      headline: p.feature,
-      publisher: { "@type": "Organization", name: p.outlet },
-      url: p.url,
-    }));
-  }
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
-    />
-  );
-}
+/* `RestaurantJsonLd` STOOD HERE AND IS GONE WITH ITS ONLY CALLER, the
+   per-venue detail route (app/restaurants/[slug]). It emitted a full
+   Restaurant record — press mentions as `subjectOf`, address, cuisine — for
+   a page that no longer exists, and structured data describing a missing
+   page is worse than none: it is a claim a crawler can check and find
+   false.
 
-// Surfaces aggregated press as a "Collection" — useful for the home page
-// where the entire group is being presented.
+   WHAT SURVIVES OF IT is the `department` list in OrganizationJsonLd above,
+   which still names every venue, still types the bookable ones as
+   Restaurant, and now points each at the site that does have a page for it.
+   The press mentions survive in `ArticleJsonLd`/PRESS on the journal.
+
+   Restoring a per-venue record means restoring a per-venue PAGE first —
+   the record's `url` is the whole point of it. */
+
 export function GroupPressJsonLd() {
   const data = {
     "@context": "https://schema.org",

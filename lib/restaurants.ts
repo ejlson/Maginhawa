@@ -253,9 +253,18 @@ export function primaryAction(r: Restaurant): VenueAction | null {
 
   if (r.website) return { label: "Visit", href: r.website, external: true };
 
-  // no booking host and no site of their own: the group's own page for the
-  // venue is still a real destination, and it carries the menu
-  return { label: "View", href: `/restaurants/${r.slug}`, external: false };
+  /* NO BOOKING HOST AND NO SITE OF THEIR OWN — AND NOW NO PAGE HERE EITHER.
+     This used to fall back to `/restaurants/<slug>`, the group's own detail
+     page for the venue, which carried the menu. That route is gone, so the
+     honest answer is that there is no single destination for this venue and
+     the tile prints no action rather than a control that goes somewhere
+     approximate.
+
+     It is not a dead branch waiting to be deleted: every venue on file today
+     has a `website`, so nothing hits it, and the moment one does not, the
+     failure mode should be a missing pill rather than a wrong one. The menu
+     is unaffected — it is an overlay the card opens in place, not a link. */
+  return null;
 }
 
 

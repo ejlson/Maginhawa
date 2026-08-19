@@ -1,7 +1,6 @@
 "use client";
 
 import Image from "next/image";
-import Link from "next/link";
 import { useRef, useState } from "react";
 import {
   motion,
@@ -14,6 +13,7 @@ import {
 import styles from "./AboutSplit.module.css";
 import PillCta from "./PillCta";
 import { asset } from "@/lib/media";
+import { getRestaurant } from "@/lib/restaurants";
 
 /**
  * The group's story, as a 50/50 split — photograph left, text right.
@@ -129,6 +129,15 @@ const DOORS = [
   { slug: "ramo", label: "Filipino-Japanese", src: "/images/ourrestaurants/print-10-web.jpg" },
   { slug: "guanabana", label: "Caribbean", src: "/images/manifesto/group-web.jpg" },
 ];
+
+/* Each door's destination, read from the canonical record rather than
+   written out here — the slug is the only thing this file should have to
+   know about a venue. `/restaurants` is the floor: a venue with no site of
+   its own still has the index, and a door that opens onto nothing is worse
+   than one that opens onto the grid it belongs to. */
+const SITE_BY_SLUG: Record<string, string> = Object.fromEntries(
+  DOORS.map((d) => [d.slug, getRestaurant(d.slug)?.website ?? "/restaurants"]),
+);
 
 /* ══════════ THE ENTRANCE ══════════
    This chapter had NO entrance at all — the only motion in the file was the
@@ -1119,10 +1128,22 @@ export default function AboutSplit() {
             <motion.ul className={styles.doors} variants={pick(DOOR_ROW)}>
               {DOORS.map((d, i) => (
                 <motion.li key={d.slug} variants={pick(DOOR_IN)} custom={i}>
-                  <Link
-                    href={`/restaurants/${d.slug}`}
+                  {/* THE VENUE'S OWN SITE, IN A NEW TAB. These pointed at
+                      `/restaurants/<slug>` — this site's page for the room —
+                      and that route has been removed, so the door opens onto
+                      the restaurant's own site instead. It is a real external
+                      link rather than a routed one, so `<a>` rather than
+                      `<Link>`, with `noopener` for the same reason every
+                      other outbound link here carries it.
+                      The accessible name says where it goes: a door that
+                      leaves the site should say so before it is pressed, not
+                      after. */}
+                  <a
+                    href={SITE_BY_SLUG[d.slug]}
+                    target="_blank"
+                    rel="noopener noreferrer"
                     className={styles.door}
-                    aria-label={`${d.label} — see the restaurant`}
+                    aria-label={`${d.label} — visit the restaurant's website, opens in a new tab`}
                   >
                     <span className={styles.doorFrame}>
                       <motion.span
@@ -1139,7 +1160,7 @@ export default function AboutSplit() {
                         />
                       </motion.span>
                     </span>
-                  </Link>
+                  </a>
                 </motion.li>
               ))}
             </motion.ul>

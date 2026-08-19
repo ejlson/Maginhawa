@@ -9,7 +9,6 @@ import {
   type CSSProperties,
 } from "react";
 import Image, { getImageProps } from "next/image";
-import Link from "next/link";
 import {
   cubicBezier,
   motion,
@@ -942,13 +941,24 @@ function TimelineItem({ chapter }: { chapter: (typeof STORY)[number] }) {
 
         <h3 className={styles.storyTitle}>
           <span className={styles.titleInner}>
-            {chapter.slug ? (
-              <Link
-                href={`/restaurants/${chapter.slug}`}
+            {/* THE CHAPTER TITLE LINKS OUT, OR NOT AT ALL. It used to open
+                `/restaurants/<slug>`, this site's page for the room; that
+                route is gone, so the destination is the restaurant's own
+                site — an external link, in a new tab, like every other
+                outbound link here. A chapter whose venue has no site of its
+                own prints as plain type rather than as a link to the
+                index: the title is a heading first, and a heading that
+                navigates somewhere generic is a worse promise than one
+                that does not navigate at all. */}
+            {chapter.slug && getRestaurant(chapter.slug)?.website ? (
+              <a
+                href={getRestaurant(chapter.slug)!.website}
+                target="_blank"
+                rel="noopener noreferrer"
                 className={styles.storyLink}
               >
                 {chapter.title}
-              </Link>
+              </a>
             ) : (
               chapter.title
             )}
