@@ -73,7 +73,7 @@ export default function LegalPage({
       />
       <Menu open={menuOpen} onClose={() => setMenuOpen(false)} />
 
-      <main className={styles.page}>
+      <main id="main-content" className={styles.page}>
         <article className={styles.doc}>
           <header className={styles.head}>
             {/* THE PAGE'S <h1>, AND THERE IS EXACTLY ONE. Both legal routes

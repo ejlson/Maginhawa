@@ -71,6 +71,44 @@ export default function PrivacyPage() {
         title="Privacy Notice"
         standfirst="What this website collects, why, who else sees it, and what you can ask us to do about it."
       >
+        {/* ── A SUMMARY, AND IT IS NOT A SUBSTITUTE FOR THE NOTICE ──
+            Added after reviewing this against a standard privacy-policy
+            template (Termly's), which opens the same way. The reason it is
+            worth having is that almost nobody reads a privacy notice
+            end-to-end; a reader arrives with ONE question, usually "do you
+            sell my data" or "what did you just set". Six lines they will
+            actually read beats twelve sections they will not.
+            ⚠️ EVERY CLAIM HERE IS REPEATED IN FULL BELOW. A summary that
+            says something the body does not is the worst kind of error in
+            this document, because the summary is the part that gets read. */}
+        <h2>The short version</h2>
+        <ul>
+          <li>
+            <strong>We do not sell your personal information</strong>, and we
+            never share it with anyone for their own marketing.
+          </li>
+          <li>
+            <strong>No cookies are set until you agree to them.</strong> If you
+            decline, or ignore the banner, no analytics or advertising script
+            is loaded at all.
+          </li>
+          <li>
+            <strong>We have no accounts and no passwords.</strong> This site
+            stores nothing about you on a server of ours — there isn&rsquo;t
+            one.
+          </li>
+          <li>
+            The only information you actively give us arrives by{" "}
+            <strong>ordinary email</strong>, because our forms open a draft in
+            your own email app rather than posting anywhere.
+          </li>
+          <li>
+            You can ask us for a copy of what we hold, or to delete it, at any
+            time — free, at{" "}
+            <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>.
+          </li>
+        </ul>
+
         <h2>Who we are</h2>
         <p>
           Maginhawa Group is a London family of restaurants. For the purposes
@@ -435,6 +473,81 @@ export default function PrivacyPage() {
               <Pending what="ICO registration reference" />.
             </>
           )}
+        </p>
+
+        <h2>How we keep your information safe</h2>
+        <p>
+          The strongest security measure this site has is how little it does.
+          There is no database, no login, no password and no server of ours
+          running at request time — the whole site is a set of static files, so
+          there is no store of customer data here to breach.
+        </p>
+        <p>Beyond that:</p>
+        <ul>
+          <li>
+            Everything is served over <strong>HTTPS</strong> and the site is
+            HSTS-preloaded, so a browser will not connect to it insecurely even
+            if asked to.
+          </li>
+          <li>
+            A <strong>Content Security Policy</strong> restricts what the page
+            is allowed to load and where it may send anything, which is what
+            stops an injected script from quietly shipping data elsewhere.
+          </li>
+          <li>
+            The site cannot be framed by another site, and browsers are told
+            not to guess at file types — the two settings behind most
+            clickjacking and content-sniffing attacks.
+          </li>
+          <li>
+            Enquiries and applications reach us as ordinary email and are
+            protected by our email provider&rsquo;s security, and by the access
+            controls on the accounts that read them.
+          </li>
+        </ul>
+        <p>
+          No method of transmission over the internet is completely secure, and
+          we cannot promise otherwise. If you ever believe something has gone
+          wrong, tell us at{" "}
+          <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a> and we will
+          look into it.
+        </p>
+
+        <h2>Other websites we link to</h2>
+        <p>
+          We link out to our restaurants&rsquo; own sites, to booking platforms,
+          to Google Maps, to our Instagram and to publications who have written
+          about us. Once you follow one of those links you are on somebody
+          else&rsquo;s site, under their privacy policy, and we have no control
+          over and no responsibility for what they collect. A link from us is
+          not an endorsement of their privacy practices.
+        </p>
+
+        <h2>Automated decisions and profiling</h2>
+        <p>
+          <strong>
+            We do not make any decision about you by automated means, and we do
+            not profile you.
+          </strong>{" "}
+          Nothing on this site scores, ranks or sorts individual people, and no
+          decision affecting you is taken without a person involved. If you
+          accept marketing cookies, the advertising platforms named above build
+          their own audiences on their own systems — that is their processing,
+          described in their policies, and it is the one thing declining
+          marketing cookies switches off entirely.
+        </p>
+
+        <h2>Do Not Track and Global Privacy Control</h2>
+        <p>
+          Most browsers can send a &ldquo;Do Not Track&rdquo; signal. There is
+          still no agreed standard for what a website should do with it, so —
+          like most sites — we do not respond to it specifically. We would
+          rather not claim to honour a signal whose meaning nobody agrees on.
+        </p>
+        <p>
+          It makes no practical difference here: nothing is tracked on this site
+          unless you have actively accepted it, which is a stronger position
+          than responding to the signal would give you.
         </p>
 
         <h2>Children</h2>

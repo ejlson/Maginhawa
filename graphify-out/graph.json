@@ -10,8 +10,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_about_page",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 165,
+      "community_name": "page.tsx",
       "norm_label": "page.tsx"
     },
     {
@@ -21,8 +21,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "app_about_page_jsonld",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 165,
+      "community_name": "page.tsx",
       "norm_label": "jsonld"
     },
     {
@@ -32,8 +32,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "app_about_page_metadata",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 165,
+      "community_name": "page.tsx",
       "norm_label": "metadata"
     },
     {
@@ -43,8 +43,8 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "app_about_page_aboutpage",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 165,
+      "community_name": "page.tsx",
       "norm_label": "aboutpage()"
     },
     {
@@ -175,8 +175,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_contact_page",
-      "community": 101,
-      "community_name": "q",
+      "community": 134,
+      "community_name": "getRestaurant",
       "norm_label": "page.tsx"
     },
     {
@@ -186,8 +186,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "app_contact_page_jsonld",
-      "community": 101,
-      "community_name": "q",
+      "community": 134,
+      "community_name": "getRestaurant",
       "norm_label": "jsonld"
     },
     {
@@ -197,8 +197,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "app_contact_page_metadata",
-      "community": 101,
-      "community_name": "q",
+      "community": 134,
+      "community_name": "getRestaurant",
       "norm_label": "metadata"
     },
     {
@@ -208,8 +208,8 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "app_contact_page_page",
-      "community": 101,
-      "community_name": "q",
+      "community": 134,
+      "community_name": "getRestaurant",
       "norm_label": "page()"
     },
     {
@@ -1209,8 +1209,8 @@
       "source_location": "L815",
       "_origin": "ast",
       "id": "components_about_subscribenarrow",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 166,
+      "community_name": "TimelineItem",
       "norm_label": "subscribenarrow()"
     },
     {
@@ -1220,8 +1220,8 @@
       "source_location": "L820",
       "_origin": "ast",
       "id": "components_about_narrowsnapshot",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 166,
+      "community_name": "TimelineItem",
       "norm_label": "narrowsnapshot()"
     },
     {
@@ -1231,8 +1231,8 @@
       "source_location": "L823",
       "_origin": "ast",
       "id": "components_about_narrowserversnapshot",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 166,
+      "community_name": "TimelineItem",
       "norm_label": "narrowserversnapshot()"
     },
     {
@@ -1242,8 +1242,8 @@
       "source_location": "L825",
       "_origin": "ast",
       "id": "components_about_timelineitem",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 166,
+      "community_name": "TimelineItem",
       "norm_label": "timelineitem()"
     },
     {
@@ -1473,7 +1473,7 @@
       "source_location": "L635",
       "_origin": "ast",
       "id": "components_aboutsplit_aboutsplit",
-      "community": 91,
+      "community": 61,
       "community_name": "RestaurantsShowcase.tsx",
       "norm_label": "aboutsplit()"
     },
@@ -1759,8 +1759,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_contact",
-      "community": 112,
-      "community_name": "page.tsx",
+      "community": 161,
+      "community_name": "unist-util-visit",
       "norm_label": "contact.tsx"
     },
     {
@@ -1770,8 +1770,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "components_contact_contactprops",
-      "community": 112,
-      "community_name": "page.tsx",
+      "community": 161,
+      "community_name": "unist-util-visit",
       "norm_label": "contactprops"
     },
     {
@@ -1781,8 +1781,8 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "components_contact_values",
-      "community": 112,
-      "community_name": "page.tsx",
+      "community": 161,
+      "community_name": "unist-util-visit",
       "norm_label": "values"
     },
     {
@@ -1792,8 +1792,8 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "components_contact_errors",
-      "community": 112,
-      "community_name": "page.tsx",
+      "community": 161,
+      "community_name": "unist-util-visit",
       "norm_label": "errors"
     },
     {
@@ -1803,8 +1803,8 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "components_contact_empty",
-      "community": 112,
-      "community_name": "page.tsx",
+      "community": 161,
+      "community_name": "unist-util-visit",
       "norm_label": "empty"
     },
     {
@@ -1814,8 +1814,8 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "components_contact_validate",
-      "community": 112,
-      "community_name": "page.tsx",
+      "community": 161,
+      "community_name": "unist-util-visit",
       "norm_label": "validate()"
     },
     {
@@ -1825,8 +1825,8 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "components_contact_contact",
-      "community": 112,
-      "community_name": "page.tsx",
+      "community": 161,
+      "community_name": "unist-util-visit",
       "norm_label": "contact()"
     },
     {
@@ -1836,8 +1836,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_contactpage",
-      "community": 91,
-      "community_name": "RestaurantsShowcase.tsx",
+      "community": 134,
+      "community_name": "getRestaurant",
       "norm_label": "contactpage.tsx"
     },
     {
@@ -1847,8 +1847,8 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "components_contactpage_visitable",
-      "community": 91,
-      "community_name": "RestaurantsShowcase.tsx",
+      "community": 134,
+      "community_name": "getRestaurant",
       "norm_label": "visitable"
     },
     {
@@ -1858,8 +1858,8 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "components_contactpage_mapurl",
-      "community": 91,
-      "community_name": "RestaurantsShowcase.tsx",
+      "community": 134,
+      "community_name": "getRestaurant",
       "norm_label": "mapurl()"
     },
     {
@@ -1869,8 +1869,8 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "components_contactpage_contactpage",
-      "community": 91,
-      "community_name": "RestaurantsShowcase.tsx",
+      "community": 134,
+      "community_name": "getRestaurant",
       "norm_label": "contactpage()"
     },
     {
@@ -1946,7 +1946,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_darkzone",
-      "community": 91,
+      "community": 61,
       "community_name": "RestaurantsShowcase.tsx",
       "norm_label": "darkzone.tsx"
     },
@@ -1957,7 +1957,7 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "components_darkzone_darkzone",
-      "community": 91,
+      "community": 61,
       "community_name": "RestaurantsShowcase.tsx",
       "norm_label": "darkzone()"
     },
@@ -2089,7 +2089,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_experience",
-      "community": 91,
+      "community": 61,
       "community_name": "RestaurantsShowcase.tsx",
       "norm_label": "experience.tsx"
     },
@@ -2100,7 +2100,7 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "components_experience_hero_insets",
-      "community": 91,
+      "community": 61,
       "community_name": "RestaurantsShowcase.tsx",
       "norm_label": "hero_insets"
     },
@@ -2111,7 +2111,7 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "components_experience_experience",
-      "community": 91,
+      "community": 61,
       "community_name": "RestaurantsShowcase.tsx",
       "norm_label": "experience()"
     },
@@ -2166,8 +2166,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_footer",
-      "community": 83,
-      "community_name": "shoot-about-rules.mjs",
+      "community": 91,
+      "community_name": "RestaurantsShowcase.tsx",
       "norm_label": "footer.tsx"
     },
     {
@@ -2177,8 +2177,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "components_footer_ease",
-      "community": 83,
-      "community_name": "shoot-about-rules.mjs",
+      "community": 91,
+      "community_name": "RestaurantsShowcase.tsx",
       "norm_label": "ease"
     },
     {
@@ -2188,8 +2188,8 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "components_footer_wordmark_mask",
-      "community": 83,
-      "community_name": "shoot-about-rules.mjs",
+      "community": 91,
+      "community_name": "RestaurantsShowcase.tsx",
       "norm_label": "wordmark_mask"
     },
     {
@@ -2199,8 +2199,8 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "components_footer_wordmark_rise",
-      "community": 83,
-      "community_name": "shoot-about-rules.mjs",
+      "community": 91,
+      "community_name": "RestaurantsShowcase.tsx",
       "norm_label": "wordmark_rise"
     },
     {
@@ -2210,8 +2210,8 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "components_footer_wordmark_fade",
-      "community": 83,
-      "community_name": "shoot-about-rules.mjs",
+      "community": 91,
+      "community_name": "RestaurantsShowcase.tsx",
       "norm_label": "wordmark_fade"
     },
     {
@@ -2221,8 +2221,8 @@
       "source_location": "L53",
       "_origin": "ast",
       "id": "components_footer_footlink",
-      "community": 83,
-      "community_name": "shoot-about-rules.mjs",
+      "community": 91,
+      "community_name": "RestaurantsShowcase.tsx",
       "norm_label": "footlink"
     },
     {
@@ -2232,8 +2232,8 @@
       "source_location": "L59",
       "_origin": "ast",
       "id": "components_footer_explore",
-      "community": 83,
-      "community_name": "shoot-about-rules.mjs",
+      "community": 91,
+      "community_name": "RestaurantsShowcase.tsx",
       "norm_label": "explore"
     },
     {
@@ -2243,8 +2243,8 @@
       "source_location": "L71",
       "_origin": "ast",
       "id": "components_footer_contact_links",
-      "community": 83,
-      "community_name": "shoot-about-rules.mjs",
+      "community": 91,
+      "community_name": "RestaurantsShowcase.tsx",
       "norm_label": "contact_links"
     },
     {
@@ -2254,8 +2254,8 @@
       "source_location": "L87",
       "_origin": "ast",
       "id": "components_footer_legal",
-      "community": 83,
-      "community_name": "shoot-about-rules.mjs",
+      "community": 91,
+      "community_name": "RestaurantsShowcase.tsx",
       "norm_label": "legal"
     },
     {
@@ -2276,8 +2276,8 @@
       "source_location": "L121",
       "_origin": "ast",
       "id": "components_footer_footer",
-      "community": 83,
-      "community_name": "shoot-about-rules.mjs",
+      "community": 91,
+      "community_name": "RestaurantsShowcase.tsx",
       "norm_label": "footer()"
     },
     {
@@ -2515,7 +2515,7 @@
       "label": "PILLARS",
       "file_type": "code",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L26",
+      "source_location": "L27",
       "_origin": "ast",
       "id": "components_joinus_pillars",
       "community": 178,
@@ -2526,7 +2526,7 @@
       "label": "HERO_LINES",
       "file_type": "code",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L112",
+      "source_location": "L113",
       "_origin": "ast",
       "id": "components_joinus_hero_lines",
       "community": 178,
@@ -2537,7 +2537,7 @@
       "label": "SPLIT_SPRING",
       "file_type": "code",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L174",
+      "source_location": "L175",
       "_origin": "ast",
       "id": "components_joinus_split_spring",
       "community": 178,
@@ -2548,7 +2548,7 @@
       "label": "INTRO_ENDS_AT",
       "file_type": "code",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L212",
+      "source_location": "L213",
       "_origin": "ast",
       "id": "components_joinus_intro_ends_at",
       "community": 178,
@@ -2559,7 +2559,7 @@
       "label": "HeroLabel()",
       "file_type": "code",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L252",
+      "source_location": "L253",
       "_origin": "ast",
       "id": "components_joinus_herolabel",
       "community": 178,
@@ -2570,7 +2570,7 @@
       "label": "DIAL_CODES",
       "file_type": "code",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L271",
+      "source_location": "L272",
       "_origin": "ast",
       "id": "components_joinus_dial_codes",
       "community": 178,
@@ -2581,7 +2581,7 @@
       "label": "DIGITS",
       "file_type": "code",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L298",
+      "source_location": "L299",
       "_origin": "ast",
       "id": "components_joinus_digits",
       "community": 178,
@@ -2592,7 +2592,7 @@
       "label": "FlipDigit()",
       "file_type": "code",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L302",
+      "source_location": "L303",
       "_origin": "ast",
       "id": "components_joinus_flipdigit",
       "community": 178,
@@ -2603,7 +2603,7 @@
       "label": "PositionCount()",
       "file_type": "code",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L375",
+      "source_location": "L376",
       "_origin": "ast",
       "id": "components_joinus_positioncount",
       "community": 178,
@@ -2614,7 +2614,7 @@
       "label": "Chevron()",
       "file_type": "code",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L417",
+      "source_location": "L418",
       "_origin": "ast",
       "id": "components_joinus_chevron",
       "community": 178,
@@ -2625,7 +2625,7 @@
       "label": "clamp01()",
       "file_type": "code",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L437",
+      "source_location": "L438",
       "_origin": "ast",
       "id": "components_joinus_clamp01",
       "community": 178,
@@ -2636,7 +2636,7 @@
       "label": "inkBox()",
       "file_type": "code",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L458",
+      "source_location": "L459",
       "_origin": "ast",
       "id": "components_joinus_inkbox",
       "community": 178,
@@ -2647,7 +2647,7 @@
       "label": "JoinUs()",
       "file_type": "code",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L481",
+      "source_location": "L482",
       "_origin": "ast",
       "id": "components_joinus_joinus",
       "community": 178,
@@ -2661,7 +2661,7 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_journalpost",
-      "community": 91,
+      "community": 61,
       "community_name": "RestaurantsShowcase.tsx",
       "norm_label": "journalpost.tsx"
     },
@@ -3046,8 +3046,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_menu",
-      "community": 91,
-      "community_name": "RestaurantsShowcase.tsx",
+      "community": 83,
+      "community_name": "shoot-about-rules.mjs",
       "norm_label": "menu.tsx"
     },
     {
@@ -3057,8 +3057,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "components_menu_items",
-      "community": 91,
-      "community_name": "RestaurantsShowcase.tsx",
+      "community": 83,
+      "community_name": "shoot-about-rules.mjs",
       "norm_label": "items"
     },
     {
@@ -3068,8 +3068,8 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "components_menu_menu",
-      "community": 91,
-      "community_name": "RestaurantsShowcase.tsx",
+      "community": 83,
+      "community_name": "shoot-about-rules.mjs",
       "norm_label": "menu()"
     },
     {
@@ -3101,8 +3101,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_nav",
-      "community": 91,
-      "community_name": "RestaurantsShowcase.tsx",
+      "community": 83,
+      "community_name": "shoot-about-rules.mjs",
       "norm_label": "nav.tsx"
     },
     {
@@ -3112,8 +3112,8 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "components_nav_theme",
-      "community": 91,
-      "community_name": "RestaurantsShowcase.tsx",
+      "community": 83,
+      "community_name": "shoot-about-rules.mjs",
       "norm_label": "theme"
     },
     {
@@ -3123,8 +3123,8 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "components_nav_getnavtheme",
-      "community": 91,
-      "community_name": "RestaurantsShowcase.tsx",
+      "community": 83,
+      "community_name": "shoot-about-rules.mjs",
       "norm_label": "getnavtheme()"
     },
     {
@@ -3134,8 +3134,8 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "components_nav_links",
-      "community": 91,
-      "community_name": "RestaurantsShowcase.tsx",
+      "community": 83,
+      "community_name": "shoot-about-rules.mjs",
       "norm_label": "links"
     },
     {
@@ -3145,8 +3145,8 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "components_nav_uselinksleft",
-      "community": 91,
-      "community_name": "RestaurantsShowcase.tsx",
+      "community": 83,
+      "community_name": "shoot-about-rules.mjs",
       "norm_label": "uselinksleft()"
     },
     {
@@ -3156,8 +3156,8 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "components_nav_nav",
-      "community": 91,
-      "community_name": "RestaurantsShowcase.tsx",
+      "community": 83,
+      "community_name": "shoot-about-rules.mjs",
       "norm_label": "nav()"
     },
     {
@@ -4564,8 +4564,8 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "lib_contact_socials",
-      "community": 83,
-      "community_name": "shoot-about-rules.mjs",
+      "community": 91,
+      "community_name": "RestaurantsShowcase.tsx",
       "norm_label": "socials"
     },
     {
@@ -4707,8 +4707,8 @@
       "source_location": "L91",
       "_origin": "ast",
       "id": "lib_jsonld_grouppressjsonld",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 160,
+      "community_name": "press.ts",
       "norm_label": "grouppressjsonld()"
     },
     {
@@ -5015,8 +5015,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_press",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 160,
+      "community_name": "press.ts",
       "norm_label": "press.ts"
     },
     {
@@ -5026,8 +5026,8 @@
       "source_location": "L6",
       "_origin": "ast",
       "id": "lib_press_pressmention",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 160,
+      "community_name": "press.ts",
       "norm_label": "pressmention"
     },
     {
@@ -5037,8 +5037,8 @@
       "source_location": "L93",
       "_origin": "ast",
       "id": "lib_press_featured_outlets",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 160,
+      "community_name": "press.ts",
       "norm_label": "featured_outlets"
     },
     {
@@ -5048,8 +5048,8 @@
       "source_location": "L116",
       "_origin": "ast",
       "id": "lib_press_highlight_quotes",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 160,
+      "community_name": "press.ts",
       "norm_label": "highlight_quotes"
     },
     {
@@ -5059,8 +5059,8 @@
       "source_location": "L154",
       "_origin": "ast",
       "id": "lib_press_press_index",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 160,
+      "community_name": "press.ts",
       "norm_label": "press_index"
     },
     {
@@ -5070,8 +5070,8 @@
       "source_location": "L210",
       "_origin": "ast",
       "id": "lib_press_press",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 160,
+      "community_name": "press.ts",
       "norm_label": "press"
     },
     {
@@ -5081,8 +5081,8 @@
       "source_location": "L395",
       "_origin": "ast",
       "id": "lib_press_pressforrestaurant",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 160,
+      "community_name": "press.ts",
       "norm_label": "pressforrestaurant()"
     },
     {
@@ -5664,8 +5664,8 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "package_dependencies_remark_rehype",
-      "community": 136,
-      "community_name": "dependencies",
+      "community": 167,
+      "community_name": "remark-rehype",
       "norm_label": "remark-rehype"
     },
     {
@@ -5675,8 +5675,8 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "remark_rehype",
-      "community": 136,
-      "community_name": "dependencies",
+      "community": 167,
+      "community_name": "remark-rehype",
       "norm_label": "remark-rehype"
     },
     {
@@ -5730,8 +5730,8 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "package_dependencies_unist_util_visit",
-      "community": 161,
-      "community_name": "unist-util-visit",
+      "community": 136,
+      "community_name": "dependencies",
       "norm_label": "unist-util-visit"
     },
     {
@@ -5741,8 +5741,8 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "unist_util_visit",
-      "community": 161,
-      "community_name": "unist-util-visit",
+      "community": 136,
+      "community_name": "dependencies",
       "norm_label": "unist-util-visit"
     },
     {
@@ -5931,6 +5931,28 @@
       "community": 25,
       "community_name": "package.json",
       "norm_label": "typescript"
+    },
+    {
+      "label": "overrides",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L38",
+      "_origin": "ast",
+      "id": "package_overrides",
+      "community": 162,
+      "community_name": "package.json",
+      "norm_label": "overrides"
+    },
+    {
+      "label": "sharp",
+      "file_type": "code",
+      "source_file": "package.json",
+      "source_location": "L39",
+      "_origin": "ast",
+      "id": "package_overrides_sharp",
+      "community": 162,
+      "community_name": "package.json",
+      "norm_label": "sharp"
     },
     {
       "label": "_dbg.mjs",
@@ -9602,8 +9624,8 @@
       "source_location": "L217",
       "_origin": "ast",
       "id": "scripts_probe_flatband_aboutraise_pressrange_doctop",
-      "community": 13,
-      "community_name": "Discover.tsx",
+      "community": 137,
+      "community_name": "VideoBackdrop.tsx",
       "norm_label": "doctop()"
     },
     {
@@ -22857,7 +22879,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L417",
+      "source_location": "L418",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_joinus",
@@ -22868,7 +22890,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L437",
+      "source_location": "L438",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_joinus",
@@ -22879,7 +22901,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L271",
+      "source_location": "L272",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_joinus",
@@ -22890,7 +22912,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L298",
+      "source_location": "L299",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_joinus",
@@ -22901,7 +22923,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L302",
+      "source_location": "L303",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_joinus",
@@ -22912,7 +22934,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L112",
+      "source_location": "L113",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_joinus",
@@ -22923,7 +22945,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L252",
+      "source_location": "L253",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_joinus",
@@ -22934,7 +22956,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L458",
+      "source_location": "L459",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_joinus",
@@ -22945,7 +22967,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L212",
+      "source_location": "L213",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_joinus",
@@ -22956,7 +22978,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L481",
+      "source_location": "L482",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_joinus",
@@ -22967,7 +22989,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L26",
+      "source_location": "L27",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_joinus",
@@ -22978,7 +23000,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L375",
+      "source_location": "L376",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_joinus",
@@ -22989,7 +23011,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L174",
+      "source_location": "L175",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_joinus",
@@ -23109,7 +23131,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L23",
+      "source_location": "L24",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_joinus",
@@ -23121,7 +23143,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L23",
+      "source_location": "L24",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_joinus",
@@ -23133,7 +23155,31 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L24",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "components_joinus",
+      "target": "lib_media",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "components/JoinUs.tsx",
+      "source_location": "L23",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "components_joinus",
+      "target": "lib_media_asset",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "components/JoinUs.tsx",
+      "source_location": "L25",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_joinus",
@@ -23145,7 +23191,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L24",
+      "source_location": "L25",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_joinus",
@@ -23158,7 +23204,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L313",
+      "source_location": "L314",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_joinus_flipdigit",
@@ -23169,7 +23215,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L593",
+      "source_location": "L594",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_joinus_joinus",
@@ -23181,7 +23227,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L584",
+      "source_location": "L585",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_joinus_joinus",
@@ -23189,12 +23235,24 @@
       "confidence_score": 1.0
     },
     {
+      "relation": "calls",
+      "context": "call",
+      "confidence": "EXTRACTED",
+      "confidence_score": 1.0,
+      "source_file": "components/JoinUs.tsx",
+      "source_location": "L1024",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "components_joinus_joinus",
+      "target": "lib_media_asset"
+    },
+    {
       "relation": "indirect_call",
       "context": "argument",
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L675",
+      "source_location": "L676",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_joinus_joinus",
@@ -23206,7 +23264,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L702",
+      "source_location": "L703",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_joinus_joinus",
@@ -23218,7 +23276,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "components/JoinUs.tsx",
-      "source_location": "L697",
+      "source_location": "L698",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_joinus_joinus",
@@ -27369,6 +27427,17 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "package.json",
+      "source_location": "L38",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "package",
+      "target": "package_overrides",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
       "source_location": "L4",
       "weight": 1.0,
       "_origin": "ast",
@@ -27945,6 +28014,17 @@
       "_origin": "ast",
       "source": "package_devdependencies_typescript",
       "target": "typescript",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "package.json",
+      "source_location": "L39",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "package_overrides",
+      "target": "package_overrides_sharp",
       "confidence_score": 1.0
     },
     {
@@ -39307,5 +39387,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "3f2bd6d69a1d010a68c3de5a55f4a561681339b5"
+  "built_at_commit": "fedf06d1e1070fe3267935463341a42939695c09"
 }

@@ -1182,7 +1182,7 @@ export default function About() {
       />
       <Menu open={menuOpen} onClose={() => setMenuOpen(false)} />
 
-      <main className={styles.page} data-nav-theme="light">
+      <main id="main-content" className={styles.page} data-nav-theme="light">
         {/* ---- pinned video scope ----
              The hero video pins to the viewport as a sticky backdrop; the
              hero type, the statement/Omar band and the story timeline all

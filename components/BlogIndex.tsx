@@ -652,7 +652,7 @@ function BlogIndexInner({ entries }: { entries: BlogEntry[] }) {
       />
       <Menu open={menuOpen} onClose={() => setMenuOpen(false)} />
 
-      <main className={styles.page} data-nav-theme="light">
+      <main id="main-content" className={styles.page} data-nav-theme="light">
         <div className="container">
           {/* ═══ THE CHAPTER HEAD — the same three-part lockup Discover
               opens with: the group's mark set into a standing label, the

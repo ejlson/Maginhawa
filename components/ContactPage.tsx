@@ -63,7 +63,7 @@ export default function ContactPage() {
       />
       <Menu open={menuOpen} onClose={() => setMenuOpen(false)} />
 
-      <main>
+      <main id="main-content">
         <DarkZone>
           <Contact standalone />
           <FAQ />

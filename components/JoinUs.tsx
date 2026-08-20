@@ -20,6 +20,7 @@ import PillCta from "./PillCta";
 import Reveal from "./Reveal";
 import SplitWords from "./SplitWords";
 import styles from "./JoinUs.module.css";
+import { asset } from "@/lib/media";
 import { JOBS } from "@/lib/jobs";
 import { lenisRef } from "@/lib/SmoothScroll";
 
@@ -869,7 +870,7 @@ export default function JoinUs() {
       />
       <Menu open={menuOpen} onClose={() => setMenuOpen(false)} />
 
-      <main className={styles.page} data-nav-theme="light">
+      <main id="main-content" className={styles.page} data-nav-theme="light">
 
         {/* ---- careers hero — a sentence with a photograph inside it ----
              THE COMPOSITION IS A FLEX COLUMN AND THE <h1> IS `display:
@@ -969,25 +970,68 @@ export default function JoinUs() {
                   style={{ y: frameY, scale: frameScale, opacity: frameFade }}
                 >
                   <motion.div className={styles.heroPan} style={{ y: panY }}>
-                    <Image
-                      className={styles.heroImg}
-                      src="/images/careers-hero.jpg"
-                      alt="A chef plating clams and seafood at the pass in a Maginhawa kitchen"
-                      width={1920}
-                      height={1080}
-                      /* The band is the container's full width, i.e.
-                         100vw minus twice --grid-margin, and --grid-margin is
-                         clamp(16px, 2.8vw, 40px) — so the breakpoints here
-                         are the clamp's own corners (570px and 1428px), not
-                         invented ones. Plain "100vw" over-asks by up to 5.6%
-                         at every width, which on a single 1920-wide hero is
-                         the difference between candidates. The frame's
-                         entrance scale never exceeds 1, so the rendered
-                         width never exceeds the band's and `sizes` still
-                         describes the largest box the image is drawn at. */
-                      sizes="(max-width: 570px) calc(100vw - 32px), (max-width: 1428px) 94.4vw, calc(100vw - 80px)"
-                      priority
-                    />
+                    {/* THE BAND IS FILM NOW, AND THE STILL IS ITS POSTER.
+                        The picture that was here — careers-hero.jpg — is a
+                        frame of belly-hero.mp4, so playing the clip is the
+                        same composition in motion rather than a different
+                        one: the pass, the hands, the clams. Keeping it as
+                        `poster` means the first paint is unchanged, the
+                        frame never shows bare --maroon while the film
+                        buffers, and the reduced-motion branch below is
+                        rendering the same photograph the poster shows.
+
+                        `asset()` HANDS VIDEO PATHS BACK UNTOUCHED — film is
+                        served by the host, not the CDN, and the reason is
+                        the quota arithmetic in lib/media.ts. It is still
+                        written through `asset()` so this call site reads
+                        like every other piece of media on the site, and so
+                        the poster (a photograph, which DOES go to the CDN)
+                        picks up f_auto and a width. */}
+                    {reduce ? (
+                      <Image
+                        className={styles.heroImg}
+                        src="/images/careers-hero.jpg"
+                        alt="A chef plating clams and seafood at the pass in a Maginhawa kitchen"
+                        width={1920}
+                        height={1080}
+                        /* The band is the container's full width, i.e.
+                           100vw minus twice --grid-margin, and --grid-margin is
+                           clamp(16px, 2.8vw, 40px) — so the breakpoints here
+                           are the clamp's own corners (570px and 1428px), not
+                           invented ones. Plain "100vw" over-asks by up to 5.6%
+                           at every width, which on a single 1920-wide hero is
+                           the difference between candidates. The frame's
+                           entrance scale never exceeds 1, so the rendered
+                           width never exceeds the band's and `sizes` still
+                           describes the largest box the image is drawn at. */
+                        sizes="(max-width: 570px) calc(100vw - 32px), (max-width: 1428px) 94.4vw, calc(100vw - 80px)"
+                        priority
+                      />
+                    ) : (
+                      /* `role="img"` + `aria-label` rather than a bare
+                         <video>: this element carries no information the
+                         page does not also say in words, but it IS the
+                         hero's picture, and dropping it out of the tree
+                         entirely would leave a screen reader with two lines
+                         of headline and nothing between them. The label is
+                         the alt text the still was carrying, verbatim.
+
+                         `muted` is not a preference — autoplay is blocked
+                         without it everywhere — and `playsInline` stops iOS
+                         taking the clip fullscreen. */
+                      <video
+                        className={styles.heroImg}
+                        src={asset("/videos/belly-hero.mp4")}
+                        poster={asset("/images/careers-hero.jpg", { width: 1920 })}
+                        role="img"
+                        aria-label="A chef plating clams and seafood at the pass in a Maginhawa kitchen"
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        preload="auto"
+                      />
+                    )}
                   </motion.div>
                   {/* the caption's ground */}
                   <div className={styles.heroScrim} aria-hidden />

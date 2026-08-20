@@ -1190,3 +1190,32 @@ html::-webkit-scrollbar {
     cursor: none;
   }
 }
+
+/* ═══ SKIP TO CONTENT ═══
+   Off-screen until focused. `left: -9999px` rather than `display: none` or
+   `visibility: hidden` — both of those remove the element from the tab
+   order, which defeats the only purpose it has. On focus it lands in the
+   top-left corner over everything, including the fixed nav (z-index 80) and
+   the cookie card (250).
+   The colours are the dark-zone pair, so it reads as part of the site the
+   moment it appears rather than as a browser default. */
+.skipLink {
+  position: fixed;
+  top: 0;
+  left: -9999px;
+  z-index: 400;
+  padding: 0.75em 1.25em;
+  background: var(--maroon);
+  color: var(--cream);
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  font-weight: var(--w-medium);
+  border-radius: 0 0 var(--radius-card) 0;
+  text-decoration: none;
+}
+
+.skipLink:focus {
+  left: 0;
+  outline: 2px solid var(--cream);
+  outline-offset: -4px;
+}

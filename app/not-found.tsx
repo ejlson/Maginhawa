@@ -63,7 +63,7 @@ export default function NotFound() {
       />
       <Menu open={menuOpen} onClose={() => setMenuOpen(false)} />
 
-      <main className={styles.page} data-nav-theme="light">
+      <main id="main-content" className={styles.page} data-nav-theme="light">
         <section className={styles.hero}>
           <p className={styles.label}>Error 404</p>
 

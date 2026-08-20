@@ -92,7 +92,7 @@ export default function Experience({ journal }: { journal?: BlogEntry[] }) {
       />
       <Menu open={menuOpen} onClose={() => setMenuOpen(false)} />
 
-      <main data-nav-theme="light">
+      <main id="main-content" data-nav-theme="light">
         <Hero started={started} />
 
         {/* ── THE STATIC BODY RENDERS ONCE ──
