@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import LegalPage, { Pending } from "@/components/LegalPage";
 import { ConsentControl } from "@/components/CookieBanner";
-import { analyticsConfigured } from "@/lib/consent";
+import { analyticsConfigured, marketingConfigured } from "@/lib/consent";
 import { CONTACT } from "@/lib/contact";
 import { LEGAL_ENTITY, LEGAL_UPDATED } from "@/lib/legal";
 import { SITE_URL } from "@/lib/site";
@@ -212,6 +212,71 @@ export default function PrivacyPage() {
               the control below. Withdrawing stops any further measurement
               immediately.
             </p>
+            {marketingConfigured && (
+              <>
+                <h3>Advertising and marketing cookies</h3>
+                <p>
+                  If you accept marketing cookies, we use three advertising
+                  tools. All three are off unless you switch them on, and each
+                  sets its own cookies:
+                </p>
+                <ul>
+                  <li>
+                    <strong>Meta pixel</strong> (Facebook and Instagram) — lets
+                    us show our restaurants to people who have visited this
+                    site, and tells us whether an Instagram ad led to a
+                    booking. Sets <strong>_fbp</strong>, which expires after 3
+                    months.
+                  </li>
+                  <li>
+                    <strong>TikTok pixel</strong> — the same, for TikTok ads.
+                    Sets <strong>_ttp</strong>, which expires after 13 months.
+                  </li>
+                  <li>
+                    <strong>Google Ads</strong> — measures whether a Google ad
+                    led to a booking, and allows us to show ads to people who
+                    have been here before. Uses the Google cookies described
+                    above together with Google&rsquo;s own advertising cookies.
+                  </li>
+                </ul>
+                <p>
+                  These tools work by recognising your browser on other
+                  websites and apps, which is what makes them different in kind
+                  from the analytics above.{" "}
+                  <strong>
+                    Our lawful basis is your consent, and you can withdraw it at
+                    any time using the control below.
+                  </strong>
+                </p>
+
+                <h3>Meta as a joint controller</h3>
+                <p>
+                  For the data collected by the Meta pixel, Maginhawa Group Ltd
+                  and Meta Platforms Ireland Limited are{" "}
+                  <strong>joint controllers</strong>. In plain terms, we decide
+                  together what is collected and why: we choose to install the
+                  pixel and what to measure, and Meta determines how it
+                  processes what it receives.
+                </p>
+                <p>
+                  Under our arrangement with Meta, Meta is responsible for
+                  giving you your data-protection rights over the information it
+                  holds — access, erasure and the rest — because Meta holds it
+                  and we do not. You can exercise those rights directly through
+                  your Facebook or Instagram settings, and you can object to
+                  this kind of advertising in Meta&rsquo;s{" "}
+                  <a
+                    href="https://www.facebook.com/settings?tab=ads"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    ad preferences
+                  </a>
+                  . You can also raise anything with us and we will pass it on.
+                </p>
+              </>
+            )}
+
             <ConsentControl />
           </>
         ) : (
@@ -276,6 +341,17 @@ export default function PrivacyPage() {
                 browser add-on
               </a>
               .
+            </li>
+          ) : null}
+          {marketingConfigured ? (
+            <li>
+              <strong>Meta, TikTok and Google Ads</strong> receive your IP
+              address, the pages you view and their own cookie identifiers —{" "}
+              <em>only</em> if you accepted marketing cookies. All three are
+              based outside the UK; those transfers rely on the UK extension to
+              the EU–US Data Privacy Framework and on standard contractual
+              clauses. See the joint-controller note above for Meta in
+              particular.
             </li>
           ) : null}
           <li>

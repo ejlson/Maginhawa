@@ -42,6 +42,34 @@ export const NO_CONSENT: ConsentCategories = {
   marketing: false,
 };
 
+export type CategoryKey = keyof ConsentCategories;
+
+/* ── THE RECORD REMEMBERS WHAT IT WAS ASKED, NOT JUST WHAT WAS ANSWERED ──
+ *
+ * `asked` is the list of purposes that existed on screen at the moment this
+ * visitor answered. Without it a stored record is ambiguous in a way that
+ * quietly breaks the site months later:
+ *
+ *   Today there are no pixels, so the banner offers ANALYTICS only and a
+ *   reader accepts → {analytics: true, marketing: false}. Three months
+ *   later a Meta pixel is configured. `readConsent()` returns a record,
+ *   the banner sees "already answered" and never appears again — and that
+ *   reader is never asked about marketing FOR AS LONG AS THE RECORD LIVES.
+ *   `marketing: false` is honoured, so nothing unlawful happens; they
+ *   simply lose the ability to opt in, permanently and invisibly.
+ *
+ * With `asked`, "false because they refused" and "false because nobody
+ * asked" stop looking identical, and `needsAsking()` below re-opens the
+ * banner for exactly the people who have a new question to answer.
+ *
+ * ⚠️ THIS IS WHY ADDING A PIXEL NO LONGER REQUIRES BUMPING CONSENT_KEY.
+ * The key bump was the blunt instrument for this problem — it works by
+ * re-asking EVERYONE, including people whose existing answers are still
+ * perfectly valid. This re-asks only those with an unanswered purpose, and
+ * it happens on its own. Bump the key only if the MEANING of an existing
+ * category changes, which is a different event entirely. */
+export type ConsentRecord = ConsentCategories & { asked: CategoryKey[] };
+
 /* ⚠️ v2, AND THE BUMP IS THE WHOLE POINT — DO NOT "MIGRATE" v1.
  *
  * v1 stored a single "granted"/"denied" and it meant ANALYTICS, because
@@ -68,12 +96,12 @@ export const CONSENT_KEY = "mg-consent-v2";
    uses for its sessionStorage read. A visitor whose browser refuses storage
    is treated as "not yet asked": they will see the banner each visit, which
    is the conservative outcome, and nothing is ever measured. */
-export function readConsent(): ConsentCategories | null {
+export function readConsent(): ConsentRecord | null {
   if (typeof window === "undefined") return null;
   try {
     const raw = window.localStorage.getItem(CONSENT_KEY);
     if (!raw) return null;
-    const v = JSON.parse(raw) as Partial<ConsentCategories>;
+    const v = JSON.parse(raw) as Partial<ConsentRecord>;
     /* Coerced field by field rather than trusted. This value is stored in
        the reader's own browser, so it is editable by hand and by any
        extension — a malformed or half-written record must read as "not yet
@@ -82,6 +110,18 @@ export function readConsent(): ConsentCategories | null {
     return {
       analytics: v?.analytics === true,
       marketing: v?.marketing === true,
+      /* An older record (written before `asked` existed) has none. Treating
+         that as "asked about nothing" would re-prompt every visitor once,
+         which is the wrong default for a field added to fix a future
+         problem — so a legacy record is read as having answered whatever it
+         has values for, i.e. everything that existed when it was written.
+         In practice that is `analytics`, the only purpose there has ever
+         been at the time of writing. */
+      asked: Array.isArray(v?.asked)
+        ? (v.asked.filter(
+            (k): k is CategoryKey => k === "analytics" || k === "marketing",
+          ) as CategoryKey[])
+        : (["analytics"] as CategoryKey[]),
     };
   } catch {
     /* unreadable storage OR unparseable JSON — both mean we do not know
@@ -95,21 +135,25 @@ export function readConsent(): ConsentCategories | null {
    page's control in step WITHIN one tab — a `storage` event only fires in
    OTHER tabs, so a same-tab subscriber would never hear about a change
    without this. Both paths are wired below. */
-const listeners = new Set<(v: ConsentCategories | null) => void>();
+const listeners = new Set<(v: ConsentRecord | null) => void>();
 
 export function setConsent(value: ConsentCategories): void {
+  /* `asked` is stamped HERE rather than passed in, so no caller can forget
+     it and no caller can lie about it: it is always exactly the set of
+     purposes this build actually offers. */
+  const record: ConsentRecord = { ...value, asked: configuredCategories() };
   try {
-    window.localStorage.setItem(CONSENT_KEY, JSON.stringify(value));
+    window.localStorage.setItem(CONSENT_KEY, JSON.stringify(record));
   } catch {
     /* storage refused — the choice still takes effect for THIS page view
        through the listeners below; it simply will not be remembered. Better
        than dropping the click entirely. */
   }
-  listeners.forEach((fn) => fn(value));
+  listeners.forEach((fn) => fn(record));
 }
 
 export function subscribeConsent(
-  fn: (v: ConsentCategories | null) => void,
+  fn: (v: ConsentRecord | null) => void,
 ): () => void {
   listeners.add(fn);
   const onStorage = (e: StorageEvent) => {
@@ -202,3 +246,22 @@ export const marketingConfigured = Boolean(
 
 /* The banner appears if there is ANY purpose to ask about. */
 export const consentRequired = analyticsConfigured || marketingConfigured;
+
+/* Which purposes this build actually has something behind. Order is the
+   order the banner lists them in. */
+export function configuredCategories(): CategoryKey[] {
+  const out: CategoryKey[] = [];
+  if (marketingConfigured) out.push("marketing");
+  if (analyticsConfigured) out.push("analytics");
+  return out;
+}
+
+/* ⚠️ THE BANNER'S ONE CONDITION. Not `consent === null` — that was the bug
+   described on ConsentRecord above. A visitor needs asking if they have no
+   record at all, OR if any purpose now configured was not on screen when
+   they last answered. Everything else about their previous answer stands. */
+export function needsAsking(record: ConsentRecord | null): boolean {
+  if (!consentRequired) return false;
+  if (record === null) return true;
+  return configuredCategories().some((c) => !record.asked.includes(c));
+}
