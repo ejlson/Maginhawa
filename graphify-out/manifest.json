@@ -15,8 +15,8 @@
     "semantic_hash": ""
   },
   "app/layout.tsx": {
-    "mtime": 1787226444.6274252,
-    "ast_hash": "9a0f9809fd569b62bbce0e32ccc19d03",
+    "mtime": 1787232407.5634506,
+    "ast_hash": "7a18a3b8afbae55d5a7f1017d464e445",
     "semantic_hash": ""
   },
   "app/page.tsx": {
@@ -1840,8 +1840,8 @@
     "semantic_hash": ""
   },
   "app/privacy/page.tsx": {
-    "mtime": 1787225486.3149006,
-    "ast_hash": "c57d2f646e5d648ce44b475d5a95c368",
+    "mtime": 1787232534.787849,
+    "ast_hash": "f95c66fb0b774422cda9fd3eba15f2c4",
     "semantic_hash": ""
   },
   "app/terms/page.tsx": {
@@ -1850,8 +1850,8 @@
     "semantic_hash": ""
   },
   "components/JournalPost.tsx": {
-    "mtime": 1787222770.0770617,
-    "ast_hash": "ee8653e931962229d1c071d15c33a0b7",
+    "mtime": 1787232182.5049276,
+    "ast_hash": "e138e5111de069a4994bc9426f937388",
     "semantic_hash": ""
   },
   "components/LegalPage.tsx": {
@@ -1865,13 +1865,13 @@
     "semantic_hash": ""
   },
   "lib/posts.ts": {
-    "mtime": 1787222793.061691,
-    "ast_hash": "7fc6f2f39270dca627a6f113bf3a0663",
+    "mtime": 1787232158.0506244,
+    "ast_hash": "6de7e2867d352893533e602f063a3aae",
     "semantic_hash": ""
   },
   "app/blog/[slug]/page.tsx": {
-    "mtime": 1787222770.0766842,
-    "ast_hash": "b9f0eac282973fdab904114d08f41bcb",
+    "mtime": 1787232182.5037622,
+    "ast_hash": "7e80a3010ab7975c379b1ccc3f822aa3",
     "semantic_hash": ""
   },
   "app/lab/layout.tsx": {
@@ -1910,8 +1910,8 @@
     "semantic_hash": ""
   },
   "lib/consent.ts": {
-    "mtime": 1787229507.1679895,
-    "ast_hash": "7d015f420769ea4226a8d589803dfc3a",
+    "mtime": 1787233077.55401,
+    "ast_hash": "14f3d113f267a68166f1a841716e254a",
     "semantic_hash": ""
   },
   "scripts/probe-nojs.mjs": {
@@ -1919,14 +1919,19 @@
     "ast_hash": "43c960aad11befabc3eda1c6ebef672e",
     "semantic_hash": ""
   },
-  "components/Analytics.tsx": {
-    "mtime": 1787225294.4799988,
-    "ast_hash": "bcfd2b7d3b119a475603fe9a639e5c2d",
+  "components/CookieBanner.tsx": {
+    "mtime": 1787233104.040817,
+    "ast_hash": "f4b343630e394605f04b5e6804f59412",
     "semantic_hash": ""
   },
-  "components/CookieBanner.tsx": {
-    "mtime": 1787229545.7838197,
-    "ast_hash": "ef874b2a323d69ee5b2a16730a110852",
+  "components/GoogleTag.tsx": {
+    "mtime": 1787232355.455364,
+    "ast_hash": "460f0f3714aab716f18774e8fc9a5951",
+    "semantic_hash": ""
+  },
+  "components/MarketingPixels.tsx": {
+    "mtime": 1787232393.7357528,
+    "ast_hash": "11195d65a67595883daceb863c8b3f6c",
     "semantic_hash": ""
   }
 }
