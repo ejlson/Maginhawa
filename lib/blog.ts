@@ -1,6 +1,14 @@
-// Blog feed for Maginhawa Group.
-//  · "native" entries are posts that live on the live blog (maginhawagroup.co.uk/blog)
-//  · "press" entries are external coverage drawn from the group's press tracker
+// Blog feed for Maginhawa Group — the CURATED half of it.
+//
+//  · "post"   entries are our own writing. They are NOT listed here: they
+//              live as markdown files in content/posts/ and are folded into
+//              this feed by lib/posts.ts at build time. See that file.
+//  · "native" entries are stories about the group published on a venue's
+//              own site or channel — Bintang's blog, a creator's TikTok.
+//              ⚠️ The name is older than the meaning: these still link OUT.
+//              What makes one "native" is authorship, not the hostname.
+//  · "press"  entries are external coverage drawn from the group's press
+//              tracker.
 //
 // Sorted newest first.
 
@@ -15,14 +23,41 @@ export type BlogEntry = {
   image: string; // path under /public
   restaurant?: string; // restaurant slug, where applicable
   category: "feature" | "review" | "news" | "inclusion";
-  kind: "native" | "press";
+  kind: "post" | "native" | "press";
 };
 
-// hand-picked from the live blog + the strongest entries from the press
-// tracker. Easy to extend — just add new objects to the array, the UI orders
-// them by date.
+/* ── WHERE A CARD LEADS DECIDES HOW IT OPENS ──
+   Every entry in THIS file carries an absolute URL to somebody else's site,
+   so every card that renders one has always been an
+   `<a target="_blank" rel="noopener noreferrer">`. Our own posts arrive in
+   the same feed carrying a ROOT-RELATIVE path (`/blog/<slug>`), and sending
+   a reader to our own page in a new tab would be a small lie about where
+   they are going — it is the same site, and the browser's back button is
+   the thing they will reach for.
+
+   ⚠️ `rel` IS NOT DECORATION ON A `target="_blank"`. Without it the opened
+   page gets a handle on this one through `window.opener`. The two belong
+   together, which is the second reason they are handed out as a pair rather
+   than typed at each of the three call sites.
+
+   Kept here rather than in a component because BOTH card surfaces need it —
+   components/Blog.tsx on the home page, components/BlogIndex.tsx on /blog —
+   and two copies of one predicate is how the two surfaces start disagreeing
+   about what an internal link is. */
+export const entryLinkProps = (entry: BlogEntry) =>
+  /^https?:\/\//.test(entry.url)
+    ? ({ target: "_blank", rel: "noopener noreferrer" } as const)
+    : {};
+
+// Hand-picked coverage: the strongest entries from the press tracker plus
+// the stories the venues published themselves. Easy to extend — add an
+// object, the UI orders the feed by date.
+//
+// ⚠️ OUR OWN POSTS DO NOT GO HERE. They are markdown files in content/posts/
+// and lib/posts.ts folds them in; adding one to this array by hand would
+// give it a card with no page behind it.
 export const BLOG: BlogEntry[] = [
-  // ----- native posts (live on maginhawagroup.co.uk/blog) -----
+  // ----- published by the venues themselves (still off-site links) -----
   {
     slug: "bintang-clarified-ube-colada",
     title: "London's best new cocktail: BINTANG's Clarified Ube Colada",

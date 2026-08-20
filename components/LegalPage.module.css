@@ -1,0 +1,189 @@
+/* ═══ THE READING ROUTES — /privacy and /terms.
+
+   This is the only stylesheet on the site whose whole brief is a MEASURE
+   and a scale of headings. There is no photography here, no grid to hang
+   off, no chapter lockup. What it borrows from the rest of the system is
+   the ground, the ink, the hairline and the type ramp; what it does NOT
+   borrow is the composition, because a legal document read in a hurry
+   wants one column and nothing to the side of it. ═══ */
+.page {
+  background: var(--cream);
+  color: var(--maroon);
+  min-height: 100vh;
+  /* clears the fixed nav — the same value BlogIndex.module.css's .page
+     uses, and for the identical reason. If the nav's height ever changes
+     both of these move together or neither does. */
+  padding-top: clamp(52px, 5.5vh, 76px);
+  padding-inline: var(--pad-x);
+}
+
+/* THE COLUMN IS --measure-tight (60ch), NOT --measure (62ch).
+   Legal prose runs longer than editorial prose and is read in scanning
+   passes rather than start-to-finish, so the return sweep happens more
+   often per useful sentence. Two characters is not a design statement; it
+   is the narrower of the two measures the system already publishes, and
+   this is the content that wants it. */
+.doc {
+  max-width: var(--measure-tight);
+  margin-inline: auto;
+  padding-block: clamp(24px, 4vh, 56px) var(--section-y);
+}
+
+/* ── THE HEAD ── title, standfirst, date. Closed by a hairline, which is
+   the same move BlogIndex's .headRule makes: a full-width boundary for
+   the document rather than an underline of the sentence above it. */
+.head {
+  padding-bottom: clamp(22px, 3.4vh, 40px);
+  border-bottom: 1px solid var(--rule);
+  margin-bottom: clamp(28px, 4vh, 48px);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--w-regular);
+  font-size: var(--t-h2);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tr-display);
+  color: var(--maroon);
+}
+
+.standfirst {
+  margin: var(--space-xs-y) 0 0;
+  font-family: var(--font-sans);
+  font-size: var(--t-lead);
+  line-height: var(--lh-body);
+  color: var(--maroon-soft);
+}
+
+/* The date is set as a LABEL rather than as body copy — small, sans,
+   tracked. It is metadata about the document, not part of it, and the
+   type has to say so or a reader takes it for the first line of the
+   policy. */
+.updated {
+  margin: var(--space-sm-y) 0 0;
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--maroon-soft);
+}
+
+/* ── THE PROSE ── styled by ELEMENT, not by class.
+
+   Everything inside .prose arrives as `children` from a server component
+   writing plain <h2>/<p>/<ul> (see LegalPage.tsx). Descendant selectors
+   are what let that copy stay unadorned markup: the pages carry the
+   WORDS and this file carries the typography, and neither has to know
+   the other's class names. It is the one place on this site where that
+   trade is right — anywhere with a composition, classes win. */
+.prose {
+  font-family: var(--font-sans);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  color: var(--maroon);
+}
+
+.prose h2 {
+  margin: clamp(32px, 4.5vh, 56px) 0 var(--space-xs-y);
+  font-family: var(--font-display);
+  font-weight: var(--w-regular);
+  font-size: var(--t-h3);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tr-display);
+}
+
+/* the first heading does not need the air a section break wants — the
+   head's own bottom margin has already provided it */
+.prose > h2:first-child {
+  margin-top: 0;
+}
+
+.prose h3 {
+  margin: clamp(22px, 3vh, 32px) 0 var(--space-3xs);
+  font-family: var(--font-sans);
+  font-weight: var(--w-bold);
+  font-size: var(--t-body);
+  line-height: var(--lh-heading);
+}
+
+.prose p {
+  margin: 0 0 var(--para-gap);
+}
+
+.prose ul {
+  margin: 0 0 var(--para-gap);
+  padding-left: 1.25em;
+  list-style: none;
+}
+
+/* A DRAWN MARKER RATHER THAN `list-style: disc`.
+   The native bullet takes its size and its baseline from the browser and
+   sits noticeably heavy against Figtree at 16px. An ::before em-dash in
+   the accent ink is the mark the rest of the site uses for a list, and it
+   can be positioned against the text's own baseline. */
+.prose li {
+  position: relative;
+  margin-bottom: var(--space-3xs);
+}
+
+.prose li::before {
+  content: "—";
+  position: absolute;
+  left: -1.25em;
+  color: var(--saffron-ink);
+}
+
+.prose a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--rule);
+  transition: text-decoration-color 0.2s var(--ease-out);
+}
+
+.prose a:hover,
+.prose a:focus-visible {
+  text-decoration-color: currentColor;
+}
+
+.prose strong {
+  font-weight: var(--w-bold);
+}
+
+/* the address block in the controller section — plain block, no italics,
+   set at the same size as the copy around it */
+.prose address {
+  font-style: normal;
+  margin: 0 0 var(--para-gap);
+}
+
+/* ── THE UNFILLED FACT ──
+   Deliberately conspicuous. See lib/legal.ts for the argument: a policy
+   that reads complete while naming no data controller is worse than one
+   with a visible hole in it, because nobody ever goes back to the first
+   kind. The accent ground and the dotted rule make it read as a FIELD,
+   which is what it is.
+   `--saffron-ink` on a 12% accent wash rather than the accent at full
+   strength — the full-strength fill is a 4.55:1 pair against cream and
+   this is small text sitting on top of it, so the wash keeps the label
+   over its floor. */
+.pending {
+  display: inline-block;
+  /* THE HORIZONTAL PADDING IS TIGHT, AND IT IS TIGHT BECAUSE OF THE COMMA.
+     At 0.45em the box held a clause-ending comma nearly half an em off the
+     word it belongs to, which reads as a typesetting fault rather than as
+     a field. 0.3em plus a -0.15em right margin puts the punctuation back
+     at roughly its natural sidebearing while leaving the box legible —
+     the negative margin eats the padding for the NEXT glyph only, so the
+     marker's own text keeps its breathing room. */
+  padding: 0.1em 0.3em;
+  margin-right: -0.15em;
+  border: 1px dashed var(--saffron-ink);
+  border-radius: var(--radius-tile);
+  background: color-mix(in srgb, var(--saffron) 12%, transparent);
+  color: var(--saffron-ink);
+  font-size: var(--t-small);
+  font-weight: var(--w-medium);
+}

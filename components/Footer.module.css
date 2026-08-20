@@ -60,13 +60,37 @@
   width: clamp(34px, 3vw, 44px);
 }
 
+/* ⚠️ THE MASK IS ITS OWN FILE, AND IT IS NOT `/logo/maginhawa.png`.
+   That is the 1024x1024 RGBA master, and it is 1,495,665 bytes — measured on
+   the live site as the second-largest download on the home page, behind only
+   the hero film. It was being fetched in full to paint a mark that
+   `.markLink` sizes at 34-44px.
+
+   Nothing about those bytes was reaching the reader. A CSS mask in the
+   default `match-source` mode reads the ALPHA CHANNEL ONLY; the colour
+   channels are discarded before anything is painted, and the visible colour
+   comes from `background` on the line above. So the master was shipping three
+   full-resolution colour channels that the compositor throws away, at 8x the
+   linear resolution the footer can show.
+
+   `maginhawa-mask.png` is the same shape at 256x256 with the colour flattened
+   and the alpha kept: 13,087 bytes, a 99.1% saving. Checked rather than
+   assumed — resampled to 132px (44px at 3x DPR, the largest this is ever
+   painted) the two alpha maps differ by a mean of 0.269/255, with the maximum
+   deviation of 12/255 confined to antialiased edges.
+
+   ── IT IS DELIBERATELY NOT SHARED WITH THE <Image> CALL SITES ──
+   Discover.tsx, Blog.tsx and BlogIndex.tsx all render the same mark through
+   next/image, which sends it to Cloudinary and resizes it there. They must
+   keep pointing at the master: it is the source the CDN derives from, and
+   this file is a mask, not a picture — it has no colour left to serve. */
 .mark {
   display: block;
   width: 100%;
   aspect-ratio: 1;
   background: var(--cream);
-  -webkit-mask: url("/logo/maginhawa.png") center / contain no-repeat;
-  mask: url("/logo/maginhawa.png") center / contain no-repeat;
+  -webkit-mask: url("/logo/maginhawa-mask.png") center / contain no-repeat;
+  mask: url("/logo/maginhawa-mask.png") center / contain no-repeat;
 }
 
 .brandName {
@@ -326,7 +350,14 @@
   margin-top: 0;
 }
 
-.col h4 {
+/* ⚠️ h3, NOT h4, AND THE LEVEL IS THE POINT RATHER THAN THE SIZE.
+   These three column heads were `<h4>` under the band's own `<h2>`
+   ("Got any questions? Contact us."), with no `<h3>` anywhere between them —
+   a skipped level, which is what `heading-order` flagged on the live site.
+   A heading level is a position in the document outline, not a type size:
+   someone navigating this footer by headings was told there was a missing
+   rung above these three. The type is unchanged; only the rung is. */
+.col h3 {
   font-family: var(--font-sans);
   font-weight: var(--w-medium);
   font-size: var(--t-small);
@@ -426,6 +457,39 @@
      let the cream page background show through under the dark zone.
      Cropping the viewBox to 22 units fixes the gap at the source. */
   padding-top: clamp(6px, 0.8vh, 12px);
+}
+
+/* THE LEGAL LINKS, seated in the middle of the bottom row.
+   The row is `justify-content: space-between` with three children now
+   instead of two, so this one centres itself between the copyright and the
+   credit without any positioning of its own.
+
+   IT INHERITS THE ROW'S OPACITY RATHER THAN SETTING ITS OWN. .bottomRow
+   already carries 0.85, which the comment above it derives from MEASURED
+   glyph-core contrast rather than from the nominal ratio — thin light
+   strokes at 13px lose luminance to anti-aliasing that no formula predicts.
+   These links are the same size and weight as their neighbours, so they
+   answer to the same number, and a second opacity here would multiply into
+   it and put them back under the floor. */
+.legal {
+  display: flex;
+  gap: var(--space-sm);
+}
+
+.legal a {
+  color: inherit;
+  text-decoration: none;
+  /* The underline is drawn on hover only, and from the link's own colour —
+     the same restraint .col a uses in the columns above. A permanent
+     underline in a row that already has three text runs in it reads as
+     clutter; no affordance at all reads as plain text. */
+  border-bottom: 1px solid transparent;
+  transition: border-color 0.2s var(--ease-out);
+}
+
+.legal a:hover,
+.legal a:focus-visible {
+  border-bottom-color: currentColor;
 }
 
 /* Phones: the three columns go 2-up rather than one long stack, and the

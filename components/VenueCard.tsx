@@ -283,7 +283,15 @@ export default function VenueCard({
           comes up under the pointer, where the blurb needs a ground the
           film cannot guarantee. A plain div with CSS-owned opacity: an
           inline opacity from framer would beat any :hover rule. */}
-      <div className={styles.hoverShade} aria-hidden />
+      <div
+        className={styles.hoverShade}
+        aria-hidden
+        /* ⚠️ A HOVER STATE, NOT AN ENTRANCE — it must STAY hidden when the
+           page is read without JavaScript. The chapter around it is
+           tagged data-entrance="scope", which restores everything inside
+           it; this opts back out. See app/layout.tsx. */
+        data-entrance="hold"
+      />
 
       {/* ═══ THE RAMP — the card's bottom material. TWO STACKED LAYERS,
           both pointer-transparent, both painted UNDER everything the
@@ -744,7 +752,12 @@ export function VenueBlock({
           how tall the block is. That is what lets one rule serve a
           portrait card and a square one. */}
       {hoverBlurb ? (
-        <span className={styles.hoverBlurb} aria-hidden>
+        <span
+          className={styles.hoverBlurb}
+          aria-hidden
+          /* a hover state, not an entrance — see .hoverShade above */
+          data-entrance="hold"
+        >
           {hoverBlurb}
         </span>
       ) : null}

@@ -15,6 +15,7 @@ import Blog from "./Blog";
 import Footer from "./Footer";
 import DarkZone from "./DarkZone";
 import type { HeroInsets } from "./types";
+import type { BlogEntry } from "@/lib/blog";
 
 // Full-screen hero: the video panel fills the viewport edge-to-edge, so the
 // loader window also grows to fill the screen (square corners at full size).
@@ -43,7 +44,7 @@ const HERO_INSETS: HeroInsets = { top: 0, side: 0, bottom: 0, radius: 0 };
 // covers the change instead)
 let introPlayed = false;
 
-export default function Experience() {
+export default function Experience({ journal }: { journal?: BlogEntry[] }) {
   const [intro, setIntro] = useState(() => !introPlayed);
 
   useEffect(() => {
@@ -283,7 +284,7 @@ export default function Experience() {
               and `.pinScope` existed only because `position: sticky` is
               bounded by its containing block. The page scrolls at one rate
               from the hero to the footer. */}
-          <Blog />
+          <Blog journal={journal} />
           {/* ══════ PRESS SITS BELOW THE JOURNAL NOW ══════
               Moved from directly above <Blog /> to directly below it, at the
               user's instruction.

@@ -6,20 +6,33 @@
     "dev": "next dev",
     "build": "next build",
     "start": "next start",
-    "lint": "next lint"
+    "lint": "next lint",
+    "press-logos": "node scripts/optimize-press-logos.mjs",
+    "lighthouse": "lighthouse --quiet --chrome-flags=\"--headless=new\" --output=html --output-path=./lighthouse-report.html"
   },
   "dependencies": {
     "framer-motion": "^11.18.0",
+    "gray-matter": "^4.0.3",
     "lenis": "^1.1.18",
     "next": "^15.5.19",
     "react": "19.0.0",
-    "react-dom": "19.0.0"
+    "react-dom": "19.0.0",
+    "rehype-stringify": "^10.0.1",
+    "remark-gfm": "^4.0.1",
+    "remark-parse": "^11.0.0",
+    "remark-rehype": "^11.1.2",
+    "remark-smartypants": "^3.0.3",
+    "unified": "^11.0.5",
+    "unist-util-visit": "^5.1.0"
   },
   "devDependencies": {
     "@types/node": "^22.10.7",
     "@types/react": "^19.0.7",
     "@types/react-dom": "^19.0.3",
+    "chrome-launcher": "^1.2.1",
+    "lighthouse": "^13.4.1",
     "puppeteer-core": "^23.11.1",
+    "sharp": "^0.34.5",
     "typescript": "^5.7.3"
   }
 }

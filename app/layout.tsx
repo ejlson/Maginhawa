@@ -6,6 +6,9 @@ import GlassFilters from "@/components/GlassFilters";
 import SmoothScroll from "@/lib/SmoothScroll";
 import { OrganizationJsonLd, WebSiteJsonLd } from "@/lib/jsonld";
 import { SITE_URL } from "@/lib/site";
+import GoogleTag from "@/components/GoogleTag";
+import MarketingPixels from "@/components/MarketingPixels";
+import CookieBanner from "@/components/CookieBanner";
 import { EB_Garamond, Figtree } from "next/font/google";
 
 /* TWO next/font LOADERS: the DISPLAY voice and, for the first time in a
@@ -102,6 +105,31 @@ export const metadata: Metadata = {
   ],
   authors: [{ name: "Maginhawa Group" }],
   alternates: { canonical: "/" },
+  /* ⚠️ THE SHARE CARD IS ITS OWN FILE, AND IT IS NOT A PHOTOGRAPH FROM
+     `/images/`. Every `openGraph` and `twitter` block on this site pointed at
+     `/images/belly.jpg` and declared it `width: 1200, height: 630`. That file is
+     1611x2416 — a PORTRAIT, at an aspect of 0.67:1, described to every social
+     platform as a 1.91:1 landscape. The declared numbers are what a card is laid
+     out against before the bytes arrive, so the shape was wrong everywhere it
+     was rendered, and `summary_large_image` in particular wants 2:1.
+
+     It was also 2,782KB, which is the part that made it silently invisible
+     rather than merely wrong: WhatsApp does not fetch a preview image over
+     roughly 300KB, so the most-shared surface for a London restaurant group
+     rendered no card at all.
+
+     `public/og/maginhawa-og.jpg` is a real 1200x630 crop of the same
+     photograph — same subject, same room, so nothing about the brand changes —
+     at 87KB.
+
+     ── THE CROP IS THE ONE PART WORTH A SECOND OPINION ──
+     It is a horizontal band lifted from the portrait's upper-middle (the table,
+     the wine, the window), chosen by eye against three alternatives because a
+     1.91:1 window on a 0.67:1 source has to discard most of the frame. It is a
+     defensible reading of the picture, not an art-directed share card. If the
+     group wants a photograph composed for this, replace the file and leave
+     everything else alone — the size and the path are what the code depends
+     on. */
   openGraph: {
     type: "website",
     siteName: "Maginhawa Group",
@@ -112,7 +140,7 @@ export const metadata: Metadata = {
     locale: "en_GB",
     images: [
       {
-        url: "/images/belly.jpg",
+        url: "/og/maginhawa-og.jpg",
         width: 1200,
         height: 630,
         alt: "Maginhawa Group restaurants in London",
@@ -124,7 +152,7 @@ export const metadata: Metadata = {
     title: "Maginhawa Group — London Restaurants",
     description:
       "Belly (Michelin Guide), Café Mama & Sons, Mamasons, Bintang, Guanabana, Ramo Ramen and Hoodwood.",
-    images: ["/images/belly.jpg"],
+    images: ["/og/maginhawa-og.jpg"],
   },
   robots: {
     index: true,
@@ -171,6 +199,86 @@ export default function RootLayout({
         <link rel="stylesheet" href="https://use.typekit.net/pev2vne.css" />
         <OrganizationJsonLd />
         <WebSiteJsonLd />
+
+        {/* ═══ THE PAGE WITHOUT JAVASCRIPT ═══
+            Every route on this site is prerendered to real HTML, so the words
+            are always in the document — but two mechanisms then hide them
+            from a person whose browser never runs the script, and both are
+            invisible in testing because a developer's browser always does.
+
+            1. THE SCROLL LOCK. The loader sets `is-loading` on <body> in the
+               server HTML and removes it when it finishes playing. It never
+               finishes without JS, so `overflow: hidden; height: 100vh`
+               stands: the reader gets the top of the page and cannot move.
+               This is the big one — it applies to every route.
+
+            2. THE ENTRANCES. Anything that animates in is written into the
+               HTML wearing its hidden state as inline style. `[data-entrance]`
+               is the opt-in mark for those; see the note on the attribute in
+               components/Reveal.tsx. The value says WHICH properties do the
+               hiding, so the reset stays narrow — a bare mark is opacity
+               only, "rise" adds the transform and blur, "wipe" the clip-path.
+
+            3. THE CHAPTERS. The home page does not animate through Reveal.
+               Each chapter hides its own parts in its own stylesheet, keyed
+               off a `data-in` attribute an observer sets on the section —
+               dozens of elements per chapter, and CSS cannot add the missing
+               attribute. So the SECTION carries `data-entrance="scope"` and
+               everything inside it is restored at once. Measured with scripts
+               off before this existed: the home page was a blank cream sheet
+               from the hero to the footer.
+
+               ⚠️ `transform` IS NOT RESET BY THE SCOPE RULE, deliberately. A
+               chapter's descendants use transforms for LAYOUT as well as for
+               entrances, and a blanket `transform: none` would take the
+               composition apart to fix the visibility. An entrance offset of
+               a few dozen pixels left in place is invisible next to that.
+               Individual elements that genuinely need it can take the "rise"
+               mark instead.
+
+               ⚠️ `data-entrance="hold"` IS THE WAY BACK OUT, and it is not
+               hypothetical: the venue cards' hover shade and hover blurb sit
+               inside the Discover chapter and are hidden BECAUSE THEY ARE
+               HOVER STATES. Revealing those would print a paragraph of blurb
+               over all eight photographs.
+
+            ⚠️ `!important` IS LOAD-BEARING, NOT LAZINESS. Every state being
+            overridden here is an INLINE style written by framer-motion, and
+            nothing in a stylesheet beats an inline declaration without it.
+
+            ⚠️ WHAT IS DELIBERATELY NOT RESET: the glass cursor, the menu
+            overlay, the page-transition curtain and the loader itself all sit
+            at opacity 0 or off-screen and MUST stay there — they are chrome
+            that only means anything once the script is running, and a
+            blanket `[style*="opacity:0"]` rule would drop the transition
+            curtain over the whole page. Hence an opt-in attribute rather
+            than a sweep.
+
+            This does not make the site work without JavaScript — the filters,
+            the menu and the scroll choreography are all script. It makes it
+            READABLE, which is the part that matters to a crawler that does
+            not execute, to a reader on a connection that dropped the bundle,
+            and to anyone browsing with scripts off. */}
+        <noscript>
+          <style>{`
+            body.is-loading { overflow: visible !important; height: auto !important; }
+            [data-entrance] { opacity: 1 !important; visibility: visible !important; }
+            [data-entrance="rise"] { transform: none !important; filter: none !important; }
+            [data-entrance="wipe"] { clip-path: none !important; }
+
+            [data-entrance="scope"],
+            [data-entrance="scope"] *:not([data-entrance="hold"]) {
+              opacity: 1 !important;
+              visibility: visible !important;
+              filter: none !important;
+              clip-path: none !important;
+              transform: none !important;
+            }
+
+            [data-nojs-hide] { display: none !important; }
+            [data-nojs-ground="film"] { background: var(--maroon) !important; }
+          `}</style>
+        </noscript>
       </head>
       <body className="is-loading">
         {/* Lenis lives at the root so the smooth-scroll feel is consistent
@@ -189,6 +297,28 @@ export default function RootLayout({
             content sitting in the lower portion of the screen always reads
             slightly defocused and resolves as it scrolls upward */}
         <div className="scrollBlur" aria-hidden />
+
+        {/* ── ANALYTICS AND THE CONSENT IT WAITS FOR ──
+            Both are inert until NEXT_PUBLIC_GA_ID is set as a BUILD
+            variable, and deleting that variable is a complete rollback:
+            no gtag, no banner, and the privacy notice's cookie section
+            hides itself to match. See lib/consent.ts.
+
+            ⚠️ NEITHER RENDERS ANYTHING until the matching consent is
+            granted — they are not tags that load and then behave. It is
+            not a tag that loads and then behaves. UK PECR governs the act
+            of writing to the device, so the request to Google cannot be
+            made first and apologised for afterwards. The long-form
+            argument is at the top of components/Analytics.tsx.
+
+            THE ORDER HERE IS NOT THE PAINT ORDER — the banner is
+            position:fixed at z-index 250, which puts it over the nav and
+            under the glass cursor. It sits last in the body so that with
+            JavaScript disabled, and thus with neither of these rendering,
+            nothing is left behind. */}
+        <GoogleTag />
+        <MarketingPixels />
+        <CookieBanner />
       </body>
     </html>
   );

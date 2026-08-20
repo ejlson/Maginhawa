@@ -1,7 +1,12 @@
 "use client";
 
-import { Suspense, useEffect, useRef, useState } from "react";
-import { useRouter, useSearchParams } from "next/navigation";
+import {
+  useEffect,
+  useMemo,
+  useRef,
+  useState,
+  useSyncExternalStore,
+} from "react";
 import Image from "next/image";
 import Nav from "./Nav";
 import Menu from "./Menu";
@@ -10,7 +15,7 @@ import PillCta from "./PillCta";
 import Footer from "./Footer";
 import DarkZone from "./DarkZone";
 import styles from "./BlogIndex.module.css";
-import { BLOG, type BlogEntry } from "@/lib/blog";
+import { BLOG, entryLinkProps, type BlogEntry } from "@/lib/blog";
 import { RESTAURANTS, getRestaurant } from "@/lib/restaurants";
 import { lenisRef } from "@/lib/SmoothScroll";
 import { asset } from "@/lib/media";
@@ -74,12 +79,20 @@ const ALL = "all";
 const ROOM_NAME = new Map(RESTAURANTS.map((r) => [r.slug, r.name]));
 const ROOM_ORDER = new Map(RESTAURANTS.map((r, i) => [r.slug, i]));
 
-// built from BLOG, not from RESTAURANTS — a slug that appears in the feed but
-// not in the canonical list still gets a chip (falling back to the raw slug
-// for its label) rather than silently dropping its entries out of reach
-const FILTERS = (() => {
+/* Built from the FEED, not from RESTAURANTS — a slug that appears in the
+   feed but not in the canonical list still gets a chip (falling back to the
+   raw slug for its label) rather than silently dropping its entries out of
+   reach.
+
+   ⚠️ IT IS A FUNCTION OF THE FEED AND NOT A MODULE CONSTANT, which it was
+   until our own posts joined it. The feed is no longer knowable at module
+   scope: content/posts/*.mdx is read at build time on the server and arrives
+   here as a prop (see the note on BlogIndex at the foot of this file), so a
+   chip list computed from the imported BLOG would count the press and miss
+   every post we wrote. */
+function buildFilters(entries: BlogEntry[]) {
   const counts = new Map<string, number>();
-  for (const entry of BLOG) {
+  for (const entry of entries) {
     if (!entry.restaurant) continue;
     counts.set(entry.restaurant, (counts.get(entry.restaurant) ?? 0) + 1);
   }
@@ -101,8 +114,11 @@ const FILTERS = (() => {
 
      The count is the whole feed, which is not necessarily the sum of the
      rooms — an entry with no restaurant is reachable here and nowhere else. */
-  return [{ slug: ALL, label: "All restaurants", count: BLOG.length }, ...rooms];
-})();
+  return [
+    { slug: ALL, label: "All restaurants", count: entries.length },
+    ...rooms,
+  ];
+}
 
 /* THE SKELETON IS THE PICTURE BOX, AND ONLY THE PICTURE BOX.
 
@@ -162,6 +178,13 @@ function CardMedia({
         // for as long as the page is open
         onError={() => setLoadedSrc(src)}
         style={{ opacity: loaded ? 1 : 0 }}
+        /* `loaded` can only ever become true from an event handler, so with
+           no JavaScript every photograph on the archive stays at opacity 0
+           and the grid is twenty-five shimmering grey rectangles. The
+           <noscript> block in app/layout.tsx restores them; the bare
+           attribute (no "rise"/"wipe" value) resets opacity ONLY, which
+           leaves the hover zoom on this same element alone. */
+        data-entrance=""
       />
       {children}
     </div>
@@ -227,9 +250,14 @@ function Chevron() {
    The cost is that open/close, dismissal and keyboard walking have to be
    built, which is what the two effects below are. */
 function RoomFilter({
+  filters,
   room,
   onSelect,
 }: {
+  /* the chip list is computed from the feed by its owner and passed in —
+     it stopped being a module constant when our own posts joined the
+     journal, see buildFilters above */
+  filters: ReturnType<typeof buildFilters>;
   room: string;
   onSelect: (slug: string) => void;
 }) {
@@ -237,7 +265,7 @@ function RoomFilter({
   const wrapRef = useRef<HTMLDivElement>(null);
   const btnRef = useRef<HTMLButtonElement>(null);
   const menuRef = useRef<HTMLDivElement>(null);
-  const active = FILTERS.find((f) => f.slug === room) ?? FILTERS[0];
+  const active = filters.find((f) => f.slug === room) ?? filters[0];
 
   // dismissal: a press anywhere else, or Escape. Escape hands focus back to
   // the trigger — closing a menu should never drop the keyboard at the top
@@ -329,7 +357,7 @@ function RoomFilter({
           // scroll and would swallow the wheel over it without this
           data-lenis-prevent
         >
-          {FILTERS.map((f) => (
+          {filters.map((f) => (
             <button
               key={f.slug}
               type="button"
@@ -369,12 +397,81 @@ function Arrow({ dir }: { dir: "left" | "right" }) {
   );
 }
 
-function BlogIndexInner() {
+/* ═══ THE ADDRESS BAR, READ AS A STORE ═══
+ *
+ * This replaces `useSearchParams()`, and the reason is not preference.
+ *
+ * ── ⚠️ WHAT useSearchParams DID TO THIS PAGE ──
+ * Reading it during render forces the route into a Suspense boundary, and
+ * under `output: "export"` that boundary is emitted as a STREAMED chunk:
+ * out/blog.html carried `<!--$?--><template id="B:0">` where the archive
+ * should be, and the entire page — nav, lede, all 25 entries — sat at the
+ * foot of the file inside `<div hidden id="S:0">`, waiting for React's inline
+ * script to move it into place. The words were in the file and the page was
+ * blank without JavaScript. A `force-static` export on the route fixed the
+ * *fallback* problem (a null fallback meant no cards at all) and not this
+ * one — the markup was still parked in a hidden div — so it is gone again;
+ * app/blog/page.tsx now needs no configuration.
+ *
+ * Reading the query from a store instead means nothing suspends, the archive
+ * renders inline, and the HTML that leaves the build is the page.
+ *
+ * ── THE THREE FUNCTIONS ──
+ * `getServerSnapshot` returns "" so the prerender — and the first render in
+ * the browser, which must match it — is the DEFAULT view: all restaurants,
+ * page 1. That is the only state a static file can hold, because Cloudflare
+ * serves the same out/blog.html for every query string. React then re-renders
+ * from the client snapshot BEFORE PAINT, which is what useSyncExternalStore
+ * is for and what a useEffect could not do without a visible frame of the
+ * wrong list.
+ *
+ * `subscribe` listens for the back button. Forward navigation notifies by
+ * hand — see `navigate` below.
+ *
+ * ⚠️ THE URL IS STILL THE SOURCE OF TRUTH. Every value the page renders is
+ * derived from `location.search` on every render after the first; nothing
+ * here caches a filter or a page number in React state. Links stay shareable
+ * and the back button still walks the pagination. */
+const queryListeners = new Set<() => void>();
+
+function subscribeQuery(onChange: () => void) {
+  queryListeners.add(onChange);
+  window.addEventListener("popstate", onChange);
+  return () => {
+    queryListeners.delete(onChange);
+    window.removeEventListener("popstate", onChange);
+  };
+}
+
+/* ⚠️ `history.pushState` RATHER THAN `router.push`, AND THE STORE IS WHY.
+   router.push runs inside a transition, so the address bar updates when that
+   transition commits — after this function has returned, which means there is
+   no moment at which it is correct to tell the store to re-read. Next 15
+   supports the native History API for exactly this case (changing the query
+   on the route you are already on, with no re-fetch), and it is synchronous:
+   push, then notify, and the render that follows sees the new URL. */
+function navigate(href: string) {
+  window.history.pushState(null, "", href);
+  queryListeners.forEach((l) => l());
+}
+
+function BlogIndexInner({ entries }: { entries: BlogEntry[] }) {
   const [menuOpen, setMenuOpen] = useState(false);
-  const router = useRouter();
-  const searchParams = useSearchParams();
+  /* the chips depend only on the feed, and the feed does not change while
+     the page is open — so this is computed once rather than on every
+     filter click and every pagination render */
+  const FILTERS = useMemo(() => buildFilters(entries), [entries]);
   const listRef = useRef<HTMLDivElement>(null);
   const dividerRef = useRef<HTMLDivElement>(null);
+
+  /* the query, re-read on every render after the first — see the store above
+     for why it is not useSearchParams */
+  const search = useSyncExternalStore(
+    subscribeQuery,
+    () => window.location.search,
+    () => "",
+  );
+  const searchParams = useMemo(() => new URLSearchParams(search), [search]);
 
   /* the URL is the single source of truth for BOTH the filter and the page —
      links stay shareable. Invalid values clamp to the valid range.
@@ -387,7 +484,7 @@ function BlogIndexInner() {
   const room = FILTERS.some((f) => f.slug === rawRoom) ? rawRoom : ALL;
 
   const filtered =
-    room === ALL ? BLOG : BLOG.filter((b) => b.restaurant === room);
+    room === ALL ? entries : entries.filter((b) => b.restaurant === room);
   // the newest of THIS set leads it — filtering to one room and still seeing
   // another room's story as the lede would read as the filter not working
   const featured = filtered[0];
@@ -452,7 +549,7 @@ function BlogIndexInner() {
     navIntentRef.current = "page";
     // push (not replace) — each page gets its own history entry, so the
     // browser back button steps back through pagination before leaving /blog
-    router.push(hrefFor(room, next), { scroll: false });
+    navigate(hrefFor(room, next));
   };
 
   /* THE FILTER RESETS THE PAGE, and that is the whole reason this is one
@@ -466,7 +563,7 @@ function BlogIndexInner() {
   const goToRoom = (slug: string) => {
     if (slug === room) return;
     navIntentRef.current = "filter";
-    router.push(hrefFor(slug, 1), { scroll: false });
+    navigate(hrefFor(slug, 1));
   };
 
   // bring the reader back to the top of the list *after* the new page's DOM
@@ -595,12 +692,15 @@ function BlogIndexInner() {
           <header className={styles.head}>
             <Reveal>
               <p className={styles.chapterLabel}>
+                {/* `sizes` — see the fuller note in Discover.tsx. 2.6em
+                    here too, so the same 48px ceiling. */}
                 <Image
                   className={styles.labelMark}
                   src="/logo/maginhawa.png"
                   alt=""
                   width={1024}
                   height={1024}
+                  sizes="48px"
                   aria-hidden
                 />
                 Blog
@@ -638,8 +738,7 @@ function BlogIndexInner() {
               <a
                 className={styles.featured}
                 href={featured.url}
-                target="_blank"
-                rel="noopener noreferrer"
+                {...entryLinkProps(featured)}
                 /* drives the pill's close from the whole card — see the
                    presentational note in PillCta.tsx */
                 data-cta-hover
@@ -698,7 +797,7 @@ function BlogIndexInner() {
               </span>
             )}
             <span className={styles.dividerRule} aria-hidden />
-            <RoomFilter room={room} onSelect={goToRoom} />
+            <RoomFilter filters={FILTERS} room={room} onSelect={goToRoom} />
           </div>
 
           {/* the list is replaced without the focus or the viewport moving
@@ -747,8 +846,7 @@ function BlogIndexInner() {
                   <a
                     className={styles.card}
                     href={item.url}
-                    target="_blank"
-                    rel="noopener noreferrer"
+                    {...entryLinkProps(item)}
                   >
                     <CardMedia
                       className={styles.cardMedia}
@@ -842,11 +940,26 @@ function BlogIndexInner() {
   );
 }
 
-// useSearchParams needs a Suspense boundary for static prerendering
-export default function BlogIndex() {
-  return (
-    <Suspense fallback={null}>
-      <BlogIndexInner />
-    </Suspense>
-  );
+/* ── THE FEED ARRIVES AS A PROP, FROM app/blog/page.tsx ──
+   This is a client component and the posts it now lists are read off the
+   filesystem (content/posts/*.md), which only a server component can do. So
+   the route reads them, merges them with BLOG and hands the result down — see
+   the architecture note at the top of lib/posts.ts.
+
+   ⚠️ THE DEFAULT IS NOT DEAD CODE. A route that forgets to pass the feed
+   renders the press-only archive rather than an empty page: the failure mode
+   is "our own posts are missing", which is visible, rather than "/blog is
+   blank", which looks like an outage.
+
+   ⚠️ THERE IS NO <Suspense> HERE ANY MORE, AND THAT IS THE POINT. It was
+   required while this read useSearchParams, and it was what put the whole
+   archive into a streamed `<div hidden>` in the exported HTML — see the store
+   at the top of this file. Nothing suspends now, so the page renders inline
+   and the file that reaches the reader is the page. */
+export default function BlogIndex({
+  entries = BLOG,
+}: {
+  entries?: BlogEntry[];
+}) {
+  return <BlogIndexInner entries={entries} />;
 }

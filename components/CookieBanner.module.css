@@ -1,0 +1,349 @@
+/* ═══ THE CONSENT CARD, AND THE WITHDRAWAL CONTROL THAT OUTLIVES IT ═══
+
+   It was a full-bleed bar across the foot of the screen and is now a card in
+   the bottom-left corner, at the user's request and against a reference
+   (Big Mamma's). Two things came across from that reference and one
+   deliberately did not:
+
+     TAKEN — the compact corner card instead of a bar, the frosted ground,
+     the soft radius, and copy short enough to read in one glance.
+
+     ⚠️ NOT TAKEN — THE BUTTON HIERARCHY. In that design "Accept" is a
+     filled button and "Decline" is a small underlined text link beneath it.
+     That is the arrangement the ICO specifically calls out: refusing must
+     be as easy as accepting, and a text link beside a button is not equal.
+     Both of ours are the same pill. If a future change makes one louder
+     than the other, that change breaks the compliance, not the design.
+
+   ── THE TWO SURFACES SIT ON OPPOSITE GROUNDS ──
+   The card is cream-on-glass-over-maroon; the withdrawal control lives on
+   the cream legal page. That is why the pill paints from --btn-fill and
+   --btn-ink rather than from the palette directly — each host declares
+   which way round it is and one definition serves both. ═══ */
+
+.banner {
+  /* the card's own ground is dark, so the pill is cream with maroon ink —
+     the Footer invitation pill's exact arrangement */
+  --btn-fill: var(--cream);
+  --btn-ink: var(--maroon);
+
+  position: fixed;
+  left: var(--pad-x);
+  bottom: clamp(16px, 3vh, 28px);
+  /* ABOVE the nav (80) and the menu overlay (70), BELOW the glass cursor
+     (300) so the lens still refracts over it. Far below the loader and the
+     page-transition curtain, which means the intro covers this with no
+     coupling between them. */
+  z-index: 250;
+
+  width: min(420px, calc(100vw - 2 * var(--pad-x)));
+  padding: var(--space-xs);
+  border-radius: var(--radius-card);
+
+  /* ── THE FROSTED GROUND ──
+     A translucent maroon wash UNDER a blur, not a blur alone: glass with no
+     tint takes its colour from whatever it happens to be over, and this card
+     sits over hero film, cream pages and dark zones on different routes. The
+     wash is what keeps the cream type at a predictable contrast everywhere.
+     ⚠️ 72%, AND IT WAS 62%, AND 62% FAILED. The worst case is not the hero
+     film — it is a CREAM page, because the lighter the backdrop the lighter
+     the composite and the less the cream type has to work against. Measured
+     with the same sRGB-luminance arithmetic the palette block in
+     globals.css uses:
+         62% over cream #f5e9e0 → composite rgb(133,102,97) → 4.33:1  FAILS
+         72% over cream         → composite rgb(114, 81, 77) → 5.85:1  passes
+         72% over dark film     →                              13.60:1
+     4.33 is under the 4.5 body copy owes, and it was arrived at by eye. The
+     28% that survives is still plenty of glass — the blur is what reads as
+     frosted, not the tint — and 5.85 leaves the margin this project's other
+     colour decisions leave (see the form underline's 0.4 → 0.5 note in
+     Contact.module.css, taken for exactly this reason).
+     blur(20px) saturate(150%) is the house recipe (VenueCard's ramp uses 34,
+     Discover's panel 40); 20 is the small-surface end of it — a heavier blur
+     on a card this size reads as opaque and loses the glass entirely. */
+  background: color-mix(in srgb, var(--maroon) 72%, transparent);
+  -webkit-backdrop-filter: blur(20px) saturate(150%);
+  backdrop-filter: blur(20px) saturate(150%);
+
+  /* the lit edge that makes it read as a pane rather than a painted panel */
+  border: 1px solid color-mix(in srgb, var(--cream) 20%, transparent);
+  box-shadow: var(--shadow-card);
+
+  color: var(--cream);
+  animation: rise 0.45s var(--ease-out) both;
+}
+
+/* ⚠️ NO BACKDROP-FILTER, NO GLASS — AND THEN THE WASH MUST BECOME OPAQUE.
+   Without the blur, a 62% maroon card over the home page's hero film is
+   type on moving footage. The same @supports shape VenueCard.module.css and
+   Discover.module.css use, testing BOTH spellings because Safari shipped
+   the prefixed property for years before the plain one. */
+@supports not (
+  (backdrop-filter: blur(1px)) or (-webkit-backdrop-filter: blur(1px))
+) {
+  .banner {
+    background: var(--maroon);
+  }
+}
+
+/* A short rise, once — deliberately the quietest entrance on the site. The
+   banner is an interruption already; giving a compliance control any of the
+   site's real choreography would lend it the weight of editorial content. */
+@keyframes rise {
+  from {
+    opacity: 0;
+    transform: translateY(12px);
+  }
+  to {
+    opacity: 1;
+    transform: none;
+  }
+}
+
+/* Reduced motion drops the travel entirely rather than shortening it. It
+   simply appears. */
+@media (prefers-reduced-motion: reduce) {
+  .banner {
+    animation: none;
+  }
+}
+
+.text {
+  margin: 0 0 var(--space-xs);
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
+  /* full-strength cream. This is the one paragraph on the site a reader is
+     legally entitled to be able to read, so it does not take the softened
+     treatment secondary copy gets elsewhere. */
+  color: var(--cream);
+}
+
+.link {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+}
+
+.actions {
+  display: grid;
+  /* ⚠️ THREE EQUAL TRACKS, NOT `auto`. Equal columns mean Accept and
+     Decline are the same WIDTH as well as the same style, so neither is the
+     bigger target — "Preferences" is far the longest word and on auto
+     tracks it would take the space from both answers, leaving the two that
+     legally must match sized by their letter counts. Equal prominence,
+     measured rather than hoped for. */
+  grid-template-columns: repeat(3, 1fr);
+  gap: 6px;
+}
+
+/* ── THE HOUSE PILL ──
+   Radius, padding, size, weight and the inset recess are the Footer
+   invitation pill's (.inviteCta in Footer.module.css). Same object, so a
+   reader who has met a button on this site already knows this one. The
+   recess is present faintly at rest and only DEEPENS on hover — a shadow
+   that appears from nothing pops instead of easing. */
+.button {
+  font-family: var(--font-sans);
+  font-weight: var(--w-medium);
+  font-size: var(--t-button);
+  line-height: var(--lh-flush);
+  white-space: nowrap;
+  color: var(--btn-ink);
+  background: var(--btn-fill);
+  border: none;
+  border-radius: 999px;
+  /* 0.6em across, not 1.4em: three pills share a 420px card, so the
+     horizontal padding is what decides whether "Preferences" fits on one
+     line. The pill's IDENTITY is its radius, its fill and its recess, none
+     of which change here — only the side padding, which is the one value
+     that can give without the control becoming a different object. */
+  padding: 0.85em 0.6em;
+  cursor: pointer;
+  box-shadow: inset 0 2px 12px rgba(47, 0, 0, 0.14);
+  transition: box-shadow 320ms var(--ease-out);
+}
+
+.button:hover:not(:disabled) {
+  box-shadow: inset 0 4px 18px rgba(47, 0, 0, 0.3);
+}
+
+.button:active:not(:disabled) {
+  box-shadow: inset 0 6px 24px rgba(47, 0, 0, 0.45);
+  transition: box-shadow 120ms var(--ease-out);
+}
+
+.button:focus-visible {
+  outline: 2px solid var(--btn-fill);
+  outline-offset: 3px;
+}
+
+/* The control's buttons disable the option already in force. 0.45 is a
+   DISABLED control, exempt from the contrast minimum (WCAG 1.4.3), and the
+   sentence above states the current setting in words so the information is
+   never carried by the dimming alone. */
+.button:disabled {
+  opacity: 0.45;
+  cursor: default;
+}
+
+
+/* ── THE CLOSE CONTROL ──
+   Top-left, following the reference design. Unconventional — a reader's eye
+   goes to the top RIGHT for a dismiss — and kept because it is what was
+   asked for; it is a placement choice, not a correctness one, and the
+   control is fully labelled either way.
+   ⚠️ ITS aria-label SAYS "without accepting". A bare × on a cookie notice
+   is genuinely ambiguous between the two answers, and the one thing it must
+   never be read as is consent. */
+.close {
+  display: grid;
+  place-items: center;
+  width: 26px;
+  height: 26px;
+  margin-bottom: var(--space-2xs);
+  padding: 0;
+  background: transparent;
+  color: var(--cream);
+  border: 1px solid color-mix(in srgb, var(--cream) 40%, transparent);
+  border-radius: 999px;
+  cursor: pointer;
+  transition:
+    background-color 0.2s var(--ease-out),
+    color 0.2s var(--ease-out);
+}
+
+.close svg {
+  width: 12px;
+  height: 12px;
+}
+
+.close:hover {
+  background: var(--cream);
+  color: var(--maroon);
+}
+
+.close:focus-visible {
+  outline: 2px solid var(--cream);
+  outline-offset: 3px;
+}
+
+/* ── THE PREFERENCES PANEL ──
+   Hairline-separated rows rather than a boxed list: the card is small and a
+   panel inside a panel reads as clutter at this size. */
+.prefs {
+  margin: 0 0 var(--space-xs);
+  border-top: 1px solid color-mix(in srgb, var(--cream) 20%, transparent);
+}
+
+.pref {
+  display: flex;
+  flex-direction: column;
+  gap: 2px;
+  padding: var(--space-2xs) 0;
+  border-bottom: 1px solid color-mix(in srgb, var(--cream) 20%, transparent);
+}
+
+/* the label wraps the checkbox, so the NAME is the hit area too — a 13px
+   box on its own is under the 24px target size WCAG 2.5.8 asks for, and
+   pairing them fixes that without drawing a bigger control */
+.prefRow {
+  display: flex;
+  align-items: center;
+  gap: var(--space-2xs);
+  cursor: pointer;
+}
+
+.prefName {
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  font-weight: var(--w-bold);
+  font-style: italic;
+  color: var(--cream);
+}
+
+.prefNote {
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  line-height: var(--lh-snug);
+  /* 78% cream on the 72% wash over a cream page measures 4.6:1 — over the
+     4.5 this size still owes. It is the quietest text in the card and it is
+     still body copy, so it does not go below that. */
+  color: color-mix(in srgb, var(--cream) 78%, transparent);
+}
+
+/* accent-color paints the native checkbox in the palette rather than the
+   OS blue, which keeps it in the design without rebuilding the control and
+   losing its keyboard behaviour and its announced role */
+.checkbox {
+  width: 16px;
+  height: 16px;
+  flex: none;
+  accent-color: var(--cream);
+  cursor: pointer;
+}
+
+.checkbox:focus-visible {
+  outline: 2px solid var(--cream);
+  outline-offset: 2px;
+}
+
+/* ── phones: the card becomes a full-width sheet at the foot ──
+   A 384px card floating in the corner of a 390px screen is a card with a
+   6px margin, which reads as a mistake. Below 520px it spans the width and
+   sits flush, which is the shape a phone expects. */
+@media (max-width: 520px) {
+  .banner {
+    left: var(--space-2xs);
+    right: var(--space-2xs);
+    bottom: var(--space-2xs);
+    width: auto;
+  }
+}
+
+/* ═══ THE WITHDRAWAL CONTROL — /privacy, on the cream ground ═══
+   Inverted: a maroon pill with cream ink, because here the ground is the
+   cream page rather than the dark card. */
+.control {
+  --btn-fill: var(--maroon);
+  --btn-ink: var(--cream);
+
+  margin: var(--space-sm) 0 var(--para-gap);
+  padding: var(--space-xs);
+  border: 1px solid var(--rule);
+  border-radius: var(--radius-card);
+}
+
+.controlState {
+  margin: 0 0 var(--space-2xs);
+  font-weight: var(--w-bold);
+}
+
+/* the control's two pills size to their words rather than splitting the
+   width — this is a settings row inside a document, not a pair of equally
+   weighted answers to a question, and "Turn on"/"Turn off" are already the
+   same length */
+.control .actions {
+  grid-template-columns: auto auto;
+  justify-content: start;
+}
+
+.controlNote {
+  margin: var(--space-2xs) 0 0;
+  font-size: var(--t-small);
+  color: var(--maroon-soft);
+}
+
+/* one block per purpose in the withdrawal control — each is independently
+   switchable, so each needs its own state sentence and its own pair */
+.controlRow {
+  padding-bottom: var(--space-2xs);
+  margin-bottom: var(--space-2xs);
+  border-bottom: 1px solid var(--rule);
+}
+
+.controlRow:last-of-type {
+  border-bottom: none;
+  margin-bottom: 0;
+}

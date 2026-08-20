@@ -127,11 +127,38 @@ export default function Hero({ started }: { started: boolean }) {
   return (
     <section
       className={styles.hero}
+      /* everything inside this chapter that hides itself for an entrance is
+         restored by the <noscript> block in app/layout.tsx — see the note on
+         the attribute in components/Reveal.tsx */
+      data-entrance="scope"
+      /* ⚠️ THE LOCKUP IS CREAM BECAUSE THE FILM IS DARK, and if the film
+         never paints the hero is cream type on a cream sheet — measured, with
+         scripts off, as a completely blank first screen even though every
+         element in it was present, positioned and at full opacity. Nothing
+         was hidden; it was simply invisible.
+
+         The film does not need JavaScript to play (a muted autoplay video is
+         a browser feature), but it needs to decode and arrive, and the one
+         thing a page cannot do is bet its legibility on that. The <noscript>
+         block paints this ground dark so the type reads either way — behind a
+         film that plays it is never seen, and behind one that does not it is
+         the difference between a hero and an empty screen. */
       id="top"
       data-nav-theme="blend"
       data-cursor="glass"
     >
-      <div className={styles.panel}>
+      <div
+        className={styles.panel}
+        /* ⚠️ THE LOCKUP IS CREAM BECAUSE THE FILM UNDER IT IS DARK. If the
+           film does not paint — and it needs to decode and arrive, which no
+           page can promise — this plate's own `--placeholder` ground leaves
+           cream type on a cream sheet. The <noscript> block paints it dark:
+           behind a film that plays it is never seen, and behind one that does
+           not it is the difference between a hero and an empty screen.
+           (Autoplay itself is a browser feature, not a script one, so the
+           first clip does still play with JavaScript off.) */
+        data-nojs-ground="film"
+      >
         {/* ═══ THE ZOOM WRAPPER ═══
             The intro's window is one scalar `k`: four cream panels open a
             centred k·vw × k·vh aperture and THIS BOX scales by k about the
@@ -171,6 +198,16 @@ export default function Hero({ started }: { started: boolean }) {
             onTimeUpdate={i === 0 ? warmNext : undefined}
             onEnded={i === clip ? advance : undefined}
             style={{ visibility: i === clip ? "visible" : "hidden" }}
+            /* ⚠️ NOT AN ENTRANCE — A CAROUSEL SEAT. Only the clip currently
+               playing is visible; the others are `preload="none"` and have
+               never fetched a frame. The chapter's data-entrance="scope"
+               restores everything inside it for readers without JavaScript,
+               and that briefly included these: the un-hidden empty layers
+               stacked over the playing one (all four are `position:absolute;
+               inset:0`) and painted the hero blank. This opts them out.
+               Autoplay itself is a browser feature, not a script one, so the
+               first clip still plays with JavaScript off. */
+            data-entrance="hold"
           />
         ))}
 

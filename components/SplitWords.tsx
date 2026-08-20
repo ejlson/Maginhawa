@@ -41,6 +41,37 @@ const emWordStart = (words: string[], em?: string) => {
 
 // the site's shared enter curve — ease-out dominant, settles long
 const EASE = [0.22, 1, 0.36, 1] as const;
+
+/* ═══════════ WHAT A SCREEN READER GETS INSTEAD OF THE WORDS ═══════════════
+   Every word below is wrapped in an `aria-hidden` mask, because read as
+   written this block is not a sentence — it is fourteen separate one-word
+   items, announced one at a time with the punctuation stranded between them.
+   So the split has to be hidden from assistive technology and the whole line
+   supplied once, intact, somewhere else.
+
+   ⚠️ THAT USED TO BE `aria-label={text}` ON THE CONTAINER, AND IT WAS INVALID.
+   ARIA prohibits `aria-label` on an element whose role does not support a
+   name from the author, and three of this component's four permitted tags are
+   exactly that: `<p>` is role `paragraph` and `<span>` is `generic`, neither
+   of which is nameable. `<h2>`/`<h3>` are fine — they are role `heading` —
+   which is precisely why the fault was easy to miss: the same prop was
+   correct on some call sites and dropped on the floor on others. It surfaced
+   as `aria-prohibited-attr` against Discover's lede, the one place the
+   default `as="p"` is used with a long enough line to notice.
+
+   ⚠️ AND "IT IS IGNORED" IS NOT THE SAME AS "IT IS HARMLESS". A prohibited
+   `aria-label` is discarded, so the container fell back to its accessible
+   name from content — and its content is entirely `aria-hidden`. The lede was
+   not being read badly; it was announcing nothing at all.
+
+   A visually hidden child has no such restriction on any tag: the words stay
+   hidden, the text is read once in order, and the accessible name now comes
+   from real content rather than from an attribute. `.sr-only` is the global
+   in app/globals.css. It must stay the FIRST child so the sentence is
+   announced before the decorative spans rather than after them. */
+function ReadableText({ text }: { text: string }) {
+  return <span className="sr-only">{text}</span>;
+}
 // the same curve for the CSS driver below — one shape, written twice because
 // the two runtimes spell it differently and neither can read the other's form
 const EASE_CSS = "var(--ease-entrance)";
@@ -201,7 +232,6 @@ export default function SplitWords({
     return (
       <Tag
         className={`${className ?? ""} ${on ? styles.cssOn : ""}`}
-        aria-label={text}
         style={
           {
             "--sw-dur": `${duration}s`,
@@ -210,6 +240,7 @@ export default function SplitWords({
           } as CSSProperties
         }
       >
+        <ReadableText text={text} />
         {words.map((word, i) => (
           <Fragment key={i}>
             <span className={maskClass(i)} aria-hidden>
@@ -239,7 +270,6 @@ export default function SplitWords({
   return (
     <Component
       className={className}
-      aria-label={text}
       initial="hidden"
       {...(driven
         ? {
@@ -255,6 +285,7 @@ export default function SplitWords({
         show: { transition: { staggerChildren: stagger, delayChildren: delay } },
       }}
     >
+      <ReadableText text={text} />
       {words.map((word, i) => (
         <Fragment key={i}>
           <span className={maskClass(i)} aria-hidden>

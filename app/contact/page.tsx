@@ -25,7 +25,7 @@ export const metadata: Metadata = {
     url: "/contact",
     images: [
       {
-        url: "/images/belly.jpg",
+        url: "/og/maginhawa-og.jpg",
         width: 1200,
         height: 630,
         alt: "Contact the Maginhawa Group",

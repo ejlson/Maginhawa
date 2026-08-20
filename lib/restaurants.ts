@@ -44,6 +44,15 @@ export type Restaurant = {
   comingSoon?: boolean;
 };
 
+/* ⚠️ THIS LIST IS RESTATED BY HAND IN public/llms.txt — the plain-text
+   summary assistants read (llmstxt.org). That file ships out of `public/`
+   uncompiled, so it cannot import this array: it names every venue, its
+   cuisine, whether it takes bookings, and the addresses of the four that
+   publish one.
+
+   ADD, RENAME OR CLOSE A VENUE HERE AND public/llms.txt IS WRONG until it is
+   edited too. Nothing in the build checks it. It is a small file and the
+   list is near the top of it. */
 export const RESTAURANTS: Restaurant[] = [
   {
     slug: "bintang",

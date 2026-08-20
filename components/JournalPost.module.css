@@ -1,0 +1,396 @@
+/* ═══ THE JOURNAL ENTRY — /blog/<slug>.
+
+   Sibling to LegalPage.module.css, and consciously so: both are reading
+   routes, both are one column, both take their ground, ink, hairline and
+   type ramp from the system rather than inventing any. What separates them
+   is that a journal entry is also LOOKED at — it opens on a photograph and
+   it is somebody's writing rather than a document — so the head is centred
+   over the picture and the prose has a display face in it.
+
+   ⚠️ THE PROSE IS STYLED BY ELEMENT, NOT BY CLASS, for the reason
+   LegalPage.module.css sets out at length: the body arrives as a string of
+   plain <h2>/<p>/<blockquote>, rendered from markdown by lib/markdown.ts,
+   and nothing a writer types in a .md file can carry a CSS-module class
+   name. The file carries the words; this carries the typography; neither
+   knows the other. ═══ */
+.page {
+  background: var(--cream);
+  color: var(--maroon);
+  min-height: 100vh;
+  /* clears the fixed nav — the same value LegalPage.module.css and
+     BlogIndex.module.css use. If the nav's height changes, all three move
+     together or none of them do. */
+  padding-top: clamp(52px, 5.5vh, 76px);
+  padding-inline: var(--pad-x);
+}
+
+/* THE DOCUMENT IS WIDER THAN ITS TEXT. The column is --measure (62ch, the
+   long-form reading measure), but the photograph wants more than a text
+   column or it reads as an illustration rather than as the opening frame.
+   So the article is sized for the PICTURE and the prose is centred inside
+   it — see .prose's own max-width below. */
+.doc {
+  max-width: 72ch;
+  margin-inline: auto;
+  padding-block: clamp(24px, 4vh, 56px) var(--section-y);
+}
+
+/* ── THE WAY BACK, AT THE TOP ──
+   Left-aligned against the document's own edge while the head above it is
+   centred, and that difference is the point: this is chrome, not part of the
+   piece. Set as a LABEL — small, sans, tracked — for the same reason the
+   kicker is. */
+.backTop {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5em;
+  margin-bottom: clamp(18px, 2.6vh, 30px);
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--maroon-soft);
+  text-decoration: none;
+  transition: color 0.2s var(--ease-out);
+}
+
+.backTop:hover,
+.backTop:focus-visible {
+  color: var(--maroon);
+}
+
+/* the arrows travel on hover — the only motion on the page, and it is
+   feedback on a control rather than decoration */
+.backArrow,
+.footArrow {
+  transition: transform 0.25s var(--ease-out);
+}
+
+.backTop:hover .backArrow,
+.backFoot:hover .backArrow,
+.footPrev:hover .backArrow {
+  transform: translateX(-3px);
+}
+
+.footNext:hover .footArrow {
+  transform: translateX(3px);
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .backArrow,
+  .footArrow {
+    transition: none;
+  }
+  .backTop:hover .backArrow,
+  .backFoot:hover .backArrow,
+  .footPrev:hover .backArrow,
+  .footNext:hover .footArrow {
+    transform: none;
+  }
+}
+
+/* ── THE HEAD ──
+   Centred, unlike the legal routes'. A privacy notice is scanned for a
+   clause and wants its headings on the same left edge as its paragraphs; a
+   journal entry is arrived at deliberately and opens like a page in a
+   magazine. No hairline under it either: the photograph immediately below is
+   a stronger boundary than any rule, and both would read as a double line. */
+.head {
+  max-width: var(--measure-tight);
+  margin-inline: auto;
+  text-align: center;
+  padding-bottom: clamp(20px, 3vh, 32px);
+}
+
+/* venue · category. Set as a LABEL — small, sans, tracked, uppercase — so it
+   reads as metadata and not as the first line of the piece. */
+.kicker {
+  margin: 0 0 var(--space-sm-y);
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--maroon-soft);
+}
+
+.title {
+  margin: 0;
+  font-family: var(--font-display);
+  font-weight: var(--w-regular);
+  font-size: var(--t-h2);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tr-display);
+  color: var(--maroon);
+  /* a headline is a phrase, not a paragraph: no orphaned last word */
+  text-wrap: balance;
+}
+
+/* author · date · reading time, on one line at label size. The separators
+   are their own spans rather than "·" typed into the string, so they can be
+   hidden from assistive technology — a screen reader announcing "middle dot"
+   between three facts is noise. */
+.byline {
+  margin: var(--space-sm-y) 0 0;
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  color: var(--maroon-soft);
+}
+
+.sep {
+  padding: 0 0.5em;
+}
+
+/* ── THE LEDE PHOTOGRAPH ──
+   16:9 and full-column. `position: relative` is what next/image's `fill`
+   measures itself against; without it the picture escapes to the nearest
+   positioned ancestor, which here is the page. */
+.figure {
+  position: relative;
+  margin: 0 0 clamp(28px, 4vh, 48px);
+  aspect-ratio: 16 / 9;
+  overflow: hidden;
+  border-radius: var(--radius-tile);
+  background: var(--placeholder);
+}
+
+.photo {
+  object-fit: cover;
+}
+
+/* ── THE PROSE ──
+   Narrower than the photograph above it, and centred under it. The column is
+   --measure rather than --measure-tight: this is continuous prose read
+   start-to-finish, which is exactly what the wider of the two measures is
+   for (the legal routes take the tighter one because they are scanned). */
+.prose {
+  max-width: var(--measure);
+  margin-inline: auto;
+  font-family: var(--font-sans);
+  font-size: var(--t-body);
+  line-height: var(--lh-body);
+  color: var(--maroon);
+}
+
+.prose > :first-child {
+  margin-top: 0;
+}
+
+.prose h2 {
+  margin: clamp(32px, 4.5vh, 56px) 0 var(--space-xs-y);
+  font-family: var(--font-display);
+  font-weight: var(--w-regular);
+  font-size: var(--t-h3);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tr-display);
+}
+
+.prose h3 {
+  margin: clamp(22px, 3vh, 32px) 0 var(--space-3xs);
+  font-family: var(--font-sans);
+  font-weight: var(--w-bold);
+  font-size: var(--t-body);
+  line-height: var(--lh-heading);
+}
+
+.prose p {
+  margin: 0 0 var(--para-gap);
+}
+
+.prose ul,
+.prose ol {
+  margin: 0 0 var(--para-gap);
+  padding-left: 1.25em;
+}
+
+.prose ul {
+  list-style: none;
+}
+
+/* An em-dash marker in the accent ink rather than `list-style: disc` — the
+   mark the rest of the site uses for a list, and the one that can be
+   positioned against the text's own baseline. Lifted from
+   LegalPage.module.css so the two reading routes punctuate identically. */
+.prose ul li {
+  position: relative;
+  margin-bottom: var(--space-3xs);
+}
+
+.prose ul li::before {
+  content: "—";
+  position: absolute;
+  left: -1.25em;
+  color: var(--saffron-ink);
+}
+
+.prose ol li {
+  margin-bottom: var(--space-3xs);
+}
+
+/* ── THE PULL QUOTE ──
+   A markdown blockquote is the only typographic gesture a writer gets
+   without leaving prose, so it is worth setting properly: the display face,
+   larger than the body, with a rule down its left edge rather than quotation
+   marks. It sits OUTSIDE the measure by its own indent, which is what keeps
+   it from reading as an indented paragraph. */
+.prose blockquote {
+  margin: clamp(28px, 4vh, 44px) 0;
+  padding-left: clamp(16px, 2.5vw, 28px);
+  border-left: 1px solid var(--rule);
+  font-family: var(--font-display);
+  font-size: var(--t-lead);
+  line-height: var(--lh-heading);
+  color: var(--maroon);
+}
+
+.prose blockquote p:last-child {
+  margin-bottom: 0;
+}
+
+/* A picture inside the body breaks the measure on purpose — it takes the
+   document's full width, the same frame the lede photograph sits in, so a
+   post can breathe halfway down instead of being one unbroken column. */
+.prose img {
+  display: block;
+  width: 100%;
+  height: auto;
+  margin: clamp(28px, 4vh, 48px) 0;
+  border-radius: var(--radius-tile);
+}
+
+.prose a {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+  text-decoration-thickness: 1px;
+  text-decoration-color: var(--rule);
+  transition: text-decoration-color 0.2s var(--ease-out);
+}
+
+.prose a:hover,
+.prose a:focus-visible {
+  text-decoration-color: currentColor;
+}
+
+.prose strong {
+  font-weight: var(--w-bold);
+}
+
+.prose em {
+  font-style: italic;
+}
+
+.prose hr {
+  margin: clamp(36px, 5vh, 64px) auto;
+  width: 3.5rem;
+  border: 0;
+  border-top: 1px solid var(--rule);
+}
+
+/* ── THE FOOT ──
+   The two neighbours on one row, the way out underneath. Opened by a
+   hairline because this is where the document ends and navigation begins,
+   and the reader needs to be told that in something other than whitespace. */
+.foot {
+  max-width: var(--measure);
+  margin: clamp(40px, 6vh, 72px) auto 0;
+  padding-top: clamp(20px, 3vh, 32px);
+  border-top: 1px solid var(--rule);
+  display: grid;
+  gap: clamp(20px, 3vh, 32px);
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+}
+
+/* ⚠️ A TWO-COLUMN GRID, NOT `justify-content: space-between`. At either end
+   of the journal one neighbour does not exist; with flex, the survivor would
+   slide to the middle of the row and a reader would have to read the label to
+   learn which direction it went. Fixed columns keep "previous" on the left
+   and "next" on the right whether or not the other one is there — the empty
+   <span> in the markup is holding a seat, not padding. */
+.footRow {
+  display: grid;
+  grid-template-columns: 1fr 1fr;
+  gap: clamp(16px, 3vw, 40px);
+  align-items: start;
+}
+
+.footLink {
+  display: grid;
+  gap: 0.45em;
+  min-width: 0;
+  color: var(--maroon-soft);
+  text-decoration: none;
+  transition: color 0.2s var(--ease-out);
+}
+
+.footLink:hover,
+.footLink:focus-visible {
+  color: var(--maroon);
+}
+
+/* each neighbour sits at the end it points toward */
+.footNext {
+  text-align: right;
+  justify-items: end;
+}
+
+.footLabel {
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5em;
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--maroon-soft);
+}
+
+/* The headline is the link's substance, so it takes the ink the label does
+   not, and it is set in the display face — this is a piece of writing being
+   offered, not a menu item. Two lines maximum: a signpost that runs longer
+   than that competes with the article above it. */
+.footTitle {
+  font-family: var(--font-display);
+  font-size: var(--t-body);
+  line-height: var(--lh-heading);
+  color: var(--maroon);
+  display: -webkit-box;
+  -webkit-line-clamp: 2;
+  -webkit-box-orient: vertical;
+  overflow: hidden;
+}
+
+/* the way out, centred under the pair — the whole set, not a neighbour in it */
+.backFoot {
+  justify-self: center;
+  display: inline-flex;
+  align-items: baseline;
+  gap: 0.5em;
+  padding-top: clamp(4px, 1vh, 12px);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--maroon-soft);
+  text-decoration: none;
+  transition: color 0.2s var(--ease-out);
+}
+
+.backFoot:hover,
+.backFoot:focus-visible {
+  color: var(--maroon);
+}
+
+@media (max-width: 640px) {
+  /* the pair stacks, and a stacked "next" aligned right would read as a
+     stray right-hand column with nothing under it */
+  .footRow {
+    grid-template-columns: minmax(0, 1fr);
+  }
+
+  .footNext {
+    text-align: left;
+    justify-items: start;
+  }
+
+  .footNext .footLabel {
+    flex-direction: row-reverse;
+  }
+}

@@ -1,0 +1,189 @@
+# ═══════════ WHAT THE EDGE SENDS BACK WITH EVERY FILE ═══════════════════════
+#
+# ── WHY THIS FILE EXISTS ──
+# Measured on the live site, 2026-08-19, with Lighthouse:
+#
+#     curl -I https://www.maginhawagroup.co.uk/_next/static/chunks/webpack-94e2912f6b6bd973.js
+#     cache-control: public, max-age=0, must-revalidate
+#
+# EVERY asset the Worker serves came back with that, including the ones whose
+# filenames already contain a content hash. `webpack-94e2912f6b6bd973.js` can
+# never change without its URL changing — that is the entire point of the hash
+# — and yet the browser was told to check with the server before reusing it on
+# every single navigation. Lighthouse costed the whole set at 9,561 KiB, of
+# which 9,783,534 bytes is one file: `/videos/belly-hero.mp4`.
+#
+# The revalidation is not a re-download — a 304 sends no body — but it IS a
+# blocking round trip per asset before anything renders or plays, and it is
+# bytes on any cache that cannot revalidate. There is no reason to pay it.
+#
+# ── WHY IT WORKS, AND HOW WE KNOW ──
+# Same mechanism as `public/_redirects`, and it is worth stating once for both:
+# `output: "export"` copies `public/` into `out/` verbatim, `wrangler.toml`
+# publishes `out/` as the Worker's `[assets]` directory, and the static-asset
+# runtime reads `_headers` and `_redirects` out of the published root. That
+# chain is not assumed — the redirects are live right now:
+#
+#     curl -o /dev/null -w '%{http_code} %{redirect_url}' .../join-us
+#     308 https://www.maginhawagroup.co.uk/careers
+#
+# ⚠️ SO THIS FILE IS ONLY IN FORCE ONCE IT IS DEPLOYED. Nothing local reads it;
+# `next dev` and `npx serve out` both ignore it entirely. Verify it with curl
+# against the deployed origin, never against localhost.
+#
+# ── THE RULES BELOW DO NOT OVERLAP, AND THAT IS DELIBERATE ──
+# Cloudflare applies EVERY matching rule, so two rules that both set
+# `Cache-Control` on the same path leave the winner to precedence rather than
+# to the reader. The split here is by concern instead: `/*` carries security
+# headers and no caching, and the caching rules sit on path prefixes that are
+# mutually exclusive. Add a rule and keep that property.
+
+
+# ── EVERY RESPONSE ─────────────────────────────────────────────────────────
+/*
+  # Stop the browser second-guessing a declared Content-Type. The press wall
+  # serves user-supplied-looking SVG out of /press-logo/; sniffing is exactly
+  # the vector that turns a mislabelled file into script.
+  X-Content-Type-Options: nosniff
+
+  # Send the full URL to ourselves, the bare origin to anyone else. Cloudinary
+  # and Typekit have no business knowing which page a reader is on.
+  Referrer-Policy: strict-origin-when-cross-origin
+
+  # This site asks for none of these. Declaring that explicitly means an
+  # injected script cannot ask on its behalf either.
+  Permissions-Policy: camera=(), microphone=(), geolocation=(), interest-cohort=()
+
+  # Two years, subdomains included, and preload-eligible. The site is HTTPS-only
+  # already; this closes the first plaintext request that a typed hostname
+  # would otherwise make.
+  Strict-Transport-Security: max-age=63072000; includeSubDomains; preload
+
+  # Nothing here is meant to be framed. `frame-ancestors` in the CSP below is
+  # the modern spelling and the one that actually governs; XFO is kept for the
+  # older agents that only understand it. They agree on purpose.
+  X-Frame-Options: DENY
+
+  # Give the page its own browsing-context group.
+  Cross-Origin-Opener-Policy: same-origin
+
+  # ── THE CONTENT SECURITY POLICY, AND AN HONEST NOTE ON ITS SCRIPT RULE ──
+  # The origins are enumerated from a real network trace of the home page,
+  # not guessed. In full, the site talks to: itself, res.cloudinary.com (every
+  # photograph, via lib/cloudinaryLoader.ts), use.typekit.net (the Contralto
+  # kit's stylesheet AND its woff2 files), p.typekit.net (the kit's second
+  # stylesheet hop), and `data:` (the inline SVGs in the compiled CSS).
+  #
+  # ⚠️ `script-src` IS THE WEAK LINE AND IT IS WEAK ON PURPOSE.
+  # `'unsafe-inline'` is not a shortcut here, it is forced: Next inlines the
+  # hydration payload and three JSON-LD blocks directly into the document, and
+  # the nonce that would normally replace this needs a server to generate one
+  # per response. Under `output: "export"` there is no server — the HTML is a
+  # file on disk, so every visitor would share one nonce, which is the same as
+  # having none. `'unsafe-eval'` is likewise present for Cloudflare's own
+  # /cdn-cgi/challenge-platform script, which we do not control and must not
+  # break.
+  #
+  # What is left still earns its place, and it is not nothing: an injected
+  # <script src> pointing anywhere off-origin is refused, `object-src 'none'`
+  # kills plugin-based execution, `base-uri 'self'` blocks the <base> tag
+  # rewrite that turns every relative URL into an attacker's, `form-action`
+  # stops a planted form posting off-site, and `frame-ancestors` is the
+  # clickjacking control. Do not read this policy as XSS-proof. Read it as the
+  # strongest policy a statically exported site can actually enforce.
+# ── GOOGLE ANALYTICS 4 AND THE THREE DIRECTIVES IT NEEDS ──
+# Added when GA4 went in. All three are required and each fails DIFFERENTLY,
+# which is why they are listed rather than folded into one wildcard:
+#   script-src   www.googletagmanager.com  — loads gtag.js itself. Without
+#                it the tag never runs and the console shows a CSP refusal.
+#   connect-src  *.google-analytics.com, *.analytics.google.com,
+#                www.googletagmanager.com — where the measurement beacons
+#                are POSTed. ⚠️ THIS IS THE ONE THAT FAILS QUIETLY: with
+#                script-src alone, gtag loads, initialises, reports no error
+#                a casual look would catch, and every event is blocked in
+#                transit. The symptom is a live tag and an empty dashboard.
+#                The region-specific endpoints are why these are wildcards —
+#                GA4 sends to region1.google-analytics.com and friends.
+#   img-src      googletagmanager.com, google-analytics.com — the legacy
+#                pixel fallback, used when fetch/beacon is unavailable.
+#
+# ⚠️ NOTHING HERE MAKES A REQUEST BEFORE CONSENT. The CSP grants permission;
+# components/Analytics.tsx decides whether to use it, and does not render
+# the script tag at all until the visitor has accepted. Widening the policy
+# is not the same as loading the tag.
+# ── THE MARKETING PIXELS: META, TIKTOK, GOOGLE ADS ──
+# Added alongside the GA4 entries above. Each vendor needs THREE directives
+# and each of the three fails in a different way, which is why none of this
+# is folded into a wildcard:
+#   script-src  connect.facebook.net, analytics.tiktok.com,
+#               googleadservices.com — loads each library. A miss here is
+#               LOUD: a CSP refusal in the console and no pixel at all.
+#   connect-src facebook.com, *.tiktok.com, google.com — where the events
+#               are POSTed. ⚠️ THIS IS THE ONE THAT FAILS QUIETLY, exactly
+#               as it does for GA4: the pixel loads, initialises, reports
+#               nothing wrong, and every event is blocked in transit. The
+#               symptom is a live pixel and an empty Events Manager.
+#   img-src     facebook.com, googleads.g.doubleclick.net, google.com,
+#               google.co.uk — the tracking-pixel fallback each platform
+#               drops back to when fetch/beacon is unavailable. google.co.uk
+#               is not redundant: Google Ads pings the LOCAL ccTLD for
+#               conversion attribution, and a UK advertiser's hits go there.
+#
+# ⚠️ WIDENING THE POLICY IS NOT LOADING THE TAG. Nothing here makes a
+# request before consent; the CSP grants permission and
+# components/MarketingPixels.tsx decides whether to use it, rendering no
+# script at all until `marketing` is granted.
+  Content-Security-Policy: default-src 'self'; script-src 'self' 'unsafe-inline' 'unsafe-eval' https://www.googletagmanager.com https://www.googleadservices.com https://connect.facebook.net https://analytics.tiktok.com; style-src 'self' 'unsafe-inline' https://use.typekit.net https://p.typekit.net; font-src 'self' https://use.typekit.net data:; img-src 'self' https://res.cloudinary.com https://www.googletagmanager.com https://www.google-analytics.com https://googleads.g.doubleclick.net https://www.google.com https://www.google.co.uk https://www.facebook.com https://analytics.tiktok.com data: blob:; media-src 'self' blob:; connect-src 'self' https://res.cloudinary.com https://p.typekit.net https://www.google-analytics.com https://*.google-analytics.com https://*.analytics.google.com https://www.googletagmanager.com https://www.google.com https://connect.facebook.net https://www.facebook.com https://analytics.tiktok.com https://*.tiktok.com; object-src 'none'; base-uri 'self'; form-action 'self'; frame-ancestors 'none'; upgrade-insecure-requests
+
+
+# ── CONTENT-HASHED BUILD OUTPUT ────────────────────────────────────────────
+# `immutable` is only ever correct when the filename changes with the bytes,
+# and here it does: Next puts a content hash in every chunk, stylesheet and
+# font under this prefix, and a rebuild that changes a file changes its URL.
+# A year is the maximum the spec allows and there is no staleness risk, so
+# there is no reason to ask for less. This is the rule that removes the
+# revalidation round trip from the critical path on every repeat visit.
+/_next/static/*
+  Cache-Control: public, max-age=31536000, immutable
+
+
+# ── THE FILM, THE PHOTOGRAPHS AND THE MARKS ────────────────────────────────
+# ⚠️ NOT `immutable`, AND THE DIFFERENCE MATTERS. These filenames are stable —
+# `/videos/belly-hero.mp4` stays `/videos/belly-hero.mp4` when the cut changes
+# — so `immutable` would pin a superseded film in readers' caches for as long
+# as it was set, with no way to reach them. Thirty days with a normal
+# revalidation is the trade: the repeat visit is free, and a replaced asset is
+# picked up within the month rather than never.
+#
+# Thirty days is also what Cloudinary itself returns for the photographs
+# (`max-age=2592000`, checked), so the two halves of the media split now agree
+# instead of one being a hundred times more cacheable than the other.
+#
+# ⚠️ IF YOU REPLACE A FILE AND NEED IT LIVE TODAY, change its name and change
+# the reference. That is the only reliable cache-bust; purging the edge does
+# not reach a browser that already has it.
+/videos/*
+  Cache-Control: public, max-age=2592000
+
+/images/*
+  Cache-Control: public, max-age=2592000
+
+/press-logo/*
+  Cache-Control: public, max-age=2592000
+
+/logo/*
+  Cache-Control: public, max-age=2592000
+
+/menu/*
+  Cache-Control: public, max-age=2592000
+
+
+# ── THE HTML IS DELIBERATELY NOT CACHED ────────────────────────────────────
+# Not an oversight and not a leftover. The pages are the one thing that must
+# change the moment a deploy lands: they carry the copy, the metadata, the
+# JSON-LD and the hashed URLs of everything above. Caching them is how a
+# reader ends up on last week's page requesting this week's chunks. The
+# assets they point at are immutable, so the document is the ONLY thing worth
+# revalidating — which is exactly the shape this leaves.
+/*.html
+  Cache-Control: public, max-age=0, must-revalidate

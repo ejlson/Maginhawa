@@ -240,12 +240,49 @@
    gives one composition for any length of copy. */
 .featuredMedia {
   position: relative;
-  /* THE FLOOR SETS THE FIRST SCREEN'S BUDGET. This is the tallest thing on
-     the page above the fold and it is a floor, not a cap — the row is
-     `align-items: stretch`, so the featured entry is as tall as the taller
-     of this and the body column. Lowered from clamp(300px, 40vh, 460px)
-     (432px at 1080) so the head, the featured entry and the "Earlier
-     entries" line fit one screen, which is what the user asked for. */
+  /* ⚠️ THE CROP IS DECLARED HERE. IT USED TO BE WHATEVER THE PHOTOGRAPH WAS.
+     There was no `aspect-ratio` on this box and no definite height, so the
+     `height: 100%` on the image below resolved to `auto` and the picture
+     rendered at its own intrinsic proportion — the plate then grew to fit it
+     and the body column stretched to match. The lede was therefore as tall
+     as whatever file the newest entry happened to carry.
+
+     Every `*-web.jpg` in public/blog is a 733x1100 PORTRAIT derivative, so
+     the lede came out 1.5x taller than it was wide: 1406px on a 1920 screen,
+     which put the headline near the fold and the "Earlier entries" line two
+     screens down. The one entry that did not was the Belly story, whose
+     image was deliberately re-cut LANDSCAPE because it was the page-1 lede
+     (see the long note on it in lib/blog.ts) — that is, the layout only ever
+     held because one photograph was hand-fitted to it.
+
+     Declaring the ratio here moves that from the picture to the page. The
+     image already carries `object-fit: cover`, so any file — portrait,
+     landscape, square — is cropped to this shape instead of setting it, and
+     nobody writing a post has to know that the newest one lands in a
+     different frame from the rest.
+
+     3:2 LANDSCAPE, not the 4:5 the grid cards take. Those are 331px columns
+     where a tall plate makes the photograph the entry; this is half the page
+     beside a headline, and a portrait crop at that width is a wall.
+
+     `max-height` IS THE HEIGHT BUDGET, and it is what keeps the promise the
+     floor below was written for: head + lede + the "Earlier entries" rule on
+     one screen. Past roughly 1400px wide, 3:2 alone would out-grow the
+     viewport again, and the cap simply widens the crop instead. */
+  aspect-ratio: 3 / 2;
+  /* ⚠️ `width: 100%` IS WHAT MAKES THE CAP WIDEN THE CROP INSTEAD OF
+     SHRINKING THE PLATE. With only a ratio and a max-height, the box keeps
+     3:2 and gives up WIDTH to obey the cap — measured at 1920, an 840px
+     picture sitting in a 937px column with 97px of cream beside it, which
+     reads as a broken grid rather than as a crop. Declaring the width makes
+     the height the thing that yields: full column, slightly wider than 3:2
+     on a big screen, still one screen tall. */
+  width: 100%;
+  max-height: min(58vh, 560px);
+  /* THE FLOOR, kept — the row is `align-items: stretch`, so the featured
+     entry is as tall as the taller of this and the body column, and on a
+     narrow screen the ratio alone would leave the picture shorter than the
+     type beside it. */
   min-height: clamp(240px, 30vh, 380px);
   overflow: hidden;
   border-radius: var(--blog-photo-radius);
