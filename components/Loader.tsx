@@ -647,6 +647,13 @@ export default function Loader({
     return (
       <div
         className={styles.overlay}
+        /* ⚠️ THE LOADER IS A CREAM SHEET AT z-index 100 COVERING THE WHOLE
+             VIEWPORT, AND ONLY SCRIPT DISMISSES IT. With JavaScript off it
+             stands for ever: measured, the home page was a blank cream
+             screen with the entire site correctly laid out underneath it.
+             The <noscript> block in app/layout.tsx removes it — an intro
+             animation that cannot play should not be a lid. */
+        data-nojs-hide=""
         style={{ background: "var(--cream)" }}
         aria-hidden
       />
@@ -655,7 +662,7 @@ export default function Loader({
   // ---- short path: just a cream overlay that cross-fades out ----------------
   if (shortPath) {
     return (
-      <div className={styles.overlay} aria-hidden>
+      <div className={styles.overlay} aria-hidden data-nojs-hide="">
         <motion.div
           className={styles.sheet}
           initial={{ opacity: 1 }}
@@ -690,7 +697,7 @@ export default function Loader({
   const lockInc = () => setLocked((n) => n + 1);
 
   return (
-    <div className={styles.overlay} aria-hidden>
+    <div className={styles.overlay} aria-hidden data-nojs-hide="">
       {/* ═══ THE WINDOW: FOUR CREAM SHUTTERS ═══
           Each is a FULL-VIEWPORT cream sheet anchored to one edge by its
           transform-origin, and each scales by exactly the same value —

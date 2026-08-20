@@ -289,3 +289,138 @@
    PillCta's stylesheet is explicit that the seat (margin, alignment, grid
    area) belongs to the caller and never to the control. */
 
+
+/* ═══════════════════ THE FORM'S FAILURE AND SUCCESS STATES ═══════════════
+
+   ── THE ERROR COLOUR IS NOT THE ERROR MESSAGE'S COLOUR ──
+   The instinct is red text. On this ground it is close to unreadable:
+   --annatto, the site's warm accent, is hsl(17, 60%, 40%) and measures
+   2.67:1 against the maroon — under BOTH the 4.5:1 body-text floor and the
+   3:1 non-text floor. Every red dark enough to read as "error" fails here,
+   because the ground is already a dark red.
+
+   SO THE TWO CHANNELS ARE SPLIT. The message is set in full-strength cream
+   (13.06:1) because its job is to be READ, and the colour cue moves to the
+   field's underline, where a lifted annatto has room to work. Which is the
+   arrangement WCAG 1.4.1 wants anyway — the meaning is in the words, and
+   the colour is a second, redundant signal rather than the only one.
+   Numbers measured with the same sRGB-luminance arithmetic the palette
+   block in globals.css uses; ratios are against --maroon #411613. ═══ */
+
+/* hsl(17, 60%, 60%) — --annatto's hue and saturation to the decimal, its
+   lightness raised from 40% to 60%. That is 2.67:1 → 5.19:1 against the
+   maroon, clear of the 3:1 a UI component owes and clear of 4.5:1 besides,
+   which leaves headroom if this is ever used for text. It is a local token
+   rather than a global one because the lift is only correct ON THIS
+   GROUND; the same colour on the cream page would be the opposite problem. */
+.form {
+  --error-mark: hsl(17, 60%, 60%);
+}
+
+/* THE UNDERLINE IS DRIVEN BY aria-invalid, NOT BY A CLASS.
+   The attribute is already there — it is what tells a screen reader the
+   field is invalid — so styling off it means the visual state and the
+   announced state cannot drift apart. A `.hasError` class alongside it
+   would be a second source of truth for one fact.
+   2px against the resting 1px: on a colour this close in value to its
+   neighbours, weight reads faster than hue. */
+.field input[aria-invalid="true"],
+.field textarea[aria-invalid="true"] {
+  border-bottom-width: 2px;
+  border-bottom-color: var(--error-mark);
+}
+
+/* focus must still win over the error state — a reader fixing the field
+   needs to see where the caret is more than they need reminding it is
+   wrong, and the message below is still on screen saying so */
+.field input[aria-invalid="true"]:focus,
+.field textarea[aria-invalid="true"]:focus {
+  border-bottom-color: var(--cream);
+}
+
+/* THE MESSAGE. Cream at full strength, --t-small, and a drawn triangle in
+   the error colour set in the margin beside it — the same "mark plus
+   label" grammar the chapter labels use, so the row reads as part of this
+   site rather than as a browser default. */
+.error {
+  position: relative;
+  margin: 0.5em 0 0;
+  padding-left: 1.4em;
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
+  color: var(--cream);
+}
+
+.error::before {
+  content: "▲";
+  position: absolute;
+  left: 0;
+  /* the glyph is optically heavy for its size — 0.85em brings it back to
+     the weight of the text it labels */
+  font-size: 0.85em;
+  line-height: inherit;
+  color: var(--error-mark);
+}
+
+/* ── THE LIVE REGION ──
+   PERMANENTLY IN THE DOM AND VISUALLY HIDDEN. Its content is a summary
+   for assistive technology ("there are 2 problems…"); on screen that
+   sentence would be a third thing saying what the two messages beside the
+   fields already say. Hidden with the site's own sr-only recipe rather
+   than `display: none`, which would take it out of the accessibility tree
+   and stop it announcing at all — the single most common way a live
+   region is silently broken. */
+.status {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── THE HAND-OFF CARD ──
+   Shown after a valid submit. It is NOT a success tick, and the wording is
+   the reason: a mailto: hand-off cannot know whether anything was sent
+   (see the note in Contact.tsx). A rule down the left rather than a filled
+   panel — the section has one light moment already, the submit pill, and a
+   second filled shape here would compete with it. */
+.sentCard {
+  display: flex;
+  flex-direction: column;
+  gap: 0.35em;
+  margin-top: var(--space-sm);
+  padding-left: var(--space-xs);
+  border-left: 2px solid var(--cream);
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  line-height: var(--lh-body);
+  color: var(--cream);
+}
+
+.sentCard strong {
+  font-weight: var(--w-bold);
+}
+
+/* the caveat inside the card — italic, and NOT dimmed. It is the most
+   important sentence in the block (nothing has been sent yet), so it takes
+   emphasis without giving up any contrast. */
+.sentCard em {
+  font-style: italic;
+}
+
+.sentLink {
+  color: inherit;
+  text-decoration: underline;
+  text-underline-offset: 0.18em;
+}
+
+/* Reduced motion is not a concern for any of the above — none of these
+   states animate. They appear because the markup appeared. That is a
+   deliberate omission rather than an oversight: an error message that
+   slides in delays the reader's understanding of what went wrong by
+   exactly the length of the transition. */

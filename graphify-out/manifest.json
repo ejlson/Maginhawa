@@ -5,28 +5,28 @@
     "semantic_hash": ""
   },
   "app/blog/page.tsx": {
-    "mtime": 1782140127.1116035,
-    "ast_hash": "680d124774b62cbb7da3e1ec6871d5f5",
+    "mtime": 1787225189.3768108,
+    "ast_hash": "b9a7d16fa5b8124f84f42ee5e8af3863",
     "semantic_hash": ""
   },
   "app/contact/page.tsx": {
-    "mtime": 1786965276.7911339,
-    "ast_hash": "84a2a3476ce5c700f225512d09e936de",
+    "mtime": 1787157931.592542,
+    "ast_hash": "bf3e318e0f00d665e7b3af82347e6c49",
     "semantic_hash": ""
   },
   "app/layout.tsx": {
-    "mtime": 1786965293.2891898,
-    "ast_hash": "9d208c31513d2704f7f03797a4ac79bd",
+    "mtime": 1787226444.6274252,
+    "ast_hash": "9a0f9809fd569b62bbce0e32ccc19d03",
     "semantic_hash": ""
   },
   "app/page.tsx": {
-    "mtime": 1785931090.208117,
-    "ast_hash": "b8744224dbf03ee3fcb520ad081a9455",
+    "mtime": 1787222115.8655953,
+    "ast_hash": "6e43f1d7e21033dd66b2fbf063660ec4",
     "semantic_hash": ""
   },
   "app/restaurants/page.tsx": {
-    "mtime": 1781779481.7730458,
-    "ast_hash": "399433e42aa7cc16a0c8dbcada6ef25a",
+    "mtime": 1787221566.6369283,
+    "ast_hash": "7cc7a33bf7a90434f7af696b2d8b4916",
     "semantic_hash": ""
   },
   "components/About.tsx": {
@@ -40,18 +40,18 @@
     "semantic_hash": ""
   },
   "components/Blog.tsx": {
-    "mtime": 1787153374.736648,
-    "ast_hash": "028df60a653a5bd78fd32190eb22390a",
+    "mtime": 1787225833.1606028,
+    "ast_hash": "d46c54d69544e80efb99a7cb6f1c978b",
     "semantic_hash": ""
   },
   "components/BlogIndex.tsx": {
-    "mtime": 1786725527.485452,
-    "ast_hash": "51944c16ead28d34bb5103f530fe26a9",
+    "mtime": 1787225189.3779337,
+    "ast_hash": "3794f7980000b4e7b8586ee9cd2c72da",
     "semantic_hash": ""
   },
   "components/Contact.tsx": {
-    "mtime": 1786725527.4865465,
-    "ast_hash": "40ead69cac4c023b80c178f6fa762442",
+    "mtime": 1787221538.4593654,
+    "ast_hash": "db2b2a28cdfb4aea83fca20bfda91b81",
     "semantic_hash": ""
   },
   "components/ContactPage.tsx": {
@@ -70,13 +70,13 @@
     "semantic_hash": ""
   },
   "components/Discover.tsx": {
-    "mtime": 1787156295.0598848,
-    "ast_hash": "3d7c0fc59408818f9abff7f4e3faac49",
+    "mtime": 1787225833.1597872,
+    "ast_hash": "a8feb2cd7a715c9d84519f87513ef75d",
     "semantic_hash": ""
   },
   "components/Experience.tsx": {
-    "mtime": 1787147924.7456832,
-    "ast_hash": "a29fcfb08079c841731b3e0293f5dce4",
+    "mtime": 1787222122.4414346,
+    "ast_hash": "91fcc1e62e99bc431db8dc5bba7e8e2a",
     "semantic_hash": ""
   },
   "components/FAQ.tsx": {
@@ -85,8 +85,8 @@
     "semantic_hash": ""
   },
   "components/Footer.tsx": {
-    "mtime": 1787151751.9945178,
-    "ast_hash": "f28c6f2e9168b8c8e5b275420ee9ff0d",
+    "mtime": 1787225833.1645052,
+    "ast_hash": "ea0e695a906a15ebc526117e4070e410",
     "semantic_hash": ""
   },
   "components/GlassFilters.tsx": {
@@ -95,8 +95,8 @@
     "semantic_hash": ""
   },
   "components/Hero.tsx": {
-    "mtime": 1787152559.4360597,
-    "ast_hash": "0819025e33f96ccb1c718229d8e4abff",
+    "mtime": 1787226444.6262329,
+    "ast_hash": "4a8a84298d700a05785f94830888d70d",
     "semantic_hash": ""
   },
   "components/JoinUs.tsx": {
@@ -105,8 +105,8 @@
     "semantic_hash": ""
   },
   "components/Loader.tsx": {
-    "mtime": 1787070983.574879,
-    "ast_hash": "a228e48a863700783899b0eab3c2a279",
+    "mtime": 1787226444.6251247,
+    "ast_hash": "6abab9e39c8c28b269576f8f28445679",
     "semantic_hash": ""
   },
   "components/Menu.tsx": {
@@ -120,8 +120,8 @@
     "semantic_hash": ""
   },
   "components/Nav.tsx": {
-    "mtime": 1786962231.9248366,
-    "ast_hash": "ab654359131cd8e558a4d9c40df23f8a",
+    "mtime": 1787225966.8552253,
+    "ast_hash": "606804a1f6bc26e0f0e32ed510767ff6",
     "semantic_hash": ""
   },
   "components/PageTransition.tsx": {
@@ -135,13 +135,13 @@
     "semantic_hash": ""
   },
   "components/RestaurantsShowcase.tsx": {
-    "mtime": 1787156197.1562653,
-    "ast_hash": "b634307fcbc17c9490c94d87035d6694",
+    "mtime": 1787221585.8343532,
+    "ast_hash": "c46acb8c138553b1236e98862d8f0a2e",
     "semantic_hash": ""
   },
   "components/Reveal.tsx": {
-    "mtime": 1786101697.213674,
-    "ast_hash": "19b242c7644261ac63f45e2f18790b0d",
+    "mtime": 1787224750.5380306,
+    "ast_hash": "3317be79a2aec8e81a1782784f0e94a9",
     "semantic_hash": ""
   },
   "components/ReviewUs.tsx": {
@@ -165,8 +165,8 @@
     "semantic_hash": ""
   },
   "lib/blog.ts": {
-    "mtime": 1785762883.0066738,
-    "ast_hash": "f0b0af5ac5cfac66d8f262f31b33d9c3",
+    "mtime": 1787222783.7101755,
+    "ast_hash": "4c836e6339a7f0471569841c238945ca",
     "semantic_hash": ""
   },
   "lib/jobs.ts": {
@@ -185,8 +185,8 @@
     "semantic_hash": ""
   },
   "lib/restaurants.ts": {
-    "mtime": 1787156114.56592,
-    "ast_hash": "63fa2d35b38cb4e67c4683e30de4cfc4",
+    "mtime": 1787222773.1278033,
+    "ast_hash": "88f5fd9f5df7afa23b1f7fe1fde53824",
     "semantic_hash": ""
   },
   "next-env.d.ts": {
@@ -200,8 +200,8 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1787156861.1714232,
-    "ast_hash": "0df566b3be07891041983b489041f6b9",
+    "mtime": 1787222715.6837819,
+    "ast_hash": "322ab1c2368031c343ca87b6904ecb17",
     "semantic_hash": ""
   },
   "scripts/console.mjs": {
@@ -220,8 +220,8 @@
     "semantic_hash": ""
   },
   "tsconfig.json": {
-    "mtime": 1786725527.8684945,
-    "ast_hash": "e5c083057fe97d30e94e681035bb9dfd",
+    "mtime": 1787222202.9604683,
+    "ast_hash": "289941687b4f5a2dcef80779fe6fc44b",
     "semantic_hash": ""
   },
   "CLAUDE.md": {
@@ -595,73 +595,73 @@
     "semantic_hash": ""
   },
   "public/press-logo/bbcgoodfood.svg": {
-    "mtime": 1787157453.7183075,
-    "ast_hash": "b3b21ffe0bbd35551ef5f891f6e64a64",
+    "mtime": 1787157607.5645258,
+    "ast_hash": "82b23916cf7b0af336776d01fe1a5974",
     "semantic_hash": ""
   },
   "public/press-logo/country-townhouse.svg": {
-    "mtime": 1787157453.776549,
-    "ast_hash": "8e898521c4c006618025e5b548759eb7",
+    "mtime": 1787157607.6040096,
+    "ast_hash": "90e9f2ea9af1988b78695faa69f30ace",
     "semantic_hash": ""
   },
   "public/press-logo/eveningstandard.svg": {
-    "mtime": 1787157453.809561,
-    "ast_hash": "65ebe8010aed30331764a2bc9de2dc99",
+    "mtime": 1787157607.6353455,
+    "ast_hash": "33e6ec6eba28f1ab20a1775596b9b5e1",
     "semantic_hash": ""
   },
   "public/press-logo/forbes.svg": {
-    "mtime": 1787157453.850912,
-    "ast_hash": "a5053ecd73b00fc9499761fe6f8feb36",
+    "mtime": 1787157607.6868913,
+    "ast_hash": "30fb9e0c3f4870b30ce19c27ba5fc293",
     "semantic_hash": ""
   },
   "public/press-logo/hypebeast.svg": {
-    "mtime": 1787157453.9513521,
-    "ast_hash": "86ca8909c9558290489cfdf2484b7c7e",
+    "mtime": 1787157607.7328525,
+    "ast_hash": "88f156ba87b7b2bb36178011e8792d52",
     "semantic_hash": ""
   },
   "public/press-logo/infatuation.svg": {
-    "mtime": 1787157454.0016296,
-    "ast_hash": "7403545b24d83c809aa39af9b533ddac",
+    "mtime": 1787157607.7730129,
+    "ast_hash": "bd1fdf87156cda21ea03302f7b41fd64",
     "semantic_hash": ""
   },
   "public/press-logo/metro.svg": {
-    "mtime": 1787157454.0589795,
-    "ast_hash": "b5a22d688e3d0e6cd5f742d2092379e6",
+    "mtime": 1787157607.8096104,
+    "ast_hash": "b2a7ab2289ffd956f01a40d3f94cbb65",
     "semantic_hash": ""
   },
   "public/press-logo/michelin.svg": {
-    "mtime": 1787157454.1196856,
-    "ast_hash": "17888b0b6295cc527868e08c2111a3a6",
+    "mtime": 1787157607.8640978,
+    "ast_hash": "b0d4f6e2f49160d7c46e3029602580c2",
     "semantic_hash": ""
   },
   "public/press-logo/thatsup.svg": {
-    "mtime": 1787157454.172983,
-    "ast_hash": "9e8cdae3dcd0ebac5aa03be568dccb38",
+    "mtime": 1787157607.909452,
+    "ast_hash": "28ed709dab8f659eed0d9cab36403ecb",
     "semantic_hash": ""
   },
   "public/press-logo/theguardian.svg": {
-    "mtime": 1787157454.262852,
-    "ast_hash": "238bbe85b791d78ed9dd1751f9cc06da",
+    "mtime": 1787157607.9823515,
+    "ast_hash": "ceb3da125d06f1d189c6014e8674526c",
     "semantic_hash": ""
   },
   "public/press-logo/theindependent.svg": {
-    "mtime": 1787157454.390856,
-    "ast_hash": "d0a15449304c997498a75babfa419462",
+    "mtime": 1787157608.0532393,
+    "ast_hash": "9607341162d83348a54c13ccb20d4b24",
     "semantic_hash": ""
   },
   "public/press-logo/thesundaytimes.svg": {
-    "mtime": 1787157454.475459,
-    "ast_hash": "c5530eaeb67c4e3c4a66b73dd05ccbc5",
+    "mtime": 1787157608.1352074,
+    "ast_hash": "56d690c94b045ac2f400db921ede83a4",
     "semantic_hash": ""
   },
   "public/press-logo/theweek.svg": {
-    "mtime": 1787157454.5180364,
-    "ast_hash": "8f908a67083c85969da57d202faef8c2",
+    "mtime": 1787157608.1831992,
+    "ast_hash": "81988761bc40b847860752718b36b4ec",
     "semantic_hash": ""
   },
   "public/press-logo/timeout.svg": {
-    "mtime": 1787157454.5818634,
-    "ast_hash": "28b1be56fc0b663ccab1ba586321c537",
+    "mtime": 1787157608.244683,
+    "ast_hash": "e4dc27799474622bffbf5d148f095337",
     "semantic_hash": ""
   },
   ".codex/hooks.json": {
@@ -685,13 +685,13 @@
     "semantic_hash": ""
   },
   "components/PressWall.tsx": {
-    "mtime": 1787152559.4350543,
-    "ast_hash": "ae63d0cf3925d323896b1a58142e2af8",
+    "mtime": 1787225833.1615536,
+    "ast_hash": "b31acf2edc05fb295f2615918d8ae9bc",
     "semantic_hash": ""
   },
   "components/Manifesto.tsx": {
-    "mtime": 1787148052.9044712,
-    "ast_hash": "de711a6710e3ce7d97c0276abba1169f",
+    "mtime": 1787225833.158597,
+    "ast_hash": "d19fa0460a1d3530074fe660d1d0befd",
     "semantic_hash": ""
   },
   "components/Interlude.tsx": {
@@ -755,8 +755,8 @@
     "semantic_hash": ""
   },
   "components/SplitWords.tsx": {
-    "mtime": 1787139796.3701656,
-    "ast_hash": "290e495e30bd6b3cc5ff3309aa0efa2f",
+    "mtime": 1787157711.7086859,
+    "ast_hash": "d4396ae05d8bcdb1c22f3250884b3362",
     "semantic_hash": ""
   },
   "components/Reservations.tsx": {
@@ -785,8 +785,8 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1786963210.1900125,
-    "ast_hash": "8649824be568d3fd52dbf11910843931",
+    "mtime": 1787222967.7433987,
+    "ast_hash": "3a10976280acdd2ce2bbbfb021797124",
     "semantic_hash": ""
   },
   "public/images/mamasons.jpg": {
@@ -1135,8 +1135,8 @@
     "semantic_hash": ""
   },
   "components/VenueCard.tsx": {
-    "mtime": 1787132940.71993,
-    "ast_hash": "d616549f6ba7ab00b1c1a8b194292fd3",
+    "mtime": 1787225852.7491865,
+    "ast_hash": "2a60d35216f07dfdae3162e9b0e2ec61",
     "semantic_hash": ""
   },
   "lib/venueCards.ts": {
@@ -1340,8 +1340,8 @@
     "semantic_hash": ""
   },
   "components/AboutSplit.tsx": {
-    "mtime": 1787156334.2617261,
-    "ast_hash": "ba009a700df0b40b5a9cff24b014f785",
+    "mtime": 1787225833.162869,
+    "ast_hash": "82ca81d7d24099d635adba089d039f91",
     "semantic_hash": ""
   },
   "components/StoryStrip.tsx": {
@@ -1595,8 +1595,8 @@
     "semantic_hash": ""
   },
   "lib/site.ts": {
-    "mtime": 1787157226.2635138,
-    "ast_hash": "34d62f5a28034e135c09e56729e98884",
+    "mtime": 1787222773.1266956,
+    "ast_hash": "a0dfec4b827509175f6685dc9203296e",
     "semantic_hash": ""
   },
   "scripts/probe-loader-postcard.mjs": {
@@ -1825,13 +1825,108 @@
     "semantic_hash": ""
   },
   "scripts/optimize-press-logos.mjs": {
-    "mtime": 1787157425.9389524,
-    "ast_hash": "cfa1fcff10d3c9ea910f8d5efdb79c68",
+    "mtime": 1787157642.9219937,
+    "ast_hash": "bda3e3ad8b4d4ca95d3c15754d2f3a70",
     "semantic_hash": ""
   },
   "public/logo/maginhawa-mask.png": {
     "mtime": 1787157286.0778058,
     "ast_hash": "428e2f0a4a77f114eabd8d1857dba5bc",
+    "semantic_hash": ""
+  },
+  "public/og/maginhawa-og.jpg": {
+    "mtime": 1787157906.4999516,
+    "ast_hash": "36264a26f3901835f86179b863014501",
+    "semantic_hash": ""
+  },
+  "app/privacy/page.tsx": {
+    "mtime": 1787225486.3149006,
+    "ast_hash": "c57d2f646e5d648ce44b475d5a95c368",
+    "semantic_hash": ""
+  },
+  "app/terms/page.tsx": {
+    "mtime": 1787221264.5282328,
+    "ast_hash": "15aa2215af835d5be110df4addc6432d",
+    "semantic_hash": ""
+  },
+  "components/JournalPost.tsx": {
+    "mtime": 1787222770.0770617,
+    "ast_hash": "ee8653e931962229d1c071d15c33a0b7",
+    "semantic_hash": ""
+  },
+  "components/LegalPage.tsx": {
+    "mtime": 1787220925.7479913,
+    "ast_hash": "c7fcc070645c54d1444f6566139f1646",
+    "semantic_hash": ""
+  },
+  "lib/legal.ts": {
+    "mtime": 1787227315.7243955,
+    "ast_hash": "664d13a7ee588875ada8927464b561e3",
+    "semantic_hash": ""
+  },
+  "lib/posts.ts": {
+    "mtime": 1787222793.061691,
+    "ast_hash": "7fc6f2f39270dca627a6f113bf3a0663",
+    "semantic_hash": ""
+  },
+  "app/blog/[slug]/page.tsx": {
+    "mtime": 1787222770.0766842,
+    "ast_hash": "b9f0eac282973fdab904114d08f41bcb",
+    "semantic_hash": ""
+  },
+  "app/lab/layout.tsx": {
+    "mtime": 1787222625.2980535,
+    "ast_hash": "646ff2f2e6e71482b54cf417a1df1de0",
+    "semantic_hash": ""
+  },
+  "app/robots.ts": {
+    "mtime": 1787222710.938356,
+    "ast_hash": "83228b6009b581262b0f03c370e7fa3c",
+    "semantic_hash": ""
+  },
+  "app/sitemap.ts": {
+    "mtime": 1787222710.938607,
+    "ast_hash": "3f45d6d49fd9691f4db43e44170b7349",
+    "semantic_hash": ""
+  },
+  "lib/markdown.ts": {
+    "mtime": 1787222801.945486,
+    "ast_hash": "c4ef355b1315f1d073e95a1991c268cc",
+    "semantic_hash": ""
+  },
+  "content/posts/a-note-on-service.md": {
+    "mtime": 1787221853.2188065,
+    "ast_hash": "bc3e1417970688cc82c39ade9dee4544",
+    "semantic_hash": ""
+  },
+  "public/llms.txt": {
+    "mtime": 1787222753.2602181,
+    "ast_hash": "35ee5610711676ba3c37a82d9d1e712b",
+    "semantic_hash": ""
+  },
+  "scripts/probe-blog-index.mjs": {
+    "mtime": 1787225189.3789144,
+    "ast_hash": "8c6b2c62e61cc1ecff03dec3e357ea8d",
+    "semantic_hash": ""
+  },
+  "lib/consent.ts": {
+    "mtime": 1787229507.1679895,
+    "ast_hash": "7d015f420769ea4226a8d589803dfc3a",
+    "semantic_hash": ""
+  },
+  "scripts/probe-nojs.mjs": {
+    "mtime": 1787224829.2652993,
+    "ast_hash": "43c960aad11befabc3eda1c6ebef672e",
+    "semantic_hash": ""
+  },
+  "components/Analytics.tsx": {
+    "mtime": 1787225294.4799988,
+    "ast_hash": "bcfd2b7d3b119a475603fe9a639e5c2d",
+    "semantic_hash": ""
+  },
+  "components/CookieBanner.tsx": {
+    "mtime": 1787229545.7838197,
+    "ast_hash": "ef874b2a323d69ee5b2a16730a110852",
     "semantic_hash": ""
   }
 }

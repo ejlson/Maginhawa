@@ -824,6 +824,10 @@ export default function Discover() {
     <section
       ref={sectionRef}
       className={styles.section}
+      /* everything inside this chapter that hides itself for an entrance is
+         restored by the <noscript> block in app/layout.tsx — see the note on
+         the attribute in components/Reveal.tsx */
+      data-entrance="scope"
       id="restaurants"
       data-nav-theme="light"
     >
@@ -896,12 +900,24 @@ export default function Discover() {
             .labelMark sizes it in em so it tracks the label's own type
             rather than the viewport. */}
         <h2 className={styles.chapterLabel}>
+          {/* `sizes` IS WHAT STOPS THIS BEING A 2048px DOWNLOAD. With
+              `width`/`height` given and no `sizes`, next/image builds the
+              srcset from the DECLARED size at 1x and 2x — 1024w and 2048w —
+              and the browser takes the 2x entry. Measured on the live home
+              page: an 85KB WebP fetched at w_2048 to paint a mark the
+              stylesheet sizes at 3.6em, which is 47px at 13px caps. The
+              declared 1024x1024 is still the file's real size and still the
+              right aspect (see the note above); `sizes` only tells the
+              browser how much of the viewport it actually covers, which is
+              the input Cloudinary's `w_` is derived from in
+              lib/cloudinaryLoader.ts. 64px carries it to a 3x screen. */}
           <Image
             className={styles.labelMark}
             src="/logo/maginhawa.png"
             alt=""
             width={1024}
             height={1024}
+            sizes="64px"
             aria-hidden
           />
           {/* THE TWO WORDS, each in its own clip, rising on the section's

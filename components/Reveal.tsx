@@ -9,7 +9,12 @@ type RevealProps = {
   /** initial vertical offset in px — defaults to 28 (the shared home rise) */
   y?: number;
   className?: string;
-  as?: "div" | "span" | "li" | "p" | "h2" | "section";
+  /* "h1" joined this union when /contact's wordmark became the page's
+     heading rather than a second-level one — see Contact.tsx. The list is
+     explicit rather than `keyof JSX.IntrinsicElements` on purpose: a
+     Reveal is a block that fades in, and the handful of elements that is
+     ever legitimately true for is worth stating. */
+  as?: "div" | "span" | "li" | "p" | "h1" | "h2" | "section";
   /** if false, reveal replays every time the element re-enters */
   once?: boolean;
   /**
@@ -109,6 +114,23 @@ export default function Reveal({
       initial="hidden"
       whileInView="shown"
       viewport={{ once, margin: "0px 0px -16% 0px" }}
+      /* ⚠️ THE MARK THAT KEEPS THIS CONTENT FROM VANISHING WITHOUT JAVASCRIPT.
+         `initial="hidden"` is written into the SERVER-RENDERED HTML as inline
+         style — `opacity:0;filter:blur(8px);transform:translateY(28px)`, or a
+         clip-path on the wipe — and `whileInView` is what removes it. No
+         script, no observer, no removal: the markup is in the document,
+         readable by a crawler, and invisible to a person.
+
+         The counter-rule lives in the <noscript> block in app/layout.tsx and
+         keys off this attribute alone, which is why it is a VALUE and not a
+         bare flag: "rise" and "wipe" hide themselves with different
+         properties, and a blanket reset of all four would take a hover zoom
+         or a layout transform with it somewhere down the line.
+
+         Anything else on the site that hides itself for an entrance can join
+         by adding this attribute — components/Nav.tsx and the card
+         photography in components/BlogIndex.tsx already have. */
+      data-entrance={clip !== undefined ? "wipe" : "rise"}
     >
       {children}
     </Component>

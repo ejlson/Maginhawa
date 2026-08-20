@@ -900,6 +900,31 @@ export default function RestaurantsShowcase() {
       />
       <Menu open={menuOpen} onClose={() => setMenuOpen(false)} />
 
+      {/* ── THE PAGE'S <h1>, AND IT IS DELIBERATELY INVISIBLE ──
+          This route had NO heading of any level. Not a missing h1 — no
+          <h1>–<h6> anywhere in the component, so the document outline was
+          empty and both crawlers and screen-reader heading navigation had
+          nothing to land on.
+
+          IT IS `sr-only` BECAUSE THE DESIGN HAS NO TITLE TO PROMOTE. Every
+          other route on this site had its heading already and only needed
+          labelling correctly (see the note on Contact.tsx's wordmark).
+          Here there is genuinely no title in the composition: the hero is
+          a full-bleed film with a wheel of restaurant names over it, and
+          the names ARE the content. Setting a display heading on top of it
+          would be inventing a design element to satisfy a validator, which
+          is the wrong way round.
+
+          So the heading exists for the machines and the assistive tech,
+          and the page looks exactly as it was drawn. This is the
+          legitimate use of a visually-hidden heading — the page has a
+          subject, that subject is simply carried by pictures and by a list
+          of proper nouns rather than by a sentence.
+
+          ⚠️ IF A VISIBLE TITLE IS EVER ADDED TO THIS HERO, DELETE THIS.
+          Two h1s is the defect on the other side of the same coin. */}
+      <h1 className="sr-only">Our restaurants</h1>
+
       <section className={styles.hero} data-nav-theme="blend">
         {/* full-bleed background; the active restaurant's clip crossfades in */}
         <div className={styles.bg} aria-hidden>

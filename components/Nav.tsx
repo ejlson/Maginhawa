@@ -246,6 +246,11 @@ export default function Nav({
       initial={{ opacity: 0, y: -24 }}
       animate={show ? { opacity: 1, y: 0 } : { opacity: 0, y: -24 }}
       transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      /* the bar drops in, which means it is written into the server HTML as
+         opacity 0 and stays there if no script runs — i.e. a reader without
+         JavaScript would have no navigation at all. The <noscript> block in
+         app/layout.tsx keys off this; see the long note in Reveal.tsx. */
+      data-entrance="rise"
     >
       <a
         className={[styles.logo, hideLogo && styles.logoStood]
@@ -256,6 +261,14 @@ export default function Nav({
         aria-label="Maginhawa — home"
         aria-hidden={hideLogo}
         tabIndex={hideLogo ? -1 : undefined}
+        /* `hideLogo` is `onHero && !menuOpen`, and `onHero` starts TRUE — the
+           hero owns the wordmark until you scroll past it. With no script
+           nothing ever sets it false, so `.logoStood` (opacity 0, visibility
+           hidden) stands on every route and the site loses its name from the
+           one piece of chrome that survives them all. On the home page this
+           does mean the bar's wordmark and the hero's are both visible at
+           once, which is a far smaller price. */
+        data-entrance=""
       >
         {/* THE WORDMARK, SET RATHER THAN DRAWN. This was the line-art mark
             (/logo/maginhawa.png, still in public/ and unused). The name now

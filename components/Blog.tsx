@@ -1,6 +1,6 @@
 "use client";
 
-import { type CSSProperties, useRef } from "react";
+import { type CSSProperties, useMemo, useRef } from "react";
 import Image from "next/image";
 import { useInView } from "framer-motion";
 import styles from "./Blog.module.css";
@@ -14,7 +14,7 @@ import styles from "./Blog.module.css";
    Blog.module.css, because a class can be imported and a variable cannot. */
 import card from "./VenueCard.module.css";
 import PillCta from "./PillCta";
-import { BLOG, type BlogEntry } from "@/lib/blog";
+import { BLOG, entryLinkProps, type BlogEntry } from "@/lib/blog";
 import { getRestaurant } from "@/lib/restaurants";
 import { asset } from "@/lib/media";
 
@@ -58,9 +58,6 @@ const HOME_SLUGS = [
   "msn-valentine-croissants",
   "time-out-michelin-january",
 ] as const;
-const POOL = HOME_SLUGS.map((s) => BLOG.find((b) => b.slug === s)).filter(
-  (b): b is BlogEntry => Boolean(b),
-);
 
 /* ═══ WHICH STORY IS THE LEDE ═══
    THE NEWEST BY DATE, not the first slug in the list above. The curated
@@ -70,13 +67,47 @@ const POOL = HOME_SLUGS.map((s) => BLOG.find((b) => b.slug === s)).filter(
    because `dateLabel` cannot be sorted — means adding a newer entry
    promotes it without anyone having to remember to reorder the list.
 
-   The rail then takes the next four IN THE CURATED ORDER, so the editorial
-   sequence still decides everything except which story leads. The
-   remaining three are reachable through the head's archive pill; a rail
-   long enough to hold all seven would run the chapter past its own screen,
-   which is the thing this layout exists to avoid. */
-const FEATURED = [...POOL].sort((a, b) => b.date.localeCompare(a.date))[0];
-const RAIL = POOL.filter((p) => p.slug !== FEATURED?.slug).slice(0, 4);
+   The rail then opens with THAT SAME STORY and takes the curated order
+   behind it, so the editorial sequence still decides everything except
+   which story leads. The remaining entries are reachable through the head's
+   archive pill; a rail long enough to hold all seven would run the chapter
+   past its own screen, which is the thing this layout exists to avoid.
+
+   ⚠️ THE LEDE APPEARS TWICE, DELIBERATELY, at the user's instruction — and
+   the reason is that the column is labelled "Latest". It used to be
+   EXCLUDED from the rail (`filter(p => p.slug !== FEATURED.slug)`), which
+   is tidy and is the thing that reads as a bug: promoting the newest story
+   into the feature card removed it from the one list whose heading promises
+   it, so a reader scanning the column found 13 Feb at the top and reported
+   the 14th missing. It is on the page — it is the largest thing on it — but
+   "the newest entry is not in Latest" is what the eye actually reports.
+
+   FOUR ROWS EITHER WAY. The rail's height is load-bearing (see above), so
+   the lede takes the first seat rather than adding one: what drops off the
+   bottom is the fifth curated story, not a row of the layout. */
+/* ⚠️ COMPUTED FROM THE FEED PASSED IN, NOT AT MODULE SCOPE, which is where
+   all three of these lived until our own posts joined the journal. The feed
+   is no longer knowable when this module is evaluated: content/posts/*.mdx
+   is read on the server at build time and arrives as a prop (see the note on
+   the component below), so a rail built from the imported BLOG could never
+   feature a post we wrote — a slug added to HOME_SLUGS above would simply
+   fall out at the `filter(Boolean)`, silently, exactly the failure that
+   filter was chosen to make loud. */
+function buildRail(journal: BlogEntry[]) {
+  const pool = HOME_SLUGS.map((s) =>
+    journal.find((b) => b.slug === s),
+  ).filter((b): b is BlogEntry => Boolean(b));
+
+  const featured = [...pool].sort((a, b) => b.date.localeCompare(a.date))[0];
+
+  return {
+    featured,
+    rail: [
+      ...(featured ? [featured] : []),
+      ...pool.filter((p) => p.slug !== featured?.slug),
+    ].slice(0, 4),
+  };
+}
 
 /* The category, as the reader's word rather than the data's. `category` is
    a real field on every entry (lib/blog.ts) — this is the display name for
@@ -133,12 +164,7 @@ function VenueMark({ slug }: { slug?: string }) {
    focusable — the category is a <span>, not a chip you can tab to. */
 function LedeCard({ post }: { post: BlogEntry }) {
   return (
-    <a
-      className={styles.feature}
-      href={post.url}
-      target="_blank"
-      rel="noopener noreferrer"
-    >
+    <a className={styles.feature} href={post.url} {...entryLinkProps(post)}>
       <Image
         className={styles.featurePhoto}
         src={post.image}
@@ -206,8 +232,7 @@ function RailRow({ post, beat }: { post: BlogEntry; beat: number }) {
     <a
       className={styles.row}
       href={post.url}
-      target="_blank"
-      rel="noopener noreferrer"
+      {...entryLinkProps(post)}
       /* the seat is declared once on the row and INHERITED by both halves,
          so the thumbnail's sweep and the headline's descent cannot drift
          apart — they are two moves on one beat, not two beats. */
@@ -255,7 +280,17 @@ function RailRow({ post, beat }: { post: BlogEntry; beat: number }) {
  * position counter and a 110vw entrance slide. All of it is gone with the
  * strip: there is nothing left on this chapter to drag.
  */
-export default function Blog() {
+export default function Blog({ journal = BLOG }: { journal?: BlogEntry[] }) {
+  /* ── THE FEED ARRIVES FROM app/page.tsx, THROUGH <Experience> ──
+     This is a client component; our own posts are read off the filesystem,
+     which only a server component can do. The default keeps the chapter
+     rendering on press alone if a route ever forgets to pass it — see the
+     architecture note at the top of lib/posts.ts. */
+  const { featured: FEATURED, rail: RAIL } = useMemo(
+    () => buildRail(journal),
+    [journal],
+  );
+
   const sectionRef = useRef<HTMLElement>(null);
   /* ⚠️ THE OBSERVER WATCHES THE HEAD, NOT THE SECTION, AND THAT IS A FIX FOR
      A REAL BREAKAGE. It read `useInView(sectionRef, { amount: 0.1 })` — 10%
@@ -287,6 +322,10 @@ export default function Blog() {
     <section
       ref={sectionRef}
       className={styles.section}
+      /* everything inside this chapter that hides itself for an entrance is
+         restored by the <noscript> block in app/layout.tsx — see the note on
+         the attribute in components/Reveal.tsx */
+      data-entrance="scope"
       id="blog"
       data-nav-theme="light"
       /* THE ONE SWITCH. Everything the cascade does hangs off this
@@ -333,12 +372,16 @@ export default function Blog() {
       <div className={styles.head} ref={headRef}>
         <div className={styles.labelRow}>
           <h2 className={styles.chapterLabel}>
+            {/* `sizes` — see the fuller note in Discover.tsx. Without it
+                the srcset is the declared 1024/2048 and the browser takes
+                2048 for a mark `.labelMark` sizes at 2.6em. */}
             <Image
               className={styles.labelMark}
               src="/logo/maginhawa.png"
               alt=""
               width={1024}
               height={1024}
+              sizes="48px"
               aria-hidden
             />
             {/* the word is wrapped because it has to be masked separately
@@ -370,8 +413,31 @@ export default function Blog() {
             our story" and the closing frame's "Choose a restaurant" (see
             components/PillCta.tsx). `styles.ctaHost` is the SEAT only: it
             hangs the pill off the display line's bottom edge at the row's
-            right end. The label reads "Read More"; the accessible name says
-            what it actually opens, which is the whole archive. */}
+            right end.
+
+            ⚠️ THE LABEL READS "All Stories" AND IT USED TO READ "Read More",
+            which failed two separate checks on the live site for one reason.
+            The pattern was: visible label short and generic, accessible name
+            carrying the real meaning. Both halves of that are a problem.
+
+            "read more" is on Lighthouse's blocklist of non-descriptive link
+            text, and that audit reads the anchor's TEXT CONTENT — the
+            aria-label is not consulted at all, so no wording of it could have
+            satisfied the check. Separately, axe's `label-content-name-mismatch`
+            fires whenever the visible text is not contained in the accessible
+            name: "Read More" is not a substring of "Read all stories", which
+            means someone driving the page by voice who says "click Read More"
+            — reading the words in front of them — matches nothing.
+
+            Naming the destination in the visible label fixes both at once,
+            and it is the honest label anyway: this opens the archive, not the
+            next article. The aria-label is KEPT and unchanged, both because
+            "Read all stories" is the fuller sentence and because "All
+            Stories" is a substring of it, which is exactly the containment
+            the check wants. "All Stories" is also within a character or two
+            of the old label, so the pill — `inline-flex`, sized by its
+            content, hung `justify-self: end` — grows leftward by a hair
+            rather than moving anything. */}
         {/* ⚠️ THE SWEEP GOES ON THE HOST, WHICH IS WHAT `className` LANDS
             ON — never on the magnet inside it. PillCta writes the cursor
             spring's x/y to `.magnet`'s inline style, so anything this file
@@ -384,7 +450,7 @@ export default function Blog() {
           className={styles.ctaHost}
           aria-label="Read all stories"
         >
-          Read More
+          All Stories
         </PillCta>
 
         {/* presentational — the outline does not need a rule announced */}

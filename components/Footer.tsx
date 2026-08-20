@@ -80,6 +80,15 @@ const CONTACT_LINKS: FootLink[] = [
     : []),
 ];
 
+// The legal routes. Kept as their own list rather than appended to EXPLORE:
+// that column is wayfinding for someone deciding where to eat, and these are
+// reference documents someone goes looking for on purpose. Different job,
+// different row (see .bottomRow below).
+const LEGAL: FootLink[] = [
+  { label: "Privacy", href: "/privacy" },
+  { label: "Terms", href: "/terms" },
+];
+
 // internal links keep a real href (works without JS) but upgrade the click
 // to the curtain transition; externals are plain new-tab anchors
 function FootLinkA({ link }: { link: FootLink }) {
@@ -143,7 +152,7 @@ export default function Footer() {
   };
 
   return (
-    <footer className={styles.footer}>
+    <footer className={styles.footer} data-entrance="scope">
       {/* TOP BAND — mark | blurb | invitation. Shares one grid with the links
           band below it, so the blurb sits over "Back to top" and the
           invitation sits over the columns. */}
@@ -226,7 +235,7 @@ export default function Footer() {
 
         <div className={styles.cols}>
           <div className={styles.col}>
-            <h4>Explore</h4>
+            <h3>Explore</h3>
             <ul>
               {EXPLORE.map((i) => (
                 <li key={i.label}>
@@ -237,7 +246,7 @@ export default function Footer() {
           </div>
 
           <div className={styles.col}>
-            <h4>Contact Us</h4>
+            <h3>Contact Us</h3>
             <ul>
               {CONTACT_LINKS.map((i) => (
                 <li key={i.label}>
@@ -250,7 +259,7 @@ export default function Footer() {
           </div>
 
           <div className={styles.col}>
-            <h4>Follow Us</h4>
+            <h3>Follow Us</h3>
             <ul>
               {SOCIALS.map((s) => (
                 <li key={s.label}>
@@ -319,12 +328,32 @@ export default function Footer() {
       </div>
 
       <div className={styles.bottomRow}>
-        <span>Maginhawa Group</span>
+        {/* NO YEAR IN THE COPYRIGHT LINE, AND THAT IS DELIBERATE.
+            `new Date().getFullYear()` in here is the classic static-export
+            hydration bug: the HTML is generated once at build time and
+            carries the build's year, then the browser hydrates with the
+            CURRENT year, and on 1 January every deployed page mismatches
+            until someone rebuilds. A year is optional in a UK copyright
+            notice anyway — the right arises automatically — so the honest
+            fix is to not claim a date this build cannot know. */}
+        <span>© Maginhawa Group</span>
+
+        {/* THE LEGAL ROW. These two routes are reachable from nowhere else
+            on the site — they are deliberately absent from the nav, the
+            menu overlay and the Explore column, because a privacy notice
+            that competes with "Restaurants" for a reader's attention is
+            mis-weighted. The footer's bottom row is where a reader looks
+            for them and the only place they need to be. */}
+        <nav className={styles.legal} aria-label="Legal">
+          {LEGAL.map((i) => (
+            <FootLinkA key={i.label} link={i} />
+          ))}
+        </nav>
+
         <div>
           <span>Website designed by </span>
           <span className={styles.developer}>EJ</span>
         </div>
-        {/* <span>By (EJ)</span> */}
       </div>
     </footer>
   );

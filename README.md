@@ -2,14 +2,22 @@
 
 How to add, change and remove content on the Maginhawa Group website.
 
-This site has **no CMS**. Every piece of content is a TypeScript file in the repo,
-edited in a code editor and published by committing. That sounds intimidating and
-isn't — most edits are copying an existing block, changing the words inside the
-quote marks, and saving.
+This site has **no CMS**. Content lives in the repo as files, edited in a code
+editor and published by committing. That sounds intimidating and isn't — most
+edits are copying an existing block, changing the words inside the quote marks,
+and saving.
 
-> **The one rule that matters:** content is data, and the data lives in `lib/`.
-> If you find yourself editing a component in `components/` to change a sentence,
-> check the table below first — there's often a data file that owns it.
+There are two kinds of content file:
+
+- **Journal posts we write** are Markdown — `content/posts/<name>.md`. One file
+  per post, and it becomes its own page. See [The Journal](#3-the-journal-blog).
+- **Everything else** is a TypeScript data file in `lib/` — restaurants, jobs,
+  contact details, press coverage. Lists of facts, not prose.
+
+> **The one rule that matters:** content is data, and the data lives in `lib/`
+> (or, for a post, in `content/posts/`). If you find yourself editing a component
+> in `components/` to change a sentence, check the table below first — there's
+> often a data file that owns it.
 
 ---
 
@@ -59,6 +67,21 @@ npm run build
 **Never run `npm run build` while `npm run dev` is running** — they write to the
 same `.next` folder and will corrupt each other. Stop the dev server first.
 
+`npm run build` writes a folder of finished files to `out/`, which is exactly
+what the live site serves. To look at that rather than the dev server:
+
+```bash
+npx serve out -l 3100
+```
+
+One difference to know about: the dev server and the live site both understand
+`/blog/a-note-on-service`, but a plain local file server does not — open
+`/blog/a-note-on-service.html` there instead.
+
+> **After pulling these changes for the first time, run `npm install` again.**
+> Writing posts added two packages (`gray-matter` for the post facts, and the `remark`/`rehype` family for the writing), and
+> without them the site won't start.
+
 ### How to read the data files
 
 Content files are arrays of objects. One object = one blog post, one restaurant,
@@ -93,7 +116,9 @@ line. Nothing is lost — fix the line and it recovers.
 
 | What you want to change | File | The bit to edit |
 | --- | --- | --- |
-| Blog / Journal posts | [lib/blog.ts](lib/blog.ts) | `BLOG` (L24) |
+| **Journal posts we write** | `content/posts/<name>.md` | the whole file — one per post |
+| Which posts appear on the home page | [components/Blog.tsx](components/Blog.tsx) | `HOME_SLUGS` |
+| Press coverage & other links in the Journal | [lib/blog.ts](lib/blog.ts) | `BLOG` |
 | Restaurant facts, addresses, booking links, menus | [lib/restaurants.ts](lib/restaurants.ts) | `RESTAURANTS` (L40) |
 | Restaurant tiles on the home page | [components/Discover.tsx](components/Discover.tsx) | `ITEMS` (L48) |
 | Restaurant carousel on `/restaurants` | [components/RestaurantsShowcase.tsx](components/RestaurantsShowcase.tsx) | `RESTAURANTS` (L79) |
@@ -115,64 +140,203 @@ line. Nothing is lost — fix the line and it recovers.
 
 ## 3. The Journal (blog)
 
-**File:** [lib/blog.ts](lib/blog.ts)
+The Journal has **two kinds of entry**, and which one you are adding decides
+which file you touch.
 
-One array, `BLOG`, holds everything. It powers three surfaces at once:
+| | **Our own posts** | **Coverage we link to** |
+| --- | --- | --- |
+| Lives in | `content/posts/<slug>.md` — one file per post | [lib/blog.ts](lib/blog.ts) — one block per entry |
+| The reader lands on | a page on this site, `/blog/<slug>` | the outlet's own website, in a new tab |
+| You write | a headline, a few facts, and the piece itself | just the card — there is no page behind it |
 
-- the `/blog` index page (paginated, 9 per page after the featured post),
-- the Journal section on the home page (draws from the newest 12),
-- the large photograph directly above it, which always uses the **newest** entry.
+Both kinds flow into the same three places, mixed together and **sorted by date,
+newest first, automatically**:
 
-Posts are **sorted automatically by date**, newest first. You do not need to
-insert new entries in any particular position in the file — put them anywhere and
-the site orders them.
+- the `/blog` index — one featured story at the top, then 8 cards a page,
+- the "Latest" rail on the home page (hand-picked — see [below](#put-a-post-on-the-home-page)),
+- the restaurant filter on `/blog`, which counts both kinds.
 
-### Add a post
+---
 
-Copy an existing block, paste it inside the `BLOG` array, and change the values:
+### Write a post
+
+**1. Make the file.** Anywhere in `content/posts/`, named for the web address you
+want:
+
+```
+content/posts/a-note-on-service.md   →   /blog/a-note-on-service
+```
+
+Lowercase, hyphens instead of spaces, ending in `.md`. **The filename is the
+URL** — there is no `slug` field to fill in, and renaming the file changes the
+address (which breaks any link already shared, so decide before you publish).
+
+**2. Open it with the facts, then write.** The block between the two `---` lines
+is the card; everything after it is the piece.
+
+```md
+---
+title: "A note on service"
+date: 2026-08-20
+excerpt: "Why we stopped calling it hospitality and started calling it looking after people."
+image: /blog/DSCF2298-web.jpg
+restaurant: belly
+category: news
+author: "Chef Omar"
+---
+
+My parents opened Bintang on Kentish Town Road in 1987 with a dining room
+that sat under thirty people.
+
+## What we mean by service
+
+Everything since has been an attempt to write that down without killing it.
+```
+
+| Field | Required | Notes |
+| --- | --- | --- |
+| `title` | yes | The headline. Shown on the card and as the page's heading. |
+| `date` | yes | **`YYYY-MM-DD`**. Drives the ordering of the whole Journal. |
+| `excerpt` | yes | The standfirst under the headline on the card, and the description Google shows. Two sentences reads best. |
+| `image` | yes | The photograph at the top of the post and on its card. A path under `public/` — see [Images & video](#12-images--video). |
+| `category` | yes | One of `news`, `feature`, `review`, `inclusion`. Nothing else is accepted. |
+| `author` | no | The byline. Defaults to `Maginhawa Group`. |
+| `restaurant` | no | A restaurant slug from [lib/restaurants.ts](lib/restaurants.ts) — `belly`, `mamasons`, `guanabana`… Puts the venue's mark on the card and files the post under that room in the `/blog` filter. |
+| `imageAlt` | no | A description of the photograph for screen readers. Leave it out unless the picture says something the words don't — the headline sits right under it and describing the same thing twice is noise. |
+
+Quotes around the text are the safe habit; they are only strictly required when
+the line contains a `:` or starts with punctuation.
+
+### What you do **not** have to write
+
+All of this is worked out from the file for you:
+
+- the pretty date (`20 Aug 2026`) — from `date`,
+- the "2 min read" estimate — from the length of the piece,
+- the web address — from the filename,
+- the card on `/blog` and its place in the order,
+- the page title, search description, and the preview card shown when the link
+  is shared on WhatsApp, Slack or Facebook,
+- the structured data Google reads to treat the page as an article.
+
+### Writing the piece
+
+The body is **Markdown** — plain text with a few marks in it.
+
+| You type | You get |
+| --- | --- |
+| `## A heading` | A section heading in the display face |
+| a blank line between blocks | A new paragraph |
+| `**important**` | **bold** |
+| `*quietly*` | *italic* |
+| `- a point` (one per line) | A list, marked with the house em-dash |
+| `> One standard, held in eight rooms.` | A pull quote, set large in the display face |
+| `[Belly](https://www.bellylondon.com)` | A link. External ones open in a new tab on their own. |
+| `![](/blog/DSCF3015-web.jpg)` | A photograph, full width, mid-piece |
+| `---` on its own line | A short centred rule between sections |
+
+A single newline inside a paragraph is just a line wrap — it does not start a new
+paragraph. Leave a blank line for that.
+
+### Drafts
+
+**Put an underscore at the front of the filename** and the post is skipped
+entirely:
+
+```
+content/posts/_kentish-town-opens.md     ← written, committed, not published
+content/posts/kentish-town-opens.md      ← published
+```
+
+Renaming it is what publishes it. This is the safe way to work on something over
+several days, or to have it reviewed, without it appearing on the site.
+
+### Look at it before you publish
+
+```bash
+npm run dev
+```
+
+Then open <http://localhost:3000/blog>. The post should be at the top if it is
+the newest; click it to read the page. Save the file and the browser updates
+itself.
+
+### Edit a post
+
+Open the file and change the words. Nothing else needs touching — the card, the
+page and the search description all read from the same file.
+
+If you change `title` after publishing, the address stays the same (it comes from
+the filename), which is usually what you want.
+
+### Delete a post
+
+Delete the file. The index re-paginates itself.
+
+> **Careful:** deleting the newest entry also changes the large featured card at
+> the top of `/blog`, because it always shows whatever is now newest. Look at the
+> page afterwards.
+
+### Put a post on the home page
+
+The "Latest" rail on the home page is **hand-picked, not automatic** — it shows
+four chosen stories rather than the four newest. The list is `HOME_SLUGS` near the
+top of [components/Blog.tsx](components/Blog.tsx):
+
+```ts
+const HOME_SLUGS = [
+  "olive-best-new-restaurants",
+  "a-note-on-service",        // ← a post of ours, named by its filename
+  ...
+] as const;
+```
+
+Add the post's slug (its filename without `.md`) and remove one, since only four
+fit. Whichever entry in that list is **newest by date** becomes the big
+photograph above the rail.
+
+---
+
+### Add a link to someone else's article
+
+Coverage in the press gets a card but no page — clicking it sends the reader to
+the publication. Copy an existing block inside the `BLOG` array in
+[lib/blog.ts](lib/blog.ts) and change the values:
 
 ```ts
 {
-  slug: "belly-summer-menu",
-  title: "Belly's summer menu lands",
-  date: "2026-08-01",
-  dateLabel: "1 Aug 2026",
+  slug: "olive-best-new-restaurants",
+  title: "Belly named among London's best new restaurants",
+  date: "2026-02-14",
+  dateLabel: "14 Feb 2026",
   excerpt:
-    "Two sentences at most — this is the paragraph that appears under the headline on the card.",
-  source: "Belly",
-  url: "https://www.bellylondon.com/blog/summer-menu",
-  image: "/blog/DSCF3015-web.jpg",
+    "Two sentences at most — this is the paragraph under the headline on the card.",
+  source: "Olive Magazine",
+  url: "https://www.olivemagazine.com/restaurants/london/best-new-restaurants-in-london/",
+  image: "/blog/DSCF3052-web.jpg",
   restaurant: "belly",
   category: "feature",
-  kind: "native",
+  kind: "press",
 },
 ```
 
 | Field | Required | Notes |
 | --- | --- | --- |
-| `slug` | yes | Lowercase, hyphens, no spaces. Must be unique. Used as an internal key. |
-| `title` | yes | The headline. |
-| `date` | yes | **`YYYY-MM-DD`** — this drives the sorting. Get it wrong and the post lands in the wrong place. |
-| `dateLabel` | yes | What readers see, e.g. `"1 Aug 2026"`. Keep it consistent with `date`. |
-| `excerpt` | yes | Card summary. Two sentences reads best. |
-| `source` | yes | Who published it — the outlet, or the restaurant for our own posts. |
-| `url` | yes | Where clicking the card sends the reader. Posts link **out** to the original article. |
-| `image` | yes | Path under `public/`. See [Images & video](#12-images--video). |
-| `restaurant` | no | A restaurant `slug` from `lib/restaurants.ts` — `belly`, `cafemama`, etc. |
-| `category` | yes | One of `"feature"`, `"review"`, `"news"`, `"inclusion"`. Nothing else is allowed. |
-| `kind` | yes | `"native"` for our own writing, `"press"` for external coverage. |
+| `slug` | yes | Lowercase, hyphens. Must be unique — and must not match the filename of one of our posts. |
+| `title` | yes | The headline as the outlet ran it. |
+| `date` | yes | **`YYYY-MM-DD`** — drives the sorting. |
+| `dateLabel` | yes | What readers see: `"14 Feb 2026"`. Typed by hand here, so keep it in step with `date`. |
+| `excerpt` | yes | Card summary. |
+| `source` | yes | The outlet. This is the credential the card leads with. |
+| `url` | yes | The article. Must start `https://` — that is what makes the card open in a new tab. |
+| `image` | yes | Path under `public/`. |
+| `restaurant` | no | A restaurant slug. |
+| `category` | yes | `feature`, `review`, `news` or `inclusion`. |
+| `kind` | yes | `press` for coverage in a publication; `native` for something a venue published itself (its own blog, a creator's TikTok). Both still link out. |
 
-### Edit a post
-
-Find it by its `title` and change the words. Nothing else needs touching.
-
-### Delete a post
-
-Delete the whole block from `{` to `},` inclusive. The index re-paginates itself.
-
-> **Careful:** deleting the newest post also changes the big photograph above the
-> home page Journal section and the featured card on `/blog`, because both take
-> whatever is now first. Look at both pages afterwards.
+> **Do not add our own posts to this array.** An entry here is a card with no
+> page behind it — the post's own file in `content/posts/` already produces its
+> card. The build will stop with an error if a slug appears in both places.
 
 ---
 
@@ -201,11 +365,11 @@ Useful fields in `lib/restaurants.ts`:
 
 ```ts
 {
-  slug: "belly",                       // web address: /restaurants/belly
+  slug: "belly",                       // the key everything else joins on
   name: "Belly",
   tagline: "Modern Filipino Bistro",
   cuisine: "Filipino · Bistro",
-  description: "Shown on the detail page and in Google results.",
+  description: "Shown on the /restaurants page and in Google results.",
   location: "Kentish Town, London",    // editorial shorthand
   addresses: [                         // the postal address; drives /contact
     { street: "157 Kentish Town Rd", locality: "London", postcode: "NW1 8PD" },
@@ -394,7 +558,7 @@ Four separate lists, each feeding a different surface:
 | `FEATURED_OUTLETS` | L26 | The scrolling masthead logos ("As seen in") |
 | `HIGHLIGHT_QUOTES` | L49 | The rotating pull-quote beneath the logos |
 | `PRESS_INDEX` | L87 | The compact outlet/year/quote list |
-| `PRESS` | L143 | Full coverage — the Awards & Recognition table on `/about`, and per-restaurant press on each detail page |
+| `PRESS` | L143 | Full coverage — the Awards & Recognition table on `/about`, and the structured data search engines read |
 
 **To add a logo to the masthead:** save the outlet's SVG into
 `public/press-logo/`, then add a line to `FEATURED_OUTLETS`:
@@ -566,15 +730,22 @@ better on screen, it just takes longer to arrive.
 
 Give files descriptive lowercase names with hyphens: `belly-dining-room.jpg`.
 
+**Photographs inside a post** work the same way: put the file in `public/blog/`
+and write `![](/blog/your-photo.jpg)` on its own line in the post. It renders
+full width, and it loads lazily so it costs nothing until the reader scrolls to
+it.
+
 ### Video
 
-`public/videos/` is **excluded from git** — the files are too large for GitHub.
-Video is copied to the server separately.
+`public/videos/` **is committed to git and ships with the site** — that changed
+when the site moved to Cloudflare Pages, whose bandwidth is free and unmetered.
+The one hard rule is Cloudflare's: **no single file over 25MB**, or the whole
+deploy is refused. `scripts/compress-media.mjs` is what brings clips under it.
 
-This means: if you add a clip and reference it, it will work on your machine and
-be **missing for everyone else** until it's uploaded to the host. Coordinate with
-whoever manages deployment before pointing new `video:` or `clip:` fields at a
-file. Existing clips are already on the server and safe to reuse.
+Photographs can optionally be served from a CDN instead of `public/` — set
+`NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` at build time. Leaving it unset serves them
+from `public/` at their original size, which works but is heavier. See
+`.env.example` and `CLOUDINARY.md`.
 
 ---
 
@@ -595,8 +766,13 @@ export const metadata: Metadata = {
 };
 ```
 
-Restaurant detail pages build their own titles and descriptions from
-`lib/restaurants.ts` and `lib/press.ts` — edit the restaurant data, not the page.
+**Journal posts write their own.** A post's title, search description, share
+preview and structured data all come from the frontmatter at the top of its
+`.md` file — there is no `metadata` block to edit and no `app/` file to create.
+Change `title` or `excerpt` in the post and everything follows.
+
+The address the site calls home — used in every canonical link, share preview and
+piece of structured data — is the single line in [lib/site.ts](lib/site.ts).
 
 ---
 
@@ -616,8 +792,14 @@ npm run build
 git add -A && git commit -m "Update August menus and close the Sous Chef role" && git push
 ```
 
-Deployment to Vercel runs from the push. A failed build does **not** replace the
-live site — the previous version stays up.
+**Cloudflare Pages builds from the push** and the new version is live a couple of
+minutes later at <https://www.maginhawagroup.co.uk>. A failed build does **not**
+replace the live site — the previous version stays up, and the failure is
+reported in the Cloudflare dashboard.
+
+There is nothing to press: committing a post is publishing it. If you are not
+ready for that, rename the file with a leading underscore (see
+[Drafts](#drafts)) and commit it that way.
 
 If you changed component files rather than just data, refresh the project's code
 map afterwards:
@@ -666,6 +848,24 @@ The home page tiles keep their own copy in `ITEMS` in
 
 **A new blog post isn't at the top.**
 Check `date` is in `YYYY-MM-DD` form. `"01-08-2026"` sorts as if it were the year 1.
+
+**A post I wrote isn't on the site at all.**
+Three things to check, in order: the filename does not start with `_` (that means
+draft), it ends in `.md`, and it is inside `content/posts/`.
+
+**`content/posts/….md: \`category\` must be one of feature, review, news, inclusion`**
+The build checks a post's facts and stops rather than publishing something
+broken. The message names the file and the field. The same happens for a missing
+`title`, `excerpt` or `image`, a `date` that isn't `YYYY-MM-DD`, and a
+`restaurant` that isn't one of ours.
+
+**`…collides with the … entry in lib/blog.ts`**
+A post's filename is the same as the `slug` of a press entry. Rename one of them
+— two entries cannot own the same address.
+
+**The post's page is there but the text runs together in one block.**
+Markdown needs a **blank line** between paragraphs. A single newline is only a
+line wrap.
 
 **A restaurant card has no logo, or its link goes nowhere.**
 Its display name doesn't match across `SLUG_BY_NAME`, `LOGOS`, `PHOTOS` and the

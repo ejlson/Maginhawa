@@ -92,6 +92,10 @@ export default function PressWall() {
   return (
     <section
       className={styles.section}
+      /* everything inside this chapter that hides itself for an entrance is
+         restored by the <noscript> block in app/layout.tsx — see the note on
+         the attribute in components/Reveal.tsx */
+      data-entrance="scope"
       aria-labelledby="featured-in"
       data-nav-theme="light"
     >

@@ -200,8 +200,8 @@
     "semantic_hash": ""
   },
   "package.json": {
-    "mtime": 1785762883.0053775,
-    "ast_hash": "a4519bef6dc4d93ef1178a8be22c6799",
+    "mtime": 1787156861.1714232,
+    "ast_hash": "0df566b3be07891041983b489041f6b9",
     "semantic_hash": ""
   },
   "scripts/console.mjs": {
@@ -595,73 +595,73 @@
     "semantic_hash": ""
   },
   "public/press-logo/bbcgoodfood.svg": {
-    "mtime": 1783956225.882029,
-    "ast_hash": "dc5830ed7feda640f0ef8b714c0c1d05",
+    "mtime": 1787157453.7183075,
+    "ast_hash": "b3b21ffe0bbd35551ef5f891f6e64a64",
     "semantic_hash": ""
   },
   "public/press-logo/country-townhouse.svg": {
-    "mtime": 1783956225.8823779,
-    "ast_hash": "e896c6144d9ead8a9c31f9c407219941",
+    "mtime": 1787157453.776549,
+    "ast_hash": "8e898521c4c006618025e5b548759eb7",
     "semantic_hash": ""
   },
   "public/press-logo/eveningstandard.svg": {
-    "mtime": 1783956225.8833237,
-    "ast_hash": "9cfa654ceb49bcb4639975b1c47d001d",
+    "mtime": 1787157453.809561,
+    "ast_hash": "65ebe8010aed30331764a2bc9de2dc99",
     "semantic_hash": ""
   },
   "public/press-logo/forbes.svg": {
-    "mtime": 1783956225.8840759,
-    "ast_hash": "b6ef94eeec772c6ae5364d015ffb981a",
+    "mtime": 1787157453.850912,
+    "ast_hash": "a5053ecd73b00fc9499761fe6f8feb36",
     "semantic_hash": ""
   },
   "public/press-logo/hypebeast.svg": {
-    "mtime": 1783956225.8852983,
-    "ast_hash": "0f7db272abb1af8934d4e9d59b8aaf55",
+    "mtime": 1787157453.9513521,
+    "ast_hash": "86ca8909c9558290489cfdf2484b7c7e",
     "semantic_hash": ""
   },
   "public/press-logo/infatuation.svg": {
-    "mtime": 1783956225.8859968,
-    "ast_hash": "54d96ede7b1d02d0eb28dcb5a40a5b47",
+    "mtime": 1787157454.0016296,
+    "ast_hash": "7403545b24d83c809aa39af9b533ddac",
     "semantic_hash": ""
   },
   "public/press-logo/metro.svg": {
-    "mtime": 1783956225.8862696,
-    "ast_hash": "300d1a5eb040bbb6128525a8a80f2449",
+    "mtime": 1787157454.0589795,
+    "ast_hash": "b5a22d688e3d0e6cd5f742d2092379e6",
     "semantic_hash": ""
   },
   "public/press-logo/michelin.svg": {
-    "mtime": 1783956225.8873305,
-    "ast_hash": "f6d7c8a3fe5abe9fbbda48a3d612d894",
+    "mtime": 1787157454.1196856,
+    "ast_hash": "17888b0b6295cc527868e08c2111a3a6",
     "semantic_hash": ""
   },
   "public/press-logo/thatsup.svg": {
-    "mtime": 1783956225.8879921,
-    "ast_hash": "3f6bbc9b29574a725fc5de2a89ba68f8",
+    "mtime": 1787157454.172983,
+    "ast_hash": "9e8cdae3dcd0ebac5aa03be568dccb38",
     "semantic_hash": ""
   },
   "public/press-logo/theguardian.svg": {
-    "mtime": 1783956225.8892565,
-    "ast_hash": "2b0bb0682ca594b6023d68852954261a",
+    "mtime": 1787157454.262852,
+    "ast_hash": "238bbe85b791d78ed9dd1751f9cc06da",
     "semantic_hash": ""
   },
   "public/press-logo/theindependent.svg": {
-    "mtime": 1785762883.1304488,
-    "ast_hash": "9a23ab1fe4a0cef52f64810135f9c1f5",
+    "mtime": 1787157454.390856,
+    "ast_hash": "d0a15449304c997498a75babfa419462",
     "semantic_hash": ""
   },
   "public/press-logo/thesundaytimes.svg": {
-    "mtime": 1785762883.130554,
-    "ast_hash": "bb19f79bfa4f50560797776f813c3b7a",
+    "mtime": 1787157454.475459,
+    "ast_hash": "c5530eaeb67c4e3c4a66b73dd05ccbc5",
     "semantic_hash": ""
   },
   "public/press-logo/theweek.svg": {
-    "mtime": 1783956225.8958073,
-    "ast_hash": "2e5a3c1c4f86edefbe31b5c5b2e1a723",
+    "mtime": 1787157454.5180364,
+    "ast_hash": "8f908a67083c85969da57d202faef8c2",
     "semantic_hash": ""
   },
   "public/press-logo/timeout.svg": {
-    "mtime": 1783956225.8974075,
-    "ast_hash": "43b601b5604acdb11e2efc4c7a9e61b9",
+    "mtime": 1787157454.5818634,
+    "ast_hash": "28b1be56fc0b663ccab1ba586321c537",
     "semantic_hash": ""
   },
   ".codex/hooks.json": {
@@ -1595,8 +1595,8 @@
     "semantic_hash": ""
   },
   "lib/site.ts": {
-    "mtime": 1786965263.745021,
-    "ast_hash": "3b1b4161a5326bb96208c65c104f348c",
+    "mtime": 1787157226.2635138,
+    "ast_hash": "34d62f5a28034e135c09e56729e98884",
     "semantic_hash": ""
   },
   "scripts/probe-loader-postcard.mjs": {
@@ -1815,13 +1815,23 @@
     "semantic_hash": ""
   },
   "app/not-found.tsx": {
-    "mtime": 1787156664.3289385,
-    "ast_hash": "d6dba851cc6698e6a51878d340fa658a",
+    "mtime": 1787157138.7091155,
+    "ast_hash": "360b6218b1c1d29f7245704eb895e578",
     "semantic_hash": ""
   },
   "scripts/probe-404.mjs": {
-    "mtime": 1787156679.4126601,
-    "ast_hash": "c8dc2e071ba6fac07eaee9b2c4bbe533",
+    "mtime": 1787157363.368404,
+    "ast_hash": "9a87fa23e3121e942ef0932cb96e316c",
+    "semantic_hash": ""
+  },
+  "scripts/optimize-press-logos.mjs": {
+    "mtime": 1787157425.9389524,
+    "ast_hash": "cfa1fcff10d3c9ea910f8d5efdb79c68",
+    "semantic_hash": ""
+  },
+  "public/logo/maginhawa-mask.png": {
+    "mtime": 1787157286.0778058,
+    "ast_hash": "428e2f0a4a77f114eabd8d1857dba5bc",
     "semantic_hash": ""
   }
 }
