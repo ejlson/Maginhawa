@@ -30,7 +30,7 @@
     "semantic_hash": ""
   },
   "components/About.tsx": {
-    "mtime": 1787234157.971256,
+    "mtime": 1787236342.1111922,
     "ast_hash": "faeac3dfcb9add1d6f6a319c69d53a89",
     "semantic_hash": ""
   },
@@ -50,8 +50,8 @@
     "semantic_hash": ""
   },
   "components/Contact.tsx": {
-    "mtime": 1787221538.4593654,
-    "ast_hash": "db2b2a28cdfb4aea83fca20bfda91b81",
+    "mtime": 1787236816.2399154,
+    "ast_hash": "2ec55c3ef33b8b25decb24a70c0649ef",
     "semantic_hash": ""
   },
   "components/ContactPage.tsx": {
@@ -785,8 +785,8 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1787222967.7433987,
-    "ast_hash": "3a10976280acdd2ce2bbbfb021797124",
+    "mtime": 1787236919.7885609,
+    "ast_hash": "772f2c68157a60971768785d2010898c",
     "semantic_hash": ""
   },
   "public/images/mamasons.jpg": {
@@ -1415,8 +1415,8 @@
     "semantic_hash": ""
   },
   "components/PillCta.tsx": {
-    "mtime": 1786725527.5016646,
-    "ast_hash": "a26fed0775b2910677bd19842db240fd",
+    "mtime": 1787236702.4339957,
+    "ast_hash": "3a953a15d5c6fa32a9d8e3056ea59776",
     "semantic_hash": ""
   },
   "scripts/probe-home-spacing.mjs": {
@@ -1840,8 +1840,8 @@
     "semantic_hash": ""
   },
   "app/privacy/page.tsx": {
-    "mtime": 1787234069.1392384,
-    "ast_hash": "7b6c79ab439600a014fe01e32b177ddc",
+    "mtime": 1787236919.7625394,
+    "ast_hash": "d26394d0057029488d697f5c984923e9",
     "semantic_hash": ""
   },
   "app/terms/page.tsx": {
@@ -1932,6 +1932,31 @@
   "components/MarketingPixels.tsx": {
     "mtime": 1787232393.7357528,
     "ast_hash": "11195d65a67595883daceb863c8b3f6c",
+    "semantic_hash": ""
+  },
+  "functions/api/.contact.probe.mjs": {
+    "mtime": 1787236764.3138096,
+    "ast_hash": "0dcc6dde34319b511929b5f536975f7a",
+    "semantic_hash": ""
+  },
+  "functions/api/contact.ts": {
+    "mtime": 1787236597.9341617,
+    "ast_hash": "3e2c3baddd821a08ebce714fa2b122b0",
+    "semantic_hash": ""
+  },
+  "scripts/_tmp-overflow.mjs": {
+    "mtime": 1787236792.406999,
+    "ast_hash": "5130c9bb9fd7b18e570bea8dcfa2328c",
+    "semantic_hash": ""
+  },
+  "scripts/_tmp-verify-service.mjs": {
+    "mtime": 1787236738.4873295,
+    "ast_hash": "6953460cc93a48532d86e8a2ce2041d5",
+    "semantic_hash": ""
+  },
+  "scripts/probe-contact-fn.mjs": {
+    "mtime": 1787236794.1535947,
+    "ast_hash": "474906a3fea9942bdda185a3959f4e83",
     "semantic_hash": ""
   }
 }

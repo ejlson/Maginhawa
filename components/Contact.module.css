@@ -424,3 +424,28 @@
    deliberate omission rather than an oversight: an error message that
    slides in delays the reader's understanding of what went wrong by
    exactly the length of the transition. */
+
+/* ── THE HONEYPOT'S HIDING PLACE ──
+   A field no person can see, reach or hear, that still exists for a bot to
+   fill. See the note on it in Contact.tsx.
+
+   ⚠️ NOT `display: none` AND NOT `visibility: hidden`. Both are trivially
+   detectable, and a scraper worth defending against skips them. This is the
+   sr-only recipe used inside out: the box is real and laid out, it is simply
+   somewhere nobody will ever look.
+
+   It is NOT the site's `.sr-only` helper either, and that is the point of
+   the duplication — sr-only exists to keep content available to a screen
+   reader, which is the exact opposite of what this needs. Same declarations,
+   opposite intent, so they must not share a name. */
+.trap {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip-path: inset(50%);
+  white-space: nowrap;
+  border: 0;
+}

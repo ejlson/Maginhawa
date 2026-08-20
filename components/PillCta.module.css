@@ -570,3 +570,19 @@
     transition: none;
   }
 }
+
+/* ── HELD, WHILE SOMETHING IS IN FLIGHT ──
+   Used by the contact form's submit between the press and the answer. Dimmed
+   rather than greyed: this control has one filled colour and a "disabled
+   grey" would be a second palette entry existing for one state. The cursor
+   is the honest part — `not-allowed` says the press will not land, which is
+   the thing a dimmed pill alone leaves ambiguous.
+
+   ⚠️ `pointer-events: none` IS NOT USED HERE. It would take the cursor with
+   it, and a control that looks pressed-out but shows a normal arrow reads as
+   a rendering fault rather than as a state. `disabled` already stops the
+   click; this only has to make it visible. */
+.cta:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
+}

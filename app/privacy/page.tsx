@@ -362,6 +362,22 @@ export default function PrivacyPage() {
             <strong>Cloudinary</strong> may serve our photography, and receives
             your IP address when it does.
           </li>
+          {/* ⚠️ NAMED HERE BECAUSE THE ENQUIRY FORM ACTUALLY SENDS NOW. It
+              used to open a draft in the reader's own mail app, which added
+              no processor at all — the message never touched a third party
+              until they pressed send in their own client. It is delivered by
+              us now (functions/api/contact.ts), and the company that carries
+              it has to be named. Unconditional, unlike the analytics entries
+              below: those describe cookies a reader can decline, and this
+              describes what happens to a message they chose to send. */}
+          <li>
+            <strong>Resend</strong> delivers the messages sent through our
+            enquiry form. What you typed into the form — your name, your email
+            address and your message — passes through Resend on its way to our
+            inbox. Nothing from the form is stored on this website. Resend is
+            based in the United States; the transfer is covered by their
+            standard contractual clauses.
+          </li>
           {analyticsConfigured ? (
             <li>
               <strong>Google</strong> provides Google Analytics, and receives

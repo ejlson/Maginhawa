@@ -100,6 +100,13 @@ type Props =
       href?: never;
       presentational?: false;
       type: "submit" | "button";
+      /* ⚠️ ONLY THE FORM ARM TAKES THIS. A link cannot be disabled — the
+         HTML attribute does nothing on an <a> — and a presentational pill
+         was never interactive to begin with, so offering `disabled` on
+         either would be a prop that silently does nothing. The contact
+         form uses it to hold the button while a message is in flight, which
+         is what stops a second press sending the enquiry twice. */
+      disabled?: boolean;
     });
 
 export default function PillCta(props: Props) {
@@ -182,6 +189,10 @@ export default function PillCta(props: Props) {
             type={props.type}
             className={ctaClass}
             aria-label={ariaLabel}
+            disabled={props.disabled}
+            /* the pill's own hover/press choreography reads from this, and
+               so does the cursor — see .cta:disabled in the stylesheet */
+            data-disabled={props.disabled || undefined}
           >
             {cells}
           </button>
