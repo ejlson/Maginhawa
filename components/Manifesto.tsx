@@ -2,7 +2,6 @@
 
 import {
   motion,
-  useMotionTemplate,
   useReducedMotion,
   useScroll,
   useMotionValueEvent,
@@ -95,59 +94,19 @@ const WORDS = [
    So the mix is one portrait against three landscape rather than an even
    split. Making a second one portrait means re-cropping or re-shooting that
    source, not changing this flag — do that first and then set it here. */
-const INLINE = new Map<
-  number,
-  { src: string; alt: string; portrait?: true }
->([
-  [4, { src: "/images/manifesto/mamasons-web.jpg", alt: "" }], // comfort.
-  [11, { src: "/images/manifesto/belly-web.jpg", alt: "", portrait: true }], // room
-  [15, { src: "/images/manifesto/cafemama-web.jpg", alt: "" }], // meal
-  [20, { src: "/images/manifesto/group-web.jpg", alt: "" }], // guest
-]);
+/* ══════════ W1: ONE PLATE, NOT FOUR CHIPS ══════════
+   The four INLINE images (mamasons / belly / cafemama / group, set into
+   the sentence after comfort / room / meal / guest) are retired with the
+   poster setting, chosen by the user from the Word study. The statement is
+   caps at display scale now, and pictures riding inside capital letters
+   read as stickers at any size — the poster's grammar is ONE photograph,
+   centred between the claim and its consequences, given real plate
+   ceremony. group-web is the one that stays: the claim is about people,
+   and it is the picture with the family in it. */
+const PLATE = { src: "/images/manifesto/group-web.jpg" };
 
-/* ⚠️ EVERY ONE IS `alt=""`. They are not illustrations of the words they
-   follow and they carry no information the sentence does not — a screen
-   reader announcing four filenames, or four descriptions, in the middle of
-   the page's one statement would break the sentence in half four times.
-   The statement's own `aria-label` is what is read. */
+const PIECES = WORDS.map((word) => ({ kind: "word" as const, word }));
 
-/* THE RENDER LIST — words and pictures interleaved, in one flat array, so
-   the reveal wave can count them as one series. A picture takes a slot in
-   the stagger exactly like a word does, which is what makes it read as part
-   of the sentence arriving rather than as something layered on top of it. */
-type Piece =
-  | { kind: "word"; word: string }
-  | { kind: "image"; src: string; alt: string; portrait?: true };
-
-const PIECES: Piece[] = WORDS.flatMap((word, i) => {
-  const img = INLINE.get(i);
-  return img
-    ? [{ kind: "word" as const, word }, { kind: "image" as const, ...img }]
-    : [{ kind: "word" as const, word }];
-});
-
-/* THE ACCENT: the two words the claim turns on. "comfortable" is what the
-   name means; "room" is the thing being promised, and the whole point of
-   the sentence is that it comes before the food. Deliberately still TWO —
-   five accented words of twenty is most of the sentence, and an accent on
-   most of a sentence is not an accent. Deliberately NOT "Maginhawa": it
-   opens the line and carries the full weight of the display size already,
-   and colouring it as well would make the first word shout twice.
-   The lookup strips trailing punctuation (see wordClass), so "comfortable."
-   matches on "comfortable" — which is the entire reason that exists. */
-/* "promise" WAS ASKED FOR AND IS NOT IN THE COPY. The request named
-   "comfort" and "promise"; the replacement sentence supplied in the same
-   message drops "promise" entirely ("A quiet idea that shapes every room we
-   create…"). "quiet" takes the second emphasis instead — it is the word
-   that characterises the idea, and it is the only other word in the line
-   carrying an argument rather than a mechanism. Say the word and it moves. */
-/* ── "welcome" JOINS THEM, at the user's instruction ──
-   The sentence opened in the accent and closed in plain roman: comfort and
-   quiet carry the claim, and then the payoff — the last word, the one the
-   whole line is travelling toward — was set like any other. Three accents
-   across twenty words is still restraint, and it closes the sentence in the
-   voice it opened in.
-   The lookup strips trailing punctuation, so this matches "welcome." */
 const KEY_WORDS = new Set(["comfort", "quiet", "welcome"]);
 
 /** the class list for one word. Shared so the static and animated passes
@@ -192,7 +151,12 @@ const STATEMENT = WORDS.join(" ");
    statement of the same shape as the sentence it introduces: one word, then
    its consequences, which is exactly the structure of "Maginhawa is Tagalog
    for comfort. A quiet idea that shapes every room…". */
-const EYEBROW = "One word, and everything that follows";
+/* ⚠️ THE EYEBROW ELEMENT IS RETIRED — the poster setting (W1, chosen by
+   the user) moves its job INTO the typography: the dictionary annotation
+   beside the first word says "this is a word, and here is everything that
+   follows" without a caption saying so. The two long arguments above about
+   what the eyebrow was for are kept because the JOB survives; only the
+   furniture changed. */
 
 /* ══════════════════ THE ENTRANCE ══════════════════
    IT IS SCROLL-SCRUBBED AGAIN, at the user's instruction. The sentence sets
@@ -273,17 +237,11 @@ const SCRUB_OFFSET: ["start end", "center center"] = [
    The timed version this replaces had the same property by a different
    route (0.75s travel against a 0.045s stagger, ≈ 16 in flight). Shorten
    SPAN and the words start arriving one at a time. */
-/* BAND_START IS THE EYEBROW'S END PLUS A BEAT — 0.15 is where the eyebrow's
-   scale settles (EYEBROW_IN[1] + 0.02, below), and 0.03 of scroll after it
-   is the pause that makes the sentence read as a consequence of the eyebrow
-   rather than as its accompaniment. Move EYEBROW_IN and this moves with it.
-   SPAN CAME DOWN 0.3 → 0.27 BECAUSE THE BAND GOT SHORTER. The stagger is
-   (band − span) / (pieces − 1), so shortening the band alone would have
-   tightened it from 0.0215 to 0.0185 and put ~16 pieces in flight instead
-   of ~14 — the wave flattening toward a single simultaneous lift, which is
-   exactly the failure the note above warns about from the other direction.
-   Trimming SPAN by the same proportion holds the in-flight count where it
-   was; the words simply travel a shade faster each. */
+/* BAND_START AT 0.18 — derived, once, as the eyebrow's end plus a beat.
+   The eyebrow is retired (see above) but the number stays: it is now
+   simply the breath of clear scroll before the first word inks, and every
+   slot in the chapter is seated off it. Nothing reads EYEBROW_IN any more;
+   re-derive from taste, not from a ghost. */
 const BAND_START = 0.18;
 const BAND_END = 0.96;
 
@@ -301,11 +259,8 @@ const BAND_END = 0.96;
    sentence and the break moves; hard-code the index and it silently splits
    the wrong phrase. */
 const CLAUSE_BREAK = (() => {
-  const i = PIECES.findIndex((p) => p.kind === "word" && /[.!?]["')\]]?$/.test(p.word));
-  if (i < 0) return PIECES.length - 1;           // one sentence: no break
-  let j = i;
-  while (j + 1 < PIECES.length && PIECES[j + 1].kind === "image") j++;
-  return j;
+  const i = PIECES.findIndex((p) => /[.!?]["')\]]?$/.test(p.word));
+  return i < 0 ? PIECES.length - 1 : i;          // one sentence: no break
 })();
 
 /* the pause. 0.06 against the eyebrow's 0.03 — twice the beat, because this
@@ -340,7 +295,13 @@ const CLAUSE_ONE_END = BAND_START + SPAN + CLAUSE_BREAK * STAGGER;
 /* the eyebrow's own slice, ahead of the first word — it introduces the
    sentence, so it has to be readable before the sentence starts writing.
    Nothing else may open before this closes: see BAND_START. */
-const EYEBROW_IN: [number, number] = [0.01, 0.13];
+/* the plate takes the clause beat: it settles in the pause between the
+   claim and its consequences, which is the beat CLAUSE_BEAT has always
+   held open. (W1's dictionary annotation stood beside the first word for
+   one draft and was removed at the user's instruction — the claim runs
+   clean from MAGINHAWA to the full stop.) */
+const PLATE_IN: [number, number] = [CLAUSE_ONE_END, CLAUSE_ONE_END + 0.1];
+const PLATE_SETTLE: [number, number] = [CLAUSE_ONE_END, CLAUSE_ONE_END + 0.2];
 
 /* ══════════ THE ACCENTS INK LAST ══════════
    comfort / quiet / welcome hold the statement's own maroon all the way
@@ -383,90 +344,16 @@ function slotStart(index: number) {
   return base + k * STAGGER;
 }
 
-/* A PICTURE IN THE SENTENCE, AND IT OPENS RATHER THAN ARRIVES.
-   A clip edge runs down it across the same window in the wave the words
-   beside it take, and the photograph itself never moves.
+/* ══ ScrubImage IS RETIRED WITH THE INLINE CHIPS ══ It clipped each of
+   the four pictures open inside the sentence (inset bottom 100 → 0 through
+   a template'd MotionValue). The ONE plate the poster setting keeps takes
+   the page's settle instead — opacity + 1.06 → 1 — driven inline in the
+   component, because a single element needs no abstraction. Its two
+   portable notes: framer cross-fades inset() strings only by parsing them
+   per frame (template one number instead), and next/image's positioned box
+   fights an inline mask's line box (background-image sizes in em and adds
+   no elements). */
 
-   ⚠️ IT USED TO TRAVEL, LIKE A WORD, AND THAT WAS THE ONE THING THIS
-   SENTENCE HAD WRONG. Everywhere else on this site a photograph reveals by
-   clip and only type travels — the venue plates, the journal's lede card,
-   the standing marks, all of them `blogSweepDown`. The statement was the
-   single place a picture slid, so media and type were speaking the same move
-   and the sentence read as twenty-seven words, four of which happened to be
-   pictures. They are pictures again.
-
-   IT KEEPS THE SAME SLOT, which is what holds the two together: the frame
-   opens exactly while the words on either side of it are coming down, so it
-   is still one wave crossing the line and not a second gesture running
-   alongside. Only the verb changed.
-
-   AND IT RETIRES THE PARK. A picture that never moves cannot peek out of its
-   clip at rest, so the -115% this carried — and the -170%/-125% before that,
-   which existed only to clear a mask that was not hugging — are gone with
-   the transform. The clip is one property on a box that stays still.
-
-   ⚠️ NO NEXT/IMAGE HERE, AND THAT IS DELIBERATE. `fill` needs a positioned
-   parent and emits its own absolutely-positioned box, which inside an inline
-   mask fights the line box the whole sentence is built on; the fixed-size
-   form emits `width`/`height` attributes that then have to be overridden in
-   em to track the type. A background-image on the mask's inner span sizes
-   itself in em, crops with `cover`, and adds no elements at all. These four
-   files are 27–45KB and already at web size — there is nothing for an
-   optimiser to do to them that would pay for the layout fight. */
-function ScrubImage({
-  progress,
-  index,
-  src,
-  portrait,
-}: {
-  progress: MotionValue<number>;
-  index: number;
-  src: string;
-  portrait?: boolean;
-}) {
-  const start = slotStart(index);
-  /* THE EDGE RUNS DOWN, which is the same direction the type travels, so the
-     two gestures agree about which way this chapter reveals. 100 → 0 of
-     bottom inset: the frame is fully closed before its slot and fully open
-     after it, and `useTransform` clamps outside the range, so no guard is
-     needed at either end.
-
-     A NUMBER THROUGH A TEMPLATE, NOT AN INTERPOLATED STRING. Framer can
-     cross-fade two `inset()` strings, but only by parsing them every frame;
-     one numeric MotionValue stitched into a template is the same result with
-     one value being animated. */
-  const closed = useTransform(progress, [start, start + SPAN], [100, 0]);
-  const clipPath = useMotionTemplate`inset(0 0 ${closed}% 0)`;
-
-  /* THE SHAPE IS ON THE INNER SPAN, NOT THE MASK. The mask is the clip the
-     picture travels out of and its height is what the line box has to make
-     room for; the inner span is the picture. Both carry the modifier because
-     a portrait frame is taller than a landscape one and the clip has to grow
-     with it — see the note on .portrait in the stylesheet for why that
-     height still has to stay under the statement's own leading. */
-  return (
-    <span
-      className={`${styles.wordMask} ${styles.imageMask}${
-        portrait ? ` ${styles.portraitMask}` : ""
-      }`}
-      aria-hidden
-    >
-      <motion.span
-        className={`${styles.inlineImage}${
-          portrait ? ` ${styles.portrait}` : ""
-        }`}
-        style={{ clipPath, backgroundImage: `url(${src})` }}
-      />
-    </span>
-  );
-}
-
-/* ONE HOOK PER WORD, WHICH IS WHY THIS IS A COMPONENT.
-   `useTransform` cannot be called inside the `.map` that builds the
-   sentence — the count is stable today but a hook in a loop is a rule
-   violation waiting for the day the copy changes. A component per word
-   calls it once, in its own render, and the mask/word pair it draws is
-   byte-for-byte what the timed version drew. */
 function ScrubWord({
   progress,
   index,
@@ -551,12 +438,11 @@ export default function Manifesto() {
     setLit((was) => (was === on ? was : on));
   });
 
-  const eyebrowOpacity = useTransform(scrollYProgress, EYEBROW_IN, [0, 1]);
-  const eyebrowScale = useTransform(
-    scrollYProgress,
-    [EYEBROW_IN[0], EYEBROW_IN[1] + 0.02],
-    [0.88, 1]
-  );
+  /* the poster's two satellites: the plate settles in the clause beat, the
+     annotation inks last. Single elements, driven inline — no abstraction
+     for one consumer. */
+  const plateOpacity = useTransform(scrollYProgress, PLATE_IN, [0, 1]);
+  const plateScale = useTransform(scrollYProgress, PLATE_SETTLE, [1.06, 1]);
 
   /* THE WORDS ARE SEPARATED BY REAL SPACES, not by margin.
 
@@ -572,54 +458,30 @@ export default function Manifesto() {
      A real space collapses at a line break, which is exactly the behaviour
      wanted, and it costs nothing. It also means the sentence is selectable
      and copies out as a sentence. */
-  const words = PIECES.map((piece, i) =>
-    piece.kind === "image" ? (
-      <Fragment key={i}>
-        {reduce ? (
-          /* ⚠️ THE SAME TWO ELEMENTS THE MOVING VERSION DRAWS, minus the
-             motion. This used to collapse mask and picture into one span
-             carrying both classes, which stopped working the moment the
-             mask's rules became `.wordMask.imageMask` — a compound selector
-             the flattened element does not match, so the still picture
-             quietly lost its side margins and its seat on the baseline while
-             the animated one kept both. One shape, one set of rules. */
-          <span
-            className={`${styles.wordMask} ${styles.imageMask}${
-              piece.portrait ? ` ${styles.portraitMask}` : ""
-            }`}
-            aria-hidden
-          >
-            <span
-              className={`${styles.inlineImage}${
-                piece.portrait ? ` ${styles.portrait}` : ""
-              }`}
-              style={{ backgroundImage: `url(${piece.src})` }}
-            />
-          </span>
-        ) : (
-          <ScrubImage
-            progress={scrollYProgress}
-            index={i}
-            src={piece.src}
-            portrait={piece.portrait}
-          />
-        )}
-        {i < PIECES.length - 1 ? " " : null}
-      </Fragment>
-    ) : (
-      <Fragment key={i}>
-        {reduce ? (
-          <span className={wordClass(piece.word)}>{piece.word}</span>
-        ) : (
-          <ScrubWord
-            progress={scrollYProgress}
-            index={i}
-            word={piece.word}
-          />
-        )}
-        {i < PIECES.length - 1 ? " " : null}
-      </Fragment>
-    )
+  /* the word run, split at the clause for the poster's two registers: the
+     claim at full display scale, the consequences in small caps under the
+     plate. One arithmetic (slotStart over the whole array) spans both, so
+     the scrub reads straight through the plate's beat. */
+  /* ⚠️ THE CLAIM'S BREAK IS AUTHORED, at the user's instruction:
+     "MAGINHAWA IS" is line one, "TAGALOG FOR COMFORT." line two. A <br>
+     after index 1 rather than two separate spans, so the words stay one
+     run for selection and the scrub's arithmetic. aria-hidden on the
+     break is unnecessary — the h2's aria-label already reads the plain
+     sentence over all of this. On narrow screens line two may wrap once
+     more; it wraps as whole words and never shears. */
+  const renderWord = (piece: (typeof PIECES)[number], i: number) => (
+    <Fragment key={i}>
+      {reduce ? (
+        <span className={wordClass(piece.word)}>{piece.word}</span>
+      ) : (
+        <ScrubWord progress={scrollYProgress} index={i} word={piece.word} />
+      )}
+      {i === 1 ? <br /> : i < PIECES.length - 1 ? " " : null}
+    </Fragment>
+  );
+  const bigWords = PIECES.slice(0, CLAUSE_BREAK + 1).map(renderWord);
+  const smallWords = PIECES.slice(CLAUSE_BREAK + 1).map((p, k) =>
+    renderWord(p, k + CLAUSE_BREAK + 1),
   );
 
   return (
@@ -636,43 +498,44 @@ export default function Manifesto() {
         {/* TYPE ONLY — no eyebrow, no label. The sentence names the group in
             its own first word, and a label asking the question the line
             immediately answers is furniture. */}
-        {reduce ? (
-          <div className={styles.block}>
-            <p className={styles.eyebrow}>{EYEBROW}</p>
-            {/* the still version is the FINISHED version, accent included —
-                a reader who asked for less movement should see the sentence
-                as it ends, not as it begins */}
-            <h2
-              className={styles.statement}
-              aria-label={STATEMENT}
-              data-lit="on"
-            >
-              {words}
-            </h2>
-          </div>
-        ) : (
-          /* NO `whileInView` AND NO VARIANTS ANY WHERE IN HERE. The block
-             used to be the cascade's root — one trigger driving a two-level
-             stagger down to twenty words. Nothing is triggered now: every
-             moving part reads the section's scroll progress directly, so
-             this is a plain div again and the sentence's state is a pure
-             function of where the page is. */
-          <div className={styles.block}>
-            <motion.p
-              className={styles.eyebrow}
-              style={{ opacity: eyebrowOpacity, scale: eyebrowScale }}
-            >
-              {EYEBROW}
-            </motion.p>
-            <h2
-              className={styles.statement}
-              aria-label={STATEMENT}
-              data-lit={lit ? "on" : undefined}
-            >
-              {words}
-            </h2>
-          </div>
-        )}
+        {/* ══ THE POSTER (W1) ══ One h2, two registers: the claim at full
+            display scale, the consequences in small caps — with the plate
+            between them INSIDE the heading, as a presentational span, so
+            the sentence stays one accessible object (aria-label reads it
+            plainly; every visual child is decoration to AT).
+
+            NO `whileInView` AND NO VARIANTS ANYWHERE IN HERE: every moving
+            part reads the section's scroll progress directly, so the
+            poster's state is a pure function of where the page is. The
+            still branch is the FINISHED poster, accent, plate and
+            annotation included. */}
+        <div className={styles.block}>
+          <h2
+            className={styles.statement}
+            aria-label={STATEMENT}
+            data-lit={reduce ? "on" : lit ? "on" : undefined}
+          >
+            <span className={styles.statementBig}>{bigWords}</span>
+            <span className={styles.plateSeat} aria-hidden>
+              {reduce ? (
+                <span
+                  className={styles.plate}
+                  style={{ backgroundImage: `url(${PLATE.src})` }}
+                />
+              ) : (
+                <motion.span
+                  className={styles.plate}
+                  style={{
+                    backgroundImage: `url(${PLATE.src})`,
+                    opacity: plateOpacity,
+                    scale: plateScale,
+                  }}
+                />
+              )}
+            </span>
+            <span className={styles.statementSmall}>{smallWords}</span>
+          </h2>
+        </div>
       </div>
 
       {/* ══ THE BAND IS GONE, at the user's instruction ══

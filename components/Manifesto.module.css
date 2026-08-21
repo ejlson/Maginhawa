@@ -205,169 +205,16 @@
   }
 }
 
-/* ══════════ THE FOUR PICTURES IN THE SENTENCE ══════════
-   A small photograph set inline after four of the sentence's nouns — see
-   INLINE in Manifesto.tsx for which four and why.
+/* ══ THE INLINE-IMAGE SYSTEM IS RETIRED (W1) ══
+   .inlineImage, .imageMask, .wordMask.imageMask, .portrait and
+   .portraitMask lived here — the four photographs set into the sentence,
+   with their line-box, baseline-seat and strut derivations. The poster
+   setting keeps ONE photograph (.plate below, between the registers), so
+   the whole system went with the chips. The portable lesson from those
+   notes: an inline-block mask seats its content by BASELINE even at
+   line-height 0 — inline-flex is what makes a clip actually hug a picture.
+   Everything else is in git. */
 
-   SIZED IN em, SO IT IS THE TYPE THAT DECIDES. The statement's own font-size
-   is a clamp against the viewport, so a px height would be a different
-   proportion at every breakpoint — large enough to break the line at 2.4rem
-   and lost in it at 5.2rem.
-
-   ⚠️ 0.62em → 0.86em, at the motion crit's Finding 01. At 0.62em the
-   pictures sat between the x-height and the cap height and read as
-   punctuation — which in practice meant they read as STICKERS: 15px chips
-   a reader could mistake for emoji. The reference this device comes from
-   (thisisstudiox's statement) runs its inline emphasis at full line
-   presence; the picture is meant to interrupt the sentence on purpose.
-   0.86em is the PORTRAIT's height — the ceiling this file already proved
-   safe ("both under the 0.92em line box", below) — so the landscape now
-   claims the same presence without touching the leading. ⚠️ DO NOT GO
-   PAST 0.86em: the portrait's own note is explicit that anything taller
-   requires opening the leading first, and every line pays for that.
-
-   THE ASPECT IS FIXED AND THE CROP IS `cover`, because the four source
-   photographs are not the same shape and four different rectangles in one
-   sentence would read as an accident. 4:3 landscape: a portrait would sit
-   taller than the cap height and push the line box open.
-
-   `vertical-align` IS OPTICAL AND NOT A BASELINE. Sitting the box ON the
-   baseline leaves it looking hung above the words, because the words have
-   descenders below that line and the picture does not. -0.06em drops it to
-   where the eye reads the two as level.
-
-   THE RADIUS IS --radius-tile — the same 2px printed-plate corner the
-   restaurant cards and the About panel carry. A softer corner here would be
-   the only rounded thing on the page. */
-/* ══════════ THE PICTURES HAVE A DECISIVE ORIENTATION ══════════
-   3 / 2 AND NOT 4 / 3. At the old sticker size the old 1.33 read as neither
-   portrait nor landscape — a square-ish chip rather than a photograph set
-   in the line.
-   3:2 is the aspect two of the four sources already are, and it is the SAME
-   aspect as the three door prints in AboutSplit.module.css, so the two
-   places on the home page that set a small photograph into type now cut
-   them from the same stock. */
-.inlineImage {
-  display: inline-block;
-  height: 0.86em;
-  aspect-ratio: 3 / 2;
-  /* the mask hugs this box and owns both the seat in the line and the gap
-     beside it — see .imageMask. `top` because the mask's line box is zero
-     high and this simply fills it. */
-  vertical-align: top;
-  border-radius: var(--radius-tile);
-  background-color: var(--placeholder);
-  background-size: cover;
-  background-position: center;
-  /* the tone the frame holds while its photograph decodes, same as every
-     other frame on the site */
-}
-
-/* THE PICTURE'S MASK, AND IT HUGS THE PICTURE.
-
-   ⚠️ IT DID NOT, AND THAT WAS A REAL DEFECT rather than a tuning nicety.
-   The rule here read `line-height: 1` with a note claiming the height came
-   from the picture and the mask "simply wraps it". It did not: `line-height:
-   1` puts a FULL EM OF STRUT in the mask's line box, so a 0.62em photograph
-   sat in a 1em box, and with `.wordMask`'s 0.06em/0.22em padding on top the
-   painted clip measured 1.28em. Against this paragraph's 0.92 leading that
-   is 0.36em of clip standing outside its own line — measured at 1440×900,
-   a line holding a landscape picture painted 92.4px into the line above it,
-   which is where a travelling photograph was being drawn over live type.
-   (A text-only pair overlaps by 0.28em / 21.5px, which is the descender
-   padding and is the leading's business, not this rule's.)
-
-   So the mask now states its height, drops the strut, and drops the block
-   padding with it — a photograph has no descenders to protect, which is the
-   only thing that padding was ever for. 0.86em landscape and portrait both,
-   under the 0.92em line box, so a picture can no longer paint outside
-   its own line whatever it is doing.
-
-   ⚠️ THE MASK NOW CARRIES THE BASELINE SEAT. `.wordMask` is
-   `vertical-align: bottom`, which for an `overflow: hidden` inline-block
-   means "bottom margin edge on the line box bottom" — correct for a word,
-   wrong for a picture that used to be seated on the BASELINE by
-   `.inlineImage`'s own `vertical-align: -0.06em` inside a strutted box.
-   With the strut gone the mask has to say it: -0.06em puts the mask's
-   bottom edge, and so the picture's, 0.06em under the baseline exactly as
-   before.
-
-   ⚠️ AND THIS CORRECTS THE PORTRAIT ONE, which was never seated the same
-   way. Its mask already had a fixed height, so it inherited `bottom` and
-   hung 0.32em below the text box while the three landscape frames sat on
-   the baseline — two seats for four pictures in one sentence. All four are
-   now on the same rule.
-
-   The inline margin moves here with the height: a margin on the inner span
-   would sit INSIDE a clip that now hugs the picture exactly, and would push
-   the photograph out of its own window. */
-/* ⚠️ THE SELECTOR IS COMPOUND BECAUSE `.wordMask` IS DECLARED LATER.
-   Both classes land on the same element and both are one class' worth of
-   specificity, so the file's ORDER decides — and `.wordMask` sits ~200 lines
-   below, which means every property the two share was silently going to it.
-   Measured while this rule read plain `.imageMask`: display resolved to
-   `inline-block`, vertical-align to `bottom`, and the padding/margin pair
-   back to the word's, i.e. none of the four declarations below applied and
-   the picture was clipped by 4.6px at the top while hanging the same amount
-   out of the bottom of its own window. Compound rather than reordered, so a
-   later tidy-up that moves these blocks around cannot re-break it. */
-.wordMask.imageMask {
-  /* ⚠️ inline-flex, NOT inline-block, AND THE REASON IS ALIGNMENT.
-     An inline-block mask lays its picture out in a LINE BOX, and a line box
-     positions its content by baseline — so even at `line-height: 0` the
-     picture landed 0.06em below the mask it is supposed to fill: clipped by
-     that much at the top, hanging out of the clip by the same at the bottom
-     (measured 4.6px at 1440). A flex container has no line box; the item
-     stretches to the cross size and the picture IS the mask, which is the
-     only arrangement in which "the clip hugs the picture" is true rather
-     than nearly true. */
-  display: inline-flex;
-  line-height: 0;
-  height: 0.86em;
-  /* both shorthands, because `.wordMask` sets both as shorthands and a
-     longhand here would only cancel the half it names */
-  padding: 0;
-  /* ⚠️ THE INLINE METRIC IS UNCHANGED AND HAS TO BE. `.wordMask` pads 0.07em
-     each side and pulls the same back with a negative margin, so a word's
-     advance is exactly the word. Setting a positive `margin-inline` here
-     REPLACES that negative one, so leaving the padding in place would widen
-     each picture by 0.14em — enough to re-wrap the sentence (measured: eight
-     lines became seven). A photograph has no side bearings to protect, so
-     the padding goes to zero and the 0.1em gap the picture always carried
-     moves out here untouched: advance = picture + 0.2em, as before. */
-  margin: 0 0.1em;
-  vertical-align: -0.06em;
-}
-
-/* ══════════ THE PORTRAIT FRAME ══════════
-   One of the four (see INLINE in Manifesto.tsx). 2 / 3 is belly-web.jpg's
-   own aspect — 240×360 exactly — so it is uncropped rather than centre-cut.
-
-   ⚠️ THE HEIGHT IS THE WHOLE PROBLEM AND 0.86em IS ITS SOLUTION. A portrait
-   picture only reads as portrait if it is taller than it is wide, and an
-   inline-block taller than the line it sits in GROWS that line's box — which
-   would leave the lines holding a picture further apart than the lines
-   without one, in the largest type on the page. The statement's leading is
-   --lh-display (0.92), so the line box is 0.92em; at 0.86em this frame stays
-   under it and the leading is untouched. Measured at 1440×900 the statement
-   is 302px tall before and after.
-
-   THAT CEILING IS WHY THIS IS NOT BIGGER. If a portrait picture ever needs
-   more presence than 0.86em, the leading has to be opened FIRST and every
-   line pays for it — do not raise this number on its own and expect the
-   paragraph to absorb it. */
-.portrait {
-  height: 0.86em;
-  aspect-ratio: 2 / 3;
-}
-
-/* The clip the picture travels out of has to be as tall as the picture, or
-   the reveal would uncover only the bottom two thirds of it and rest there.
-   It is now the only thing the portrait mask has to say — the seat, the gap
-   and the missing strut are all on .imageMask above. */
-.wordMask.portraitMask {
-  height: 0.86em;
-}
 
 /* ---------- the statement ---------- */
 /* display voice, a step below the section titles — a spoken line, not a
@@ -382,7 +229,11 @@
      NOTE: the wrap is FROZEN by useLockedLines, so a size change changes
      what gets locked — the line count is a measured result. Re-check it if
      this moves again. */
-  font-size: clamp(2.4rem, 5.35vw, 5.2rem);
+  /* ══ W1: SIZE LIVES ON THE TWO REGISTERS NOW ══ .statementBig carries
+     the claim at the summation's scale, .statementSmall the consequences;
+     this shell keeps only what both share. The old single size —
+     clamp(2.4rem, 5.35vw, 5.2rem) — is recorded here because the leading
+     table below was measured against it. */
   /* ══════════ 1.25, NOT --lh-display (0.92) ══════════
      ⚠️ THIS IS THE ONLY THING THAT STOPS THE WORDS OVERLAPPING, and it was
      arrived at by measurement rather than taste. A word mid-descent is only
@@ -411,7 +262,9 @@
      THE COST IS VISIBLE AND IS THE TRADE: the statement is a third taller
      and reads as an airier block than the tight display setting it was.
      Putting it back is this one line — and brings the 17px graze with it. */
-  line-height: 1.25;
+  /* the 1.25 leading above was the anti-collision setting for TRAVELLING
+     masked words; the words only INK now, so each register states its own
+     tight leading below and nothing can collide. */
   letter-spacing: var(--tr-display);
   color: var(--maroon);
   /* CENTRED — the lines on a common axis, and the block on the page's.
@@ -428,6 +281,58 @@
   text-align: center;
   margin-inline: auto;
 }
+
+/* ══════════ THE POSTER'S TWO REGISTERS (W1) ══════════
+   The claim wears the summation's voice — --font-display-big (Contralto),
+   caps, near the Passage slab's scale — so the page's two arguments, the
+   Word near the top and "SEVEN DIFFERENT ROOMS…" near the close, bookend
+   the cream in one voice. The consequences answer in small caps at reading
+   scale. What keeps the two chapters from becoming interchangeable is the
+   plate between the registers: the Word carries a photograph, the
+   Summation never does. */
+.statementBig {
+  display: block;
+  font-family: var(--font-display-big);
+  /* bigger, at the user's instruction — and the authored two-line break
+     (see renderWord) is what makes the size safe: "TAGALOG FOR COMFORT."
+     is the widest line and clears the measure at 7.4vw everywhere the
+     clamp's ceiling allows. */
+  font-size: clamp(2.5rem, min(7.4vw, 18svh), 8.25rem);
+  line-height: 1.0;
+  letter-spacing: 0.005em;
+  text-transform: uppercase;
+}
+
+.statementSmall {
+  display: block;
+  font-family: var(--font-display-big);
+  font-size: clamp(1.1rem, 2.1vw, 1.95rem);
+  line-height: 1.32;
+  letter-spacing: 0.03em;
+  text-transform: uppercase;
+  max-width: 30em;
+  margin-inline: auto;
+}
+
+/* the one photograph, seated between the registers. A span-in-span because
+   both live inside the h2 (the sentence is one accessible object); the
+   seat is the block-level line, the plate the sized picture. The settle —
+   opacity + 1.06 → 1 — is driven from the component in the clause beat. */
+.plateSeat {
+  display: block;
+  margin-block: clamp(20px, 3.2vh, 36px);
+}
+.plate {
+  display: inline-block;
+  width: clamp(180px, 19vw, 280px);
+  aspect-ratio: 3 / 2;
+  background-size: cover;
+  background-position: center;
+  background-color: var(--placeholder);
+  border-radius: var(--radius-tile);
+}
+
+
 
 /* THE BLOCK — eyebrow and statement as one object.
 
@@ -448,32 +353,9 @@
      and their own `text-align: center` does the centring. */
 }
 
-/* the descriptor over the statement — what this actually is.
+/* .eyebrow is retired with its element — the poster carries the job in
+   the typography itself (see Manifesto.tsx). */
 
-   SENTENCE CASE AT --t-label, deliberately NOT the uppercase tracked voice
-   the masthead marks use below the photographs. The two are close enough on
-   the page to be read together, and set identically they would frame the
-   statement in two matching rails, which reads as a caption above and a
-   caption below rather than as an introduction and an imprint. Sentence
-   case says "this is a description"; small caps says "this is apparatus".
-
-   --maroon-soft (6.56:1, well past the 4.5:1 this size answers to) so it
-   introduces the sentence rather than competing with it. */
-.eyebrow {
-  /* ── HALVED, at the user's instruction ── It was clamp(16px, 2.4vh,
-     30px). That distance was right while the eyebrow and the statement made
-     the SAME gesture — both rose and inked in, so they read as one movement
-     and wanted air between them. The eyebrow pops now and the sentence
-     builds after it, which is a sequence: the two are a question and its
-     answer, and an answer sits close to its question. */
-  margin: 0 0 clamp(8px, 1.2vh, 15px);
-  font-family: var(--font-sans);
-  font-weight: var(--w-regular);
-  font-size: var(--t-label);
-  letter-spacing: 0.01em;
-  color: var(--maroon-soft);
-  text-align: center;
-}
 
 @media (min-width: 981px) {
   .block {
