@@ -303,7 +303,11 @@
      (see renderWord) is what makes the size safe: "TAGALOG FOR COMFORT."
      is the widest line and clears the measure at 7.4vw everywhere the
      clamp's ceiling allows. */
-  font-size: clamp(2.5rem, min(7.4vw, 18svh), 8.25rem);
+  /* ceilings freed at the user's instruction — at 1920 the old caps bit
+     before the vw did, so the poster rendered smaller in proportion than
+     the approved mock. The vw terms are the design; the caps only fence
+     ultra-wide monitors. */
+  font-size: clamp(2.5rem, min(7.4vw, 18svh), 9rem);
   line-height: 1.0;
   letter-spacing: 0.005em;
   text-transform: uppercase;
@@ -312,7 +316,7 @@
 .statementSmall {
   display: block;
   font-family: var(--font-display-big);
-  font-size: clamp(1.2rem, 2.5vw, 2.3rem);
+  font-size: clamp(1.2rem, 2.5vw, 3rem);
   line-height: 1.32;
   letter-spacing: 0.03em;
   text-transform: uppercase;
@@ -330,7 +334,7 @@
 }
 .plate {
   display: inline-block;
-  width: clamp(220px, 24vw, 356px);
+  width: clamp(220px, 24vw, 464px);
   aspect-ratio: 3 / 2;
   background-size: cover;
   background-position: center;

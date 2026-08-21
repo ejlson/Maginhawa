@@ -877,6 +877,8 @@ html {
 body {
   background: var(--cream);
   color: var(--maroon);
+  /* the grain overlay below is absolutely positioned against this box */
+  position: relative;
   font-family: var(--font-sans);
   font-size: 16px;
   line-height: 1.4;
@@ -885,23 +887,62 @@ body {
   overflow-x: clip;
 }
 
-/* PAPER GRAIN — a fixed, static fractal-noise wash over the whole page so
-   the cream reads as stock, not as a flat hex value. One compositor layer,
-   never animated, never repainted; multiply keeps it a texture (it darkens
-   micro-speckles) rather than a grey film. Sits above every chapter and
-   below nothing that matters — the nav, modals and films all gain the same
-   print feel. */
+/* ══════════ THE PAPER GRAIN ══════════
+   A whisper of stock under the ink, at the user's instruction — the one
+   "effect" the editorial references actually use (WatchHouse's cream reads
+   as paper, not as a hex value). Everything here is chosen against the two
+   ways this device goes wrong:
+
+   · IT SCROLLS WITH THE PAGE, position: absolute over the whole document,
+     not position: fixed — grain is IN the paper, so it must travel with
+     the ink. A fixed overlay reads as frosted glass over a screen (and
+     would also poison scripts/probe-scroll-feel.mjs: content that moves
+     under a static texture never cancels in the shifted diff; a scrolling
+     texture cancels perfectly and the probes stay honest).
+   · IT IS STATIC. Animated grain is the film-look; shimmering noise over
+     the scrub choreography would read as rendering error. One turbulence
+     tile, stitched seamless, repeated.
+   · 5% OPACITY UNDER MULTIPLY, measured against both grounds: on the
+     cream it is a texture the eye accepts without finding; on the maroon
+     footer and the films it is fainter still and reads as stock, not
+     sensor noise. Multiply is what buys the extra two points — a
+     normal-blend wash goes grey past 3%; a multiplied one just deepens
+     the speckle. Past ~8% the cream starts to look unwashed — that is the
+     failure mode, and the number to hold.
+
+   ⚠️ TWO SESSIONS WROTE THIS RULE ON THE SAME DAY and the file briefly
+     carried both — a fixed 5%-multiply version and a scrolling 3% one,
+     with the later rule silently winning the cascade. This is the merge:
+     the SCROLLING position (the probe argument below is not optional),
+     the multiply blend and 240px tile from the fixed version, one rule.
+
+   ABOVE ALL CONTENT (z-index 9999, the grid overlay's own tier),
+   pointer-events: none. Above the nav and the menu too, deliberately: the
+   page is one sheet of paper and its chrome is printed on the same sheet.
+   The loader and the page-transition curtain mount on <body>'s stacking
+   context as later siblings at their own z — grain over them is the same
+   sheet, and at 3% it is imperceptible on their maroon.
+
+   ⚠️ THE TILE IS AN INLINE SVG feTurbulence — no asset, no fetch, ~700
+   bytes. `stitchTiles='stitch'` is what makes the 240px tile seamless;
+   remove it and every tile edge prints. */
 body::after {
   content: "";
-  position: fixed;
+  position: absolute;
   inset: 0;
-  z-index: 2000;
   pointer-events: none;
-  opacity: 0.05;
-  mix-blend-mode: multiply;
+  z-index: 9999;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 240px 240px;
+  /* multiply, from the parallel session's version of this rule: the
+     speckle DARKENS the ground instead of laying grey over it, which is
+     what ink-on-stock actually does — and it is why the opacity can sit a
+     touch higher than a normal-blend wash could. */
+  mix-blend-mode: multiply;
+  opacity: 0.05;
 }
+
+
 
 /* Lenis smooth scroll */
 html.lenis,
