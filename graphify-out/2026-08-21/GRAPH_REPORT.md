@@ -1,11 +1,11 @@
 # Graph Report - Maginhawa  (2026-08-21)
 
 ## Corpus Check
-- 235 files · ~4,594,903 words
+- 228 files · ~4,593,955 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1622 nodes · 2009 edges · 186 communities (139 shown, 47 thin omitted)
+- 1611 nodes · 2005 edges · 179 communities (131 shown, 48 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 48 edges (avg confidence: 0.67)
 - Token cost: 0 input · 0 output
 
@@ -145,6 +145,7 @@
 - remark-rehype
 - CustomCursor.tsx
 - Contact.tsx
+- _tmp-seam-lr.mjs
 - SmoothScroll
 - SplitWords.tsx
 - react
@@ -180,7 +181,7 @@
 ## Import Cycles
 - None detected.
 
-## Communities (186 total, 47 thin omitted)
+## Communities (179 total, 48 thin omitted)
 
 ### Community 0 - "user-account-core-06dbaa1bcfe1a542-min.en-US.js"
 Cohesion: 0.05
@@ -543,21 +544,21 @@ Cohesion: 0.06
 Nodes (25): jsonLd, metadata, clamp01(), DIAL_CODES, DIGITS, FlipDigit(), HERO_LINES, inkBox() (+17 more)
 
 ## Knowledge Gaps
-- **743 isolated node(s):** `jsonLd`, `metadata`, `metadata`, `jsonLd`, `metadata` (+738 more)
+- **744 isolated node(s):** `jsonLd`, `metadata`, `metadata`, `jsonLd`, `metadata` (+739 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **47 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **48 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `JoinUs()` connect `JoinUs.tsx` to `PageTransition.tsx`, `VideoBackdrop.tsx`?**
-  _High betweenness centrality (0.052) - this node is a cross-community bridge._
+  _High betweenness centrality (0.041) - this node is a cross-community bridge._
 - **Why does `q()` connect `VideoBackdrop.tsx` to `VideoBackdrop.tsx`, `probe-404.mjs`, `JoinUs.tsx`, `probe-timeline-contrast.mjs`, `shoot`, `press.ts`?**
-  _High betweenness centrality (0.040) - this node is a cross-community bridge._
+  _High betweenness centrality (0.038) - this node is a cross-community bridge._
 - **Why does `asset()` connect `PageTransition.tsx` to `AboutSplit.tsx`, `common-dabb52f27fbf7211-min.en-US.js`, `q`, `remark-rehype`, `SmoothScroll`, `JoinUs.tsx`, `shoot-about-rules.mjs`, `restaurants.ts`, `posts.ts`?**
-  _High betweenness centrality (0.028) - this node is a cross-community bridge._
+  _High betweenness centrality (0.024) - this node is a cross-community bridge._
 - **What connects `jsonLd`, `metadata`, `metadata` to the rest of the system?**
-  _743 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _744 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `user-account-core-06dbaa1bcfe1a542-min.en-US.js` be split into smaller, more focused modules?**
   _Cohesion score 0.045454545454545456 - nodes in this community are weakly interconnected._
 - **Should `probe-timeline.mjs` be split into smaller, more focused modules?**

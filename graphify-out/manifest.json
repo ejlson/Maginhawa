@@ -40,8 +40,8 @@
     "semantic_hash": ""
   },
   "components/Blog.tsx": {
-    "mtime": 1787325669.166658,
-    "ast_hash": "459c384c05c89bc490d5e2a815b78e7c",
+    "mtime": 1787327220.1677191,
+    "ast_hash": "689e06ae6edd4de7f328f02a58f7ca36",
     "semantic_hash": ""
   },
   "components/BlogIndex.tsx": {
@@ -70,8 +70,8 @@
     "semantic_hash": ""
   },
   "components/Discover.tsx": {
-    "mtime": 1787323613.8484275,
-    "ast_hash": "43185eba49057c7331d4aa07352b16bb",
+    "mtime": 1787327706.9822352,
+    "ast_hash": "8eff761ebde290887754e6729d4beed3",
     "semantic_hash": ""
   },
   "components/Experience.tsx": {
@@ -95,8 +95,8 @@
     "semantic_hash": ""
   },
   "components/Hero.tsx": {
-    "mtime": 1787226444.6262329,
-    "ast_hash": "4a8a84298d700a05785f94830888d70d",
+    "mtime": 1787327880.5758295,
+    "ast_hash": "9ff5a29ffb7583c4c3f1bfd47c44ad76",
     "semantic_hash": ""
   },
   "components/JoinUs.tsx": {
@@ -690,8 +690,8 @@
     "semantic_hash": ""
   },
   "components/Manifesto.tsx": {
-    "mtime": 1787225833.158597,
-    "ast_hash": "d19fa0460a1d3530074fe660d1d0befd",
+    "mtime": 1787327323.0526962,
+    "ast_hash": "423568a973122e24510b603e13938b0d",
     "semantic_hash": ""
   },
   "components/Interlude.tsx": {
@@ -1340,8 +1340,8 @@
     "semantic_hash": ""
   },
   "components/AboutSplit.tsx": {
-    "mtime": 1787324944.341045,
-    "ast_hash": "52b7221a43e7218ac1c742d956134432",
+    "mtime": 1787327220.1897502,
+    "ast_hash": "890626fadd29311790cc6ccdf890d002",
     "semantic_hash": ""
   },
   "components/StoryStrip.tsx": {
@@ -1590,8 +1590,8 @@
     "semantic_hash": ""
   },
   "components/Passage.tsx": {
-    "mtime": 1787325385.4222019,
-    "ast_hash": "937f98525e300491cb93aae173a853ca",
+    "mtime": 1787327283.9781415,
+    "ast_hash": "cc10a2e3d7ea9290832b4be1d69d4145",
     "semantic_hash": ""
   },
   "lib/site.ts": {
@@ -1955,8 +1955,8 @@
     "semantic_hash": ""
   },
   "lib/drift.ts": {
-    "mtime": 1787325766.6039793,
-    "ast_hash": "4076ef1c06fe0795ff694adfd44233c7",
+    "mtime": 1787327247.548484,
+    "ast_hash": "c4cb2ece3ee7aea12ec1d7cd47bbb4cb",
     "semantic_hash": ""
   },
   "scripts/probe-blog-sweep.mjs": {
@@ -1987,11 +1987,6 @@
   "scripts/probe-discover-wave.mjs": {
     "mtime": 1787323444.7309768,
     "ast_hash": "1b0b1166425876a1c828caf728c92189",
-    "semantic_hash": ""
-  },
-  "scripts/_tmp-refs.mjs": {
-    "mtime": 1787325718.6847937,
-    "ast_hash": "df878f8b3e01fb2e022ab640f8b1e704",
     "semantic_hash": ""
   }
 }
