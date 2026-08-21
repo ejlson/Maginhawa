@@ -359,7 +359,17 @@
      ⚠️ IT IS A COPY, and the original is AboutSplit.module.css's `.copy`
      padding-top. */
   --chapter-head-seat: calc(var(--grid-gutter) + clamp(40px, 8vh, 104px));
-  --about-seam: var(--home-gap-tight);
+  /* ⚠️ HALVED, at the user's instruction ("make the blog header appear
+     higher up, closer to the image above it"). The seam has now been cut
+     at the user's word three times — ×1.618, then ×1, now ×0.5 — and each
+     cut is recorded because the arrival maths in lib/drift.ts reads ink
+     position as (1 − p) × viewport + seam: a smaller seam means the
+     header's fade spends MORE of itself on screen, which is the direction
+     every one of these instructions has pushed. Remember the header also
+     carries --front-drop (80px) to sit level with the featured plate, so
+     the visible air above the label is seam − gutter + drop, not the seam
+     alone. */
+  --about-seam: calc(var(--home-gap-tight) / 2);
   /* ⚠️ THE BOTTOM IS THE WHOLE SEAM DOWN TO THE MARQUEE, and it has been
      cut hard at the user's instruction ("much closer"). It was
      clamp(64px, 9vh, 132px) — 81px at a 900-tall window, measured from the
