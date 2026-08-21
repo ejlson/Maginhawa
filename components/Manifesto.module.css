@@ -115,6 +115,18 @@
      above and below — which is what a poster is for. */
   min-height: 100svh;
   padding-block: clamp(56px, 9vh, 128px);
+  /* ══ AND REAL AIR OUTSIDE THE SCREEN, at the user's instruction
+     ("increase the gap between sections above and below the manifesto").
+     The padding above centres the poster inside its own screen; this
+     margin holds the NEIGHBOURS off — the venue grid's tail above, the
+     story's heading below — so the Word approaches and departs through
+     open cream rather than shoulder-to-shoulder. --home-gap-tight is the
+     token for a full-bleed/major block adjoining cream (globals.css owns
+     the scale), so the gap breathes with the viewport instead of being a
+     frozen number. The grounds are identical cream on both sides of the
+     margin, and the paper grain rides body, so the seam is invisible as a
+     seam — it is pure distance. */
+  margin-block: var(--home-gap-tight);
   padding: clamp(24px, 4vh, 56px) var(--pad-x);
   /* NO CLOSING RULE. A full-width hairline used to sit on this section's
      bottom border box, between the statement and Our Restaurants. It was
