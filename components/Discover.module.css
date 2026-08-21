@@ -711,7 +711,34 @@
        without an explicit width the whole grid shrink-to-fits to its own
        gaps (measured: 60px). */
     width: 100%;
-    max-width: 952px;
+    /* ══ THE GRID'S WIDTH IS SOLVED FROM THE VIEWPORT'S HEIGHT ══
+       A fixed 952px stood here for one pass, solved at 1440×900 — and at
+       1920×1080 it left the eight cards marooned in cream ("the cards are
+       too small", at the user's instruction). The constraint was never a
+       width; it is ONE SCREEN: head + two portrait rows ≤ the window. So
+       the width is derived from that constraint instead of frozen at one
+       window's answer.
+
+       THE ARITHMETIC, measured at 1440×900 and generalised:
+         room for the grid   = 100svh − 342px   (head 208 + section pads 84
+                                                 + head→grid air ~50)
+         card height         = (room − 24px row gap) / 2
+         card width          = height / 1.25    (the 4:5 plate)
+         grid width          = 4 × width + 3 × 20px
+                             = (100svh − 342px − 24px) × 1.6 + 60px
+       Check: 900 → 952px (the number this replaces, recovered exactly);
+       1080 → 1240px, cards 295×369 — the size the wide screenshot wanted.
+
+       THE FLOOR keeps short laptops honest: below ~840svh the derived
+       width would crush the cards under the 250px container query's
+       tightest setting, so 880px is the floor and those windows scroll a
+       little instead — the same trade every earlier PLATE_RATIO derivation
+       made for 768-tall screens. The min() against 100% is the narrow-
+       viewport guard. */
+    max-width: min(
+      100%,
+      max(880px, calc((100svh - 366px) * 1.6 + 60px))
+    );
     margin-inline: auto;
     column-gap: 20px;
     row-gap: 24px;

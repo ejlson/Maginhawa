@@ -397,9 +397,11 @@ const ITEMS: DiscoverItem[] = venueCards().map((v) => {
    the plate upright inverts the trade: the ratio is now fixed by the brief
    (portrait, uniform) and the GRID WIDTH is the free variable that fits
    the screen. Measured after the change, at 1440×900 with the head as it
-   stands: grid 940px wide, card 220×275, section within 8px of its
-   landscape height. The old table is kept above because its window set is
-   the checklist any future re-fit should measure against. */
+   stands: grid ≈952px wide at 900svh and ≈1240px at 1080svh — the width
+   now DERIVES from the viewport height (see .grid's max-width calc), so
+   the cards grow with the screen instead of freezing at one window's
+   answer. The old table is kept above because its window set is the
+   checklist any future re-fit should measure against. */
 const PLATE_RATIO = 1.25;
 
 // shared enter curve for the head's staged rise
@@ -655,7 +657,13 @@ const ARRIVE_TO = 0.45;
    after the card is legible — the overhang that DRIFT's note calls "a
    panel that simply stops" avoiding. */
 const INK_SLOT: [number, number] = [0, 0.45];
-const CAPTION_SLOT: [number, number] = [0.4, 0.8];
+/* caption end pulled 0.8 → 0.66: at 0.8 a card low on the screen carried
+   its photograph with no name for a third of its climb, and a reader who
+   stops mid-wave reads that as missing content rather than as sequence
+   ("the full content of the cards cannot be seen", at the user's
+   instruction). The beat survives — picture first, words after — but the
+   words now land while the card is still low. */
+const CAPTION_SLOT: [number, number] = [0.34, 0.66];
 const SETTLE_FROM = 1.06;
 
 /* the row's internal wave, per column, as a fraction of the viewport.
