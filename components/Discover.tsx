@@ -4,8 +4,6 @@ import Image from "next/image";
 import {
   AnimatePresence,
   motion,
-  useMotionTemplate,
-  useMotionValueEvent,
   useReducedMotion,
   useScroll,
   useTransform,
@@ -57,7 +55,7 @@ import { asset } from "@/lib/media";
    machine, the page hold, the settle travel, the per-word split measurement
    and the fitted title size that only existed so the two words could clear a
    centred deck. What is left is a grid that scrolls in like every other
-   chapter on the site (see WIPE_FROM) and a heading that rises out of
+   chapter on the site (see ARRIVE_FROM) and a heading that rises out of
    its own word masks on an observer.
 
    WHAT SURVIVES IT, and why, because each one looks orphaned otherwise:
@@ -390,7 +388,19 @@ const ITEMS: DiscoverItem[] = venueCards().map((v) => {
    the viewport rather than from the card's width, which is the real fix the
    0.76 note describes and the only one that stops this constant being a
    compromise between two window shapes. */
-const PLATE_RATIO = 0.82;
+/* ══════════ 1.25 — THE PLATE TURNS UPRIGHT (Setting A) ══════════
+   At the user's instruction: 4:5 portrait, the whole grid inset to keep
+   all eight on one screen (see .grid's max-width in the stylesheet, which
+   now owns the fit arithmetic this constant used to carry). The entire
+   derivation above — both tests, the window table, the 0.76 → 0.785 → 0.82
+   history — solved a LANDSCAPE ratio against a full-bleed grid; turning
+   the plate upright inverts the trade: the ratio is now fixed by the brief
+   (portrait, uniform) and the GRID WIDTH is the free variable that fits
+   the screen. Measured after the change, at 1440×900 with the head as it
+   stands: grid 940px wide, card 220×275, section within 8px of its
+   landscape height. The old table is kept above because its window set is
+   the checklist any future re-fit should measure against. */
+const PLATE_RATIO = 1.25;
 
 // shared enter curve for the head's staged rise
 const EASE = [0.22, 1, 0.36, 1] as const;
@@ -419,17 +429,20 @@ const EASE = [0.22, 1, 0.36, 1] as const;
    assembly, where the flying plate's layoutId morph WAS the cell's
    entrance and any slide of the cell underneath it would have fought the
    flight. With no flight, every cell takes the slide. */
-/* ══ THE ENTRANCE IS A CLIP WIPE. ══
-   Each card's RECTANGLE opens from its own bottom edge. The card does not
-   move, does not fade and does not scale — only the window it is seen
-   through grows, bottom to top.
+/* ══ THE ENTRANCE WAS A CLIP WIPE — RETIRED; THE SETTLE LIVES AT
+   ARRIVE_FROM. ══ Everything below in this block is the wipe's own
+   history, kept because its two lessons (the resting-inset shear, framer
+   owning inline clipPath) are portable; nothing below is current
+   behaviour.
 
-   ⚠️ THIS SENTENCE WAS A LIE UNTIL THE MOTION CRIT'S FINDING 03. The
+   Each card's RECTANGLE opened from its own bottom edge — the card did
+   not move, fade or scale; only the window grew.
+
+   ⚠️ THAT SENTENCE WAS A LIE UNTIL THE MOTION CRIT'S FINDING 03. The
    stylesheet's inset sat in the bottom slot, so the window actually grew
    top-down — against the card's own upward arrival — and nobody had
-   compared the prose to the paint. The CSS now puts the variable in the
-   TOP slot (see .cell[data-wiping] in Discover.module.css) and this
-   paragraph describes the page again.
+   compared the prose to the paint. The flip landed days before the wipe
+   itself retired.
 
    THIS IS NOT THE ENTRANCE THAT WAS REMOVED. That one was the 110vw slide
    described below, taken out at the user's instruction, and nothing here
@@ -456,7 +469,8 @@ const EASE = [0.22, 1, 0.36, 1] as const;
    clear is silently undone (measured — the property was back to
    `inset(0%)` on the next commit). Animating `--wipe` instead leaves framer
    writing a VARIABLE, which no stylesheet has to fight, and lets the
-   stylesheet decide whether a clip exists at all: `.cell[data-wiping]`
+   stylesheet decide whether a clip exists at all: a `.cell[data-wiping]`
+   rule (since retired with the wipe)
    carries it, and Tile drops that attribute when the wipe lands. See
    Discover.module.css.
 
@@ -598,25 +612,62 @@ const WIPE_COL_STEP_S = 0.14;
    seconds gave it: 3 × COL_LEAD against the card's own span was 0.42s
    against 0.92s, about 46%. */
 
-/* how far down the screen a card's top edge is when its wipe starts, and
-   where it has got to when the wipe finishes. 0.92 is just inside the fold;
-   0.45 is the upper middle, so a card is open and still well before it is
-   read. At 900 tall that is 423px of scroll for a ~292px card — the window
-   travels slightly slower than the page, which is what stops a wipe from
-   outrunning the hand driving it. */
-const WIPE_FROM = 0.92;
-const WIPE_TO = 0.45;
+/* ══════════ THE ENTRANCE IS A SETTLE NOW — THE WIPE IS RETIRED ══════════
+   At the user's instruction ("I don't like our current cards-arrive
+   animation"), and the replacement is not an invention: it is the page's
+   own PLATE grammar. Every large photograph on this site lands the same
+   way — the About film's DRIFT and the journal's blogDrift both settle
+   from a slight overscan (−4% / 1.1) into their frame while the plate
+   inks — and the venue cards now do exactly that, at card scale: the cell
+   INKS from 0 → 1 over the first half of its arrival while the PHOTOGRAPH
+   inside settles from 1.06 → 1 across the whole of it, and the caption
+   block inks a beat behind the picture. One family of gestures, hero to
+   booking.
+
+   WHAT DIED WITH THE WIPE, so nobody re-derives it: the clip-path window,
+   the `data-wiping` attribute and its two-way latch, the `--wipe` variable,
+   and the .cell clip rule in Discover.module.css. The two lessons that
+   block taught are portable and stay true — a resting `inset(0%)` shears
+   the hover lift's shadow, and framer re-writes an inline `clipPath` after
+   onAnimationComplete — but nothing here clips any more, so neither trap
+   can bite this entrance.
+
+   WHY THE SETTLE IS SAFE WHERE A CARD TRANSFORM IS NOT. The morph measures
+   `.tileMedia`, and this file has twice recorded that a transform on a
+   measured box corrupts the morph's rect. The settle never touches it: the
+   OPACITY sits on the cell (opacity does not move a rect), and the SCALE
+   sits on the photograph INSIDE the card, driven through the same CSS-var
+   channel the parallax pan already uses (--photo-enter beside --photo-base;
+   VenueCard multiplies them). The measured box never animates. */
+
+/* how far down the screen a card's top edge is when its settle starts, and
+   where it has got to when it finishes. 0.92 is just inside the fold; 0.45
+   is the upper middle, so a card is inked and at rest well before it is
+   read. At 900 tall that is 423px of scroll for a card — the settle rides
+   slightly slower than the page, the same relationship the wipe had. */
+const ARRIVE_FROM = 0.92;
+const ARRIVE_TO = 0.45;
+
+/* the settle's two spans, as fractions of the arrival: the ink finishes at
+   0.45 (a card at half-ink is being read as broken, so it clears early —
+   the READ_INK argument in AboutSplit), the caption starts as the ink ends
+   and the photograph settles across the whole range, still moving faintly
+   after the card is legible — the overhang that DRIFT's note calls "a
+   panel that simply stops" avoiding. */
+const INK_SLOT: [number, number] = [0, 0.45];
+const CAPTION_SLOT: [number, number] = [0.4, 0.8];
+const SETTLE_FROM = 1.06;
 
 /* the row's internal wave, per column, as a fraction of the viewport.
    0.07 is 63px at 900, so first card to last across a four-up row is 189px
    of scroll against a 423px card — the 46% the seconds above worked out to.
-   ⚠️ IT IS BOUNDED BY WIPE_TO: the last column's range is shifted down by
+   ⚠️ IT IS BOUNDED BY ARRIVE_TO: the last column's range is shifted down by
    (cols − 1) × this, and a shift past WIPE_TO would put a card's finish
    above the top of the screen. At four columns and 0.07 the last column
    ends at 0.24, with room to spare. */
 const COL_LEAD = 0.07;
 
-const WIPE_CLEAR_PCT = 0.05;
+
 
 /* ══ PARALLAX INSIDE THE FRAME ══
    The photograph travels slower than the card holding it, so the grid gains
@@ -652,7 +703,7 @@ const PHOTO_PAN_RATIO = 0.024;
    A `GRID_LEAD_S = 0.26` stood here: the delay the grid's cascade held so
    the chapter would read top-down (label, sentence, pictures) rather than
    arriving all at once. It is removed with the cascade — the grid's wipe is
-   spent against the SCROLL now (see WIPE_FROM), and the head is simply 208px
+   spent against the SCROLL now (see ARRIVE_FROM), and the head is simply 208px
    further up the page than the first plate is, so the reader reaches it
    first at every speed. A lead in seconds was the clock's way of expressing
    an order the layout already has.
@@ -1203,7 +1254,7 @@ export default function Discover() {
                `transition.delay`, and then briefly as a seat in one shared
                scroll range. Both are gone: each card measures its own
                arrival, so the row is the LAYOUT and needs no arithmetic. See
-               the block over WIPE_FROM for what that fixed. The lead went
+               the block over ARRIVE_FROM for what that fixed. The lead went
                with them — a cascade that has to wait for the type above it
                was solving a problem the scroll solves by itself, since the
                head is simply further up the page than the grid is. */
@@ -1326,11 +1377,6 @@ function Tile({
 }) {
   const reduce = useReducedMotion();
 
-  /* whether this cell is still being wiped open. It starts true so the card
-     is clipped shut on the very first paint — including the server's, which
-     is what stops eight cards flashing whole and then wiping. */
-  const [wiping, setWiping] = useState(true);
-
   /* ── THIS CELL'S SLICE OF THE GRID'S RANGE ──
      `useTransform` clamps at both ends, so the cell is fully shut for the
      whole of the range before its seat and fully open for the whole of it
@@ -1360,35 +1406,25 @@ function Tile({
      belongs on a scrub.
 
      ⚠️ THE RANGE IS THIS CARD'S OWN, and it is measured on the cell rather
-     than on the grid — see the block over WIPE_FROM for the two faults that
-     forced it. A clip-path does not change an element's bounding box, so a
-     cell can safely be the target of the range that drives its own clip;
-     that is not true of a transform, and AboutSplit.tsx records the version
-     of this trap that is.
+     than on the grid — see the block over ARRIVE_FROM for the two faults
+     that forced it. Opacity does not change an element's bounding box, so
+     the cell can safely be the target of the range that drives its own ink;
+     a TRANSFORM on it could not be, and AboutSplit.tsx records the version
+     of this trap that is — which is why the settle's scale lives on the
+     photograph inside the card, not on any measured box.
 
-     REDUCED MOTION STILL RUNS THE HOOK, because hooks cannot be called
-     conditionally — it simply never installs the attribute the clip hangs
-     off (see `data-wiping` below), so the value is computed and ignored. */
-  /* ⚠️ GATED ON MOUNT, WHICH IS A CHANGE OF FAILURE MODE AND A DELIBERATE
-     ONE. Discover.module.css states that the clip's fallback is 0% "and
-     that is a deliberate failure mode: if the script never runs, framer
-     never writes --wipe and the cell renders fully open." That was NOT what
-     shipped. Framer writes a motion value's progress-0 reading into the
-     SERVER's HTML, so every cell went out as
-     `data-wiping="on" style="--wipe:100%"` — verified in the raw response —
-     and a page whose script never ran showed eight blank cards. The
-     stylesheet's stated fallback could not reach.
-
-     Holding both the attribute and the variable until after mount makes the
-     documented behaviour the real one: no script, no clip, eight readable
-     cards.
-
-     THE FIRST-PAINT FLASH THIS TRADES FOR IS ~NIL, and that is geometry
-     rather than luck: the grid's top edge is 1176px down a 900-tall window,
-     so on an ordinary load no cell is on screen when the attribute lands.
-     A reader who deep-links INTO the chapter finds those cells already past
-     their own range, so they mount open and stay open; the ones that mount
-     shut are the ones below the fold. */
+     REDUCED MOTION STILL RUNS THE HOOKS, because hooks cannot be called
+     conditionally — it simply never applies the styles, so the values are
+     computed and ignored and the cards are plainly present. */
+  /* ⚠️ GATED ON MOUNT — the sitewide rule, learned the hard way in three
+     other files: framer renders a motion value's progress-0 reading into
+     the SERVER's HTML, and progress 0 here means `opacity: 0`. Withheld
+     until mount, the no-script page and any load whose hydration dies get
+     eight plainly visible cards; the flash this trades for is ~nil because
+     the grid's top edge sits ~1176px down a 900-tall window, so no cell is
+     on screen when the styles land. A reader who deep-links INTO the
+     chapter finds those cells already past their own range, so they mount
+     settled. */
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
@@ -1396,22 +1432,17 @@ function Tile({
   const lead = (col ?? 0) * COL_LEAD;
   const { scrollYProgress: arriving } = useScroll({
     target: cellRef,
-    offset: [`start ${WIPE_FROM - lead}`, `start ${WIPE_TO - lead}`],
+    offset: [`start ${ARRIVE_FROM - lead}`, `start ${ARRIVE_TO - lead}`],
   });
-  const wipe = useTransform(arriving, [0, 1], [100, 0]);
-  const wipePct = useMotionTemplate`${wipe}%`;
 
-  /* ⚠️ `wiping` IS NO LONGER A ONE-WAY LATCH, and that is the scroll-link's
-     doing. A time cascade lands once and never runs again, so `false` was
-     final; a scrubbed wipe re-closes if the reader scrolls back up into it,
-     and a cell left un-clipped would then show its whole photograph through
-     a window that is meant to be shut. The attribute follows the value in
-     both directions instead. The comparison guards the setState, so this
-     costs one commit per crossing rather than one per frame. */
-  useMotionValueEvent(wipe, "change", (v) => {
-    const on = v > WIPE_CLEAR_PCT;
-    setWiping((was) => (was === on ? was : on));
-  });
+  /* the settle's three strands, one range. All linear — see the NO-EASE
+     block above — and all reversible: scroll back up and the card recedes
+     the way it came, no latch to manage because nothing clips. */
+  const cardInk = useTransform(arriving, INK_SLOT, [0, 1]);
+  const photoSettle = useTransform(arriving, [0, 1], [SETTLE_FROM, 1]);
+  const captionInk = useTransform(arriving, CAPTION_SLOT, [0, 1]);
+
+  const settled = mounted && !reduce;
 
   /* ═══════════════════════════════════════════════════════════════════
      THE CARD IS <VenueCard> NOW, AND EVERYTHING THIS FUNCTION USED TO DO
@@ -1447,36 +1478,25 @@ function Tile({
      the retired assembly intro's job and it is not passed, so the card's
      three prop objects stay at their `{}` default and the whole card
      simply renders. The entrance it does take is the CELL's — see
-     scrubbed wipe (see WIPE_FROM); the card's window opens as one object,
-     which is what an unstaged card should do.
+     scrubbed settle (see ARRIVE_FROM); the card inks and its photograph
+     lands as one object, which is what an unstaged card should do.
      ═══════════════════════════════════════════════════════════════════ */
   return (
     <motion.li
       ref={cellRef}
       className={styles.cell}
-      /* THE ATTRIBUTE IS WHAT MAKES THE CLIP EXIST. The stylesheet only
-         clips a cell while this is on, so dropping it when the wipe lands
-         leaves the card with NO clip-path rather than a resting `inset(0%)`
-         — which would shear the hover lift and its shadow off at the cell's
-         edge forever. See the note over WIPE_FROM for why the clip is
-         driven through a variable instead of animating clip-path directly.
-
-         REDUCED MOTION NEVER TURNS IT ON, and takes no variants either, so
-         the cards are simply present from the first paint and nothing about
-         them waits on an observer that may never fire. */
-      data-wiping={mounted && !reduce && wiping ? "on" : undefined}
       /* the recede's two hooks. `data-open` is the exemption and carries no
          style of its own; the delay is a custom property because the value
          is per-cell and a stylesheet cannot compute a distance. */
       data-open={open ? "on" : undefined}
-      /* ⚠️ `--wipe` IS WRITTEN AS A STYLE, NOT ANIMATED AS A VARIANT, AND
-         IT IS WITHHELD UNTIL MOUNT. Framer renders a motion value's current
-         reading into the style attribute on the SERVER too — which is
-         exactly how the no-script fallback came to be broken. See the note
-         over `mounted` above. */
+      /* ⚠️ THE INK RIDES THE CELL, the one element the morph never
+         measures; the settle rides the photograph via --photo-enter on the
+         seat below. Both are WITHHELD UNTIL MOUNT — framer renders a motion
+         value's current reading into the SERVER's HTML, which is how the
+         old wipe once shipped eight invisible cards. See `mounted`. */
       style={{
         ["--recede-delay" as string]: `${recedeDelay}s`,
-        ...(mounted ? { ["--wipe" as string]: wipePct } : null),
+        ...(settled ? { opacity: cardInk } : null),
       }}
     >
       {/* NO HOVER HANDLERS ON THIS ELEMENT ANY MORE. They opened the film
@@ -1497,8 +1517,22 @@ function Tile({
         /* padding-top carries the plate's aspect from PLATE_RATIO — the
            stylesheet's 143.33% is only the fallback. Inline because the
            same number must also size the expansion, and a value stated in
-           the stylesheet AND in the component is a value that drifts. */
+           the stylesheet AND in the component is a value that drifts.
+
+           ── AND THE SETTLE'S CHANNEL RIDES THE SAME PROP ── the var
+           mechanism the parallax pan already drives through this seat
+           (--photo-base/--photo-pan): VenueCard's .photo multiplies
+           --photo-enter into its scale, and the caption block reads
+           --card-ink. Both default to 1 in the card's stylesheet, so
+           /restaurants and the expansion — which never see these vars —
+           are byte-identical. Withheld until mount like the cell's ink. */
         style={{
+          ...(settled
+            ? {
+                ["--photo-enter" as string]: photoSettle,
+                ["--card-ink" as string]: captionInk,
+              }
+            : null),
           /* --radius-tile, matching the story band, at the user's request.
              This box is `overflow: visible`, so its own corner paints
              nothing — the visible curve is VenueCard's .cardSurface inside

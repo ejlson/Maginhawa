@@ -691,9 +691,30 @@
 @media (min-width: 981px) {
   .grid {
     grid-template-columns: repeat(4, 1fr);
-    /* the global 12-col grid's gutter between the tiles */
-    column-gap: var(--grid-gutter);
-    row-gap: clamp(12px, 1.25vw, 18px);
+    /* ══ SETTING A (portrait): THE GRID IS INSET AND THE GUTTERS OPEN ══
+       Two changes, one cause. The plates are 4:5 now (PLATE_RATIO 1.25),
+       and a full-bleed four-up of portraits is ~430px tall per row — two
+       rows would bury the screen. The grid takes a measured width instead
+       and centres: at 952px the card is ~220×275 and the eight sit on one
+       screen under the untouched head, which is the brief. The max-width
+       OWNS the fit arithmetic PLATE_RATIO used to own; re-fit here, not
+       there.
+
+       And the gutter opens 12 → 20px: portrait plates read as columns,
+       and columns need air — the 12px page gutter that was right for
+       landscape tiles reads as a contact print at this orientation. Row
+       gap slightly wider than column for the same shadow-reach reason
+       stated above the two-up block. */
+    /* ⚠️ width BEFORE max-width, and it is load-bearing: `margin-inline:
+       auto` takes this grid item out of stretch sizing, and its cells are
+       sized by padding-top percentages — no intrinsic width at all — so
+       without an explicit width the whole grid shrink-to-fits to its own
+       gaps (measured: 60px). */
+    width: 100%;
+    max-width: 952px;
+    margin-inline: auto;
+    column-gap: 20px;
+    row-gap: 24px;
   }
 }
 
@@ -744,27 +765,15 @@
    `round` IS ABSENT ON PURPOSE — the visible corner belongs to
    .cardSurface inside this box, so a square clip only ever cuts at or
    outside a corner the reader can see. */
-/* ⚠️ THE VARIABLE IS THE TOP INSET, NOT THE BOTTOM, and the flip is the
-   motion crit's Finding 03 closing a real disagreement: the note in
-   Discover.tsx has always said the window "grows, bottom to top", but the
-   inset sat in the BOTTOM slot, so the card actually revealed top-down —
-   its top sliver appearing at the fold and the window extending DOWNWARD
-   while the card travelled UP the screen. A reveal that runs against its
-   own arrival reads as the card being printed while it rises. With the
-   inset in the top slot the uncovering edge moves up WITH the scroll, the
-   same direction the About chapter's prints used when they wiped, and the
-   comment in Discover.tsx is finally describing the code. */
-.cell[data-wiping="on"] {
-  clip-path: inset(var(--wipe, 0%) 0% 0% 0%);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  /* belt to the component's brace: it never sets the attribute under this
-     query, and if it somehow did, the cell still would not clip */
-  .cell[data-wiping="on"] {
-    clip-path: none;
-  }
-}
+/* ══ NO CLIP RULE ANY MORE — THE WIPE IS RETIRED ══
+   `.cell[data-wiping]` stood here, carrying the entrance clip and two
+   hard-won lessons (a resting `inset(0%)` shears the hover lift's shadow;
+   the fallback had to be open-not-shut for no-script readers). The wipe
+   went at the user's instruction and the entrance is a SETTLE now — cell
+   ink + photograph landing from 1.06, all driven from Discover.tsx through
+   --photo-enter/--card-ink on the seat, consumed in VenueCard.module.css.
+   Nothing in this file animates the entrance any more; this note is the
+   pointer for whoever greps for the old attribute. */
 
 /* ── THE SHELF STEPS BACK ──
    While a card is open the grid behind it scales down and dims, in a wave

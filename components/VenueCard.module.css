@@ -307,7 +307,13 @@
    carry the arithmetic tying the two together. */
 .photo {
   object-fit: cover;
-  scale: var(--photo-base, 1);
+  /* --photo-enter is the ENTRANCE's settle (1.06 → 1, scroll-scrubbed by
+     Discover through the seat, exactly as --photo-base/--photo-pan arrive)
+     — the same landing gesture the About film and the journal plate make.
+     Defaults to 1: /restaurants and the expansion never write it. It
+     multiplies rather than replaces so the pan's overscan arithmetic is
+     untouched at every moment of the entrance. */
+  scale: calc(var(--photo-base, 1) * var(--photo-enter, 1));
   /* THE WHOLE VALUE COMES FROM THE VARIABLE, defaulting to `none` — not
      `0 var(--photo-pan, 0px)`, which resolves to a real `translate: 0px` on
      a card nobody is panning. A non-none translate is not free: it creates
@@ -335,7 +341,7 @@
      1.07 base the moment the pointer arrived, which reads as the picture
      jolting outward. Times the base, the zoom is the same 3% on both grids. */
   .cardSurface:hover .photo {
-    scale: calc(var(--photo-base, 1) * 1.03);
+    scale: calc(var(--photo-base, 1) * var(--photo-enter, 1) * 1.03);
   }
   .cardSurface:hover .hoverShade {
     opacity: 1;
@@ -350,7 +356,7 @@
    response. OUTSIDE the hover media query so keyboards on touch hybrids
    still get it. */
 .cardSurface:focus-within .photo {
-  scale: calc(var(--photo-base, 1) * 1.03);
+  scale: calc(var(--photo-base, 1) * var(--photo-enter, 1) * 1.03);
 }
 .cardSurface:focus-within .hoverShade {
   opacity: 1;
@@ -930,6 +936,16 @@
   gap: clamp(6px, 0.7vw, 8px);
   padding: clamp(9px, 1vw, 12px);
   pointer-events: none;
+  /* ── THE ENTRANCE'S CAPTION INK ── --card-ink arrives from the seat the
+     way --photo-base does (Discover writes it, scroll-scrubbed 0 → 1 a
+     beat behind the plate's own ink), and it defaults to 1, so
+     /restaurants and the expansion render at rest untouched. The 8px rise
+     resolves to 0 at the default for the same reason. The gesture is
+     Blog's plate-then-type beat at card scale: picture first, words after.
+     `translate` rather than `transform` so nothing here can collide with
+     a transform another rule owns. */
+  opacity: var(--card-ink, 1);
+  translate: 0 calc(8px * (1 - var(--card-ink, 1)));
 }
 
 /* the anchors and buttons take their clicks back out of the
