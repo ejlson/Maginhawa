@@ -1609,7 +1609,9 @@
 .dividerLabelMask,
 .dividerLabel {
   --i: 0;
-  --enter-d: 600ms;
+  /* no --enter-d any more: the label fades with the rail at the ink
+     block's fixed 350ms — the per-element duration was the descent's,
+     and the descent is gone (Finding 03) */
 }
 
 /* ══════════ THREE GATES, NOT TWO, AND THE THIRD IS THE RAIL'S ══════════
@@ -1645,16 +1647,21 @@
    element parked forever, so the pairs are kept adjacent and both halves
    name the same attribute. */
 
-/* THE SWEEP — every photograph and every block of type whose height is a
-   function of the measure, plus the two framed objects in the head */
+/* THE SWEEP — the head's two framed objects and the FEATURED PLATE's
+   lockup, and nothing below the divider.
+
+   ⚠️ THE RAIL IS GONE FROM THIS LIST, at the motion crit's Finding 03. The
+   settled page ran roughly twenty of these top-anchored reveals between
+   the hero and the footer, and a 96px rail thumbnail was performing the
+   same 900ms ceremony as the full-bleed film — which flattens the scale
+   hierarchy the sweep exists to serve. The budget now: PLATES SWEEP,
+   FURNITURE INKS. The rail's own block is below, on blogFade. */
 .section:not([data-in]) .labelMark,
 .section:not([data-in]) .ledeMask,
 .section:not([data-in]) .ctaHost,
 .section:not([data-plate]) .frontPhoto,
 .section:not([data-plate]) .frontTitleMask,
-.section:not([data-plate]) .frontCta,
-.section:not([data-rail]) .entryMedia,
-.section:not([data-rail]) .entryBodyMask {
+.section:not([data-plate]) .frontCta {
   clip-path: inset(0 0 100% 0);
 }
 .section[data-in] .labelMark,
@@ -1662,24 +1669,39 @@
 .section[data-in] .ctaHost,
 .section[data-plate] .frontPhoto,
 .section[data-plate] .frontTitleMask,
-.section[data-plate] .frontCta,
-.section[data-rail] .entryMedia,
-.section[data-rail] .entryBodyMask {
+.section[data-plate] .frontCta {
   animation: blogSweepDown var(--enter-d, 900ms) var(--ease-entrance)
     calc(var(--i, 0) * var(--cascade-beat)) backwards;
 }
 
-/* THE DESCENT — the three single lines, each out of its own mask. Nothing
-   here wraps, so each one's travel is bounded by its own line box; see the
-   rule stated over blogSettle. */
-.section:not([data-in]) .labelWord,
-.section:not([data-plate]) .frontTag,
+/* THE INK — the rail. Five small cards and the label above them arrive by
+   a 350ms fade on the same seats they always held (--i 0…5 on
+   --cascade-beat), so the row still reads left to right; nothing sweeps,
+   nothing descends, nothing settles. A card this size gets one quiet verb.
+   The divider label loses its mask descent for the same reason — it is a
+   12px caption, not a lockup. */
+.section:not([data-rail]) .entryMedia,
+.section:not([data-rail]) .entryBodyMask,
 .section:not([data-rail]) .dividerLabel {
+  opacity: 0;
+}
+.section[data-rail] .entryMedia,
+.section[data-rail] .entryBodyMask,
+.section[data-rail] .dividerLabel {
+  animation: blogFade 350ms ease-out
+    calc(var(--i, 0) * var(--cascade-beat)) backwards;
+}
+
+/* THE DESCENT — the two single lines that are part of a plate lockup.
+   Nothing here wraps, so each one's travel is bounded by its own line box;
+   see the rule stated over blogSettle. (The divider label used to be the
+   third — it fades with the rail now, in the ink block above.) */
+.section:not([data-in]) .labelWord,
+.section:not([data-plate]) .frontTag {
   transform: translateY(-110%);
 }
 .section[data-in] .labelWord,
-.section[data-plate] .frontTag,
-.section[data-rail] .dividerLabel {
+.section[data-plate] .frontTag {
   animation: blogDescend var(--enter-d, 700ms) var(--ease-entrance)
     calc(var(--i, 0) * var(--cascade-beat)) backwards;
 }
@@ -1687,13 +1709,11 @@
 /* THE SETTLE — every block that wraps, drifting against its own mask and
    outlasting it */
 .section:not([data-in]) .lede,
-.section:not([data-plate]) .frontTitle,
-.section:not([data-rail]) .entryBody {
+.section:not([data-plate]) .frontTitle {
   transform: translateY(-0.22em);
 }
 .section[data-in] .lede,
-.section[data-plate] .frontTitle,
-.section[data-rail] .entryBody {
+.section[data-plate] .frontTitle {
   animation: blogSettle 1000ms var(--ease-drawer)
     calc(var(--i, 0) * var(--cascade-beat)) backwards;
 }
@@ -1860,10 +1880,10 @@
   .section:not([data-in]) .frontTitleMask,
   .section:not([data-in]) .frontTitle,
   .section:not([data-in]) .frontCta,
-  .section:not([data-in]) .dividerLabel,
-  .section:not([data-in]) .entryMedia,
-  .section:not([data-in]) .entryBodyMask,
-  .section:not([data-in]) .entryBody {
+  .section:not([data-rail]) .dividerLabel,
+  .section:not([data-rail]) .entryMedia,
+  .section:not([data-rail]) .entryBodyMask,
+  .section:not([data-rail]) .entryBody {
     clip-path: none;
     transform: none;
     opacity: 0;
@@ -1880,12 +1900,20 @@
   .section[data-in] .frontTitleMask,
   .section[data-in] .frontTitle,
   .section[data-in] .frontCta,
-  .section[data-in] .dividerLabel,
-  .section[data-in] .entryMedia,
-  .section[data-in] .entryBodyMask,
-  .section[data-in] .entryBody {
+  .section[data-rail] .dividerLabel,
+  .section[data-rail] .entryMedia,
+  .section[data-rail] .entryBodyMask,
+  .section[data-rail] .entryBody {
     animation: blogFade 400ms ease-out backwards;
   }
+  /* ⚠️ THE RAIL RIDES ITS OWN GATE HERE TOO, and this stopped being a
+     nicety when the base rules went to opacity (Finding 03). The base
+     parked rule — `:not([data-rail]) … opacity: 0` — applies inside this
+     media query as well, and a fade fired off `data-in` with `backwards`
+     fill hands the property straight back to that declaration when it
+     ends: the cards would fade IN on data-in and then VANISH until
+     data-rail landed. Keying the fade on the same attribute as the park
+     makes that window impossible. */
 
   /* AND THE ALREADY-PLAYED PATH HOLDS HERE TOO. The rule outside this
      block is overridden by the fade above — same specificity, later in the

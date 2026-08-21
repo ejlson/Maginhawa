@@ -477,39 +477,41 @@ function ScrubWord({
   word: string;
 }) {
   const start = slotStart(index);
-  /* ⚠️ NEGATIVE, at the user's instruction: the sentence COMES DOWN. The
-     gesture is otherwise untouched — same mask, same span, same wave, same
-     scrub — so this is one sign, not a new animation. It is the direction
-     the chapter heads on the cream page already travel (Blog's `blogDescend`
-     and, since the same pass, Discover's `.titleWord`), which is the whole
-     point of changing it: the page now reveals type one way.
+  /* ══════════ THE WORDS INK NOW — THEY NO LONGER TRAVEL ══════════
 
-     110%, NOT 55%: with a mask the word has to start fully clear of its own
-     clip or an edge of it is visible at rest. Which edge changed with the
-     sign — it is the word's BOTTOM showing under the clip's top now, not its
-     top showing over the bottom — and the magnitude did not need to: the
-     mask pads 0.06em above the word and 0.22em below (see .wordMask), so the
-     upward hide is the CHEAPER of the two and the number that already
-     covered the downward one covers this with room to spare.
+     This ran a masked rise for a long time (−110% → 0 through .wordMask's
+     clip, later re-signed to descend at the user's instruction), and the
+     travel is deleted at the motion crit's Finding 01. The fault was never
+     the pacing — reading along with the wheel is the chapter's best idea —
+     it was the SHEAR: for the whole of each word's slot the sentence had no
+     baseline, a line of display type caught with every word at a different
+     height, exactly while the eye is on it. None of the editorial
+     benchmarks animates type per-word, and The Gentlewoman's masthead has
+     never moved at all. The scrub clock survives whole: same slotStart,
+     same SPAN, same clause beat, same wave — only the verb changed.
 
-     It is a PERCENTAGE because
-     Framer resolves transform percentages against the element's own box, so
-     it is a consistent fraction of the type size at every breakpoint — an
-     em would not resolve here and a px would be a different lift at 2.4rem
-     than at 5.2rem.
-     NO OPACITY. A masked word does not need to fade — the clip is doing the
-     reveal, and fading as well makes the entrance mushy at the exact moment
-     it should be crisp. */
-  const y = useTransform(progress, [start, start + SPAN], ["-110%", "0%"]);
+     THE FLOOR IS 0.14, NOT 0. At zero the sentence assembles from nothing
+     and the reader cannot see where it is going; at 0.14 the whole
+     statement is present as a ghost of itself and the scrub INKS it in,
+     word by word — a line being typeset rather than a line arriving. 0.14
+     composites maroon-on-cream to ~1.3:1, well under the 3:1 floor this
+     project holds any real mark to, so the ghost reads as tone, not text,
+     and cannot be mistaken for the settled state.
 
-  /* TWO ELEMENTS PER WORD: the mask clips, the word travels. The mask
-     carries the accent class as well, because it is the box that has to
-     grow to fit an italic's overhang — and, now, because it is the box the
-     ink latch colours. Nothing about the accent is decided here: see
-     INK_AT and `.key` in the stylesheet. */
+     NO TRANSFORM AT ALL — not a token 2px settle. One verb per element is
+     the rule the rest of this pass enforces on the page; opacity is the
+     verb here. The mask element stays (it carries the accent class and the
+     ink latch's colour hook, and its clip now clips nothing) so the DOM
+     and the stylesheet's cascade are untouched. */
+  const opacity = useTransform(progress, [start, start + SPAN], [0.14, 1]);
+
+  /* TWO ELEMENTS PER WORD STILL: the mask carries the accent class (the
+     box that grows to fit an italic's overhang, and the box the ink latch
+     colours), the inner span carries the fade. Nothing about the accent is
+     decided here: see INK_AT and `.key` in the stylesheet. */
   return (
     <span className={`${styles.wordMask} ${wordClass(word)}`}>
-      <motion.span className={styles.word} style={{ y }}>
+      <motion.span className={styles.word} style={{ opacity }}>
         {word}
       </motion.span>
     </span>
@@ -520,8 +522,8 @@ function ScrubWord({
  * The positioning statement: the display line across the full measure, with
  * the band of photographs beneath it sharing the same screen.
  *
- * The words lift into place and ink in, staggered, once, when the sentence
- * arrives. Reduced motion renders it static and fully inked.
+ * The words ink into place, staggered along the scroll, as the sentence
+ * is read. Reduced motion renders it static and fully inked.
  */
 export default function Manifesto() {
   const reduce = useReducedMotion();

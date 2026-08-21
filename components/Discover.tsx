@@ -33,7 +33,6 @@ import styles from "./Discover.module.css";
    belongs beside the block it scales. */
 import card from "./VenueCard.module.css";
 import VenueCard, { VenueBlock } from "./VenueCard";
-import SplitWords from "./SplitWords";
 import MenuOverlay from "./MenuOverlay";
 import { venueCards, type VenueCardItem } from "@/lib/venueCards";
 import { getRestaurant } from "@/lib/restaurants";
@@ -424,6 +423,13 @@ const EASE = [0.22, 1, 0.36, 1] as const;
    Each card's RECTANGLE opens from its own bottom edge. The card does not
    move, does not fade and does not scale — only the window it is seen
    through grows, bottom to top.
+
+   ⚠️ THIS SENTENCE WAS A LIE UNTIL THE MOTION CRIT'S FINDING 03. The
+   stylesheet's inset sat in the bottom slot, so the window actually grew
+   top-down — against the card's own upward arrival — and nobody had
+   compared the prose to the paint. The CSS now puts the variable in the
+   TOP slot (see .cell[data-wiping] in Discover.module.css) and this
+   paragraph describes the page again.
 
    THIS IS NOT THE ENTRANCE THAT WAS REMOVED. That one was the 110vw slide
    described below, taken out at the user's instruction, and nothing here
@@ -1081,49 +1087,49 @@ export default function Discover() {
             </span>
           </span>
         </h2>
-        {/* ── THE DISPLAY LINE BUILDS AGAIN, at the user's instruction ──
-            It was <SplitWords>, then it was flat text "at the user's
-            instruction", and it is <SplitWords> again for the same reason
-            the first note gave: at this size it has type worth building.
-            The intervening flat version is not worth reconstructing.
+        {/* ══ THE DISPLAY LINE DESCENDS BY CLAUSE, NOT BY WORD ══
+            This was <SplitWords> — fifteen word-masks descending on a 40ms
+            stagger — and the motion crit's Finding 01 retired that grammar
+            here: for a full second the sentence had no baseline, every word
+            caught at a different height exactly while the eye was on it.
+            None of the editorial benchmarks animates type per-word.
 
-            IT TAKES `on`, NOT whileInView, AND THAT IS THE WHOLE POINT.
-            SplitWords' own observer would be a THIRD trigger in a chapter
-            that now has exactly one — the heading's masks, this line and
-            the grid's wipe all hang off `inView`, so the chapter arrives in
-            an order instead of as three things that happen to be nearby.
-            An independent observer here would fire on this paragraph's own
-            rect and un-sequence the head from the pictures under it, which
-            is the defect the whole pass exists to remove.
+            TWO MASKS, AUTHORED AT THE CLAUSE BREAK. The measure was already
+            tuned so the line breaks after "stores," at every width in the
+            sweep (the old note here proved it), so the clause boundary IS
+            the line boundary and each line can descend as ONE object —
+            baseline intact, same direction, same ease, same cadence as the
+            title words above (0.09s apart, one beat after the label). At
+            narrow widths a clause may wrap to two lines and the pair
+            descends together, which is chunkier and still never shears.
 
-            THE LEAD IS SPENT ON THE TYPE. This starts a beat after the
-            label; the grid below no longer waits behind it in seconds,
-            because it is scrubbed against the scroll and the reader reaches
-            this sentence first by simple geometry. See the note where
-            GRID_LEAD_S used to stand.
-
-            ⚠️ THE MASKS CHANGE THE MEASURE, so `.lede`'s max-width is not
-            free of this. SplitWords sets the word gap as a 0.24em
-            margin-right rather than a natural space (~0.25–0.28em on this
-            face), so a line of masks is fractionally NARROWER than the same
-            line of plain text, and .lede's measure was tuned to break at
-            the clause boundary — after "stores,". Measured after this
-            change: the break still lands there at every width in the sweep.
-            Retune the measure and check that break, not just the height. */}
-        {/* ⚠️ `down`, AT THE USER'S INSTRUCTION — this line comes down out of
-            its masks, the way the label above it now does. It is the shared
-            component's prop rather than a flip inside it: SplitWords is the
-            site's word-mask grammar and /about, /careers and the deck's nine
-            chapter bodies all still build upward. The magnitude is untouched
-            (the mask's padding is symmetric); only the sign moves. */}
-        <SplitWords
-          as="p"
-          className={styles.lede}
-          text="Explore our family of restaurants and stores, where tradition is served with a modern twist."
-          on={inView}
-          delay={0.1}
-          down
-        />
+            SAME TRIGGER AS EVERYTHING ELSE IN THE HEAD. The spans key off
+            `titleOn` — the chapter's single latch — for the reason the old
+            note gave: an independent observer here would un-sequence the
+            head from the pictures under it. And the same no-script trade as
+            .titleWord: the park lives in the stylesheet, the text stays in
+            the DOM for find-in-page and AT, and reduced motion unparks both
+            lines in the same media block that unparks the title. */}
+        <p className={styles.lede}>
+          <span className={styles.ledeLineMask}>
+            <span
+              className={styles.ledeLine}
+              style={{ "--ll-i": 0 } as CSSProperties}
+              data-on={titleOn ? "on" : undefined}
+            >
+              Explore our family of restaurants and stores,
+            </span>
+          </span>{" "}
+          <span className={styles.ledeLineMask}>
+            <span
+              className={styles.ledeLine}
+              style={{ "--ll-i": 1 } as CSSProperties}
+              data-on={titleOn ? "on" : undefined}
+            >
+              where tradition is served with a modern twist.
+            </span>
+          </span>
+        </p>
 
         {/* THE MIDDLE HAIRLINE. It closes the head and opens the grid, which is
             the one place on this chapter a rule earns its keep: it is INSIDE
@@ -1537,7 +1543,7 @@ function Tile({
    redesign — the block prints an address and two stats now, and neither
    the strip nor the `.metaClip` motion this note used to point at exists
    anywhere. The manifesto's word-mask grammar still runs this chapter's
-   heading and its standfirst; see the <h2> and <SplitWords> above. */
+   heading and its standfirst; see the <h2> and the .lede spans above. */
 
 /* The App Store morph: the plate's rectangle becomes a centred detail card.
    The card element shares the plate's layoutId, so Framer Motion FLIPs it

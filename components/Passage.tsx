@@ -557,7 +557,18 @@ const SWELL = 0.04;
    ⚠️ THE SLAB, NOT THE STAGE. The stage is a whole viewport and the slab
    is seated above its centre, so the two bottoms are a long way apart; it
    is the ink the reader is looking at that the blur is about. */
-const BLUR_PX = 22;
+/* ⚠️ 22 → 10, at the motion crit's Finding 02. At 22 the exit was a smear:
+   display type at glyph-height blur radii, held across hundreds of pixels
+   of scroll while the film climbed — captured, it was the worst sustained
+   frame on the page. Ten is still an unmistakable focus pull (these are
+   90px letterforms; 10px softens them well past legibility) but the words
+   remain WORDS going out of focus rather than becoming a tone band in the
+   cream. This is also the page's ONLY blur now — both arrival blurs were
+   deleted in the same pass (see the retired ARRIVAL_BLUR note in
+   lib/drift.ts) precisely so this focus pull would read as the camera
+   gesture it is. Do not hand blur back to the arrivals without re-arguing
+   that. */
+const BLUR_PX = 10;
 
 /* ══════════ AND THE INK GOES WITH IT ══════════
    ⚠️ THE BLUR ON ITS OWN WAS THE UGLIEST FRAME IN THE SEQUENCE, and this is

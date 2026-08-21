@@ -319,6 +319,34 @@
    The clamp and the 1.1 leading now live in globals as --t-chapter /
    --lh-chapter, shared with the journal's lede and /blog's title, so the
    three chapter heads cannot drift apart. Same values, one name. */
+/* ══ THE LEDE'S TWO LINE-MASKS ══
+   The sentence descends by CLAUSE — each line one object out of one mask —
+   in the title's own grammar: parked in the stylesheet, released by
+   `data-on`, staggered by an index the markup declares. See the note over
+   the spans in Discover.tsx for why the word-mask version died (motion
+   crit, Finding 01: sentences must not shear while being read).
+
+   THE MASK CLIPS WITH clip-path, NOT overflow, so the descender bleed can
+   be stated: 0 above (the parked line must be fully hidden), 0.3em below
+   for descenders mid-flight, and a hair each side for italic overhang —
+   Blog's .labelWordMask idiom, same numbers. */
+.ledeLineMask {
+  display: block;
+  clip-path: inset(0 -0.2em -0.3em -0.12em);
+}
+.ledeLine {
+  display: block;
+  transform: translateY(-115%);
+  /* one beat after the label's second word (title steps land at 0 and
+     0.09s), then the clauses 0.09s apart — the head reads downward in one
+     cadence: mark, "Our", "restaurants", clause, clause. */
+  transition: transform 0.85s var(--ease-entrance)
+    calc(0.1s + var(--ll-i, 0) * 0.09s);
+}
+.ledeLine[data-on="on"] {
+  transform: translateY(0);
+}
+
 .lede {
   margin: 0;
   max-width: 17.7em;
@@ -549,6 +577,13 @@
     transition: none;
     will-change: auto;
   }
+  .ledeLine {
+    transform: none;
+    transition: none;
+  }
+  .ledeLineMask {
+    clip-path: none;
+  }
   .titleRise {
     transition: none;
   }
@@ -709,8 +744,18 @@
    `round` IS ABSENT ON PURPOSE — the visible corner belongs to
    .cardSurface inside this box, so a square clip only ever cuts at or
    outside a corner the reader can see. */
+/* ⚠️ THE VARIABLE IS THE TOP INSET, NOT THE BOTTOM, and the flip is the
+   motion crit's Finding 03 closing a real disagreement: the note in
+   Discover.tsx has always said the window "grows, bottom to top", but the
+   inset sat in the BOTTOM slot, so the card actually revealed top-down —
+   its top sliver appearing at the fold and the window extending DOWNWARD
+   while the card travelled UP the screen. A reveal that runs against its
+   own arrival reads as the card being printed while it rises. With the
+   inset in the top slot the uncovering edge moves up WITH the scroll, the
+   same direction the About chapter's prints used when they wiped, and the
+   comment in Discover.tsx is finally describing the code. */
 .cell[data-wiping="on"] {
-  clip-path: inset(0% 0% var(--wipe, 0%) 0%);
+  clip-path: inset(var(--wipe, 0%) 0% 0% 0%);
 }
 
 @media (prefers-reduced-motion: reduce) {

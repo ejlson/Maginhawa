@@ -107,13 +107,13 @@ export const DRIFT_SLOT: [number, number] = [0.15, 0.5];
 export const ARRIVAL_SLOT: [number, number] = [0.14, 0.86];
 
 /* ═══════════════ AND THE PAGE'S ONE ARRIVAL ═══════════════════════════
-   The gesture AboutSplit's heading makes — sitting high, blurred and
-   transparent, then descending sharp and opaque as the chapter is reached —
+   The gesture AboutSplit's heading makes — sitting high and transparent,
+   then descending opaque as the chapter is reached —
    is now the gesture the journal's voice column makes too, at the user's
    instruction that the two read the same.
 
-   THREE PARTS, ONE PROGRESS. The travel runs the WHOLE approach; the fade
-   and the blur clear in its first sixth. That split is the signature: the
+   TWO PARTS, ONE PROGRESS. The travel runs the WHOLE approach; the fade
+   clears in its first sixth. That split is the signature: the
    type becomes legible early and then keeps moving, so it reads as
    something arriving rather than something fading in on the spot.
 
@@ -125,7 +125,9 @@ export const ARRIVAL_SLOT: [number, number] = [0.14, 0.86];
    which is further than the chapter's own top padding and would put it
    over the section above during the fade. 16vh sits inside that padding at
    every window and reads identically, because what carries the gesture is
-   the blur-and-descend, not the distance. */
+   the ink-and-descend, not the distance. (It was blur-and-descend; the
+   blur went at the motion crit's Finding 02 — see the retired ARRIVAL_BLUR
+   note at the bottom of this file.) */
 /* ⚠️ 16 → 11, AND IT MOVED BECAUSE THE SEAM DID. This number is a FLOOR
    on `--about-seam` in Blog.module.css: the column starts this far above
    its seat, the seat is the seam below the section's top edge, and About —
@@ -137,7 +139,7 @@ export const ARRIVAL_SLOT: [number, number] = [0.14, 0.86];
    The seam went to 0.7 × --home-gap-tight (130px at a 900-tall window) for
    "much closer"; 11vh is 99px, which keeps the 30-odd px of margin the
    pairing has always had. The gesture is unharmed — this file's own note
-   says what carries it is the blur-and-descend, not the distance, and the
+   says what carries it is the ink-and-descend, not the distance, and the
    page's drift reads clearly at 10. */
 /* ⚠️ 11 → 16 → 7 → 12, IN TWO PASSES, AND THE LESSON IS THAT THIS SHOULD
    NEVER HAVE BEEN A TUNED NUMBER. It is a BOUND, and the bound is
@@ -174,7 +176,7 @@ export const ARRIVAL_OFFSET: ["start end", "start start"] = [
   "start start",
 ];
 
-/* the fade and the blur, as a slot of that approach — AboutSplit's HEAD_IN,
+/* the fade, as a slot of that approach — AboutSplit's HEAD_IN,
    which is where this pairing was tuned */
 /* ⚠️ MEASURED INSIDE ARRIVAL_SLOT, NOT THE WHOLE RANGE. AboutSplit's own
    HEAD_IN is [0.02, 0.16] of a full approach; this is the same SHARE of the
@@ -192,9 +194,9 @@ export const ARRIVAL_OFFSET: ["start end", "start start"] = [
    the ink was at ~86% of the screen — the fade RAN TO COMPLETION in the
    reader's bottom margin, every time, and what arrived in view was a
    finished header. Making it start earlier only pushed more of it off the
-   bottom. Ending at 0.42 keeps the last third of the fade and the whole of
-   the blur clearing while the ink is climbing into the middle of the
-   screen, which is the part a reader can actually watch.
+   bottom. Ending at 0.42 keeps the last third of the fade clearing while
+   the ink is climbing into the middle of the screen, which is the part a
+   reader can actually watch.
 
    ⚠️ IT NO LONGER SHARES ARRIVAL_SLOT's PROPORTIONS with AboutSplit's
    HEAD_IN, which is what it was originally derived from. That derivation
@@ -291,7 +293,13 @@ export const ARRIVAL_OFFSET: ["start end", "start start"] = [
    from the layout, the voice column being above the plate on the page. That
    is why 0.66 is allowed to sit past the plate's own moment. */
 export const ARRIVAL_IN: [number, number] = [0.18, 0.66];
-export const ARRIVAL_BLUR = 8;
+/* ⚠️ ARRIVAL_BLUR IS RETIRED. It was 8, and it fed two `filter` transforms
+   — the About heading's flight and the journal voice's descent — both now
+   deleted at the motion crit's Finding 02: a fade whose last third runs
+   in front of the reader leaves type legible-but-defocused mid-read, and
+   with four blurs on one page none of them meant anything. The page's one
+   remaining blur is the Passage → Reservations focus pull (BLUR_PX in
+   Passage.tsx), which is the camera metaphor the others were diluting. */
 
 /* ═══════════════ AND THE PAGE'S ONE PARALLAX ═══════════════════════════
    The two large photographs — AboutSplit's film and the journal's lede —

@@ -212,9 +212,19 @@
    SIZED IN em, SO IT IS THE TYPE THAT DECIDES. The statement's own font-size
    is a clamp against the viewport, so a px height would be a different
    proportion at every breakpoint — large enough to break the line at 2.4rem
-   and lost in it at 5.2rem. 0.62em holds the picture between the x-height
-   and the cap height of the line it sits in, at every size, which is the
-   proportion that reads as punctuation rather than as an inserted object.
+   and lost in it at 5.2rem.
+
+   ⚠️ 0.62em → 0.86em, at the motion crit's Finding 01. At 0.62em the
+   pictures sat between the x-height and the cap height and read as
+   punctuation — which in practice meant they read as STICKERS: 15px chips
+   a reader could mistake for emoji. The reference this device comes from
+   (thisisstudiox's statement) runs its inline emphasis at full line
+   presence; the picture is meant to interrupt the sentence on purpose.
+   0.86em is the PORTRAIT's height — the ceiling this file already proved
+   safe ("both under the 0.92em line box", below) — so the landscape now
+   claims the same presence without touching the leading. ⚠️ DO NOT GO
+   PAST 0.86em: the portrait's own note is explicit that anything taller
+   requires opening the leading first, and every line pays for that.
 
    THE ASPECT IS FIXED AND THE CROP IS `cover`, because the four source
    photographs are not the same shape and four different rectangles in one
@@ -230,15 +240,16 @@
    restaurant cards and the About panel carry. A softer corner here would be
    the only rounded thing on the page. */
 /* ══════════ THE PICTURES HAVE A DECISIVE ORIENTATION ══════════
-   3 / 2 AND NOT 4 / 3. At 0.62em the old 1.33 read as neither portrait nor
-   landscape — a square-ish chip rather than a photograph set in the line.
+   3 / 2 AND NOT 4 / 3. At the old sticker size the old 1.33 read as neither
+   portrait nor landscape — a square-ish chip rather than a photograph set
+   in the line.
    3:2 is the aspect two of the four sources already are, and it is the SAME
    aspect as the three door prints in AboutSplit.module.css, so the two
    places on the home page that set a small photograph into type now cut
    them from the same stock. */
 .inlineImage {
   display: inline-block;
-  height: 0.62em;
+  height: 0.86em;
   aspect-ratio: 3 / 2;
   /* the mask hugs this box and owns both the seat in the line and the gap
      beside it — see .imageMask. `top` because the mask's line box is zero
@@ -268,8 +279,8 @@
 
    So the mask now states its height, drops the strut, and drops the block
    padding with it — a photograph has no descenders to protect, which is the
-   only thing that padding was ever for. 0.62em landscape, 0.86em portrait,
-   both under the 0.92em line box, so a picture can no longer paint outside
+   only thing that padding was ever for. 0.86em landscape and portrait both,
+   under the 0.92em line box, so a picture can no longer paint outside
    its own line whatever it is doing.
 
    ⚠️ THE MASK NOW CARRIES THE BASELINE SEAT. `.wordMask` is
@@ -312,7 +323,7 @@
      than nearly true. */
   display: inline-flex;
   line-height: 0;
-  height: 0.62em;
+  height: 0.86em;
   /* both shorthands, because `.wordMask` sets both as shorthands and a
      longhand here would only cancel the half it names */
   padding: 0;

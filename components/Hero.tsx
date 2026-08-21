@@ -48,10 +48,21 @@ function scrollToSection(hash: string, pass = 0) {
   });
 }
 
-// the kitchens take turns behind the wordmark — each clip plays through
-// to its end, then the next one starts on a clean hard cut. BOTH videos
-// stay mounted the whole time; the swap only flips visibility, so there's
-// no loading gap or flash between clips.
+// the kitchens take turns behind the wordmark — each clip plays through to
+// its end, then the next one DISSOLVES in over it. BOTH videos stay mounted
+// the whole time, so there's no loading gap or flash between clips.
+//
+// ⚠️ A DISSOLVE, NOT A CUT, at the motion crit's Finding 04. The swap used
+// to flip `visibility` — a hard splice, landing while the reader idles on
+// the hero, which is exactly when they are looking at it. A cut in a
+// full-screen film reads as a glitch; the editorial references run their
+// imagery as slow in-place crossfades (Sessions Arts Club is the
+// benchmark). Mechanically the swap now drives `opacity` and lets a 600ms
+// transition on .video do the blend: the ended clip holds its last frame,
+// the next fades in over it, and the eye reads one continuous piece of
+// film. The noscript restore treats opacity exactly as it treated
+// visibility (see layout.tsx — these carry data-entrance="hold"), so the
+// no-script behaviour is unchanged.
 //
 // ⚠️ ONLY THE FIRST ONE IS PRELOADED, AND ON A PHONE THAT IS THE DIFFERENCE
 // BETWEEN A PAGE AND A DOWNLOAD. Both carried `preload="auto"`, which fetches
@@ -197,7 +208,7 @@ export default function Hero({ started }: { started: boolean }) {
             preload={i === 0 ? "auto" : "none"}
             onTimeUpdate={i === 0 ? warmNext : undefined}
             onEnded={i === clip ? advance : undefined}
-            style={{ visibility: i === clip ? "visible" : "hidden" }}
+            style={{ opacity: i === clip ? 1 : 0 }}
             /* ⚠️ NOT AN ENTRANCE — A CAROUSEL SEAT. Only the clip currently
                playing is visible; the others are `preload="none"` and have
                never fetched a frame. The chapter's data-entrance="scope"

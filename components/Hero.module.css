@@ -32,6 +32,10 @@
   display: block;
   /* dim the footage so the wordmark and nav stay legible */
   filter: brightness(0.62);
+  /* the montage dissolves between clips — Hero.tsx drives opacity and this
+     is the blend. 600ms: long enough to read as film grammar, short enough
+     that both layers are only ever briefly live together. */
+  transition: opacity 600ms ease;
 }
 
 /* THE LOCKUP — statement, then the two ways in, centred on the film.

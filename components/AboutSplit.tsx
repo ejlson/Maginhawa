@@ -918,11 +918,12 @@ export default function AboutSplit() {
      touching a transform whose endpoints are derived four notes up. */
   const bodyY = useTransform(bodyRise, (rise: number) => `${rise}vh`);
   const headOpacity = useTransform(chapter, HEAD_IN, [0, 1]);
-  const headBlur = useTransform(
-    chapter,
-    HEAD_IN,
-    ["blur(8px)", "blur(0px)"]
-  );
+  /* ⚠️ `headBlur` IS DELETED, NOT ZEROED — the heading arrives by flight
+     and ink alone. blur(0px) still installs a filter and a composited
+     layer, so removing the transform is the only true removal. Why it went:
+     the motion crit's Finding 02 — four separate blurs on one page turned a
+     cinematic device into a rendering artifact. The one that stays is the
+     Passage → Reservations focus pull, which this deletion is protecting. */
 
   const mediaRef = useRef<HTMLElement>(null);
   const readingRef = useRef<HTMLDivElement>(null);
@@ -1292,11 +1293,7 @@ export default function AboutSplit() {
                 lockup's top edge is the same thing today only because the
                 heading is its first child. State the element the rule is
                 about. */}
-            <motion.h2
-              ref={headRef}
-              className={styles.heading}
-              style={reduce ? undefined : { filter: headBlur }}
-            >
+            <motion.h2 ref={headRef} className={styles.heading}>
               {/* THE EM-DASH IS DECORATION AND IS HIDDEN FROM THE ACCESSIBLE
                   NAME. Left in the text it would be announced as "em dash"
                   before every reading of the heading. */}

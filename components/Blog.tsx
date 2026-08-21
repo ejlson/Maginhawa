@@ -39,7 +39,6 @@ import { BLOG, entryLinkProps, type BlogEntry } from "@/lib/blog";
 import { getRestaurant } from "@/lib/restaurants";
 import { asset } from "@/lib/media";
 import {
-  ARRIVAL_BLUR,
   ARRIVAL_IN,
   ARRIVAL_OFFSET,
   ARRIVAL_VH,
@@ -630,11 +629,15 @@ export default function Blog({ journal = BLOG }: { journal?: BlogEntry[] }) {
 
   const arriveY = useTransform(arriving, ARRIVAL_SLOT, [-ARRIVAL_VH, 0]);
   const introOpacity = useTransform(arriving, ARRIVAL_IN, [0, 1]);
-  const introBlur = useTransform(
-    arriving,
-    ARRIVAL_IN,
-    [`blur(${ARRIVAL_BLUR}px)`, "blur(0px)"],
-  );
+  /* ⚠️ NO BLUR ON THE ARRIVAL ANY MORE. An `introBlur` ran here —
+     blur(8px) → blur(0) across ARRIVAL_IN — and it is deleted rather than
+     zeroed, because `filter: blur(0px)` is not `none`: it still installs a
+     filter, a containing block and a composited layer for nothing. The
+     editorial argument is in the motion crit (Finding 02): the fade's last
+     third runs while the column is being READ, and type that is legible but
+     defocused mid-read looks broken, not atmospheric. Blur is spent ONCE on
+     this page now — the Passage → Reservations focus pull — and the descend
+     + ink here carry the arrival on their own. */
 
   const { scrollYProgress: passing } = useScroll({
     target: sectionRef,
@@ -936,7 +939,7 @@ export default function Blog({ journal = BLOG }: { journal?: BlogEntry[] }) {
             className={styles.intro}
             style={
               drifting
-                ? { y: introY, opacity: introOpacity, filter: introBlur }
+                ? { y: introY, opacity: introOpacity }
                 : undefined
             }
           >

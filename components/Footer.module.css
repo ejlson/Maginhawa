@@ -376,11 +376,30 @@
   font-size: var(--t-small);
   line-height: var(--lh-body);
   opacity: 0.72;
-  transition: opacity 0.3s ease;
+  /* ── THE UNDERLINE DRAWS IN FROM THE LEFT ── the quiet hover layer the
+     motion crit's Finding 06 asked for: editorial sites spend almost
+     nothing on arrival and everything on the feel of touching the page.
+     A gradient sized 0 → 100% is the classic draw — no pseudo-element, no
+     layout, and it composes with the ink deepening as one gesture. 1px on
+     the text's own baseline; currentColor so it inherits the cream. */
+  background: linear-gradient(currentColor, currentColor) no-repeat 0 100% /
+    0 1px;
+  transition:
+    opacity 0.3s ease,
+    background-size 240ms var(--ease-out);
 }
 
 .col a:hover {
   opacity: 1;
+  background-size: 100% 1px;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .col a {
+    transition: opacity 0.3s ease;
+    /* the underline still appears — instantly. The affordance is the
+       information; the draw was only the pleasure. */
+  }
 }
 
 /* Reveal wrapper — same flex box the svg used to occupy, so its width:100%
