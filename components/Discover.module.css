@@ -735,9 +735,17 @@
        little instead — the same trade every earlier PLATE_RATIO derivation
        made for 768-tall screens. The min() against 100% is the narrow-
        viewport guard. */
+    /* ⚠️ ENLARGED, at the user's instruction ("increase the size of the
+       restaurant cards"): the reserved allowance drops 366px → 280px, which
+       at 900svh grows the cards ~214 → ~250px wide. The cost is stated
+       plainly: the section now runs a little past one screen on a 900-tall
+       window (row two's foot sits just under the fold), the same trade
+       every landscape-ratio derivation before this accepted for short
+       windows. The formula still tracks the viewport, so tall screens get
+       proportionally grander cards, not overflow. */
     max-width: min(
       100%,
-      max(880px, calc((100svh - 366px) * 1.6 + 60px))
+      max(940px, calc((100svh - 280px) * 1.6 + 60px))
     );
     margin-inline: auto;
     column-gap: 20px;
