@@ -62,421 +62,198 @@
   opacity: 1;
 }
 
-.hero {
-  /* one knob for the display type */
-  --hero-display-size: clamp(4rem, 14vw, 14rem);
+/* ═══ 01 · THE CREAM HERO ═══
+   SIZED BY ITS CONTENTS. What was here was a 320svh runway with a sticky stage
+   in it, a title that parted into two words, and a two-screen reduced-motion
+   fork so the parted title and the answer did not print through each other.
+   All of it goes with the scrub: this is nav-height of air, a headline, and
+   the answer beside it.
 
-  min-height: 100svh;
-  padding-block: 0 var(--section-y-sm);
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-  gap: clamp(2px, 0.4vh, 8px);
-  position: relative;
-}
-
-/* THE DISPLAY LINES' WORD WINDOW — an asymmetric clip, and the whole of what
-   the hero's own type needs on top of SplitWords' shared `.mask`.
-
-   `.mask` is `overflow: hidden`, i.e. both axes. The vertical half is the
-   animation: the word starts 145% down and the window is what hides it until
-   it rises. The horizontal half is pure collateral, and on display type it is
-   destructive rather than harmless — GROUP? is set in the grotesk's swashed
-   italic, whose P overhangs its advance width, and MAGINHAWA carries a
-   negative letter-space that pulls its last glyph's ink past the box. Both get
-   shorn by a hairline, permanently, long after the animation is over.
-
-   `overflow: visible clip` is the pair that fixes it: the block is clipped
-   vertically and unbounded horizontally. `visible hidden` is NOT the same
-   declaration — a `visible` paired with `hidden` computes to `auto`, which
-   would give the line a scroll container — which is exactly why this is a
-   different value rather than a relaxed one.
-
-   THE HISTORY, because this element has been here before under another name.
-   It was `.heroLineClip` on the line itself, was deleted when the display
-   lines started sliding in from the viewport edges (a horizontal travel wants
-   no clip at all), and returns now that they rise again — moved down onto the
-   word masks, which is where the clipping actually happens. The descender
-   padding lives on `.mask` and is not repeated here.
-
-   WRITTEN AS A DESCENDANT so it cannot lose. `.heroMask` lands on the same
-   element as SplitWords' `.mask`, and two single-class rules setting the same
-   property are decided by which stylesheet the bundler emitted last — which
-   is an import-order coincidence, not a rule. Two classes deep always wins.
-   It also says out loud that this override belongs to the hero's display line
-   and nowhere else.
-
-   IT IS ONE LINE NOW, NOT TWO, and that is a measurement rather than a tidy-up.
-   Half the reason this rule existed was GROUP?'s swashed italic P overhanging
-   its advance; GROUP? is Contralto upright now (see .heroLineBottom) and has
-   no overhang in either direction — measured against a laid-out advance of
-   682.21 at 201.6px, its ink ends 4.94px inside the box on the right and
-   starts 6.85px inside it on the left. So the horizontal relaxation buys that
-   line nothing and it drops back to `.mask`'s plain clip, which is what every
-   other split line on the site uses.
-
-   MAGINHAWA STILL NEEDS IT, and by the exact amount the comment above claims:
-   the -0.01em tracking shortens the advance while leaving the final A's ink
-   where it is, so measured ink runs 1013.95 against an advance of 1013.44 —
-   0.51px past the box, permanently shorn by a both-axis clip. A hairline is
-   still the whole of the letter that is missing. */
-/* `.heroLineTop .heroMask` IS GONE WITH THE MASKS. It relaxed SplitWords'
-   both-axis clip to `overflow: visible clip` on this one line, because
-   MAGINHAWA's -0.01em tracking pushes the final A's ink 0.51px past its
-   advance box and a both-axis clip shears that hairline permanently, long
-   after the animation that needed the vertical half is over.
-   The display lines are plain <p>s now — the opening's beat 4 is scrubbed as
-   a block rather than built word by word — so nothing clips them at all and
-   the ink is simply unshorn. The measurement is kept here because it is the
-   thing anyone reinstating a mask on this line would have to rediscover. */
-
-/* "Who is" — small italic serif kicker sitting on the title's shoulder.
-   Negative bottom margin swallows the display line's internal top leading
-   so the kicker reads as attached to MAGINHAWA, not floating above it. */
-.heroKicker {
-  font-family: var(--font-emphasis);
-  font-style: italic;
-  /* hairline weight — the grotesk's true italic at its lightest reads as a
-     pencil note on the title's shoulder (the AboutIntro .titleItalic
-     treatment) rather than competing with MAGINHAWA's heft. Said "Fraunces"
-     until the two-family swap; that face has not loaded in a long time. */
-  font-weight: var(--w-hairline);
-  font-size: clamp(1.2rem, 2.4vw, 2.2rem);
-  line-height: var(--lh-flush);
-  color: var(--cream);
-  /* above .heroScrim — see the note there. z-index stays `auto`: both are
-     positioned, so tree order alone decides, and the scrim is first. */
-  position: relative;
-  margin-left: 0.15em;
-  /* tuned at the glyph-ink level (canvas TextMetrics): -0.15 of the
-     display size gives the same visual gap above MAGINHAWA as GROUP
-     carries below it, so the title stack reads as one even column */
-  margin-bottom: calc(var(--hero-display-size) * -0.15);
-}
-
-/* ---------------------------------------------------------------------------
-   THE HERO'S SHAPED SCRIM — the fix that had to land before any of the motion
-   on this page was worth building.
-
-   WHAT WAS WRONG. Every hero line was set `mix-blend-mode: difference` in
-   cream over the film. Measured off the rendered page at 1440x900, per glyph,
-   against the exact pixels behind it:
-
-     MAGINHAWA   ink(118,182,239)  ground(130,62,0)    3.10:1   (need 3)
-     GROUP?      ink(132,169,239)  ground(116,76,0)    3.21:1   (need 3)
-     lede        ink(121,131,183)  ground(128,111,25)  1.37:1   (need 4.5)
-     kicker      ink(122,137,149)  ground(126,108,90)  1.40:1   (need 4.5)
-
-   DIFFERENCE FAILS IN THE MIDDLE, NOT AT THE ENDS, which is why this was
-   never caught by looking at a dark frame or a light one. (The worked
-   example below uses cream = 250,247,241, the token's value at the time;
-   it is #eae3cc now, and the arithmetic lands in exactly the same place —
-   the failure is a property of `difference`, not of which cream.)
-   Cream (250,247,241)
-   differenced against a mid-brown (127,105,100) gives (123,142,141) — a pale
-   cyan at very nearly the same luminance as the ground it is sitting on. That
-   is not an approximation of the failure, it IS the measured ink above. The
-   blend also produces a cyan cast that appears nowhere in the palette, so on
-   the frames where it was legible it was legible in the wrong colour.
-
-   SO THE INK IS SOLID CREAM AND THE GROUND IS SHAPED. Measured on the same
-   frames, cream on the ground as it already stood — no new scrim at all —
-   reached 4.62:1 on the lede and 6.89:1 on the display lines. Dropping the
-   blend was therefore the whole fix; but 4.62 against a 4.5 floor is 3% of
-   margin on footage that changes 25 times a second, so this buys headroom.
-
-   ⚠️ RE-DERIVED AFTER THE PALETTE SOFTENING. --cream went L 0.872 → 0.768,
-   and the film did not move, so each reading above can be re-solved for its
-   own (unchanged) ground: the lede is 4.10:1 and the display lines 6.12:1
-   WITHOUT this ellipse. The lede therefore no longer clears 4.5:1 on its
-   own — the 3% of margin the note called thin is now a deficit, and this
-   element has gone from buying headroom to being load-bearing. It still
-   delivers: see the fitted-ellipse figure further down, re-derived with it.
-
-   IT IS A SHAPE, NOT MORE WASH. A heavier flat gradient would have to darken
-   the gutters, the plate and the whole lower half of the frame — where there
-   is no type — to move the ~15% of the frame where there is. The proven
-   recipe on this codebase is Reservations' .locScrim: an ellipse over the
-   copy's own footprint, riding a low flat floor. Here .videoScrim IS that
-   floor (0.55-0.62 maroon, constant, and it also serves the statement, the
-   chef block and the story timeline scrolling over the same film), so this
-   element contributes only the ellipse.
-
-   THE ELLIPSE IS FITTED TO THE TYPE, not centred by eye. The four lines
-   occupy x 40-1368, y 245-590 of a 1440x900 hero: centre (49%, 46%), half-
-   extents (46%, 19%). Radii of 74% x 40% about (46%, 44%) put the lede's
-   worst corner — bottom-left, the line with the least contrast and the
-   smallest type — at 0.65 of the radius, where the ramp still holds 0.24
-   alpha. That composites the brightest measured ground to L 0.11 — a GROUND
-   luminance, which no palette change touches — putting cream on it at
-   5.11:1 (it was ~5.8:1 before the ground token softened). Still clear of
-   the 4.5:1 the lede owes, and now the only thing that is. The centre is pulled left and up off the geometric middle because
-   the two lines that need help (the lede and the kicker) are both there;
-   MAGINHAWA's right half and GROUP? are display type over the darkest part of
-   the frame and already clear 3:1 twice over.
-
-   0.36 AT THE CORE, not the 0.72 .locScrim runs, because .locScrim is the
-   entire scrim on its section and this one is a second layer on top of an
-   existing 0.58. Composited they reach 0.73 at dead centre — dark enough to
-   seat the type, light enough that the dish under MAGINHAWA is still a dish. */
-.heroScrim {
-  position: absolute;
-  inset-block: 0;
-  /* full-bleed out of .container: the type runs to both edges of the
-     viewport, so an ellipse clipped to the content column would pool visibly
-     inside the gutters. .page carries `overflow-x: clip`, so the overhang
-     costs nothing. */
-  left: 50%;
-  width: 100vw;
-  transform: translateX(-50%);
-  pointer-events: none;
-  background: radial-gradient(
-    74% 40% at 46% 44%,
-    rgba(18, 0, 0, 0.36) 0%,
-    rgba(18, 0, 0, 0.34) 44%,
-    rgba(18, 0, 0, 0.2) 74%,
-    rgba(18, 0, 0, 0) 100%
-  );
-}
-
-/* prefers-contrast: more — the ellipse becomes a near-flat field. The
-   softness above is a compositional choice; a reader asking for contrast is
-   asking for the type, not the composition. */
-@media (prefers-contrast: more) {
-  .heroScrim {
-    background: radial-gradient(
-      110% 70% at 46% 44%,
-      rgba(18, 0, 0, 0.62) 0%,
-      rgba(18, 0, 0, 0.58) 60%,
-      rgba(18, 0, 0, 0.44) 100%
-    );
-  }
-}
-
-/* ═══════════════════ THE SCROLL-SCRUBBED OPENING ═══════════════════
-   The runway, the screen that sticks inside it, and the title that parts.
-   Every number the MOTION uses lives in About.tsx; what is here is the box
-   the motion happens in.
-
-   THE RUNWAY IS THE CLOCK. Its height is the only thing that decides how
-   much scrolling the opening takes, and it is stated in svh so a mobile URL
-   bar retracting cannot change the mapping mid-scrub the way a vh would.
-   `--opening-vh` mirrors OPENING_VH in About.tsx — the two must agree, and
-   the component is the source: the scrub's `offset` is written against this
-   box's own start and end, so a disagreement does not break the mapping,
-   it only changes how long the opening lasts. */
+   THE WHOLE LINE IS CONTRALTO CAPS. "Who is" used to be the UI face against
+   the display face below it; the question is one utterance and is set as one.
+   Caps at this size take NEGATIVE tracking — a didone's capitals carry their
+   own sidebearings and read loose without it. */
 .opening {
-  --opening-vh: 320;
-  position: relative;
-  height: calc(var(--opening-vh) * 1svh);
+  background: var(--cream);
+  padding-block: clamp(48px, 7vh, 88px) clamp(28px, 4vh, 40px);
 }
 
-/* REDUCED MOTION: TWO STILL SCREENS, NOT ONE.
-   The obvious version — collapse the runway to a single screen and let the
-   stage render its finished state — puts the title and the answer on the
-   same 900px of glass, and they are both display type at the same scale.
-   Photographed, "ABOUT US" sat in maroon straight through the middle of
-   "MAGINHAWA GROUP?": not a degraded animation, an unreadable page.
-   So the runway is sized to its content and the two layers become ordinary
-   full-height blocks in flow — the title on its own screen, the question
-   and the answer on the next. Nothing sticks, nothing is scrubbed, and both
-   things the opening had to say are legible with no motion at all. */
-.opening[data-static] {
-  height: auto;
-}
-
-.openStage {
-  position: sticky;
-  top: 0;
-  height: 100svh;
-  /* the title's words travel 58vw each and leave through the screen edges;
-     clip so they never widen the document on the way out. `clip` rather
-     than `hidden` so this never becomes a scroll container — the same call
-     .heroTrail makes two rules down. */
-  overflow: clip;
-}
-
-.opening[data-static] .openStage {
-  position: relative;
-  height: auto;
-  overflow: visible;
-}
-
-/* the title's layer, and the box the indicator is seated in. Absolute over
-   the stage while it is scrubbed; an ordinary screen-tall block when it is
-   not. */
-.openHead {
-  position: absolute;
-  inset: 0;
-}
-
-.opening[data-static] .openHead {
-  position: relative;
-  inset: auto;
-  min-height: 100svh;
-}
-
-/* THE TITLE. Maroon on the page's cream, because that is what is behind it:
-   the film starts at scale 0 and only ever occupies the hole BETWEEN the
-   two words (the clamp in About.tsx guarantees it), so neither word is ever
-   over the picture and neither needs the cream-on-film treatment the answer
-   below it wears.
-
-   Sized off the same `--hero-display-size` knob the answer's display lines
-   use, so the opening and the beat it hands over to are one voice at one
-   scale. `white-space: nowrap` on the line: "About Us" must be ONE line at
-   every width or the two words cannot part horizontally. */
-.openTitle {
-  --hero-display-size: clamp(3.4rem, 12vw, 12rem);
-  position: absolute;
-  inset-inline: 0;
-  top: 50%;
-  transform: translateY(-50%);
-  margin: 0;
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  white-space: nowrap;
-  font-family: var(--font-display-big);
-  font-weight: var(--w-medium);
-  font-size: var(--hero-display-size);
-  line-height: 0.86;
-  letter-spacing: -0.01em;
-  text-transform: uppercase;
-  color: var(--maroon);
-  pointer-events: none;
-}
-
-/* the two words. `will-change` is NOT set: an element with a transform being
-   written to it every frame is promoted by the compositor for exactly that
-   window, and a standing hint here would hold two layers over a pinned
-   video for the eleven thousand pixels below — the cost .heroTrailImg's
-   note measured and refused. */
-.openWord {
-  display: inline-block;
-}
-
-/* STATIC: the title takes a screen of its own, and it takes it ON the film —
-   which is why the ink changes. Maroon is correct while the picture is still
-   a hole between the words and everything around them is the cream page; on
-   a full-bleed frame it is the same near-invisible pairing .heroScrim's own
-   note measures. Cream over the constant .videoScrim is what every other
-   line in this scope wears. */
-.opening[data-static] .openTitle {
-  position: relative;
-  top: auto;
-  transform: none;
-  min-height: 100svh;
-  color: var(--cream);
-}
-
-/* the visible gap is this margin; the space character next to it carries no
-   advance at all. Both halves are load-bearing — see the note at the use
-   site, and SplitWords, which carries the same pair. */
-.openWord:first-of-type {
-  margin-right: 0.24em;
-}
-
-.openSpace {
-  font-size: 0;
-}
-
-/* BEAT 4's layer: the old hero, seated on the full-screen film. `inset: 0`
-   with the container inside it so `.hero`'s own centred flex column gets a
-   full screen to centre in, exactly as it did when it was a section in the
-   flow. */
-.openAnswer {
-  position: absolute;
-  inset: 0;
-  display: flex;
+/* the answer is bottom-aligned to the headline, so its last line and the foot
+   of "Group?" close together rather than the column starting at cap-height */
+.openGrid {
+  display: grid;
+  grid-template-columns: 1fr minmax(240px, 304px);
+  gap: clamp(32px, 5vw, 64px);
+  /* STRETCH, NOT END. The aside now holds a film above its prose, and the
+     brief pins both ends of it: the film's top to the headline's top, the last
+     line of prose to the foot of "Group?". Only a stretched track can satisfy
+     both — `end` would hang the whole column off the bottom. */
   align-items: stretch;
 }
 
-.opening[data-static] .openAnswer {
-  position: relative;
-  inset: auto;
-  min-height: 100svh;
+.openGrid > .openTitle {
+  align-self: start;
 }
 
-.openAnswer > .container {
+/* `width: max-content` makes the heading exactly as wide as its widest line,
+   which IS "Maginhawa" — so ranging line one right (below) lands "IS" flush
+   with MAGINHAWA's right edge with no measuring at all, and keeps it flush if
+   the copy or the size ever change. */
+.openTitle {
+  margin: 0;
+  width: max-content;
+  max-width: 100%;
+  font-family: var(--font-display-big);
+  font-weight: var(--w-medium);
+  /* MEASURED, NOT GUESSED. "MAGINHAWA" is the widest line and its width is a
+     constant 5.01x the font-size in this cut, so the ceiling is set from the
+     column it has to live in: at 1920 the left track is 1472px, and 12rem
+     lands the line at 65% of it. The old 6.5rem cap filled 35% — the headline
+     stopped growing at 1280 and every wider screen just added empty cream. */
+  font-size: clamp(3rem, 10.2vw, 12rem);
+  line-height: 0.94;
+  letter-spacing: -0.012em;
+  text-transform: uppercase;
+  color: var(--maroon);
+}
+
+.openLine { display: block; }
+
+/* JUSTIFIED ACROSS THE HEADING'S OWN WIDTH. `width: max-content` on .openTitle
+   makes that width MAGINHAWA's, so "Who" landing on flex-start and "is" pushed
+   out by `margin-left: auto` puts one on each edge of the widest line. Baseline
+   alignment rather than centre: the mark between them is set on the same
+   baseline as the capitals, so it sits in the line rather than floating in it. */
+.openLineIs {
+  display: flex;
+  align-items: baseline;
+}
+
+/* ONE LINE, NOT A LINE AND A PICTURE. `align-items: baseline` seats the mark
+   on the capitals' own baseline, and `flex-wrap: nowrap` with a `flex: none`
+   mark means it can never drop below the name however narrow the column gets
+   — it is part of the word, not an item that follows it. */
+.openLineMark {
+  display: flex;
+  align-items: baseline;
+  flex-wrap: nowrap;
+}
+
+.openWho {
+  flex: none;
+}
+
+.openIs {
+  flex: none;
+  margin-left: auto;
+}
+
+/* SIZED IN em, SO IT TRACKS THE TYPE. The heading is fitted by a clamp across
+   five breakpoints; a px mark would be right at one of them and wrong at four.
+   0.62em is the cut's cap height, so the mark reads as the same height as the
+   capitals beside it rather than as an image dropped next to them.
+
+   AND IT CONTRIBUTES NO WIDTH, which is the whole of the second problem it
+   caused. `width: max-content` on the heading measures its widest line, and
+   with the mark in flow that line became MAGINHAWA + mark — so "is", which
+   ranges to that width, drifted right and came to rest over the mark instead
+   of over the final A. The end margin cancels the start margin and the box
+   exactly (0.22 + 0.62 - 0.84 = 0), so the line measures as the word alone
+   while the mark still paints beyond it, still on the baseline the flex row
+   gives it. Overflow rather than layout: nothing between here and .page clips
+   the inline axis. */
+.openLogo {
+  display: inline-block;
+  flex: none;
+  width: 0.62em;
+  height: 0.62em;
+  margin-inline-start: 0.22em;
+  margin-inline-end: -0.84em;
+}
+
+.openLogo img {
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: contain;
+}
+
+.openAside {
   display: flex;
   flex-direction: column;
-  justify-content: center;
+  padding-bottom: 0.35em;
 }
 
-.openAnswer .hero {
-  flex: 1;
+/* THE FILM TAKES WHAT THE HEADLINE LEAVES. It cannot also hold a fixed aspect
+   — both ends are pinned, so its height is a remainder rather than a choice.
+   The source is 1080x1920, so `cover` on a taller-than-wide box is a straight
+   crop and never a stretch; the min-height stops it collapsing to a letterbox
+   strip under a short headline. */
+/* A PORTRAIT FLOOR, AND THE REMAINDER ABOVE IT.
+
+   `flex: 1 0 auto` with an aspect-ratio gives both halves of the brief what
+   they need: the frame is never shallower than 4:5, so it stays a portrait at
+   every width, and it still absorbs whatever height a taller headline leaves,
+   so the two columns end together when the headline is tall enough to allow
+   it. On a narrower screen the aside is the taller of the two and the row
+   grows to it — the film's top still meets the headline's top, which is the
+   end that was asked for.
+
+   THE VIDEO IS TAKEN OUT OF FLOW, and that is the whole fix for the first
+   attempt: a <video> carries intrinsic dimensions (this one is 1080x1920), so
+   in flow it reported a 540px height at a 304px width and drove the column
+   instead of filling it. Absolutely positioned it contributes nothing, and
+   `cover` crops the portrait source to whatever box the flexbox settles on. */
+.openMedia {
+  position: relative;
+  flex: 1 0 auto;
+  aspect-ratio: 4 / 5;
+  overflow: hidden;
+  border-radius: var(--radius-tile);
+  background: color-mix(in srgb, var(--maroon) 10%, transparent);
 }
 
-/* the indicator sits under the title on the same axis — this screen is
-   CENTRED (one word either side of the middle), unlike the left-hung hero
-   the cue used to close, so a left-hung signpost would be the only thing on
-   it off the centre line */
-.opening .scrollCue {
-  left: 50%;
-  transform: translateX(-50%);
-  color: var(--maroon);
-}
-
-.opening .scrollCueInner {
-  color: var(--maroon);
-}
-
-/* …except when the title screen is ON the film, which is the static case —
-   the ink follows the title's own for the same reason (see above). */
-.opening[data-static] .scrollCue,
-.opening[data-static] .scrollCueInner {
-  color: var(--cream);
-}
-
-/* THE SCROLL CUE. The page is 11,114px tall and said so nowhere: the hero is
-   a full-bleed film with no edge, no fold and nothing under the type to
-   suggest it continues. The home hero has carried this signpost since it was
-   built — this is Hero.module.css's .scrollHint, same mono-caps voice, same
-   chevron, deliberately not a new gesture.
-
-   BOTTOM LEFT, NOT CENTRED, and that is the one thing changed from home.
-   Home's hero is a centred wordmark and the cue sits under it on the same
-   axis. This hero is left-hung editorial: the kicker, MAGINHAWA and the lede
-   all start at the container's left edge, and a centred cue would be the only
-   thing on the screen not on that line.
-
-   IT DOES NOT MOVE once it has landed — no bob, no pulse. A signpost that
-   animates is one more thing competing for the eye on a page that already has
-   a pinned film, a scrubbed statement and a drifting timeline, and a slow looping
-   oscillation is specifically the kind of ambient motion a reduced-motion
-   reader is asking to be spared.
-
-   IT DOES LEAVE, THOUGH, and that was the whole of the defect. Fading in was
-   its only animation, so it was still at 0.8 opacity a full viewport into the
-   read at every size tested — worst on a phone, where a 100svh hero puts it
-   dead centre of the second screen, over a photograph, telling a reader who is
-   already scrolling to scroll. About.tsx now drives this element's opacity off
-   the hero's own scroll progress; the child carries the entrance. Two
-   elements, because one of the two fades has to be reversible and the other
-   must not be. */
-.scrollCue {
+.openMediaVideo {
   position: absolute;
-  left: 0;
-  bottom: clamp(14px, 3vh, 40px);
-  pointer-events: none;
+  inset: 0;
+  display: block;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
 }
 
-.scrollCueInner {
-  display: flex;
-  align-items: center;
-  gap: var(--lockup-gap-sm);
-  font-family: var(--font-mono);
-  font-weight: var(--w-regular);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label-mono);
-  text-transform: uppercase;
-  color: var(--cream);
+/* pushed to the foot of the column, which is what closes it with "Group?" */
+.openCopy {
+  margin-top: auto;
+  padding-top: clamp(20px, 2.4vw, 32px);
 }
 
-.scrollCue svg {
-  width: 0.85em;
-  height: 0.85em;
+.openLede {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  line-height: 1.7;
+  color: color-mix(in srgb, var(--maroon) 78%, transparent);
+}
+
+.openTag {
+  margin: 0.75rem 0 0;
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  line-height: 1.7;
+  font-weight: var(--w-medium);
+  color: var(--maroon);
+}
+
+@media (max-width: 900px) {
+  .openGrid { grid-template-columns: 1fr; align-items: start; }
+  /* the right-ranged "IS" only means anything while the two lines share a
+     width; stacked, the heading is simply left-hung */
+  .openTitle { width: 100%; }
+  /* stacked, there is no shared width to justify against, so the line simply
+     closes up; the mark stays on the name either way */
+  .openLineIs { justify-content: flex-start; }
+  .openIs { margin-left: 0.24em; }
 }
 
 /* ---- pinned video scope ----
@@ -584,11 +361,20 @@
 .videoScrim {
   position: absolute;
   inset: 0;
+  /* DEEPENED FOR THE REBUILD, and it replaces a local fix rather than adding
+     to one. These stops were tuned when the film carried a hero, one sentence
+     and a scattered deck with large gaps of bare footage between them; the
+     page is now content from the first row to the last, over a clip whose
+     mid-section is a lit, near-cream bowl. At 0.55 the accent failed (2.70:1)
+     and the cream ran thin, so a radial was added behind each chapter's copy
+     — which then read as nine soft rectangles floating on the picture, a
+     worse fault than the one it fixed. One even scrim over the whole frame has
+     no edges to notice. Verified by scripts/probe-about-onfilm.mjs. */
   background: linear-gradient(
     180deg,
-    rgba(31, 0, 0, 0.62) 0%,
-    rgba(31, 0, 0, 0.55) 45%,
-    rgba(31, 0, 0, 0.74) 100%
+    rgba(31, 0, 0, 0.82) 0%,
+    rgba(31, 0, 0, 0.78) 45%,
+    rgba(31, 0, 0, 0.86) 100%
   );
   pointer-events: none;
 }
@@ -779,848 +565,305 @@
   font-weight: inherit;
 }
 
-/* ---- Statement + Omar Shah band ----
-   Scrolls over the pinned video; the shared backdrop scrim provides the
-   dark field, so the band itself is transparent. Cream type throughout. */
-.band {
+/* ═══ 02 · THE STORY, ON THE FILM ═══
+   THE ACCENT IS LIFTED HERE AND ONLY HERE. --saffron is #2a5c4a, a deep green
+   chosen against cream, where it measures comfortably. On the footage it does
+   not: probed across six frames of belly-hero.mp4 it ran 1.87:1 at worst
+   against a 4.5:1 bar. This is the same accent carried toward the ground
+   rather than away from it — the move PressWall already makes on the maroon —
+   and it is scoped to the film, so every cream section keeps the brand value. */
+.videoContent {
+  --accent-on-film: #8fc3a9;
   color: var(--cream);
 }
+
+/* ONE GAP, USED TWICE. The dateline's margin-bottom and the standfirst's
+   margin-top were 26px and 20px — close enough to look deliberate and wrong
+   enough to read as drift. They come off a single token now, so they cannot
+   diverge again.
+
+   AND EQUAL MARGINS ARE THE RIGHT ANSWER HERE, which is worth stating because
+   at display size it usually is not: a line box that crops its own ink
+   asymmetrically needs optical compensation, not equal boxes. Measured, this
+   cut's box sits -0.207em above the ink and -0.206em below it — symmetric to
+   within a thousandth of an em — so equal margins ARE equal optical gaps. */
+.storyHead {
+  --story-gap: clamp(18px, 2.1vw, 30px);
+  padding-block: clamp(28px, 4.5vh, 56px) 0;
+}
+
+/* the small line over the title — the site's own label voice, the same one
+   .chapterPlace and .ownerEyebrow already speak in */
+.storyDateline {
+  margin: 0 0 var(--story-gap);
+  text-align: center;
+  font-family: var(--font-mono);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label-mono);
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--cream) 66%, transparent);
+}
+
+/* Fitted edge to edge by FitLine in About.tsx — the size and the tracking are
+   both written from JS, because a CSS pair would be correct at exactly one
+   width. What is here is what it renders at before the effect runs, and with
+   no JS at all, so the line is never unreadable. */
+.storyTitle {
+  margin: 0;
+  font-family: var(--font-display-big);
+  font-weight: var(--w-medium);
+  font-size: clamp(3rem, 13vw, 12rem);
+  line-height: 0.92;
+  letter-spacing: -0.02em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--cream);
+}
+
+/* the TEXT is measured, not the box — scrollWidth on a block is at least its
+   own content-box width, which would make the fit a silent no-op */
+.storyTitle > span { display: inline-block; }
 
 /* ---------------------------------------------------------------------------
-   THE STATEMENT — right-hung, and given a whole screen.
+   THE LETTERS ARRIVE ONE AT A TIME.
 
-   IT HAD NO ROOM. This is the sentence the brand is named for, set at the
-   largest type on the page, and it was living inside 465px of a 900px viewport
-   — half a screen, with the founder's block arriving underneath before it had
-   finished being read. Two things followed from that and only one of them was
-   about the statement.
+   The line was simply there — the largest thing on the page and the only thing
+   on it that did not happen. Each character now rises out of a 0.4em drop and
+   fades up, 42ms apart, so the word writes itself left to right at about the
+   speed it is read.
 
-   THE SCRUB HAD NOWHERE TO GO. The rise is scrubbed over `start 0.88` to
-   `end 0.42` (see the Statement block in About.tsx), which is about three
-   quarters of a screen of travel — but in a half-screen section that range
-   overlapped the chef block's own entrance, so at scrollY 780-960 there were
-   three and four independent movers in frame at once, the only positions on
-   the page where that happens. The chef block's arrival was invisible not
-   because it was too quiet but because it was competing with a wave of
-   display type. A full viewport separates them without touching either.
-
-   RIGHT, NOT LEFT, and it is a composition rather than a preference. The hero
-   above is hung hard left — kicker, MAGINHAWA and the lede all start at the
-   container's left edge — and the founder's portrait below it takes the left
-   five columns. Putting the one sentence between them on the opposite edge is
-   what makes the three read as a sequence instead of a column. The text
-   inside the block stays left-aligned: this is a right-hung measure, not
-   ragged-left setting. */
-.statement {
-  /* a whole screen, and centred in it */
-  min-height: 100svh;
-  display: grid;
-  align-content: center;
-  padding-block: var(--section-y);
-  /* the containing block for .statementScrim */
-  position: relative;
-}
-
-.statementText {
-  font-family: var(--font-display);
-  font-weight: var(--w-medium);
-  font-size: var(--t-display);
-  line-height: var(--lh-display);
-  letter-spacing: var(--tr-display);
-  color: var(--cream);
-  /* RIGHT-HUNG, AND THE MEASURE IS WHAT MAKES THAT VISIBLE. 26ch alone is
-     ~1140px at this size — 86% of the container — so `margin-left: auto` had
-     nowhere to push it and the block still read as centred. Capping at 60% of
-     the column instead costs a line and a half of raggedness and buys the
-     composition: the hero above hangs hard left, the founder's portrait below
-     takes the left five columns, and this sits opposite both. 26ch stays as
-     the ceiling so the measure can never grow past comfortable reading on a
-     very wide screen. */
-  max-width: min(26ch, 60%);
-  /* with the width capped, `margin-left: auto` absorbs the remainder of the
-     container and the block sits on its right edge */
-  margin: 0 0 0 auto;
-}
-
-/* THE SAME MOVE AS THE HERO'S AND THE CHEF BLOCK'S, and this section is the
-   one that needed it most.
-
-   Measured against the film through .videoScrim alone, the statement's cream
-   words are fine — but the two EMPHASISED phrases are not, and they are set in
-   saffron: `comfortable` and `every kitchen we run`. Saffron on the shared
-   gradient's 45% stop, which is that gradient's LIGHTEST point and exactly
-   where this section sits in viewport space, is the least legible type on the
-   page — under the 3:1 large-text floor on the brighter frames. The chef block
-   one section below got a shaped scrim for precisely this reason (see
-   .chefScrim, including why the fix cannot be applied to .videoScrim itself:
-   its 45% stop is also what the story timeline's frames sit behind, so raising
-   it would muddy every chapter photograph to fix four lines of type).
-
-   SHAPED TO THE RIGHT, because the type is. The block occupies roughly the
-   right 40% of the container and most of the height of a centred screen, so
-   the ellipse is centred at 68% across rather than at the middle.
-
-   IT IS HEAVIER THAN THE HERO'S AND THE CHEF BLOCK'S, and the reason is the
-   INK rather than the composition. Those two are cream (relative luminance
-   0.932 — the token's value two swaps ago; it is L 0.768 now) and clear
-   their floors on the shared scrim alone; 0.30 buys them headroom. Saffron
-   was 0.273 — a third of cream's — so the same ground that put cream at
-   6.5:1 put these phrases at 2.9:1, under the 3:1 large-text floor. Both
-   tokens have moved since; the re-derivation is in the table below. Measured on the rendered page with scripts/probe-hero-contrast.mjs
-   (`statement` mode, and `noscrim` for the counterfactual):
-
-     worst frame of the film      no scrim   at 0.30   at 0.52
-     statement (cream)              4.34:1    6.47:1    9.67:1
-     emphasis  (saffron)            2.40:1    2.89:1    3.43:1
-
-   0.52 is what put the saffron over 3:1 with margin on the WORST frame of a
-   21-second film rather than on a frame chosen by hand.
-
-   ⚠️ THAT TABLE IS TWO PALETTES OLD AND THE EMPHASIS ROW NO LONGER HOLDS.
-   It is written against cream at L 0.932 and saffron at L 0.273, which are
-   the #faf7f1 / #c97e3f pair — neither token has had those values for two
-   swaps. The film is unchanged, so re-solving each column for the CURRENT
-   tokens (cream L 0.768, accent L 0.127) gives:
-
-     worst frame of the film      no scrim   at 0.30   at 0.52
-     statement (cream)              3.61:1    5.39:1    8.05:1
-     emphasis  (saffron)            1.34:1    1.61:1    1.91:1
-
-   The cream row still clears its 3:1 large-display floor at 0.52 with room.
-   THE EMPHASIS ROW FAILS AT EVERY ALPHA, and it was already failing before
-   this pass — the accent has been drifting darker across two swaps while
-   this note went on quoting a value from before either of them. No scrim
-   alpha fixes it: at 0.52 the ground is already L 0.044 and the accent is
-   L 0.127, so the two are converging, not separating. The fix is a lighter
-   accent for THIS use (the mix PressWall.module.css uses on the maroon —
-   accent carried toward the ground rather than away from it — is the
-   pattern that works on a dark ground), and it is out of scope here.
-   Recorded rather than quietly corrected, because the number that was here
-   said the emphasis passed. Composited with
-   .videoScrim it reaches ~0.80 at the core, which is dark — and it is a whole
-   screen carrying one sentence, so the film is atmosphere here rather than
-   subject. The fall to zero at the edges keeps it a vignette on the right
-   rather than a band across the page. */
-.statementScrim {
-  position: absolute;
-  inset-block: 0;
-  /* full-bleed out of .container — the ellipse must not pool inside the
-     gutters. .page carries `overflow-x: clip`, so the overhang costs nothing. */
-  left: 50%;
-  width: 100vw;
-  transform: translateX(-50%);
-  pointer-events: none;
-  background: radial-gradient(
-    62% 50% at 68% 50%,
-    rgba(18, 0, 0, 0.52) 0%,
-    rgba(18, 0, 0, 0.5) 52%,
-    rgba(18, 0, 0, 0.28) 78%,
-    rgba(18, 0, 0, 0) 100%
-  );
-}
-
-@media (prefers-contrast: more) {
-  .statementScrim {
-    background: radial-gradient(
-      130% 100% at 68% 50%,
-      rgba(18, 0, 0, 0.74) 0%,
-      rgba(18, 0, 0, 0.68) 60%,
-      rgba(18, 0, 0, 0.5) 100%
-    );
-  }
-}
-
-/* ---------------------------------------------------------------------------
-   THE SCRUBBED STATEMENT'S WORD MASKS — Manifesto's .wordMask / .word, to the
-   letter, because this is the same gesture and it should not be a second
-   dialect of it. See the Statement block in About.tsx for why this sentence in
-   particular is scrubbed rather than revealed.
-
-   The padding/negative-margin pair is not decoration: the display face sits on
-   a 0.92 line-height, so the raw line box is SHORTER than the glyphs and a
-   bare `overflow: hidden` shaves ascenders and the tails of p/g/y at rest.
-   Padding the clip window out and pulling the same amount back with negative
-   margins widens the window without moving the text. */
-/* THE HEADROOM IS SET BY THE ITALIC, NOT BY THE UPRIGHT. This is set at
-   line-height 0.92, so the clip window is already shorter than the face's ink
-   box, and the saffron emphasis run swaps to Helvetica ITALIC — whose 'f' and
-   'y' descend visibly further than the upright's. At 0.14em the descenders of
-   "comfortable" and "every" were being shorn flat.
-
-   IT DOES NOT SHOW UP IN LAYOUT, which is why it survived a measuring pass:
-   every word's border box sat a comfortable 11.2px INSIDE the mask's padding
-   box (probed at 1440 — "comfortable" -11.19, "every" -8.55). What overflows
-   is the glyph's PAINT, and no box geometry reports that. It has to be looked
-   at.
-
-   0.30em clears it with room to spare. The rise in About.tsx moves with this
-   number and is not independent of it: the word must still start fully below
-   the window, so the travel is (line box + bottom padding) / line box, which
-   at this padding is ~133% — hence 145% there, not the old 130%. */
-.statementMask {
+   TRANSFORM AND OPACITY ONLY, so nine glyphs at ~190px cost no layout and no
+   repaint of the film behind them. The stagger is a per-character
+   `transition-delay` off `--i` rather than nine keyframe rules, and it is
+   latched once by an observer in FitLine — a display line that re-plays every
+   time it scrolls past is the most distracting thing a page can own.
+   --------------------------------------------------------------------------- */
+.fitChar {
   display: inline-block;
-  overflow: hidden;
-  vertical-align: bottom;
-  /* the word gap, since the masks sit adjacent with no whitespace between */
-  margin-right: 0.24em;
-  padding-block: 0.3em;
-  margin-block: -0.3em;
+  opacity: 0;
+  transform: translateY(0.4em);
+  transition:
+    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
+    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--i, 0) * 42ms);
 }
 
-.statementMask:last-child {
-  margin-right: 0;
+.storyTitle[data-lit] .fitChar {
+  opacity: 1;
+  transform: none;
 }
 
-/* A REAL SPACE between the masks, with no advance of its own — the same fix
-   and the same reasoning as SplitWords' `.space`, which see. The 0.24em margin
-   above stays the only gap; this exists so the sentence's text is words. */
-.statementSpace {
-  font-size: 0;
-}
-
-/* will-change IS correct here and it is the one place on this page it is:
-   these words are driven by an independent `y` motion value written from JS on
-   every scroll frame — not a whole-`transform` WAAPI animation the browser
-   promotes on its own — so without the hint each word is re-rastered as it
-   travels.
-
-   WHAT WAS WRONG WAS THE TENURE, not the hint. It sat on `.statementWord`
-   unconditionally, so nineteen compositor layers were held for the life of an
-   11,000px page to serve one paragraph's worth of scroll — the exact standing
-   cost SplitWords' CSS driver exists to avoid. About.tsx toggles `.statementLive` from an observer on
-   the paragraph, so the promotion lasts as long as the block is near the
-   viewport and no longer. Outside that the words are not moving. */
-.statementWord {
+/* the space carries the fitted tracking like any other character, so it cannot
+   be a bare text node between two inline-blocks */
+.fitSpace {
   display: inline-block;
+  white-space: pre;
 }
 
-.statementLive .statementWord {
-  will-change: transform;
+/* no observer runs under the preference, so the letters would sit at 0 for
+   ever — they are simply present instead */
+.storyTitle[data-reduce] .fitChar {
+  opacity: 1;
+  transform: none;
+  transition: none;
 }
 
-.chef {
-  padding-block: var(--section-y-sm) var(--section-y);
-}
-
-/* offset editorial grid — the landscape portrait hugs the left edge at
-   roughly 5 of 12 columns and everything else sits right of it.
-
-   ONE ROW NOW, and that is what fixes the block's real defect. It used to be
-   two: portrait + name in row 1, and a two-column slab of small print in row
-   2 hanging under the name. Row 1 alone was most of a viewport, so at every
-   normal scroll position the name landed at the foot of one screen and the
-   print was orphaned at the head of the next with nothing above it to say
-   whose bio it was. Collapsing to a single row makes the four things the
-   section is made of — portrait, headline, name, bio — one object that
-   cannot be split by a fold. */
-.chefGrid {
-  display: grid;
-  grid-template-columns: minmax(0, 5fr) minmax(0, 7fr);
-  column-gap: clamp(36px, 5vw, 96px);
-  row-gap: clamp(28px, 4vh, 56px);
-  align-items: center;
-  /* the containing block for .chefScrim below */
-  position: relative;
-}
-
-/* THE SAME MOVE AS THE HERO'S, ONE SECTION LOWER, and it is here because the
-   copy above it changed. Measured against the film through .videoScrim alone:
-
-     chefQuote  4.37:1  (need 3)     chefBody  4.51:1  (need 4.5)
-     chefName   4.70:1  (need 3)     eyebrow   4.54:1  (need 4.5)
-
-   Every one of those passed and two of them passed by less than a percent,
-   on footage that changes twenty-five times a second — which is not a pass,
-   it is a coin toss with a good average.
-
-   ⚠️ RE-DERIVED AFTER THE PALETTE SOFTENING, same film, cream L 0.872 →
-   0.768:  chefQuote 3.88:1 (need 3, still clear) · chefName 4.17:1 (need 3,
-   still clear) · chefBody 4.00:1 and eyebrow 4.03:1 — BOTH NOW UNDER THE
-   4.5:1 they owe. The coin toss the note describes has landed. The two
-   small runs need either more scrim on this block or a step up in size to
-   reach the large-text floor; that is a change to this section's design
-   rather than to the palette, so it is recorded here and not guessed at. It also happens to be the block whose
-   bio was just rewritten to carry the whole succession, so it is now the only
-   prose in the section and the least legible thing in it.
-
-   SOFTER AND WIDER THAN THE HERO'S. There is no tight type footprint to fit
-   here — a portrait, a headline and a paragraph spread across the full
-   measure — so this is a broad, low ellipse that simply seats the block,
-   rather than a shape shrink-wrapped to letterforms. 0.30 at the core against
-   the hero's 0.36, for the same reason the hero's is 0.36 and .locScrim's is
-   0.72: it is the second layer over an existing 0.55-0.62, not the only one.
-
-   NOT ON .videoScrim ITSELF, which was the obvious one-line alternative — its
-   45% stop is the lightest point of the shared gradient and raising it would
-   have lifted this band. But that gradient is in VIEWPORT space, not page
-   space, so the 45% stop is also what the story timeline's frames sit behind:
-   every chapter photograph would have been muddied to fix four lines of type
-   two screens above them. */
-.chefScrim {
-  position: absolute;
-  inset-block: -22%;
-  left: 50%;
-  width: 100vw;
-  transform: translateX(-50%);
-  pointer-events: none;
-  background: radial-gradient(
-    68% 52% at 50% 50%,
-    rgba(18, 0, 0, 0.3) 0%,
-    rgba(18, 0, 0, 0.28) 46%,
-    rgba(18, 0, 0, 0.16) 76%,
-    rgba(18, 0, 0, 0) 100%
-  );
-}
-
-@media (prefers-contrast: more) {
-  .chefScrim {
-    background: radial-gradient(
-      120% 90% at 50% 50%,
-      rgba(18, 0, 0, 0.6) 0%,
-      rgba(18, 0, 0, 0.54) 60%,
-      rgba(18, 0, 0, 0.4) 100%
-    );
-  }
-}
-
-.chefImage {
-  grid-column: 1;
-  grid-row: 1;
-  width: 100%;
-  /* above .chefScrim — both are positioned, so tree order alone decides */
-  position: relative;
-}
-
-.chefImage img {
-  width: 100%;
-  max-width: 678px; /* native width — never upscaled */
-  height: auto;
-  display: block;
-  border-radius: var(--radius-tile);
-}
-
-.chefText {
-  grid-column: 2;
-  grid-row: 1;
-  align-self: center;
-  position: relative;
-  display: flex;
-  flex-direction: column;
-  gap: clamp(14px, 2.2vh, 26px);
-}
-
-/* THE TWO REVEAL GROUPS, and they are also the layout. Each wraps one beat
-   of the block's single arrival (see the Reveals in About.tsx): the eyebrow
-   and the headline lead, the name and the bio follow. Grouping them this way
-   is what let five nested Reveals become two — the wrappers were needed for
-   the motion, so they may as well carry the spacing. */
-.chefLead,
-.chefCredit {
-  display: flex;
-  flex-direction: column;
-}
-
-.chefCredit {
-  gap: clamp(10px, 1.4vh, 18px);
-}
-
-/* THE NAME IS NO LONGER THE HEADLINE. It ran at clamp(2.8rem, 6.2vw, 6rem) —
-   larger than the page's own --t-display — back when it was the biggest thing
-   in the section. The quote leads now, so the name steps down to what it
-   actually is: an attribution under a statement. Still the display face and
-   still cream, so it reads as a name and not as a caption. */
-.chefName {
-  font-family: var(--font-display);
-  font-weight: var(--w-medium);
-  font-size: clamp(1.5rem, 2.4vw, 2.1rem);
-  line-height: var(--lh-heading);
-  letter-spacing: -0.018em;
-  color: var(--cream);
-  margin: 0;
-}
-
-/* THE SECTION'S HEADLINE — promoted from a caption, and it is the answer to
-   the question the hero asks two screens above it.
-
-   CREAM WITH ONE SAFFRON WORD, not the solid saffron it used to be. At
-   --t-lead as a pull-quote the old treatment was a decorative line; at
-   display size it is the largest type in the section and the whole line in
-   raw saffron measured ~2.2:1 on the dark scrim (~1.95:1 since the accent
-   and the ground both moved — same film, re-solved) — under the 3:1 large-text
-   floor. Cream clears it several times over, and putting the accent on
-   "family" alone spends the saffron on the one word the sentence turns on.
-   It is also the statement's own grammar one screen above (.emItalic on the
-   phrase that carries the claim), which is what ties the two together. */
-.chefQuote {
-  font-family: var(--font-display);
-  font-weight: var(--w-medium);
-  font-size: var(--t-display);
-  line-height: var(--lh-display);
-  letter-spacing: var(--tr-display);
-  color: var(--cream);
-  margin: 0;
-  max-width: 18ch;
-}
-
-.chefBody {
+.storyStandfirst {
+  margin: var(--story-gap) auto 0;
+  max-width: 58ch;
+  text-align: center;
   font-family: var(--font-sans);
   font-size: var(--t-small);
-  line-height: var(--lh-body);
-  color: var(--cream);
-  /* 0.85 was set when this was one of two columns of small print with no
-     other job. It is the section's only prose now and it carries the whole
-     succession — and at 14px it is the lowest-contrast type in the section,
-     so the dimming is spent on legibility instead. */
-  opacity: 1;
-  margin: 0;
-  max-width: 52ch;
+  line-height: 1.7;
+  color: color-mix(in srgb, var(--cream) 74%, transparent);
 }
 
-/* ---- Story timeline ---- */
+/* HEADROOM HAS TO EXCEED THE DRIFT. Each frame climbs up to 56px against the
+   scroll (see ChapterRow); with less than that above it, chapter one sits on
+   the standfirst at the top of its own pass. */
+.chapters { list-style: none; margin: 88px 0 0; padding: 0; }
 
-.story {
-  /* no border-top — the maroon band→cream cut above is the divider */
-  padding-block: var(--section-y) var(--section-y);
+/* --inset is dealt per chapter in About.tsx and is how far this pair is pushed
+   IN from the margin it belongs to — the scatter that stops nine rows reading
+   as two columns. */
+/* THE FRAMES SCALE WITH THE PAGE. They were a flat 300px, which is a
+   reasonable plate at 1280 and a postage stamp at 1920 — the row kept its
+   proportions while the page around it doubled. Both tracks are viewport-led
+   now and both are capped, so the pair grows with the screen and then stops
+   before the picture outruns its own resolution. */
+.chapter {
+  --fig-w: clamp(240px, 24vw, 440px);
+  --txt-w: clamp(300px, 29vw, 520px);
+  display: grid;
+  gap: clamp(24px, 3.2vw, 40px);
+  align-items: center;
+  padding-block: clamp(28px, 4vh, 44px);
 }
 
-/* ===========================================================================
-   THE ARCHIVE TIMELINE — nine chapters on one centred spine
-   ===========================================================================
+/* both cells are pinned to row 1. Auto-placement is sparse: on a right-hand
+   row the frame takes column 2 and the cursor moves past it, so a text cell
+   asking for column 1 would silently drop to a second row. */
+.chapter > * { grid-row: 1; }
 
-   The deck/list fork and the year wheel are gone; this is the one
-   presentation every width gets. The grammar is an archive index, not an
-   article: the year heads its item ON the spine with the photograph tucked
-   over its foot, the photograph sits in a seat dealt by SEATS in About.tsx,
-   and the chapter's title is the link out. The chapter prose stays in
-   CHAPTERS as the record; the index deliberately does not print it.
-
-   THE GROUND IS THE PINNED FILM, so every value the reference archive shows
-   as black-on-off-white arrives here inverted: spine, marker, years and
-   titles are cream, and the frame's backing is cream at 10% rather than
-   white over white.
-
-   STATE LIVES IN THE STYLESHEET. Hover and focus do all the work — there is
-   no scroll-driven "active chapter" in this section any more, which is
-   deliberate rather than an omission. If the column ever reads
-   undifferentiated on a long scroll, raise the years' resting alpha or
-   tighten the item padding; do not reintroduce the observer. */
-
-/* THE HEADING CARRIES THE SECTION ALONE NOW — and it amends, deliberately,
-   the law that used to live above the old wheel label: that this title and
-   "Awards & Recognition" share one Helvetica face because both name
-   apparatus. Both reasons that law gave for the small size died with the
-   wheel — there is no 124px numeral above it doing the shouting, and no
-   stack symmetry for its box to hold. By the old comment's own closing
-   logic (the Awards title carries weight because it is the only thing at
-   the head of its section), this heading now qualifies too: it is an
-   archive's masthead, not a label on an instrument. The two section titles
-   play different roles on purpose — one masthead, one apparatus — and
-   .coverageTitle keeps the apparatus voice, untouched. */
-.storyHeading {
-  margin: 0 0 clamp(48px, 7vh, 96px);
-  font-family: var(--font-display-big);
-  font-weight: var(--w-regular);
-  font-size: var(--t-display);
-  line-height: var(--lh-display);
-  letter-spacing: var(--tr-display);
-  color: var(--cream);
+.chapterL {
+  grid-template-columns: minmax(0, var(--fig-w)) minmax(0, var(--txt-w));
+  justify-content: start;
+  padding-left: var(--inset, 0px);
 }
+.chapterR {
+  grid-template-columns: minmax(0, var(--txt-w)) minmax(0, var(--fig-w));
+  justify-content: end;
+  padding-right: var(--inset, 0px);
+}
+.chapterL .chapterFig { grid-column: 1; }
+.chapterL .chapterText { grid-column: 2; }
+.chapterR .chapterFig { grid-column: 2; }
+.chapterR .chapterText { grid-column: 1; text-align: right; }
+.chapterR .chapterBody { margin-left: auto; }
 
-.timeline {
-  /* easeOutQuart, module-local on purpose (no new global token): the title
-     reveal's 800/600 asymmetry is this section's signature timing, and
-     folding it into --ease-out would erase it. Quartic decelerates harder
-     early, which makes a 150% travel land rather than glide. */
-  --tl-ease-quart: cubic-bezier(0.25, 1, 0.5, 1);
-
-  /* how deep the photograph tucks over its year's foot — the occlusion
-     MOTIF, authored rather than accidental. Em-based so it scales with the
-     numeral through every clamp stop, and derived from the face the token
-     ACTUALLY resolves to today (--font-display-small is repointed to a
-     serif; Contralto's advances no longer apply). Canvas-measured on the
-     live page: this serif's lining digits ink from ≈0.15em to ≈0.87em of
-     their 1em line box, so 0.34em of tuck hides (0.87 − 0.66) / 0.72 ≈
-     29% of the DIGIT ink where a frame straddles the spine — an
-     unmistakable bite, while every date stays comfortably past the
-     two-thirds-visible floor even after anti-aliased edges shave the
-     pixel count. Re-derive from those two ink bounds
-     (probe-timeline-yearink.mjs) if the display face moves again. */
-  --tl-year-tuck: 0.34em;
-
+/* THE FRAME IS THE MASK. The picture inside is 128% of its height and seated
+   -14% high, so it travels the whole row without ever showing an edge. */
+.chapterFig {
   position: relative;
-  list-style: none;
-  margin: 0 auto;
-  padding: 0;
-  /* the measure every seat fraction in SEATS is a fraction OF. Uncapped, a
-     1920px container deals ~880px frames and the scatter reads as a gallery
-     rather than an archive. */
-  max-width: min(100%, 1120px);
-}
-
-/* the spine — a centred hairline, pitched between the old chapter border's
-   0.14 and full cream so it reads as structure rather than as a rule.
-
-   #faf7f1 until now, the cream from two palettes ago; 22% of the token at the
-   same alpha, because a spine hangs chapters off itself and identifies no
-   control. Measured against the footage behind the story column: the old
-   literal composited to rgb(47,28,27) for 1.19:1. */
-.timeline::before {
-  content: "";
-  position: absolute;
-  top: 0;
-  bottom: 0;
-  left: 50%;
-  width: 1px;
-  transform: translateX(-50%);
-  background: color-mix(in srgb, var(--cream) 22%, transparent);
-}
-
-/* one chapter. The li is the hover/focus HOST and carries no opacity of its
-   own — the spotlight dims .itemBody, so the year and the marker stay lit
-   while the photograph and title fade. That split is load-bearing: were the
-   year inside the dimmed wrapper, its 0.40 ink would multiply to 0.12 and
-   every date on the spine would sink whenever any sibling is hovered. */
-.storyItem {
-  position: relative;
-  padding-bottom: 1.5rem;
-}
-
-/* THE YEAR IS CONTENT NOW, NOT ORNAMENT — the one place the date appears,
-   so it renders at every width and is never aria-hidden. It seats at the
-   item's HEAD, in flow and centred on the spine, and the photograph tucks
-   over its foot: the negative margin below pulls the frame (z 1) up over
-   the year's (z 0) bottom --tl-year-tuck. Six of the nine seats straddle
-   the spine by design, so those six numerals lose the same measured third
-   behind their own photograph — the recurrence is the composition — while
-   items 1, 3 and 6 sit clear at wide and show their year whole. It first
-   shipped vertically CENTRED behind the frame, which read as composition
-   in the stylesheet and as nothing on the screen: a centred frame covers
-   the spine at every narrow width, and the wide straddlers covered their
-   numerals whole — pixel-measured at 1/9 readable years at 768px. The head
-   seat keeps the occlusion motif without ever taking a date below
-   two-thirds visible.
-
-   THE TUCK HOLDS THROUGH THE PARALLAX because the year rides the frame's
-   own MotionValue (see TimelineItem) — a static year would surrender up to
-   |drift|/2 more of itself exactly at the viewport's centre, the position
-   every reader holds an item in.
-
-   The alpha lives in `color`, never `opacity`, so the sibling spotlight
-   cannot touch it. 0.40 cream at EVERY width now: the shipped 0.30 wide
-   value measured 2.45:1 against the film across all nine of its frames
-   (2.17:1 re-solved for the softened cream, same film) —
-   under the 3:1 large-text bar — and §9.5's remedy is the alpha, never the
-   size. The <time> value is available to assistive tech regardless. */
-.year {
-  display: block;
-  position: relative;
-  z-index: 0;
-  width: fit-content;
-  margin: 0 auto calc(var(--tl-year-tuck) * -1);
-  font-family: var(--font-display-small);
-  font-weight: var(--w-regular);
-  font-size: clamp(3.2rem, 5.5vw, 5.6rem);
-  line-height: var(--lh-flush);
-  letter-spacing: var(--tr-display);
-  /* THE ONE STRANDED LITERAL ON THIS PAGE THAT IS TYPE, AND THE ONLY ONE HERE
-     WHOSE ALPHA MOVED. It was `rgba(250, 247, 241, 0.4)` — #faf7f1, the cream
-     from two palettes ago. Everything else migrated in this file kept its
-     alpha, because ornament is supposed to dim when the ground does; a date
-     the reader has to read is not ornament.
-
-     0.4 -> 0.45 HOLDS THE COMPOSITE RATHER THAN THE NUMBER. 45% of the current
-     cream lands on the same luminance 40% of the old one did, so the dates
-     look exactly as they did before the swap. The factor is 1.115 and it is
-     not per-site taste: it is what the two creams' luminances require, and it
-     came out between 1.094 and 1.126 across all seven measured sites.
-
-     WHY IT DID NOT SIMPLY GO TO 3:1. This is large text (5.6rem at the top of
-     the clamp) so 1.4.3 asks 3:1 — and measured, it does not have it and never
-     did. The old literal reads 1.84:1 against the brightest footage under the
-     spine; at the same 0.4 of the new cream it would fall to 1.60:1. 0.45
-     stops the migration from taking anything, but the gap to 3:1 is a
-     PRE-EXISTING failure of pale type over a photograph, and closing it needs
-     a scrim or a heavier tone rather than another alpha — a design decision,
-     not a migration. Named here rather than quietly half-fixed. */
-  color: color-mix(in srgb, var(--cream) 45%, transparent);
-}
-
-/* the spotlight's one target — everything that dims on a sibling hover
-   lives in here; everything that must stay lit (year, marker) lives outside */
-.itemBody {
-  position: relative;
-  transition: opacity 750ms var(--ease-out);
-}
-
-/* framer-motion writes the parallax translate here — on a wrapper, never on
-   .frame itself, so the shutter below stays verifiable as pure clip-path:
-   the frame's own computed transform is `none` through every state */
-.parallax {
-  position: relative;
-}
-
-/* the photograph's seat. Narrow first: half the column, centred — the
-   scatter only exists where there is room for it. The entrance is a
-   clip-path wipe and the hover shutter is a clip-path inset: one property,
-   three states, and NEVER transform: scale, which would move the photograph
-   with the mat instead of closing the mat over it. Cream-at-10% is the
-   "never empty" backing (no LQIP exists for these runtime paths, and a
-   base64 pipeline is not this change's to add); the round token keeps the
-   house media radius through every inset. z-index 1 keeps the photograph in
-   front of the year even when reduced motion strips the wrapper transform
-   that would otherwise stack it. */
-.frame {
-  position: relative;
-  z-index: 1;
-  width: 50%;
-  margin-inline: auto;
-  aspect-ratio: var(--tl-ratio, 1.5);
   overflow: hidden;
-  border-radius: var(--radius-media);
-  /* the "never empty" backing, #faf7f1 until now — two palettes stale like the
-     rest of this file. 10% of the token, same alpha: a photograph covers it the
-     moment one decodes, so it is a surface step rather than anything a floor
-     applies to, and it is not measured here for exactly that reason. */
-  background: color-mix(in srgb, var(--cream) 10%, transparent);
-  clip-path: inset(0% 0% 100% 0% round var(--radius-media));
-  transition: clip-path 700ms var(--ease-out);
+  border-radius: var(--radius-tile);
+  background: color-mix(in srgb, var(--cream) 6%, transparent);
+  will-change: transform;
 }
+.figLand { aspect-ratio: 4 / 3; }
+.figPort { aspect-ratio: 5 / 6; }
 
-/* entered — set once by TimelineItem's observer (whileInView cannot fire
-   inside an overflow-hidden mask, which is exactly what .frame is) */
-.entered .frame {
-  clip-path: inset(0% 0% 0% 0% round var(--radius-media));
-}
+.chapterImg { position: absolute; inset-inline: 0; top: -14%; height: 128%; }
+.chapterImg img { width: 100%; height: 100%; object-fit: cover; display: block; }
 
-.storyImage {
-  object-fit: cover;
-  object-position: var(--tl-focus, 50% 50%);
-  /* the house photo grade, carried over from the list treatment */
-  filter: saturate(0.96) contrast(0.98);
-  /* the sharp frame cross-fades in on decode, over the cream backing */
-  opacity: 0;
-  transition: opacity 500ms var(--ease-out);
-}
-
-.storyImage[data-loaded="true"] {
-  opacity: 1;
-}
-
-/* coming-soon chapters ship no photography — the wordmark sits contained on
-   a soft maroon field (the Discover tile's treatment, which is what the
-   `wordmark` flag has always denoted) */
-.storyImageWordmark {
-  object-fit: contain;
-  padding: clamp(24px, 16%, 88px);
-  background: var(--maroon-soft);
-  filter: none;
-}
-
-/* the chapter title — an <h3>, and on wide screens also the reveal MASK.
-   The narrow state is the base state: in flow under the photograph, centred,
-   permanently visible. The resting off-mask translate lives ONLY inside the
-   hover gate below — in the base rule it would ship every touch device and
-   coarse-pointer laptop a timeline whose titles are parked out of sight.
-   Contralto small at every width; the sizes differ, the face does not. */
-.storyTitle {
-  position: relative;
-  z-index: 2;
-  margin: 2rem 0 0;
+/* no photography yet — the wordmark on a maroon field, the coming-soon
+   treatment the Discover tile already uses */
+.chapterMark {
+  position: absolute;
+  inset: 0;
+  display: grid;
+  place-items: center;
+  padding: 1rem;
   text-align: center;
-  font-family: var(--font-display-small);
-  font-weight: var(--w-regular);
-  font-size: var(--t-lead);
-  line-height: 1.05;
-  letter-spacing: var(--tr-display);
-  text-wrap: balance;
+  background: var(--maroon);
+  font-family: var(--font-display-big);
+  font-size: var(--t-h3);
   color: var(--cream);
 }
 
-.titleInner {
-  display: inline-block;
+.chapterYear {
+  margin: 0;
+  font-family: var(--font-display-big);
+  font-weight: var(--w-medium);
+  font-size: clamp(2rem, 3.8vw, 3.25rem);
+  line-height: 1;
+  font-variant-numeric: tabular-nums;
+  color: var(--accent-on-film);
+}
+.chapterTitle {
+  margin: 0.5rem 0 0;
+  font-family: var(--font-sans);
+  font-weight: 600;
+  font-size: clamp(1.25rem, 2.1vw, 1.7rem);
+  line-height: 1.14;
+  letter-spacing: -0.02em;
+  color: var(--cream);
+}
+.chapterBody {
+  margin: 0.75rem 0 0;
+  max-width: 40ch;
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  line-height: 1.74;
+  color: color-mix(in srgb, var(--cream) 80%, transparent);
+}
+.chapterPlace {
+  margin: 1rem 0 0;
+  font-family: var(--font-mono);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label-mono);
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--cream) 55%, transparent);
 }
 
-/* the title IS the link out — the archive's own grammar; the section's nine
-   restaurant links live here now that the "See the restaurant" rows are gone */
-.storyLink {
-  color: inherit;
-  text-decoration: none;
-  transition: color 0.3s ease;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .storyLink:hover {
-    color: var(--saffron);
+/* STACKED, THE SCATTER STOPS MEANING ANYTHING. Below 900px there is not enough
+   width for an inset to read as composition — it only makes the column ragged
+   — so the rows become one column and the deal is ignored. */
+@media (max-width: 900px) {
+  .chapters { margin-top: 56px; }
+  .chapterL,
+  .chapterR {
+    grid-template-columns: 1fr;
+    justify-content: stretch;
+    padding-left: 0;
+    padding-right: 0;
   }
+  .chapter > * { grid-row: auto; grid-column: 1; }
+  .chapterR .chapterText { text-align: left; }
+  .chapterR .chapterBody { margin-left: 0; }
+  .chapterFig { max-width: 420px; }
 }
 
-/* the coming-soon sub-line — carries the status the old "Bunso — coming
-   soon" title carried, at half size so the name stays the headline */
-.titleSoon {
+/* PORTRAIT CENTRED AND UNFILTERED. The block this replaces ran the photograph
+   through grayscale as a house treatment — applied to the one image on the
+   page that is a person, which made him read as archive rather than as the man
+   currently running the kitchens. */
+.owner {
+  padding-block: clamp(88px, 13vh, 128px) clamp(56px, 8vh, 96px);
+  text-align: center;
+}
+.ownerEyebrow,
+.ownerRole {
+  margin: 0;
+  font-family: var(--font-mono);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label-mono);
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--cream) 60%, transparent);
+}
+.ownerPortrait {
   display: block;
-  margin-top: 0.5rem;
-  font-size: 0.5em;
-  line-height: var(--lh-flush);
-  opacity: 0.75;
+  width: min(232px, 60vw);
+  margin: 2rem auto 0;
+  aspect-ratio: 29 / 36;
+  overflow: hidden;
+  border-radius: var(--radius-tile);
 }
-
-/* the diamond on the spine at the item's foot — ornament (aria-hidden in
-   the markup), centre seated exactly on the item boundary by the -4px pull.
-   z-index 1: the NEXT item's year heads its li on the same spine, and while
-   it rides its parallax its upper ink can cross this diamond. Unranked, the
-   later-DOM year paints over the diamond and its 0.40 cream stroke blends
-   into the solid cream — the diamond appears to melt wherever a date
-   passes. Ranked over the year, the diamond stamps crisply on the numeral
-   instead, the same order the frames already hold. */
-.marker {
-  position: absolute;
-  bottom: 0;
-  left: 50%;
-  margin-bottom: -4px;
-  width: 8px;
-  height: 8px;
-  transform-origin: center;
-  transform: translateX(-50%) rotate(45deg);
-  background: var(--cream);
-  z-index: 1;
+.ownerPortrait img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: 54% 18%;
 }
-
-/* keyboard focus — the global ring is maroon, which is invisible on this
-   dark ground; scoped to cream here rather than edited globally */
-.story :focus-visible {
-  outline-color: var(--cream);
+.ownerName {
+  margin: 1.25rem 0 0;
+  font-family: var(--font-display-big);
+  font-weight: var(--w-medium);
+  font-size: clamp(1.6rem, 2.6vw, 2rem);
+  line-height: 1;
+  color: var(--cream);
 }
+.ownerRole { margin-top: 0.5rem; }
 
-/* ---- wide: the scatter ---------------------------------------------------
-   Layout only, gated on width alone — a coarse-pointer wide screen gets the
-   identical scatter, years and parallax, with permanently visible titles;
-   the hover choreography gates separately below. */
-@media (min-width: 981px) {
-  /* no .year override here any more — the resting alpha is 0.40 at every
-     width, because the 0.30 this gate used to hold measured 2.45:1 — 2.17:1
-     on the softened cream — against
-     the film (bar: 3:1 for large text; see the .year header) */
-
-  /* the seat — width and displacement arrive from SEATS via the per-item
-     custom properties; left edge = 0.5 + offset − span/2 */
-  .itemBody {
-    width: calc(var(--tl-span, 0.3) * 100%);
-    margin-left: calc(
-      (0.5 + var(--tl-offset, 0) - var(--tl-span, 0.3) / 2) * 100%
-    );
-  }
-
-  .frame {
-    width: 100%;
-    margin-inline: 0;
-  }
-
-  /* right-hung beside the frame, overhanging its right edge by 40% of the
-     frame's own width (the containing block is .itemBody, which IS
-     frame-sized here — that is what makes the -40% mean what it says).
-     --tl-safe keeps a long title from walking back across the column. */
-  .storyTitle {
-    position: absolute;
-    top: 50%;
-    right: -40%;
-    transform: translateY(-50%);
-    margin: 0;
-    text-align: right;
-    font-size: clamp(1.6rem, 2.4vw, 2.4rem);
-    line-height: var(--lh-display);
-    max-width: var(--tl-safe, 45ch);
-  }
+/* 34ch each and centred — narrower than the measure around them, so the pair
+   reads as a caption block rather than as body copy */
+.ownerCols {
+  display: grid;
+  grid-template-columns: repeat(2, minmax(0, 34ch));
+  gap: clamp(24px, 4vw, 48px);
+  justify-content: center;
+  margin-top: 2.5rem;
+  text-align: left;
 }
-
-/* ---- wide + a real pointer + motion allowed: the choreography ------------
-   All three extra gates matter: no hover grammar on touch (titles must never
-   park off-mask where no hover can retrieve them), none of it under reduced
-   motion, and none below the scatter.
-
-   :has(:focus-visible), NOT :focus-within. focus-within matches mouse focus
-   too: click a chapter link, take the cursor off the list entirely, and the
-   link is still focused — measured latching the spotlight open indefinitely,
-   siblings pinned at 0.3, shutter held, title out. The first cut reached for
-   focus-within on the claim that :has() cannot nest inside the
-   .timeline:has() spotlight selector; true of that formulation only. The
-   spotlight's :has() argument needs no nesting — a descendant combinator
-   (`.storyItem :focus-visible`) asks the same question — and the item's own
-   state, `.storyItem:has(:focus-visible)`, sits outside any :has() argument
-   entirely. Keyboard parity survives intact: Tab makes the link
-   :focus-visible and runs the full spotlight/shutter/reveal; a mouse click
-   never does, so nothing is left latched when the cursor departs. */
-@media (min-width: 981px) and (hover: hover) and (pointer: fine) and (prefers-reduced-motion: no-preference) {
-  /* the mask. -0.3em vertical bleed lets ascenders and descenders survive;
-     the small HORIZONTAL bleed hides nothing (the travel is vertical) and
-     exists so the focus ring is not shorn off at the sides. */
-  .storyTitle {
-    clip-path: inset(-0.3em -0.4em);
-  }
-
-  /* resting = parked below the mask — and the travel is calibrated to the
-     face the title ACTUALLY renders in, not to the token's old name. This
-     serif carries a 0.984em ascent against the 0.92 line box, so at 130%
-     the parked ascenders sat 0.86px — under one pixel — below the mask's
-     -0.3em bottom bleed, one rounding error from printing every title's
-     ascender tips through the window at rest (the é of Café Mama & Sons
-     was the nearest miss; canvas-measured). 150% banks ≈0.21em ≈ 7px of
-     hiding margin at every clamp stop, scale-proof because every term is
-     em-proportional. The 200ms delay applies BOTH ways — the asymmetry is
-     duration only: 800ms rising out, 600ms settling back. */
-  .titleInner {
-    transform: translateY(150%);
-    transition: transform 600ms var(--tl-ease-quart) 200ms;
-  }
-
-  .storyItem:hover .titleInner,
-  .storyItem:has(:focus-visible) .titleInner {
-    transform: translateY(0);
-    transition-duration: 800ms;
-  }
-
-  /* the spotlight — pure CSS, and it dims .itemBody, never the item, so the
-     years and markers hold the spine while the photographs fade */
-  .timeline:has(.storyItem:hover, .storyItem :focus-visible)
-    .storyItem:not(:hover):not(:has(:focus-visible))
-    .itemBody {
-    opacity: 0.3;
-  }
-
-  .timeline:has(.storyItem:hover, .storyItem :focus-visible)
-    :is(.storyItem:hover, .storyItem:has(:focus-visible))
-    .itemBody {
-    opacity: 1;
-  }
-
-  /* the shutter — the mat closes 5% over the photograph, which itself does
-     not move (clip-path, never scale; the frame's transform stays none).
-     Gated on .entered so a cursor parked at the fold cannot half-summon a
-     frame the entrance wipe has not yet revealed. */
-  .storyItem.entered:hover .frame,
-  .storyItem.entered:has(:focus-visible) .frame {
-    clip-path: inset(5% 5% 5% 5% round var(--radius-media));
-  }
+.ownerCols p {
+  margin: 0;
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  line-height: 1.76;
+  color: color-mix(in srgb, var(--cream) 84%, transparent);
 }
-
-/* ---- reduced motion ------------------------------------------------------
-   No parallax (TimelineItem withholds the transform), no entrance wipe, no
-   shutter, no title travel, no spotlight — the hover gate above excludes
-   itself, so this block only opens the frame and quickens the decode fade
-   to the section's ≤0.4s cross-fade precedent. Everything visible,
-   statically, at every width. */
-@media (prefers-reduced-motion: reduce) {
-  .storyItem .frame {
-    clip-path: inset(0% 0% 0% 0% round var(--radius-media));
-    transition: none;
-  }
-
-  .storyItem .storyImage {
-    transition-duration: 0.3s;
-  }
-
-  .storyItem .itemBody {
-    transition: none;
-  }
+@media (max-width: 720px) {
+  .ownerCols { grid-template-columns: 1fr; max-width: 40ch; margin-inline: auto; }
 }
 
 /* ---- Press & Coverage table ---- */

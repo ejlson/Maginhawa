@@ -143,14 +143,27 @@
      rather than a reference to it, and it would have survived this one the
      same way, quietly drawing the previous palette's rule across the new
      ground. It is a color-mix of the token now, so it cannot drift again.
-     THE ALPHA IS BACK TO 0.55. It went to 0.62 under the green ink because
-     55% of THAT ink measured 2.99:1 and missed 1.4.11's 3:1 bar by a hair.
-     The maroon is far darker, so 55% now measures 3.53:1 — within two
-     hundredths of the 3.55:1 this hairline has weighed since the beginning.
-     Re-measured rather than carried: 62% of the maroon would have made
-     4.33:1, a rule visibly heavier than the one every layout was drawn
-     against. */
-  --rule: color-mix(in srgb, var(--maroon) 55%, transparent);
+     ⚠️ THE ALPHA IS 0.68 NOW, at the user's instruction that the lines read
+     darker, and it is the first time this hairline has been deliberately
+     heavier rather than held at its historical weight. The run, re-measured
+     on the current pair (#411613 on #f5e9e0) rather than carried forward:
+
+       55%  3.53:1   the weight every layout on the site was drawn against
+       62%  4.31:1   what the green ink briefly needed to clear 1.4.11
+       68%  5.16:1   here
+       72%  5.83:1   the next step, if this still reads light
+
+     IT IS GLOBAL AND THAT IS THE POINT — 29 uses across the stylesheets, so
+     every rule on the page moves together: the journal's card rules and its
+     archive divider, the press band's two hairlines, the chapter heads,
+     the tables. A darker line in one chapter and the old weight in the next
+     is the fault this token exists to prevent.
+
+     Still a color-mix of --maroon rather than a literal. This was
+     rgba(23, 37, 27, 0.55) once — the OLD ink's channels, frozen — and it
+     survived a palette swap only because nobody noticed it was a copy
+     rather than a reference. It cannot drift again. */
+  --rule: color-mix(in srgb, var(--maroon) 68%, transparent);
 
   /* BOTTLE GREEN — the accent, and it has changed side of the wheel.
      hsl(158, 37%, 26.3%). It was an annatto orange, hsl(17, 60%, 40%), which

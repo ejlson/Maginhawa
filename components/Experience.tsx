@@ -362,23 +362,24 @@ export default function Experience({ journal }: { journal?: BlogEntry[] }) {
               different rooms, line B answers that they hold one standard.
               That is the last thing said before a booking form.
 
-              ⚠️ IT OWNS ONE SEAM NOW, NOT TWO, AND THAT IS THE REVERSAL.
-              Its stylesheet used to subtract Blog's 36px top from its own
-              bottom and take the whole chapter break on top because
-              AboutSplit contributed nothing. BOTH FACTS INVERT HERE:
+              ⚠️ IT HAS ONE SEAM AND ONE OVERLAP, NOT TWO SEAMS.
               — ABOVE, <PressWall /> pays. Its bottom is
                 clamp(64px, 9vh, 132px) and its own note says that value
                 exists because "Reservations owns nothing" — which is no
                 longer who is under it. That air is now the top of this
                 seam, so Passage.module.css SUBTRACTS it rather than
                 stacking a second chapter break on top of it.
-              — BELOW, nothing pays. <Reservations /> declares
-                `margin-top: 0` and no top padding at all; it is the film and
-                it starts at its own first pixel. So the bottom pad here is
-                the entire cream→film seam with nothing subtracted from it.
-              Move this section again and both halves of that arithmetic move
-              with it — the numbers are derived in Passage.module.css and
-              each one names the neighbour it was measured against.
+              — BELOW THERE IS NO SEAM AT ALL. This section PINS now: it
+                holds its type for a runway and <Reservations /> climbs over
+                the top of it. Passage.module.css declares
+                `margin-bottom: -100svh` so the film's top edge lands on the
+                held stage's top edge, and the last of the cream is COVERED
+                rather than ended. A bottom pad here would be a strip of
+                empty cream the film has to cross before it reaches any
+                words — exactly the dead run the pin deletes.
+              Move this section again and both halves move with it — the
+              numbers are derived in Passage.module.css and each one names
+              the neighbour it was measured against.
 
               ⚠️ AND PressWall.module.css NOW DESCRIBES THE WRONG NEIGHBOUR.
               Its bottom-padding note is headed "BOTTOM OWNS THE WHOLE GAP
@@ -393,10 +394,20 @@ export default function Experience({ journal }: { journal?: BlogEntry[] }) {
               would go anyway. */}
 
           {/* The page closes on the booking index, set ON the film rather
-              than in its own 200svh pinned section above it — which also
-              retires the film's -100svh rise-and-cover coupling. Discover
-              browses all eight venues; this one transacts the four that take
-              reservations. */}
+              than in its own pinned section above it. Discover browses all
+              eight venues; this one transacts the four that take
+              reservations.
+
+              ⚠️ THE RISE-AND-COVER IS BACK, BUT IT IS NOT THIS FILE'S AND
+              IT IS NOT THIS COMPONENT'S. An older layout had the film carry
+              its own -100svh to cover a pinned ReadyCta, and
+              Reservations.module.css still carries the note recording that
+              that pull-up was removed — which is still true. What is above
+              the film now is <Passage />, which pins, and which pays for the
+              overlap out of its OWN margin-bottom. Reservations is untouched
+              by it: it is still a plain 125svh block that scrolls past 1:1,
+              and all three of its scrubs are element-relative, so none of
+              them can tell the difference. */}
           <Reservations />
 
           {/* No Contact block here any more — the enquiry form lives on

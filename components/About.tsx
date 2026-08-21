@@ -140,75 +140,49 @@ const CHAPTERS: {
 ];
 
 /* ---------------------------------------------------------------------------
-   THE SEATS ARE DEALT BY POSITION, NOT HASHED FROM TITLES.
+   THE SCATTER IS DEALT BY POSITION, NOT RANDOMISED.
 
-   A hash of the chapter's title used to deal each card one of two shapes —
-   the right tool when the ask was "two shapes, random-looking, identical on
-   the server and in the browser". The timeline needs four CORRELATED numbers
-   per chapter, and the scatter is a composition rather than a deal: no two
-   neighbours may share a span, the left edges swing instead of marching, the
-   crop ratios alternate landscape/portrait. "Not the same as the one above"
-   is exactly the constraint a hash cannot express, so the deal is written
-   out. A literal is identical on server and client by definition — strictly
-   stronger than the determinism the hash existed to buy — and a chapter can
-   be retitled without silently re-dealing its geometry (which is what let
-   "Bunso — coming soon" become "Bunso").
+   The retired deck seated nine photographs on a centred spine with per-card
+   spans, offsets and crops. The chapters are ordinary rows now — one frame,
+   one column of copy, ranged to the margin they belong to — and the only thing
+   dealt is how far each pair is pushed IN from that margin.
 
-   THE INVARIANTS, printed because a table is only composed if somebody has
-   checked what it actually says. With left = 0.5 + offset − span/2 and
-   right = 0.5 + offset + span/2:
+   Math.random() would compose the page differently on every load, which is not
+   a design; it is noise that looks composed once. A literal is identical on
+   the server and in the browser by definition, and a chapter can be re-ordered
+   without silently re-dealing the layout under it. (The retired SEATS table
+   made the same argument and it still holds.)
 
-     spans   0.26 0.34 0.22 0.42 0.28 0.24 0.46 0.30 0.36 — no two adjacent equal
-     lefts   0.15 0.35 0.08 0.21 0.41 0.12 0.09 0.38 0.19 — scattered, never
-             monotonic, never under 0.05
-     rights  0.41 0.69 0.30 0.63 0.69 0.36 0.55 0.68 0.55 — never past 0.70,
-             because the title hangs off the frame's right edge at -40% of its
-             width and needs that gutter to stay on the column
-     ratios  L P L P L P L P L — strict alternation; the archive feel lives here
-     drift   scales with span — bigger frames read nearer the camera and must
-             move more, or the parallax reads as noise rather than depth
+   WHAT THE NUMBERS SAY, printed because a table is only composed if somebody
+   has checked what it reads as:
 
-   THE RATIOS ARE AUTHORED CROPS. Six files serve nine chapters and every
-   photograph is the same ≈0.667 portrait, so "native proportions" would give
-   nine near-identical upright rectangles — the exact uniformity the scatter
-   exists to avoid. Chapters 2 and 6 keep their true native ratios; the rest
-   are crops the frame imposes via `object-fit: cover` plus a per-seat focus.
-   The two repeated files are told apart by crop alone — cafemama at 1.25 vs
-   0.667 (chapters 3 and 6), belly at 1.35 vs 0.80 (chapters 7 and 8) — a
-   stated limitation until new photography exists, not a bug. */
-type Seat = {
-  /** frame width, as a fraction of the timeline column */
-  span: number;
-  /** frame centre's displacement from the centred spine, in the same
-      fraction units — negative sits the frame left of the spine */
-  offset: number;
-  /** the frame's aspect ratio (width / height) — an authored crop, per the
-      header above, not the file's native proportion */
-  ratio: number;
-  /** where the cover crop anchors, as a CSS object-position value */
-  focus: string;
-  /** parallax travel in px across the item's full pass through the
-      viewport; negative drifts the frame upward, against the scroll */
-  drift: number;
-};
+     side    L   R   L   R   L   R   L   R   L
+     inset   0  96 212  24 132 268  56 160  96
+     shape   L   P   L   P   L   P   L   P   L
 
-/* one seat per chapter, dealt by position — SEATS matches CHAPTERS by
-   maintenance, and STORY zips them for TimelineItem */
-const SEATS: Seat[] = [
-  { span: 0.26, offset: -0.22, ratio: 1.5, focus: "50% 42%", drift: -34 },
-  { span: 0.34, offset: 0.02, ratio: 0.5625, focus: "50% 50%", drift: -58 },
-  { span: 0.22, offset: -0.31, ratio: 1.25, focus: "50% 38%", drift: -22 },
-  { span: 0.42, offset: -0.08, ratio: 0.75, focus: "50% 45%", drift: -76 },
-  { span: 0.28, offset: 0.05, ratio: 2, focus: "50% 40%", drift: -44 },
-  { span: 0.24, offset: -0.26, ratio: 0.667, focus: "50% 50%", drift: -30 },
-  { span: 0.46, offset: -0.18, ratio: 1.35, focus: "50% 44%", drift: -88 },
-  { span: 0.3, offset: 0.03, ratio: 0.8, focus: "50% 36%", drift: -50 },
-  { span: 0.36, offset: -0.13, ratio: 2.4, focus: "50% 50%", drift: -64 },
+   · no two neighbours share an inset
+   · never monotonic for more than two steps, so it never reads as a ramp
+   · 0 opens the sequence, so chapter one still lands hard on the margin and
+     the scatter has something to be measured against
+   · 268 is the deepest, against the 420px available before a pair would cross
+     the centre line — so even that row keeps its side
+   · the shapes alternate landscape/portrait, which is what stops six files
+     serving nine chapters from reading as one repeated rectangle
+
+   THE ALTERNATION DOES NOT VARY, only the amplitude. Breaking both at once
+   stops reading as a scatter and starts reading as a fault. */
+const INSETS = [0, 96, 212, 24, 132, 268, 56, 160, 96];
+const SHAPES: ("land" | "port")[] = [
+  "land", "port", "land", "port", "land", "port", "land", "port", "land",
 ];
 
+/** one row per chapter, zipped with the deal above */
 const STORY = CHAPTERS.map((chapter, index) => ({
   ...chapter,
-  seat: SEATS[index],
+  index,
+  inset: INSETS[index] ?? 0,
+  shape: SHAPES[index] ?? "land",
+  side: index % 2 === 0 ? ("l" as const) : ("r" as const),
 }));
 
 /* NO DATE. lib/press.ts carries 24 entries and 23 of them have `date: "—"`,
@@ -283,694 +257,192 @@ const COVERAGE_GROUPS: { outlet: string; entries: CoverageRow[] }[] = (() => {
     .sort((a, b) => priorityOf(a.outlet) - priorityOf(b.outlet));
 })();
 
-const TRAIL_IMAGES = [
-  "/images/belly.jpg",
-  "/images/bintang.jpg",
-  "/images/guanabana.jpg",
-  "/images/ramo.jpg",
-  "/images/hoowood.jpg",
-  "/images/cafemama.jpg",
-];
-
-/* THE POOL, and its shapes are the point. Seven slots, seven proportions —
-   two landscapes, two portraits, a square, a wide panel and a small tall one —
-   so a sweep leaves a scatter of prints rather than seven copies of one frame.
-   The sizes are CSS px as drawn; `sizes` below is written from the widest. */
-const TRAIL_POOL = [
-  { w: 190, h: 128 },
-  { w: 116, h: 156 },
-  { w: 148, h: 148 },
-  { w: 220, h: 124 },
-  { w: 132, h: 176 },
-  { w: 168, h: 112 },
-  { w: 104, h: 138 },
-] as const;
-
-const TRAIL_SRC = TRAIL_IMAGES.map((src) => {
-  const { props } = getImageProps({
-    src,
-    alt: "",
-    width: 220,
-    height: 176,
-    sizes: "220px",
-  });
-  return { src: props.src, srcSet: props.srcSet, sizes: props.sizes };
-});
-
-/** px of pointer travel between emissions — see the header */
-const TRAIL_STEP = 110;
-/* PEAK OPACITY, AND IT IS A CONTRAST BUDGET RATHER THAN A LOOK.
-
-   probe-hero-contrast's `trail` mode parks all seven nodes at once directly
-   under the four display lines — the worst arrangement the pool can produce,
-   and one a real wake never produces, since the prints are spread along the
-   path the hand took. At 0.5 that measured:
-
-     line        clean    all seven parked on the type   floor
-     MAGINHAWA   5.93:1   4.44:1                         3
-     GROUP?      6.97:1   5.04:1                         3
-     lede        7.00:1   5.32:1                         4.5
-     kicker      6.66:1   6.66:1                         4.5   (above the band)
-
-   Every line passes, but the lede passes with 18% of margin on a worst case
-   rather than the 56% it has clean, and the lede is the line with the highest
-   floor and the least headroom to begin with. 0.44 buys that back without the
-   prints reading as ghosts — measured at the end of this file's own header. */
-const TRAIL_PEAK = 0.44;
-
-/** ms a print takes to fall away. Long enough that four are in the air on a
- *  brisk sweep, short enough that a parked pointer leaves a clean frame. */
-const TRAIL_LIFE = 900;
-
-function HeroTrail() {
-  const hostRef = useRef<HTMLDivElement>(null);
-  const reduce = useReducedMotion();
-
-  useEffect(() => {
-    if (reduce) return;
-    /* no cursor, no trail — and this is checked before anything is created, so
-       a touch device never pays for the pool at all */
-    if (!window.matchMedia("(hover: hover) and (pointer: fine)").matches)
-      return;
-    const host = hostRef.current;
-    if (!host) return;
-
-    const nodes = [...host.children] as HTMLElement[];
-    if (!nodes.length) return;
-
-    let next = 0;
-    let lastX = 0;
-    let lastY = 0;
-    let primed = false;
-
-    const onMove = (e: PointerEvent) => {
-      /* READS FIRST, and only one of them: the host's own box, which is the
-         hero and does not move while the pointer is inside it. Everything
-         after this is a write. */
-      const box = host.getBoundingClientRect();
-      const x = e.clientX - box.left;
-      const y = e.clientY - box.top;
-      if (!primed) {
-        primed = true;
-        lastX = x;
-        lastY = y;
-        return;
-      }
-      const dx = x - lastX;
-      const dy = y - lastY;
-      if (dx * dx + dy * dy < TRAIL_STEP * TRAIL_STEP) return;
-      lastX = x;
-      lastY = y;
-
-      const node = nodes[next];
-      next = (next + 1) % nodes.length;
-      /* the tilt is derived from the DIRECTION of travel rather than picked at
-         random, so the wake leans the way the hand went — the print reads as
-         having been dropped by the movement rather than placed by a script */
-      const angle = Math.max(-14, Math.min(14, (dx / TRAIL_STEP) * 9));
-      node.animate(
-        [
-          {
-            transform: `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%) rotate(${angle}deg) scale(0.86)`,
-            opacity: 0,
-            offset: 0,
-          },
-          {
-            transform: `translate3d(${x}px, ${y}px, 0) translate(-50%, -50%) rotate(${angle}deg) scale(1)`,
-            opacity: TRAIL_PEAK,
-            offset: 0.14,
-          },
-          {
-            transform: `translate3d(${x}px, ${y + 26}px, 0) translate(-50%, -50%) rotate(${angle * 1.5}deg) scale(0.94)`,
-            opacity: 0,
-            offset: 1,
-          },
-        ],
-        {
-          duration: TRAIL_LIFE,
-          easing: "var(--ease-entrance)",
-          fill: "forwards",
-        },
-      );
-    };
-
-    /* pointerleave re-primes rather than clearing: coming back in should not
-       drop a print at the boundary just because the pointer jumped */
-    const onLeave = () => {
-      primed = false;
-    };
-
-    host.addEventListener("pointermove", onMove, { passive: true });
-    host.addEventListener("pointerleave", onLeave, { passive: true });
-    return () => {
-      host.removeEventListener("pointermove", onMove);
-      host.removeEventListener("pointerleave", onLeave);
-      nodes.forEach((n) => n.getAnimations().forEach((a) => a.cancel()));
-    };
-  }, [reduce]);
-
-  /* Rendered even under reduced motion so the tree does not change shape
-     between the two; the effect above simply never binds, every node stays at
-     opacity 0, and nothing animates. The <img>s are `loading="lazy"` and this
-     is the top of the page, so a reduced-motion reader who never triggers the
-     trail never fetches them either. */
-  return (
-    <div
-      ref={hostRef}
-      className={styles.heroTrail}
-      /* the peak, published for the harness — probe-hero-contrast's `trail`
-         mode parks the pool at this alpha, and a number typed into the probe
-         instead would go stale the first time this one moved */
-      data-trail-peak={TRAIL_PEAK}
-      aria-hidden
-    >
-      {TRAIL_POOL.map((slot, i) => (
-        /* eslint-disable-next-line @next/next/no-img-element */
-        <img
-          key={i}
-          {...TRAIL_SRC[i % TRAIL_SRC.length]}
-          alt=""
-          className={styles.heroTrailImg}
-          style={{ width: slot.w, height: slot.h }}
-          loading="lazy"
-          decoding="async"
-          draggable={false}
-        />
-      ))}
-    </div>
-  );
-}
-
-/* ===========================================================================
-   THE OPENING IS SCROLL-SCRUBBED, AND IT IS THE READER WHO OPENS IT
-   ===========================================================================
-
-   WHAT REPLACED WHAT. This page used to open on a TIMED three-beat entrance
-   — "Who is" rising word by word, then MAGINHAWA and GROUP? at display
-   scale, then the lede — on a schedule of constants (HERO_KICKER, HERO_DELAY,
-   HERO_LEDE, HERO_LANDS_MS, HERO_CUE_DELAY) that four other things read: the
-   frame the film was allowed to start playing on, the settle keyframe in the
-   stylesheet, and the scroll cue's own fade-in. All of it played itself at
-   the reader in the first three seconds whether they were looking or not.
-
-   The opening is now driven entirely by scroll position:
-
-     1. "About Us" sits centred on the cream page, with a scroll indicator
-        under it. Nothing has happened and nothing will until the reader
-        moves.
-     2. The two words travel apart in opposite directions, and the film
-        opens in the hole between them.
-     3. The film grows until it fills the screen; the words leave through
-        their own edges a beat before it closes.
-     4. The question and the answer — "Who is MAGINHAWA GROUP?" and the
-        lede — rise onto the full-screen film.
-
-   EVERY ONE OF THOSE IS A PURE FUNCTION OF SCROLL. There is not a timer or a
-   spring anywhere in it, which is the property that makes it reversible:
-   scrolling back up unwinds the film into the hole and closes the words over
-   it. A spring would still be settling after the wheel had stopped, and a
-   timeout could not be run backwards at all — the same reason Manifesto
-   dropped its springs when its statement became scrubbed.
-
-   THE FILM IS THE PAGE'S OWN PINNED BACKDROP, NOT A SECOND VIDEO. The scope
-   below already sticks one 100svh <video> behind the whole first half of the
-   page; the opening scales THAT element's frame, so the "video" that grows is
-   the same file the statement and the founder's block scroll over afterwards.
-   No second element, no second fetch, and no cut at the handover — when the
-   scrub finishes, the frame is at scale 1 and the page is exactly the page it
-   would have been. public/ is ~709MB and belly-hero.mp4 is 25MB of that; a
-   second copy for the opening would have been the single most expensive thing
-   on the site.
-
-   THE STAGE IS STICKY, NOT PINNED BY SCRIPT. `position: sticky` inside a tall
-   runway costs no scroll listener, no `lenis.stop()`, no overflow lock and no
-   document-height arithmetic — and it cannot leave the page held if the
-   component unmounts mid-scroll, which is the failure mode the retired
-   restaurant-grid assembly kept shipping. Lenis is left entirely alone by
-   this section. */
-
-/* HOW LONG THE OPENING TAKES, in viewport heights of scrolling. The stage is
-   one screen and sticks for OPENING_VH − 100 of travel, so this is 2.2
-   screens of scroll to open the film and read the answer. Measured against a
-   900px viewport that is 1980px, i.e. about four notches of this site's
-   deliberately slow wheel (see lib/SmoothScroll: lerp 0.032, wheelMultiplier
-   0.58). Shorter and the film snaps open under one flick; much longer and the
-   reader is scrolling through a held screen wondering if the page is stuck. */
-const OPENING_VH = 320;
-
-/* THE PARTING, as a window inside the scrub's own [0,1].
-   It does not start at 0: the first few percent are the reader's first
-   movement, and something that begins on the very first pixel of scroll reads
-   as the page reacting to a twitch. It does not run to 1 either — the last
-   fifth is the answer's, so the film is already still when the type arrives
-   on it. */
-const PART_FROM = 0.05;
-const PART_TO = 0.72;
-
-/* ── THE GEOMETRY IS MEASURED, AND IT HAS TO BE ──────────────────────────
-   The first version of this was measurement-free: each word travelled a
-   fixed 58vw and the film's width was clamped to `58·p − air`, on the
-   argument that a word's inner edge starts at or before the screen's centre
-   so the travel alone bounds the hole. That argument is wrong, and the probe
-   caught it at the first sample.
-
-   ABOUT IS THREE TIMES THE WIDTH OF US. The pair is centred AS A LINE, so
-   the JOINT between the two words does not sit on the screen's centre —
-   measured at 1440×900 with the display face loaded, ABOUT's right edge is
-   at +137px and US's left edge at +178px, i.e. the hole is 41px wide and its
-   centre is 157px RIGHT of the middle of the screen. A film centred on the
-   screen is therefore not in the hole at all: it is behind ABOUT, and it
-   stays behind it for most of the parting. (Discover's retired assembly hit
-   the same wall from the other side — "Our" against "Restaurants." put the
-   joint 163px LEFT of centre — and its note is the reason this was
-   recognised rather than tuned around.)
-
-   So three numbers are read off the real line, once, and everything else is
-   arithmetic on them:
-
-     inL   ABOUT's right edge, relative to the screen centre
-     inR   US's left edge, relative to the screen centre
-     trav  how far each word travels — `half the screen + max(inL, inR) +
-           air`, which is the distance that clears the WIDER-reaching of the
-           two through its own screen edge. Both words take the SAME travel,
-           and that is load-bearing rather than tidy: unequal travels move
-           the hole's centre while the film is trying to sit in it, which is
-           a second moving target for no gain.
-
-   THE FILM THEN RIDES THE HOLE. Its centre eases from the joint back to the
-   screen centre across the parting (so it is born where the words open and
-   arrives centred exactly as it fills the screen), and its half-width is the
-   smaller of the two clearances the words have actually opened, less the
-   air. Overlap is impossible by construction rather than by tuning — which
-   is the property probe-about-open.mjs checks at every one of its samples,
-   not just at the ends.
-
-   RE-MEASURED WHEN IT CAN CHANGE, and only then: at mount, when the display
-   face resolves (the fallback's metrics give a different joint entirely —
-   the same trap Discover's fitTitle and JoinUs's seam both record), and on
-   resize. Not per frame: the line does not move while it is being scrubbed,
-   because the words' travel is a transform. */
-const FILM_AIR_VW = 2;
-
-/* THE ANSWER'S WINDOW. It begins where the parting ends and runs to the end
-   of the scrub, so the question rises onto a film that has already stopped
-   growing — two things arriving at once is what the retired timed entrance
-   was criticised for on this very page. */
-const ANSWER_FROM = 0.74;
-const ANSWER_TO = 0.96;
-
-/* THE PARTING'S OWN CURVE, and it is NOT the site's shared enter curve.
-   SCRUB_EASE (0.22, 1, 0.36, 1) is ease-out dominant — it is 63% of the way
-   through its travel at a fifth of its window, which is exactly right for a
-   word rising out of a mask and wrong for a movement that IS the section.
-   Measured with it: at 18% of the scrub the film was already 73% of the
-   screen wide and "Us" had left, so the whole "the words open the picture"
-   reading happened in the first three hundred pixels and the remaining
-   1,700 had nothing left to do.
-
-   A symmetric ease-in-out instead: soft at both ends so neither the first
-   nor the last pixel of the window jerks, and very nearly linear through
-   the middle, where the reader's hand should be moving the picture at its
-   own rate. This is the one curve on the page chosen for a scrub rather
-   than for an entrance. */
-const OPEN_EASE = cubicBezier(0.4, 0, 0.6, 1);
-
-/* THE INDICATOR LEAVES ON THE FIRST MOVEMENT. 0 → 0.04 of the scrub is ~88px
-   at a 900px viewport: gone as soon as the reader has demonstrably started,
-   and back if they return to the top, because it is a pure function of scroll
-   like everything else here. A signpost that is still on screen after the
-   reader has obeyed it is the exact defect this page's own stylesheet
-   recorded against the old cue. */
-const CUE_OUT = 0.04;
-
 /* ---------------------------------------------------------------------------
-   THE STATEMENT IS SCRUBBED, and it is the one place on this page where the
-   reader's hand should be setting the pace.
+   A DISPLAY LINE FITTED TO ITS COLUMN.
 
-   This is the first real prose on the page and the sentence the whole brand
-   rests on. As a `Reveal` it played once, at whatever speed Motion chose, and
-   a reader moving quickly got a block of display type that had finished
-   arriving before they looked at it — which is to say, skimmable. Scrubbed,
-   it cannot be: the words come up under the wheel, so the sentence is read at
-   the speed it is scrolled and stopping stops it.
+   "OUR STORY" spans the measure edge to edge. Doing that in CSS means a
+   font-size and a letter-spacing that are correct at exactly one width, so it
+   is measured instead: the face is scaled until the words nearly fill the
+   column, then whatever is left over is divided between the letters.
 
-   IT SPEAKS THE MANIFESTO'S GRAMMAR because the home page already taught it:
-   words rising out of their own clips on a short overlap (components/
-   Manifesto.tsx, and SplitWords for the timed variant). Nothing new is being
-   invented here — the same 145% rise, the same curve, the same mask.
+   THREE THINGS IT HAS TO SURVIVE, and all three have bitten this codebase
+   before:
+     · THE SERVER. No measuring on the server — it renders at the CSS size and
+       the effect corrects it after mount, so the markup is identical either
+       way and the line is readable with no JS at all.
+     · THE FACE ARRIVING. Contralto comes in over the two-hop Adobe stylesheet
+       (app/layout.tsx), so a cold cache measures the FALLBACK's metrics and
+       latches a wrong size. Same trap, and the same fix, as Discover's
+       fitTitle and JoinUs's seam geometry.
+     · A RESIZE. The column width is the whole input, so it re-fits on resize.
 
-   ONE RANGE, NOT ONE PER LINE. Manifesto locks its lines by measuring them and
-   gives each its own scroll range, because its headline is four lines of
-   image-bearing display type and a line that set itself two screens early
-   would look broken. This statement is two sentences; one range over the whole
-   block means the rise sweeps through it as a single wave, and it costs no
-   measurement, no layout effect, no resize handling and no state.
-
-   NO SPRING, deliberately. A scrubbed value has to be a pure function of
-   scroll or it fights the wheel on the way back up — the same reason
-   Manifesto dropped its springs. This also makes it correct under momentum
-   scrolling on touch, where a spring would still be settling after the finger
-   has gone. */
-const SCRUB_EASE = cubicBezier(0.22, 1, 0.36, 1);
-
-/* The statement as words, with the two emphasised phrases flagged. It is
-   spelled out rather than split from a string because the emphasis is not
-   derivable from the text — and because the reduced-motion branch below
-   renders the same sentence as ordinary prose with real <em>s. */
-const STATEMENT_PARTS: { w: string; em?: boolean }[] = [
-  { w: "Maginhawa" },
-  { w: "is" },
-  { w: "Tagalog" },
-  { w: "for" },
-  { w: "comfortable", em: true },
-  { w: "—" },
-  { w: "a" },
-  { w: "life" },
-  { w: "of" },
-  { w: "ease." },
-  { w: "Comfort" },
-  { w: "is" },
-  { w: "the" },
-  { w: "thread" },
-  { w: "through" },
-  { w: "every", em: true },
-  { w: "kitchen", em: true },
-  { w: "we", em: true },
-  /* the stop travels with the word rather than as its own mask — a lone
-     full point would carry the 0.24em word gap in front of it and read as a
-     typo. Manifesto's "London." makes the same call. */
-  { w: "run.", em: true },
-];
-const STATEMENT_TEXT =
-  "Maginhawa is Tagalog for comfortable - a life of ease. Comfort is the thread through every kitchen we run.";
-
-/** how much of the block's range one word takes to complete — Manifesto's
- *  PART_SPAN, and the reason the rise reads as a wave rather than as twenty
- *  separate events */
-const STATEMENT_SPAN = 0.55;
-
-/* THE RANGE. Opens with the paragraph's top a little below the fold and
-   closes with its foot a little above the middle — about three quarters of a
-   screen of travel at every viewport tested, because both ends are expressed
-   in viewport fractions and the block's own height is the only other term. */
-const STATEMENT_OFFSET = ["start 0.88", "end 0.42"] as const;
-
-const statementWindow = (i: number, n: number): [number, number] => {
-  if (n <= 1) return [0, STATEMENT_SPAN];
-  const step = (1 - STATEMENT_SPAN) / (n - 1);
-  return [i * step, i * step + STATEMENT_SPAN];
-};
-
-/** one word, rising out of its own clip as the block is scrubbed */
-function StatementWord({
-  p,
-  at,
-  part,
-  last,
-}: {
-  p: MotionValue<number>;
-  at: [number, number];
-  part: { w: string; em?: boolean };
-  /** no trailing space after the final word — see SplitWords' <Space> */
-  last: boolean;
-}) {
-  /* 145%, and it is derived from the mask rather than chosen: the clip window
-     is padded 0.30em taller than the word's line box so the italic descenders
-     survive at rest (see .statementMask), and the word has to start fully
-     below that window. (0.92 + 0.30) / 0.92 = 133%, plus margin. Move the
-     padding and this moves with it. */
-  const y = useTransform(p, at, ["145%", "0%"], {
-    clamp: true,
-    ease: SCRUB_EASE,
-  });
-  return (
-    <>
-      <span className={styles.statementMask} aria-hidden>
-        <motion.span
-          className={
-            part.em
-              ? `${styles.statementWord} ${styles.emItalic}`
-              : styles.statementWord
-          }
-          style={{ y }}
-        >
-          {part.w}
-        </motion.span>
-      </span>
-      {/* A REAL SPACE, with no advance of its own. The masks' gaps are a
-          0.24em margin, so this sentence's textContent was
-          "MaginhawaisTagalogforcomfortable—alifeofease." — see .statementSpace
-          and SplitWords, which carries the same fix for the deck's nine
-          chapter bodies. */}
-      {!last && (
-        <span className={styles.statementSpace} aria-hidden>
-          {" "}
-        </span>
-      )}
-    </>
-  );
-}
-
-function Statement() {
+   THE TEXT IS MEASURED, NOT THE BOX. scrollWidth on a block is at least its
+   own content-box width, so measuring the <h2> reports the column width
+   whatever the type is doing and the whole pass silently becomes a no-op. The
+   inner span is inline-block: its offsetWidth IS the text.
+   --------------------------------------------------------------------------- */
+function FitLine({ className, text }: { className?: string; text: string }) {
+  const ref = useRef<HTMLHeadingElement>(null);
   const reduce = useReducedMotion();
-  const ref = useRef<HTMLParagraphElement>(null);
-  const { scrollYProgress } = useScroll({
-    target: ref,
-    offset: [...STATEMENT_OFFSET],
-  });
 
-  /* PROMOTED ONLY WHILE IT IS ON SCREEN. Each word is driven by an
-     independent `y` written from JS every scroll frame, so it genuinely needs
-     `will-change` while it is moving — but it was a STANDING hint on all
-     nineteen words, i.e. nineteen compositor layers held for the life of the
-     page, which is the exact cost SplitWords' CSS driver was written to
-     avoid. The class is toggled by an observer on the paragraph itself: two
-     toggles per visit, none of them on a scrub frame, and outside the range
-     the words are not moving anyway.
-
-     Not React state — a re-render here would reconcile nineteen children to
-     change one boolean. A hand-toggled class on the DOM node is the whole
-     mechanism. */
+  /* THE LETTERS ARRIVE ONE AT A TIME, and the latch is a class rather than
+     state: the effect below already owns this node, and re-rendering nine
+     children to flip one boolean is work for nothing. `once` — the line does
+     not re-play every time it is scrolled past, which at this scale would be
+     the most distracting thing on the page. */
   useEffect(() => {
     const el = ref.current;
     if (!el || reduce) return;
     const io = new IntersectionObserver(
-      ([entry]) =>
-        el.classList.toggle(styles.statementLive, entry.isIntersecting),
-      { rootMargin: "20% 0px" },
+      ([e]) => {
+        if (e.isIntersecting) {
+          el.dataset.lit = "";
+          io.disconnect();
+        }
+      },
+      { threshold: 0.25 },
     );
     io.observe(el);
-    return () => {
-      io.disconnect();
-      el.classList.remove(styles.statementLive);
-    };
+    return () => io.disconnect();
   }, [reduce]);
 
-  /* Reduced motion gets the sentence as ordinary prose — not the same markup
-     held still, but real <em> phrases in one flowing paragraph. The masked
-     form's word gaps are a 0.24em margin rather than a space, which is the
-     right compromise while the words are moving and the wrong one when they
-     never will. */
-  if (reduce) {
-    return (
-      <p ref={ref} className={styles.statementText}>
-        Maginhawa is Tagalog for{" "}
-        <em className={styles.emItalic}>comfortable</em> — a life of ease.
-        Comfort is the thread through{" "}
-        <em className={styles.emItalic}>every kitchen we run</em>.
-      </p>
-    );
-  }
+  useLayoutEffect(() => {
+    const el = ref.current;
+    const inner = el?.firstElementChild as HTMLElement | null;
+    if (!el || !inner) return;
 
+    const fit = () => {
+      const target = (el.parentElement as HTMLElement | null)?.clientWidth ?? 0;
+      if (!target) return;
+      el.style.marginRight = "0px";
+      el.style.letterSpacing = "0px";
+      el.style.fontSize = "100px";
+      const natural = inner.offsetWidth;
+      if (!natural) return;
+      /* leave ~4.5% of the measure for the tracking to spend — sizing alone
+         can never land exact, tracking alone blows the word apart */
+      el.style.fontSize = `${(100 * (target / natural) * 0.955).toFixed(2)}px`;
+      const gaps = Math.max(1, text.trim().length - 1);
+      const ls = (target - inner.offsetWidth) / gaps;
+      el.style.letterSpacing = `${ls.toFixed(3)}px`;
+      /* tracking is applied after the FINAL glyph too, so the line would sit
+         one gap proud of the right edge; the negative margin takes it back */
+      el.style.marginRight = `${(-ls).toFixed(3)}px`;
+    };
+
+    fit();
+    document.fonts?.ready.then(fit).catch(() => {});
+    window.addEventListener("resize", fit);
+    return () => window.removeEventListener("resize", fit);
+  }, [text]);
+
+  /* SPLIT AFTER THE MEASUREMENT IS SAFE, and it has to be: the effect above
+     reads `inner.offsetWidth`, and inline-block characters box each glyph
+     separately. Kerning pairs are lost by that — which costs nothing here,
+     because the fitted tracking has already overridden the pair table. The
+     transforms below never touch layout, so the fit stays exact once made. */
   return (
-    <p ref={ref} className={styles.statementText} aria-label={STATEMENT_TEXT}>
-      {STATEMENT_PARTS.map((part, i) => (
-        <StatementWord
-          key={i}
-          p={scrollYProgress}
-          at={statementWindow(i, STATEMENT_PARTS.length)}
-          part={part}
-          last={i === STATEMENT_PARTS.length - 1}
-        />
-      ))}
-    </p>
+    <h2 ref={ref} className={className} data-reduce={reduce ? "" : undefined}>
+      <span>
+        {Array.from(text).map((ch, i) =>
+          ch === " " ? (
+            <span key={i} className={styles.fitSpace}>
+              {"\u00a0"}
+            </span>
+          ) : (
+            <span
+              key={i}
+              className={styles.fitChar}
+              style={{ "--i": i } as CSSProperties}
+            >
+              {ch}
+            </span>
+          ),
+        )}
+      </span>
+    </h2>
   );
 }
 
 /* ---------------------------------------------------------------------------
-   ONE CHAPTER ON THE TIMELINE — its own component, and that is forced, not
-   stylistic: each item owns a useScroll (a hook, so it cannot live in the
-   parent's .map) and its own entrance observer. Nothing in here reports
-   upward. The section has NO scroll-driven active chapter any more — the
-   archive's only states are hover and focus, and both live entirely in the
-   stylesheet — so the parent renders nine of these and holds no per-item
-   refs, no indices, no observers.
+   ONE CHAPTER — its own component, and that is forced rather than stylistic:
+   each row owns a useScroll, which is a hook and so cannot live inside the
+   parent's .map. Nothing in here reports upward.
+
+   THE DRIFT IS TWO LAYERS OFF ONE PROGRESS, which is why it reads as depth
+   rather than as a moving picture:
+     · the FRAME travels 56px against the scroll across the row's pass, so the
+       photograph and its own caption separate as the row crosses the window —
+       the text holds the layout, the picture does not.
+     · the PICTURE travels inside the frame on top of that. It is 128% of the
+       frame's height, so there is 28% of slack, 14% either side; ±10% spends
+       it and keeps 4% in hand, so an edge can never appear however the row is
+       sized.
+   Both are transforms, so nine drifting rows cost no reflow, and both come off
+   the same MotionValue so they cannot separate by a frame.
+
+   HEADROOM HAS TO EXCEED AMPLITUDE. The frames climb up to 56px against the
+   scroll; the chapter list carries 88px above it for exactly that reason (see
+   .chapters), or chapter one sits on the standfirst at the top of its pass.
    --------------------------------------------------------------------------- */
-
-/* the single centred column below 981px — the width at which the section's
-   old two-column shell collapsed, kept so it has one notion of "narrow".
-   External-store machinery rather than a resize listener because it is a
-   media query: the browser already owns its state. */
-const NARROW_MQ = "(max-width: 980px)";
-const subscribeNarrow = (onChange: () => void) => {
-  const mq = window.matchMedia(NARROW_MQ);
-  mq.addEventListener("change", onChange);
-  return () => mq.removeEventListener("change", onChange);
-};
-const narrowSnapshot = () => window.matchMedia(NARROW_MQ).matches;
-/* the server renders the wide drift; the value only feeds a motion style
-   applied after mount, so hydrating against `false` cannot mismatch markup */
-const narrowServerSnapshot = () => false;
-
-function TimelineItem({ chapter }: { chapter: (typeof STORY)[number] }) {
-  const itemRef = useRef<HTMLLIElement>(null);
-  const [entered, setEntered] = useState(false);
-  const [loaded, setLoaded] = useState(false);
-  const reduceMotion = useReducedMotion();
-  const narrow = useSyncExternalStore(
-    subscribeNarrow,
-    narrowSnapshot,
-    narrowServerSnapshot,
-  );
-
-  const { span, offset, ratio, focus, drift } = chapter.seat;
-
-  /* the parallax — scroll-linked, per item, at the item's own rate. The
-     travel is the seat's `drift` across the item's full pass through the
-     viewport, halved on the narrow column where the frames are centred and
-     large relative to the screen. Under reduced motion the RANGE is zeroed
-     rather than the style prop withheld: the motion style has to render on
-     the server and the client alike, or a reduce-preferring reader's first
-     paint disagrees with the SSR markup and React reports a hydration
-     mismatch. A zeroed range computes to no transform at all — the same
-     stillness, without the fork in the markup. */
+function ChapterRow({ chapter }: { chapter: (typeof STORY)[number] }) {
+  const ref = useRef<HTMLLIElement>(null);
+  const reduce = useReducedMotion();
   const { scrollYProgress } = useScroll({
-    target: itemRef,
+    target: ref,
     offset: ["start end", "end start"],
   });
-  const y = useTransform(
-    scrollYProgress,
-    [0, 1],
-    reduceMotion ? [0, 0] : [0, narrow ? drift / 2 : drift],
-  );
+  /* 0.5 is the row at the window's centre; the row's pass maps to -1 .. 1 */
+  const figY = useTransform(scrollYProgress, [0, 1], [56, -56]);
+  const imgY = useTransform(scrollYProgress, [0, 1], ["-10%", "10%"]);
 
-  /* THE ENTRANCE OBSERVER — new, small, and deliberately not the old
-     centre-line detector (that one existed to pick an active chapter, which
-     no longer exists as a concept). One-shot: it flips `entered` so the
-     stylesheet can run the frame's clip-path wipe, then disconnects. A plain
-     observer rather than whileInView because the reveal target sits inside
-     an overflow-hidden mask, where whileInView never fires. */
-  useEffect(() => {
-    const item = itemRef.current;
-    if (!item) return;
-    const observer = new IntersectionObserver(
-      (entries) => {
-        if (entries.some((entry) => entry.isIntersecting)) {
-          setEntered(true);
-          observer.disconnect();
-        }
-      },
-      { rootMargin: "0px 0px -12% 0px" },
-    );
-    observer.observe(item);
-    return () => observer.disconnect();
-  }, []);
-
-  /* the title's safe measure — how wide the right-hung title may grow before
-     it walks back across the column, expressed as a percentage of the FRAME
-     (its absolute containing block), which is what makes it exact at any
-     rendered column width rather than assuming the 1120px cap */
-  const right = 0.5 + offset + span / 2;
-  const titleSafe = ((1 - right + 0.4 * span) / span) * 100;
+  const missing = MISSING_IMAGES.has(chapter.image);
 
   return (
     <li
-      ref={itemRef}
-      className={`${styles.storyItem} ${entered ? styles.entered : ""}`}
-      style={
-        {
-          "--tl-span": span,
-          "--tl-offset": offset,
-          "--tl-ratio": ratio,
-          "--tl-focus": focus,
-          "--tl-safe": `clamp(14ch, ${titleSafe.toFixed(1)}%, 45ch)`,
-        } as CSSProperties
-      }
+      ref={ref}
+      className={`${styles.chapter} ${
+        chapter.side === "l" ? styles.chapterL : styles.chapterR
+      }`}
+      style={{ "--inset": `${chapter.inset}px` } as CSSProperties}
     >
-      {/* the year is CONTENT here, not ornament — it is the only place the
-          date appears, so it is a real <time>, never aria-hidden. It seats at
-          the item's head on the spine and the frame tucks over its bottom
-          third by z-order (see .year) — partial occlusion is the composition.
-          It rides the SAME MotionValue as the frame, so that tuck holds
-          constant through the parallax: on a static year the frame's upward
-          drift would swallow up to |drift|/2 more of the numeral exactly when
-          the item is centred in the viewport — the one position every reader
-          actually holds it in. Sharing `y` keeps year and photograph moving
-          as one archival plate, and it must stay OUTSIDE .itemBody so the
-          sibling spotlight cannot dim it. */}
-      <motion.time
-        className={styles.year}
-        dateTime={chapter.year}
-        style={{ y }}
+      <motion.div
+        className={`${styles.chapterFig} ${
+          chapter.shape === "port" ? styles.figPort : styles.figLand
+        }`}
+        style={reduce ? undefined : { y: figY }}
       >
-        {chapter.year}
-      </motion.time>
-
-      {/* everything that dims under the sibling spotlight lives in
-          .itemBody; the year above and the marker below stay lit — see the
-          stylesheet */}
-      <div className={styles.itemBody}>
-        <motion.div className={styles.parallax} style={{ y }}>
-          <div className={styles.frame}>
+        {missing || chapter.wordmark ? (
+          /* no photography yet — the wordmark on a maroon field, which is the
+             coming-soon treatment the Discover tile already uses */
+          <span className={styles.chapterMark} aria-hidden>
+            {chapter.title}
+          </span>
+        ) : (
+          <motion.div
+            className={styles.chapterImg}
+            style={reduce ? undefined : { y: imgY }}
+          >
             <Image
               src={chapter.image}
               alt={chapter.imageAlt}
-              fill
-              sizes={`(max-width: 600px) 72vw, (max-width: 980px) 50vw, ${Math.round(
-                span * 1120,
-              )}px`}
-              quality={74}
-              className={`${styles.storyImage} ${
-                chapter.wordmark ? styles.storyImageWordmark : ""
-              }`}
-              data-loaded={loaded ? "true" : undefined}
-              onLoad={() => setLoaded(true)}
+              width={600}
+              height={720}
             />
-          </div>
-        </motion.div>
+          </motion.div>
+        )}
+      </motion.div>
 
-        <h3 className={styles.storyTitle}>
-          <span className={styles.titleInner}>
-            {/* THE CHAPTER TITLE LINKS OUT, OR NOT AT ALL. It used to open
-                `/restaurants/<slug>`, this site's page for the room; that
-                route is gone, so the destination is the restaurant's own
-                site — an external link, in a new tab, like every other
-                outbound link here. A chapter whose venue has no site of its
-                own prints as plain type rather than as a link to the
-                index: the title is a heading first, and a heading that
-                navigates somewhere generic is a worse promise than one
-                that does not navigate at all. */}
-            {chapter.slug && getRestaurant(chapter.slug)?.website ? (
-              <a
-                href={getRestaurant(chapter.slug)!.website}
-                target="_blank"
-                rel="noopener noreferrer"
-                className={styles.storyLink}
-              >
-                {chapter.title}
-              </a>
-            ) : (
-              chapter.title
-            )}
-            {chapter.wordmark && (
-              <span className={styles.titleSoon}>(Coming soon)</span>
-            )}
-          </span>
-        </h3>
+      <div className={styles.chapterText}>
+        <Reveal>
+          <p className={styles.chapterYear}>{chapter.year}</p>
+          <h3 className={styles.chapterTitle}>{chapter.title}</h3>
+        </Reveal>
+        <Reveal delay={0.08}>
+          <p className={styles.chapterBody}>{chapter.body}</p>
+          <p className={styles.chapterPlace}>{chapter.place}</p>
+        </Reveal>
       </div>
-
-      {/* the diamond on the spine — pure ornament, unlike the year */}
-      <span className={styles.marker} aria-hidden />
     </li>
   );
 }
@@ -978,185 +450,51 @@ function TimelineItem({ chapter }: { chapter: (typeof STORY)[number] }) {
 export default function About() {
   const [menuOpen, setMenuOpen] = useState(false);
 
-  /* ---- the pinned film, and the opening that opens it ----
-     The <video> is a sticky 100svh backdrop for the whole first half of the
-     page: the opening's stage, the statement, the founder's block and the
-     story timeline all scroll over the same frame, and the Awards sheet
-     finally covers it. A constant scrim keeps cream type legible on it at
-     every one of those positions. */
+  /* ---- the film, and the three sections that sit on it ----
+     The <video> is a sticky 100svh backdrop; the story head, the nine chapter
+     rows and the founder's block all scroll over the same frame, and the
+     Awards sheet finally covers it. One photograph under three subjects is
+     what removes the seams between them — there are none to hide, only space
+     to separate them with.
+
+     WHAT WENT. A 320svh runway with a sticky stage in it, "About Us" parting
+     into two words, the film growing in the hole they opened, a nineteen-word
+     scrubbed statement and a nine-card deck seated on a spine. All of it was a
+     pure function of scroll and all of it was reversible, which was the good
+     part — but the page took two and a bit screens to answer its own question
+     and the deck's geometry was a table nobody could edit safely. The hero
+     lands complete on cream now and the chapters are rows. */
   const reduceMotion = useReducedMotion();
 
-  /* THE SCRUB. One `useScroll` over the opening's runway drives everything in
-     the stage AND the film's scale — one subscription, one progress, so the
-     words, the picture and the answer cannot drift apart by a frame however
-     the windows above are retuned.
-
-     `["start start", "end end"]` is the sticky stage's own life: 0 is the
-     runway's top at the top of the window (the stage has just stuck), 1 is
-     its bottom at the bottom of the window (the stage is about to release).
-     Anything outside that is clamped, so scrolling back to the very top
-     leaves the composition exactly as it was found. */
-  const openRef = useRef<HTMLElement>(null);
-  const { scrollYProgress: openP } = useScroll({
-    target: openRef,
-    offset: ["start start", "end end"],
-  });
-
-  /* The parting, eased ONCE and read by everything that belongs to it — the
-     two words and the film's scale all come off this single value, so they
-     cannot drift apart by a frame however the windows are retuned. See
-     OPEN_EASE for why this is not the site's shared enter curve. */
-  const part = useTransform(openP, [PART_FROM, PART_TO], [0, 1], {
-    clamp: true,
-    ease: OPEN_EASE,
-  });
-  /* THE MEASURED LINE, as MotionValues rather than state.
-     They are read INSIDE the transforms below, so a re-measure (fonts
-     arriving, a resize) recomputes the film's seat and the words' travel on
-     the same frame. Held in state instead, `useTransform`'s closure would
-     only pick the new numbers up the next time the scroll changed — which,
-     for a reader who resizes a stopped window, is never. */
-  const inL = useMotionValue(0);
-  const inR = useMotionValue(0);
-  const trav = useMotionValue(0);
-  const air = useMotionValue(0);
-  /* HALF THE VIEWPORT, AS A MOTIONVALUE RATHER THAN `window.innerWidth`
-     READ INSIDE THE TRANSFORM. `useTransform`'s mapper is evaluated during
-     render to seed its value, including on the SERVER — a `window` reference
-     in there is a 500 on the document, which is exactly what it was: the
-     page still hydrated and looked correct in a browser (Next recovers by
-     client-rendering), so this was invisible except in the status code.
-     Measured with the rest of the line below. */
-  const half = useMotionValue(0);
-  const wordARef = useRef<HTMLSpanElement>(null);
-  const wordBRef = useRef<HTMLSpanElement>(null);
-
-  useLayoutEffect(() => {
-    const measure = () => {
-      const a = wordARef.current;
-      const bEl = wordBRef.current;
-      if (!a || !bEl) return;
-      const cx = window.innerWidth / 2;
-      /* the RESTING line, which is what these numbers describe — the words
-         carry a transform while the scrub runs, and getBoundingClientRect
-         reports the transformed box. Reading it mid-scrub would feed the
-         clamp the geometry of a line that has already moved. The rects are
-         corrected back to rest by subtracting whatever x is on them, which
-         is cheaper and steadier than clearing the transform and forcing a
-         reflow twice per measurement. */
-      const ar = a.getBoundingClientRect();
-      const br = bEl.getBoundingClientRect();
-      const left = ar.right - (wordAX.get() || 0) - cx;
-      const right = br.left - (wordBX.get() || 0) - cx;
-      if (!ar.width || !br.width) return;
-      const gap = window.innerWidth * (FILM_AIR_VW / 100);
-      inL.set(left);
-      inR.set(right);
-      air.set(gap);
-      half.set(cx);
-      // clears the further-reaching of the two words through its own screen
-      // edge; both take it, so the hole's centre never moves
-      trav.set(cx + Math.max(left, right) + gap);
-    };
-    measure();
-    /* AND AGAIN WHEN THE REAL FACE ARRIVES. Contralto comes in over the
-       two-hop Adobe stylesheet (app/layout.tsx), so on a cold cache the
-       measurement above reads the FALLBACK's metrics — a different joint, a
-       wrong travel, both latched until the next resize. Same pattern, and
-       the same reason, as Discover's fitTitle and JoinUs's seam geometry. */
-    document.fonts?.ready.then(measure).catch(() => {});
-    window.addEventListener("resize", measure);
-    return () => window.removeEventListener("resize", measure);
-    // wordAX/wordBX are stable MotionValues; the setters are too
-    // eslint-disable-next-line react-hooks/exhaustive-deps
-  }, []);
-
-  /* the two words, in measured px. Same travel each, so the hole between
-     them keeps the centre it started with. */
-  const wordAX = useTransform([part, trav], ([p, t]: number[]) => -t * p);
-  const wordBX = useTransform([part, trav], ([p, t]: number[]) => t * p);
-
-  /* THE FILM RIDES THE HOLE.
-     x      the frame's centre eases from the joint — the midpoint of the gap
-            the two words leave at rest — back to the screen's centre across
-            the parting, so the picture is born exactly where the words open
-            and is dead centre by the time it fills the screen.
-     scale  the SMALLER of the two clearances the words have actually opened
-            about that centre, less the air, as a fraction of the half
-            screen. Whatever the words do, the picture cannot reach either
-            one: the bound is the geometry itself rather than a number that
-            happened to look right. */
-  const filmX = useTransform(
-    [part, inL, inR],
-    ([p, l, r]: number[]) => ((l + r) / 2) * (1 - p),
-  );
-  const filmScale = useTransform(
-    [part, inL, inR, trav, air, half],
-    ([p, l, r, t, g, hw]: number[]) => {
-      // nothing has been measured yet (the server, and the frame before the
-      // layout effect runs) — a zero scale is the resting state anyway
-      if (!hw) return 0;
-      // the frame's centre, and the two words' inner edges, at this progress
-      const c = ((l + r) / 2) * (1 - p);
-      const roomL = c - (l - t * p);
-      const roomR = r + t * p - c;
-      return Math.min(1, Math.max(0, (Math.min(roomL, roomR) - g) / hw));
-    },
-  );
-  const filmFade = useTransform(part, [0.02, 0.12], [0, 1], { clamp: true });
-
-  /* The answer: opacity and a short rise, both pure functions of the same
-     progress. No stagger, no per-word mask — a mask sequence is a TIMED
-     animation wearing a scroll trigger, and this beat has to be able to run
-     backwards under the reader's hand like the rest of the opening. */
-  const answerFade = useTransform(openP, [ANSWER_FROM, ANSWER_TO], [0, 1], {
-    clamp: true,
-    ease: SCRUB_EASE,
-  });
-  const answerY = useTransform(openP, [ANSWER_FROM, ANSWER_TO], [28, 0], {
-    clamp: true,
-    ease: SCRUB_EASE,
-  });
-  const cueFade = useTransform(openP, [0, CUE_OUT], [1, 0], { clamp: true });
-
-  /* THE FILM STARTS WHEN THE READER DOES.
-     `preload="none"` and no `src`-side autoplay in the markup, then both are
-     turned on the first time the scrub moves off zero. Three things follow
-     from that and all three are the point:
-       · a reader who never scrolls never fetches 25MB
-       · nothing competes with the fonts and the stylesheet for the first
-         paint of a page whose first screen is one word of display type on
-         cream
-       · the film's first visible frame is the one the words open onto,
-         rather than whatever the decoder happened to reach three seconds
-         after hydration
-     REDUCED MOTION KEEPS THE POSTER and never fetches the file at all — a
-     looping film under the whole page is exactly the ambient movement the
-     preference asks to be spared.
-     Driven imperatively off the ref: both values are ones React would
-     otherwise re-render the whole page to change, and neither is worth a
-     render. */
+  /* THE FILM STARTS WITH THE PAGE. It used to wait for the reader's first
+     scroll, which was right while the first screen was two words of maroon
+     type on cream. The first screen is cream again — but the film is the
+     ground for everything under it and a poster held under moving type reads
+     as a stall, so it plays from mount. Reduced motion never fetches it: the
+     poster is a complete backdrop on its own. */
   const videoRef = useRef<HTMLVideoElement>(null);
-  const started = useRef(false);
+  const heroVideoRef = useRef<HTMLVideoElement>(null);
   useEffect(() => {
-    const v = videoRef.current;
-    if (!v) return;
-    if (reduceMotion) {
-      v.pause();
-      return;
-    }
-    const go = (p: number) => {
-      if (started.current || p < 0.005) return;
-      started.current = true;
+    /* BOTH FILMS, ONE RULE. The hero's portrait clip was carrying `autoPlay`
+       in the markup, which no preference can reach — it played under
+       prefers-reduced-motion while the backdrop behind it correctly did not,
+       which is the one combination worse than either alone. Neither element
+       autoplays from markup now; both start here, and neither is fetched at
+       all when the preference is set. */
+    const els = [videoRef.current, heroVideoRef.current].filter(
+      (v): v is HTMLVideoElement => !!v,
+    );
+    for (const v of els) {
+      if (reduceMotion) {
+        v.pause();
+        continue;
+      }
       v.preload = "auto";
-      /* rejects when the browser declines to start (no user gesture, a
-         decode error, the element already gone) — the poster is the fallback
-         and it is already on screen, so there is nothing to recover */
+      /* rejects when the browser declines to start — a poster is already on
+         screen in both cases, so there is nothing to recover */
       void v.play().catch(() => {});
-    };
-    go(openP.get());
-    return openP.on("change", go);
-  }, [reduceMotion, openP]);
+    }
+  }, [reduceMotion]);
 
   useEffect(() => {
     const html = document.documentElement;
@@ -1183,47 +521,107 @@ export default function About() {
       <Menu open={menuOpen} onClose={() => setMenuOpen(false)} />
 
       <main id="main-content" className={styles.page} data-nav-theme="light">
-        {/* ---- pinned video scope ----
-             The hero video pins to the viewport as a sticky backdrop; the
-             hero type, the statement/Omar band and the story timeline all
-             scroll over it, and the Awards cream sheet finally slides up
-             to cover it (layered pinning — the video releases underneath
-             once hidden). The constant scrim keeps every layer of type
-             legible against the footage. NB: .videoContent must not create
-             a stacking context, or the difference-blend type couldn't see
-             the video beneath it. */}
+        {/* ═══════════════ 01 · THE CREAM HERO ═══════════════
+             SIZED BY ITS CONTENTS, not by the viewport. The retired opening
+             held one screen and then spent two more assembling itself; this
+             is nav, headline and the answer beside it, and then the film
+             starts. The whole line is Contralto caps — "Who is" used to be
+             the UI face, and the question is one utterance.
+
+             "IS" RANGES RIGHT AGAINST MAGINHAWA, and it costs no measuring:
+             `width: max-content` makes the heading exactly as wide as its
+             widest line, which IS "Maginhawa", so ranging line one right lands
+             it flush and keeps it flush if the copy or the size ever change. */}
+        <section className={styles.opening} aria-label="About Maginhawa Group">
+          <div className="container">
+            <div className={styles.openGrid}>
+              <h1 className={styles.openTitle}>
+                {/* LINE ONE IS A RULE, NOT A RAG. "Who" now starts on
+                    MAGINHAWA's left edge and "is" stays out on its right, so
+                    the line is justified across the heading's own width rather
+                    than ranged to one side — and the gap that opens between
+                    them is where the mark sits. */}
+                <span className={`${styles.openLine} ${styles.openLineIs}`}>
+                  <span className={styles.openWho}>Who</span>
+                  <span className={styles.openIs}>is</span>
+                </span>
+                {/* THE MARK RIDES THE NAME. It sits on the same baseline as the
+                    capitals rather than beside the line as a separate object,
+                    so the row is one lockup — and because it is inside the
+                    widest line, it is what `width: max-content` now measures,
+                    which is what "is" above ranges itself to. */}
+                <span className={`${styles.openLine} ${styles.openLineMark}`}>
+                  <span>Maginhawa</span>
+                  <span className={styles.openLogo} aria-hidden>
+                    <Image
+                      src="/logo/maginhawa.png"
+                      alt=""
+                      width={256}
+                      height={256}
+                    />
+                  </span>
+                </span>
+                <span className={styles.openLine}>Group?</span>
+              </h1>
+
+              {/* THE ASIDE STRETCHES THE ROW. Its film's top sits on the
+                  headline's top and its last line of prose closes with the
+                  foot of "Group?" — which means the frame cannot also hold a
+                  fixed aspect: its height is whatever the headline leaves. It
+                  is a portrait crop of a portrait source, so `cover` keeps it
+                  honest at every width. */}
+              <div className={styles.openAside}>
+                <div className={styles.openMedia}>
+                  <video
+                    ref={heroVideoRef}
+                    className={styles.openMediaVideo}
+                    src={asset("/videos/about-big.mp4")}
+                    poster={asset("/images/omar.jpg")}
+                    muted
+                    loop
+                    playsInline
+                    preload="none"
+                    aria-hidden
+                  />
+                </div>
+                <div className={styles.openCopy}>
+                <Reveal>
+                  <p className={styles.openLede}>
+                    A London family of restaurants, from a Camden kitchen in
+                    1987 to seven distinct dining rooms today. Filipino,
+                    Filipino-Japanese and Caribbean kitchens, a bakery and an
+                    ice-cream counter, all still run by the same family.
+                  </p>
+                </Reveal>
+                <Reveal delay={0.06}>
+                  <p className={styles.openTag}>
+                    Made with heritage,{" "}
+                    <em className={styles.emItalic}>served with heart</em>.
+                  </p>
+                </Reveal>
+                </div>
+              </div>
+            </div>
+          </div>
+        </section>
+
+        {/* ═══════════════ 02 · THE FILM, AND WHAT SITS ON IT ═══════════════
+             The video pins as a sticky backdrop and the story head, the nine
+             chapters and the founder all scroll over the same frame. The
+             constant scrim keeps cream type legible at every one of those
+             positions. NB: .videoContent must not create a stacking context. */}
         <div
           className={styles.videoScope}
           data-nav-theme="blend"
           data-cursor="glass"
         >
           <div className={styles.videoBackdrop} aria-hidden>
-            {/* THE FRAME THE SCRUB SCALES. It wraps the film AND the scrim so
-                the two shrink together — a full-screen scrim over a
-                quarter-screen picture would be a dark page with a bright
-                hole in it, which is the opposite of the reading.
-
-                ONE TRANSFORM AND ONE OPACITY, both on this element and
-                nothing else on it. That keeps the whole opening on the
-                compositor: no width, no height, no top, no left, no
-                clip-path (which is a paint-level property in most engines
-                and would repaint a playing video every frame).
-
-                Reduced motion gets no style object at all rather than a
-                style object holding identity values — an inline transform,
-                even `scale(1)`, promotes the element and holds a compositor
-                layer under the entire first half of the page for nothing. */}
-            <motion.div
-              className={styles.filmFrame}
-              style={
-                reduceMotion
-                  ? undefined
-                  : { x: filmX, scale: filmScale, opacity: filmFade }
-              }
-            >
-              {/* NO autoPlay AND preload="none" IN THE MARKUP — both are set
-                  from the effect above, on the reader's first scroll. See
-                  that effect for the three reasons. */}
+            {/* A PLAIN FRAME. It used to carry x, scale and opacity off the
+                opening's scrub — the picture grew out of the hole the title's
+                two words opened. With the hero on cream there is nothing to
+                grow: no inline transform, and no compositor layer held under
+                the whole first half of the page. */}
+            <div className={styles.filmFrame}>
               <video
                 ref={videoRef}
                 className={styles.heroVideo}
@@ -1235,325 +633,88 @@ export default function About() {
                 preload="none"
               />
               <div className={styles.videoScrim} />
-            </motion.div>
+            </div>
           </div>
 
           <div className={styles.videoContent}>
-            {/* ═══════════════ THE OPENING ═══════════════
-                A tall runway with one sticky screen in it. The runway is the
-                clock — its progress IS the scrub — and the stage is the only
-                thing the reader ever sees. Nothing here touches Lenis, locks
-                the root, or adds a scroll listener: `position: sticky` does
-                the pinning, and a sticky element cannot leave the page held
-                if this component unmounts mid-scroll.
-
-                REDUCED MOTION sizes the runway to its content and unsticks
-                the stage (see .opening[data-static]): the title takes one
-                still screen and the question and answer take the next, with
-                the film at full size behind both. Two screens rather than
-                one — collapsing to a single screen was tried first and put
-                "ABOUT US" straight through the middle of "MAGINHAWA GROUP?",
-                which is not a degraded animation but an unreadable page. */}
-            <section
-              ref={openRef}
-              className={styles.opening}
-              /* the runway's height, from the constant rather than from the
-                 stylesheet's own fallback — one source for the number that
-                 decides how much scrolling the opening takes. The scrub's
-                 `offset` is written against this box, so the two can never
-                 disagree about the mapping, only about the duration. */
-              style={
-                { "--opening-vh": OPENING_VH } as CSSProperties
-              }
-              data-static={reduceMotion ? "" : undefined}
-              aria-label="About Maginhawa Group"
-            >
-              <div className={styles.openStage}>
-                {/* THE TRAIL IS FIRST, AHEAD OF THE SCRIM, and the order is
-                    the whole of why it is safe — see HeroTrail. */}
-                <HeroTrail />
-
-                {/* THE SHAPED SCRIM, on the same fade as the answer it seats.
-                    It exists to hold the four lines of the answer off the
-                    footage (the derivation is in .heroScrim, and it is a
-                    measurement rather than a taste); before the answer
-                    arrives there is nothing on the film to seat, and a
-                    standing ellipse of ink over the picture while it is
-                    still opening is a smudge on the one moment the reader is
-                    watching the photograph. */}
-                <motion.div
-                  className={styles.heroScrim}
-                  aria-hidden
-                  style={reduceMotion ? undefined : { opacity: answerFade }}
-                />
-
-                {/* ── BEATS 1–3: the title, and the film it opens.
-                    ONE <h1> WITH TWO SPANS. The words have to move
-                    independently, so they cannot be one text node; the space
-                    between them is a real character in a `font-size: 0` span
-                    (SplitWords' own trick, and .titleSpace's on the home
-                    page) so the heading's textContent reads "About Us" for
-                    find-in-page, copy-paste and anything that falls back to
-                    content, while contributing no advance of its own — the
-                    visible gap is the words' own margin, which is the metric
-                    the film's clamp is written against. */}
-                {/* TITLE AND INDICATOR IN ONE BOX, and that box is what
-                    changes shape under reduced motion. Scrubbed, it is an
-                    absolute layer filling the stage; static, it becomes an
-                    ordinary full-height block so the title gets a screen of
-                    its own and the answer gets the next one — see
-                    .opening[data-static]. The cue has to travel with the
-                    title or it seats itself at the foot of two stacked
-                    screens instead of under the words. */}
-                <div className={styles.openHead}>
-                  <h1 className={styles.openTitle}>
-                    <motion.span
-                      ref={wordARef}
-                      className={styles.openWord}
-                      style={reduceMotion ? undefined : { x: wordAX }}
-                    >
-                      About
-                    </motion.span>
-                    <span className={styles.openSpace}> </span>
-                    <motion.span
-                      ref={wordBRef}
-                      className={styles.openWord}
-                      style={reduceMotion ? undefined : { x: wordBX }}
-                    >
-                      Us
-                    </motion.span>
-                  </h1>
-
-                  {/* ── THE INDICATOR. The page is 11,000px tall and its first
-                    screen is two words on cream with no edge, no fold and
-                    nothing under them to suggest it continues; the reader has
-                    to be told that scrolling is what opens this.
-
-                    It is the home hero's own signpost (Hero.module.css
-                    .scrollHint) in the same mono-caps voice with the same
-                    chevron — deliberately not a new gesture — and it does NOT
-                    move once it is there. A signpost that bobs is one more
-                    animation on a screen whose whole subject is a single
-                    movement, and a slow loop is specifically the ambient
-                    motion a reduced-motion reader is asking to be spared.
-
-                    IT IS HONEST BECAUSE IT IS SCROLL-LINKED. It fades over
-                    the first 4% of the scrub, so it is gone the moment the
-                    reader has demonstrably started and back if they return to
-                    the top. Reduced motion keeps it at full strength: an
-                    opacity that aids comprehension is exactly what the
-                    preference asks to be left alone. */}
-                  <motion.div
-                    className={styles.scrollCue}
-                    style={reduceMotion ? undefined : { opacity: cueFade }}
-                    aria-hidden
-                  >
-                    <div className={styles.scrollCueInner}>
-                      <span>Scroll</span>
-                      <svg
-                        viewBox="0 0 12 12"
-                        fill="none"
-                        stroke="currentColor"
-                        strokeWidth="1.2"
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                      >
-                        <path d="M2.5 4.5 L6 8 L9.5 4.5" />
-                      </svg>
-                    </div>
-                  </motion.div>
-                </div>
-                {/* ── BEAT 4: the question, and the answer to it.
-                    This is the page's old hero, unchanged in layout, copy and
-                    type — the kicker on MAGINHAWA's shoulder, GROUP? ranged
-                    right with the lede beside it — moved into the stage and
-                    handed a scrubbed opacity instead of a three-beat timed
-                    entrance. Every class below is the one it already wore, so
-                    the ~150 lines of measured typography in .heroKicker,
-                    .heroLineTop/.heroLineBottom and .heroBottomRow all still
-                    apply.
-
-                    PLAIN TEXT, NOT SplitWords. The word-mask rise is a timed
-                    animation, and a timed animation inside a scrub either
-                    runs past the reader's hand or has to be re-triggered
-                    every time they scroll back over it. The block's arrival
-                    is the scrub itself.
-                    `.heroMask`'s asymmetric clip goes with the masks — there
-                    is nothing clipping these lines now, so MAGINHAWA's
-                    negative letter-space and GROUP?'s edges are simply
-                    unshorn. */}
-                <motion.div
-                  className={styles.openAnswer}
-                  style={
-                    reduceMotion
-                      ? undefined
-                      : { opacity: answerFade, y: answerY }
-                  }
-                >
-                  <div className="container">
-                    <div className={styles.hero}>
-                      <p className={styles.heroKicker}>Who is</p>
-                      <p className={styles.heroLineTop}>MAGINHAWA</p>
-                      <div className={styles.heroBottomRow}>
-                        <div className={styles.heroAside}>
-                          <p className={styles.heroLede}>
-                            A London family of restaurants - from a Camden
-                            kitchen in 1987 to seven distinct dining
-                            destinations today. Made with heritage and{" "}
-                            <em className={styles.emItalic}>
-                              served with heart
-                            </em>
-                            .
-                          </p>
-                        </div>
-                        <p className={styles.heroLineBottom}>GROUP?</p>
-                      </div>
-                    </div>
-                  </div>
-                </motion.div>
-              </div>
-            </section>
-
-            {/* ---- Statement + Omar Shah band ----
-                 Scrolls over the pinned video like everything else in the
-                 scope — transparent now, the shared scrim carries the dark
-                 field the cream type sits on. */}
-            <div className={styles.band}>
-              <section className={styles.statement}>
-                {/* the shaped scrim its saffron phrases needed — first child so
-                it paints under the type. See .statementScrim. */}
-                <div className={styles.statementScrim} aria-hidden />
-
-                <div className="container">
-                  {/* scrubbed, not revealed — see the Statement block above */}
-                  <Statement />
-                </div>
-              </section>
-
-              {/* ---- Chef & Founder ----
-
-               THE QUOTE IS THE HEADLINE NOW, and the move is structural
-               rather than typographic. The page opens by asking "Who is
-               MAGINHAWA GROUP?" and then spends two screens not answering it;
-               "One restaurant became a family." answers it in five words and
-               was filed as a caption under a name. Promoted, the hero's
-               question and this line become one sentence with a screen
-               between them, which is the only reason the hero's question is
-               worth asking.
-
-               THE SUCCESSION IS SAID PLAINLY. The old bio opened "Co-founder
-               of the Maginhawa Group" one screen above a timeline whose first
-               chapter says his PARENTS opened the original restaurant, and
-               left the reader to reconcile the two. Omar founded the group;
-               the first restaurant was his parents'. Both facts, in that
-               order, in the first two sentences — the succession is the story,
-               so it is told rather than implied.
-
-               IT ALSO STOPPED LISTING. The old bio spent its words on
-               Mamasons, Belly and the Michelin Guide, all three of which get
-               their own chapters in the deck within seconds. A founder's bio
-               directly above a timeline should carry what a timeline cannot:
-               what carried over, and what he was trying to do with it.
-
-               ONE ARRIVAL, TWO BEATS. Five nested Reveals (0 / 0 / 0.08 /
-               0.14 / 0.2) used to spend a stagger across a screen break, where
-               a stagger cannot be perceived at all — the name landed at the
-               bottom of one screen and the columns were orphaned at the top of
-               the next. The block is one grid row now and it arrives as one
-               thing, with the quote a beat ahead of everything else because
-               it is the sentence the section exists to deliver. */}
-              <section className={styles.chef}>
-                <div className="container">
-                  <div className={styles.chefGrid}>
-                    {/* seats the block on the film — see .chefScrim */}
-                    <div className={styles.chefScrim} aria-hidden />
-
-                    <Reveal className={styles.chefImage} delay={0.06}>
-                      <Image
-                        src="/images/omar.jpg"
-                        alt="Omar Shah, founder of the Maginhawa Group"
-                        width={678}
-                        height={452}
-                      />
-                    </Reveal>
-
-                    <div className={styles.chefText}>
-                      <Reveal className={styles.chefLead}>
-                        <span className={styles.eyebrow}>
-                          Chef &amp; Founder
-                        </span>
-                        <h2 className={styles.chefQuote}>
-                          One restaurant became a{" "}
-                          <em className={styles.emItalic}>family</em>.
-                        </h2>
-                      </Reveal>
-
-                      <Reveal className={styles.chefCredit} delay={0.12}>
-                        <p className={styles.chefName}>Omar Shah</p>
-
-                        <p className={styles.chefBody}>
-                          Omar Shah founded the Maginhawa Group. The first
-                          restaurant was his parents&rsquo; - Bintang, opened on
-                          Kentish Town Road in 1987, feeding the neighbourhood
-                          he grew up in. What carried over was not a recipe but
-                          a way of receiving people, which is why the group is
-                          named for the Tagalog word for comfort. Every
-                          restaurant since has been that same welcome, set in a
-                          different kitchen.
-                        </p>
-                      </Reveal>
-                    </div>
-                  </div>
-                </div>
-              </section>
-            </div>
-
             <div className="container">
-              {/* THE DECK OWNS ITS CURSOR. This section sits inside the
-                  pinned video's data-cursor="glass" scope, and its nine cards
-                  are large photographs — so the glass disc sprang across the
-                  chapter being read, the copy beside it and the year wheel,
-                  refracting type over cards that are themselves rotating in
-                  3D. `default` switches the zone off from the inside; see
-                  resolve() in CustomCursor.tsx. */}
-              <section
-                className={`${styles.story} ${cursor.optOut}`}
-                data-cursor="default"
-              >
-                {/* THE HEADING STAYS WHEN THE WHEEL GOES. "Our Story" was the
-                year wheel's <h2> — and before that an aria-hidden span, which
-                once left the nine chapter <h3>s hanging under the chef
-                block's heading. The wheel is deleted; the heading is rehomed,
-                not removed, and it leads the section as the archive masthead
-                now. See .storyHeading for the type law it amends. */}
-                <h2 className={styles.storyHeading}>Our Story</h2>
+              <div className={styles.storyHead}>
+                {/* A DATELINE, NOT A SECOND TITLE. The display line already
+                    names the section, so an eyebrow repeating it would be the
+                    same word twice at two sizes. The span is the one fact
+                    neither the title nor the standfirst states as a figure —
+                    and it is the marker the reference set hangs over its own
+                    full-bleed frames. */}
+                <Reveal>
+                  <p className={styles.storyDateline}>
+                    Est. Camden &middot; 1987 &mdash; 2026
+                  </p>
+                </Reveal>
+                <FitLine className={styles.storyTitle} text="Our Story" />
+                <Reveal delay={0.08}>
+                  <p className={styles.storyStandfirst}>
+                    Thirty-eight years of Filipino kitchens in London, in nine
+                    openings. From a Camden dining room in 1987 to a place in
+                    the Michelin Guide in 2026 &mdash; the same family, the same
+                    welcome, set each time in a different kitchen.
+                  </p>
+                </Reveal>
+              </div>
 
-                {/* THE INDEX. One <ol> at every width — the deck/list fork, the
-                year wheel and the scroll-driven active chapter are all gone.
-                Chronological because it is an archive; each item is its own
-                component because each owns a useScroll and an entrance
-                observer, and hooks cannot live in a .map. */}
-                <ol className={styles.timeline}>
-                  {STORY.map((chapter) => (
-                    <TimelineItem
-                      key={`${chapter.year}-${chapter.title}`}
-                      chapter={chapter}
-                    />
-                  ))}
-                </ol>
+              <ol className={styles.chapters}>
+                {STORY.map((chapter) => (
+                  <ChapterRow key={chapter.title} chapter={chapter} />
+                ))}
+              </ol>
+
+              {/* ---- The founder ----
+                   Portrait centred and UNFILTERED. The grayscale this block
+                   used to wear was a house treatment applied to the one
+                   photograph on the page that is a person, and it made him
+                   read as archive rather than as the man currently running the
+                   kitchens. Two columns beneath at 34ch, narrower than the
+                   measure around them so they read as a caption block. */}
+              <section className={styles.owner} aria-labelledby="owner-name">
+                <Reveal>
+                  <p className={styles.ownerEyebrow}>The Owner</p>
+                </Reveal>
+                <Reveal delay={0.06} className={styles.ownerPortrait}>
+                  <Image
+                    src="/images/omar.jpg"
+                    alt="Omar Shah, founder of the Maginhawa Group"
+                    width={464}
+                    height={576}
+                  />
+                </Reveal>
+                <Reveal delay={0.12}>
+                  <h2 className={styles.ownerName} id="owner-name">
+                    Omar Shah
+                  </h2>
+                  <p className={styles.ownerRole}>
+                    Founder &middot; Executive Chef
+                  </p>
+                </Reveal>
+                <div className={styles.ownerCols}>
+                  <Reveal delay={0.18}>
+                    <p>
+                      Omar grew up in his parents&rsquo; Camden dining room and
+                      took the stove in his twenties. There was never a plan to
+                      build a group &mdash; only a kitchen to keep open, and
+                      then another one when the first got too small.
+                    </p>
+                  </Reveal>
+                  <Reveal delay={0.24}>
+                    <p>
+                      Thirty-eight years and nine openings later he still writes
+                      every menu in the group. Belly, the most personal of them,
+                      was added to the Michelin Guide for Greater London in
+                      2026.
+                    </p>
+                  </Reveal>
+                </div>
               </section>
             </div>
 
-            {/* Awards & Recognition — rises over the pinned video as an
-                opaque cream sheet (layered pinning: the video stays pinned
-                beneath while this section slides up to cover it, and only
-                releases underneath once hidden). The content inside is
-                static — the slide-over entrance IS the effect. The eyebrow
-                and the rows used to carry their own scroll reveals on top
-                of it; two entrances stacked on one arrival read as a stall,
-                and the rows re-animating under a sheet that had already
-                delivered them made the table feel detached from its own
-                title. Plain elements, no Reveal. */}
             {/* IT OWNS ITS CURSOR, for the same reason the deck does and
                 with a worse symptom. This sheet is inside the pinned video's
                 data-cursor="glass" scope, so the glass disc was live over it —

@@ -99,10 +99,28 @@
      block because of the hairline closing it. */
   /* NAMED for .topRule, which subtracted it so the opening hairline could
      sit 18px off the head rather than a full gap away. That rule is
-     deleted, so nothing reads this any more — it is kept because it is the
-     honest name for what the gap is, and the next thing seated against the
-     head will want it. The value has never changed. */
-  --sec-gap: clamp(26px, 3.8vh, 44px);
+     deleted, so .headRule is what reads this now — it is kept because it is
+     the honest name for what the gap is, and the next thing seated against
+     the head will want it. */
+  /* ── AND THE VALUE FINALLY MOVES, at the user's instruction: the air
+     under .headRule now matches the air under Blog's "Earlier Entries"
+     divider, so the page's two internal hairlines are bracketed the same
+     way. clamp(26px, 3.8vh, 44px) was 34px at 900 against Blog's 24 — the
+     one rule read attached to its grid, the other floating off it. */
+  /* ── THE AIR EITHER SIDE OF .headRule, BORROWED FROM BLOG ──
+     Blog's "Earlier Entries" divider is a hairline seated in a label row,
+     with --step-arc: clamp(10px, 1.7vh, 22px) of margin above the row and
+     the same below it. What a reader sees there is that clamp PLUS half
+     the label row, because the rule is centred in it — measured ink-to-rule
+     at 1440x900 by scripts/probe-home-spacing.mjs's method: 23.9px, equal
+     on both sides. This states that number in Blog's own terms rather than
+     freezing it, so a retune of --step-arc carries across.
+
+     ⚠️ 8.6px IS HALF THE LABEL ROW, not a nudge: (18.19 - 1) / 2 with the
+     label at its current size. It is spelled in px because there is no
+     label on this side of the page to take it from. */
+  --rule-air: calc(clamp(10px, 1.7vh, 22px) + 8.6px);
+  --sec-gap: var(--rule-air);
   gap: var(--sec-gap);
   /* the entrance choreography slides cells in from PAST the viewport
      edges (±110vw) — clip the x-axis so off-screen tiles never widen the
@@ -335,14 +353,20 @@
    THE MARGIN SUBTRACTS THE HEAD'S OWN GAP, which is why --head-gap is
    named: this rule is the last item of a flex column, so the gap is already
    between it and the display line and the margin only has to make up the
-   difference. `calc(18px - var(--head-gap))` states the intent — "18px
-   under the type, whatever the lockup's gap is" — and survives a retune of
-   that clamp. Same construction as .topRule above. */
+   difference. The calc states the intent — "--rule-air under the type,
+   whatever the lockup's gap is" — and survives a retune of that clamp.
+   Same construction as .topRule above.
+
+   ⚠️ THE 18px IS NOW --rule-air, at the user's instruction, and the two
+   sides of this rule are the same measure for the first time: the air below
+   it (--sec-gap) reads the same token. Both are Blog's divider gap — see
+   --rule-air on .section for where 23.9px comes from. The 18px the
+   paragraph above argues for is what it replaced. */
 .headRule {
   width: 100%;
   height: 1px;
   background: var(--rule);
-  margin-top: calc(18px - var(--head-gap));
+  margin-top: calc(var(--rule-air) - var(--head-gap));
 }
 
 /* ── .footRule IS GONE, at the user's instruction ──
@@ -668,12 +692,19 @@
    cell goes back to having no clip at all.
 
    THE FALLBACK IS 0%, NOT 100%, and that is a deliberate failure mode. If
-   the script never runs, framer never writes --wipe and the cell renders
-   fully open: no animation, but eight readable cards. A 100% fallback would
-   fail the other way, leaving an empty grid on any page where hydration
-   died. The parked state comes from framer's own `initial="hidden"`, which
-   is emitted into the server's HTML, so the honest first paint is still a
-   closed card.
+   the script never runs, nothing writes --wipe and the cell renders fully
+   open: no animation, but eight readable cards. A 100% fallback would fail
+   the other way, leaving an empty grid on any page where hydration died.
+
+   ⚠️ THAT SENTENCE WAS FALSE FOR AS LONG AS THE ENTRANCE WAS A VARIANT, and
+   it is worth recording because the rule it states is right and the
+   mechanism under it was not. The parked state used to come from framer's
+   `initial="hidden"`, and framer emits that into the SERVER's HTML — so
+   every cell shipped as `data-wiping="on" style="--wipe:100%"` and the
+   fallback above could never be reached. A page with no script showed eight
+   blank cards, silently. Discover.tsx now withholds both the attribute and
+   the variable until after mount, so the no-script state is a plain
+   unclipped card and this note describes what actually happens.
 
    `round` IS ABSENT ON PURPOSE — the visible corner belongs to
    .cardSurface inside this box, so a square clip only ever cuts at or

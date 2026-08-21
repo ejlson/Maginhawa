@@ -1,12 +1,31 @@
 "use client";
 
-import { motion, useReducedMotion } from "framer-motion";
 import styles from "./PressWall.module.css";
 import { FEATURED_OUTLETS } from "@/lib/press";
 import { asset } from "@/lib/media";
 
-// shared enter curve — the same rise the other chapters use
-const EASE = [0.22, 1, 0.36, 1] as const;
+/* ══════════ THERE IS NO ENTRANCE, AT THE USER'S INSTRUCTION ══════════
+   The lane used to arrive on the reader's scroll — a 26px rise and a fade
+   scrubbed across the section's approach, matching <Passage> two chapters
+   below — and before that on a `whileInView` timer. Both are gone: the
+   marks are simply there, drifting, the way the hairlines above and below
+   them are simply there.
+
+   WHAT THAT REMOVES BESIDES THE MOVE: a useScroll, two useTransforms, a
+   mount gate and the motion element itself. The section is now a plain
+   subtree with one CSS animation in it, which is what a band of furniture
+   should be.
+
+   ⚠️ THE MOUNT GATE WENT WITH IT AND THAT IS SAFE ONLY BECAUSE THE FADE
+   DID. The gate existed because the lane animated FROM opacity 0: framer
+   server-renders a motion value at its progress-0 value, so a scrub that
+   failed to attach would have left fourteen mastheads permanently
+   invisible, silently. Nothing here starts from a hidden state any more,
+   so there is no failure mode left to guard.
+
+   If a drifting lane ever wants an entrance again, the scrubbed version is
+   in git — and the reason it beat the timer is worth keeping: a scrub has
+   no pace of its own, so it cannot be out-run on a flick, and it reverses. */
 
 /**
  * The group's press credential, on the cream — ONE DRIFTING LANE OF
@@ -87,15 +106,9 @@ const MARKS = ORDER.map((name) =>
 ).filter((o): o is NonNullable<typeof o> => Boolean(o?.logo));
 
 export default function PressWall() {
-  const reduce = useReducedMotion();
-
   return (
     <section
       className={styles.section}
-      /* everything inside this chapter that hides itself for an entrance is
-         restored by the <noscript> block in app/layout.tsx — see the note on
-         the attribute in components/Reveal.tsx */
-      data-entrance="scope"
       aria-labelledby="featured-in"
       data-nav-theme="light"
     >
@@ -105,15 +118,10 @@ export default function PressWall() {
         As featured in
       </h2>
 
-      <motion.div
-        className={styles.lane}
-        initial={reduce ? false : { opacity: 0, transform: "translateY(14px)" }}
-        whileInView={
-          reduce ? undefined : { opacity: 1, transform: "translateY(0px)" }
-        }
-        viewport={{ once: true, amount: 0.3 }}
-        transition={{ duration: 0.55, ease: EASE }}
-      >
+      {/* the band's two hairlines — see .band in the stylesheet for why
+          they sit on --grid-gutter while the lane inside bleeds past them */}
+      <div className={styles.band}>
+      <div className={styles.lane}>
         {/* The track holds the line TWICE and travels exactly -50%, so the
             wrap is seamless — at the end of the pass the second copy sits
             precisely where the first began. The reader is meant to see one
@@ -160,7 +168,8 @@ export default function PressWall() {
             )),
           )}
         </ul>
-      </motion.div>
+      </div>
+      </div>
     </section>
   );
 }

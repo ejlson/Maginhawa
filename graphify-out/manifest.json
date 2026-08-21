@@ -30,8 +30,8 @@
     "semantic_hash": ""
   },
   "components/About.tsx": {
-    "mtime": 1787236342.1111922,
-    "ast_hash": "faeac3dfcb9add1d6f6a319c69d53a89",
+    "mtime": 1787252599.289543,
+    "ast_hash": "ab53dfa92b46da11a36b630d7999044d",
     "semantic_hash": ""
   },
   "components/AboutIntro.tsx": {
@@ -40,8 +40,8 @@
     "semantic_hash": ""
   },
   "components/Blog.tsx": {
-    "mtime": 1787225833.1606028,
-    "ast_hash": "d46c54d69544e80efb99a7cb6f1c978b",
+    "mtime": 1787325669.166658,
+    "ast_hash": "459c384c05c89bc490d5e2a815b78e7c",
     "semantic_hash": ""
   },
   "components/BlogIndex.tsx": {
@@ -70,13 +70,13 @@
     "semantic_hash": ""
   },
   "components/Discover.tsx": {
-    "mtime": 1787225833.1597872,
-    "ast_hash": "a8feb2cd7a715c9d84519f87513ef75d",
+    "mtime": 1787323613.8484275,
+    "ast_hash": "43185eba49057c7331d4aa07352b16bb",
     "semantic_hash": ""
   },
   "components/Experience.tsx": {
-    "mtime": 1787234157.962639,
-    "ast_hash": "4aa8179a6cb55ab3cae6ef37707e0271",
+    "mtime": 1787242683.8788135,
+    "ast_hash": "52fa114439f77db4b9e202135bcce6cd",
     "semantic_hash": ""
   },
   "components/FAQ.tsx": {
@@ -85,8 +85,8 @@
     "semantic_hash": ""
   },
   "components/Footer.tsx": {
-    "mtime": 1787225833.1645052,
-    "ast_hash": "ea0e695a906a15ebc526117e4070e410",
+    "mtime": 1787323540.0907764,
+    "ast_hash": "27140b947ef3fd6358ccf80bb931e67c",
     "semantic_hash": ""
   },
   "components/GlassFilters.tsx": {
@@ -685,8 +685,8 @@
     "semantic_hash": ""
   },
   "components/PressWall.tsx": {
-    "mtime": 1787225833.1615536,
-    "ast_hash": "b31acf2edc05fb295f2615918d8ae9bc",
+    "mtime": 1787316580.7692742,
+    "ast_hash": "9844853aa54709d23753480b8f507e0a",
     "semantic_hash": ""
   },
   "components/Manifesto.tsx": {
@@ -760,8 +760,8 @@
     "semantic_hash": ""
   },
   "components/Reservations.tsx": {
-    "mtime": 1787148403.675895,
-    "ast_hash": "81bd4e2de96f149f61028736d12f6dbc",
+    "mtime": 1787322050.639508,
+    "ast_hash": "3dff620cd3ce371881258e794d7b3293",
     "semantic_hash": ""
   },
   "scripts/audit-type.mjs": {
@@ -1340,8 +1340,8 @@
     "semantic_hash": ""
   },
   "components/AboutSplit.tsx": {
-    "mtime": 1787225833.162869,
-    "ast_hash": "82ca81d7d24099d635adba089d039f91",
+    "mtime": 1787324944.341045,
+    "ast_hash": "52b7221a43e7218ac1c742d956134432",
     "semantic_hash": ""
   },
   "components/StoryStrip.tsx": {
@@ -1590,8 +1590,8 @@
     "semantic_hash": ""
   },
   "components/Passage.tsx": {
-    "mtime": 1787151411.551657,
-    "ast_hash": "2ce0528bc10e8730e5779d1af7edf39b",
+    "mtime": 1787325385.4222019,
+    "ast_hash": "937f98525e300491cb93aae173a853ca",
     "semantic_hash": ""
   },
   "lib/site.ts": {
@@ -1944,19 +1944,54 @@
     "ast_hash": "3e2c3baddd821a08ebce714fa2b122b0",
     "semantic_hash": ""
   },
-  "scripts/_tmp-overflow.mjs": {
-    "mtime": 1787236792.406999,
-    "ast_hash": "5130c9bb9fd7b18e570bea8dcfa2328c",
-    "semantic_hash": ""
-  },
-  "scripts/_tmp-verify-service.mjs": {
-    "mtime": 1787236738.4873295,
-    "ast_hash": "6953460cc93a48532d86e8a2ce2041d5",
-    "semantic_hash": ""
-  },
   "scripts/probe-contact-fn.mjs": {
     "mtime": 1787236794.1535947,
     "ast_hash": "474906a3fea9942bdda185a3959f4e83",
+    "semantic_hash": ""
+  },
+  "scripts/probe-about-onfilm.mjs": {
+    "mtime": 1787251473.5257344,
+    "ast_hash": "d0ab0a43133dfa22866390fe31d0aca2",
+    "semantic_hash": ""
+  },
+  "lib/drift.ts": {
+    "mtime": 1787325766.6039793,
+    "ast_hash": "4076ef1c06fe0795ff694adfd44233c7",
+    "semantic_hash": ""
+  },
+  "scripts/probe-blog-sweep.mjs": {
+    "mtime": 1787317772.0368755,
+    "ast_hash": "a82f63eb27a1be593550ed49ca4fdb6b",
+    "semantic_hash": ""
+  },
+  "scripts/probe-home-flow.mjs": {
+    "mtime": 1787323165.1735783,
+    "ast_hash": "2c04ee1100325db553d7c21295fdae06",
+    "semantic_hash": ""
+  },
+  "scripts/probe-scroll-feel.mjs": {
+    "mtime": 1787324347.4597538,
+    "ast_hash": "7be714098ed85ff278f620e8466854d4",
+    "semantic_hash": ""
+  },
+  "scripts/probe-home-seams.mjs": {
+    "mtime": 1787322480.1704464,
+    "ast_hash": "22ae26acf891fb278f182ff4b6004a25",
+    "semantic_hash": ""
+  },
+  "scripts/probe-blog-blocks.mjs": {
+    "mtime": 1787324066.014395,
+    "ast_hash": "e3f078673a81266e50781daa8c66f5f4",
+    "semantic_hash": ""
+  },
+  "scripts/probe-discover-wave.mjs": {
+    "mtime": 1787323444.7309768,
+    "ast_hash": "1b0b1166425876a1c828caf728c92189",
+    "semantic_hash": ""
+  },
+  "scripts/_tmp-refs.mjs": {
+    "mtime": 1787325718.6847937,
+    "ast_hash": "df878f8b3e01fb2e022ab640f8b1e704",
     "semantic_hash": ""
   }
 }

@@ -233,13 +233,27 @@
        the line count    caps are ~15% wider than the mixed case they
                          replaced; the wrap floor below is the check. */
   font-family: var(--font-display-big);
-  /* 600 — THE WORDMARK'S WEIGHT, not About's --w-medium. Asked for
-     explicitly, and Contralto's big cut carries a real drawn 600 (see the
-     font block in globals.css and `.logoWord` in Nav.module.css), so this is
-     a cut rather than a synthesised weight. --w-medium is 500, which font
-     matching resolves DOWN to the 400 in this family — the visible gap
-     between the hero and MAGINHAWA in the bar above it. */
-  font-weight: 600;
+  /* ⚠️ 400, AND IT WAS 600. Both were asked for explicitly, at different
+     times; this is the later instruction — match <Passage>'s slab on the
+     home page, which sets the sentence at --w-regular. Same family either
+     way (both are --font-display-big), so this is a like-for-like swap of
+     cut, not of face, and Contralto's big carries real drawn weights at
+     300, 400, 600, 700 and 900 — 400 is a cut, not a synthesis.
+
+     ⚠️ WHAT GOES WITH IT: the hero no longer matches MAGINHAWA in the bar
+     above. The note this replaces chose 600 precisely because it did, and
+     called the alternative "the visible gap between the hero and MAGINHAWA
+     in the bar". That gap is back, deliberately — the headline now agrees
+     with the home page's biggest statement instead of with the wordmark.
+     If someone reverses this again, reverse the reasoning too rather than
+     leaving both notes standing.
+
+     WHAT IT DOES NOT BREAK, both re-measured after the change rather than
+     argued: the wrap floor (a lighter cut is NARROWER, so the two-line
+     guarantee moves further from failing, not closer) and `.heroLabels`'
+     0.212em seat on the ink top of "WHERE" (a function of the face's
+     ascender-to-cap, which the weight does not move). */
+  font-weight: var(--w-regular);
   text-transform: uppercase;
   /* 7rem, up from 5.6rem. The ceiling here has always been the FOLD and not
      taste — the caption is the third beat of the entrance and it lives inside

@@ -27,27 +27,223 @@
   /* a quarter-screen longer than the viewport: the extra 25svh is the beat
      the footage holds at full bleed between sealing and settling */
   height: 125svh;
-  /* the section lives OUTSIDE the DarkZone: the video ARRIVES as a
-     slightly inset, rounded plate that grows to edge-to-edge as it
-     seals (--enter 0→1 over the approach), rides full bleed, then
-     --settle 0→1 brings full bleed down to the page container's inset
-     as the section leaves the viewport — so the departing plate width
-     matches the dark section's content. The two phases never overlap,
-     so their insets simply add. Defaults (--enter 1, --settle 0) keep
-     the pre-hydration paint at full bleed. */
+  /* the section lives OUTSIDE the DarkZone: the video ARRIVES as an inset,
+     rounded plate that grows to edge-to-edge as it seals (--enter 0→1 over
+     the approach), rides full bleed, then --settle 0→1 (the first 60% of
+     the departure — see the note on it in Reservations.tsx) brings full
+     bleed
+     down to the page container's inset as the section leaves the viewport
+     — so the departing plate width matches the dark section's content. The
+     two phases never overlap, so their insets simply add. Defaults
+     (--enter 1, --settle 0) keep the pre-hydration paint at full bleed.
+
+     ⚠️ THE ENTRY INSET IS A CARD NOW, NOT A CHAMFER. It was a flat 24px on
+     all four sides, which at 1920 is 1.2% of the width — the film arrived
+     as very nearly a full-bleed sheet with its corners knocked off. What
+     is above it changed: <Passage /> pins its type and this film climbs
+     over the held block, so the arrival is now something the reader WATCHES
+     rather than something that has already happened by the time they look.
+     A sheet sliding up reads as the page scrolling; a card rising out of
+     the cream reads as an object arriving, which is what the pin is for.
+
+     ⚠️ THE PLATE IS A SMALL CARD NOW AND THE THREE INSETS ARE NO LONGER
+     TWO. It was 172px off each side and 86px off the top and bottom at
+     1920 — 82% of the screen, which is a sheet with its corners knocked
+     off rather than an object. It is a genuinely small card at the user's
+     instruction: about 460 × 238 at 1920, which is under a quarter of the
+     width. Everything below follows from that.
+
+     ⚠️ THE TOP INSET IS ZERO ON ENTRY, AND THAT IS THE WHOLE TRICK. The
+     film travels 1:1 with the scroll, so where the card SITS on the screen
+     is where its box has got to. Insetting the card equally top and bottom
+     centres it in a 125svh box, which puts its visible top edge more than
+     a screen below the fold — the reader would watch a held, empty screen
+     for a third of the pin and then meet the card already halfway over the
+     type. Pinning the card to the TOP of its own box instead means its
+     first pixel arrives with the box's first pixel, so --pin-peep in
+     Passage.module.css still shows the lip it promises, and the card then
+     rises into the cream BELOW the sentence rather than onto it.
+
+     ⚠️ SO THE HEIGHT IS SET FROM THE BOTTOM. 125svh less 100svh leaves a
+     25svh card — 270px at 1920×1080, about 1.7:1 with the side insets
+     below.
+
+     ⚠️ THE CEILING ON IT IS THE ROOM UNDER THE SENTENCE, and that room is
+     not the same everywhere. Passage.tsx seats this card by deriving
+     --pin-peep from where its own last line ends, so the card's top is
+     always a fixed gap below the type; what varies is how much screen is
+     left underneath. Measured room below the last line: 38svh at
+     1920×1080, 40 at 1440×900, 43 at 1100×800, 55 on a phone — and only
+     28svh at 1440×620, where the block is 60% of a short screen.
+
+     25svh therefore fits with air to spare on every ordinary screen and
+     runs about 10px past the bottom edge on the short laptop, which crops
+     the card's bottom rule rather than hiding anything. That is the
+     deliberate trade for a taller card, and it is the number to revisit
+     first if this ever needs to grow again: past about 27svh the short
+     screen stops reading as a seated card at all. Do not fix that by
+     closing the gap above — the gap is what stops the picture touching the
+     claim, and Passage.tsx guarantees it in preference to everything else.
+
+     ⚠️ AND THE SIDES ARE A FRACTION OF THE VIEWPORT WITH A CAP, so the card
+     holds roughly a 1.8:1 shape from a laptop up. Without the 1000px cap a
+     2560 screen inset 38% a side leaves a 3:1 letterbox. Narrow screens
+     take a different pair entirely — see the query at the foot of this
+     file — because 38vw of a phone is a postage stamp. */
+  /* ⚠️ THE SIDES RUN ON --seal-x AND THE BOTTOM ON --enter, AND THE TWO ARE
+     NOT THE SAME RAMP. This is the fix for the plate sitting flush against
+     the bottom of the screen with three hundred pixels of cream still
+     showing either side of it, and the reason it needs two ramps is
+     geometry rather than taste.
+
+     The visible bottom edge is `film box top + 125svh − bottom inset`, and
+     BOTH of those terms are moving: the box is climbing while the inset is
+     shrinking. Working it through, the bottom edge crosses the foot of the
+     screen at approach 0.819 — and that is a constant, independent of
+     --pin-peep, so it does not drift per viewport. It also cannot be
+     deferred: at full bleed the inset must be 0, which puts the box's
+     bottom 25svh BELOW the fold, so the edge has to pass the screen's foot
+     before the plate is sealed. There is no ramp that lands them together.
+
+     What can be moved is the SIDES. Sealing them by 0.82 means the plate is
+     already full width at the frame its bottom reaches the foot, so there
+     is never a frame with a flush bottom and inset sides.
+
+     ⚠️ AND THE TOP IS MOVED THE SAME WAY NOW. This note used to end "what
+     follows is a full-width band whose top edge rises the last 18svh —
+     which is the film climbing". That was the argument for leaving the top
+     open, and it was wrong twice over: 18svh of full-width film bled off
+     the bottom with cream along the top alone does not read as a film
+     climbing, it reads as an unfinished edge, and the user rejected it
+     twice. The top now spends --head on --seal-x exactly as the sides spend
+     their clamp, so all four margins reach 0 on one frame. See --head
+     below for why that costs the seated card nothing. */
   --side-inset: calc(
-    24px * (1 - var(--enter, 1)) + var(--pad-x) * var(--settle, 0)
+    clamp(24px, 38vw, 1000px) * (1 - var(--seal-x, 1)) + var(--pad-x) *
+      var(--settle, 0)
   );
+
+  /* ══════════ THE STAGE'S HEADROOM ABOVE THE SECTION ══════════
+     ⚠️ THIS IS THE FOURTH MARGIN, AND UNTIL NOW THERE WERE ONLY THREE.
+     --top-inset was `--pad-x * --settle` alone — exactly 0 for the whole of
+     the approach — so the plate's top edge was never an inset at all, only
+     the section's own box climbing, and that box does not reach the
+     viewport's top until approach 1. The sides seal at 0.82 and the bottom
+     crosses the foot at 0.819, so what followed was ~18svh of scrolling
+     with the film full width, bled off the bottom, and carrying a cream
+     band along the TOP alone. That band is the defect. The top has to close
+     WITH the other three, and it cannot do that from inside a box whose own
+     top is still 18svh down the screen — so the box gets headroom.
+
+     ⚠️ WHY 18svh, AND IT IS ARITHMETIC RATHER THAN AN AMOUNT SOMEONE LIKED.
+     Let `a` be the approach (0 when the section's top is at the viewport's
+     bottom, 1 when it reaches the viewport's top). The film travels 1:1
+     with the scroll and is never pinned, so the section's top sits at
+     `100svh × (1 − a)` down the viewport at every frame — exactly, not
+     approximately. Lift the stage by --head and ramp the top inset from
+     --head to 0 on --seal-x (call it `p`):
+
+         plate top in viewport = stage top          + top inset
+                               = [100(1 − a) − head] + head(1 − p)
+                               = 100(1 − a) − head·p
+
+     --seal-x reaches 1 at a = 0.82, where 100(1 − a) is 18svh. head = 18svh
+     therefore puts the plate's top edge at exactly 0 on the SAME FRAME the
+     sides seal and the bottom crosses the foot. All four margins close
+     together, which is the entire point of the property.
+
+     ⚠️ AT REST IT MOVES NOTHING, and that is the constraint that mattered
+     most. --seal-x shares --enter's flat first segment — 0 until approach
+     0.58 — so p is 0 for the whole hold, the head term is exactly 0, and
+     the plate's top edge is the section's top edge, where it has always
+     been. The seated frame is untouched at every width. That holds only
+     while the SEAT lands before 0.58, and it cannot land later:
+     Passage.tsx clamps --pin-peep at PEEP_MAX = 0.52 of its stage, so the
+     seat is bounded by construction rather than by measurement. Measured
+     seats anyway, because a bound is not a reading: a = 0.34 at 1920×1080,
+     0.234 at 1440×620, 0.52 at 390×844.
+
+     THE BOTTOM IS UNAFFECTED. The stage grows UPWARD only — see .stage —
+     so its bottom edge is still the section's bottom and --bot-inset means
+     precisely what it always meant.
+
+     ⚠️ IT IS THE SAME 18svh BELOW 980px, WHICH IS NOT AN OVERSIGHT. The
+     number is derived from --seal-x's 0.82, a position on a JS ramp with no
+     viewport in it — unlike --card-drop below, which is a DISTANCE and
+     therefore does get a narrow-screen value. Anything that retunes
+     sealX's 0.82 in Reservations.tsx has to retune this in step: the pair
+     is `head = 100 × (1 − sealEnd)`. */
+  --head: 18svh;
+
+  /* ⚠️ THE TOP RUNS ON --seal-x NOW, LIKE THE SIDES, AND NOT ON --settle
+     ALONE. THREE terms, and the file's existing rule holds — the approach
+     and the departure never overlap, so the insets simply add:
+
+       1. head × (1 − seal-x)  the headroom above, spent from --head down to
+          0 over exactly the ramp the sides use, so the two edges are the
+          same gesture and cannot drift apart. Zero on the departure.
+       2. head × settle        ⚠️ PUTS THE HEADROOM BACK FOR THE SETTLE, and
+          leaving it out is a real bug rather than a tidiness point. This
+          inset is measured from the STAGE, and the stage's top is --head
+          above the section's; the other three edges are the section's. So
+          `pad-x × settle` alone lands the departing plate's top --head too
+          high — MEASURED at settle 1 before this term existed: the plate sat
+          154.4px ABOVE the section's top edge at 1920×1080 (−194.4 of
+          headroom plus 40 of pad) and 135.9px above it at 390×844, i.e. the
+          departing plate was a fifth of a screen too tall and was not the
+          container plate the seam with DarkZone is matched to. It happens to
+          be invisible — the settle completes with the section's top at
+          −783px, so both the right edge and the wrong one are off the top of
+          the screen at every viewport measured — which is exactly why it
+          needed measuring rather than looking at.
+       3. pad-x × settle       the departure's container inset, untouched.
+
+     Terms 2 and 3 collapse to `(head + pad-x) × settle`; they are written
+     separately because they answer to different things — one cancels a
+     geometry offset, the other is a designed margin matched to the footer.
+
+     The default --seal-x of 1 and --settle of 0 zero all three, so the
+     pre-hydration paint and the no-JS reader still get full bleed. */
   --top-inset: calc(
-    24px * (1 - var(--enter, 1)) + var(--pad-x) * var(--settle, 0)
+    var(--head) * (1 - var(--seal-x, 1)) + var(--head) * var(--settle, 0) +
+      var(--pad-x) * var(--settle, 0)
+  );
+  --bot-inset: calc(
+    var(--card-drop, 100svh) * (1 - var(--enter, 1)) + var(--pad-x) *
+      var(--settle, 0)
   );
 }
 
-/* the stage fills the section exactly; everything visual lives inside
-   it */
+/* ⚠️ THE STAGE NO LONGER FILLS THE SECTION — IT OVERHANGS ITS TOP EDGE.
+   It used to be exactly the section box. It now starts --head ABOVE the
+   section and is --head taller, which is the room --top-inset spends on the
+   approach (the derivation is over --head at the top of this file). The
+   BOTTOM edge is arithmetically unchanged: −head + (100% + head) = 100%, so
+   the settle, the seam with DarkZone and --bot-inset all still measure from
+   the section's own bottom.
+
+   ⚠️ POSITION: ABSOLUTE, NOT RELATIVE, AND THE REASON IS THE SECTION'S BOX.
+   `top` applies under either, and relative is the smaller diff — but a
+   relatively positioned stage keeps a 143svh FLOW box inside a 125svh
+   section, and the only thing stopping that from mattering is .section's
+   explicit height. Out of flow, the section has no in-flow children at all,
+   so its height is its declared 125svh by construction instead of by
+   coincidence, and nothing in here can grow it if that declaration is ever
+   relaxed (the note at the foot of this file records that it once was, for
+   the four-row index). `left/right: 0` restores the full width the block
+   box had for free.
+
+   ⚠️ THE SECTION'S LAYOUT IS IDENTICAL EITHER WAY, which is what made the
+   choice free: .section declares height: 125svh and .stage is its ONLY
+   child, so taking that child out of flow changes no measurement anywhere
+   on the page. Verified against the seated frame — 461×270 at 1920×1080,
+   346×225 at 1440×900, 343×236 at 390×844, all unmoved. */
 .stage {
-  position: relative;
-  height: 100%;
+  position: absolute;
+  top: calc(-1 * var(--head));
+  left: 0;
+  right: 0;
+  height: calc(100% + var(--head));
   overflow: hidden;
 }
 
@@ -56,34 +252,216 @@
    full-bleed), so the shrink always reveals a finished maroon ground
    (never a cream→maroon fade in progress). It meets the maroon DarkZone
    at the section's bottom edge, so the seam reads continuous. */
+/* ⚠️ IT COVERS THE SECTION AND NOT THE HEADROOM, WHICH IS WHY THIS IS NO
+   LONGER `inset: 0`. The headroom hangs over <Passage>'s sticky stage —
+   the held sentence this film climbs across — and this section paints at
+   z-index 4, above it. --dark is 0 across the whole approach and only rises
+   on the departure, a screen and a half later, so covering the band would
+   look identical today; the reason to exclude it is that the band's
+   emptiness would then be a PROMISE (a custom property's default) rather
+   than a fact about the box. Confining it keeps the invariant worth having:
+   the only thing this section can paint above its own top edge is the film
+   itself. The other three edges are the section's, exactly as before. */
 .stage::before {
   content: "";
   position: absolute;
-  inset: 0;
+  top: var(--head);
+  right: 0;
+  bottom: 0;
+  left: 0;
   background: var(--maroon);
   opacity: var(--dark, 0);
 }
 
-/* clip container — fills the stage; the scroll-driven full-bleed→plate
-   framing is done entirely with clip-path, which composites on the GPU.
-   Radius scales with the phases: the film ENTERS as a generously
-   rounded plate (the hero-plate rounding the About card used to carry) whose corners seal
-   flat exactly at full view (--enter 0→1 over the approach), then
-   settles at the flat media radius the surrounding plates use. The two
-   phases never overlap, so their radii simply add. */
+/* ⚠️ THE FRAME IS A REAL BOX NOW, NOT A CLIP, AND THAT IS A DELIBERATE
+   TRADE. Framing used to be done entirely with `clip-path`, which
+   composites on the GPU and never touches layout — a genuinely better
+   way to animate a rectangle, and the reason this file chose it.
+
+   IT CANNOT SIZE THE PICTURE, ONLY HIDE IT. A clip leaves the video laid
+   out at the full section and paints a window onto it, so the small card
+   showed a 460-pixel CENTRE CROP of a 1920-wide frame — about a fifth of
+   the picture, which at most timestamps is an unreadable dark shape rather
+   than a photograph of a restaurant. No transform fixes it either: the
+   card and the section have different aspect ratios, so no uniform scale
+   maps a cover-fit of one onto a cover-fit of the other.
+
+   Positioning the frame instead means `.bg` and the video inside it are
+   laid out AT THE CARD'S SIZE, so `object-fit: cover` composes for
+   whatever the card currently is — correct at 460px, correct at full
+   bleed, and correct at every size in between. That is what the trade
+   buys, and it is the whole reason the card is worth having.
+
+   ⚠️ WHAT IT COSTS, stated plainly so nobody reverts it by accident: these
+   four properties dirty layout, so each scroll frame re-lays-out this
+   element's subtree instead of moving a compositor layer. The subtree is
+   small on purpose — a transformed `.bg`, the video, and the scrim — and
+   the animation only runs across the approach. If this ever shows up in a
+   profile, the fix is to shrink the subtree, not to go back to the clip.
+
+   The RADIUS is an ordinary border-radius now for the same reason, and
+   `overflow: hidden` is what makes it bite on the video. */
 .reveal {
   position: absolute;
-  inset: 0;
+  top: var(--top-inset);
+  right: var(--side-inset);
+  bottom: var(--bot-inset);
+  left: var(--side-inset);
   overflow: hidden;
-  clip-path: inset(
-    var(--top-inset) var(--side-inset) var(--top-inset) var(--side-inset)
-      round
-      calc(
-        clamp(24px, 2.2vw, 36px) * (1 - var(--enter, 1)) +
-          var(--radius-media) * var(--settle, 0)
-      )
+
+  /* ⚠️ 2px, AT THE USER'S INSTRUCTION, AND IT IS NOT A ROUNDED CARD ANY
+     MORE. This has come down twice: 3.6vw / 56px, then 2vw / 32px, now a
+     flat two pixels. At 56px the corner was a sixth of the plate's own
+     inset and read as a lozenge; at 32 it read as a rounded card; at 2 it
+     reads as a rectangle that has been mitred rather than rounded, which
+     is what a photograph laid on a page looks like. It is a flat px and
+     not a vw because a 2px corner does not want to scale — below about 1px
+     a corner stops being visible at all and above about 4px it stops being
+     a mitre. The settle term is untouched: once seated the film still
+     finishes on the flat --radius-media the neighbouring plates use. */
+  border-radius: calc(
+    2px * (1 - var(--enter, 1)) + var(--radius-media) * var(--settle, 0)
   );
-  will-change: clip-path;
+
+  /* ══════════ THE CARD SITS OFF THE CREAM, JUST BARELY ══════════
+     At the user's instruction: "a very little shadow behind the card". The
+     plate arrives as a 346 × 225 photograph (measured, 1440×900) laid on
+     the cream the passage above is set on, and until now it had no edge
+     treatment at all — it read as a hole cut in the page rather than as a
+     print resting on it.
+
+     ⚠️ IT IS A PRINT ON PLASTER, NOT A MATERIAL CARD, which is the same
+     argument globals.css makes over --shadow-card: a photograph's own edge
+     should be what separates it from the page, and the shadow is only
+     there to say which side of the paper it is on. So this is TWO layers
+     rather than that token's four, and lighter than it at both:
+
+       0 2px 4px      at 6%   — the contact shadow, the edge itself
+       0 10px 20px -8px at 10% — the throw
+
+     THROW: 10 + 20/2 − 8 = 12px below the box, against --shadow-card-throw
+     of 16px and --shadow-control's 5px. On a 225px plate that is 5.3% of
+     its own height — visible as a lift, far too short to read as float.
+
+     MEASURED OFF A SCREENSHOT rather than argued for, sampling straight
+     down from the card's bottom edge at 1440×900, pin frame 0, against a
+     cream that reads rgb(243,231,222) once the page's grain is on it:
+
+         edge + 1px   rgb(227,211,203)   Δ21   ← the whole of the shadow
+         edge + 11px  rgb(241,228,219)   Δ3
+         edge + 24px  rgb(243,231,222)   Δ0    gone
+
+     A peak composite of about 10% alpha over roughly two dozen pixels.
+     Beside the card, 7px clear of its right edge, the sample is Δ2 — the
+     bias is doing what it is meant to. */
+  /* ⚠️ THE ARITHMETIC ABOVE THE BOX IS CHECKED, AND IT MEASURES ZERO.
+     Sampling the fifteen pixels above the card's top edge returns
+     rgb(244,232,223) all the way to the picture — indistinguishable from
+     the surrounding cream. Confirmed rather than assumed, because a halo
+     above a climbing edge is the specific way this could have gone wrong.
+
+     ⚠️ NOTHING IS CAST ABOVE THE TOP EDGE, AND THAT IS DELIBERATE ARITHMETIC
+     RATHER THAN LUCK. A shadow's reach above its box is `blur/2 − spread −
+     offsetY`: layer one gives 4/2 − 0 − 2 = 0, layer two 20/2 − 8 − 10 =
+     −8. Both are ≤ 0, so the plate's climbing top edge never drags a halo
+     up the cream ahead of itself — which is the one place a shadow here
+     would be read as dirt on the band rather than as depth.
+
+     ⚠️ THE TWO PARAGRAPHS ABOVE WERE MEASURED WHEN .stage CLIPPED AT THE
+     SECTION'S TOP EDGE, AND THEY ARE NOW OFF BY THREE PIXELS. The stage
+     overhangs the section by --head to give --top-inset somewhere to spend
+     (see .stage), and its `overflow: hidden` was what used to cut layer
+     one's blur rim flush with the card's top. Re-measured against the taller
+     stage, hiding .stage and diffing the frame — 1920×1080 and 390×844,
+     approach 0.30 and 0.45, all four runs agreeing to the row:
+
+       +1px above the edge   rgb(240,228,219) vs rgb(243,231,222) cream   Δ9
+       +2px                  rgb(241,229,220)                             Δ6
+       +3px                  rgb(242,230,221)                             Δ3
+       +4px and beyond       identical to the cream                       Δ0
+
+     THE ARITHMETIC IS NOT WRONG — Chrome renders a box-shadow blur as a
+     three-pass box filter approximating a Gaussian of σ = blur/2, and that
+     approximation carries about 1.5σ rather than terminating at blur/2. So
+     `reach = 0` means "no shadow proper", not "no pixels", and the
+     difference is 3 rows of rim.
+
+     ⚠️ IT IS DELIBERATELY NOT FIXED, and the reason is which knob would have
+     to move. Δ9 is 3/255 on each channel, ~1.2% against the cream, decaying
+     over 3px — under the just-noticeable step for a soft gradient, and a
+     null control (two frames, nothing changed) reports Δ0, so this figure is
+     the rim and not sampling noise. Every way of removing it — dropping
+     layer one's blur, or its offset — changes the SEATED CARD's own contact
+     shadow, which is the one frame this whole section is composed around and
+     the one thing that had to stay identical. Three pixels of 1.2% rim is
+     the cheaper side of that trade. If it ever has to go, the fix is a
+     clipping wrapper around .reveal inside the stage, NOT a lighter shadow.
+
+     TINTED IN --maroon, never black and never an rgba() literal: the
+     ground is --cream and the ink is a warm red-brown, so a neutral shadow
+     under it greys the cream. Same rule the tokens follow.
+
+     ⚠️ AND IT HAS TO BE GONE BY FULL BLEED. A drop shadow on a full-bleed
+     film is meaningless — there is no page left for it to fall on — and it
+     would paint a dark band along the viewport's own edge. --enter is the
+     plate's SIZE (0 = the small card, 1 = full bleed), so the shadow is
+     simply the card's own presence: full strength for the whole hold, then
+     spent linearly as the plate opens out, and exactly zero at the frame it
+     seals. The default --enter of 1 also means the pre-hydration paint —
+     which is full bleed — carries no shadow at all.
+
+     ⚠️ AND THE DEPARTURE IS CHECKED, BECAUSE IT IS THE OTHER TIME THIS
+     ELEMENT IS AN INSET PLATE. --settle brings full bleed back down to the
+     container inset as the section leaves, so the plate is a rectangle
+     again — but --enter is 1 and stays there, so the shadow is exactly 0
+     across the whole settle (measured: alpha 0 at every sample from the
+     seal onward). That is right twice over. Nothing about the settle is a
+     card arriving on a page, and the ground behind it by then is --dark at
+     1, i.e. --maroon — a maroon shadow on maroon is a shadow nobody could
+     see even if it were wanted. Do NOT wire this to --settle to "finish the
+     gesture"; there is no page left under the plate to cast onto.
+
+     ⚠️ THE ALPHA MULTIPLIER HAS TO LIVE ON THIS ELEMENT, and globals.css
+     records why the obvious version fails: a var() inside a custom property
+     is substituted when that property is computed on the element that
+     DECLARES it, so --shadow-card cannot be faded by any --shadow-a set
+     further down the tree. It resolves here because --plate-shade and the
+     box-shadow that reads it are declared on the SAME element. That is also
+     why this stack is written out rather than reusing the token — there is
+     no way to fade the token, and a shadow that cannot fade is worse here
+     than no shadow at all.
+
+     ⚠️ IT COSTS NO LAYOUT AND CANNOT ESCAPE THE SECTION. An outer
+     box-shadow is painted outside the border box, so this element's own
+     `overflow: hidden` does not touch it; .stage's does, which is what
+     keeps it inside the film's box. It changes neither this plate's size
+     nor its position — see the note above about these four insets being the
+     only properties here that dirty layout. */
+  /* ⚠️ IT RIDES --seal-x AND NOT --enter, AND THE DIFFERENCE IS TWO PIXELS
+     OF MAROON DOWN BOTH SCREEN EDGES. Both reach 1 at full bleed, so either
+     looks right in a still; they do not get there together. --seal-x closes
+     at approach 0.82, which is the frame the plate's four margins all reach
+     zero — from there it IS the viewport, and a shadow cast by something
+     with no edge on the page is a dark rim painted along the screen. --enter
+     runs on to 1.0, so on that ramp the shadow was still at 43% strength
+     across the whole of the last 18svh, measured as a ~2px maroon rim on
+     the left and right edges of an otherwise full-bleed film.
+     ⚠️ TIE THIS TO WHATEVER TERM CLOSES THE PLATE'S MARGINS. If the sides
+     ever move to a different ramp, this follows them, not the size. */
+  --plate-shade: calc(1 - var(--seal-x, 1));
+  box-shadow:
+    0 2px 4px
+      color-mix(
+        in srgb,
+        var(--maroon) calc(6% * var(--plate-shade)),
+        transparent
+      ),
+    0 10px 20px -8px
+      color-mix(
+        in srgb,
+        var(--maroon) calc(10% * var(--plate-shade)),
+        transparent
+      );
 }
 
 /* reduced motion: skip the morph entirely — the video stays at full
@@ -93,8 +471,48 @@
   .section {
     --settle: 0 !important;
   }
+
+  /* the plate is full bleed here, so the invitation is legible from the
+     first frame and has nothing to wait for: it is simply present, and it
+     is clickable whatever the latch says. A booking control is not
+     something to withhold from a reader who has asked for less motion. */
+  .section[data-cta="off"] .cta {
+    opacity: 1;
+  }
+
+  .section[data-cta="off"] .cta > * {
+    pointer-events: auto;
+  }
+
+  .section[data-cta="in"] .title,
+  .section[data-cta="in"] .magnetHost {
+    animation: none;
+  }
   .reveal {
-    clip-path: inset(0 round 0);
+    /* ⚠️ --head, NOT 0, AND THIS BRANCH IS THE ONE PLACE THE HEADROOM CAN
+       BITE UNNOTICED. The stage overhangs the section's top edge by --head
+       (see .stage), so pinning this plate to `top: 0` would seat the film a
+       fifth of a screen ABOVE the section and leave a matching band of bare
+       cream along the section's bottom — on a reader who asked for LESS
+       motion, i.e. the one branch nobody scrolls through while tuning. The
+       three insets are still 0 because the section's other three edges are
+       the stage's; only the top needs putting back. */
+    top: var(--head);
+    right: 0;
+    bottom: 0;
+    left: 0;
+    border-radius: 0;
+    /* ⚠️ THIS IS NOT TIDYING UP — WITHOUT IT THIS BRANCH PAINTS THE EXACT
+       BAND THE SHADOW EXISTS TO AVOID. The insets are pinned above, but
+       --enter is NOT: Reservations.tsx writes it from the approach on every
+       reader, reduced motion included (it drives the invitation's latch as
+       well as the plate's size, so it cannot simply be withheld). So
+       --plate-shade would still ride 1 → 0 over a plate that is full bleed
+       from the first frame, and the reader who asked for less motion would
+       get a maroon smear along the bottom of their viewport that nobody
+       else ever sees. There is no card here to sit off the page, so there
+       is nothing for a shadow to say. */
+    box-shadow: none;
   }
 }
 
@@ -203,28 +621,79 @@
   position: absolute;
   inset: 0;
   z-index: 1;
-  background:
-    radial-gradient(
-      58% 36% at 50% 50%,
-      rgba(18, 0, 0, 0.72) 0%,
-      rgba(18, 0, 0, 0.7) 46%,
-      rgba(18, 0, 0, 0.44) 76%,
-      rgba(18, 0, 0, 0) 100%
-    ),
-    linear-gradient(rgba(18, 0, 0, 0.14), rgba(18, 0, 0, 0.14));
+
+  /* ⚠️ IT IS A SOFT VIGNETTE NOW AND IT WAS A TIGHT ELLIPSE, at the user's
+     instruction, and the reason it became visible is worth recording.
+
+     It read `radial-gradient(58% 36% at 50% 50%, …0.72 → 0 …)`, sized
+     against this element's own box — and this element is inside .reveal,
+     which used to be the whole section and is now THE CARD. A 58%-wide
+     ellipse on a 1920-wide film is a wash nobody sees; the same ellipse on
+     a 461-wide card is a dark oval sitting in the middle of a photograph,
+     which is exactly what it looked like. The framing change made a scrim
+     that had always been shaped into a scrim that was visibly shaped.
+
+     TWO THINGS FIX IT AND BOTH ARE NEEDED. The extents now exceed the box
+     on both axes, so the frame only ever shows the gentle inner part of the
+     falloff and there is no edge to see; and the opacity is tied to
+     --enter, so while the plate is a small card there is no scrim at all
+     and the photograph is clean. It has nothing to do while the card is
+     small — the invitation it exists to carry is withheld until the plate
+     has sealed (see .cta) — so this costs nothing and removes the last
+     frame in which a shape could be read.
+
+     ⚠️ IT STILL HAS TO CARRY THE TYPE, which is the constraint the old
+     numbers were tuned against: the heading is the only text node on the
+     frame and its ink needs a composited alpha over about 0.62 to clear on
+     a blown highlight. The centre here is 0.68 and the corners 0.32, so the
+     copy is better served than the 0.62 floor and the outer thirds of the
+     footage are no darker than they were. Do not flatten this to a single
+     tint to be rid of the shape entirely without re-measuring: a uniform
+     wash heavy enough for the heading is heavy enough to mute the whole
+     film, which is the trade the vignette exists to avoid. */
+  opacity: var(--enter, 1);
+  background: radial-gradient(
+    118% 108% at 50% 52%,
+    rgba(18, 0, 0, 0.68) 0%,
+    rgba(18, 0, 0, 0.64) 40%,
+    rgba(18, 0, 0, 0.5) 72%,
+    rgba(18, 0, 0, 0.32) 100%
+  );
 }
 
 @media (max-width: 980px) {
+  /* ⚠️ THE CARD IS NEARLY FULL WIDTH ON A PHONE, and that is not a
+     compromise. The wide rule insets 38% a side because a laptop has width
+     to spare; 38% of 390px leaves a 148px card, which is a thumbnail rather
+     than a photograph. Holding the sides to a page margin keeps the shape
+     around 1.6:1 on a phone, and the card still reads as an object because
+     the drop below it does the work the side margins do on a desktop.
+
+     THE DROP COMES DOWN A LITTLE TOO. A phone screen is much taller than it
+     is wide, so the same svh is a bigger share of the cream beneath the
+     sentence; 97svh leaves a 28svh card, which holds the same proportion of
+     the space under the type that 25svh holds on a laptop, and keeps the
+     shape near 1.45:1 rather than letting it go square. */
+  .section {
+    --side-inset: calc(
+      clamp(18px, 6vw, 40px) * (1 - var(--seal-x, 1)) + var(--pad-x) *
+        var(--settle, 0)
+    );
+    --card-drop: 97svh;
+  }
+
+  /* a phone frame is much taller than it is wide, so the same extents leave
+     the corners lighter than the desktop's; widening the horizontal term
+     keeps the falloff as shallow across a portrait frame as it is across a
+     landscape one. Same centre alpha, same floor. */
   .locScrim {
-    background:
-      radial-gradient(
-        105% 32% at 50% 50%,
-        rgba(18, 0, 0, 0.72) 0%,
-        rgba(18, 0, 0, 0.7) 46%,
-        rgba(18, 0, 0, 0.44) 76%,
-        rgba(18, 0, 0, 0) 100%
-      ),
-      linear-gradient(rgba(18, 0, 0, 0.14), rgba(18, 0, 0, 0.14));
+    background: radial-gradient(
+      150% 92% at 50% 52%,
+      rgba(18, 0, 0, 0.68) 0%,
+      rgba(18, 0, 0, 0.64) 40%,
+      rgba(18, 0, 0, 0.5) 72%,
+      rgba(18, 0, 0, 0.32) 100%
+    );
   }
 }
 
@@ -235,13 +704,41 @@
    order to read as a button (the old stylesheet admitted as much).
    The z-index STAYS: it is what lifts this above .locScrim (z-index 1).
    Removing it along with the blend would drop the copy behind the wash. */
+/* ⚠️ IT IS WITHHELD WHILE THE CARD IS SMALL, at the user's instruction, and
+   the reason is legibility rather than taste: the heading and the pill are
+   sized for a full-bleed frame, and a 460px card cannot hold them at any
+   size a reader would thank you for.
+
+   ⚠️ NO OPACITY IS DECLARED HERE, AND THAT IS THE NO-JS CONTRACT. The
+   resting state of the page's only booking control is VISIBLE. A reader
+   whose script never runs, and the server's own paint before hydration,
+   both get the invitation with nothing withheld; everything below is an
+   enhancement layered on top by an attribute that only appears once
+   Reservations.tsx has mounted. Do not "tidy" this by moving `opacity: 0`
+   onto .cta — that is one typo away from a homepage with no way to book. */
 .cta {
   position: absolute;
-  inset: 0;
+  /* ⚠️ TOP IS --head AND NOT 0, WHICH PUTS THIS BOX BACK ON THE SECTION.
+     This was `inset: 0` while .stage was the section box and the two were
+     the same rectangle. They are not any more: the stage overhangs the
+     section's top by --head, so `inset: 0` would centre the invitation in
+     the 143svh STAGE instead of the 125svh SECTION — lifting it head/2 =
+     9svh up the screen and falsifying every figure in the note below,
+     including the one thing that note exists to guarantee (that the block
+     crosses the viewport's own centre at the midpoint of the full-bleed
+     beat). Offsetting the top by --head makes this box exactly the section
+     again, so the arithmetic reads as written and the entrance lands where
+     it was composed to land. The other three edges are the section's
+     already. */
+  top: var(--head);
+  right: 0;
+  bottom: 0;
+  left: 0;
   z-index: 2;
   display: grid;
   /* DEAD CENTRE, both axes, in the SECTION — which is 125svh, not one
-     viewport, and that is what the vertical centring buys.
+     viewport, and that is what the vertical centring buys. (It is the
+     section and not the stage only because of the --head offset above.)
 
      The block's centre sits 62.5svh from the section's top. At the seal
      (section top on viewport top, --enter 1) that reads 12.5svh BELOW the
@@ -287,8 +784,81 @@
    children must stay pressable. `auto` inherits, so one restored child
    covers an arbitrarily deep tree beneath it — a SECOND top-level child
    would still need this rule to match it. */
+/* ⚠️ AND IT MUST NOT BE CLICKABLE WHILE IT IS INVISIBLE. A hidden
+   full-frame link still takes a tap, and while it is hidden it lies across
+   the passage's held sentence — a reader dragging that text would be
+   navigated to the restaurants page. */
 .cta > * {
   pointer-events: auto;
+}
+
+.section[data-cta="off"] .cta {
+  opacity: 0;
+}
+
+.section[data-cta="off"] .cta > * {
+  pointer-events: none;
+}
+
+/* ══════════ THE INVITATION COMES INTO FOCUS ══════════
+   Chosen from six, at the user's instruction. Both objects resolve out of a
+   blur as the plate finishes sealing: the heading with a hair of scale
+   under it, the pill 140ms behind.
+
+   ⚠️ IT IS TIMED, NOT SCRUBBED, and that is half the change. What it
+   replaced was an opacity dragged by the wheel, which played at whatever
+   speed the reader was moving and ran backwards on a scroll up. This runs
+   at its own tempo from the frame data-cta becomes "in" — see the note over
+   setCta in Reservations.tsx for the thresholds and why there are two.
+
+   ⚠️ WHY A BLUR AND NOT A FADE, since a fade is cheaper. The frame it lands
+   on is a film, and the passage one screen above goes SOFT as this plate
+   climbs over it — that blur is already in the page, on the type this
+   heading is answering. The sentence defocuses and the invitation resolves;
+   it is the same gesture pointed in opposite directions, which is the only
+   argument for spending a filter here.
+
+   ⚠️ THE BLUR IS IN em ON THE HEADING AND IN px ON THE PILL, ON PURPOSE.
+   0.26em tracks --t-display, so the softness is the same fraction of the
+   letterform at every breakpoint; the pill's em is its label's size, where
+   the same figure would be about three pixels and invisible. */
+@keyframes ctaFocus {
+  from {
+    opacity: 0;
+    filter: blur(0.26em);
+    transform: scale(1.03);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+    transform: none;
+  }
+}
+
+/* ⚠️ THE PILL TAKES NO transform, AND THIS IS NOT A STYLISTIC CHOICE.
+   .magnetHost IS PillCta's `.host`, whose border box is the rest rect the
+   magnet measures its offset from — PillCta's own note is explicit that the
+   host is never transformed and that measuring a moving element makes the
+   magnet its own input. A filter does not move the border box; a scale
+   does. So the heading gets the scale and the pill does not, and the
+   difference is invisible at this size. */
+@keyframes ctaFocusFlat {
+  from {
+    opacity: 0;
+    filter: blur(8px);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
+  }
+}
+
+.section[data-cta="in"] .title {
+  animation: ctaFocus 720ms cubic-bezier(0.22, 0.61, 0.36, 1) both;
+}
+
+.section[data-cta="in"] .magnetHost {
+  animation: ctaFocusFlat 720ms cubic-bezier(0.22, 0.61, 0.36, 1) 140ms both;
 }
 
 /* ---------- the invitation ---------- */
@@ -302,18 +872,41 @@
 
 /* the display heading — same grammar as "Our Restaurants." and "Blog.", one
    line, normal flow. Deliberately NOT the stretched-SVG treatment the
-   footer's MAGINHAWA carries twelve hundred pixels below: firing that device
-   twice inside ~1.5 screens is what stopped it meaning anything. Off the
-   stretch means off Contralto too — --font-display-big is reserved for
-   wordmark moments (globals.css), and everything else is the grotesk. */
+   footer's MAGINHAWA carries twelve hundred pixels below: firing that
+   device twice inside ~1.5 screens is what stopped it meaning anything.
+
+   ⚠️ IT IS CONTRALTO NOW, AND THE RULE IT BREAKS WAS ALREADY BROKEN. The
+   note that stood here said "off the stretch means off Contralto too —
+   --font-display-big is reserved for wordmark moments". That rule was
+   written to stop a crowd of near-Didones blurring into the wordmark, and
+   it has been overtaken: <Passage>, one section above, now sets the page's
+   largest statement in Contralto at 165px. Contralto is already the voice
+   of the biggest thing on the page, and this heading is the ANSWER to that
+   statement — the handover's "So . . ." funnels onto the very axis where
+   this line appears. Setting the question in a different face than the
+   sentence that points at it was the odder of the two choices.
+
+   ⚠️ AND THE FACE IT REPLACES WAS NEVER REACHING ANYONE. --font-display
+   leads on "FreightBig Pro", which is not in the Adobe kit (checked: the
+   kit serves contralto-* and nothing else) and is not self-hosted. It
+   resolves only on machines with the retail font installed — measured on
+   the author's: 841.1px for this string where the nonsense-family control
+   gave 913.6, so it was rendering locally and falling through to EB
+   Garamond for every visitor. Nobody was choosing between Contralto and
+   Freight; the choice was Contralto or an accidental Garamond.
+
+   ⚠️ THE WEIGHT IS 400 AND NOT --w-medium. contralto-big ships drawn
+   weights at 300, 400, 600, 700 and 900 — there is no 500. A 500 request
+   resolves DOWN to 400 by the CSS matching rules, so the old declaration
+   was already rendering this, just without saying so. */
 .title {
   /* Nothing sits above the heading any more — the live clock that used to
      carry the gap on its own margin-bottom is gone — and the pill below
      carries the only gap left, so this owns no vertical margin in either
      direction. */
   margin: 0;
-  font-family: var(--font-display);
-  font-weight: var(--w-medium);
+  font-family: var(--font-display-big);
+  font-weight: var(--w-regular);
   font-size: var(--t-display);
   line-height: var(--lh-display);
   letter-spacing: var(--tr-display);

@@ -1,19 +1,24 @@
 /* Blog chapter — a hairline opening the chapter, the head lockup (mark +
-   label, display line, the archive pill, a closing rule), then TWO
-   COLUMNS: the newest story as one large card wearing the restaurant
-   cards' material — full-bleed photograph, photo-derived ramp in the
-   bottom edge, cream type ON the ramp — and, beside it, a rail of the four
-   next stories as thumbnail rows on the cream.
+   label, display line, the archive pill, a closing rule), and then a
+   BROADSHEET: the newest story as a full-measure 24:9 photograph with its
+   type on the cream beneath it — headline left, standfirst and the house
+   pill right — then /blog's own "Earlier Entries" divider, then four of
+   /blog's grid cards.
 
-   WHAT IT REPLACES: eight 1:1 cards in a draggable scroll-snap strip that
-   bled off the right viewport edge, with captions below the photography
-   on the cream, prev/next discs riding the strip's centre and ~180 lines
-   of pointer physics behind it. The strip said every story was the same
-   size, which is the one thing a journal's front page should not say.
+   WHAT IT REPLACES: two columns. One 4:3 card wearing the restaurant
+   cards' material — a 34px backdrop-blurred ramp with cream type set ON
+   the photograph — beside a rail of four 64px thumbnail rows. The rail was
+   the fault: four rows that size against a 473px picture read as a caption
+   rather than as four stories, and type inside a crop cannot be given air.
 
-   Geometry: the rules, the head, the card and the rail all seat on the
-   page margin; the card takes the binding grid's first 7 columns and the
-   rail the remaining 5. */
+   BEFORE THAT it was eight 1:1 cards in a draggable scroll-snap strip with
+   prev/next discs and ~180 lines of pointer physics. The strip said every
+   story was the same size, which is the one thing a journal's front page
+   should not say.
+
+   Geometry: the rule, the head, the photograph, the divider and the four
+   entries all seat on the page margin — one left edge, shared with
+   <AboutSplit>'s film directly above. */
 .section {
   position: relative;
   isolation: isolate;
@@ -25,24 +30,19 @@
      Discover.module.css for why the page had three left edges and which
      one survives.
 
-     ⚠️ AND THE COLUMN HAS TO BE RE-DERIVED, WHICH IS THE PART THAT IS
-     EASY TO MISS. --grid-col is computed in globals.css against the PAGE
-     MARGIN: (100vw − 2·margin − 11·gutter) / 12. Inheriting it into a
-     chapter that no longer uses that margin would size the lede card as
-     six columns of a NARROWER grid inside a WIDER measure — the card would
-     have stayed 674px while the band grew to 1416, silently shifting the
-     card:rail ratio the layout was set at. The same expression is restated
-     below against --blog-margin, so twelve local columns span exactly this
-     chapter's own measure.
-
-     --blog-col2 is left pointing at the global column-2 seat: nothing
-     reads it any more except the ≤900px alias at the foot of this file. */
+     ⚠️ THE LOCAL TWELVE-COLUMN GRID IS GONE WITH THE TWO-COLUMN BODY, and
+     the reason it existed is worth keeping because it will apply again to
+     whatever replaces it. --grid-col is computed in globals.css against
+     the PAGE MARGIN: (100vw − 2·margin − 11·gutter) / 12. Inheriting it
+     into a chapter that uses a NARROWER margin sizes a six-column card
+     against a WIDER measure — the card stays 674px while the band it sits
+     in grows to 1416, silently shifting a ratio nobody chose to change.
+     --blog-col / --blog-gutter / --blog-col2 restated that expression
+     locally so twelve columns spanned this chapter's own measure. Nothing
+     reads them now: the body seats flush on --blog-margin. If a column
+     measure is ever wanted here again, RE-DERIVE it rather than reaching
+     for the global one. */
   --blog-margin: var(--grid-gutter);
-  --blog-gutter: var(--grid-gutter);
-  --blog-col: calc(
-    (100vw - 2 * var(--blog-margin) - 11 * var(--blog-gutter)) / 12
-  );
-  --blog-col2: var(--grid-col2);
   /* IT NO LONGER COVERS ANYTHING. This sheet used to climb over the pinned
      interlude above it — the photograph held its screen and this section's
      own top edge crossed the picture, which is why it carried a z-index and
@@ -126,52 +126,257 @@
      so there is no overhang to clear: the plate's bottom is where its own
      box says it is, at every scroll position.
 
-     AND THE SEAM IS CUT TWICE, both times at the user's instruction, because
-     a hairline now sits in it (see .section::before). The line is what
-     separates the two chapters, so the whitespace no longer has to do that
-     job alone — and a full chapter gap with a rule floating in the middle of
-     it reads as an orphaned line rather than as a boundary.
+     ROUND THREE — THE SEAM WAS CUT TWICE and has now given one back. It
+     was halved and then thirded, both times at the user's instruction, on
+     one argument: a hairline had been put in it, the LINE was doing the
+     separating, and a full chapter gap with a rule floating in the middle
+     of it reads as an orphaned line rather than as a boundary.
 
-         --about-seam = --home-gap-tight / 2   →   / 3
+         --about-seam = --home-gap-tight / 2  →  / 3   (the line arrives)
+                                              →  / 2   (the line is deleted)
+
+     ⚠️ THE LINE IS GONE — see the banner over the deleted `.section::before`
+     — SO THE ARGUMENT FOR THE THIRD IS GONE WITH IT. Whitespace is the
+     separator again and it needs its size back; leaving 66px of cream
+     between a full-bleed photograph and a chapter that now opens on nothing
+     but a 13px eyebrow would read as the two sections colliding.
 
      DERIVED, NOT PICKED: a fraction of the token that means "a full-bleed
      colour or photo block adjoins the cream", which is exactly what adjoins
-     this chapter — so it still scales with the viewport, which the old
-     +150px term could not. The halving came first (99px at 1440×900); the
-     third followed when the picture still read as too far off the line.
+     this chapter — so it still scales with the viewport, which the +150px
+     term two rounds ago could not. 99px at 1440×900.
 
-     WHERE THE THIRD LANDS, and it is the reason this fraction and not some
-     other. The line stands 18px off the head (see .section::before), so what
-     a reader sees between the photograph and the line is `seam − 18`:
-
-         66 − 18 = 48px at 1440×900 — FOUR --grid-gutters exactly, which is
-         the same 48px the chapter's own opening rule used to hold, and the
-         gutter is the number every edge in AboutSplit is already set to.
-
-     The coincidence is not load-bearing (this is derived from the chapter
-     scale, not from the gutter) but it is a good sign: 168/3 = 56px on a
-     short window and 312/3 = 104px on a tall one, i.e. 38px and 86px of
-     cream above the line. For the record, the run of clearances between the
-     photograph and the journal's first ink: 348px at rest before any of
-     this, then 198, then 99, now 66.
+     For the record, the run of clearances between AboutSplit's photograph
+     and the journal's first ink: 348px at rest before any of this, then
+     198, then 99, then 66 with a rule in it, and 99 again without one.
 
      THE PADDING IS THAT SEAM LESS AboutSplit's OWN BOTTOM GUTTER, because
      the two are consecutive air and both are real: that section closes on
      `padding: var(--grid-gutter)` all round, so 12px of the seam is already
      spent before this box starts.
 
-     ⚠️ --about-seam IS NAMED BECAUSE THE RULE READS IT. .section::before
-     hangs off this token — the seam LESS the gutter LESS 18px, which puts
-     the line 18px above the head, the same distance .headRule stands below
-     it. Change the seam and the line follows it down; hard-code either one
-     and they drift apart.
-
      The bottom breath is unchanged and still owns the seam below: press sits
      directly under this chapter now and takes 0 on top, precisely because
      this value is here (see PressWall.module.css). */
-  --about-seam: calc(var(--home-gap-tight) / 3);
+  /* ⚠️ /2 AGAIN, NOT /3. It was halved to /3 in the pass that introduced
+     the opening hairline, explicitly because a line had taken over the
+     separating; that line is gone (see the banner above) so the cream is
+     the separator again and takes its size back. 99px at a 900-tall window
+     against the 66px the ruled version used.
+     ⚠️ NOTHING READS THIS ANY MORE EXCEPT THE PADDING. `.section::before`
+     hung off it and is deleted; the name is kept because a seam worth
+     pointing at is worth naming, and because the bottom breath below still
+     owns the gap down to the press marquee (see PressWall.module.css,
+     which takes 0 on top precisely because this value is here). */
+  /* ⚠️ THE WHOLE TOKEN NOW, at the user's instruction ("increase the gap
+     between the blog and about us section"). The run of this number is the
+     chapter's whole history with its neighbour: 348px at rest, then a
+     halving to 198, then 99, then 66 once a hairline was doing the
+     separating, then 99 again when that hairline was deleted — and now the
+     token itself, 198px at a 900-tall window.
+
+     --home-gap-tight IS THE RIGHT TOKEN RATHER THAN A NEW NUMBER: it means
+     "a full-bleed colour or photo block adjoins the cream", which is
+     exactly what adjoins this chapter. Using the token whole rather than a
+     fraction of it is the first time this seam has been at its own house
+     value, and it scales with the viewport the way a hand-picked pixel
+     could not.
+
+     ⚠️ NOTHING READS THIS BUT THE PADDING. `.section::before` hung off it
+     and is deleted. The name is kept because a seam worth pointing at is
+     worth naming, and because the bottom breath below still owns the gap
+     down to the press marquee — which takes 0 on top precisely because this
+     value is here (see PressWall.module.css). */
+  /* ⚠️ IT IS NOT --home-gap-tight ANY MORE, AND THE REASON IS THE
+     NEIGHBOUR. That token was right while this chapter owned the whole
+     seam; AboutSplit now carries clamp(96px, 13vh, 160px) of its own bottom
+     padding — the runway its reading column drifts into — so the two are
+     consecutive air and the measured ink-to-ink came out at 303px, which is
+     half a screen of cream between two chapters that are meant to read
+     continuously.
+
+     16vh SPLITS IT SENSIBLY AND MEANS SOMETHING. 132px of padding here
+     against About's 117 gives ~249px ink to ink, and 16vh is also
+     ARRIVAL_VH — the distance the journal's voice column travels as it
+     descends — so the column begins its descent almost exactly at the top
+     of the seam and lands as the chapter opens. The gap and the gesture
+     that crosses it are one number.
+
+     For the record, the run of clearances between AboutSplit's photograph
+     and the journal's first ink: 348 at rest before any of this, then 198,
+     99, 66 with a rule in it, 99 without, 303 once About grew its runway,
+     and 249 now. */
+  /* ⚠️ THIS CHAPTER OWNS THE WHOLE SEAM AGAIN. It was cut to 16vh while
+     AboutSplit carried 13vh of its own bottom padding and the two summed;
+     that padding is reverted (it was charging the photograph for the
+     drift's runway), so the air is all on this side once more.
+
+     × 1.25 OF --home-gap-tight — 247px at a 900-tall window, which is what
+     the split value measured before the revert. The token means "a
+     full-bleed colour or photo block adjoins the cream", which is exactly
+     what adjoins this chapter; the quarter on top is the user's asked-for
+     increase, kept as a factor so it still scales with the viewport.
+
+     For the record, the run of clearances between AboutSplit's photograph
+     and the journal's first ink: 348 at rest before any of this, then 198,
+     99, 66 with a rule in it, 99 without, 303 once About grew a runway,
+     249 split between the two, and 247 all on this side. */
+  /* ⚠️ THE TOKEN WHOLE AGAIN — × 1.25 → × 1, at the user's instruction that
+     the header sit HIGHER. This padding is the only thing between the
+     section's top edge and its first ink, so it is also where the header
+     sits: 235px of it put the lockup a quarter of a screen down. 186px now.
+
+     ⚠️ AND IT HAS A FLOOR IT MUST NOT GO UNDER: ARRIVAL_VH, the 16vh (144px
+     at 900) the column travels as it descends. The column starts that far
+     above its seat, and <AboutSplit> above now carries `z-index: 1` so its
+     box paints OVER anything the journal lifts into it. Below ~144px of
+     padding the header would be arriving inside a section that draws on top
+     of it. 186 against 144 leaves 42px of margin; raise ARRIVAL_VH and this
+     has to move with it. */
+  /* ⚠️ × 1 → × 0.7, at the user's instruction that the header sit MUCH
+     closer to the chapter above. 130px at a 900-tall window against 186,
+     which takes the clearance between AboutSplit's fine print and the
+     journal's first ink from ~198px to ~142px.
+
+     ⚠️ THE FLOOR CAME DOWN WITH IT, IT WAS NOT IGNORED. That floor is
+     ARRIVAL_VH — the column starts that far above its seat, and About is an
+     earlier sibling carrying `z-index: 1` over its own cream, so any
+     overhang past this section's top edge is painted over rather than
+     clipped, and the descent's first half simply happens behind another
+     chapter. 16vh (144px) was already ABOVE 130, so the travel went to 11vh
+     (99px) in lib/drift.ts and the pairing keeps its ~30px of margin.
+     Move one and re-check the other; the check is `seam > ARRIVAL_VH`.
+
+     For the record, the run of clearances between AboutSplit's photograph
+     and the journal's first ink: 348 at rest before any of this, then 198,
+     99, 66 with a rule in it, 99 without, 303 once About grew a runway,
+     249 split between the two, 247 all on this side, 186, and 130 now. */
+  /* ⚠️ × 0.7 → × 1.15, at the user's instruction to open the seam FURTHER.
+     214px at a 900-tall window, which is the widest this has been since the
+     × 1.25 pass — the clearance between AboutSplit's fine print and the
+     journal's first ink goes back to ~226px.
+
+     ⚠️ AND ARRIVAL_VH WENT BACK UP WITH IT, to 16vh. That constant is a
+     FLOOR on this value, not a companion to it: the column starts that far
+     above its seat, About is an earlier sibling carrying `z-index: 1` over
+     its own cream, so an overhang past this section's top edge is painted
+     over rather than clipped. 11vh was a concession to a 130px seam and
+     this one has room for the full gesture again. The check is
+     `seam > ARRIVAL_VH`; 214 against 144 leaves 70px.
+
+     ⚠️ A WIDER SEAM MAKES THE HEADER APPEAR LOWER UNLESS THE FADE MOVES.
+     The ink sits one seam below the section's top edge and the arrival is
+     measured on that top edge, so every pixel added here puts the ink a
+     pixel further down the screen at the same progress. ARRIVAL_IN moved
+     from [0.06, 0.42] to [0.10, 0.60] in the same pass to pay for it — see
+     the note there, and re-measure if this number moves again.
+
+     For the record, the run of clearances between AboutSplit's photograph
+     and the journal's first ink: 348 at rest before any of this, then 198,
+     99, 66 with a rule in it, 99 without, 303 once About grew a runway,
+     249 split between the two, 247 all on this side, 186, 130, and 226. */
+  /* ⚠️ × 1.15 → × 1.65, AND IT IS NO LONGER A TASTE VALUE — it is SOLVED
+     against the seam above it, at the user's instruction that the gap
+     between About and the journal match the gap between the manifesto and
+     About. Measured at 1440×900 with every transform neutralised (they do
+     not affect layout, so this is the resting geometry):
+
+         manifesto → About    282px ink to ink
+         About     → journal  189px ink to ink   ← short by 93
+
+     × 1.65 landed 6px long at 288, so the factor is × 1.618 — 301px of
+     padding here, which is the 214 that produced 189 plus that 93, less the
+     overshoot. Measured back at 282, matching. ⚠️ RE-MEASURE, DO NOT RE-DERIVE, if the
+     chapter above ever changes: the number this has to match is the
+     manifesto seam's, and it is not written down anywhere but there.
+
+     ⚠️ AND THE ARRIVAL HAD TO BE RE-SOLVED AGAIN — see ARRIVAL_IN. A seam
+     this wide eats a THIRD of the approach: the ink sits 307px below the
+     section's top edge, so it does not cross the foot of a 900-tall window
+     until p ≈ 0.34, and any fade scheduled before that runs where nobody
+     can see it. */
+  /* ══ AND × 1.618 IS GONE, at the user's instruction: "make the blog
+     header start higher up from the blog section just like what the
+     'Everything we know about hospitality, we learned at home.' text
+     does." ══
+
+     THAT IS A DIFFERENT REQUIREMENT FROM THE ONE ABOVE, and the two cannot
+     both hold — which is worth stating plainly rather than quietly
+     dropping. The paragraph above solves this value as a SEAM (ink above to
+     ink below, matched to the manifesto → About seam). This solves it as a
+     HEAD SEAT: the distance from a chapter's own top edge down to its first
+     ink, matched to the chapter above. About's opening is
+     --grid-gutter of section padding plus .copy's own clamp(40px, 8vh,
+     104px) — 84px at a 900-tall window, 98 at 1080 — so that is what this
+     chapter's opening is now too.
+
+     WHAT IT COSTS, measured at 1440×900 with transforms neutralised:
+     About → journal falls from 282px ink to ink to ~96, against the
+     manifesto → About seam's 282. The two seams no longer agree. They
+     cannot: About is a one-screen chapter whose reading column is flush to
+     its own bottom edge (`.copy` carries NO bottom padding, by
+     instruction), so the only cream between it and this chapter is the
+     cream this chapter puts above its own head. Pull the head up and the
+     seam comes with it. If the seam matters more than the head's seat,
+     the × 1.618 line above is what to put back.
+
+     ⚠️ AND THE ARRIVAL WAS RE-SOLVED WITH IT — ARRIVAL_VH is a FLOOR on
+     this number and 16vh no longer fits under it. See lib/drift.ts. */
+  /* ══ AND THE GAP COMES BACK UP, at the user's instruction ("increase the
+     gap between the blog and the about us section") — but only part of the
+     way, and the head does NOT go back to where it started. ══
+
+     THE RUN OF THIS ONE NUMBER, so the next person can see the shape of the
+     argument rather than just its answer:
+
+         320px   × 1.618, solved to match the manifesto → About seam
+          96px   About's own head seat, so the two chapters open alike
+         198px   here
+
+     --home-gap-tight, straight, with no factor on it. It is the token the
+     system reserves for a full-bleed block meeting cream, and that is
+     exactly what this seam is: AboutSplit is edge-to-edge furniture — it
+     does not even sit on --pad-x — and the journal is the cream it meets.
+     A named token beats a tuned number on a value that has now moved four
+     times.
+
+     WHAT IT LEAVES: the head sits 186px under this section's top edge at a
+     900-tall window, against About's 84 and against the 308 this chapter
+     opened at before any of this. The two chapters no longer open at the
+     same distance from their own top edges — that was the previous
+     instruction and this one supersedes it — but the journal still opens
+     nearer its own edge than it did, which is the half of it worth
+     keeping. --chapter-head-seat below is what About's opening actually
+     measures, kept because it is the thing this was compared against.
+
+     ⚠️ ARRIVAL_VH IS A FLOOR ON THIS and moved with it, twice. See
+     lib/drift.ts, where the bound is now written as a formula rather than
+     as a value that has to be re-derived every time this line changes. */
+  /* AboutSplit's own opening, in its two terms and its order: the section's
+     padding and then the copy column's. NOT read by the seam any more —
+     kept as the reference the seam was measured against, and as the number
+     to point at if the two openings are ever asked to match again.
+     ⚠️ IT IS A COPY, and the original is AboutSplit.module.css's `.copy`
+     padding-top. */
+  --chapter-head-seat: calc(var(--grid-gutter) + clamp(40px, 8vh, 104px));
+  --about-seam: var(--home-gap-tight);
+  /* ⚠️ THE BOTTOM IS THE WHOLE SEAM DOWN TO THE MARQUEE, and it has been
+     cut hard at the user's instruction ("much closer"). It was
+     clamp(64px, 9vh, 132px) — 81px at a 900-tall window, measured from the
+     last card's foot to the band's upper rule.
+
+     PressWall takes 0 on top precisely because this value is here (its own
+     note says so), so this is the only number in the seam. It has come down
+     twice at the user's instruction — 81px, then 36, and 21px now.
+
+     IT CAN GO THIS TIGHT BECAUSE THE MARQUEE HAS EDGES NOW. The band's
+     upper hairline is a real boundary; before it existed the marks floated
+     in open cream and the gap was the only thing separating them from the
+     journal, which is why it had to be a chapter's worth. A rule does that
+     job in 1px, and the air above it only has to keep the two from
+     touching. */
   padding: calc(var(--about-seam) - var(--grid-gutter)) 0
-    clamp(64px, 9vh, 132px);
+    clamp(14px, 2.3vh, 32px);
   display: flex;
   flex-direction: column;
   /* head → body gap on the Discover head's rhythm — the display heading
@@ -183,7 +388,18 @@
      because the head→body distance is worth being able to point at, and
      because anything that wants a distance to the head OTHER than this gap
      has to do the same subtraction — see the note where .topRule was. */
-  --sec-gap: clamp(22px, 2.7vh, 34px);
+  /* ⚠️ IT OPENED WHEN THE BODY DID, and the old value is worth keeping in
+     view: clamp(22px, 2.7vh, 34px) — 22px at a 720-tall window. That was
+     the distance from the head's closing rule to a 674px card sitting in
+     the left half of the measure. What it now separates is a photograph
+     running the whole 1416px band, and 22px of cream above an object that
+     size reads as the rule being stuck to it rather than as an opening.
+
+     THIS IS THE FIRST RUNG OF THE LADDER on .body, and it is the only one
+     that is not declared there — it cannot be, because the section's own
+     `gap` is what applies it. Change it here and the ladder's proportions
+     move; the note over .body is where they are set out. */
+  --sec-gap: clamp(34px, 5.6vh, 64px);
   gap: var(--sec-gap);
   background: var(--cream);
   color: var(--maroon);
@@ -193,143 +409,156 @@
   overflow-x: clip;
 }
 
-/* ═══ THE SEAM'S OWN LINE ─ the boundary between About Us and the journal.
-   Asked for by the user in the same breath as the tightened seam above, and
-   the two are one decision: the gap was halved BECAUSE a line now does the
-   separating, and the line is bearable BECAUSE the gap is no longer a full
-   chapter's worth of cream with something floating in it.
+/* ── BOTH OF THE CHAPTER'S HAIRLINES ARE DELETED, at the user's
+   instruction ("remove the line on top of the blog section"), and the pair
+   is worth recording because one of them was itself a reversal.
 
-   THIS IS A REVERSAL, AND IT IS THE USER'S TO MAKE. Three hairlines were
-   removed from this seam and its neighbours over previous passes, each time
-   with the same objection recorded — Manifesto.module.css's "the gap is the
-   separator, do not put the line back". That reasoning applied to lines that
-   sat inside a full chapter gap and had no partner; this one is a stated
-   requirement and it comes with the tighter seam that gives it a job.
+   `.section::before` drew a 1px rule inset to --blog-margin, 18px above the
+   head. It was added deliberately after three hairlines had been removed
+   from this seam and its neighbours — Manifesto.module.css's "the gap is
+   the separator, do not put the line back" — on the argument that a
+   TIGHTENED seam needed something to do the separating. `.headRule` closed
+   the head 18px under the display line, so the lockup sat inside a bracket.
 
-   A PSEUDO-ELEMENT, NOT A FLEX ITEM. .section is a flex column whose `gap`
-   also sets the head→body distance, so a real child would take --sec-gap
-   underneath it and the old .topRule had to carry a NEGATIVE margin to undo
-   that (its note is below). Positioned absolutely, this one is outside the
-   layout entirely: it cannot move the head, and it cannot be pushed by
-   anything the chapter does.
+   THE BRACKET HAD NOTHING LEFT TO HOLD. The head is not a full-width lockup
+   any more: the mark, the word, the sentence and the pill are a column on
+   the left of a two-column row, so a rule spanning the page above them
+   brackets the row rather than the head, and a second one under them would
+   cut the column in half.
 
-   ⚠️ IT IS 18px OFF THE HEAD, NOT CENTRED IN THE SEAM — at the user's
-   instruction, and 18px is not a new number. `.headRule` closes this same
-   head with `margin-top: calc(18px - var(--head-gap))`, i.e. exactly 18px
-   below the display line, and Discover's rules do the same off their
-   eyebrow. Both of this head's hairlines now stand the house distance off
-   the type, so the label, the display line and the two rules read as one
-   bracketed lockup rather than as a divider that happens to be nearby.
+   ⚠️ AND THE SEAM WIDENS BACK BECAUSE OF IT — see --about-seam below. The
+   gap above was halved BECAUSE a line did the separating; with the line
+   gone the argument goes with it and the cream has to do the job again.
 
-   IT WAS CENTRED IN THE SEAM FIRST — half of --about-seam, 49.5px of cream
-   to the photograph above and 49.5px to the head below — and that is the
-   line worth recording, because it is what "reduce the gap between the head
-   and the line above it" was measured against: 49.5px above the head
-   against 18px below it, near enough three to one, and the pair did not
-   read as a pair. The cream ABOVE the line was then cut in its own pass —
-   81px to 48px — by tightening --about-seam rather than by touching this,
-   which is what the derivation below is for.
+   ONE RULE SURVIVES: the archive's, which separates the newest story from
+   the older ones. That is the only boundary in this chapter between two
+   different kinds of thing, and it is the only one drawn. */
 
-   THE MEASUREMENT IS FROM THE HEAD'S BOX, and it can be, because at the top
-   the head's box edge IS its ink: `.labelRow`'s tallest child is the drawn
-   mark, whose box is the drawing (measured — head top and mark top are the
-   same 3660.1). At the bottom the display line's box bottom sits within a
-   pixel of the glyphs' ink, and the pill lands flush with it (measured — the
-   CTA and the lede share a bottom to 0.1px). So 18px means the same thing at
-   both ends, which is the whole point of matching them.
 
-   WHAT IT COSTS: the seam is no longer symmetrical. 48px of cream from the
-   photograph down to the line and 18px from the line to the head at
-   1440×900 — the 18px is fixed at every viewport, the 48px scales with the
-   seam (38px on a short window, 86px on a tall one). The line belongs to the chapter under it now, not to the gap.
+/* ═══════════════ THE BODY — the chapter's one box ═══════════════════
 
-   INSET TO --blog-margin, which is --grid-gutter, so it starts and ends
-   exactly where the picture above it and the cards below it do. */
-.section::before {
-  content: "";
-  position: absolute;
-  /* the section's own padding-top, less the house 18px — see above. Written
-     against --about-seam rather than against `padding-top` because there is
-     no way to read a longhand back in a calc(): if the seam moves, this
-     follows it and the 18px holds. */
-  top: calc(var(--about-seam) - var(--grid-gutter) - 18px);
-  left: var(--blog-margin);
-  right: var(--blog-margin);
-  height: 1px;
-  background: var(--rule);
-  pointer-events: none;
-}
+   ONE WRAPPER, AND IT EXISTS FOR THE GAPS. `.section` is a flex column
+   whose `gap` sets the distance to its first child. The chapter has three
+   blocks in it — the row, the divider, the entries — and parked directly on
+   the section they would each take that one gap, flattening the ladder
+   below into three identical steps. This box takes the gap once and owns
+   every distance inside itself.
 
-/* ── .topRule IS DELETED, at the user's instruction ──
-   The chapter's opening hairline: 1px on --rule, inset to --blog-margin,
-   carrying `margin-bottom: calc(18px - var(--sec-gap))` so it sat exactly
-   18px off the head no matter what the section's gap was.
+   IT SEATS ON THE PAGE MARGIN, not on a centred eleven-column block, so the
+   chapter has ONE left edge and it is the same edge <AboutSplit>'s film
+   uses directly above.
 
-   That negative margin is the only thing worth carrying forward if it ever
-   comes back. The gap it subtracted also sets the head→body distance and
-   must not move, so a rule that wants a different distance to the head has
-   to take it out of its own margin rather than out of --sec-gap. The fuller
-   version of that argument is in Discover.module.css, whose copy of this
-   rule was removed before this one.
+   ── THE WHITESPACE LADDER ──
+   Four steps, each named for what it separates, and every one scales with
+   the window rather than sitting at a fixed pixel:
 
-   .headRule is untouched — it closes the head and opens the pictures. */
+     --sec-gap    the seam   → the row      the chapter opening
+     --step-arc   the row    → divider      the step down to the archive
+     --step-arc   divider    → entries      the same step, deliberately
+     --space-md   entry      → entry        /blog's own column gap
 
-/* ---------- head row — display heading on the left, the archive pill
-   hung off the display line's bottom edge at the far right ---------- */
+   plus the row's own column gap, which is the split itself.
 
-/* ═══ THE HEAD — Discover's lockup, and THE LEFT EDGE MOVES WITH IT.
-
-   `margin-inline: var(--blog-col2) …` was the last --grid-col2 seat on the
-   home page. Discover.module.css's own note records the defect and names
-   this chapter as the one still to fix: the page had TWO left edges — the
-   page margin (About, Featured In, and Discover since it moved) and this
-   column-2 seat — so a reader coming down the page watched the left edge
-   step out by a column and back again. Measured at 1440 before this change:
-   Discover's label and cards at x=40, this chapter's heading and cards at
-   x=154. Both are 40 now, by derivation rather than by a copied number. ═══ */
-/* A GRID, NOT A FLEX COLUMN, and only because of where the CTA now sits.
-
-   The pill used to ride the LABEL row, level with the small "Blog" eyebrow
-   at the top of the head. It is dropped to the bottom of the display line
-   at the user's instruction, which means it has to share a row with the
-   lede and hang off that row's baseline — a relationship a flex column
-   cannot express, because the lede and the pill would be siblings in the
-   stack rather than neighbours in a row.
-
-   Three named rows: the eyebrow, then the display line with the pill
-   closing it, then the hairline. `1fr auto` gives the lede the measure and
-   the pill exactly its own width. */
-.head {
-  display: grid;
-  grid-template-columns: 1fr auto;
-  grid-template-areas:
-    "label label"
-    "lede  cta"
-    "rule  rule";
-  align-items: start;
-  /* the label row and the display line read as one lockup — the air that
-     separates the head from the pictures is the rule's margin, not this.
-     NAMED because .headRule subtracts it; value unchanged — it now points
-     at the global --space-xs-y, which holds the same clamp this line used
-     to spell out. */
-  --head-gap: var(--space-xs-y);
-  gap: var(--head-gap);
+   ⚠️ --step-arc IS THE ONE THAT ANSWERS "REDUCE THE GAP BELOW THE LATEST
+   ENTRY". It was clamp(48px, 6.4vh, 76px) when the lede's type sat under
+   its picture on the cream and needed a real step to separate it from the
+   archive. The type is back inside the picture, so what the gap now
+   separates is a photograph's bottom edge from a hairline — a boundary that
+   reads at half the distance. */
+.body {
   margin-inline: var(--blog-margin);
+
+  /* ⚠️ ONE STEP, USED TWICE, at the user's instruction that the air above
+     and below the archive rule match. It was two — 48px above and 30px
+     below at a 900-tall window — on the reasoning that the gap ABOVE
+     separates two chapters and the one BELOW only separates a label from
+     the things it labels.
+
+     That reasoning is wrong for this rule, and the render is what says so:
+     a hairline with more air on one side than the other does not read as a
+     boundary between two blocks, it reads as a caption belonging to
+     whichever block it sits closer to. Symmetry is what makes it a rule
+     rather than a label. Named once so it cannot drift back apart. */
+  /* ⚠️ REDUCED AGAIN, at the user's instruction. It was clamp(48px, 6.4vh,
+     76px) when the lede's type sat under its picture on the cream and the
+     gap had to separate two blocks of type; it went to clamp(30px, 4vh,
+     48px) once the type moved back inside the picture, and it is smaller
+     again now. What this actually separates is a photograph's bottom edge
+     from a hairline, and then that hairline from a row of small plates —
+     boundaries that read at a fraction of the distance two paragraphs need.
+     23px at a 900-tall window, symmetric above and below. */
+  /* ⚠️ AND SMALLER ONCE MORE, at the user's instruction: 23px at a 900-tall
+     window → 15px. Still ONE value used on both sides — the symmetry is the
+     thing that makes this read as a rule between two blocks rather than as
+     a caption belonging to one of them, and it survives every reduction. */
+  --step-arc: clamp(10px, 1.7vh, 22px);
+
+  /* the fifth step, and the only one that is not vertical: how much lower
+     the plate sits than the voice beside it. See .front for what it is for
+     and why it is a flat px value. */
+  --front-drop: 80px;
 }
 
-/* the label and the archive link share one line: the chapter's name at the
-   left, its "more of this" closing the row at the right */
-.labelRow {
-  grid-area: label;
+/* ═══════════ THE ROW — the voice, and the newest story ═══════════════
+
+   The mark, the word "Blog", the display sentence and the archive pill are
+   one column on the left; the story is a picture on the right.
+
+   ⚠️ THE PICTURE IS THE WIDTH OF AboutSplit's PHOTOGRAPH, at the user's
+   instruction, and it is DERIVED rather than copied. That section is a
+   `1fr 1fr` split on `--grid-gutter` inside a box inset by the same
+   `--grid-gutter`, so its media column is exactly:
+
+       (100% − --grid-gutter) / 2 − --space-lg     = 646px at 1440
+
+   ⚠️ LESS --space-lg, at the user's instruction ("a bit less wide"). The
+   plate matched AboutSplit's photograph exactly for one pass and it read as
+   heavy: that section carries a picture on BOTH halves of its split, so a
+   702px plate is half of a pair, where this one is a single object with a
+   sentence beside it. Coming in by one house step leaves the derivation
+   intact — the width is still AboutSplit's, minus a named token — so the
+   two still move together if either margin ever changes.
+
+   This chapter's `.body` is inset to `--blog-margin`, which IS
+   `--grid-gutter`, so `100%` means the same measure in both files and the
+   expression transfers unchanged. Write 702px here instead and the two
+   drift apart the first time either margin moves.
+
+   THE TWO SIT ON OPPOSITE SIDES — About's photograph on the left, this one
+   on the right — so what the reader gets is not a repeat but a rhyme: the
+   same object, mirrored, one chapter later. The left column takes what is
+   left, which is 658px at 1440, and the row is asymmetric by 44px plus the
+   gap. That is deliberately close to even: the weight is carried by what is
+   IN the columns — one photograph at display scale against a sentence —
+   rather than by the split.
+
+   ⚠️ THE COLUMN NO LONGER STICKS. It was `position: sticky` and held at the
+   top of the window while the story travelled past. That is now a scroll
+   drift instead, driven from Blog.tsx off lib/drift.ts — the shared rate
+   the About chapter's reading column uses. `align-items: start` is kept and
+   is still load-bearing for a different reason: a stretched grid item would
+   make the column as tall as the picture, and the drift would then be
+   moving a box with 200px of empty space under its own ink. */
+.top {
+  display: grid;
+  grid-template-columns: 1fr calc((100% - var(--grid-gutter)) / 2 - var(--space-lg));
+  column-gap: clamp(28px, 3.9vw, 56px);
+  align-items: start;
+}
+
+.intro {
+  min-width: 0;
   display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--lockup-gap-lg);
-  width: 100%;
+  flex-direction: column;
+  align-items: flex-start;
+  /* the drift is a transform, and a transform on a box that later gains a
+     filter or a clip would create a containing block for it — nothing here
+     does today, but `will-change` is deliberately NOT set: this element
+     moves a few vh over a whole chapter, which is not worth a layer. */
 }
 
-/* the standing label: small, sans, the mark set into the line before it.
-   Every value is Discover's — see the warning in BlogIndex.module.css's
+/* ═══ THE LOCKUP — Discover's, and the left edge is the chapter's ═══
+   Every value here is Discover's — see the warning in BlogIndex.module.css's
    head block about retuning one of the three without the others. */
 .chapterLabel {
   margin: 0;
@@ -344,11 +573,9 @@
   color: var(--maroon);
 }
 
-/* sized in em so it tracks the label rather than needing a second clamp
-   that agrees with the label's own. 2.6em because maginhawa.png is a
-   SQUARE mark — far less optical weight at a given height than a
-   horizontal lockup, so it takes a value that would look oversized for
-   one. */
+/* 2.6em because maginhawa.png is a SQUARE mark — far less optical weight at
+   a given height than a horizontal lockup, so it takes a value that would
+   look oversized for one. */
 .labelMark {
   height: 2.6em;
   width: auto;
@@ -357,14 +584,17 @@
   object-fit: contain;
 }
 
-/* THE DISPLAY LINE. It replaces `Blog.` at clamp(3rem, 7.2vw, 6.75rem) —
-   a one-word title at nearly twice this size, in a grammar no other
-   chapter on the page uses. Same clamp and same em measure as Discover's
-   lede and /blog's title, so the three open identically. The clamp and
-   the 1.1 leading now live in globals as --t-chapter / --lh-chapter, so
-   the three cannot drift apart. Same values, one name. */
+.labelWordMask {
+  display: block;
+  min-width: 0;
+}
+
 .ledeMask {
-  grid-area: lede;
+  display: block;
+  /* the eyebrow sits ON the sentence now rather than across the page, so
+     this is the distance between them — the house lockup gap, not the
+     chapter gap the old full-width head used */
+  margin-top: var(--space-sm-y);
 }
 
 .lede {
@@ -378,180 +608,165 @@
   color: var(--maroon);
 }
 
-/* the hairline that closes the head and opens the pictures. Full band
-   width — a rule stopping at the type's right edge reads as an underline
-   of the sentence, and this is a boundary for the whole chapter. */
-/* ── 18px OFF THE DISPLAY LINE, matching .topRule's distance to the eyebrow
-   and Discover's copy of both. The head read 18px above the label and 43px
-   below the display line, so the two hairlines bracketing it sat at
-   different distances from the type they bracket.
-   The margin subtracts the head grid's own row gap — see the fuller note on
-   Discover.module.css's .headRule. */
-.headRule {
-  grid-area: rule;
-  display: block;
-  width: 100%;
-  height: 1px;
-  background: var(--rule);
-  margin-top: calc(18px - var(--head-gap));
-}
+/* ═══ THE ARCHIVE LINK — THE SEAT ONLY ═══
+   THE CONTROL ITSELF IS components/PillCta.tsx, because About's "Read our
+   story" and the closing frame's "Choose a restaurant" are the same object
+   and a shape that exists in three files is three shapes waiting to drift
+   apart. The clip equation, the three-cell nesting and the goo filter it
+   replaced are all in the banner at the top of PillCta.module.css.
 
-/* ═══════════ THE ARCHIVE LINK — THE SEAT ONLY ═══════════════════════════
-
-   THE CONTROL ITSELF HAS MOVED to components/PillCta.tsx and its
-   stylesheet, because About's "Read our story" and the closing frame's
-   "Choose a restaurant" are the same object now and a shape that exists in
-   three files is three shapes waiting to drift apart. Everything that was
-   here — the clip equation, the three-cell nesting, the goo filter it
-   replaced, the magnet's tuning — is in the banner at the top of
-   PillCta.module.css.
-
-   WHAT STAYS IS THE SEAT, and only the seat. `align-self: end` is what
-   hangs the pill off the display line's bottom edge: in the "lede cta" row
-   the lede is the tall item, so ending the pill against that row's bottom
-   sits it on the display line's last baseline however many lines the lede
-   wraps to. Hard-coding a margin would hold only at the width it was
-   measured at, because the lede is a clamp() that rewraps.
-
-   PillCta's own `.host` brings `display: block` and `width: fit-content`
-   (the magnet has to measure the control, not the grid cell), so this rule
-   never restates them. ═══ */
+   ⚠️ THE SEAT IS NOW JUST "UNDER THE SENTENCE". It was `grid-area: cta;
+   align-self: end; justify-self: end` — hung off the display line's last
+   baseline at the far right of a head that spanned the page. There is no
+   right-hand end of a column and nothing to hang from, so the pill simply
+   follows the sentence in the stack. PillCta's own `.host` brings
+   `display: block` and `width: fit-content`, so this rule never restates
+   them. */
 .ctaHost {
-  grid-area: cta;
-  align-self: end;
-  justify-self: end;
+  margin-top: clamp(22px, 2.6vh, 34px);
 }
 
-/* ═══════════════ THE BODY — the card and the rail ═══════════════════
-   Seven columns of the binding grid for the lede card, the remaining five
-   for the rail, on the grid's own gutter. `align-items: stretch` is what
-   makes the rail exactly as tall as the card, which is what lets its four
-   rows divide that height between them rather than needing a measured row
-   height that would only hold at one viewport. */
-.body {
-  /* the rail row's vertical padding — the air between two stories is twice
-     it. It was briefly the COLUMN gap as well (one measure for both axes),
-     and it is not any more: see the gap below. */
-  --rail-air: clamp(7px, 0.8vh, 11px);
-  /* ── CENTRED ON A NARROWER MEASURE, at the user's instruction ──
-     The head stays left-ranged on the page margin; only the pictures move.
-     ELEVEN of the binding grid's twelve columns, centred, so the inset is
-     half a column either side rather than a number: 1297px at 1440 against
-     the 1416 the head still spans, i.e. 71px of cream at each end.
+/* ═══════════ THE FRONT — the newest story, as a broadsheet lede ═══════
 
-     IT WAS TEN, and eleven is the last step that still reads as centred —
-     twelve IS the head's measure, at which point the block is flush and the
-     centring has nothing to show. Ten left 131px a side, which the user
-     asked to close up.
+   A photograph running the full measure, then the type BENEATH it on the
+   cream: headline in the left column, standfirst and the house action in
+   the right.
 
-     `width: min(…)` RATHER THAN `max-width` + `margin-inline: auto`,
-     because the margin has to survive as a FLOOR: below the width where ten
-     columns exceed the viewport, the first term wins and the block falls
-     back to the page margin instead of overflowing. One declaration does
-     both jobs. */
-  width: min(
-    100% - 2 * var(--blog-margin),
-    calc(var(--blog-col) * 11 + var(--blog-gutter) * 10)
-  );
-  margin-inline: auto;
-  display: grid;
-  /* SIX COLUMNS FOR THE CARD, down from seven at the user's instruction —
-     788px to 674px at 1440. The rail takes the rest (1fr), which lands it
-     at 672px: the two columns are now near enough equal in WIDTH, and the
-     hierarchy is carried entirely by what is in them — one photograph at
-     display scale against four thumbnail rows. It does not need the extra
-     column to be the lede.
-     The right-hand column no longer lands on a grid line, and that is the
-     cost of the gap being the rail's air rather than --grid-gutter: the
-     two outer edges still seat on the page margin, which is the edge a
-     reader can actually see. */
-  /* ── TWO EQUAL COLUMNS, and the change is forced by the centring above ──
-     This was `calc(var(--blog-col) * 6 + var(--blog-gutter) * 5) 1fr`: the
-     card took six columns of the FULL page grid and the rail took whatever
-     was left. That is exact while the block spans the whole measure and
-     wrong the moment it does not — the card would have held its 674px
-     inside a 1261px block and the rail would have absorbed the entire
-     inset, shifting a ratio nobody chose to change. Two `1fr` tracks keep
-     the split the six-column seat produced (674 against 672, measured) at
-     any block width. */
-  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
-  /* ── THE COLUMN GAP IS ITS OWN MEASURE AGAIN, at the user's instruction.
-     It was `--rail-air * 2` — exactly the air between two rail rows, 14.4px
-     at 1440 — on the argument that one measure on both axes makes the block
-     read as one field. On the render it made it read as one CROWDED field:
-     the vertical air separates a row from another row of the same kind,
-     where this separates a 674px photograph from a column of type, and the
-     two boundaries are not doing the same work.
-     36px at 1440 — three page gutters — and it scales with the viewport
-     rather than with the row's padding. */
-  column-gap: clamp(24px, 2.5vw, 40px);
-  align-items: stretch;
-}
-
-/* ═══════════ THE LEDE CARD — the restaurant cards' material ═══════════
-
-   THE MATERIAL IS IMPORTED, NOT COPIED. components/Blog.tsx pulls
-   `.rampBlur`, `.rampScrim`, `.cardCrown`, `.cardLogo` and `.cardLogoMark`
-   straight from VenueCard.module.css, which is the same thing Discover's
-   expansion already does with `.photo` / `.fallback` / `.stickerBadge`.
-   So the photo-derived ramp under this type IS the venue cards' ramp —
-   one 34px backdrop blur, one neutral scrim, one mask — and it cannot
-   drift from them.
-
-   WHAT THIS FILE STILL HAS TO DECLARE, and why it is not duplication: the
-   three CUSTOM PROPERTIES those rules read. A class can be imported; a
-   custom property set on `.cardSurface` cannot travel to an element that
-   does not carry that class. The ramp height is this card's own decision
-   anyway (it is a 16:10 landscape, not a 3:4.3 portrait or a square), and
-   the wash values below are VenueCard's `.square` list — the closest of
-   its two shapes to this one. ⚠️ IF THE WASH IS RETUNED THERE, RETUNE IT
-   HERE. */
-.feature {
-  position: relative;
+   ⚠️ THE TYPE IS OFF THE PICTURE, and Blog.tsx carries the argument. The
+   short version is the one that matters here: whitespace around a
+   headline seated inside a crop is not whitespace, it is more picture.
+   Every step in the ladder above exists because the type left the plate. */
+.front {
   display: block;
-  overflow: hidden;
   text-decoration: none;
-  color: var(--cream);
-  /* 4:3, and the ratio moved WITH the width. At seven columns this was
-     16:10 — the flattest shape that still left the photograph a clean
-     upper half above the block. Six columns is 114px narrower, and holding
-     16:10 there would have taken 71px off the card's HEIGHT as well, which
-     comes straight out of the four rail rows dividing it and shrinks every
-     thumbnail with them. 4:3 on the narrower card is 505px against the old
-     493 — the rail keeps its rows, the thumbnails keep their size, and the
-     card simply stops being letterboxed. */
-  aspect-ratio: 4 / 3;
+  color: var(--maroon);
+  /* ══ THE PLATE DROPS, AND THE VOICE BESIDE IT DOES NOT ══
+     At the user's instruction to "add air back on the right side only".
+
+     ⚠️ IT IS A COMPOSITION CHOICE AND NOT A CORRECTION, and the difference
+     matters because the first draft of this rule got it wrong. The seam
+     above is SYMMETRIC without this: AboutSplit's `.copy` and `.media` are
+     stretched siblings of one grid and its copy column carries no bottom
+     padding, so the fine print's foot and the film's foot are level by
+     construction, and both of this chapter's columns open on the same seat.
+     Measured settled, ink to ink at 1920 × 1080: left (film → head) 238,
+     right (fine → plate) 238.
+
+     ⚠️ AND THE DRIFT THIS WAS FIRST WRITTEN TO CANCEL DOES NOT EXIST.
+     AboutSplit's exit drift — a measured travel that carried the reading
+     column down as the chapter left — was DELETED at the user's
+     instruction that the chapter "stays in its correct place". What is
+     still in that file is the old implementation QUOTED INSIDE A COMMENT,
+     which is this repo's habit and reads exactly like live code. The live
+     column has an entrance rise and nothing else. Verified on the render:
+     `.readingBlock`'s computed transform is `none` at every point of the
+     passage.
+
+     SO WHAT THIS BUYS is a staggered opening: the plate starts a beat
+     under the voice instead of level with it, which gives the fine print
+     above it more cream than the film gets and is what was asked for. It
+     lands the plate's top edge partway down the display sentence's first
+     line (measured 268 against a line top of 232 at 1440 × 900; 307
+     against 276 at 1920; 246 against 209 at 1280) — under the sentence,
+     clear of the eyebrow.
+
+     FLAT PIXELS, NOT A CLAMP, because what it is measured against is TYPE
+     — the label's 2.6em mark and the sentence under it, both of which are
+     rem-based here — rather than the window. A vh term would open and
+     close a gap that has nothing to do with viewport height.
+
+     THE COST INSIDE THIS CHAPTER: the head and the plate no longer start
+     level, and the row — and so the divider and the rail under it — sit
+     80px lower. */
+  margin-top: var(--front-drop);
+}
+
+.frontPhoto {
+  position: relative;
+  overflow: hidden;
+
+  /* ⚠️ 3:2, AND IT WAS 24:9 UNTIL THE PICTURE STOPPED BEING FULL WIDTH.
+     That crop was chosen to rhyme with AboutSplit's edge-to-edge film on
+     the same 12px inset, which was a real argument while this plate spanned
+     the measure. It does not span it any more — it is the wider half of a
+     two-column row — and 24:9 in a 724px column is a 271px letterbox. Two
+     things broke at once, and both were measured:
+
+       · THE COLUMN BESIDE IT IS TALLER THAN IT. The sticky travel is
+         `picture − column`, and at 271 against a 303px column that is
+         NEGATIVE: `position: sticky` resolves to doing nothing at all,
+         silently, which is the whole point of the layout gone.
+       · THE RAMP CANNOT HOLD THE TYPE. 62% of 271 is 168px against a
+         267px block — the headline's first line would sit on bare
+         photograph.
+
+     3:2 gives 483px in the same column: ~180px of stick, and a 299px ramp
+     against the same 267px block. See --vc-ramp-h below for the full table.
+
+     The responsive block still opens the crop twice on the way down, but
+     for the other reason: once the row stacks, the plate is full width
+     again and a tall crop would fill a phone screen. */
+  aspect-ratio: 3 / 2;
   border-radius: var(--radius-tile);
   background: var(--placeholder);
-  /* THE CARD IS THE MEASURE, NOT THE VIEWPORT. The imported crown and mark
-     rules are sized in cqi (1% of the container's inline size), so without
-     this they would resolve against the nearest ancestor container — or
-     the small viewport — and the mark would come out the wrong size. */
-  container-type: inline-size;
-  container-name: card;
   box-shadow: var(--shadow-card);
 
-  /* ---- the three knobs the imported rules read ---- */
-  /* the ramp's share of the card's height. 56% against the portrait
-     card's 58% and the square's 70%: this card is WIDER than it is tall,
-     so a given share of its height is a shorter band in pixels, and the
-     block on it is three short elements rather than a three-line address
-     plus two stats and two controls. */
-  --vc-ramp-h: 56%;
-  /* the mark's corner wash — VenueCard's `.square` geometry, which is the
-     one derived for a short card. 26cqi rather than 34 because this card
-     is wider: cqi buys more pixels here, and the ellipse still has to die
-     inside the photograph's clean upper half. */
-  --vc-wash-h: clamp(64px, 26cqi, 116px);
-  --vc-wash-stops:
-    color-mix(in srgb, var(--maroon) 74%, transparent) 0%,
-    color-mix(in srgb, var(--maroon) 70%, transparent) 26%,
-    color-mix(in srgb, var(--maroon) 62%, transparent) 72%,
-    color-mix(in srgb, var(--maroon) 34%, transparent) 85%,
-    color-mix(in srgb, var(--maroon) 12%, transparent) 94%,
-    /* transparent MAROON, never the `transparent` keyword: sRGB
-       interpolation toward transparent-black greys the fade */
-      color-mix(in srgb, var(--maroon) 0%, transparent) 100%;
+  /* THE RAMP'S DEPTH — the one variable that crosses into
+     VenueCard.module.css's `.rampBlur` / `.rampScrim`, which this chapter
+     imports so the lede's type has a ground to stand on.
+
+     ⚠️ IT IS A max(), NOT A BARE PERCENTAGE, and the reason is the aspect
+     ratio moving underneath it. VenueCard's cards are portrait, where 56%
+     of the height is a deep band; this plate is 24:9, so at 1416 wide 56%
+     is 297px but on a 640px phone — where the responsive block below opens
+     the crop to 3:2 — it is 239px against a type block that needs ~150.
+     THE TWO NUMBERS ARE FITTED TO THE BLOCK, NOT PICKED. What has to hold
+     at every width is ramp >= block, and the block is 2*padding + tag +
+     2*gap + two headline lines + the pill — all clamps, so it can be
+     solved. Measured against the worst case at each end:
+
+       390   plate 275 (4:3,  full width)   ramp 190   block 160
+       641   plate 347 (16:9, full width)   ramp 215   block 174
+       960   plate 308 (3:2,  half measure) ramp 209   block 164
+       1250  plate 404 (3:2,  half measure) ramp 275   block 262
+       1440  plate 468 (3:2,  half measure) ramp 318   block 291
+
+     ⚠️ 72% NOW, AND IT HAS BEEN 62 AND 68. Each rise followed the plate
+     getting narrower — first to half the measure, then a further
+     --space-lg in. The block does not shrink with it at the same rate: its
+     cqi terms hit their px FLOORS on a small plate (the 2cqi gap bottoms
+     out at 8px around 400px of plate) while the fixed tag and pill never
+     shrink at all, so the ratio worsens as the plate narrows. Measured at
+     1010 with 68%: 10px of clearance. At 72%: 23px.
+
+     A TALLER RAMP IS NOT A DARKER ONE. `.rampBlur`'s mask runs transparent
+     → 0.4 at 32% → opaque at 62%, so raising the height mostly extends the
+     transparent lead-in; the fully-dark band at the bottom is unchanged.
+     That is why this is the cheap lever and the plate's crop is not.
+
+     THE HISTORY: 62% was solved against a full-measure plate. The share was
+     solved against a picture spanning the whole measure; narrowing it to
+     match AboutSplit's photograph took a third off its HEIGHT while the
+     headline beside it stayed the same size, and the block overflowed the
+     ramp at every desktop width — measured at 960 the miss was 28px, and
+     at 1440 it was 1px, which is the kind of margin that is not a margin.
+     The breakpoint below moved with it: the smaller headline now starts at
+     1200 rather than 900, because between those two widths the plate is
+     half a narrowing measure and --t-h2 no longer fits its own ramp.
+
+     46% was the first guess and it fails at 1280 by 50px — the share has
+     to carry the wide plates, where the headline is at its largest and the
+     plate at its flattest. The floor carries the phone, where 62% of a
+     275px plate is less than the block. ⚠️ THE HEADLINE'S TWO-LINE CLAMP IS
+     WHAT MAKES THIS SOLVABLE — see .frontTitle. Remove it and the block
+     has no upper bound and neither number means anything. */
+  --vc-ramp-h: min(100%, max(72%, 190px));
+
+  /* the mark inside is sized in cqi — against THIS box, not the viewport.
+     Without a container the units resolve against the small viewport and
+     the mark comes out the wrong size on every window. Same declaration,
+     same reason, as /blog's `.cardMedia`. */
+  container-type: inline-size;
 
   transform: scale(1);
   transition:
@@ -559,66 +774,214 @@
     box-shadow 400ms var(--ease-drawer);
 }
 
-/* the photograph, full bleed under the ramp. next/image `fill`, so the box
-   is this element and the intrinsic size never reaches layout. */
-.featurePhoto {
+/* THE PAN LAYER — see .mediaPan in AboutSplit.module.css for the budget
+   arithmetic; the two pictures share it. A separate box from the image
+   because `.frontPhotoImg` already carries the entrance's drift keyframe,
+   and one element cannot hold two independent transforms. */
+.frontPan {
+  position: absolute;
+  inset: 0;
+  /* ⚠️ THE SCALE IS NOT HERE, AND IT USED TO BE. framer writes the whole
+     `transform` property inline when it animates `y`, so a `scale()` left
+     in the stylesheet is not composed with the pan — it is REPLACED by it,
+     silently, and the picture pans with nothing in reserve until its frame
+     shows at the trailing edge. It travels in the same motion style as the
+     pan instead; see PARALLAX_SCALE in lib/drift.ts. */
+  will-change: transform;
+}
+
+/* next/image renders the <img>; `fill` gives it the absolute inset */
+.frontPhotoImg {
   object-fit: cover;
-  transform: scale(1);
   transition: transform 700ms var(--ease-drawer);
 }
 
-/* the block of type ON the ramp — seated in the card's bottom edge, with
-   no material of its own. The ramp above IS the ground; a second one
-   stacked here would put back the one thing the ramp exists to remove, a
-   locatable edge. */
-.featureBlock {
+/* ── THE VENUE'S MARK, and it is /blog's now rather than VenueCard's ──
+   This chapter used to import `card.cardCrown` and wear the restaurant
+   cards' material entire — ramp, scrim and crown. The ramp went with the
+   type, and with it went the argument: a plate carrying no ramp and no
+   cream type on it is not a venue card, it is a journal lede, and the
+   system it should be built out of is the journal's.
+
+   So both marks below are /blog's `.cardMark` — the same flex box, the
+   same cream mask, the same radial wash under it — at two sizes. THE WASH
+   IS NOT DECORATION: a bare cream mark on the brightest photograph in the
+   set measures ~1.16:1, i.e. it is not there. The ellipse is 100cqi wide,
+   so its horizontal radius is the plate's width and the alpha reaches zero
+   exactly at the right edge rather than ending on a visible cut.
+
+   TRANSPARENT MAROON, NEVER THE `transparent` KEYWORD: sRGB interpolation
+   toward transparent-black greys the fade. */
+.frontMark,
+.entryMark {
   position: absolute;
+  top: clamp(10px, 1.4vw, 16px);
+  left: clamp(10px, 1.4vw, 16px);
+  z-index: 2;
+  display: flex;
+  align-items: flex-start;
+  min-width: 0;
+  pointer-events: none;
+}
+
+.frontMark::before,
+.entryMark::before {
+  content: "";
+  position: absolute;
+  top: calc(-1 * clamp(10px, 1.4vw, 16px));
+  left: calc(-1 * clamp(10px, 1.4vw, 16px));
+  width: 100cqi;
+  background: radial-gradient(
+    100% 100% at 0% 0%,
+    color-mix(in srgb, var(--maroon) 74%, transparent) 0%,
+    color-mix(in srgb, var(--maroon) 70%, transparent) 26%,
+    color-mix(in srgb, var(--maroon) 62%, transparent) 72%,
+    color-mix(in srgb, var(--maroon) 34%, transparent) 85%,
+    color-mix(in srgb, var(--maroon) 12%, transparent) 94%,
+    color-mix(in srgb, var(--maroon) 0%, transparent) 100%
+  );
+  pointer-events: none;
+}
+
+.frontMarkInk,
+.entryMarkInk {
+  position: relative;
+  display: block;
+  max-width: 100%;
+  height: 100%;
+  min-width: 0;
+  background-color: var(--cream);
+  -webkit-mask: var(--ov-logo-url) no-repeat left top / contain;
+  mask: var(--ov-logo-url) no-repeat left top / contain;
+}
+
+/* ⚠️ THE TWO SIZES ARE NOT ONE CLAMP WITH A DIFFERENT CEILING. /blog's
+   own numbers (9cqi tall, 32cqi wide) are set against a 4:5 card ~330px
+   across; on this 1416px plate the same coefficients give a 127px-tall
+   mark. The front takes a much smaller SHARE of a much wider box, which
+   is what keeps the two reading as the same object at two scales. The
+   plain px pair above each cqi one is the fallback for an engine without
+   container units — do not delete either as a duplicate. */
+.frontMark {
+  height: 42px;
+  height: clamp(30px, 3.2cqi, 46px);
+}
+.frontMark::before {
+  height: 128px;
+  height: clamp(96px, 12cqi, 170px);
+}
+.frontMarkInk {
+  width: 118px;
+  width: clamp(84px, 9cqi, 128px);
+}
+
+.entryMark {
+  height: 26px;
+  height: clamp(22px, 9cqi, 32px);
+}
+.entryMark::before {
+  height: 96px;
+  height: clamp(64px, 34cqi, 122px);
+}
+.entryMarkInk {
+  width: 88px;
+  width: clamp(64px, 32cqi, 96px);
+}
+
+/* ── THE LEDE'S TYPE, ON THE RAMP ──
+   Seated in the plate's bottom-left, over the two ramp layers, in cream
+   ink because it is standing on a darkened photograph.
+
+   ⚠️ IT COSTS THE CHAPTER NO HEIGHT, which is the whole reason it is here
+   rather than under the picture. For one pass it was a two-column lockup on
+   the cream — tag and headline left, standfirst and action right — which is
+   what /blog's featured lede does and which reads better on its own. It
+   added ~200px plus its own --space-md gap to a chapter that was asked to
+   get smaller, and the standfirst went with it: at 48px on a ramp this deep
+   a paragraph would be a third voice competing with the picture it stands
+   on. /blog can afford one because it sets its type BESIDE the photograph
+   rather than inside it. Different ground, different budget.
+
+   TEXT-SHADOW ON TOP OF THE RAMP, not instead of it. --scrim-text is the
+   house pair (a 1px contact shadow and a 12px halo); the ramp does the
+   contrast work and this only keeps the glyph edges off whatever texture
+   happens to sit under them. */
+/* ⚠️ EVERY MEASURE HERE IS cqi — 1% OF THE PLATE'S OWN WIDTH — AND NOT vw.
+   This is the fix for a fault that took three passes to stop chasing. The
+   block has to fit inside the ramp, the ramp is a share of the plate's
+   HEIGHT, and the plate's height is a function of its WIDTH. Size the type
+   in vw and the two scale on different inputs: once the picture was
+   narrowed to half the measure, the headline kept growing with the window
+   while the ramp under it shrank with the column, and the block overflowed
+   at every desktop width — 28px at 960, 1px at 1440.
+
+   In cqi the whole block is a constant fraction of the plate, so the
+   arithmetic collapses to one inequality that holds at every width:
+
+       block ≈ 0.304·P + 50        ramp = 0.68 · H  (H = 2P/3, or 3P/4 stacked)
+       ⇒ 0.453·P ≥ 0.304·P + 50   ⇒  P ≥ 336px
+
+   and the narrowest this plate ever gets is 366px on a phone, where the
+   crop is 4:3 and the floor takes over anyway. THAT IS WHY THERE IS NO
+   BREAKPOINT for the block any more: a 1200px media query stood here and
+   was a symptom, not a fix — it patched one band and left the boundary at
+   6px of headroom. The container query has no boundary to be tight at.
+
+   The px floors and ceilings are still vw-free absolutes: 18px of padding
+   is the least that reads as a margin, and 46px is where the headline stops
+   growing regardless of how wide the plate gets. */
+.frontBlock {
+  position: absolute;
+  z-index: 4;
   left: 0;
   right: 0;
   bottom: 0;
-  z-index: 5;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: clamp(8px, 0.9vw, 12px);
-  padding: clamp(14px, 1.6vw, 22px) clamp(16px, 1.8vw, 26px)
-    clamp(16px, 1.8vw, 24px);
+  gap: clamp(8px, 2cqi, 18px);
+  padding: clamp(18px, 5.5cqi, 44px);
 }
 
-/* THE CATEGORY, as a cream outline pill — the same secondary-control
-   grammar the venue cards' "Menu" wears (42% is the weight at which an
-   outline reads as an object rather than as a disabled state), except that
-   this one is not pressable: the whole card is the link, so it is a
-   <span> and not a second focusable inside it. */
-.category {
-  display: inline-flex;
-  align-items: center;
-  min-height: clamp(24px, 2vw, 28px);
-  padding: 0 0.85em;
-  border-radius: 999px;
-  border: 1px solid color-mix(in srgb, var(--cream) 42%, transparent);
-  font-family: var(--font-mono);
-  font-weight: var(--w-medium);
+/* THE TAG CARRIES THE CATEGORY PILL'S OLD JOB — see Blog.tsx. Three facts
+   on one line, in the order /blog states them. */
+.frontTag {
+  display: block;
+  font-family: var(--font-sans);
+  font-weight: var(--w-regular);
   font-size: var(--t-label);
-  letter-spacing: var(--tr-label-mono);
-  line-height: var(--lh-flush);
+  letter-spacing: var(--tr-label);
   text-transform: uppercase;
   color: var(--cream);
+  opacity: 0.86;
+  text-shadow: var(--scrim-text);
 }
 
-/* the headline. Display face, because this is the one story the chapter is
-   actually presenting; the rail's titles are sans and a third of the size,
-   which is the whole hierarchy this layout exists to state.
-   Two lines maximum: a third line climbs out of the ramp's legible band. */
-.featureTitle {
+.frontTitle {
   margin: 0;
-  max-width: 20ch;
   font-family: var(--font-display);
   font-weight: var(--w-regular);
-  font-size: clamp(1.5rem, 2.4vw, 2.4rem);
-  line-height: 1.12;
+  /* against the PLATE, not the window — see the banner on .frontBlock.
+     6.4cqi lands at 45px on a 702px plate, which is within 3px of the
+     --t-h2 this replaces at the same width; what changes is that it now
+     shrinks WITH the picture instead of with the browser. */
+  font-size: clamp(20px, 6.4cqi, 46px);
+  line-height: var(--lh-heading);
   letter-spacing: var(--tr-display);
   color: var(--cream);
+  /* the house measure, not the plate's width — 20ch at --t-h2 wraps to two
+     lines, which is what a lede headline on a ramp should be */
+  max-width: 20ch;
+  text-shadow: var(--scrim-text);
+
+  /* ⚠️ TWO LINES, HARD — the clamp .featureTitle carried before this
+     chapter was rebuilt, and it is restored for a reason that was measured
+     rather than remembered. This block is absolutely seated in the plate's
+     bottom edge and the RAMP under it is sized in the plate's own height,
+     so the two are not coupled: a headline that runs to three lines grows
+     the block past the ramp's top edge and its first line ends up on bare
+     photograph at ~1.2:1. Bounding the headline is what makes the ramp
+     floor on .frontPhoto a number that can be checked. */
   display: -webkit-box;
   -webkit-box-orient: vertical;
   -webkit-line-clamp: 2;
@@ -626,264 +989,387 @@
   overflow: hidden;
 }
 
-/* THE FOOT OF THE BLOCK — the meta at the left, the control at the right.
+/* THE SEAT ONLY — the control is PillCta's, and its own `.host` brings
+   `display: block` and `width: fit-content`. The `cream` tone is passed in
+   Blog.tsx rather than set here, because it is a fact about the ground the
+   control is standing on, not about where it sits. */
+.frontCta {
+  margin-top: clamp(2px, 0.5vh, 8px);
+}
 
-   A ROW RATHER THAN A FOURTH STACKED ELEMENT, at the user's instruction to
-   add the control at all. Stacked under the meta it would have cost the
-   block ~44px of height, which comes off the photograph; on the meta's own
-   line it costs nothing and it uses the width the card has to spare. The
-   two ends of one line also give the block a base — the type above it is
-   ragged-right by nature, and this is the only element that reaches the
-   card's far edge. */
-.featureFoot {
+/* ═══════════ THE DIVIDER — /blog's, word for word ═══════════════════
+   A hairline with the archive's own caption on it. It is the strongest
+   tie between the two pages, and it is also what retired the duplicated
+   lede: under the heading "Latest" the newest story had to appear twice
+   (a reader scanning the column reported it missing otherwise); under
+   "Earlier Entries" the repeat is simply wrong. Renaming the column is
+   what fixed the duplication — see buildChapter in Blog.tsx. */
+.divider {
   display: flex;
   align-items: center;
-  justify-content: space-between;
-  gap: clamp(12px, 1.4vw, 20px);
-  width: 100%;
+  gap: var(--space-sm);
+  margin-top: var(--step-arc);
 }
 
-/* THE CONTROL. A styled SPAN, not an anchor — the whole card is the link
-   and nesting anchors is invalid — so this is a pill that looks pressable
-   without being separately focusable, and it is `aria-hidden` because the
-   card's accessible name is already the headline. "Read More" announced a
-   second time is noise on a screen reader.
-
-   IT IS THE VENUE CARDS' PRIMARY PILL: a cream FILL with the ink label,
-   the same object `.cardBtnFill` paints on the restaurant cards, and for
-   the same reason — it sits on a photo-derived ramp whose hue moves from
-   card to card, and cream is the one ink that reads on all of them. It is
-   also the only OPAQUE thing on the ramp, which is what makes it the
-   loudest without any colour at all. Cream on --maroon is 9.80:1.
-
-   NO SHADOW. The venue cards' pills carry none: a chip inside a card that
-   threw the card's own elevation would read as floating off it. */
-.featureCta {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--lockup-gap);
-  flex: none;
-  min-height: clamp(28px, 2.5vw, 34px);
-  padding: 0 1.1em;
-  border-radius: 999px;
-  background: var(--cream);
-  color: var(--maroon);
-  font-family: var(--font-mono);
-  font-weight: var(--w-medium);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label-mono);
-  line-height: var(--lh-flush);
-  text-transform: uppercase;
-  white-space: nowrap;
-  transition: transform 400ms var(--ease-drawer);
-}
-
-.featureCtaArrow {
-  width: clamp(18px, 1.6vw, 26px);
-  height: 10px;
-  transition: transform 0.4s var(--ease-out);
-}
-
-/* date · outlet. MIXED WITH BLACK, NOT SET IN ALPHA — the second half of
-   VenueCard's sanctioned exception, and for its reason: a cream at reduced
-   alpha would let the blurred photograph through the letterforms, so the
-   reading would shift card to card, and mixing toward `--maroon` (a
-   green-black) would put a cast on the words. 84% is the value the venue
-   cards' address pair was re-derived to when the ground token deepened. */
-.featureMeta {
-  font-family: var(--font-sans);
-  font-weight: var(--w-regular);
-  font-size: var(--t-small);
-  line-height: var(--lh-snug);
-  color: color-mix(in srgb, var(--cream) 84%, #000);
-}
-
-/* ---------- the rail: the next four stories ---------- */
-.rail {
-  display: flex;
-  flex-direction: column;
-  min-width: 0;
-}
-
-/* the rail's own standing label. The same small sans voice as the chapter
-   label above it, and NOT a second display heading — the chapter has one
-   heading and this is a column header inside it.
-
-   IT CARRIED THE COLUMN'S LAST RULE AND NOW CARRIES NONE. The hairline was
-   a border-top on every row; the row rules went first (see .row), this one
-   survived a round as the label's underline, and it is gone too at the
-   user's instruction. Nothing is lost that was doing work: the chapter
-   already draws a full-width rule directly above this label (.headRule),
-   so the column's top edge was being stated twice, 27px apart. The label's
-   bottom margin is kept — the air that the padding and the rule occupied
-   is what now separates the header from the first story. */
-.railLabelMask {
-  margin: 0 0 clamp(12px, 1.5vh, 20px);
-}
-
-.railLabel {
+.dividerLabel {
   display: block;
-  margin: 0;
   font-family: var(--font-sans);
   font-weight: var(--w-medium);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
   color: var(--maroon);
-  opacity: 0.75;
+  /* ⚠️ NO LONGER HELD BACK AT 0.6, at the user's instruction that it read
+     as solid rather than grey. It was faded on the usual reasoning that a
+     label should sit under the thing it labels; what that actually did here
+     was put a washed-out word beside a hairline drawn at 68% maroon, so the
+     label read LIGHTER than its own rule and the pair came apart. Full
+     strength closes it up.
+
+     AND IT REMOVES A COLLISION: `blogFade`, which this element runs under
+     reduced motion, animates opacity to 1 — so the declaration fought the
+     animation it shares an element with and snapped back to 0.6 when it
+     rested. */
 }
 
-/* THE ROW. `flex: 1` on all four is what divides the card's height between
-   them — the rail is stretched to the card by the grid, so the rows share
-   whatever that comes to and the two columns finish on the same line at
-   every viewport with nothing measured.
-
-   NO RULES BETWEEN THE STORIES, at the user's instruction. Each row used
-   to sit under a 1px hairline. The thumbnails carry --shadow-card now and
-   fill the row's full height, so every story already reads as its own
-   object standing off the cream — and a divider drawn between two objects
-   that are separated by their own edges and their own shadows is a third
-   statement of a boundary the eye has made twice. What separates them is
-   the air the padding leaves. */
-.row {
+.dividerRule {
   flex: 1;
+  height: 1px;
+  background: var(--rule);
+}
+
+/* ═══════════ THE ENTRIES — /blog's card, compact, on a rail ═══════
+   A 4:5 plate, then the type beneath it on the cream: headline, hairline,
+   outlet leading the date. Every value is BlogIndex.module.css's, down to
+   the 3px dot, because the two are meant to be the same card — except the
+   two things this one drops and the one it re-sizes, each noted below.
+
+   ── WHY IT IS A RAIL AND NOT A ROW OF FOUR ──
+   A four-column grid shows four stories and hides the other three behind a
+   pill. The rail shows the same four at rest, admits there are more by
+   letting the fifth sit half-cut at the right edge, and costs the chapter
+   ~240px of height because the cards are narrower. It is the shorter and
+   the more honest answer at once.
+
+   THE PHYSICS ARE IN Blog.tsx and they are recovered from git rather than
+   rewritten — an eased follow while held, an inertial coast with friction
+   and boundary damping on release. What this file owns is the rail. */
+.strip {
   display: flex;
-  align-items: center;
-  gap: clamp(12px, 1.2vw, 18px);
-  /* half the air between two stories, top and bottom — the other half is
-     the next row's. See --rail-air on .body: the column gap is this
-     doubled, so the two axes carry one measure. */
-  padding-block: var(--rail-air);
+  gap: var(--space-md);
+  margin-top: var(--step-arc);
+
+  overflow-x: auto;
+  overflow-y: hidden;
+  /* PROXIMITY, NOT MANDATORY, AND THAT IS THE COAST'S DOING. The loop in
+     Blog.tsx writes scrollLeft every frame and the browser applies snap
+     when the scrolling stops; under `mandatory` a long fling is yanked onto
+     the nearest card the instant the velocity dies, which is exactly the
+     "settles rather than snaps" behaviour the friction curve exists to
+     produce. Proximity lets it land where it lands unless it stops close. */
+  scroll-snap-type: x proximity;
+  cursor: grab;
+
+  /* the bar is chrome on a control whose affordance is the cards
+     themselves; the rail is keyboard-reachable through `tabIndex` instead
+     — see the note on the element in Blog.tsx */
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+.strip::-webkit-scrollbar {
+  display: none;
+}
+
+/* the snap is lifted for the whole gesture — under a held pointer it would
+   fight the eased follow on every frame */
+.strip[data-dragging] {
+  cursor: grabbing;
+  scroll-snap-type: none;
+}
+
+.strip:focus-visible {
+  outline: 2px solid var(--maroon);
+  outline-offset: 6px;
+  border-radius: var(--radius-tile);
+}
+
+.entry {
+  flex: none;
+  /* ⚠️ SOLVED, NOT CLAMPED, and that is what makes the row a row. Five
+     cards and four gaps have to fill the measure exactly, so the width is
+     the expression that says so rather than a number tuned to look right at
+     one window. At 1440 it lands at 257.6px and the five sit flush edge to
+     edge; the max() floor takes over at about 1300px, the row overflows,
+     and the drag in Blog.tsx earns itself. One expression, both behaviours.
+
+     THE FLOOR IS 178px because below it a headline gives three words a
+     line. It is also why the standfirst and the "Read article →" button are
+     off this card: another ~90px of type on a plate this width is a
+     paragraph nobody reads on the way past. */
+  width: max(178px, calc((100% - 4 * var(--space-md)) / 5));
+  scroll-snap-align: start;
+  display: flex;
+  flex-direction: column;
+  min-width: 0;
   text-decoration: none;
   color: var(--maroon);
-  min-width: 0;
 }
 
-/* THE THUMBNAIL — square, on --radius-tile like every other photograph on
-   the page, and now AS TALL AS ITS ROW.
-
-   `align-self: stretch` + `width: auto` is what sizes it: the row's height
-   is already decided (four rows dividing the card's), so stretching the
-   thumb to it and letting `aspect-ratio` resolve the width gives the
-   largest square the row can hold — 109px at 1440 against the 92px clamp
-   it replaces. A width clamp cannot do this: it would have to guess the
-   row height, and any guess over it grows the rail past the card and the
-   two columns stop finishing on the same line. This way the picture is
-   always exactly the row, at every viewport, with nothing measured.
-
-   ⚠️ IT NEEDS A ROW WITH A HEIGHT OF ITS OWN. Under 900px the rows go
-   `flex: none` and take their height from their content — i.e. from this
-   element — so the stretch would be circular and the thumb would collapse
-   onto the type's height. The narrow query at the foot of this file gives
-   it an explicit width there instead.
-
-   --shadow-card, the same four-stop shadow the lede card and the venue
-   cards carry: these are photographs standing off the cream, and the rail
-   is the one place on the chapter where they had been sitting flat on
-   it. */
-.thumb {
+.entryMedia {
   position: relative;
-  flex: none;
-  align-self: stretch;
-  width: auto;
-  aspect-ratio: 1;
   overflow: hidden;
+  aspect-ratio: 4 / 5;
   border-radius: var(--radius-tile);
   background: var(--placeholder);
-  box-shadow: var(--shadow-card);
-  transition: box-shadow 400ms var(--ease-drawer);
+  /* the mark's cqi units resolve against this box — see .frontPhoto */
+  container-type: inline-size;
 }
 
-.thumbPhoto {
+.entryPhoto {
   object-fit: cover;
-  transform: scale(1);
   transition: transform 700ms var(--ease-drawer);
 }
 
-/* the type column. `min-width: 0` is not a tidy-up: a flex item's
-   min-width resolves to its content's min-content size, so without it the
-   headline refuses to shrink and pushes the row wider than the rail. */
-.rowText {
+/* ⚠️ BOTH GROW, AND THAT IS WHAT ALIGNS THE HAIRLINES. `.strip` is a flex
+   row, so every card is as tall as the tallest one; `margin-top: auto` on
+   .entryRule then pushes the rule and the meta to the card's own bottom
+   edge, which is the same height on all of them. Without `flex: 1 1 auto`
+   here the body only wraps its content, the rule sits directly under the
+   headline, and a card whose title runs to three lines drops its hairline
+   21px below its neighbours' — measured, before this rule existed. A row
+   of rules at two different heights reads as a broken grid, not as prose.
+
+   /blog does the same thing one element further down: its `.cardBody`
+   grows and `margin-top: auto` sits on the "Read article" button. That
+   button is dropped here, so the rule inherits the job. */
+.entryBodyMask,
+.entryBody {
   display: flex;
   flex-direction: column;
-  gap: 0.35em;
   min-width: 0;
+  flex: 1 1 auto;
 }
 
-.rowTitle {
+.entryBody {
+  /* NAMED BECAUSE THE ACTION BAND HAS TO SUBTRACT FROM IT — see
+     .entryAction. Everything else in the card is spaced on --entry-gap. */
+  --entry-gap: clamp(8px, 0.9vw, 12px);
+  /* the air INSIDE the ruled band, above and below "Read More", cut at the
+     user's instruction: a control sitting in its own two rules wants to
+     read as one object, and a band as loose as the gaps between the card's
+     other parts reads as two more gaps with a word floating in them.
+     ⚠️ OPENED BACK UP A LITTLE, at the user's instruction: 5px at 1440 was
+     the first cut and read pinched, 7.5px is the second. It is still well
+     under --entry-gap, which is what keeps the band a band. */
+  --entry-band: clamp(5px, 0.52vw, 7.5px);
+  gap: var(--entry-gap);
+  padding-top: clamp(10px, 1.1vw, 14px);
+}
+
+.entryTitle {
   margin: 0;
-  font-family: var(--font-sans);
-  font-weight: var(--w-regular);
-  font-size: clamp(0.95rem, 1.05vw, 1.0625rem);
+  font-family: var(--font-display);
+  font-weight: var(--w-medium);
+  /* ⚠️ NOT --t-h3, which is what /blog's card uses. That token tops out at
+     25.6px, set against a card half again this wide; here it gives four
+     words a line. This clamp lands at ~17px on a 236px card, which is the
+     same RATIO of type to measure that /blog's card has. */
+  font-size: clamp(1rem, 1.35vw, 1.2rem);
   line-height: var(--lh-heading);
+  letter-spacing: var(--tr-display);
   color: var(--maroon);
+  /* three lines, so the rule and the meta below land at the same height on
+     every card in the rail — the alternative is a row of hairlines at four
+     different heights, which reads as a broken grid rather than as prose */
   display: -webkit-box;
   -webkit-box-orient: vertical;
-  -webkit-line-clamp: 2;
-  line-clamp: 2;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
   overflow: hidden;
   transition: color 0.3s ease;
 }
 
-/* the quiet voice on the row. 0.75 of the ink measures 4.97:1 on the
-   cream — quiet, not inaudible; see the same value on the retired
-   caption's date line, whose 0.65 fell to 3.8:1 when the ground
-   deepened. */
-.rowMeta {
+/* TWO REAL ELEMENTS, not ::before/::after on the body, because each has to
+   sit BETWEEN two things — a pseudo-element on the parent cannot.
+
+   ⚠️ ONLY THE FIRST TAKES `margin-top: auto`, and that is the whole
+   difference between them. That is what pushes the rule, the meta and the
+   foot rule to the bottom of a card whose height is set by its tallest
+   neighbour in the row; putting it on both would make the second claim the
+   slack as well and open a gap between the date and the line under it.
+
+   THE FOOT RULE IS NEW, at the user's instruction. It closes the card the
+   way the head rule opens the meta, so the outlet and the date sit in a
+   ruled band of their own rather than hanging off the bottom of the type.
+   It also gives the row a common baseline the eye can read across five
+   cards — five lines at one height, which is the same argument the divider
+   above makes at full width. */
+.entryRule,
+.entryRuleFoot {
   display: block;
+  width: 100%;
+  height: 1px;
+  background: var(--rule);
+}
+.entryRule {
+  margin-top: auto;
+}
+
+/* ── THE DATE, ON THE PLATE ──
+   Bottom-right, opposite the venue's mark, and it carries its own ground
+   for the same reason the mark does: cream type on an arbitrary photograph
+   is not legible by default. The wash is the mark's, mirrored — a radial
+   from the corner it sits in, in transparent maroon rather than the
+   `transparent` keyword, because sRGB interpolation toward transparent
+   BLACK greys the fade. */
+.entryDate {
+  position: absolute;
+  right: clamp(10px, 1.4vw, 16px);
+  bottom: clamp(10px, 1.4vw, 16px);
+  z-index: 2;
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--cream);
+  text-shadow: var(--scrim-text);
+  pointer-events: none;
+}
+
+.entryDate::before {
+  content: "";
+  position: absolute;
+  right: calc(-1 * clamp(10px, 1.4vw, 16px));
+  bottom: calc(-1 * clamp(10px, 1.4vw, 16px));
+  z-index: -1;
+  width: 100cqi;
+  height: clamp(56px, 30cqi, 104px);
+  background: radial-gradient(
+    100% 100% at 100% 100%,
+    color-mix(in srgb, var(--maroon) 70%, transparent) 0%,
+    color-mix(in srgb, var(--maroon) 62%, transparent) 34%,
+    color-mix(in srgb, var(--maroon) 34%, transparent) 72%,
+    color-mix(in srgb, var(--maroon) 12%, transparent) 90%,
+    color-mix(in srgb, var(--maroon) 0%, transparent) 100%
+  );
+  pointer-events: none;
+}
+
+/* ── THE ACTION, BETWEEN THE TWO RULES ──
+   Label at one end, arrow at the other, the full width of the card. It
+   replaces the outlet-and-date line that used to sit here: the outlet
+   leads the headline now and the date is on the picture, so the band
+   between the rules was left holding nothing.
+
+   `space-between` rather than a gap, because what makes this read as a
+   control rather than as a caption is the arrow being AT the card's edge —
+   the same arrangement the lede's pill makes at a larger size. */
+.entryAction {
+  /* ⚠️ NEGATIVE, AND IT IS A SUBTRACTION FROM THE FLEX GAP RATHER THAN A
+     SMALLER GAP. `gap` is one value for the whole column and the rules,
+     the headline and the band are all spaced by it; pulling the action
+     toward both rules with its own margin is the only way to tighten THIS
+     seam without loosening or tightening every other one. Resolves to
+     --entry-band above and below at every width, because whatever the gap
+     contributes is cancelled first. */
+  margin-block: calc(var(--entry-band) - var(--entry-gap));
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  gap: var(--space-xs);
   font-family: var(--font-sans);
   font-weight: var(--w-regular);
   font-size: var(--t-small);
-  line-height: var(--lh-snug);
+  line-height: var(--lh-flush);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
   color: var(--maroon);
-  opacity: 0.75;
+}
+
+.entryActionArrow {
+  flex: none;
+  width: 32px;
+  height: 10px;
+  transition: transform 400ms var(--ease-drawer);
+}
+
+/* ⚠️ THE LABEL IS WRAPPED AND ITS TEXT BOX IS TRIMMED, AND THAT IS WHAT
+   MAKES THE BAND SYMMETRICAL TO THE PIXEL.
+
+   THE BOXES WERE ALREADY EXACT AND THE INK WAS NOT. Measured at 1440×900
+   with the negative margin above in place:
+
+       rule → action box   5.00px above, 5.00px below   ✔
+       rule → arrow ink    7.50px above, 7.50px below   ✔
+       rule → WORD ink     6.20px above, 7.83px below   ✘
+
+   The word is the odd one out because "READ MORE" is all caps: its ink runs
+   from cap-height to the baseline, and a font's line box reserves room for
+   an ascender above the caps and a descender below the baseline that this
+   string never uses. The box is centred; the letters inside it are not.
+
+   `text-box: trim-both cap alphabetic` cuts the line box down to exactly
+   that cap-to-baseline band, so the box the flex line centres IS the ink.
+   ⚠️ IT NEEDS ITS OWN ELEMENT: the label used to be a bare text node, which
+   becomes an anonymous flex item and cannot be styled. Hence the span in
+   Blog.tsx — it exists for this rule and for nothing else.
+
+   Where `text-box` is not supported the span is inert and the band falls
+   back to the 1.6px asymmetry above, which is the state it shipped in. */
+.entryActionLabel {
+  display: block;
+  text-box: trim-both cap alphabetic;
 }
 
 /* ---------- hover ---------- */
-/* The card answers exactly as a venue card does — a 1% lift on a deeper
-   shadow with the photograph zooming under it. The rail rows are quieter:
-   a thumb zoom and the title warming to saffron, which is the grammar the
-   strip's captions used. */
+/* The lede answers as a venue card does — a lift on a deeper shadow with
+   the photograph zooming under it — but at a THIRD of the scale, because
+   the object is 1416px wide: a 1% lift on a 674px card is 7px of travel
+   and on this plate it is 14, which reads as the whole chapter twitching.
+
+   ⚠️ THE LEDE'S HEADLINE DOES NOT WARM TO SAFFRON, and the entries' does.
+   The house hover for a headline is a shift to --saffron; that token is a
+   dark green chosen against the cream, and on a ramp over a photograph it
+   is very nearly the ramp. The plate's own lift is its hover, and the pill
+   closing beside it is the second half.
+
+   ⚠️ THE PILL IS NOT LISTED HERE, and that is not an omission. It closes
+   off `[data-cta-hover]` on the lede anchor, in PillCta.module.css, where
+   the rest of its choreography lives. There is deliberately no keyboard
+   equivalent — a presentational pill is not focusable and the plate's own
+   focus ring is the keyboard affordance. /blog's featured lede behaves the
+   same way. */
 @media (hover: hover) and (pointer: fine) {
-  .feature:hover {
-    transform: scale(1.01);
+  .front:hover .frontPhoto {
+    transform: scale(1.005);
     box-shadow: var(--shadow-card-hover);
   }
-  .feature:hover .featurePhoto {
+  .front:hover .frontPhotoImg {
     transform: scale(1.03);
   }
-  /* the pill answers with the card rather than on its own hover — the card
-     IS the control here, so a chip that lit up only under the pointer
-     would imply a second, smaller target inside it */
-  .feature:hover .featureCta {
-    transform: scale(1.02);
+  /* ⚠️ NOT `.strip:hover .entryPhoto` — a rail is one box under the
+     pointer, so hovering anywhere on it would zoom all seven plates at
+     once. The card is the object being answered. */
+  .entry:hover .entryPhoto {
+    transform: scale(1.04);
   }
-  .feature:hover .featureCtaArrow {
-    transform: translateX(4px);
-  }
-  .row:hover .thumbPhoto {
-    transform: scale(1.06);
-  }
-  .row:hover .rowTitle {
+  .entry:hover .entryTitle {
     color: var(--saffron);
+  }
+  .entry:hover .entryActionArrow {
+    transform: translateX(4px);
   }
 }
 
 /* keyboard parity — outside the hover query, so keyboards on touch hybrids
    still get it */
-.feature:focus-visible {
-  transform: scale(1.01);
-  box-shadow: var(--shadow-card-hover);
-  outline: 2px solid var(--maroon);
-  outline-offset: 3px;
-}
-
-.row:focus-visible {
+.front:focus-visible,
+.entry:focus-visible {
   outline: 2px solid var(--maroon);
   outline-offset: 3px;
   border-radius: var(--radius-tile);
 }
-.row:focus-visible .rowTitle {
+.entry:focus-visible .entryTitle {
   color: var(--saffron);
 }
 
@@ -913,8 +1399,8 @@
 
    ⚠️ `backwards`, NOT `both`, AND IT IS LOAD-BEARING. With `both` the
    animation keeps winning the cascade after it ends, which would pin
-   .featurePhoto's transform forever and silently kill
-   `.feature:hover .featurePhoto` — the CSS form of the trap PillCta's
+   .frontPhotoImg's transform forever and silently kill
+   `.front:hover .frontPhotoImg` — the CSS form of the trap PillCta's
    magnet sets in JS. `backwards` holds the from-state through the delay
    and then hands the property back to the stylesheet, and every keyframe
    here ends exactly where the stylesheet already sits (no transform, no
@@ -924,8 +1410,11 @@
 
    THE BEAT IS ONE NUMBER. --cascade-beat is the whole cadence and --i is
    each element's place in it, the same arrangement as Discover's --tw-i.
-   At 70ms the last thumbnail finishes ~1.46s in; 55ms is the tighter
-   alternative if that reads long.
+   ⚠️ THE TAIL MOVED WHEN THE LEDE GREW. The old chapter's last seat was 8
+   (four rail rows from 5); this one's is 10, because the lede's type takes
+   three beats of its own — so at 70ms the last entry starts 700ms in and
+   its 1000ms settle finishes ~1.7s from the top, against ~1.46s before.
+   55ms is the tighter alternative if that reads long.
 
    ⚠️ THE PARKED STATE LIVES IN CSS, so a reader whose JS never runs sees
    the type parked rather than seated. That is the trade Discover's title
@@ -937,17 +1426,27 @@
   --cascade-beat: 70ms;
 }
 
+/* THE MASKS THAT ONLY CLIP. These three wrap a single line that DESCENDS,
+   so the clip is all they do and it stays put; the masks that SWEEP
+   (.ledeMask, .frontTitleMask, .entryBodyMask) declare
+   no base clip at all, because the animation is their clip and they should
+   be unclipped once it ends.
+
+   The negative bottom inset is the descender bleed — 0.3em, the same
+   number SplitWords uses, and the one -110% is derived against. */
 .labelWordMask,
-.railLabelMask,
-.rowTextMask {
+.frontTagMask,
+.dividerLabelMask {
   display: block;
   min-width: 0;
   clip-path: inset(0 -0.6em -0.3em -0.12em);
 }
 
-/* the rail row's text is a flex child before it is a mask, and it takes
-   the seat .rowText used to hold — default flex, min-width: 0 (see the
-   note on .rowText for why that one is not a tidy-up) */
+/* the divider's label sits in a flex row beside a 1fr rule, so its mask
+   has to refuse to shrink or "Earlier Entries" wraps mid-phrase */
+.dividerLabelMask {
+  flex: none;
+}
 
 @keyframes blogSweepDown {
   from {
@@ -1044,109 +1543,294 @@
   --i: 3;
   --enter-d: 700ms;
 }
-.feature,
-.featurePhoto,
-.railLabel {
-  --i: 4;
+
+/* ── THE LEDE TAKES THREE BEATS WHERE THE OLD CARD TOOK ONE ──
+   It used to be one object: a photograph with its type inside it, so the
+   plate's sweep revealed the headline as a side effect. The type is on the
+   cream now and arrives on its own beats — the plate and its tag, then the
+   headline and the standfirst, then the action.
+
+   ⚠️ THE TAG AND THE HEADLINE SHARE SEAT 5 rather than taking one each.
+   They are two lines of one lockup on the ramp, four pixels apart;
+   staggering them would read as the block assembling itself. */
+/* ⚠️ THE PLATE'S COUNT STARTS AT 0, NOT 4, because it no longer follows
+   the head's. Those four seats were a queue behind the mark, the word, the
+   sentence and the pill — all of which now arrive on the scroll instead,
+   under [data-in], a third of the approach earlier. Leaving the plate at 4
+   meant 280ms of dead time after its own trigger before anything moved. */
+.frontPhoto,
+.frontPhotoImg {
+  --i: 0;
 }
-.railLabel {
+/* ⚠️ THE LEDE SWEEPS ON AboutSplit's NUMBERS, at the user's instruction
+   that the two pictures move the same. The GESTURE was already identical —
+   a top-anchored clip running down, with the plate drifting −4%/1.1 against
+   it on --ease-drawer — because both were written from the same argument.
+   What differed was the timing: this ran 900ms/1400ms against that
+   chapter's 1150ms/1700ms.
+
+   THE OVERHANG IS THE POINT, and it survives the change: the drift outlasts
+   the mask by 550ms either way, so the picture is still settling for half a
+   second after the reveal edge has gone. Matching the two durations instead
+   would give back a panel that simply stops — AboutSplit's own note on
+   DRIFT says exactly that. */
+.frontPhoto {
+  --enter-d: 1150ms;
+}
+/* ⚠️ AND IT HAS TO BE PUT BACK HERE, because --enter-d INHERITS. The block
+   of type sits INSIDE the plate, so raising the picture's sweep to
+   AboutSplit's 1.15s quietly raised the tag's descent and the headline's
+   sweep to 1.15s as well — measured on the render, 1150ms against the
+   700ms a single line of type is tuned for. A descent that long does not
+   read as slower, it reads as stuck.
+   The default is restated rather than unset because `unset` on a custom
+   property makes it inherit, which is the exact behaviour being undone. */
+.frontBlock {
+  --enter-d: 700ms;
+}
+/* the type is ON the plate, so it arrives one beat AFTER the plate opens
+   rather than with it — the ramp is there to be landed on */
+.frontTagMask,
+.frontTag,
+.frontTitleMask,
+.frontTitle {
+  --i: 1;
+}
+.frontCta {
+  --i: 2;
+  --enter-d: 700ms;
+}
+/* ⚠️ SEAT 0, NOT 2, BECAUSE THE RAIL IS ITS OWN CASCADE NOW.
+   "Earlier Entries" used to be the third beat of the featured plate's run
+   — it opened with the card above it, because one attribute drove both.
+   The rail has its own gate (see the block over `data-rail` below) and this
+   label is what opens it, so it takes the first seat and the five entries
+   count from 1. */
+.dividerLabelMask,
+.dividerLabel {
+  --i: 0;
   --enter-d: 600ms;
 }
 
-/* THE SWEEP — every photograph, plus the two framed objects in the head */
+/* ══════════ THREE GATES, NOT TWO, AND THE THIRD IS THE RAIL'S ══════════
+
+   `data-in` opens the voice column, `data-plate` opens the featured card,
+   and `data-rail` — new — opens "Earlier Entries" and the five cards under
+   it. The rail used to ride on `data-plate`, and that was measurably wrong.
+
+   THE ARITHMETIC, at 1440×900 (scripts/probe-blog-blocks.mjs):
+     · `data-plate` latches at SWEEP_AT, scrollY ≈ 3475, where the section's
+       top edge is 94px down the screen.
+     · the rail's own top edge is at document 4356 — 881px down the screen
+       at that instant, i.e. sitting ON the fold.
+     · its five cards take seats 3…7 of a 70ms beat and sweep for 900ms, so
+       the last one finishes 1.39s after the latch.
+     · a reader moving at an ordinary 900px/s has travelled ~1250px in that
+       time. The rail's top is then 369px ABOVE the screen. THE LAST CARDS
+       OF THE RAIL FINISHED OPENING AFTER THE RAIL HAD LEFT.
+
+   So the reader either watched a row of half-clipped cards slide out of
+   view, or — scrolling faster — never saw the reveal at all and met the
+   rail already open on the way back. Neither is the gesture.
+
+   THE GATE IS THE FIX, NOT A SCRUB. This is one row of cards on one line:
+   five seats at 70ms is a 350ms wave, which is a LOCKUP-scale gesture, and
+   a lockup should land rather than track the wheel. What was wrong was
+   never the cadence — it was that the cadence started when a DIFFERENT
+   element arrived. Blog.tsx measures the rail's own approach and latches
+   RAIL_AT on it.
+
+   ⚠️ EVERY SELECTOR BELOW BELONGS TO EXACTLY ONE GATE. Splitting a rule's
+   `:not()` half from its animation half across two attributes leaves an
+   element parked forever, so the pairs are kept adjacent and both halves
+   name the same attribute. */
+
+/* THE SWEEP — every photograph and every block of type whose height is a
+   function of the measure, plus the two framed objects in the head */
 .section:not([data-in]) .labelMark,
 .section:not([data-in]) .ledeMask,
 .section:not([data-in]) .ctaHost,
-.section:not([data-in]) .feature,
-.section:not([data-in]) .thumb {
+.section:not([data-plate]) .frontPhoto,
+.section:not([data-plate]) .frontTitleMask,
+.section:not([data-plate]) .frontCta,
+.section:not([data-rail]) .entryMedia,
+.section:not([data-rail]) .entryBodyMask {
   clip-path: inset(0 0 100% 0);
 }
 .section[data-in] .labelMark,
 .section[data-in] .ledeMask,
 .section[data-in] .ctaHost,
-.section[data-in] .feature,
-.section[data-in] .thumb {
+.section[data-plate] .frontPhoto,
+.section[data-plate] .frontTitleMask,
+.section[data-plate] .frontCta,
+.section[data-rail] .entryMedia,
+.section[data-rail] .entryBodyMask {
   animation: blogSweepDown var(--enter-d, 900ms) var(--ease-entrance)
     calc(var(--i, 0) * var(--cascade-beat)) backwards;
 }
 
-/* THE DESCENT — every piece of type, each out of its own mask */
+/* THE DESCENT — the three single lines, each out of its own mask. Nothing
+   here wraps, so each one's travel is bounded by its own line box; see the
+   rule stated over blogSettle. */
 .section:not([data-in]) .labelWord,
-.section:not([data-in]) .railLabel,
-.section:not([data-in]) .rowText {
+.section:not([data-plate]) .frontTag,
+.section:not([data-rail]) .dividerLabel {
   transform: translateY(-110%);
 }
 .section[data-in] .labelWord,
-.section[data-in] .railLabel,
-.section[data-in] .rowText {
+.section[data-plate] .frontTag,
+.section[data-rail] .dividerLabel {
   animation: blogDescend var(--enter-d, 700ms) var(--ease-entrance)
     calc(var(--i, 0) * var(--cascade-beat)) backwards;
 }
 
-/* the display line, drifting against its own mask and outlasting it */
-.section:not([data-in]) .lede {
+/* THE SETTLE — every block that wraps, drifting against its own mask and
+   outlasting it */
+.section:not([data-in]) .lede,
+.section:not([data-plate]) .frontTitle,
+.section:not([data-rail]) .entryBody {
   transform: translateY(-0.22em);
 }
-.section[data-in] .lede {
+.section[data-in] .lede,
+.section[data-plate] .frontTitle,
+.section[data-rail] .entryBody {
   animation: blogSettle 1000ms var(--ease-drawer)
     calc(var(--i, 0) * var(--cascade-beat)) backwards;
 }
 
-/* THE PLATE, moving against its own mask and outlasting it */
-.section:not([data-in]) .featurePhoto {
+/* THE PLATE, moving against its own mask and outlasting it. Only the
+   lede's — the four entry photographs sweep and hold still, which is what
+   keeps a row of four from reading as four separate zooms. */
+.section:not([data-plate]) .frontPhotoImg {
   transform: translateY(-4%) scale(1.1);
 }
-.section[data-in] .featurePhoto {
-  animation: blogDrift 1400ms var(--ease-drawer)
+.section[data-plate] .frontPhotoImg {
+  /* 1700ms — AboutSplit's DRIFT, not this file's old 1400. See .frontPhoto */
+  animation: blogDrift 1700ms var(--ease-drawer)
     calc(var(--i, 0) * var(--cascade-beat)) backwards;
 }
 
+/* ══════════ ALREADY PERFORMED — THE CHAPTER SKIPS TO THE END ══════════
+   At the user's instruction that once the pictures have opened they cannot
+   be made to open again, by scrolling back and returning OR by reloading.
+   The latch in Blog.tsx covers the first; this covers the second, because a
+   refresh below this chapter restores the scroll position, finds the
+   approach already complete on mount, and would otherwise run the whole
+   cascade from nothing in front of a reader who has already seen it.
+
+   ⚠️ IT MUST COME AFTER THE [data-plate] AND [data-rail] BLOCKS AND NOT
+   BEFORE. Every pair here is (0,2,1) against (0,2,1) — one class, one
+   attribute, one class — so nothing outranks anything and SOURCE ORDER IS
+   THE WHOLE MECHANISM. Moving this block up the file silently un-does it.
+
+   `animation: none` and not a zero duration: a 0s animation still fires
+   animationstart/animationend, and `.frontPhoto`'s own note records that
+   this file has been bitten by animation events firing when no animation
+   was meant to be running. Nothing is scheduled at all here.
+
+   THE PARKED PROPERTIES GO WITH IT. The :not([data-plate]) and
+   :not([data-rail]) rules above set
+   the FROM state as real declarations — a clip to nothing, a −4% offset —
+   and those stop applying the moment the attribute lands, so the elements
+   are already at their resting values. The only thing left to remove is the
+   animation that would have travelled between them. */
+.section[data-instant] .labelMark,
+.section[data-instant] .labelWord,
+.section[data-instant] .ledeMask,
+.section[data-instant] .lede,
+.section[data-instant] .ctaHost,
+.section[data-instant] .frontPhoto,
+.section[data-instant] .frontPhotoImg,
+.section[data-instant] .frontTag,
+.section[data-instant] .frontTitleMask,
+.section[data-instant] .frontTitle,
+.section[data-instant] .frontCta,
+.section[data-instant] .dividerLabel,
+.section[data-instant] .entryMedia,
+.section[data-instant] .entryBodyMask,
+.section[data-instant] .entryBody {
+  animation: none;
+}
+
 /* ---------- responsive ---------- */
-/* ONE COLUMN under 900px. The card keeps the full measure and the rail
-   falls beneath it — a half-width rail on a phone is a thumbnail beside
-   two words. The card's 4:3 carries over unchanged; it is the right shape
-   at full width too, and the row gap here is a chapter break between two
-   blocks rather than the rail's own air. */
-@media (max-width: 900px) {
-  .section {
-    --blog-col2: var(--blog-margin);
-  }
-  .body {
+
+/* ⚠️ THE LEDE'S CROP OPENS TWICE ON THE WAY DOWN, and it has to. 24:9 is a
+   shape for a 1416px measure; at 366px it is a 137px letterbox with a ramp
+   deeper than the picture above it. 16:9 at the tablet step and 3:2 on a
+   phone — and 3:2 is /blog's own featured shape, so the two pages land on
+   the same crop exactly where this one stops being a broadsheet.
+
+   ⚠️ THE RAIL NEEDS NO BREAKPOINT, which is the quiet argument for it. A
+   four-column grid has to become two and then one; a rail of fixed-width
+   cards simply shows fewer of them as the window narrows, and the gesture
+   that reaches the rest is the one the reader already used. The card's own
+   clamp does the whole job. */
+
+/* ⚠️ THE ROW STACKS AT 1000, NOT 900, and the number is the PLATE's rather
+   than the sentence's. In two columns the picture is half a narrowing
+   measure, so the lower the stacking point the smaller the plate gets while
+   the block on it has a floor: measured at 910 the ramp cleared the block
+   by 9px, which is not a margin, it is a coincidence waiting to be undone
+   by a longer headline. Stacking at 1000 means the plate never goes below
+   ~482px in two-column mode, where the clearance is 21px and rising.
+
+   IT IS ALSO THE BETTER TYPOGRAPHY. At 910 the type column is 417px and the
+   display sentence sets to five lines in it; stacked, it has the full
+   measure back. Two arguments, one breakpoint. */
+@media (max-width: 1000px) {
+  /* THE ROW STACKS. Nothing else has to come off with it any more — the
+     column used to be `position: sticky` here and needed an explicit
+     `static` to stop it pinning the sentence over a picture that was now
+     BELOW it. It drifts rather than sticks now, and a few vh of drift is
+     harmless in a stacked layout, so the override is gone with the stick. */
+  .top {
     grid-template-columns: 1fr;
-    row-gap: clamp(24px, 3.4vh, 40px);
+    row-gap: clamp(26px, 3.4vh, 40px);
+    /* ⚠️ AND THE PLATE'S DROP COMES OFF WITH THE SECOND COLUMN. --front-drop
+       stands the plate a beat below the voice BESIDE it (see .front);
+       stacked there is no beside — the plate is simply the next thing under
+       the sentence, and the drop would land on top of the row-gap as
+       106–120px of unexplained air inside the head. */
+    --front-drop: 0px;
   }
-  /* the rows stop dividing a card's height and take their own */
-  .row {
-    flex: none;
-  }
-  /* ⚠️ AND THE THUMB HAS TO STOP STRETCHING WITH THEM. Its desktop size is
-     `align-self: stretch` against a row whose height is already decided;
-     here the row's height comes from its CONTENT, i.e. from this element,
-     so a stretch would be circular and the picture would collapse onto the
-     two lines of type beside it. An explicit width, and the row is as tall
-     as the picture rather than the other way round. */
-  .thumb {
-    align-self: center;
-    width: clamp(88px, 24vw, 120px);
+  .frontPhoto {
+    aspect-ratio: 16 / 9;
   }
 }
 
-@media (max-width: 560px) {
-  .featureTitle {
+@media (max-width: 640px) {
+  /* ⚠️ 4:3, NOT 3:2, AND THE REASON IS THE RAMP RATHER THAN THE CROP.
+     Measured at 390: the type block is ~154px once the rules below shrink
+     it, and the ramp has to be taller than the block or the headline's
+     first line sits on bare photograph. On a 3:2 plate (244px tall here)
+     a ramp that clears 154px is 69% of the picture, i.e. the photograph is
+     mostly gradient. 4:3 is 292px, the same 168px ramp is 58% of it, and
+     the 48px it costs the chapter buys back a readable picture. */
+  .frontPhoto {
+    aspect-ratio: 4 / 3;
+  }
+  /* the block already shrank at 900; here the headline only loses its
+     measure, because 20ch at --t-h3 is wider than the plate anyway */
+  .frontTitle {
     max-width: none;
+  }
+  /* the plate flattens with the lede's. Four-fifths of a 178px card is
+     222px of picture, and on a phone the rail wants to show a card and a
+     half rather than one card and a sliver. */
+  .entryMedia {
+    aspect-ratio: 1;
   }
 }
 
 /* ---------- reduced motion — no zoom, no lift; the colour-only hovers
    survive ---------- */
 @media (prefers-reduced-motion: reduce) {
-  .featurePhoto,
-  .thumbPhoto,
-  .featureCta,
-  .featureCtaArrow,
-  .feature,
-  .feature:hover,
-  .feature:focus-visible {
+  .frontPhoto,
+  .frontPhotoImg,
+  .entryPhoto,
+  .front:hover .frontPhoto,
+  .front:hover .frontPhotoImg,
+  .front:focus-visible .frontPhoto {
     transform: none !important;
     transition: none;
   }
@@ -1160,8 +1844,8 @@
      The masks are released too — with nothing translating, a clip on the
      type is a crop for no reason. */
   .labelWordMask,
-  .railLabelMask,
-  .rowTextMask {
+  .frontTagMask,
+  .dividerLabelMask {
     clip-path: none;
   }
   .section:not([data-in]) .labelMark,
@@ -1169,11 +1853,17 @@
   .section:not([data-in]) .ledeMask,
   .section:not([data-in]) .lede,
   .section:not([data-in]) .ctaHost,
-  .section:not([data-in]) .feature,
-  .section:not([data-in]) .featurePhoto,
-  .section:not([data-in]) .railLabel,
-  .section:not([data-in]) .thumb,
-  .section:not([data-in]) .rowText {
+  .section:not([data-in]) .frontPhoto,
+  .section:not([data-in]) .frontPhotoImg,
+  .section:not([data-in]) .frontTagMask,
+  .section:not([data-in]) .frontTag,
+  .section:not([data-in]) .frontTitleMask,
+  .section:not([data-in]) .frontTitle,
+  .section:not([data-in]) .frontCta,
+  .section:not([data-in]) .dividerLabel,
+  .section:not([data-in]) .entryMedia,
+  .section:not([data-in]) .entryBodyMask,
+  .section:not([data-in]) .entryBody {
     clip-path: none;
     transform: none;
     opacity: 0;
@@ -1183,11 +1873,41 @@
   .section[data-in] .ledeMask,
   .section[data-in] .lede,
   .section[data-in] .ctaHost,
-  .section[data-in] .feature,
-  .section[data-in] .featurePhoto,
-  .section[data-in] .railLabel,
-  .section[data-in] .thumb,
-  .section[data-in] .rowText {
+  .section[data-in] .frontPhoto,
+  .section[data-in] .frontPhotoImg,
+  .section[data-in] .frontTagMask,
+  .section[data-in] .frontTag,
+  .section[data-in] .frontTitleMask,
+  .section[data-in] .frontTitle,
+  .section[data-in] .frontCta,
+  .section[data-in] .dividerLabel,
+  .section[data-in] .entryMedia,
+  .section[data-in] .entryBodyMask,
+  .section[data-in] .entryBody {
     animation: blogFade 400ms ease-out backwards;
+  }
+
+  /* AND THE ALREADY-PLAYED PATH HOLDS HERE TOO. The rule outside this
+     block is overridden by the fade above — same specificity, later in the
+     file — so without this a reader on reduced motion would still watch a
+     400ms fade replay on every reload, which is the thing [data-instant]
+     exists to stop. Restated rather than reordered: the selector list above
+     has to stay next to the fade it belongs to. */
+  .section[data-instant] .labelMark,
+  .section[data-instant] .labelWord,
+  .section[data-instant] .ledeMask,
+  .section[data-instant] .lede,
+  .section[data-instant] .ctaHost,
+  .section[data-instant] .frontPhoto,
+  .section[data-instant] .frontPhotoImg,
+  .section[data-instant] .frontTag,
+  .section[data-instant] .frontTitleMask,
+  .section[data-instant] .frontTitle,
+  .section[data-instant] .frontCta,
+  .section[data-instant] .dividerLabel,
+  .section[data-instant] .entryMedia,
+  .section[data-instant] .entryBodyMask,
+  .section[data-instant] .entryBody {
+    animation: none;
   }
 }

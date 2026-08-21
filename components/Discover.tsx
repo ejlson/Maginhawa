@@ -4,7 +4,11 @@ import Image from "next/image";
 import {
   AnimatePresence,
   motion,
+  useMotionTemplate,
+  useMotionValueEvent,
   useReducedMotion,
+  useScroll,
+  useTransform,
 } from "framer-motion";
 import {
   useCallback,
@@ -54,7 +58,7 @@ import { asset } from "@/lib/media";
    machine, the page hold, the settle travel, the per-word split measurement
    and the fitted title size that only existed so the two words could clear a
    centred deck. What is left is a grid that scrolls in like every other
-   chapter on the site (see `cellVariants`) and a heading that rises out of
+   chapter on the site (see WIPE_FROM) and a heading that rises out of
    its own word masks on an observer.
 
    WHAT SURVIVES IT, and why, because each one looks orphaned otherwise:
@@ -493,10 +497,12 @@ const EASE = [0.22, 1, 0.36, 1] as const;
    reads as a band opening rather than as four separate cards. Preserve that
    ratio if these move again.
 
-   The arrival closes at GRID_LEAD_S + 1×ROW + 3×COL + DURATION
-   = 0.26 + 0.32 + 0.42 + 0.92 ≈ 1.92s, against the lede's ≈1.41s. The row
-   term is ×1 and not ×3 because of the two-row seating above — an earlier
-   version of this note had it as ×3 and overstated the close by 0.4s.
+   ⚠️ THE ARITHMETIC BELOW IS THE SHAPE'S, NOT A SCHEDULE. It used to close
+   the arrival at GRID_LEAD_S + 1×ROW + 3×COL + DURATION ≈ 1.92s against the
+   lede's ≈1.41s. Those seconds are no longer spent by anything — the same
+   1×ROW + 3×COL spread and the same spread : card ratio are spent against
+   the scroll instead. The row term is ×1 and not ×3 because of the two-row
+   seating above, and that part is still load-bearing.
 
    THE TOTAL DOES NOT GROW ON NARROW SCREENS. GRID_COLS is a constant 4 even
    where the CSS grid sets one column, so the delay pattern stays two groups
@@ -505,19 +511,106 @@ const WIPE_DURATION_S = 0.92;
 const WIPE_ROW_STEP_S = 0.32;
 const WIPE_COL_STEP_S = 0.14;
 
-const cellVariants = {
-  hidden: { "--wipe": "100%" },
-  show: (c: { d: number }) => ({
-    "--wipe": "0%",
-    transition: {
-      duration: WIPE_DURATION_S,
-      // --ease-entrance, cubic-bezier(.22,1,.36,1), as framer's array form
-      ease: [0.22, 1, 0.36, 1],
-      delay: c?.d ?? 0,
-    },
-  }),
-  exit: { "--wipe": "0%" },
-};
+/* ══════════ THE WAVE IS SPENT ON SCROLL NOW, NOT ON THE CLOCK ══════════
+
+   ⚠️ THE THREE NUMBERS ABOVE ARE NO LONGER READ BY ANYTHING. They are kept
+   because every comment in this file quotes them and because they still
+   define the SHAPE below — but the cascade they used to time is gone, and
+   the paragraphs above that talk in seconds describe the shape, not the
+   mechanism. Do not re-wire a `transition` to them.
+
+   WHY IT HAD TO CHANGE, measured rather than argued
+   (scripts/probe-home-flow.mjs, 1440×900):
+
+     · the section's one `IntersectionObserver` — threshold 0.05 with a
+       −16% bottom rootMargin — fires at scrollY ≈ 190, where the section
+       is still 84% BELOW THE FOLD and the hero owns the screen.
+     · the cascade then runs on the CLOCK: last card at
+       0.26 + 0.32 + 3×0.14 = 1.0s, plus a 0.92s card ≈ 1.92s.
+     · a reader moving at an ordinary ~800px/s is at scrollY ≈ 1800 by
+       then — PAST the whole chapter. The grid's entrance was, for anyone
+       not sitting still, an animation that happened off screen.
+     · and for anyone who WAS sitting still it was worse in the other
+       direction: the grid finished opening before it had arrived, so the
+       stretch from scrollY 560 to 1000 measured a mean motion energy of
+       7.5 against a page mean of 68 — nearly half a screen of scrolling
+       with nothing moving at all. It was the page's second-longest dead
+       run.
+
+   THE FIX IS NOT A DIFFERENT TRIGGER. Any threshold has the same defect:
+   the cascade's length is fixed in seconds and the reader's arrival is
+   measured in pixels, so the two can only agree at one scroll speed. The
+   wave is spent against the SCROLL instead, exactly as the statement
+   chapter spends its words (see Manifesto.tsx `slotStart`) — so the grid
+   opens as it is scrolled to, at any speed, in either direction.
+
+   THE SHAPE IS PRESERVED EXACTLY, which is the point of doing it this way
+   rather than picking new numbers. Every ratio the notes above derive is
+   carried over into progress space:
+     · spread : card  =  0.74s : 0.92s  →  3 × COL_LEAD : the card's span
+     · row : col      =  0.32  : 0.14   →  the card's own height : COL_LEAD
+   so a row still reads as a band opening rather than four separate cards,
+   and a plate is still opening when the last one starts. The row term is
+   the LAYOUT now — a card's height plus the grid gap — which is why only
+   the column survives as a number. */
+
+/* ══ THE RANGE IS PER-CARD, AND IT HAD TO BECOME SO ══
+   The first scrubbed version gave the whole GRID one range and seated each
+   card in it by `row × ROW_STEP + col × COL_STEP`, with GRID_COLS fixed at
+   4. That is the seating the retired time cascade used, and it is fine on a
+   clock — the whole cascade lasted 1.9s, so a seat being slightly wrong
+   cost milliseconds. Spent against scroll it is wrong twice over, and both
+   faults were measured at 390×844 (scripts/probe-discover-wave.mjs,
+   which exists to keep them fixed):
+
+     · THE CARDS OPENED OUT OF ORDER. GRID_COLS is a constant 4 even where
+       the stylesheet renders ONE column, so cell 4 — "row 1, column 0" —
+       seated at 0.238, ahead of cell 3's 0.312. In a single column those
+       two are simply the fourth and fifth cards down the page, and the
+       reader watched the fifth open while the fourth above it was still
+       shut.
+     · AND THEY OPENED NOWHERE NEAR THEMSELVES. One range across a 2418px
+       stack means each card's slot is a fraction of the whole column, not
+       of its own arrival: cell 0 was 64% shut with its top at 301px, in the
+       middle of the screen, and took another 700px of scroll to finish.
+
+   EACH CARD NOW OWNS ITS OWN RANGE, measured on its own top edge. The
+   vertical order is then not a computation at all — it is the layout, and
+   it is right at every breakpoint by construction, with no column constant
+   to keep in step with a stylesheet.
+
+   WHAT IS LEFT TO STAGGER IS THE ROW, and only the row: four cards in one
+   row share a top edge, so without a term they would open in lockstep. Each
+   column starts COL_LEAD of a viewport later than the one before it.
+   ⚠️ A LATER COLUMN NEEDS A SMALLER FRACTION, not a bigger one: the offsets
+   are distances DOWN the screen, so `start 0.92` is reached before
+   `start 0.71`. Getting that backwards runs the wave right to left.
+
+   THE SHAPE IS STILL THE OLD ONE. The row step is now supplied by geometry
+   — a card's height plus the grid gap, ~300px at 1440 — and COL_LEAD is set
+   so the wave across a row stays the same fraction of a card that the
+   seconds gave it: 3 × COL_LEAD against the card's own span was 0.42s
+   against 0.92s, about 46%. */
+
+/* how far down the screen a card's top edge is when its wipe starts, and
+   where it has got to when the wipe finishes. 0.92 is just inside the fold;
+   0.45 is the upper middle, so a card is open and still well before it is
+   read. At 900 tall that is 423px of scroll for a ~292px card — the window
+   travels slightly slower than the page, which is what stops a wipe from
+   outrunning the hand driving it. */
+const WIPE_FROM = 0.92;
+const WIPE_TO = 0.45;
+
+/* the row's internal wave, per column, as a fraction of the viewport.
+   0.07 is 63px at 900, so first card to last across a four-up row is 189px
+   of scroll against a 423px card — the 46% the seconds above worked out to.
+   ⚠️ IT IS BOUNDED BY WIPE_TO: the last column's range is shifted down by
+   (cols − 1) × this, and a shift past WIPE_TO would put a card's finish
+   above the top of the screen. At four columns and 0.07 the last column
+   ends at 0.24, with room to spare. */
+const COL_LEAD = 0.07;
+
+const WIPE_CLEAR_PCT = 0.05;
 
 /* ══ PARALLAX INSIDE THE FRAME ══
    The photograph travels slower than the card holding it, so the grid gains
@@ -549,20 +642,20 @@ const cellVariants = {
 const PHOTO_OVERSCAN = 1.07;
 const PHOTO_PAN_RATIO = 0.024;
 
-/* HOW LONG THE PICTURES WAIT FOR THE TYPE.
-   The chapter reads top-down — label, sentence, then the grid — and all
-   three now hang off one `inView`, so the order has to be spent as delay
-   rather than assumed from the markup. The head's two heading words leave
-   at 0 and 0.09s and the lede starts at 0.1s; the grid holding this long
-   puts the first card's wipe under the lede's fourth or fifth word, which
-   is late enough to read as a consequence of the sentence and early enough
-   that the band is never just standing there.
+/* THE PICTURES NO LONGER WAIT FOR THE TYPE — THE PAGE DOES THAT.
+   A `GRID_LEAD_S = 0.26` stood here: the delay the grid's cascade held so
+   the chapter would read top-down (label, sentence, pictures) rather than
+   arriving all at once. It is removed with the cascade — the grid's wipe is
+   spent against the SCROLL now (see WIPE_FROM), and the head is simply 208px
+   further up the page than the first plate is, so the reader reaches it
+   first at every speed. A lead in seconds was the clock's way of expressing
+   an order the layout already has.
 
-   The arrival's full arithmetic lives on the WIPE_* block above, which owns
-   the steps and the duration; the lede lands at 0.1 + 14×0.04 + 0.75 ≈ 1.41s
-   and the last plate at ≈1.92s, so the type settles first and the pictures
-   go on arriving behind it. */
-const GRID_LEAD_S = 0.26;
+   ⚠️ THE HEAD IS STILL ON `inView` and still lands in ≈1.41s. That is
+   correct and deliberate: it is one lockup, it fits on one screen, and a
+   scrubbed heading is a heading that never quite settles. The rule the rest
+   of this pass follows is that content taller than a screen is scrubbed and
+   a lockup shorter than one is timed. */
 
 /* ══ THE MORPH ══════════════════════════════════════════════════════
    Quick, interruptible mid-flight (a spring keeps its velocity when
@@ -663,6 +756,34 @@ export default function Discover() {
      A plain ref is enough now: one list, one height, nothing to swap. */
   const setGridEl = useCallback((el: HTMLUListElement | null) => {
     gridRef.current = el;
+  }, []);
+
+  /* ── HOW MANY COLUMNS THE STYLESHEET IS ACTUALLY RENDERING ──
+     Read off the computed grid rather than assumed, because it is the only
+     thing that stands between a card's index and its place in the reading
+     order, and the answer changes four times on the way down to a phone
+     (see .grid in Discover.module.css: 1 / 2 / 3 / 4).
+
+     ⚠️ GRID_COLS IS NOT THIS AND MUST NOT BE USED FOR IT. That constant is
+     deliberately fixed at 4 at every width — its own note says so — and the
+     retired cascade could afford that because a wrong seat cost a few
+     milliseconds. It costs the wave its ORDER now: at one column, a "row 1,
+     column 0" seat lands ahead of a "row 0, column 3" seat, and the fifth
+     card down opens while the fourth is still shut. Measured at 390×844.
+     GRID_COLS still serves the recede's distance-from-the-finger, which is
+     a different question and is happy with a constant. */
+  const [cols, setCols] = useState(GRID_COLS);
+  useEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) return;
+    const read = () => {
+      const n = getComputedStyle(grid).gridTemplateColumns.split(" ").filter(Boolean).length;
+      setCols((was) => (was === n || n < 1 ? was : n));
+    };
+    read();
+    const ro = new ResizeObserver(read);
+    ro.observe(grid);
+    return () => ro.disconnect();
   }, []);
 
   /* one-shot entrance reveal. It watches the SECTION rather than the ul —
@@ -976,8 +1097,10 @@ export default function Discover() {
             is the defect the whole pass exists to remove.
 
             THE LEAD IS SPENT ON THE TYPE. This starts a beat after the
-            label and the grid waits GRID_LEAD_S behind it, so the chapter
-            reads top-down: name, sentence, pictures. See GRID_LEAD_S.
+            label; the grid below no longer waits behind it in seconds,
+            because it is scrubbed against the scroll and the reader reaches
+            this sentence first by simple geometry. See the note where
+            GRID_LEAD_S used to stand.
 
             ⚠️ THE MASKS CHANGE THE MEASURE, so `.lede`'s max-width is not
             free of this. SplitWords sets the word gap as a 0.24em
@@ -1045,10 +1168,6 @@ export default function Discover() {
              one has no state worth interpolating in JS. Off under reduced
              motion, where the backdrop does the whole job by itself. */
           data-dimmed={!reduce && active ? "on" : undefined}
-          variants={{ hidden: {}, show: {}, exit: {} }}
-          initial="hidden"
-          animate={inView ? "show" : "hidden"}
-          exit="exit"
         >
           {ITEMS.map((it, i) => {
             /* WHEN THIS CELL'S WIPE STARTS. Rows lead, columns follow
@@ -1073,20 +1192,16 @@ export default function Discover() {
                steps and the duration live on WIPE_* above; see that block
                for why they are the size they are.
 
-               EVERY CELL CARRIES GRID_LEAD_S ON TOP, which is what makes the
-               chapter read top-down rather than all at once. */
-            const motionCustom = reduce
-              ? { d: 0 }
-              : (() => {
-                  const row = Math.floor(i / GRID_COLS);
-                  const col = i % GRID_COLS;
-                  return {
-                    d:
-                      GRID_LEAD_S +
-                      row * WIPE_ROW_STEP_S +
-                      col * WIPE_COL_STEP_S,
-                  };
-                })();
+               ⚠️ ONLY THE COLUMN IS COMPUTED. The row used to be too —
+               `GRID_LEAD_S + row×ROW_S + col×COL_S`, spent by framer as a
+               `transition.delay`, and then briefly as a seat in one shared
+               scroll range. Both are gone: each card measures its own
+               arrival, so the row is the LAYOUT and needs no arithmetic. See
+               the block over WIPE_FROM for what that fixed. The lead went
+               with them — a cascade that has to wait for the type above it
+               was solving a problem the scroll solves by itself, since the
+               head is simply further up the page than the grid is. */
+            const col = reduce ? 0 : i % cols;
             /* HOW FAR THIS CELL IS FROM THE ONE THE READER PRESSED, in grid
                steps — the recede travels outward from the finger, so the
                delay has to be a distance on the LAYOUT and not a distance in
@@ -1108,7 +1223,11 @@ export default function Discover() {
                 key={it.slug}
                 item={it}
                 index={i}
-                motionCustom={motionCustom}
+                /* this card's place in its own row. The range, and the
+                   `useTransform` that turns it into a clip, live in Tile —
+                   a hook cannot be called from inside this `.map`, the same
+                   constraint Manifesto.tsx records over its own ScrubWord. */
+                col={reduce ? undefined : col}
                 onOpen={() => setActive(it)}
                 onMenu={() => setMenuFor(it.slug)}
                 open={openIndex === i}
@@ -1169,7 +1288,7 @@ export default function Discover() {
 function Tile({
   item,
   index,
-  motionCustom,
+  col,
   onOpen,
   onMenu,
   open,
@@ -1181,7 +1300,11 @@ function Tile({
      across on, and the `data-plate` attribute the probes measure the
      card's rectangle through. */
   index: number;
-  motionCustom: { d: number };
+  /** this card's column in the grid as it is actually being rendered, or
+   *  undefined under reduced motion — where the cell simply renders open and
+   *  no clip is ever installed. It is the ONLY part of the wave that is
+   *  computed; the rest is the card's own position on the page. */
+  col?: number;
   onOpen: () => void;
   /** opens the venue's menu pages — the page owns the overlay, the card only
    *  says which venue it is asking for */
@@ -1196,10 +1319,93 @@ function Tile({
   recedeDelay: number;
 }) {
   const reduce = useReducedMotion();
+
   /* whether this cell is still being wiped open. It starts true so the card
      is clipped shut on the very first paint — including the server's, which
      is what stops eight cards flashing whole and then wiping. */
   const [wiping, setWiping] = useState(true);
+
+  /* ── THIS CELL'S SLICE OF THE GRID'S RANGE ──
+     `useTransform` clamps at both ends, so the cell is fully shut for the
+     whole of the range before its seat and fully open for the whole of it
+     after — no guard needed, and nothing to reset when the reader turns
+     round.
+
+     ⚠️ NO EASE, AND THE ENTRANCE CURVE WAS TRIED FIRST AND MEASURED WRONG.
+     The obvious move was to keep --ease-entrance — cubic-bezier(.22,1,.36,1),
+     the exact curve the retired transition carried — so one card would open
+     with the identical shape and only its clock would change. It does not
+     work on a scrub, and the reason is the curve's whole point: it spends
+     most of itself in the first third. Spent against TIME that reads as
+     decisiveness. Spent against SCROLL it means the card is essentially
+     open a quarter of the way through its own slot and the other
+     three-quarters do nothing — the burst-then-nothing pattern this pass
+     exists to remove, reproduced inside every individual card. Measured
+     (scripts/probe-home-flow.mjs) it put a 3935-unit snap at scrollY 800,
+     the largest single step anywhere on the page, with one cell's clip edge
+     travelling 1315px in a 40px step.
+
+     Linear is also what this site's other two scrubs already do —
+     Manifesto's ScrubWord and Passage's SlabLine both map straight through
+     with no ease — and it is the correct default for anything the reader is
+     driving with their own hand: the edge tracks the wheel 1:1, so the
+     gesture belongs to them rather than to a curve arguing with them.
+     The SHAPE is now carried by the span and the seats, which is where it
+     belongs on a scrub.
+
+     ⚠️ THE RANGE IS THIS CARD'S OWN, and it is measured on the cell rather
+     than on the grid — see the block over WIPE_FROM for the two faults that
+     forced it. A clip-path does not change an element's bounding box, so a
+     cell can safely be the target of the range that drives its own clip;
+     that is not true of a transform, and AboutSplit.tsx records the version
+     of this trap that is.
+
+     REDUCED MOTION STILL RUNS THE HOOK, because hooks cannot be called
+     conditionally — it simply never installs the attribute the clip hangs
+     off (see `data-wiping` below), so the value is computed and ignored. */
+  /* ⚠️ GATED ON MOUNT, WHICH IS A CHANGE OF FAILURE MODE AND A DELIBERATE
+     ONE. Discover.module.css states that the clip's fallback is 0% "and
+     that is a deliberate failure mode: if the script never runs, framer
+     never writes --wipe and the cell renders fully open." That was NOT what
+     shipped. Framer writes a motion value's progress-0 reading into the
+     SERVER's HTML, so every cell went out as
+     `data-wiping="on" style="--wipe:100%"` — verified in the raw response —
+     and a page whose script never ran showed eight blank cards. The
+     stylesheet's stated fallback could not reach.
+
+     Holding both the attribute and the variable until after mount makes the
+     documented behaviour the real one: no script, no clip, eight readable
+     cards.
+
+     THE FIRST-PAINT FLASH THIS TRADES FOR IS ~NIL, and that is geometry
+     rather than luck: the grid's top edge is 1176px down a 900-tall window,
+     so on an ordinary load no cell is on screen when the attribute lands.
+     A reader who deep-links INTO the chapter finds those cells already past
+     their own range, so they mount open and stay open; the ones that mount
+     shut are the ones below the fold. */
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  const cellRef = useRef<HTMLLIElement>(null);
+  const lead = (col ?? 0) * COL_LEAD;
+  const { scrollYProgress: arriving } = useScroll({
+    target: cellRef,
+    offset: [`start ${WIPE_FROM - lead}`, `start ${WIPE_TO - lead}`],
+  });
+  const wipe = useTransform(arriving, [0, 1], [100, 0]);
+  const wipePct = useMotionTemplate`${wipe}%`;
+
+  /* ⚠️ `wiping` IS NO LONGER A ONE-WAY LATCH, and that is the scroll-link's
+     doing. A time cascade lands once and never runs again, so `false` was
+     final; a scrubbed wipe re-closes if the reader scrolls back up into it,
+     and a cell left un-clipped would then show its whole photograph through
+     a window that is meant to be shut. The attribute follows the value in
+     both directions instead. The comparison guards the setState, so this
+     costs one commit per crossing rather than one per frame. */
+  useMotionValueEvent(wipe, "change", (v) => {
+    const on = v > WIPE_CLEAR_PCT;
+    setWiping((was) => (was === on ? was : on));
+  });
 
   /* ═══════════════════════════════════════════════════════════════════
      THE CARD IS <VenueCard> NOW, AND EVERYTHING THIS FUNCTION USED TO DO
@@ -1235,34 +1441,36 @@ function Tile({
      the retired assembly intro's job and it is not passed, so the card's
      three prop objects stay at their `{}` default and the whole card
      simply renders. The entrance it does take is the CELL's — see
-     cellVariants; the card travels in from the screen edge as one object,
+     scrubbed wipe (see WIPE_FROM); the card's window opens as one object,
      which is what an unstaged card should do.
      ═══════════════════════════════════════════════════════════════════ */
   return (
     <motion.li
+      ref={cellRef}
       className={styles.cell}
       /* THE ATTRIBUTE IS WHAT MAKES THE CLIP EXIST. The stylesheet only
          clips a cell while this is on, so dropping it when the wipe lands
          leaves the card with NO clip-path rather than a resting `inset(0%)`
          — which would shear the hover lift and its shadow off at the cell's
-         edge forever. See the note on cellVariants for why the clip is
+         edge forever. See the note over WIPE_FROM for why the clip is
          driven through a variable instead of animating clip-path directly.
 
          REDUCED MOTION NEVER TURNS IT ON, and takes no variants either, so
          the cards are simply present from the first paint and nothing about
          them waits on an observer that may never fire. */
-      data-wiping={!reduce && wiping ? "on" : undefined}
+      data-wiping={mounted && !reduce && wiping ? "on" : undefined}
       /* the recede's two hooks. `data-open` is the exemption and carries no
          style of its own; the delay is a custom property because the value
          is per-cell and a stylesheet cannot compute a distance. */
       data-open={open ? "on" : undefined}
-      style={{ ["--recede-delay" as string]: `${recedeDelay}s` }}
-      variants={reduce ? undefined : cellVariants}
-      custom={motionCustom}
-      /* `show` is the only state that lands — guarding on it stops an
-         interrupted run from un-clipping a cell that is still shut. */
-      onAnimationComplete={(definition) => {
-        if (definition === "show") setWiping(false);
+      /* ⚠️ `--wipe` IS WRITTEN AS A STYLE, NOT ANIMATED AS A VARIANT, AND
+         IT IS WITHHELD UNTIL MOUNT. Framer renders a motion value's current
+         reading into the style attribute on the SERVER too — which is
+         exactly how the no-script fallback came to be broken. See the note
+         over `mounted` above. */
+      style={{
+        ["--recede-delay" as string]: `${recedeDelay}s`,
+        ...(mounted ? { ["--wipe" as string]: wipePct } : null),
       }}
     >
       {/* NO HOVER HANDLERS ON THIS ELEMENT ANY MORE. They opened the film

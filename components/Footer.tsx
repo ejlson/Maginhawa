@@ -1,14 +1,68 @@
 "use client";
 
 import Link from "next/link";
-import { useRef } from "react";
-import { motion, useInView, useReducedMotion, type Variants } from "framer-motion";
+import { useEffect, useRef, useState } from "react";
+import {
+  motion,
+  useInView,
+  useReducedMotion,
+  useScroll,
+  useTransform,
+  type Variants,
+} from "framer-motion";
 import styles from "./Footer.module.css";
 import { useRouteTransition } from "./PageTransition";
 import { CONTACT, SOCIALS } from "@/lib/contact";
 import { lenisRef } from "@/lib/SmoothScroll";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
+
+/* ══════════ THE CLOSE ARRIVES, IT NO LONGER JUST APPEARS ══════════
+
+   The footer's top band — the mark, the line under it and the invitation —
+   had no entrance of any kind. Only the wordmark at the very bottom did.
+   That is what made the end of the home page its flattest stretch:
+   measured at 1440×900 with the stepped probe, the band scrollY
+   6200 → 6400 scored a mean motion energy of 1.7 against a page mean near
+   300, and the pixel probe independently found the same 360px as the only
+   flat run on the page. The film above had finished resolving and nothing
+   below it had anything to do.
+
+   ⚠️ IT IS SCRUBBED RATHER THAN TRIGGERED, AGAINST THIS SITE'S USUAL RULE
+   that a lockup shorter than a screen should be timed. The reason is the
+   geometry of the last screen and it is specific: the document's maximum
+   scroll IS the footer's own top edge, so the band travels from the foot of
+   the window to a third of the way up it and THE PAGE THEN STOPS. A timed
+   reveal fired on the crossing would still be running when the reader hits
+   the bottom of the document and the scroll refuses to go further — the
+   animation finishing against a wall the reader can feel. Tied to the
+   scroll, it is simply complete when the page is.
+
+   THE SLOTS, and they overlap so the band reads as one object settling
+   rather than three separate arrivals:
+       mark + line   [0.06, 0.52]
+       invitation    [0.20, 0.70]
+       the pill      [0.34, 0.88]
+   measured on the band's own approach — its top edge from the foot of the
+   window (0) to 28% of the way up it (1), which at 1440×900 is scrollY
+   5814 → 6462 and covers the whole of the flat run.
+
+   THE FADE CLEARS AT 55% OF EACH SLOT, the same split the reading column
+   uses (AboutSplit's READ_INK) and for the same reason: legible early, then
+   still moving. On a dark ground it matters more — cream type at half
+   opacity on maroon is not half-read, it is unread. */
+const CLOSE_OFFSET: ["start end", "start 0.28"] = ["start end", "start 0.28"];
+const CLOSE_MARK: [number, number] = [0.06, 0.52];
+const CLOSE_INVITE: [number, number] = [0.2, 0.7];
+const CLOSE_CTA: [number, number] = [0.34, 0.88];
+const CLOSE_INK = 0.55;
+/* 24px, the page's rise — AboutSplit's READ_RISE and Reveal.tsx's 28 are
+   the two the site already runs; this band sits between two of them. */
+const CLOSE_RISE = 24;
+const closeInk = (slot: [number, number]): [number, number] => [
+  slot[0],
+  slot[0] + (slot[1] - slot[0]) * CLOSE_INK,
+];
 
 /* THE WORDMARK'S ENTRANCE. The letters rise out from behind their own
    baseline: the mask is the entrance, and the travel is only what makes them
@@ -143,6 +197,44 @@ export default function Footer() {
   const markRef = useRef<HTMLDivElement>(null);
   const markIn = useInView(markRef, { once: true, amount: 0.5 });
 
+  /* ⚠️ GATED ON MOUNT, and this is a correctness rule rather than a
+     nicety — it is the one PressWall.tsx and Blog.tsx both spell out, and
+     leaving it off shipped a real fault for one revision.
+
+     Framer server-renders a motion value at its progress-0 reading, and
+     progress 0 here means `opacity: 0`. So the FIRST version of this band
+     went out in the server's HTML as
+     `style="opacity:0;transform:translateY(24px)"` — verified in the raw
+     response — which is invisible until a scroll listener attaches. With
+     JavaScript off, or on any load where hydration fails, the page's
+     contact invitation and its "Get in touch" pill would simply not be
+     there, silently and with nothing in the console.
+
+     Holding the styles off until after mount makes the RESTING state the
+     one that ships. The band is plain type on a plain ground with no
+     offset in its stylesheet, so the no-JS reader gets it whole. */
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  /* the closing band's arrival — see CLOSE_OFFSET for why it is scrubbed */
+  const topRef = useRef<HTMLDivElement>(null);
+  const { scrollYProgress: closing } = useScroll({
+    target: topRef,
+    offset: CLOSE_OFFSET,
+  });
+  const markOpacity = useTransform(closing, closeInk(CLOSE_MARK), [0, 1]);
+  const markY = useTransform(closing, CLOSE_MARK, [CLOSE_RISE, 0]);
+  const inviteOpacity = useTransform(closing, closeInk(CLOSE_INVITE), [0, 1]);
+  const inviteY = useTransform(closing, CLOSE_INVITE, [CLOSE_RISE, 0]);
+  const ctaOpacity = useTransform(closing, closeInk(CLOSE_CTA), [0, 1]);
+  const ctaY = useTransform(closing, CLOSE_CTA, [CLOSE_RISE, 0]);
+  /* ⚠️ REDUCED MOTION TAKES NONE OF IT AND GETS NO FALLBACK REVEAL EITHER.
+     Withholding the styles leaves the band simply present, which is the
+     correct reduced-motion answer and needs no second path — and is the
+     same state the un-mounted server render ships. */
+  const closeStyle = (opacity: typeof markOpacity, y: typeof markY) =>
+    reduce || !mounted ? undefined : { opacity, y };
+
   // Lenis owns the scroll, so window.scrollTo would fight it — go through the
   // shared instance when it exists and fall back to native smooth scrolling
   // (e.g. before hydration, or with Lenis disabled for reduced motion).
@@ -156,23 +248,39 @@ export default function Footer() {
       {/* TOP BAND — mark | blurb | invitation. Shares one grid with the links
           band below it, so the blurb sits over "Back to top" and the
           invitation sits over the columns. */}
-      <div className={styles.top}>
+      <div className={styles.top} ref={topRef}>
         {/* The source PNG is a BLACK line drawing on transparent, so dropping
             it straight onto the maroon footer rendered it all but invisible.
             Masking with it and painting cream THROUGH the mask gives the mark
             the exact palette colour rather than a filter approximation. */}
-        <Link href="/" className={styles.markLink} aria-label="Maginhawa Group — home">
-          <span className={styles.mark} aria-hidden />
-        </Link>
+        {/* ⚠️ THE TRANSFORM IS ON THE <Link>, NOT ON `.mark` INSIDE IT. The
+            mark is a mask painting cream through a PNG; a transform on the
+            painted span is a transform on the mask's own box, and the glyph
+            would travel out from under its own window. The link is the
+            band's grid cell and moving it moves the whole cell. */}
+        <motion.div style={closeStyle(markOpacity, markY)}>
+          <Link href="/" className={styles.markLink} aria-label="Maginhawa Group — home">
+            <span className={styles.mark} aria-hidden />
+          </Link>
+        </motion.div>
 
-        <p className={styles.blurb}>
+        <motion.p
+          className={styles.blurb}
+          style={closeStyle(markOpacity, markY)}
+        >
           Filipino at heart, pan-Asian and Caribbean by kitchen.
-        </p>
+        </motion.p>
 
         <div className={styles.invite}>
-          <h2 className={styles.inviteTitle}>Got any questions? Contact us.</h2>
+          <motion.h2
+            className={styles.inviteTitle}
+            style={closeStyle(inviteOpacity, inviteY)}
+          >
+            Got any questions? Contact us.
+          </motion.h2>
           {/* One pill — label and arrow share a single cream capsule; hover
               widens the pill and deepens its recess (see Footer.module.css) */}
+          <motion.div style={closeStyle(ctaOpacity, ctaY)}>
           <Link href="/contact" className={styles.inviteCta}>
             <span className={styles.ctaMain}>Get in touch</span>
             <span className={styles.ctaArrow} aria-hidden>
@@ -189,6 +297,7 @@ export default function Footer() {
               </svg>
             </span>
           </Link>
+          </motion.div>
 
           {/* the direct line — papatom's closing move: for a relationship
               business the most confident CTA is a bare address and number,

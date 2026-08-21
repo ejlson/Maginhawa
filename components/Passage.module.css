@@ -1,413 +1,643 @@
-/* The handover between the press wall and the booking film — four rows of
-   display type on an otherwise empty screen. See Passage.tsx for what it is
-   for and why it carries no eyebrow, label, control or picture.
+/* The handover between the press wall and the booking film — four short
+   sentences, set very large across four centred rows, held while
+   <Reservations> climbs over it. See Passage.tsx for what it is for, why it carries no
+   eyebrow, label, control or picture, and what was here before.
 
-   ⚠️ IT USED TO SIT BETWEEN <AboutSplit> AND <Blog>, and every measurement
-   in this file was derived against those two. It moved, and all four
-   paddings were re-derived against <PressWall> above and <Reservations>
-   below. If you are reading an old commit's numbers, none of them apply. */
+   ⚠️ THIS FILE OWNS THE PIN, AND THE PIN IS ARITHMETIC, NOT A FEELING.
+   Three numbers below have to agree with each other and one of them has to
+   agree with Passage.tsx. They are all derived in the block over .scope;
+   read that before changing any of them. */
 
 .section {
   background: var(--cream);
   color: var(--maroon);
 
-  /* the two knobs every row shares, declared once so the quiet row and the
-     hand-off's pull can be expressed as fractions of them rather than as
-     second copies of a clamp. --passage-fs is the passage size (see .line
-     for why it is smaller than the manifesto's); --passage-beat is the air
-     between the SENTENCES (see gap below). */
-  --passage-fs: clamp(1.7rem, 3.2vw, 3.2rem);
-  --passage-beat: clamp(118px, 19vh, 280px);
+  /* ══════════ THE TWO SEAMS ══════════
 
-  /* ══════════ THE TWO SEAMS, RE-DERIVED AFTER THE MOVE ══════════
-     This section sits between <PressWall /> and <Reservations /> now. Both
-     seams were measured against AboutSplit and Blog, and BOTH INVERTED.
+     ABOVE — THE NEIGHBOUR PAYS ALL OF IT, SO THIS PAYS NONE.
 
-     ABOVE — THE NEIGHBOUR PAYS, SO THIS SUBTRACTS. It used to be the whole
-     chapter boundary less 12px, because AboutSplit contributes no vertical
-     air of its own. PressWall does: `padding: 0 var(--pad-x) clamp(64px,
-     9vh, 132px)` — 81px at 1440×900 — and its own note says that bottom
-     exists so the mastheads are not stuck to the edge of whatever follows.
-     Leaving a chapter break on top of it would stack 81 + 330 = 411px of
-     cream, which is the "two correct numbers summing to a wrong one" trap
-     AboutSplit.module.css keeps flagging. So the token is --home-gap rather
-     than --home-gap-chapter — PressWall and this section share the cream
-     ground, which is what --home-gap is defined for — and PressWall's own
-     bottom comes off it. 270 − 81 = 189px at 1440×900.
+     ⚠️ THIS IS ZERO AND IT IS NOT AN OVERSIGHT. It was
+     `--home-gap − clamp(64px, 9vh, 132px)`, i.e. a chapter break less
+     PressWall's own bottom — 189px at 1440×900 — which is the right number
+     for a section whose content starts at its first pixel. THIS SECTION'S
+     CONTENT DOES NOT. .stage is a full viewport that CENTRES the slab in
+     itself, so it already brings half a screen of air above the type
+     wherever it is in its travel: at 1440×900 the slab is ~320px tall in a
+     900px stage, so 290px of the gap between the marquee and the first
+     word is the stage's own centring. Adding a chapter break on top of
+     that made the real gap 479px — over half a screen of empty cream
+     between the logos and the sentence — which is what the user was
+     looking at when they asked for it to come down.
 
-     ⚠️ THE SUBTRAHEND IS A COPY OF PressWall's OWN EXPRESSION, character for
-     character, and there is no token shared between the two files. If
-     PressWall.module.css's bottom padding changes, change it here with it.
-     Same warning as the one this replaced, repointed at a different file.
+     So PressWall's own bottom is now the entire seam, and the stage's
+     centring is the breath. There is no longer any expression here copied
+     from PressWall.module.css, which also retires the warning that used to
+     sit at this spot about keeping the two files' numbers in step.
 
-     BELOW — NOTHING PAYS, SO THIS OWNS ALL OF IT. It used to subtract 36px
-     of Blog's top. Blog is not down there any more; <Reservations /> is, and
-     it declares `margin-top: 0` with no top padding — measured rather than
-     assumed: computed margin-top 0px, padding-top 0px. It is the film and it
-     starts at its own first pixel, so there is nothing to subtract and no
-     hardcoded read of another stylesheet left on this side at all.
+     ⚠️ AND THE STAGE'S HALF OF THAT GAP IS AT ITS FLOOR. The air above the
+     slab is not only the distance from the marquee — once the section
+     pins, it is the distance from the TOP OF THE SCREEN to the first line.
+     Measured at 1920×1080 it is 59px against a 56px navbar: three pixels.
+     Seating the slab any higher (a larger padding-bottom on .stage) runs
+     the sentence under the bar. Every further request to close this gap
+     has to be answered in PressWall.module.css, and its own note now says
+     so from the other side.
 
-     THE TOKEN BELOW IS --home-gap-tight, AND THE SCALE PICKED IT. That
-     token's own definition is "a full-bleed colour/photo block adjoins the
-     cream", which is exactly what Reservations is: a 125svh film plate
-     starting hard against this section's last pixel. 198px at 1440×900.
+     BELOW — THERE IS NO SEAM AT ALL ANY MORE, AND THAT IS THE WHOLE POINT
+     OF THE SECTION. This used to declare --home-gap-tight (198px at
+     1440×900) because the film started at its own first pixel below a
+     finished block of cream. It does not start below anything now: it
+     arrives OVER the held type, and the last of this section's cream is
+     covered rather than ended. A bottom seam here would be a strip of
+     empty cream that the film has to cross before it reaches any words,
+     which is precisely the dead run the pin exists to delete.
 
-     AND THE PAIR CAME OUT VERY NEARLY CENTRED, WHICH IS THE POINT. The old
-     seams were 330 above against 234 below, so the content sat (330 − 234)/2
-     = 48px BELOW the section's own centre, and no value of `gap` could move
-     it — the content term cancels out of that difference. The new ones are
-     189 against 198, so it sits 4.5px ABOVE centre at 1440×900. That is not
-     a happy accident, it is what happens when both seams come from the
-     scale instead of from one neighbour's leftovers, and it holds across the
-     clamp: 0px at 600 tall, 4.5 at 900, 6.5 at 1300, 12 at 1600 — inside
-     half a line of this type at every height. */
-  /* ══════════ THE FOUR SEATS ══════════
-     Row A flush right, row B pushed in off the left, row C pulled well in
-     off the right, row D centred. The eye crosses the page once inside the
-     first sentence, finds the landing SHORT of the margin it has just
-     learned to expect — which is the whole of why row C is not flush — and
-     then closes on the centre axis. Each seat is nearer the axis than the
-     one before: a funnel closing on exactly the spot where
-     <Reservations>'s "Where will you start?" appears a moment later.
+     ⚠️ SO THE OLD CENTRING ARGUMENT IS GONE TOO. The pair used to come out
+     189 above against 198 below and the note here spent a paragraph on how
+     nearly centred that was. The content is centred in the STAGE now (see
+     .stage), which is a viewport tall and has nothing to do with either
+     seam. Do not restore a bottom padding to "balance" the top one; the
+     top one is a seam with PressWall and the bottom one would be a hole in
+     the handover. */
+  padding-top: 0;
 
-     WHAT THE NEIGHBOURS ACTUALLY OFFER, measured at 1440×900 off the
-     rendered ink rather than read off their stylesheets:
-       PressWall — ONE edge, and it is on the left. Its "As featured in"
-                   label inks at x = 39: the page margin (--pad-x, 40px) less
-                   the glyph's own left sidebearing. Its mastheads are no use
-                   — the lane runs `margin-inline: calc(-1 * var(--pad-x))`
-                   and bleeds 0 → 1440, so it offers no right edge and no
-                   left one either.
-       Reservations — NO EDGE, ONE AXIS. Every line in it is centred on 720:
-                   the heading inks 409.3 → 1030.7, "Seven rooms. Different
-                   worlds." 590.3 → 849.7, the clock 642.3 → 797.6. Its
-                   computed padding-inline is 0.
+  /* ⚠️ NOT --pad-x, AND THIS IS THE ONE SECTION ENTITLED TO SAY SO. The
+     page margin exists so that running text, cards and photographs share
+     one left edge down the whole page. This section has none of those: it
+     is a single sentence set as wide as it will go, and the margin is
+     simply measure it cannot spend on the type. Halving it at 1920 hands
+     back 36px, which is most of a letter at this size.
 
-     So row A takes the right margin (its right ink at 1400 is the mirror
-     of --pad-x, the same margin the press label above is seated on), and
-     every row after it steps IN from an edge: row B comes 5.4% in off the
-     left margin, row C 18% in off the right (see .rowB/.rowC for both
-     derivations), and row D takes Reservations' axis — which is the page's
-     own centre, because this section's padding is symmetric. Margin, in a
-     little, in more, centre: each seat is nearer the axis than the one
-     before, so the passage reads as a funnel closing on exactly the spot
-     where the film's heading appears — rather than as a zigzag bouncing
-     off both page edges, which is what a flush-left row B produced.
+     It is not zero, because the words would then start at the same pixel
+     as the browser chrome and the block would read as clipped rather than
+     as full-bleed. */
+  padding-inline: clamp(10px, 1.15vw, 22px);
+  padding-bottom: 0;
 
-     ⚠️ DO NOT "RESTORE" the old 12px left. It was Blog's number. Nothing
-     below this section sits at 12 any more. */
-  padding: calc(var(--home-gap) - clamp(64px, 9vh, 132px)) var(--pad-x)
-    var(--home-gap-tight);
+  /* ══════════ THE FILM'S PULL-UP ══════════
+     <Reservations> follows in normal flow, so the only way it can be over
+     this section rather than after it is for this section's box to end
+     early. It ends one viewport early: the film's top edge lands exactly
+     on the stage's top edge, so from the film's own point of view nothing
+     has changed — it still scrolls past 1:1 with no pin of its own, and
+     its three element-relative scrubs are untouched.
+
+     ⚠️ THE PULL-UP LIVES HERE AND NOT ON Reservations. It is a consequence
+     of this section pinning, so this section pays for it; a negative
+     margin-top in Reservations.module.css would be a number that file
+     cannot explain. Reservations.module.css carries a note saying its old
+     pull-up was removed when the ReadyCta pin went — that note is still
+     correct, and this is not a revival of it.
+
+     IT DOES NOT NEED A z-index. Reservations declares `position: relative;
+     z-index: 4` already, and .stage below is sticky with `z-index: auto`,
+     so the film paints over the held type by the ordinary rules. Giving
+     .stage a z-index would break that, not secure it. */
+  margin-bottom: -100svh;
 }
 
-/* ══════════ THE DRIFTING GROUND ══════════
-   Every row and the ring live inside this wrapper, and Passage.tsx eases
-   it from +0.125em to −0.125em of the display size across the whole scrub
-   — the ambient layer, running opposite to the descending words. See
-   DRIFT_EM in Passage.tsx for why it exists and, more importantly, why it
-   is an INNER wrapper: the section is the element useScroll measures, and
-   a transform on the measured element is a progress feedback loop.
+/* ══════════ THE RUNWAY ══════════
+   A sticky element holds for exactly as long as its containing block is
+   taller than it is, so this box is the pin's whole duration:
 
-   IT CARRIES THE FLEX COLUMN AND THE BEAT, which used to sit on .section —
-   they moved with the rows, because a wrapper between a flex parent and
-   its items would otherwise have collapsed the seats (align-self reads the
-   nearest flex container). A transform never affects layout, so the
-   section's height and both seams are identical with the drift in;
-   measured, not assumed — see probe-passage-setting.mjs.
+       .scope height = 100svh (the stage) + --pin-over
 
-   font-size is the em anchor for the drift's transform: translateY in em
-   resolves against THIS element's font, and without the declaration the
-   wrapper would inherit the root size and the drift would be a third of
-   what it reads. (The same class of bug hid in the pair gap once — see
-   .pair.) Rows are unaffected; each sets its own size.
+   AND --pin-over IS NOT A TASTE NUMBER. Two events have to coincide — the
+   film finishing its climb, and the type letting go — or the reader either
+   watches a covered screen keep scrolling or sees the type slide away with
+   the film half-arrived. Since the film travels 1:1 with the scroll, the
+   pin must last exactly as long as the film's remaining journey at the
+   moment the pin starts:
 
-   THE AIR BETWEEN THE SENTENCES — the gap — is between the A+B pair and
-   row C, and (less its pull-back, see .rowD) between row C and the
-   hand-off. It is NOT the air between rows A and B: those are one sentence
-   broken across two rows and sit a leading apart inside .pair. The beat is
-   the pause a reader takes at a full stop, and it is the point of the
-   section.
+       --pin-over = 100svh − --pin-peep
 
-   ⚠️ THE BEAT WAS clamp(112px, 18vh, 280px) AND WAS WIDENED ONE STEP TO
-   19vh — +5.6% at every stop where the coefficient binds: 162px → 171px at
-   900 tall, 234 → 247 at 1300 — and the motion study confirmed the wider
-   figure (its proof sheet runs the equivalent 12.5cqw). The floor moved
-   112 → 118 with it, derived by holding the clamp's knee where it was: the
-   old floor bound below 112/0.18 = 622px of height, and 0.19 × 622 =
-   118.2, so the floor still takes over at the same 622px rather than
-   drifting the knee downward.
+   ⚠️ --pin-peep IS THE ONE FREE NUMBER AND IT USED TO BE ITS OPPOSITE.
+   This was --pin-hold: a stretch of runway at the start on which the film
+   had not yet appeared at all, so the type was held alone on an empty
+   screen before anything arrived. It is inverted at the user's
+   instruction. The film's top edge now sits --pin-peep ABOVE the bottom of
+   the screen for the entire pin, so while the reader is taking in the
+   sentence there is already a lip of the booking card showing under it —
+   the next chapter announcing itself rather than ambushing them.
 
-   ⚠️ THE CEILING IS THE SEAMS, NOT THE VIEWPORT. The two pads either side
-   are SEAMS — one is PressWall's air less its own contribution, the other
-   is the whole cream→film boundary — so widening the beat has to come out
-   of the middle, never out of them, AND the beat must stay clearly
-   smaller than both, or the pair stops reading as one unit two beats long
-   and starts reading as separate things evenly spaced down the section.
-   At 19vh it clears that at every stop: 171 against seams of 189/198 at
-   900 tall, 247 against 273/286 at 1300, 118 against 168/168 at 600 — and
-   at 90% of the smaller seam it is also as far as the rule allows: another
-   step (20vh = 180 against 189 at 900) would leave 9px between beat and
-   seam, which is not "clearly smaller", it is a coin toss.
+   ⚠️ THE TWO CANNOT COEXIST, and it is worth being clear about why, since
+   a future note may well ask for both. The film is not pinned; it moves
+   with the scroll. A hold means it is off-screen while the page scrolls,
+   a peep means it is on-screen while the page scrolls, and there is no
+   arrangement in which it is on-screen and NOT moving without giving it a
+   pin of its own — which would put two pinned sections on one screen
+   fighting over the same viewport.
 
-   THE 280px CAP IS THAT RULE AT THE TOP END and not a round number: the
-   top pad's own cap is (420 − 132) = 288px, so 288 is where an uncapped
-   beat would draw level with the seam above it — at 1516px of height now
-   (288/0.19), where it was 1600 (288/0.18); the cap itself binds from
-   1474 (280/0.19) instead of 1556. 280 keeps the beat under the seam at
-   every height a browser can report, same as before, with the margin
-   thinned from 8px over a shorter run of heights. Raise the coefficient
-   again and re-derive this cap against 288 with it. */
-.drift {
+   Working the geometry through with the section's own box:
+
+       film top (document)  = section bottom − 100svh
+                            = scope top + 100svh − --pin-peep
+       film first visible   at scrollY = film top − 100svh
+                            = scope top − --pin-peep   (i.e. BEFORE the pin)
+       film fully covers    when scrollY = film top
+                            = scope top + 100svh − --pin-peep
+       stage releases       when scrollY = scope top + --pin-over
+                            = scope top + 100svh − --pin-peep
+
+   so the last two are the same moment, and the margin-bottom above stays
+   at exactly −100svh regardless of the peep. Every term is svh or a token;
+   nothing here hard-codes a viewport.
+
+   ⚠️ AND IT IS A FALLBACK NOW, NOT THE VALUE. Passage.tsx measures the
+   slab's bottom edge after mount and writes --pin-peep as a px value on
+   this element, because the card below has to be SEATED under the sentence
+   at the frame the pin engages and where the sentence ends is not a
+   constant across viewports. The declaration here is what a reader without
+   script gets, and what the server paints before hydration; the arithmetic
+   above holds either way, since every term is expressed in --pin-peep
+   rather than in its value. See the note over measurePinPeep.
+
+   12svh is about an inch and a half of card on a laptop: unmistakably a
+   thing arriving, far short of competing with the sentence for attention.
+
+   Passage.tsx DERIVES ITS BLUR START FROM THIS BOX rather than copying any
+   of it: the type must stay sharp until the film has climbed over the
+   bottom third of the screen, which it works out from the scope and stage
+   rects. So --pin-peep can differ per breakpoint — and it does, see the
+   narrow rules at the foot of this file — without the component knowing. */
+.scope {
+  --pin-peep: 12svh;
+  height: calc(100svh + (100svh - var(--pin-peep)));
+}
+
+.stage {
+  position: sticky;
+  top: 0;
+  height: 100svh;
+
+  /* ONE CHILD, CENTRED VERTICALLY AND STRETCHED HORIZONTALLY. This was a
+     flex column with a gap because a whisper of the same sentence hung
+     above the slab; that was removed at the user's instruction and the gap
+     went with it.
+
+     ⚠️ `align-content`, NOT `place-content`, AND THE REASON IS NOW HISTORY
+     RATHER THAN LAW. The shorthand centres on BOTH axes, and centring on
+     the inline axis shrink-wraps the slab to its own max-content width.
+     While the lines were justified that quietly deleted the entire
+     setting: with no slack in the box, `justify-content: space-between`
+     had nothing to distribute, so the widest line had no hole at all —
+     measured at 1920 the slab came out 1709px inside an 1840px stage and
+     the tightest line read 100% full. Centred lines do not care; a
+     shrink-wrapped slab would centre them on the same axis.
+
+     It stays `align-content` anyway, because the slab being handed the
+     whole measure is what makes the block's width a property of the PAGE
+     rather than of whichever line happens to be longest — and because
+     restoring the old alignment would otherwise re-break this at a
+     distance, from a file that does not mention it. */
+  display: grid;
+  align-content: center;
+
+  /* ⚠️ THE PADDING IS HOW THE SLAB SITS ABOVE CENTRE, and it is the second
+     half of taking the gap down (the first was zeroing the section's top —
+     see .section). Centred in a full viewport, the slab carries half a
+     screen of cream above it wherever it is in its travel, and that air is
+     what the reader reads as the distance from the marquee. Padding the
+     BOTTOM of the grid shortens the box the slab centres in, so it lands
+     --pin-peep-and-then-some higher up the screen without anything moving.
+
+     IT ALSO OPENS THE FLOOR THE CARD ARRIVES ON. The film peeps above the
+     bottom edge for the whole pin; type centred on the axis sits directly
+     on top of that lip, and type seated above it leaves the card a floor
+     to rise from. One number does both, which is why it is here and not
+     expressed as a margin on the slab.
+
+     ⚠️ AND IT IS CAPPED BY THE NAVBAR, WHICH IS NOT OBVIOUS AND IS NOT
+     OPTIONAL. The air above the slab is one number doing two jobs: in flow
+     it is the distance from the marquee, and once the section pins it is
+     the distance from the TOP OF THE SCREEN. Push the slab up to close the
+     first and you push it under the bar in the second. Measured at
+     1920×900 with a flat 22svh: the slab's top sat 43px down against a
+     53px navbar — the first line ran ten pixels under it.
+
+     The cap is written in em of the display type so it tracks the block
+     rather than the viewport: 4.6em is the slab's own height with a margin
+     (it measures 4.39em) and 108px is the bar plus air to clear it.
+
+     ⚠️ 108 AND NOT 130, AND THE DIFFERENCE IS THE FONT'S OWN METRICS. The
+     guard protects the slab's BOX, and with line-height 0.86 the visible
+     capitals sit well inside that box — measured at 1920, the line box is
+     142px tall against a 165px em, so the caps begin around a dozen pixels
+     below the box top. Guarding the box to 130px was therefore buying
+     nearly 40px of clearance to protect a bar 56px tall. 108 leaves about
+     15px on the box and something closer to 28 on the ink, which is what
+     the eye actually judges. Do not trim it further without re-measuring
+     the ink rather than the box. The
+     min() means 22svh applies on tall screens, where it is safe, and the
+     cap takes over on short ones, where it is not. .stage carries a
+     font-size for exactly this reason and for no other — the em has to
+     resolve against the display size, not the root.
+
+     ⚠️ THE em TERM IS THE SLAB'S HEIGHT, AND THE SLAB HAS NOW BEEN BOTH
+     SIZES. It was 4.6em against a 4.39em block, then 5.7em against 5.43em
+     when the copy went to four lines and a beat, and it is 3.9em now that
+     the beat has gone: four rows at 0.86 plus three 0.06em row gaps is
+     3.62em, and the guard is that plus a margin. ⚠️ IF A ROW IS EVER ADDED
+     OR REMOVED, THIS NUMBER AND THE svh TERM IN THE CLAMP BELOW BOTH MOVE,
+     in the same proportion and in opposite directions — a taller block
+     needs a bigger guard and a smaller type. Leaving either behind fails
+     silently: the guard runs the first line under the navbar, the clamp
+     runs the last line off the bottom of the stage.
+
+     ⚠️ AND THIS CLAMP MUST STAY IDENTICAL TO .line's. It is the same
+     declaration written twice, and it has to be: .slab inherits its em
+     from here (for the row gap) while each row resolves its own from
+     .line. If the two ever disagree, the gaps and the guard are measuring
+     a different type size from the one on the screen.
+
+     ⚠️ THIS IS THE FLOOR ON THE MARQUEE GAP. It has been asked to close
+     three times and this is where it stops: what is left is the navbar's
+     air, not spare. Closing it further means moving the BAR — hiding it
+     while this section is pinned — not moving the type. */
+  font-size: clamp(1.1rem, min(7.2vw, 20svh), 12rem);
+  padding-bottom: min(22svh, calc(100svh - 3.9em - 108px));
+
+  /* the swell and the blur are both animated on this element by
+     Passage.tsx. It is INSIDE .scope, which is the element useScroll
+     measures, so neither can feed back into the progress that drives it. */
+  transform-origin: 50% 46%;
+
+  /* ⚠️ NO `will-change` HERE, DELIBERATELY. It is the obvious thing to add
+     to an element that is about to be transformed and filtered, and on
+     THIS element it is the wrong trade: the stage is a viewport-sized box
+     that exists for the whole life of the page, so a standing hint would
+     hold a full-screen composited layer from first paint to last for the
+     sake of one scroll runway near the bottom. Framer promotes the layer
+     when it starts writing the transform, which is the moment it is
+     actually needed. */
+}
+
+/* ══════════ THE SLAB ══════════
+   ⚠️ THE ROW GAP IS NEW AND IT IS SMALL ON PURPOSE. The three-line block
+   set its rows on the leading alone (0.86), which is right for three rows
+   of one sentence and too tight for five: at that leading a five-row stack
+   reads as a solid mass and the composed rag — the whole reason the block
+   is centred now — stops being visible as a shape. 0.06em is about five
+   pixels at 1440: not a gap the reader sees, just enough air that the rows
+   read as separate lengths.
+
+   IT IS em OF THE DISPLAY SIZE, inherited from .stage, so it stays the
+   same fraction of the type at every breakpoint. That only works while
+   .stage and .line carry the identical clamp — see the note on .stage. */
+.slab {
   display: flex;
   flex-direction: column;
-  gap: var(--passage-beat);
-  font-size: var(--passage-fs);
+  row-gap: 0.06em;
 }
 
-/* rows A and B are ONE SENTENCE broken across two rows, so they sit a
-   LEADING apart, not a beat apart — the wrapper exists so the ground's gap
-   never opens between them.
+/* ONE LINE, CENTRED ON THE PAGE AXIS.
 
-   ⚠️ THE FIGURE IS 0.5 OF THE DISPLAY SIZE, AND ITS HISTORY IS A UNIT BUG.
-   The prototype set the gap in a bare em on an element that carried the
-   ROOT font size, so every figure it proofed was a third of what it read —
-   "0.36em" was rendering ~7.5px while reading as 16, which is why three
-   rounds of widening moved the rendered gap two or three pixels at a time.
-   The calc pins the em to the display size, where 0.5 measures 23.0px at
-   1440×900 — 0.135 of the 171px beat, unmistakably a leading and not a
-   beat, so the pair keeps reading as one sentence with two seats rather
-   than as two lines of a list. Keep it under about 0.7: past that the two
-   rows drift far enough apart that the reader has to re-join them, which
-   defeats the deliberate break. (0.02em was also proofed — row A's
-   descenders nearly on row B's ascenders, reading as a wrap.) */
-.pair {
-  display: flex;
-  flex-direction: column;
-  gap: calc(var(--passage-fs) * 0.5);
-}
+   ⚠️ IT WAS `justify-content: space-between` AND THE CHANGE IS THE WHOLE
+   REDESIGN. Every line used to be pushed to BOTH margins: the groups are
+   `flex: none`, so all of the line's slack went into the gaps between
+   them, one hole per line, with the annotation standing in it. That
+   setting is recoverable from this note and from git, and it had a real
+   virtue — the holes differed in size because the lines differed in
+   length, so the block had an internal rhythm nobody had to place. What it
+   could not have is a RAG: every line filled its measure exactly, so the
+   block was four rectangles of ink and the only thing distinguishing them
+   was how big a gap each one carried.
 
-/* ══════════ THE ROWS ══════════
-   Set SMALLER than the manifesto's statement — clamp(2.4rem, 5.35vw,
-   5.2rem) there against clamp(1.7rem, 3.2vw, 3.2rem) here — and that
-   difference is load-bearing rather than cosmetic. The manifesto is the
-   page's statement and has to be the largest type on the cream; a handover
-   set at the same size reads as a second statement and picks a fight the
-   chapter above it has already won. This is the page's second voice, and it
-   is quieter. */
+   Centred, the line lengths become visible, and that is what makes a stack
+   of display type read as editorial rather than as a banner. See the copy
+   block in Passage.tsx for the shape the four lines are composed into.
+
+   ⚠️ THE COST IS PAID IN TYPE SIZE, AND IT IS PAID TWICE. A justified line
+   is as wide as the measure whatever is in it; a centred line is as wide
+   as its own contents, and the annotation is now a real item on it rather
+   than a zero-width seat, so it spends its own width plus two gaps. Both
+   push the largest workable size down — see the clamp below, whose vw term
+   came down by more than a quarter at this change.
+
+   ⚠️ AND NOTHING HERE WRAPS. Every group is nowrap and the breaks are
+   authored in Passage.tsx. A group that wrapped would put a second line
+   inside a flex row and silently destroy the arrangement, which is why the
+   size below is a clamp with a floor rather than a fitter allowed to
+   shrink the type until it fits. */
 .line {
+  display: flex;
+  align-items: flex-start;
+  justify-content: center;
   margin: 0;
-  /* the seat for the ink mark's <svg>, which is absolutely positioned and
-     therefore out of flow — see .ink. Nothing else in this file positions
-     against it. */
-  position: relative;
-  font-family: var(--font-display);
-  font-weight: var(--w-regular);
-  font-size: var(--passage-fs);
-  /* NOT --lh-display (0.92). That value is for the wordmark and the
-     statement, where the type is big enough that 0.92 still clears the
-     descenders; at this size it collides. 1.04 is the smallest leading that
-     does not. */
-  line-height: 1.04;
-  letter-spacing: var(--tr-display);
-  color: var(--maroon);
 
-  /* ⚠️ NO MEASURE, AND NO WRAP — AND THE TWO ARE ONE DECISION. This rule
-     used to carry `max-width: 16ch` (and the landing later grew its own
-     18ch guard), whose one real job was deciding where the first sentence
-     broke. The rows are AUTHORED now — the break after "rooms," is the
-     setting's whole point, putting the two "seven"s at opposite margins —
-     so there is nothing left for a measure to decide, and a measure that
-     decides nothing is a trap for the next reader. `nowrap` is the other
-     half of the same decision: a row that may not wrap must be PROVEN to
-     fit instead, because it cannot relieve itself by breaking — it will
-     overflow the section, and an ancestor's clip can make that overflow
-     vanish rather than visibly break.
+  /* ⚠️ THE GAP IS ON THE LINE AND IT WAS ON THE CAPTION'S MARGINS, WHICH
+     BROKE EVERY PHONE. `margin-inline: 0.28em` on .tag produces exactly the
+     same desktop layout — 0.28em either side of the caption — and it is the
+     obvious place to put it, because the gap exists FOR the caption. The
+     failure is one rule away: below 900px .tag is `display: none`, a
+     display:none item takes its margins out of the layout with it, and the
+     two word groups either side then butt together with no space at all.
+     Measured at 390 before the fix, the line read "SEVEN DIFFERENTROOMS".
 
-     PROVEN, measured off the rendered ink against the content width
-     (viewport − 2 × --pad-x), zero horizontal overflow at all six stops.
-     Row C is the widest row (216.6px at the clamp floor, against A's 215.6
-     and B's 213.3) and it also carries the 18% pull, so it is the binding
-     case everywhere:
-       1920  row C ink 407.7 + pull 331.2 = 738.9 of 1840
-       1440  row C ink 366.9 + pull 244.8 = 611.7 of 1360
-       1280  row C ink 326.2 + pull 217.5 = 543.7 of 1208.3
-       1024  row C ink 260.9 + pull 174.0 = 434.9 of 966.7
-        768  row C ink 216.6 + pull 130.5 = 347.1 of 725.0
-        390  row C ink 216.6 + pull  64.4 = 281.0 of 358.0
-     The tightest is row C at 390: 77px (21.5%) of room, its left ink
-     sitting 76.9px clear of the left margin. If a future copy does not
-     clear, THE FIX IS THIS CLAMP'S LOWER BOUND — not letting the rows
-     wrap, and not cutting the user's words. */
+     A flex gap survives that, because it is a property of the LINE rather
+     than of the item that disappears: three items give two gaps, and when
+     the caption goes there are two items and one gap — which is the word
+     space the sentence needed anyway. Bare lines have a single child and
+     are unaffected either way.
+
+     0.28em is a shade wider than the face's own word space, so on a phone
+     the pair reads as two words and on a desktop it reads as a caption
+     standing in a gap. In em of the display size, so it tracks the type. */
+  gap: 0.28em;
+
+  font-family: var(--font-display-big);
+
+  /* ⚠️ 600 IS A LITERAL AND IT IS NOT --w-medium, WHICH WOULD DO NOTHING.
+     The weight scale in globals.css is 300 / 400 / 500 / 700, and
+     `contralto-big` does not ship a 500 — the kit carries 300, 400, 600,
+     700 and 900. Asking for 500 therefore resolves to the 400 cut and the
+     block renders exactly as it did before, silently. The token is right
+     for Helvetica and wrong for this face, so the face's own number is
+     written here with this note rather than a token that lies.
+
+     ⚠️ AND 600 RATHER THAN 700, WHICH IS THE WHOLE DECISION. Measured on
+     "SEVEN DIFFERENT" at 200px against the real kit, the cuts set at:
+
+         300  1772px      400  1470px  (was)
+         600  1510px      700  1873px
+
+     so 600 costs 2.7% of the line's width and 700 costs 27%. The longest
+     line already fills 86% of the measure, so 700 would put it at 109% —
+     it would not fit at all, and buying it back means dropping the type
+     about a fifth on every screen. A block a fifth smaller is a worse
+     trade than a block a shade lighter.
+
+     ⚠️ IT IS A MEDIUM, NOT A BOLD, AND THAT IS WHAT WAS ASKED FOR. The
+     reference is watchhouse.com, whose display lines are Tiempos Headline
+     at weight 500 with -0.02em tracking — a medium of a high-contrast
+     serif, sentence case, set tight. Not a bold. 600 of contralto-big is
+     this family's nearest true equivalent: the stems thicken and the
+     hairlines hold, where 700 is a visibly different letterform rather
+     than a heavier one.
+
+     THE EARLIER ARGUMENT AGAINST A HEAVIER CUT DOES NOT APPLY HERE. This
+     file used to carry a note saying a bold line "reads as two typefaces
+     rather than as emphasis" — that was about setting ONE line heavier
+     than the other three. All four move together, so there is no second
+     weight on the screen to read against. */
+  font-weight: 600;
+
+  /* tight, because the block is meant to read as one object rather than
+     as five rows that happen to be stacked. The air between the rows is
+     the slab's row-gap, not the leading. */
+  line-height: 0.86;
+  text-transform: uppercase;
+
+  /* THE SIZE IS A CLAMP AND NOT A FITTER, and that is a deliberate
+     downgrade from the prototype. A fitter measures the rendered ink and
+     picks the largest size that still fits — which is lovely, and which
+     costs a measure-and-relayout pass on every resize and a second one
+     when Contralto lands. This block is a fixed set of words at a fixed
+     set of breaks, so the size that works is knowable in advance; the
+     clamp is that size. The vw term is what keeps the block the same
+     share of the measure across the range.
+
+     ⚠️ THE vw TERM IS THE WHOLE SETTING AND A rem CEILING NEARLY RUINED IT.
+     The type has to track the measure. This carried a 4.4rem ceiling for
+     an afternoon and a 1920 screen ran the type at 70px in a box that
+     wanted 134 — the lines stranded in the middle of a mostly empty
+     measure, which is not the arrangement, it is the arrangement failing.
+     The ceiling is 12rem now and 7.2vw does not reach it until ~2670px.
+
+     ⚠️ NOTHING WRAPS, SO THE LONGEST LINE GOVERNS THE SIZE OF ALL OF THEM,
+     and the three long lines are within HALF A POINT of each other:
+     measured at 1440 against the real face, 73.7 / 73.8 / 74.2 / 46.6% of
+     the measure. That is a deliberately fragile arrangement and it is the
+     one thing to know before touching either the copy or the captions —
+     lengthening any of the first three lines, or widening the caption on
+     line 1 or 2, makes THAT line the governing one and shrinks the whole
+     block to pay for it. WHAT in Passage.tsx is the narrowest caption in
+     the set for exactly this reason.
+
+     ⚠️ 7.2 PUTS THE GOVERNING LINE AT ABOUT 86% OF THE MEASURE, and the
+     coefficient is derived from that rather than chosen. It ran at 6.2 for
+     a version, which left the block filling 82% — three-quarters of a
+     screen of type with a fifth of the measure standing empty either side,
+     which reads as type that failed to fit rather than type that was
+     placed. 86 is full enough to be the setting and short of the flush
+     edges the justified block used to have.
+
+     ⚠️ AND IT IS ONE COEFFICIENT FOR THE WHOLE RANGE, WHICH IS NEW. The
+     narrow rule at the foot of this file used to carry its own vw term
+     because dropping the captions changed which line governed. It does not
+     any more: line 3 carries no caption, so it governs at every width and
+     the fill is constant apart from the section's padding clamp, which
+     takes a slightly larger share of a phone (measured: 86% at 1440
+     against about 89% at 390). Two coefficients that have to be kept in
+     proportion is a thing this file has got wrong before. */
+  /* ⚠️ IT IS BOUND BY BOTH AXES, AND THE HEIGHT TERM IS NOT DECORATIVE.
+     The measure sets how large the type CAN be; the frame sets how large
+     it MAY be. On a short laptop the two disagree badly, so `min()` takes
+     whichever axis is binding — the width on ordinary screens, the height
+     on short ones — and the block never grows into its own margins.
+
+     ⚠️ THE HEIGHT TERM IS TUNED TO BIND ONLY WHEN IT MUST, and it has to
+     move whenever the block's height does. The block is 3.62em tall now
+     (see the note on .stage), so at 20svh a height-governed block occupies
+     72% of the stage — the same fraction it held at 5.43em and 13.4svh.
+     The point of the number is the CROSSOVER, not that fraction: at
+     1920×1080 the width asks 138px and the height allows 216, so the width
+     governs, which is what should happen on an ordinary screen; the height
+     does not take over until about 1440×500. A four-row block simply needs
+     less guarding than a five-row one did. Set it tighter and it starts
+     governing at 16:9 too, and the type gets smaller for no reason the
+     reader can see — which is exactly what happened when the vw term went
+     from 6.2 to 7.2 and this one was left behind. svh rather than vh so a
+     phone's URL bar sliding does not resize the type mid-scroll. */
+  font-size: clamp(1.1rem, min(7.2vw, 20svh), 12rem);
+}
+
+.group {
+  flex: none;
   white-space: nowrap;
+  font-weight: inherit;
+
+  /* ⚠️ THIS IS THE MASK THE LINE ARRIVES OUT OF. The travel is on .groupInk
+     inside it; this box is what hides the ink before it lands. See
+     LINE_TRAVEL in Passage.tsx for why the travel is 118% of this box and
+     not 100%.
+
+     ⚠️ IT CLIPS NOTHING AT REST, WHICH IS NOT OBVIOUS AT line-height: 0.86.
+     A tighter-than-em line box means the ink can overflow it, and an
+     overflow:hidden that cropped the caps would be a defect visible on
+     every frame rather than only during the entrance. It does not, because
+     these are capitals with no descenders: measured at 1440, the ink sits
+     about 0.08em below this box's top and its baseline about 0.13em above
+     the bottom. ⚠️ IF A LINE EVER CARRIES A LOWERCASE DESCENDER OR THE
+     leading IS OPENED, re-measure this before trusting it. */
+  overflow: hidden;
 }
 
-.rowA {
-  align-self: flex-end;
+/* the travelling half of the mask. inline-block because a transform needs a
+   box, and the group is `nowrap` so this can never be more than one line. */
+.groupInk {
+  display: inline-block;
 }
 
-/* PUSHED IN OFF THE LEFT MARGIN, the mirror of row C's pull MUCH
-   shallower — the proof sheet sets 5cqw against the landing's 17cqw, and
-   the gap between the two figures is deliberate: row B is still part of
-   the accumulating sentence, and only the landing has earned the middle
-   (it was proofed at 11cqw first and pulled back — that deep, the second
-   row started competing with the landing for the axis). Flush left, the
-   first sentence read as a full-width zigzag bouncing off both page
-   edges; brought in, the rows describe a shape that closes toward the
-   centre (see the seats note above). 5.4% by the same conversion as
-   .rowC's 18%: the prototype's cqw was of its stage's full width and its
-   rows lived inside 3.4cqw of padding each side, so 5cqw of stage =
-   5/93.2 = 5.4% of the box the rows occupied, and a percentage margin
-   here resolves against the section's content width. At 390 the push is
-   19.3px against row B's 213.3px of ink — 125.4px of room, so the narrow
-   case stays clear (row C remains the binding row; see .line). */
-.rowB {
-  align-self: flex-start;
-  margin-left: 5.4%;
+/* ══════════ THE ROW THAT WENT ══════════
+   ⚠️ THERE IS NO .last ANY MORE AND THE BEAT WENT WITH IT. A fifth row sat
+   here carrying "SO . . .", set 0.95em below the claim — a gap deliberately
+   wider than the leading above it, so the pause read as a pause. It was
+   removed at the user's instruction along with the word; the three dots
+   moved onto the end of line 4 and are now the whole of the handover. See
+   the note on LAST_WORD in Passage.tsx for the argument.
+
+   WHAT IT COST WHILE IT EXISTED, since that is the part worth keeping: the
+   row plus its beat was 1.81em of a 5.43em block — a third of the block's
+   height for a two-letter word — and on a pinned screen the block's height
+   is one of the two terms deciding how large the type may be. Removing it
+   is why the guard on .stage is 3.9em and not 5.7em.
+
+   ⚠️ DO NOT REINSTATE IT WITHOUT MOVING BOTH NUMBERS BACK. The em guard on
+   .stage and the svh term in .line's clamp are both derived from the row
+   count; a fifth row added here and nowhere else runs the first line under
+   the navbar. */
+
+
+
+/* THE SPACING IS ON THE DOTS AND NOT ON THE LINE. At display size three
+   periods sit almost on top of each other and need opening up; the words
+   do not, and tracking the whole string set "So" as "S O" back when there
+   was a word here to set.
+
+   ⚠️ IT IS A FLEX GAP AND NO LONGER letter-spacing, because each dot is
+   its own animated element. Tracking puts its space AFTER a glyph, so the
+   last dot carried a trailing 0.42em that pushed the centred line off the
+   page axis by half of it and needed a negative margin to cancel — a gap
+   simply does not create the space it is not between two things.
+
+   ⚠️ IT SITS INSIDE A WORD GROUP NOW, NOT ON A ROW OF ITS OWN, which is
+   what keeps it on the same line as "STANDARD": .group is nowrap, so the
+   claim and its trailing punctuation cannot be separated by a wrap however
+   narrow the screen gets. The 0.42em on the left is the space between the
+   word and the first dot, and it is the same measure as the space between
+   the dots so the four objects read as one piece of punctuation. */
+.dots {
+  display: inline-flex;
+  gap: 0.42em;
+  margin-left: 0.42em;
 }
 
-/* ══════════ THE LANDING, PULLED IN FROM THE MARGIN ══════════
-   Row C seats right like row A but stops well short of the margin, nearer
-   the section's own axis than either edge. It breaks the column the first
-   two rows set up, which is what makes the last sentence read as a
-   different KIND of statement rather than as a third line — the proof
-   sheet's "toward the middle" setting, chosen over flush, a word short, and
-   fully centred.
-
-   18%, DERIVED FROM THE PROTOTYPE'S 17cqw RATHER THAN COPIED FROM IT. Its
-   unit was the stage's full width; a percentage margin on a flex item
-   resolves against the containing block's CONTENT width, and the
-   prototype's rows lived inside 3.4cqw of padding each side, so 17cqw of
-   stage = 17/93.2 = 18.2% of the box the rows actually occupied. 18% is
-   that, expressed in the unit this section has. A fraction and not a px
-   value because a fixed pull that reads well at 1440 puts the row off the
-   page at 390: at 1440 this is 244.8px, at 390 it is 64.4px — and row C's
-   left ink still sits 55.4px clear of the left margin there (measured:
-   ink 238.2px + pull 64.4 against 358 of content width). */
-.rowC {
-  align-self: flex-end;
-  margin-right: 18%;
+/* each dot animates from Passage.tsx; the inline-block is what lets it
+   take a transform at all */
+.dot {
+  display: inline-block;
 }
 
-/* ══════════ THE HAND-OFF ══════════
-   "So…" is not a fourth statement, it is the sentence that walks the reader
-   over the seam into <Reservations>, whose every line is centred on the
-   page axis. So it is centred too — see the seats note above — and it is
-   set QUIETER than the passage (0.66 of the size, in the softer maroon)
-   because a connective that matches the statement's weight reads as a third
-   claim. It is pulled TIGHTER to row C than the beat — the section's gap
-   less 0.42 of it, so the air above it is 0.58 of a beat — because it
-   belongs to the line above it, not to the air below: a full beat here
-   would read as a fourth entry in a list, and the row is a trailing-off,
-   not an entry. */
-.rowD {
+/* ══════════ THE ANNOTATION ON THE LINE ══════════
+   Sized off the VIEWPORT and not off the line it sits in: it has to stay
+   caption-sized whatever the display type around it is doing, and an em on
+   the ink would scale it with the slab and turn it into a second heading.
+
+   ⚠️ IT WAS A ZERO-WIDTH SEAT AND IT IS AN ORDINARY FLEX ITEM NOW. That
+   seat was the single cleverest thing in this file and it existed for one
+   reason: while the block was justified, the annotation stood in the hole
+   its line left, and any width it took came straight out of the two gaps
+   that were keeping the words off it. `width: 0` with the ink absolutely
+   positioned on the resulting point put the caption at the OPTICAL centre
+   of the hole for free. Measured with the ink in the flow at the old
+   settings, the failure it avoided: 1920 left a 9% hole, 1280 a 5% hole
+   and 920 a 4% one — 2% of the measure either side of the caption, which
+   is the words touching it.
+
+   NONE OF THAT SURVIVES CENTRING, because there is no hole any more. A
+   centred line is as wide as its contents, so the caption's width is
+   simply part of the line and the space either side of it is a gap that
+   was asked for rather than one that was left over. The seat would now
+   collapse the caption INTO the words, which is the exact defect it was
+   built to prevent. The arithmetic is in git; do not restore it without
+   restoring `space-between` with it.
+
+   ⚠️ IT CARRIES NO MARGIN, AND THE GAP EITHER SIDE OF IT IS .line's. That
+   is not a stylistic preference — see the note on .line, where the margin
+   version is recorded along with the phone it broke. Anything added here
+   is width the caption spends on ITS OWN line, so keep it at nothing. */
+.tag {
+  flex: none;
   align-self: center;
-  font-size: calc(var(--passage-fs) * 0.66);
-  margin-top: calc(var(--passage-beat) * -0.42);
+}
+
+.tagInk {
+  font-family: var(--font-sans);
+  font-size: clamp(0.4375rem, 0.66vw, 0.5625rem);
+  font-weight: var(--w-regular);
+  line-height: 1.55;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  text-align: center;
+  white-space: nowrap;
   color: var(--maroon-soft);
 }
 
-/* ══════════ THE MASK AND THE WORD ══════════
-   Lifted from Manifesto.module.css, deliberately, so the two chapters
-   reveal with identical mechanics: the mask clips, the word travels out of
-   it, nothing fades.
-
-   THE PADDING/MARGIN PAIR IS NOT DECORATION. `overflow: hidden` on a box
-   sized to the line box clips the parts of a glyph that legitimately sit
-   outside it — a descender below the baseline, an italic's overhang at the
-   right. The padding grows the clip box to cover them and the equal
-   negative margin takes the growth back out of the layout, so the words
-   still set on their true metrics. Change one and change the other — and
-   the .dot rules below assume the 0.07em side pair; change it and change
-   them. */
-.mask {
-  display: inline-block;
-  overflow: hidden;
-  padding: 0.06em 0.07em 0.22em;
-  margin: -0.06em -0.07em -0.22em;
-  vertical-align: bottom;
+/* every row of the stack is its own block; the first carries the weight
+   and the ink, the rest are the quieter detail under it */
+.tagInk b,
+.tagInk i {
+  display: block;
+  font-style: normal;
 }
 
-.word {
-  display: inline-block;
+.tagInk b {
+  font-weight: var(--w-medium);
+  color: var(--maroon);
 }
 
-/* THE DOTS CARRY THEIR OWN AIR — row D has no word gaps (Passage.tsx emits
-   no spaces there), because an ellipsis sits hard against the word it
-   trails from and the spacing between dots is punctuation-sized, not
-   word-sized. 0.15em of INK gap, in row D's own em.
+/* ══════════ NARROW ══════════
+   ⚠️ THE BREAKPOINT IS 900 AND IT IS NOT A DEVICE WIDTH, IT IS WHERE THE
+   CAPTION STOPS BEING AN ASIDE. The annotation is sized off the viewport
+   with a floor, so as the screen narrows it stops shrinking while the
+   display type keeps tracking down — and its share of the line it stands
+   on grows without limit. Justified, that showed up as the words closing
+   onto the caption (measured at 768 with it still in, the tightest line
+   filled 93.9% of the measure, about 3% per gap). Centred, it shows up
+   differently and no less badly: the caption does not get crowded, it gets
+   BIG, until a nine-pixel three-row stack is a third the height of the
+   line it is annotating and reads as a second column rather than as a
+   footnote.
 
-   TWO RULES BECAUSE THE DOT CLASS LANDS ON TWO ELEMENTS. Animating, it is
-   on the .mask, whose 0.07em left padding/−0.07em margin pair is
-   metric-neutral — the ink sits 0.07em inside the border edge — so the
-   margin that puts the INK 0.15em out is 0.15 − 0.07 = 0.08em. Under
-   reduced motion there is no mask and the class is on the bare .word,
-   which has no padding, so there the margin is the plain 0.15em. Same ink
-   gap, both paths. */
-.mask.dot {
-  margin-left: calc(0.15em - 0.07em);
-}
+   Either way the answer is the same one, and it is the honest one for a
+   phone: below 900px there is no caption. The facts are all carried in
+   prose elsewhere on the page — see the annotations block in Passage.tsx.
 
-.word.dot {
-  margin-left: 0.15em;
-}
+   ⚠️ AND DROPPING IT ALSO SHORTENS THREE OF THE FOUR LINES, which is why
+   the type can come back up a little here rather than down. */
+@media (max-width: 900px) {
+  .tag {
+    display: none;
+  }
 
-/* ══════════ THE INK MARK AROUND "one standard." ══════════
-   Geometry — which row, which words, the ring's radii, the outline itself,
-   the scrubbed reveal — is generated in Passage.tsx from the measured
-   type; nothing in this file names a row. This file owns only what the ink
-   is painted with and where the svg sits.
+  /* ⚠️ THERE IS NO font-size HERE ANY MORE, AND ITS ABSENCE IS THE POINT.
+     Every previous version of this query carried its own clamp, because
+     the line that governed the type size changed when the captions went
+     away. It does not now: line 3 ("SEVEN DIFFERENT KITCHENS") carries no
+     caption, so it governs at 1920 and at 390 alike and one coefficient
+     serves the whole range. Restoring a size here means re-deriving it
+     against the wide rule and keeping the two in proportion for ever
+     after — see the note on .line before doing it.
 
-   ⚠️ ONE FILLED OUTLINE, NOT A STROKE, AND NOT THREE OF THEM. A stroked
-   path has one width for its whole length, so a pen quality had to be faked
-   here by stacking three strokes (bleed/body/core) and pushing them off
-   true with an feTurbulence + feDisplacementMap pair — and at full size
-   that read as PIXELATED: the filter shoved three separate edges a pixel or
-   two each, a line breaking up rather than a hand. The replacement computes
-   the width along the ring in Passage.tsx (ringOutline) and emits a single
-   closed shape. No filter is involved at all, so there is nothing left to
-   break the edge up — and everything that existed to serve the stack (the
-   .defs filters, the dash-offset draw, the bleed's blur, the pool) is gone
-   with it. The reveal is the path's own regenerated arc length, driven by
-   the scrub — there is no transition and no clip here to switch off. */
+     The block is a smaller share of a phone screen than of a laptop's, and
+     that is not a bug to tune out: five authored rows that must not wrap
+     can only be as large as the longest of them allows. */
 
-/* NO viewBox ON THIS ELEMENT, DELIBERATELY. A viewBox introduces a fit —
-   and `preserveAspectRatio="none"`, the obvious way to make a stretched
-   viewBox line up, turns a curve into a DIFFERENT curve at every viewport
-   width. With width/height set in px from the measurement and no viewBox,
-   one user unit is one CSS pixel forever and there is no aspect ratio to
-   preserve. `overflow: visible` because the ring clears the letterforms on
-   all four sides and so reaches outside the line box top and bottom.
-
-   ABSOLUTELY POSITIONED AND pointer-events: none — the mark can neither
-   take space in the section nor feed back into the line box that buildMark
-   measures (the same property that lets its ResizeObserver watch the line
-   safely). ⚠️ The svg is a DIRECT child of the marked <p>: svg is phrasing
-   content and legal there, and the block wrapper an earlier draft used was
-   a live hydration error — see the note on <InkMark> in Passage.tsx. */
-.ink {
-  position: absolute;
-  left: 0;
-  top: 0;
-  overflow: visible;
-  pointer-events: none;
-}
-
-/* the outline is a closed shape and the maroon fills it; there is no stroke
-   anywhere in the mark any more. */
-.ink path {
-  fill: var(--maroon);
-  stroke: none;
-}
-
-/* Reduced motion gets the four rows plainly, with the same air around them
-   — the pacing is padding, not animation, so it survives. The words render
-   without masks (Passage.tsx), this rule catches any framer inline
-   transform that landed before the preference was read, and the ring is
-   rendered at its full arc and never touched: it is static texture, not
-   animation, so a reader who has asked for less motion still gets the
-   drawn mark rather than nothing. */
-@media (prefers-reduced-motion: reduce) {
-  .word {
-    transform: none !important;
+  /* a phone screen is taller than it is wide, so the same fraction of it
+     is a much bigger lip of card; 8svh reads as the same gesture. */
+  .scope {
+    --pin-peep: 8svh;
   }
 }
+
+/* ══════════ REDUCED MOTION ══════════
+   Passage.tsx already withholds the swell and the blur, so there is
+   nothing here to switch off — the type is legible at rest by
+   construction, which is the one real advantage this setting has over the
+   per-word entrance it replaced.
+
+   THE PIN ITSELF STAYS. It is layout, not motion: nothing moves under it,
+   the type is simply held while the film passes. Collapsing the runway
+   would make this section a short block again and hand the film a seam it
+   no longer has a number for. */
