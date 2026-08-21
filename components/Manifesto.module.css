@@ -108,7 +108,13 @@
      another percent off this number. And if the gap still reads as too wide,
      the lever is HEAD_LIFT — perch the heading lower and this floor comes
      down with it — not this number on its own. */
-  min-height: 92svh;
+  /* ══ A FULL SCREEN OF ITS OWN, at the user's instruction ══ 92svh let
+     the venue grid's tail and the About heading share the poster's screen
+     from both ends. 100svh plus real block padding means there is a scroll
+     position where the Word owns the frame outright — neighbours held off
+     above and below — which is what a poster is for. */
+  min-height: 100svh;
+  padding-block: clamp(56px, 9vh, 128px);
   padding: clamp(24px, 4vh, 56px) var(--pad-x);
   /* NO CLOSING RULE. A full-width hairline used to sit on this section's
      bottom border box, between the statement and Our Restaurants. It was
@@ -306,7 +312,7 @@
 .statementSmall {
   display: block;
   font-family: var(--font-display-big);
-  font-size: clamp(1.1rem, 2.1vw, 1.95rem);
+  font-size: clamp(1.2rem, 2.5vw, 2.3rem);
   line-height: 1.32;
   letter-spacing: 0.03em;
   text-transform: uppercase;
@@ -324,7 +330,7 @@
 }
 .plate {
   display: inline-block;
-  width: clamp(180px, 19vw, 280px);
+  width: clamp(220px, 24vw, 356px);
   aspect-ratio: 3 / 2;
   background-size: cover;
   background-position: center;

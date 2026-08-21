@@ -648,7 +648,16 @@ const WIPE_COL_STEP_S = 0.14;
    read. At 900 tall that is 423px of scroll for a card — the settle rides
    slightly slower than the page, the same relationship the wipe had. */
 const ARRIVE_FROM = 0.92;
-const ARRIVE_TO = 0.45;
+/* ⚠️ 0.45 → 0.66, AND IT IS A VISIBILITY FIX, NOT A TASTE CHANGE. The
+   section is designed to be READ FRAMED — all eight cards on one screen —
+   and a reader who frames it stops scrolling, so a card whose range
+   completes above ~62% of the window NEVER completes for them. Measured on
+   the user's own screenshot at 1080 tall: Café Mama, Belly and Bunso sat
+   with plates and no captions, permanently, because their (column-led)
+   ranges still had a third to run at the natural stop. Ending at 0.66 —
+   with the lead shrunk below — puts every card's completion at or below
+   the position the framed section actually gives it. */
+const ARRIVE_TO = 0.66;
 
 /* the settle's two spans, as fractions of the arrival: the ink finishes at
    0.45 (a card at half-ink is being read as broken, so it clears early —
@@ -663,7 +672,7 @@ const INK_SLOT: [number, number] = [0, 0.45];
    ("the full content of the cards cannot be seen", at the user's
    instruction). The beat survives — picture first, words after — but the
    words now land while the card is still low. */
-const CAPTION_SLOT: [number, number] = [0.34, 0.66];
+const CAPTION_SLOT: [number, number] = [0.3, 0.55];
 const SETTLE_FROM = 1.06;
 
 /* the row's internal wave, per column, as a fraction of the viewport.
@@ -673,7 +682,11 @@ const SETTLE_FROM = 1.06;
    (cols − 1) × this, and a shift past WIPE_TO would put a card's finish
    above the top of the screen. At four columns and 0.07 the last column
    ends at 0.24, with room to spare. */
-const COL_LEAD = 0.07;
+/* 0.07 → 0.04: the wave survives (4 columns still read left to right)
+   but the last column's whole range now shifts only 0.12 down-screen, so
+   Bunso finishes where a framed reader can see it finish. Bounded by the
+   same ARRIVE_TO arithmetic as ever. */
+const COL_LEAD = 0.04;
 
 
 

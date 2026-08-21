@@ -119,7 +119,12 @@
      ⚠️ 8.6px IS HALF THE LABEL ROW, not a nudge: (18.19 - 1) / 2 with the
      label at its current size. It is spelled in px because there is no
      label on this side of the page to take it from. */
-  --rule-air: calc(clamp(10px, 1.7vh, 22px) + 8.6px);
+  /* tightened ~30% at the user's instruction ("reduce the gaps in the
+     header") — the head's three seams (label→lede, lede→rule, rule→grid)
+     all derive from this pair, so one edit moves them together and the
+     Blog-parity note above still describes the RELATIONSHIP, at a snugger
+     setting. */
+  --rule-air: calc(clamp(7px, 1.15vh, 15px) + 8.6px);
   --sec-gap: var(--rule-air);
   gap: var(--sec-gap);
   /* the entrance choreography slides cells in from PAST the viewport
@@ -223,7 +228,7 @@
      NAMED because .headRule subtracts it — see the note there. Value
      unchanged: it now points at the global --space-xs-y, which holds the
      same clamp this line used to spell out. */
-  --head-gap: var(--space-xs-y);
+  --head-gap: calc(var(--space-xs-y) * 0.65);
   gap: var(--head-gap);
 }
 

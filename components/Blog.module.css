@@ -681,6 +681,19 @@
   margin-top: var(--front-drop);
 }
 
+/* ══ THE VOICE COLUMN DROPS WITH THE PLATE, at the user's instruction
+   ("the blog header needs to be in its correct position"). --front-drop
+   was born as air on the right side ONLY, which left the header's top
+   80px above the plate's — measured laid-out, and visible in the user's
+   own framing of the section. Sharing the drop puts the two tops on one
+   line, the way About's split seats its columns, and it re-symmetrises
+   the seam above (fine→plate and fine→head now both carry the drop).
+   The media query that strips --front-drop when the columns stack strips
+   this with it, since it reads the same variable. */
+.intro {
+  margin-top: var(--front-drop);
+}
+
 .frontPhoto {
   position: relative;
   overflow: hidden;
