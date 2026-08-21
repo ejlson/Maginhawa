@@ -388,21 +388,18 @@ const ITEMS: DiscoverItem[] = venueCards().map((v) => {
    the viewport rather than from the card's width, which is the real fix the
    0.76 note describes and the only one that stops this constant being a
    compromise between two window shapes. */
-/* ══════════ 1.25 — THE PLATE TURNS UPRIGHT (Setting A) ══════════
-   At the user's instruction: 4:5 portrait, the whole grid inset to keep
-   all eight on one screen (see .grid's max-width in the stylesheet, which
-   now owns the fit arithmetic this constant used to carry). The entire
-   derivation above — both tests, the window table, the 0.76 → 0.785 → 0.82
-   history — solved a LANDSCAPE ratio against a full-bleed grid; turning
-   the plate upright inverts the trade: the ratio is now fixed by the brief
-   (portrait, uniform) and the GRID WIDTH is the free variable that fits
-   the screen. Measured after the change, at 1440×900 with the head as it
-   stands: grid ≈952px wide at 900svh and ≈1240px at 1080svh — the width
-   now DERIVES from the viewport height (see .grid's max-width calc), so
-   the cards grow with the screen instead of freezing at one window's
-   answer. The old table is kept above because its window set is the
-   checklist any future re-fit should measure against. */
-const PLATE_RATIO = 1.25;
+/* ══════════ 0.82 AGAIN — THE PORTRAIT EXPERIMENT IS CLOSED ══════════
+   The plate went 4:5 upright for one day (Setting A of the portrait
+   study, chosen and then iterated at the user's word: inset grid, width
+   derived from viewport height, two enlargements) — and, seen live at
+   full size, the user chose the original proportions back, full-span:
+   "make the restaurant cards wider and fill the full span of the page."
+   So the constant returns to the value the whole derivation above solved,
+   and the grid returns to the page's measure (see .grid). What SURVIVES
+   from the portrait day, because it was never about the ratio: the settle
+   entrance, the completion-at-framing arrival ranges, and the tightened
+   head. */
+const PLATE_RATIO = 0.82;
 
 // shared enter curve for the head's staged rise
 const EASE = [0.22, 1, 0.36, 1] as const;

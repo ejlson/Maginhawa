@@ -696,65 +696,15 @@
 @media (min-width: 981px) {
   .grid {
     grid-template-columns: repeat(4, 1fr);
-    /* ══ SETTING A (portrait): THE GRID IS INSET AND THE GUTTERS OPEN ══
-       Two changes, one cause. The plates are 4:5 now (PLATE_RATIO 1.25),
-       and a full-bleed four-up of portraits is ~430px tall per row — two
-       rows would bury the screen. The grid takes a measured width instead
-       and centres: at 952px the card is ~220×275 and the eight sit on one
-       screen under the untouched head, which is the brief. The max-width
-       OWNS the fit arithmetic PLATE_RATIO used to own; re-fit here, not
-       there.
-
-       And the gutter opens 12 → 20px: portrait plates read as columns,
-       and columns need air — the 12px page gutter that was right for
-       landscape tiles reads as a contact print at this orientation. Row
-       gap slightly wider than column for the same shadow-reach reason
-       stated above the two-up block. */
-    /* ⚠️ width BEFORE max-width, and it is load-bearing: `margin-inline:
-       auto` takes this grid item out of stretch sizing, and its cells are
-       sized by padding-top percentages — no intrinsic width at all — so
-       without an explicit width the whole grid shrink-to-fits to its own
-       gaps (measured: 60px). */
-    width: 100%;
-    /* ══ THE GRID'S WIDTH IS SOLVED FROM THE VIEWPORT'S HEIGHT ══
-       A fixed 952px stood here for one pass, solved at 1440×900 — and at
-       1920×1080 it left the eight cards marooned in cream ("the cards are
-       too small", at the user's instruction). The constraint was never a
-       width; it is ONE SCREEN: head + two portrait rows ≤ the window. So
-       the width is derived from that constraint instead of frozen at one
-       window's answer.
-
-       THE ARITHMETIC, measured at 1440×900 and generalised:
-         room for the grid   = 100svh − 342px   (head 208 + section pads 84
-                                                 + head→grid air ~50)
-         card height         = (room − 24px row gap) / 2
-         card width          = height / 1.25    (the 4:5 plate)
-         grid width          = 4 × width + 3 × 20px
-                             = (100svh − 342px − 24px) × 1.6 + 60px
-       Check: 900 → 952px (the number this replaces, recovered exactly);
-       1080 → 1240px, cards 295×369 — the size the wide screenshot wanted.
-
-       THE FLOOR keeps short laptops honest: below ~840svh the derived
-       width would crush the cards under the 250px container query's
-       tightest setting, so 880px is the floor and those windows scroll a
-       little instead — the same trade every earlier PLATE_RATIO derivation
-       made for 768-tall screens. The min() against 100% is the narrow-
-       viewport guard. */
-    /* ⚠️ ENLARGED, at the user's instruction ("increase the size of the
-       restaurant cards"): the reserved allowance drops 366px → 280px, which
-       at 900svh grows the cards ~214 → ~250px wide. The cost is stated
-       plainly: the section now runs a little past one screen on a 900-tall
-       window (row two's foot sits just under the fold), the same trade
-       every landscape-ratio derivation before this accepted for short
-       windows. The formula still tracks the viewport, so tall screens get
-       proportionally grander cards, not overflow. */
-    max-width: min(
-      100%,
-      max(940px, calc((100svh - 280px) * 1.6 + 60px))
-    );
-    margin-inline: auto;
-    column-gap: 20px;
-    row-gap: 24px;
+    /* ══ FULL SPAN AGAIN — the portrait inset is closed ══
+       For one day this grid took a measured width derived from the
+       viewport's height (portrait plates, one-screen fit; then enlarged
+       twice). The user, seeing it live, chose the original full-measure
+       landscape grid back. The page-gutter columns return; the slightly
+       opened row gap stays, for the shadow-reach reason above the two-up
+       block. */
+    column-gap: var(--grid-gutter);
+    row-gap: clamp(12px, 1.25vw, 18px);
   }
 }
 
