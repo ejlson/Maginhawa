@@ -337,6 +337,16 @@ const STAGGER =
 const SPAN = IN_FLIGHT * STAGGER;
 const CLAUSE_ONE_END = BAND_START + SPAN + CLAUSE_BREAK * STAGGER;
 
+/* HOW FAR OUT OF FOCUS A WORD STARTS, in em of its own size rather than in
+   px — see the note on ScrubWord. 0.11em is ~4px at the statement's small
+   end and ~9px at its large one, which holds the same PERCEIVED softness
+   across the clamp; a fixed px radius does not, and reads as a smear on the
+   small screens where the type is already tight.
+   It is deliberately short of the radius at which the word stops being a
+   word: at 0.11em the shape is still legible as its own silhouette, so the
+   sentence reads as out of focus rather than as a row of grey bars. */
+const BLUR_MAX_EM = 0.11;
+
 /* the eyebrow's own slice, ahead of the first word — it introduces the
    sentence, so it has to be readable before the sentence starts writing.
    Nothing else may open before this closes: see BAND_START. */
@@ -498,12 +508,28 @@ function ScrubWord({
      project holds any real mark to, so the ghost reads as tone, not text,
      and cannot be mistaken for the settled state.
 
-     NO TRANSFORM AT ALL — not a token 2px settle. One verb per element is
-     the rule the rest of this pass enforces on the page; opacity is the
-     verb here. The mask element stays (it carries the accent class and the
-     ink latch's colour hook, and its clip now clips nothing) so the DOM
-     and the stylesheet's cascade are untouched. */
+     ⚠️ IT SETTLES OUT OF FOCUS NOW, at the user's instruction, after a
+     study of seven entrances. Opacity keeps its slot and its 0.14 floor;
+     what joins it is a FOCUS PULL, blur BLUR_MAX → 0 across the same span,
+     so each word resolves the way ink dries into paper rather than simply
+     brightening. The two read as one gesture because they share one slot
+     and one range — this is not two animations on an element, it is one
+     verb (settling) expressed in the two channels that carry it.
+
+     STILL NO TRANSFORM. The study's demo carried a token translateY and a
+     1.03 scale coming off; both are refused here for the reason Finding 01
+     already established — a per-word transform shears the baseline of a
+     display line exactly while the eye is on it. Focus changes in place, so
+     the sentence keeps its baseline the whole way. That is also why this
+     entrance can be per-word at all where a travelling one could not.
+
+     BLUR_MAX IS PROPORTIONAL, NOT A PIXEL CONSTANT. The statement runs a
+     clamp from ~34px to ~83px, so a fixed radius that reads as "soft" at
+     the top of that range is a smear at the bottom; it is set in `em` off
+     the word's own size and resolved to px for the filter. */
   const opacity = useTransform(progress, [start, start + SPAN], [0.14, 1]);
+  const blurEm = useTransform(progress, [start, start + SPAN], [BLUR_MAX_EM, 0]);
+  const filter = useMotionTemplate`blur(${blurEm}em)`;
 
   /* TWO ELEMENTS PER WORD STILL: the mask carries the accent class (the
      box that grows to fit an italic's overhang, and the box the ink latch
@@ -511,7 +537,7 @@ function ScrubWord({
      decided here: see INK_AT and `.key` in the stylesheet. */
   return (
     <span className={`${styles.wordMask} ${wordClass(word)}`}>
-      <motion.span className={styles.word} style={{ opacity }}>
+      <motion.span className={styles.word} style={{ opacity, filter }}>
         {word}
       </motion.span>
     </span>
@@ -552,11 +578,28 @@ export default function Manifesto() {
   });
 
   const eyebrowOpacity = useTransform(scrollYProgress, EYEBROW_IN, [0, 1]);
-  const eyebrowScale = useTransform(
-    scrollYProgress,
-    [EYEBROW_IN[0], EYEBROW_IN[1] + 0.02],
-    [0.88, 1]
-  );
+
+  /* ══════════ THE POP IS BACK, AND IT IS LATCHED RATHER THAN SCRUBBED ══════
+     The eyebrow used to pop 0.88 → 1 on a spring, and the note on THE
+     ENTRANCE records why it was taken out: a spring driven off scroll fights
+     the wheel on the way back up. That objection is about SCRUBBING a
+     spring, not about the spring — so this restores the gesture by changing
+     what drives it. The scrub still decides WHEN (the latch below arms at
+     the same EYEBROW_IN[0] the fade opens on); the spring then runs on its
+     own clock, once, and is never asked to play backwards.
+
+     That also fixes the thing the linear scale could never do. A pop is a
+     spring's overshoot; ramping scale linearly across a scroll range gives
+     a slow swell instead, which is why the gesture read as missing even
+     though the numbers were still there.
+
+     ⚠️ IT DOES NOT RE-ARM ON THE WAY UP. `popped` latches true and stays,
+     so scrolling back through the chapter does not re-pop the line at every
+     pass — the pop is an arrival, and a thing that arrives twice is a tic. */
+  const [popped, setPopped] = useState(false);
+  useMotionValueEvent(scrollYProgress, "change", (v) => {
+    if (v >= EYEBROW_IN[0]) setPopped((was) => was || true);
+  });
 
   /* THE WORDS ARE SEPARATED BY REAL SPACES, not by margin.
 
@@ -658,9 +701,15 @@ export default function Manifesto() {
              this is a plain div again and the sentence's state is a pure
              function of where the page is. */
           <div className={styles.block}>
+            {/* opacity stays on the SCRUB (the line inks with the page's
+                position); scale is the latched spring — two drivers on one
+                element, which is legal here because they are different
+                properties and framer composes them into one style object. */}
             <motion.p
               className={styles.eyebrow}
-              style={{ opacity: eyebrowOpacity, scale: eyebrowScale }}
+              style={{ opacity: eyebrowOpacity }}
+              animate={{ scale: popped ? 1 : 0.88 }}
+              transition={{ type: "spring", stiffness: 460, damping: 17, mass: 0.7 }}
             >
               {EYEBROW}
             </motion.p>
