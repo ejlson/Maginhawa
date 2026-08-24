@@ -35,7 +35,7 @@
 
 .wordText {
   font-family: var(--font-display-big);
-  font-weight: var(--w-medium);
+  font-weight: var(--w-display);
   letter-spacing: var(--tr-display);
   fill: var(--cream);
 }

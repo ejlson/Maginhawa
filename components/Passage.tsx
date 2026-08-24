@@ -259,6 +259,65 @@ const LINES: Line[] = [
   { left: "One", tag: WHO, right: "standard" },
 ];
 
+/* ══════════ THE PHONE SETS THE SAME SENTENCE OVER SEVEN ROWS ══════════
+   Four authored rows that must not wrap can only be as large as the
+   longest of them allows, and on a phone the longest is "SEVEN DIFFERENT
+   KITCHENS" — 10.714em against the real face. At 390 that put the type at
+   32px filling 14% of the screen, under 272px of empty cream: a paragraph
+   set in a display face, not display type. The three-line drumbeat that
+   carries the whole argument reads at that size as a repetition somebody
+   forgot to edit.
+
+   BREAKING AFTER "SEVEN DIFFERENT" IS WHAT BUYS THE SIZE BACK, and it is
+   the only break that does not cost the argument something. The phrase
+   itself becomes three consecutive rows with nothing standing between
+   them, so the anaphora comes out STRONGER than it is on a desktop, where
+   two captions interrupt it. Measured against the real face, the governing
+   line is now the claim with its ellipsis on it (7.659em) rather than the
+   third concession, and the type roughly doubles.
+
+   ⚠️ THE CLAIM IS NOT BROKEN AND MUST NOT BE. "ONE / STANDARD" over two
+   rows would be the shortest line in the block split in half — the landing
+   the whole setting is built to arrive at, delivered in two pieces. It
+   stays whole even though it is now the line that governs the type size,
+   which is a cost paid on purpose.
+
+   ⚠️ THE WORDS ARE THE SAME WORDS. `spoken` below is derived from LINES and
+   NOT from whichever set is on screen, because a screen reader must hear
+   four sentences either way — a narrow reading of this array would announce
+   "Seven different. Rooms." and turn every concession into two.
+
+   ⚠️ IF A ROW IS EVER ADDED OR REMOVED HERE, three numbers in
+   Passage.module.css move with it and all three fail silently: the narrow
+   clamp, its svh term, and the navbar guard on .stage. See the narrow
+   media query, which carries the arithmetic. */
+const LINES_NARROW: Line[] = [
+  { left: "Seven different" },
+  { left: "rooms" },
+  { left: "Seven different" },
+  { left: "stories" },
+  { left: "Seven different" },
+  { left: "kitchens" },
+  /* two groups rather than one so the ellipsis has a `right` to ride on —
+     see the trail argument in SlabLine. With no caption standing between
+     them the line's 0.28em gap is simply the word space. */
+  { left: "One", right: "standard" },
+];
+
+/* ⚠️ THE CAPTIONS ARE MOVED, NOT DELETED, AND THAT IS THE CHANGE. They used
+   to be `display: none` below 900px, on the sound reasoning that an
+   annotation sized off the viewport stops being an aside once the display
+   type has tracked down past it — it does not get crowded, it gets BIG,
+   until a three-row stack is a third the height of the line it annotates.
+   All of that is still true of a caption standing INSIDE a line. None of it
+   is true of one row set once under the block, which is what this is.
+
+   DERIVED, SO THE FACTS CANNOT DRIFT from the three arrays above. The
+   emphasis survives the flattening: each caption keeps its first entry as
+   the loud one, which is what tells "Belly" apart from the listing it
+   carries. */
+const NARROW_CAPTION: Tag[] = [WHERE, WHAT, WHO];
+
 /* ⚠️ TWO LINES SHARE THE STRING "Seven different" AND THE KEY DOES NOT.
    <SlabLine> is keyed on the whole line rather than on line.left for that
    reason — see the map in the component. Keying on the words would give
@@ -391,60 +450,87 @@ function dotSlots(from: number): [number, number][] {
    SECTION (start end → start start) and is 1 that same frame. They meet
    exactly once, at the moment the type stops moving.
 
-   THE SLOTS OVERLAP BY DESIGN. A stagger wide enough to read as three
-   separate arrivals reads as a list being populated; these are three lines
-   of one sentence, so each starts while the one above is still travelling
-   and the block arrives as a block. The last one is home at 0.86 rather
-   than 1.0 — the final stretch of the approach is the type sitting still,
-   which is what makes the pin feel like a stop rather than a freeze.
+   ⚠️ THE SLOTS ARE CONTIGUOUS NOW AND THEY USED TO OVERLAP BY FOUR FIFTHS.
+   Every row travels out from behind an overflow:hidden group, and even
+   rows rise while odd rows descend (see LINE_TRAVEL). Under the old
+   settings — 0.47 long, 0.09 apart — three rows were mid-travel at once,
+   and because the directions alternate, ADJACENT rows were cut in OPPOSITE
+   directions with nothing between them: a rising row carries its ink at the
+   BOTTOM of its box and a descending one carries it at the TOP, so the two
+   bands met across the 0.06em row gap. One line losing its feet directly on
+   top of the next losing its caps is not a reveal, it is a braid, and at
+   approach 0.5 it was the whole screen.
 
-   ⚠️ THE STEP CAME DOWN WHEN THE FOURTH LINE ARRIVED, and the two numbers
-   that did not move are the ones that matter. The first line still starts
-   at 0.12 and the last is still home at 0.86, so the entrance occupies
-   exactly the stretch of approach it always did; what changed is that four
-   starts share it instead of three, at 0.09 apart rather than 0.13. Each
-   slot keeps its own 0.47 duration, so the lines still overlap heavily and
-   the block still arrives as a block. Widening the stagger to keep the old
-   step would have run the last line past 0.86 and into the pin — which is
-   the failure this scrub exists to avoid. */
-/* ⚠️ THE PHONE RUNS THE WHOLE THING 0.08 LATER, AND IT IS NOT A TASTE
-   TWEAK. Where the block SITS in its own stage is not the same on every
-   screen, and the stage only fills the viewport at approach 1 — so the same
-   slots show the sentence assembling in a different part of the screen
-   depending on the width.
+   THE FIX IS PHASING, NOT TRAVEL. A row now starts the frame the row above
+   it lands, so no frame contains two cuts.
 
-   Measured: the slab's top edge is 16% down the stage at 1920×1080 and 33%
-   down at 390×844, because the type is a much smaller share of a tall
-   screen. The slab is therefore on screen from approach 0.16 on a desktop
-   and only from 0.33 on a phone — so at the wide timings the sentence had
-   finished arriving (0.86) while it was still in the lower third of the
-   viewport, with <PressWall> above it. There is no way to photograph a
-   mid-entrance frame with the type centred, which is how it was found.
+   ⚠️ AND THE PRICE IS NAMED HERE RATHER THAN DISCOVERED LATER: THE BLOCK NO
+   LONGER ARRIVES AS A BLOCK. One window shared four ways makes each row two
+   and a half times quicker (0.185 of the approach, about 167px of scroll)
+   and leaves exactly one moving at a time, so the entrance reads as a
+   cascade down the stack rather than as four lines converging at once. That
+   is a different gesture, not a tuned version of the old one.
 
-   Shifting the whole set 0.08 later moves the landing to 0.94, where the
-   block sits about 39% down the screen — mid-upper, which is where the eye
-   is. Every duration (0.47) and every step (0.09) is unchanged, so the
-   overlap that makes the four lines arrive as a block is untouched; only
-   the window moves.
+   ⚠️ THERE IS SLACK IN HERE, AND IT IS 15.3%. A row shows NOTHING for the
+   first 0.153 of its slot: the travel is 118% of the box, so it has to come
+   down to 100% before any ink enters. Slots may therefore overlap by up to
+   0.153 × duration and still never put two cuts on screen. Contiguous is
+   the simple, checkable end of that range — anything inside it is legal,
+   anything past it brings the braid back.
 
-   ⚠️ 0.94 IS THE CEILING AND THE DOTS ARE WHY. The entrance must be FINISHED
-   before the pin engages at 1.0 — that is the whole reason it runs on the
-   approach — and the three dots still have to arrive after the last line
-   lands. 0.94 leaves them 0.06 of the approach, about 50px of scroll on a
-   phone: quick, which is what punctuation should be, and the least it can
-   have. Anything later has the ellipsis arriving under the booking card. */
+   ⚠️ THE OTHER ANSWER IS ONE WORD RATHER THAN FOUR NUMBERS, and it was
+   declined rather than missed. Give every row the SAME direction and the
+   braid cannot happen at any overlap: two rising rows both carry their ink
+   at the bottom of their boxes with clear cream between, so the old
+   0.47/0.09 settings would be safe exactly as they stood and the block
+   would still arrive as a block. What it costs is the weave, which is the
+   thing LINE_TRAVEL exists to defend. The trade is the weave against the
+   overlap; this file has chosen the weave, and the other half of the
+   choice is recorded here for whoever wants it back.
+
+   THE WINDOW HAS NOT MOVED. The first row still starts at 0.12 and the last
+   is still home at 0.86, so the entrance occupies exactly the stretch of
+   approach it always did and dotSlots() still reads 0.86 off the end of
+   it. Only the phasing inside the window changed. */
 const LINE_SLOTS_WIDE: [number, number][] = [
-  [0.12, 0.59],
-  [0.21, 0.68],
-  [0.3, 0.77],
-  [0.39, 0.86],
+  [0.12, 0.305],
+  [0.305, 0.49],
+  [0.49, 0.675],
+  [0.675, 0.86],
 ];
 
+/* ⚠️ THE PHONE RUNS A DIFFERENT SENTENCE NOW, NOT THE SAME ONE LATER. This
+   was the wide set shifted 0.08 later, because the block sat lower in its
+   own stage on a narrow screen and the old timings finished the sentence
+   while it was still in the lower third. Below 900px the copy is re-broken
+   over SEVEN rows (see LINES_NARROW), so there is no wide set left to
+   shift — this is its own, built the same way: contiguous slots 0.08 apart,
+   ending at 0.94 so the ellipsis keeps the 0.06 of approach it has always
+   had.
+
+   ⚠️ IT STARTS AT 0.38 AND NOT AT 0.12, AND THE SEVEN ROWS ARE WHY. Where a
+   row LANDS on the screen is fixed by the scroll and not by the timing: the
+   stage travels a full viewport across the approach, so a row that lands
+   early lands near the bottom edge. Seven sequential rows cannot all land
+   high in one screen of scroll, and starting late is what keeps the first
+   of them off the floor. Measured at 390×844, the set climbs 77 · 74 · 70 ·
+   67 · 63 · 60 · 57 per cent down the screen — every row in the lower half,
+   but each one higher than the last, which is the cascade reading as a
+   block gathering itself rather than as rows appearing at random depths.
+
+   THE SAME SET BEGUN AT 0.12 WOULD LAND ROW 1 OFF THE BOTTOM OF THE SCREEN.
+   Row 1 rests with its centre 194px down a 844px stage, and the stage is a
+   full viewport higher at approach 0, so at 0.20 that centre is at 869 —
+   past the bottom edge. The last row is unaffected wherever the set starts;
+   every row before it is not. */
 const LINE_SLOTS_NARROW: [number, number][] = [
-  [0.2, 0.67],
-  [0.29, 0.76],
-  [0.38, 0.85],
-  [0.47, 0.94],
+  [0.38, 0.46],
+  [0.46, 0.54],
+  [0.54, 0.62],
+  [0.62, 0.7],
+  [0.7, 0.78],
+  [0.78, 0.86],
+  [0.86, 0.94],
 ];
 
 /* ══════════ HOW A LINE ARRIVES ══════════
@@ -480,30 +566,44 @@ const LINE_TRAVEL = "118%";
    (300, 400, 600, 700, 900) where a variable family reports a range (the
    site's Figtree reports "300 900"). An animated font-weight across static
    cuts is therefore a single STEP, not a settle, and the step is not free:
-   the 300 cut sets 17% wider than the 600, so the line would jerk sideways
-   by ~100px a side at the frame it snaps.
+   the cuts differ in WIDTH as well as in colour, so the line would jerk
+   sideways at the frame it snaps.
+
+   ⚠️ THE FIGURE THIS NOTE USED TO QUOTE FOR THAT JERK WAS WRONG, and it is
+   worth correcting rather than deleting because it was quoted in two files
+   as settled fact. It said the 300 cut sets SEVENTEEN PER CENT WIDER than
+   the 600. Measured against the real kit, 300 is the NARROWEST of the four
+   and the ladder runs 300 < 400 < 600 < 700 in width — the table is in
+   Passage.module.css beside the font-weight. The step is about 5% and it
+   would still be a jerk; the conclusion survives, the number did not.
 
    Tracking is the property that gives the same reading — type consolidating
    as it lands — on a face with fixed weights. It is smoothly animatable, it
    is symmetric about the centre line, and it costs no letterform change.
 
    ⚠️ IT IS BOUNDED BY THE MEASURE, AND THE BOUND BINDS ON A PHONE. The
-   longest line already fills 88.6% of its measure at rest, so the entrance
+   longest line already fills 89.8% of its measure at rest, so the entrance
    can only borrow what is left — and what is left is not the same
    everywhere. MEASURED at the widest point of the entrance, which is the
-   frame the slot opens:
+   frame the slot opens, at the current size and cut:
 
-       1920×1080   90.3 / 91.5 / 93.6 / 70.6%   (rest 86.2 / 86.9 / 88.6)
-       1440×900    91.1 / 92.1 / 93.6 / 71.5%   (rest 87.0 / 87.5 / 88.6)
-        390×844    88.3 / 90.3 / 96.4 / 67.6%   (rest 84.0 / 85.6 / 91.3)
+       1920×1080   93.0 / 93.6 / 95.3 / 73.0%   (rest 88.4 / 88.6 / 89.8)
+       1440×900    93.8 / 94.2 / 95.3 / 73.9%   (rest 89.2 / 89.2 / 89.8)
+        390×844    88.4 / 89.6 / 95.3 / 68.2%   (rest 86.1 / 87.0 / 92.5)
 
    The phone is the binding case twice over: the line starts 2.7 points
-   fuller AND the section's padding is a bigger share of the screen, so the
-   same em of tracking eats more of what is left. At a flat 0.028em the
-   third line peaked at 96.4% — seven pixels of air a side. It does not
-   overflow, and it is transient, and it is still too close to a wall that
+   fuller AND the section's padding floor is a bigger share of the screen,
+   so the same em of tracking eats more of what is left. It does not
+   overflow, and it is transient, and it is still close to a wall that
    fails SILENTLY: these lines are `nowrap`, so the failure mode is ink
    running off the screen rather than a wrap anyone would notice in review.
+
+   ⚠️ AND THIS IS NOW A SHARED BUDGET, WHICH IT WAS NOT BEFORE. The type
+   size in Passage.module.css is set against the ENTRANCE PEAK rather than
+   against the rest, so the tracking here and the vw coefficient there are
+   spending the same margin. Opening this wider does not just make a
+   livelier entrance — it forces the settled block smaller. Re-derive both
+   together or not at all.
 
    ⚠️ SO THE NARROW VALUE IS HALF, AND IT CANNOT COME FROM CSS. The
    entrance is written as an inline style by framer, and an inline style
@@ -512,8 +612,23 @@ const LINE_TRAVEL = "118%";
    re-read on resize, so a window dragged across 900px picks up the right
    one. 900px is the section's own breakpoint (the captions drop there);
    this does not introduce a second one. */
-const LINE_TRACK = "0.028em";
-const LINE_TRACK_NARROW = "0.014em";
+/* ⚠️ THE SETTLE NOW LANDS ON A NEGATIVE REST, NOT ON ZERO. .line in
+   Passage.module.css sets letter-spacing: -0.03em, which is what bought the
+   block its type size — and framer writes this value as an INLINE style, so
+   whatever the transform ends on is what the reader ends on. Ending on
+   "0em" would silently loosen the settled block by 0.03em and push the
+   longest line back past the measure it was sized against.
+
+   So the rest is the number, the two TRACK values are how far the entrance
+   OPENS from it, and the strings the transform interpolates are derived
+   rather than written out — a hand-typed "-0.002em" is exactly the kind of
+   literal that survives a later change to either input. */
+const LINE_REST = -0.03;
+const LINE_OPEN = 0.028;
+const LINE_OPEN_NARROW = 0.014;
+const em = (n: number) => `${+n.toFixed(4)}em`;
+const LINE_TRACK = em(LINE_REST + LINE_OPEN);
+const LINE_TRACK_NARROW = em(LINE_REST + LINE_OPEN_NARROW);
 const NARROW = "(max-width: 900px)";
 
 /* THE SWELL is 4% across the whole runway, and it is the smaller half of
@@ -817,7 +932,7 @@ function SlabLine({
      line. It fades on the same slot instead, a shade behind the words. */
   const opacity = useTransform(approach, slot, [0, 1]);
   const y = useTransform(approach, slot, [travel, "0%"]);
-  const letterSpacing = useTransform(approach, slot, [track, "0em"]);
+  const letterSpacing = useTransform(approach, slot, [track, em(LINE_REST)]);
 
   return (
     /* ⚠️ THE TRACKING IS ON THE LINE AND THE TRAVEL IS ON THE GROUPS, and
@@ -934,10 +1049,27 @@ export default function Passage() {
      first paint, and the effect below corrects it before it can. */
   const [track, setTrack] = useState(LINE_TRACK);
 
-  /* the entrance lands later on a phone — see LINE_SLOTS_NARROW. Same
-     default reasoning as `track`: matchMedia has no server, and the
-     entrance has not started at first paint either way. */
-  const [slots, setSlots] = useState(LINE_SLOTS_WIDE);
+  /* ⚠️ THE COPY AND ITS TIMINGS ARE ONE PIECE OF STATE ON PURPOSE. The two
+     sets have DIFFERENT ROW COUNTS now (four wide, seven narrow), and every
+     slot is a useTransform input read by index — so a render in which the
+     lines had swapped and the slots had not would ask for slots[6] of a
+     four-long array and hand framer `undefined`. React batches the two
+     setState calls today and it would work; holding them in one object
+     means it cannot stop working. Same SSR default reasoning as `track`:
+     matchMedia has no server, and the entrance has not started at first
+     paint either way.
+
+     ⚠️ AND THE SWAP IS A LAYOUT CHANGE, NOT JUST A TIMING ONE. A phone gets
+     the four-row setting until this effect runs. That is invisible in
+     practice — the section is most of a document down and hydration is long
+     finished before anyone scrolls to it — but it is the reason the narrow
+     rules in Passage.module.css still hide .tag rather than trusting the
+     narrow copy to carry none. */
+  const [setting, setSetting] = useState<{
+    lines: Line[];
+    slots: [number, number][];
+  }>({ lines: LINES, slots: LINE_SLOTS_WIDE });
+  const { lines, slots } = setting;
 
   /* ⚠️ MEMOISED BECAUSE EACH SLOT IS A useTransform INPUT. dotSlots()
      returns fresh arrays, and handing framer a new range object on every
@@ -989,6 +1121,25 @@ export default function Passage() {
         if (scope.style.getPropertyValue("--pin-peep") !== next) {
           scope.style.setProperty("--pin-peep", next);
         }
+        /* ⚠️ AND THE SAME NUMBER GOES ON THE ROOT, AS A FRACTION, FOR
+           <Reservations>. The peep is where the pin starts, so on the
+           film's own approach scale it is exactly the progress at which
+           the card is seated under the sentence — which is the earliest
+           the card may begin to grow. Reservations cannot derive it: it
+           depends on this section's slab height, which is measured here.
+
+           It is a unitless fraction of the viewport rather than a length
+           because that is the scale the consumer works in, and it is on
+           documentElement rather than .scope because the film is this
+           section's SIBLING and inherits nothing from it. Written in the
+           same pass as --pin-peep so the two can never disagree; see
+           ENTER_HOLD in Reservations.tsx for what reads it and for the
+           fallback that applies if this never lands. */
+        const frac = (peep / window.innerHeight).toFixed(4);
+        const root = document.documentElement;
+        if (root.style.getPropertyValue("--pin-peep-frac") !== frac) {
+          root.style.setProperty("--pin-peep-frac", frac);
+        }
       }
       /* ⚠️ BOTH ENDS COME OFF THE ONE PASS, and the fade's end is derived
          from the blur's start rather than re-measured beside it, so the
@@ -1009,17 +1160,46 @@ export default function Passage() {
       );
       const narrow = window.matchMedia(NARROW).matches;
       setTrack(narrow ? LINE_TRACK_NARROW : LINE_TRACK);
-      setSlots(narrow ? LINE_SLOTS_NARROW : LINE_SLOTS_WIDE);
+      setSetting(
+        narrow
+          ? { lines: LINES_NARROW, slots: LINE_SLOTS_NARROW }
+          : { lines: LINES, slots: LINE_SLOTS_WIDE }
+      );
     };
     measure();
     const ro = new ResizeObserver(measure);
     if (scopeRef.current) ro.observe(scopeRef.current);
+    /* ⚠️ THE SLAB IS WATCHED TOO, AND IT IS NOT REDUNDANT. All three numbers
+       this effect writes — the peep, the blur's start and the fade's end —
+       are measured off the slab's own box, and the slab's height moves
+       AFTER the first pass in two ordinary cases:
+
+         · THIS EFFECT CHANGES IT ITSELF. The breakpoint swap below hands a
+           phone seven rows where the server painted four, so the first
+           measurement is taken against a block a third of the height of the
+           one that ends up on the screen. Left unwatched, the card's seat
+           was computed from the wrong slab and the film arrived on top of
+           the claim — which is exactly what it looked like.
+         · THE DISPLAY FACE LANDS LATE. contralto-big arrives from a kit
+           after first paint, and the fallback does not set to the same
+           depth.
+
+       Watching .scope alone caught neither: its height is 100svh plus the
+       peep, so it does not move when the slab does. No loop — the write
+       lands on .scope, and .scope's height cannot change .slab's, which is
+       laid out inside a .stage that is exactly a viewport tall. */
+    if (slabRef.current) ro.observe(slabRef.current);
     window.addEventListener("resize", measure);
     return () => {
       ro.disconnect();
       window.removeEventListener("resize", measure);
     };
   }, []);
+
+  /* the caption row rides the ellipsis' window: from the frame the last
+     line lands to the frame the pin engages. Declared unconditionally
+     because it is a hook — the row itself is conditional, this is not. */
+  const captionFade = useTransform(approach, [slots[slots.length - 1][1], 1], [0, 1]);
 
   const scale = useTransform(scrollYProgress, [0, 1], [1, 1 + SWELL]);
   const filter = useTransform(
@@ -1121,7 +1301,7 @@ export default function Passage() {
               moved onto line 4. See LAST_WORD's note above for what that
               row was doing and why the dots are not going with it. */}
           <div ref={slabRef} className={styles.slab}>
-            {LINES.map((line, i) => (
+            {lines.map((line, i) => (
               <SlabLine
                 key={i}
                 line={line}
@@ -1133,7 +1313,7 @@ export default function Passage() {
                 travel={i % 2 === 0 ? LINE_TRAVEL : `-${LINE_TRAVEL}`}
                 track={track}
                 trail={
-                  i === LINES.length - 1 ? (
+                  i === lines.length - 1 ? (
                     <span className={styles.dots}>
                       {dots.map((slot, j) => (
                         <Dot
@@ -1148,6 +1328,40 @@ export default function Passage() {
                 }
               />
             ))}
+
+            {/* ⚠️ THE CAPTION ROW EXISTS ONLY WHERE THE CAPTIONS CANNOT
+                STAND INSIDE THE LINES. It is rendered off the same three
+                arrays the desktop annotations use (see NARROW_CAPTION), so
+                the facts cannot drift apart, and it is hidden by the
+                stylesheet as well as by this condition — the wide setting
+                must never grow a row it has not budgeted height for.
+
+                IT FADES, AND THAT IS NOT THE INCONSISTENCY IT LOOKS LIKE.
+                The lines use a mask because a fade at 138px spends its run
+                as grey letterforms; at 7px there is nothing for a mask to
+                reveal and a fade is simply what arriving looks like. It
+                runs on the DOTS' window rather than its own, so the last
+                thing to land is the punctuation and its footnote together.
+
+                aria-hidden for the same reason the desktop annotations are:
+                the section already announces the sentence through its
+                label, and these facts are carried in prose elsewhere. */}
+            {lines === LINES_NARROW && (
+              <motion.p
+                className={styles.captionRow}
+                aria-hidden
+                style={
+                  reduce || !animate ? undefined : { opacity: captionFade }
+                }
+              >
+                {NARROW_CAPTION.map((tag, i) => (
+                  <span key={i} className={styles.captionItem}>
+                    <b>{tag[0]}</b>
+                    {tag.length > 1 ? ` ${tag.slice(1).join(" ")}` : ""}
+                  </span>
+                ))}
+              </motion.p>
+            )}
           </div>
         </motion.div>
       </div>

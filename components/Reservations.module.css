@@ -895,10 +895,11 @@
    Garamond for every visitor. Nobody was choosing between Contralto and
    Freight; the choice was Contralto or an accidental Garamond.
 
-   ⚠️ THE WEIGHT IS 400 AND NOT --w-medium. contralto-big ships drawn
-   weights at 300, 400, 600, 700 and 900 — there is no 500. A 500 request
-   resolves DOWN to 400 by the CSS matching rules, so the old declaration
-   was already rendering this, just without saying so. */
+   ⚠️ THE WEIGHT IS --w-display AND NOT --w-medium. It read 400 here, with
+   a note that contralto-big ships no 500 so --w-medium would resolve to
+   the 400 cut anyway. That is still true and it is now a token: see
+   --w-display in globals.css, which sets the wordmark voice for every
+   piece of Contralto on the site in one place. This heading follows it. */
 .title {
   /* Nothing sits above the heading any more — the live clock that used to
      carry the gap on its own margin-bottom is gone — and the pill below
@@ -906,7 +907,7 @@
      direction. */
   margin: 0;
   font-family: var(--font-display-big);
-  font-weight: var(--w-regular);
+  font-weight: var(--w-display);
   font-size: var(--t-display);
   line-height: var(--lh-display);
   letter-spacing: var(--tr-display);

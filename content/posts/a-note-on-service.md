@@ -2,7 +2,7 @@
 title: "A note on service"
 date: 2026-08-20
 excerpt: "Why we stopped calling it hospitality and started calling it looking after people — a note from Chef Omar on what the eight rooms are meant to have in common."
-image: /blog/DSCF2298-web.jpg
+image: /images/blog/post-olive-web.jpg
 imageAlt: ""
 restaurant: belly
 category: news

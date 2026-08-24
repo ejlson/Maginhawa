@@ -90,7 +90,7 @@
 .board {
   display: flex;
   font-family: var(--font-display-big);
-  font-weight: var(--w-regular);
+  font-weight: var(--w-display);
   font-size: clamp(2.6rem, 8vw, 5.5rem);
   line-height: var(--lh-display);
   color: var(--maroon);

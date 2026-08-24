@@ -15,7 +15,15 @@ import PillCta from "./PillCta";
 import Footer from "./Footer";
 import DarkZone from "./DarkZone";
 import styles from "./BlogIndex.module.css";
-import { BLOG, entryLinkProps, type BlogEntry } from "@/lib/blog";
+/* ⚠️ THE RAMP UNDER THE LEDE'S TYPE COMES FROM THE VENUE CARD, and the
+   home page's journal chapter imports it the same way. `.rampBlur` must
+   precede `.rampScrim` in the DOM — the banner over them in that file
+   explains why the blur has to be the layer underneath. Its depth is one
+   variable, --vc-ramp-h, declared on the plate. */
+import card from "./VenueCard.module.css";
+import { BLOG, entryLinkProps, headline, type BlogEntry } from "@/lib/blog";
+import ActionBand from "./ActionBand";
+import PlateDate from "./PlateDate";
 import { RESTAURANTS, getRestaurant } from "@/lib/restaurants";
 import { lenisRef } from "@/lib/SmoothScroll";
 import { asset } from "@/lib/media";
@@ -654,62 +662,41 @@ function BlogIndexInner({ entries }: { entries: BlogEntry[] }) {
 
       <main id="main-content" className={styles.page} data-nav-theme="light">
         <div className="container">
-          {/* ═══ THE CHAPTER HEAD — the same three-part lockup Discover
-              opens with: the group's mark set into a standing label, the
-              display sentence under it, then a full-width hairline that
-              closes the head and opens the entries.
+          {/* ═══ THE MASTHEAD — the page's name, and a caption beside it ═══
+              At the user's instruction, and it replaces a three-part stack:
+              a 2.6em group mark with the word "Blog" beside it, then the
+              sentence below set at 65.6px as if it were the title.
 
-              WHAT IT REPLACES: a bare <h1> sitting alone on the page
-              margin. The comment that used to live here argued the eyebrow
-              was better gone — "this header already owns an <h1>, and the
-              sentence in it says what the page is" — and that reasoning was
-              about a SAFFRON-DOT eyebrow, a device since retired site-wide.
-              This is not that device. It is Discover's label row, the
-              chapter grammar the home page settled on, and the journal was
-              the last chapter still opening without it.
+              WHAT WENT AND WHY. The mark and the small "Blog" both said, in
+              furniture, the thing the masthead now says in type — a reader
+              who has just clicked "Blog" in the nav does not need the word
+              repeated at 13px under a logo. And the sentence was never a
+              title: it describes what the archive holds, which is a
+              caption's job, so it is set as one.
 
-              THE LABEL IS A <p>, NOT A PROMOTED HEADING, and that is the
-              one place this deliberately parts from Discover. Discover's
-              label IS its <h2> because a section's name is its heading;
-              /blog is a PAGE, its <h1> is the sentence that names it (and
-              the string the OG description echoes), and adding a second
-              heading that said "Blog" would put two headings on one idea.
-              The outline stays h1 → h2 featured → h3 cards, exactly as the
-              retired comment wanted.
-
-              THE MARK IS DECORATIVE, hence alt="". The word beside it
-              already says what it is. 1024×1024 is the file's real size —
-              maginhawa.png is a SQUARE mark, not a horizontal lockup, and
-              declaring it as one would reserve a 5.33:1 box for a 1:1
-              picture (see the same note in Discover.tsx).
-
-              "BLOG", NOT "JOURNAL". The nav, the footer and the menu all
-              say Blog and so does the home chapter; the page's <title> and
-              OG tags say Journal. The visible label follows the four
-              surfaces a reader navigates by. The metadata mismatch is real
-              and is left alone here — it is a copy decision, not a layout
-              one. ═══ */}
+              THE FACE IS CONTRALTO, at the user's instruction — the brand's
+              own wordmark cut, and this is the first time /blog has used
+              it. Same size and weight as /about's "WHO IS MAGINHAWA?": see
+              .masthead, which copies that clamp rather than sharing a token,
+              for the reason About.module.css states about /careers. ═══ */}
           <header className={styles.head}>
             <Reveal>
-              <p className={styles.chapterLabel}>
-                {/* `sizes` — see the fuller note in Discover.tsx. 2.6em
-                    here too, so the same 48px ceiling. */}
-                <Image
-                  className={styles.labelMark}
-                  src="/logo/maginhawa.png"
-                  alt=""
-                  width={1024}
-                  height={1024}
-                  sizes="48px"
-                  aria-hidden
-                />
-                Blog
-              </p>
-            </Reveal>
-            <Reveal delay={0.06}>
-              <h1 className={styles.title}>
-                Stories, openings, and ideas shaping the Maginhawa Group.
-              </h1>
+              <div className={styles.masthead}>
+                <h1 className={styles.mastheadWord}>Maginhawa Blog</h1>
+                {/* THE CAPTION, IN THE DIVIDER LABEL'S VOICE — the same face,
+                    size, tracking and caps as "Earlier Entries" further down
+                    the page, at the user's instruction. Two labels in one
+                    voice is what makes them read as the page's furniture
+                    rather than as two unrelated small texts.
+
+                    ⚠️ NOT A <p> INSIDE THE <h1>. It is a sibling: it is not
+                    part of the page's heading, and putting it in one would
+                    give the accessible name "Maginhawa Blog Stories,
+                    openings, and ideas…". */}
+                <p className={styles.mastheadNote}>
+                  Stories, openings, and ideas shaping the Maginhawa Group.
+                </p>
+              </div>
             </Reveal>
             {/* THE HEAD'S RULE ONLY EXISTS WHEN SOMETHING SEPARATES IT FROM
                 THE LIST'S RULE — i.e. on page one, where the featured lede
@@ -732,41 +719,88 @@ function BlogIndexInner({ entries }: { entries: BlogEntry[] }) {
             {showLede && <span className={styles.headRule} aria-hidden />}
           </header>
 
-          {/* compact featured lede — page 1 only */}
+          {/* ═══ THE LEDE — ONE FULL-MEASURE PLATE, TYPE ON THE RAMP ═══
+              Page 1 only.
+
+              ⚠️ THIS IS THE HOME PAGE'S JOURNAL LEDE AT ARCHIVE WIDTH, at
+              the user's instruction, and it replaces a two-column row: a
+              3:2 photograph in the left 1.05fr and a stacked tag / headline
+              / standfirst / pill in the right 0.95fr.
+
+              WHAT THE OLD ROW COST. The page opened with two type moments
+              220px apart — a 65.6px sentence in the head above, then a 48px
+              headline in a column beside a picture — and neither could win.
+              With the type ON the photograph the head's sentence is the only
+              thing set on cream, so it can stand down to 44px and the
+              PICTURE becomes the page's opening statement. That is the
+              argument the home chapter already makes; this is the same
+              object at 1360px instead of 646.
+
+              WHAT IT DROPS: the standfirst. There is no room for three lines
+              of summary on a ramp without crowding the headline off it — the
+              same trade the home page makes, which is why the two now read
+              as one object rather than as a copy of one.
+
+              THE META FOLLOWS THE CARDS BELOW. The tag line was "Latest ·
+              14 Feb 2026 · Olive Magazine"; the outlet has moved to the
+              front of the headline (headline() in lib/blog.ts) exactly as it
+              has on every card in the grid, so what is left on the tag is
+              the date and the word that says which story this is. ═══ */}
           {showLede && featured && (
             <Reveal>
               <a
                 className={styles.featured}
                 href={featured.url}
                 {...entryLinkProps(featured)}
-                /* drives the pill's close from the whole card — see the
+                /* drives the pill's close from the whole plate — see the
                    presentational note in PillCta.tsx */
                 data-cta-hover
               >
                 <CardMedia
                   className={styles.featuredMedia}
                   src={featured.image}
-                  alt={featured.title}
+                  /* DECORATIVE — the headline on the ramp names the story in
+                     real text and the mark above announces the venue. A third
+                     description of the same thing is noise on a screen
+                     reader. The home page's lede states the same reason. */
+                  alt=""
                 >
+                  {/* the ramp — blur first, then scrim; see the import note */}
+                  <div className={card.rampBlur} aria-hidden />
+                  <div className={card.rampScrim} aria-hidden />
+
                   <VenueMark slug={featured.restaurant} />
+
+                  <div className={styles.featuredBlock}>
+                    <span className={styles.featuredTag}>
+                      The latest · {featured.dateLabel}
+                    </span>
+                    <h2 className={styles.featuredTitle}>
+                      {headline(featured)}
+                    </h2>
+                    {/* THE HOUSE ACTION — the pill and its disc, at the
+                        user's instruction. It renders PRESENTATIONALLY
+                        because this whole plate is an anchor and an <a>
+                        inside an <a> is invalid: the browser closes the outer
+                        one and the plate silently stops being one link.
+                        `data-cta-hover` on that anchor is what closes the
+                        disc into the pill, because `.cta:hover` never fires
+                        for a span the pointer only passes near.
+
+                        `tone="cream"` because it is standing on the ramp: the
+                        default maroon fill is the darkest thing in the
+                        palette and the ramp is already dark, so the two would
+                        read as one shape. Cream fill, maroon ink — the same
+                        inversion the type above it already makes. */}
+                    <PillCta
+                      presentational
+                      tone="cream"
+                      className={styles.featuredCta}
+                    >
+                      Read the story
+                    </PillCta>
+                  </div>
                 </CardMedia>
-                <div className={styles.featuredBody}>
-                  <span className={styles.featuredTag}>
-                    Latest · {featured.dateLabel} · {featured.source}
-                  </span>
-                  <h2 className={styles.featuredTitle}>{featured.title}</h2>
-                  <p className={styles.featuredExcerpt}>{featured.excerpt}</p>
-                  {/* THE HOUSE ACTION, at the user's instruction — the same
-                      PillCta the home page's journal head presses ("Read
-                      More"), rather than the outlined chip this used to
-                      share with the grid cards below. It renders
-                      presentationally because the whole lede is the anchor;
-                      PillCta.tsx explains that mode and `data-cta-hover`
-                      above hands it the card's hover. */}
-                  <PillCta presentational className={styles.featuredCta}>
-                    Read the story
-                  </PillCta>
-                </div>
               </a>
             </Reveal>
           )}
@@ -818,29 +852,36 @@ function BlogIndexInner({ entries }: { entries: BlogEntry[] }) {
               style={{ listStyle: "none" }}
               aria-label="Blog entries"
             >
-              {/* ═══ THE ENTRY, AS THE USER'S REFERENCE DRAWS IT ═══
-                  A tall photograph, the headline under it, a hairline, the
-                  standfirst, and a plain "Read article →". No card.
+              {/* ═══ THE ENTRY — THE HOME PAGE'S CARD, WITH ITS STANDFIRST ═══
+                  A tall photograph carrying the venue's mark and the date,
+                  then the type beneath it on the cream: the outlet leading
+                  the headline, a hairline, the standfirst, a second
+                  hairline, the action band, and a third hairline closing
+                  the card.
 
-                  WHAT IT REPLACES: the object this grid carried until now —
-                  a cream panel with a 12px mat, a four-stop shadow and a
-                  1% lift, cut from the venue card's material so the two
-                  grids would read as one system. That argument was about
-                  the RESTAURANTS grid; this is the JOURNAL, and the
-                  reference is unambiguous that an entry here is a printed
-                  plate with type set under it, not a pressable tile.
+                  ⚠️ THIS IS THE HOME PAGE'S EARLIER-ENTRIES CARD, at the
+                  user's instruction, and the two now differ in exactly one
+                  thing: the standfirst, which survives here and does not
+                  there. That difference is the whole argument for keeping
+                  two cards at all. The strip on the home page is glanced at
+                  on the way somewhere else, so it drops to a headline; this
+                  page is where a reader ARRIVES, and three cards in a row
+                  saying only a headline give someone scanning for a story
+                  less to go on than the teaser did.
 
-                  WHAT THE BOX WAS DOING, and who does it now: the panel's
-                  edge was what separated one entry from the next. With it
-                  gone the row gap and the column gap carry that on their
-                  own, which is why both grew — see .grid.
+                  WHAT THE META LINE'S TWO HALVES BECAME. It is gone, and
+                  neither half was dropped: the outlet leads the headline now
+                  (headline() in lib/blog.ts) and the date is on the
+                  photograph (PlateDate). On a page where every entry links
+                  OUT the masthead is the credential and it could not be the
+                  thing cut — it was promoted instead.
 
-                  THERE IS NO "PREVIEW." LEAD-IN, at the user's
-                  instruction. The reference bolds a category word at the
-                  head of the standfirst; the outlet and the date keep
-                  their own line under the rule instead, because on a page
-                  where every entry links OUT the masthead is the
-                  credential and it cannot be the one thing dropped. ═══ */}
+                  WHY THREE RULES. Each one sits BETWEEN two things, which is
+                  why all three are real elements rather than pseudo-elements
+                  on the body — the same reason .divider's is. The first
+                  closes the headline, the second opens the action, the third
+                  closes the card. Read across four columns they give the row
+                  a common baseline; see .cardRule for what anchors them. ═══ */}
               {posts.map((item) => (
                 <li key={item.slug}>
                   <a
@@ -854,31 +895,23 @@ function BlogIndexInner({ entries }: { entries: BlogEntry[] }) {
                       alt={item.title}
                     >
                       <VenueMark slug={item.restaurant} />
+                      <PlateDate>{item.dateLabel}</PlateDate>
                     </CardMedia>
                     <div className={styles.cardBody}>
-                      <h3 className={styles.cardTitle}>{item.title}</h3>
-                      {/* the reference's rule, and it is a real element for
-                          the reason .divider's is: it has to sit BETWEEN two
-                          things, which a ::after on the body cannot do */}
+                      <h3 className={styles.cardTitle}>{headline(item)}</h3>
                       <span className={styles.cardRule} aria-hidden />
-                      {/* THE OUTLET LEADS, the date follows. "Forbes" earns
-                          attention; "11 Feb 2026" does not. */}
-                      <div className={styles.cardMeta}>
-                        <span className={styles.cardSource}>{item.source}</span>
-                        <span className={styles.cardSep} aria-hidden />
-                        <span>{item.dateLabel}</span>
-                      </div>
                       <p className={styles.cardExcerpt}>{item.excerpt}</p>
-                      {/* A <span>, never a nested anchor: the whole card is
-                          the link. The pill it used to be now belongs to the
+                      <span className={styles.cardRuleMid} aria-hidden />
+                      {/* THE ACTION. A <span>, never a nested anchor: the
+                          whole card is the link. It reads --entry-gap and
+                          --entry-band off .cardBody — see the contract in
+                          ActionBand.tsx — so those two declarations are
+                          load-bearing for a stylesheet this file does not
+                          import. The pill this used to be belongs to the
                           lede alone, which is what keeps the top story and
                           the archive from reading as equals. */}
-                      <span className={styles.cardBtn}>
-                        Read article
-                        <span className={styles.cardBtnArrow} aria-hidden>
-                          →
-                        </span>
-                      </span>
+                      <ActionBand />
+                      <span className={styles.cardRuleFoot} aria-hidden />
                     </div>
                   </a>
                 </li>

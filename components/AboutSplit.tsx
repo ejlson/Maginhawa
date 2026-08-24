@@ -212,22 +212,30 @@ const FADE: Variants = {
    145% is not a round number — it is derived from the 0.3em the mask is
    padded by to protect descenders ("Where it began." has a `g`), exactly as
    SplitWords derives it. Move one and move the other.
-   +0.55s AFTER THE SWEEP IS A HAND-OFF, and it is the offset the sweep's
-   direction buys. The mask runs 1.15s from MEDIA_IN on --ease-entrance,
-   which is heavily front-loaded: measured on the real render it has
-   uncovered 90% of the frame 0.35s in, so the band this caption sits in —
-   the bottom fifth — is
-   clear well before this fires. Both lines land onto a picture that is
-   already there, with no clip edge to ride and none to avoid, while the
-   sweep's tail and the drift's settle are both still visibly moving.
-   THAT IS ONLY TRUE WHILE THE SWEEP RUNS DOWN. Reverse MEDIA and this
+   +0.7s AFTER THE SWEEP IS A HAND-OFF, and it is the offset the sweep's
+   direction buys. The requirement is that both lines land onto a picture
+   that is ALREADY THERE, with no reveal edge to ride and none to avoid —
+   and it is a real requirement rather than a nicety, because `.mediaLine`
+   is a sibling of `.mediaFrame` and is therefore OUTSIDE the mask. The
+   caption is never masked; it would simply be type sitting on a part of the
+   frame the sweep had not reached yet.
+
+   ⚠️ IT WAS +0.55s, DERIVED FROM A CURVE THAT IS GONE. That number was
+   solved against --ease-entrance, which had uncovered 90% of the frame
+   0.35s in and ~96% by 0.55s — the caption's band is the bottom 22%
+   (measured: its top edge sits at 78% of the frame's height), so the edge
+   had long since passed it. On the flatter SWEEP curve the edge is only at
+   ~86% at 0.55s, i.e. still crossing the middle of the caption's own band.
+   0.7s is the same rule re-solved: ~95% uncovered, which with a 6% feather
+   means the ramp's trailing tail is already off the bottom edge.
+   THE RULE ALSO DEPENDS ON THE SWEEP RUNNING DOWN. Reverse MEDIA and this
    number is wrong by most of the duration, because the caption's band is
    then the FIRST thing uncovered rather than the last. */
 const LINE: Variants = {
   hidden: { transform: "translateY(145%)" },
   shown: (i: number) => ({
     transform: "translateY(0%)",
-    transition: { duration: 0.7, ease: EASE, delay: MEDIA_IN + 0.55 + i * 0.08 },
+    transition: { duration: 0.7, ease: EASE, delay: MEDIA_IN + 0.7 + i * 0.08 },
   }),
 };
 
@@ -265,25 +273,107 @@ const LINE: Variants = {
    Change one of these two numbers and re-solve the other. */
 const DRAWER = [0.32, 0.72, 0, 1] as const;
 
-/* THE MASK. `clipPath` and not a scaleY on an overlay: an overlay would
-   have to be painted in the ramp's colour and would then need its own fade,
-   and the site already has an element whose whole job is that edge.
+/* ══════ THE SWEEP GETS ITS OWN CURVE, AND IT IS THE ONE THING ON THIS
+   PAGE THAT EARNS ONE ══════
+   Every other reveal on the site rides --ease-entrance, and it is right
+   there because what those reveals ease is OPACITY or a 28px lift —
+   properties whose last 10% is invisible, so a curve that spends 65% of its
+   duration on that last 10% costs nothing.
 
-   ⚠️ IT IS ON `.mediaFrame` AND NOT ON `.media`, AND THAT IS THE SAME TRAP
-   DOOR_WIPE's note records: `clip-path` clips an element's ENTIRE
-   rendering, box-shadow included, and it stays on the element as an inline
-   style once the animation rests. Wiping `.media` directly would clip the
-   card shadow off the picture permanently. `.mediaFrame` exists for exactly
-   this and for nothing else — it was deleted when the animation came out
-   and it comes back with it.
+   THIS ONE EASES AN EDGE ACROSS 876px, and the crawl is the whole gesture.
+   Measured on the real render at 1440×900 (scripts/_tmp-about-sweep.mjs),
+   --ease-entrance put the edge
 
-   BOTH KEYFRAMES SPELL EVERY SIDE THE SAME WAY. `inset(0% 0 100% 0)` and
-   `inset(0% 0 0% 0)` interpolate; a mismatched unit count does not. */
+       25% down the frame at  +67ms      50% at +150ms
+       75%                    +283ms     90% at +449ms
+       99%                    +751ms    100% at +1058ms
+
+   — 438px in the first 150ms (≈2900px/s), then 88px over the remaining
+   900ms. That is not a sweep, it is a POP with a long invisible tail: the
+   reader sees the panel snap open and then sees nothing at all for two
+   thirds of a 1.15s animation.
+
+   THIS IS --ease-state, ALREADY IN THE HOUSE SET, and it is the flattest
+   curve in it: peak velocity 2.70× the mean, against 4.54× for
+   --ease-entrance and 4.22× for --ease-drawer. globals.css names it for
+   "colour/border changes where --ease-in-out's near-linear middle reads as
+   a snap" — the same property that makes it right for a travelling edge,
+   which is why this is a REUSE rather than a thirteenth curve. It has a
+   real (short) acceleration, so the panel BEGINS rather than appears, and
+   it reaches 99% at 87% of the duration instead of 65%.
+   Written as a tuple rather than read from the token for the same reason
+   EASE and DRAWER above are: neither runtime can read the other's spelling.
+
+   ⚠️ 0.95s, DOWN FROM 1.15s, AND THE TWO ARE NOT COMPARABLE. The old
+   number was nominal — the gesture a reader could actually see ran ~450ms
+   and the rest was the crawl. Re-measured on the same probe, the edge now
+   sits 25% down at +234ms, 50% at +337ms, 75% at +467ms, 90% at +601ms,
+   99% at +834ms and lands at +934ms: visibly travelling for the whole
+   duration, so the PERCEIVED sweep gets LONGER while the animation gets
+   shorter.
+
+   THE VALUE IS SOLVED, NOT PICKED. DRIFT below is the settle that has to
+   overrun this, and its own curve is front-loaded enough that it is only
+   ever going to be late by a little: measured, it is 88.9% done at 600ms
+   and 98.5% at 1100ms. Landing the edge at 90% inside that window leaves
+   the drift ~8.8px of the panel's 79px of travel still to spend after the
+   sweep has visibly finished — the overhang this chapter was built around,
+   preserved WITHOUT touching DRIFT_DUR or the shadow that hangs off it
+   (SETTLED). Retime this and re-derive against DRIFT, not against taste. */
+const SWEEP = [0.4, 0.05, 0.2, 1] as const;
+
+/* HOW SOFT THE EDGE IS, as a percentage of the frame's height (≈53px of
+   876 at 1440×900). It is the one number the mask below and the stylesheet
+   both have to agree on — see `--sweep-feather` in AboutSplit.module.css,
+   where the gradient is actually drawn, and note that this constant only
+   sets where the travel STARTS. */
+const FEATHER = 6;
+
+/* THE MASK, AND THE EDGE IS FEATHERED NOW.
+   `clipPath` used to draw this and the reason it is gone is what it looks
+   like on FILM: a razor-sharp, aliased horizontal line stair-stepping down
+   over moving video at ~1000px/s, which reads as a rendering artefact
+   rather than as a reveal. Over a still photograph it was fine; the panel
+   has been a looping clip since the poster came off (see VIDEO), and this
+   is the half of that change that never followed.
+
+   A 6% ALPHA RAMP RATHER THAN A DISSOLVE. The panel is a printed plate in
+   this design language (--radius-tile is 2px precisely so it reads as one),
+   and a soft dissolve is the wrong metaphor for uncovering one. 53px of
+   ramp is enough that the edge has no line in it and short enough that the
+   plate still has a defined top edge the whole way down.
+
+   ⚠️ IT IS A MASK ON `.mediaFrame`, AND BOTH HALVES OF THAT MATTER.
+   — A MASK, not a clip, because a clip cannot be soft.
+   — ON `.mediaFrame`, and that is the SAME TRAP DOOR_WIPE's note records:
+     `mask-image`, exactly like `clip-path`, applies to an element's ENTIRE
+     rendering, box-shadow included, and whatever framer writes stays on the
+     element as an inline style once the animation rests. Masking `.media`
+     directly would take the card shadow off this picture permanently.
+     `.mediaFrame` exists for exactly this and for nothing else.
+
+   ⚠️ WHAT ANIMATES IS THE CUSTOM PROPERTY, NOT `mask-image`. The gradient
+   is declared once in the stylesheet and reads `--sweep`; framer only moves
+   that one number. This is the house rule from Framer-owns-the-inline-style
+   — animate a custom property and let CSS own the real one — and here it
+   also buys the reduced-motion and no-JS paths for free: `.mediaFrame`
+   DEFAULTS to `--sweep: 100%`, i.e. fully uncovered, so a reader whom
+   `pick()` has swapped onto FADE (which touches opacity and nothing else)
+   sees a whole picture rather than an empty box. Only the `hidden` variant
+   masks anything, exactly as the clip-path did.
+
+   THE TRAVEL RUNS FROM −FEATHER, NOT FROM 0. A gradient holds its first
+   colour everywhere above the first stop, so at `--sweep: 0%` the ramp
+   itself would still be sitting on the frame's top edge and the picture
+   would be part-visible before the animation starts. Starting the opaque
+   stop one feather-height above the frame puts the whole ramp off the top.
+   BOTH KEYFRAMES ARE PERCENTAGES for the same reason the old insets both
+   spelled every side: matched units interpolate, mismatched ones do not. */
 const MEDIA: Variants = {
-  hidden: { clipPath: "inset(0% 0 100% 0)" },
+  hidden: { "--sweep": `-${FEATHER}%` },
   shown: {
-    clipPath: "inset(0% 0 0% 0)",
-    transition: { duration: 1.15, ease: EASE, delay: MEDIA_IN },
+    "--sweep": "100%",
+    transition: { duration: 0.95, ease: SWEEP, delay: MEDIA_IN },
   },
 };
 

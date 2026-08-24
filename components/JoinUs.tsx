@@ -1176,18 +1176,28 @@ export default function JoinUs() {
                 words of argument aimed at someone who has already decided to
                 apply. Three columns of ~30 words is also the shape this copy
                 was written in. */}
-            {/* `data-nav-theme="light"`, and it is STATED rather than
-                inherited. The band was a dark ground and carried "dark" for
-                it — the navbar samples what is UNDER the bar (Nav.tsx:
-                elementFromPoint at 24,56 then `.closest`), so on the maroon
-                it had to be told to stop painting maroon ink. The ground is
-                a step off the cream now (see `.reasons`), so the bar's own
-                light treatment is the correct one and "dark" would have
-                painted cream ink on a near-cream band — the same failure
-                the attribute was added to prevent, pointing the other way.
-                Left explicit rather than deleted so the next change of
-                ground has the sampler's rule in front of it. */}
-            <ul className={styles.reasons} data-nav-theme="light">
+            {/* `data-nav-theme="dark"`, and it MUST track `--plate`. The
+                navbar samples what is under the bar and paints against it:
+                Nav.tsx reads `elementFromPoint(24, barHeight + 4)` and walks
+                up with `.closest("[data-nav-theme]")`, so whatever this list
+                claims is what the bar believes it is sitting on. The cards
+                are the ink again, so the bar has to stop painting maroon
+                type over them; when they were a tint this said "light" for
+                exactly the opposite reason.
+
+                x = 24 IS WHY THIS MATTERS ON PHONES SPECIFICALLY. The probe
+                is a fixed 24px from the left edge, and the first card starts
+                at --grid-margin — clamp(16px, 2.8vw, 40px), which is under
+                24px below an 857px viewport. So from a phone up to a small
+                laptop the probe lands INSIDE card 01 and this attribute
+                decides the bar's colour; above that it lands in the page
+                margin, finds no host, and the bar falls through to "blend"
+                over the cream, which is what it should do there anyway.
+
+                Stated rather than inherited, and kept next to the note, so
+                the next change of ground has the sampler's rule in front of
+                it. */}
+            <ul className={styles.reasons} data-nav-theme="dark">
               {PILLARS.map((pl, i) => (
                 <Reveal as="li" key={pl.mark} className={styles.reason} delay={i * 0.07}>
                   <span className={styles.reasonMark}>{pl.mark}</span>

@@ -170,14 +170,19 @@
   "168": "CustomCursor.tsx",
   "169": "Contact.tsx",
   "170": "_tmp-seam-lr.mjs",
-  "171": "SmoothScroll",
+  "171": "Blog.tsx",
   "172": "react",
   "173": "remark-rehype",
   "175": "probe-blog-index.mjs",
   "176": "remark-rehype",
+  "177": "_tmp-about-sweep.mjs",
   "178": "JoinUs.tsx",
   "179": "_tmp-ink-rail.mjs",
   "180": "_tmp-ink-rail2.mjs",
   "181": "_tmp-rail3.mjs",
-  "187": "probe-home-seams.mjs"
+  "182": "SplitWords.tsx",
+  "183": "VideoBackdrop.tsx",
+  "184": "shoot-sections.mjs",
+  "187": "probe-home-seams.mjs",
+  "189": "_tmp-about-geo.mjs"
 }

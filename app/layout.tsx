@@ -273,6 +273,16 @@ export default function RootLayout({
               filter: none !important;
               clip-path: none !important;
               transform: none !important;
+              /* ⚠️ AND THE MASK, which is NOT the same reset as clip-path
+                 even though it hides the same way. AboutSplit's panel sweeps
+                 with a gradient mask now (see MEDIA there): the boundary is
+                 a custom property, and a rule here cannot put a custom
+                 property back — it can only take the mask away. Without
+                 this line the group's story arrives as an empty rectangle
+                 for a reader with scripts off, which is exactly the failure
+                 this whole block exists to prevent. */
+              -webkit-mask-image: none !important;
+              mask-image: none !important;
             }
 
             [data-nojs-hide] { display: none !important; }

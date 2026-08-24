@@ -244,12 +244,15 @@
    background, no radius, no shadow — because .media already carries all
    three and a second copy is a second thing to keep in step.
 
-   ⚠️ .mediaFrame IS THE ONLY ELEMENT THE CLIP MAY TOUCH. `clip-path` clips
-   an element's ENTIRE rendering, box-shadow included, and it stays on the
-   element as an inline style once the animation rests — so a clip on .media
-   would take the card shadow off this picture permanently, and nothing
-   about that failure looks like an animation bug. Both of this file's
-   wiping animations are written this way; see DOOR_WIPE's note too.
+   ⚠️ .mediaFrame IS THE ONLY ELEMENT THE MASK MAY TOUCH. `mask-image`,
+   exactly like the `clip-path` that used to draw this, applies to an
+   element's ENTIRE rendering, box-shadow included, and whatever framer
+   writes stays on the element as an inline style once the animation rests —
+   so a mask on .media would take the card shadow off this picture
+   permanently, and nothing about that failure looks like an animation bug.
+   Both of this file's wiping animations are written this way; see
+   DOOR_WIPE's note too (the prints still use a real clip-path — they are
+   small, still, and want a hard edge).
 
    BOTH ARE `position: absolute; inset: 0` FOR THE SAME REASON .mediaVideo
    is: .media's height is governed by the grid row, and a box in normal flow
@@ -257,10 +260,47 @@
 .mediaFrame {
   position: absolute;
   inset: 0;
+
+  /* ══════════ THE SWEEP'S EDGE IS DRAWN HERE ══════════
+     framer animates ONE NUMBER — `--sweep`, the position of the reveal
+     boundary as a percentage of this box's height — and the gradient below
+     turns it into a soft edge. See MEDIA in AboutSplit.tsx for why the edge
+     is feathered at all and why the animation is a custom property rather
+     than the mask itself.
+
+     ⚠️ THE DEFAULT IS 100%, i.e. FULLY UNCOVERED, AND THAT IS LOAD-BEARING.
+     The old clip-path existed only as an inline style written by the
+     `hidden` variant, so a reader that variant never reaches simply never
+     had one. A mask declared in the stylesheet does not have that property:
+     if it defaulted to hidden, then reduced motion — where `pick()` swaps
+     MEDIA for FADE, which touches opacity and nothing else — would leave
+     `--sweep` parked at its start value and the panel permanently empty.
+     Same for the no-JS path, whose <noscript> reset in app/layout.tsx
+     clears `clip-path` and `transform` but cannot clear a mask.
+     Defaulting to the END of the travel makes "nobody animated this" mean
+     "the picture is simply there", which is what both of those paths want.
+
+     ⚠️ 6% IS DUPLICATED FROM FEATHER IN AboutSplit.tsx and cannot be read
+     from here: the variant has to start the travel one feather-height above
+     the frame (`-6%`) so the ramp itself is off the top edge before the
+     sweep begins. Change one and change the other. */
+  --sweep: 100%;
+  --sweep-feather: 6%;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 var(--sweep),
+    transparent calc(var(--sweep) + var(--sweep-feather))
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 var(--sweep),
+    transparent calc(var(--sweep) + var(--sweep-feather))
+  );
+
   /* THE PICTURE'S CORNER AND ITS CLIP, both moved down from .media so that
      box can paint nothing at rest — see the note there. Rounding the box
-     that is already being clip-pathed costs nothing: `clip-path` and
-     `border-radius` compose, the inset mask cuts the top edge and the radius
+     that is already being masked costs nothing: the mask and
+     `border-radius` compose, the gradient takes the top edge and the radius
      keeps the corners. */
   overflow: hidden;
   border-radius: var(--radius-tile);

@@ -254,7 +254,7 @@
      three times and this is where it stops: what is left is the navbar's
      air, not spare. Closing it further means moving the BAR — hiding it
      while this section is pinned — not moving the type. */
-  font-size: clamp(1.1rem, min(7.2vw, 20svh), 12rem);
+  font-size: clamp(1.1rem, min(8.15vw, 20svh), 12rem);
   padding-bottom: min(22svh, calc(100svh - 3.9em - 108px));
 
   /* the swell and the blur are both animated on this element by
@@ -347,46 +347,68 @@
 
   font-family: var(--font-display-big);
 
-  /* ⚠️ 600 IS A LITERAL AND IT IS NOT --w-medium, WHICH WOULD DO NOTHING.
-     The weight scale in globals.css is 300 / 400 / 500 / 700, and
-     `contralto-big` does not ship a 500 — the kit carries 300, 400, 600,
-     700 and 900. Asking for 500 therefore resolves to the 400 cut and the
-     block renders exactly as it did before, silently. The token is right
-     for Helvetica and wrong for this face, so the face's own number is
-     written here with this note rather than a token that lies.
+  /* ⚠️ THE WEIGHT IS A SITE TOKEN NOW, AND IT USED TO BE A LITERAL HERE.
+     It was 600, then 400, and both were written as bare numbers with a
+     note saying the Helvetica scale (--w-regular / --w-medium / --w-bold)
+     does not fit this face — contralto-big ships 300/400/600/700/900 and
+     has no 500, so a rule asking it for --w-medium silently got the 400
+     cut. --w-display in globals.css is that note turned into a token: the
+     wordmark voice set in one place, in a number the face owns.
 
-     ⚠️ AND 600 RATHER THAN 700, WHICH IS THE WHOLE DECISION. Measured on
-     "SEVEN DIFFERENT" at 200px against the real kit, the cuts set at:
+     ⚠️ IT IS 300 AT THE USER'S INSTRUCTION, AND THE SIZE ABOVE IS PART OF
+     THE SAME CHANGE. On this face a lighter cut is a NARROWER one, so the
+     weight is also a size lever. Measured against the real kit at 1440 on
+     the governing line, with the entrance's tracking open:
 
-         300  1772px      400  1470px  (was)
-         600  1510px      700  1873px
+         cut    governing line    vs 600    size it buys
+         300        11.386em      -4.9%        +5.2%
+         400        11.637em      -2.8%        +2.9%
+         600        11.977em         —            —
+         700        12.522em      +4.6%        -4.4%
 
-     so 600 costs 2.7% of the line's width and 700 costs 27%. The longest
-     line already fills 86% of the measure, so 700 would put it at 109% —
-     it would not fit at all, and buying it back means dropping the type
-     about a fifth on every screen. A block a fifth smaller is a worse
-     trade than a block a shade lighter.
+     ⚠️ AND THAT TABLE CORRECTS AN EARLIER ONE IN THIS FILE, which had the
+     300 cut setting SEVENTEEN PER CENT WIDER than the 600 and was quoted
+     here and in Passage.tsx as the reason a weight settle could not be
+     built. It is not what the kit does: 300 is the NARROWEST cut of the
+     four and the ladder runs 300 < 400 < 600 < 700 in width as well as in
+     colour. The old figure looks like a measurement taken against the
+     fallback rather than against contralto-big.
 
-     ⚠️ IT IS A MEDIUM, NOT A BOLD, AND THAT IS WHAT WAS ASKED FOR. The
-     reference is watchhouse.com, whose display lines are Tiempos Headline
-     at weight 500 with -0.02em tracking — a medium of a high-contrast
-     serif, sentence case, set tight. Not a bold. 600 of contralto-big is
-     this family's nearest true equivalent: the stems thicken and the
-     hairlines hold, where 700 is a visibly different letterform rather
-     than a heavier one.
-
-     THE EARLIER ARGUMENT AGAINST A HEAVIER CUT DOES NOT APPLY HERE. This
-     file used to carry a note saying a bold line "reads as two typefaces
-     rather than as emphasis" — that was about setting ONE line heavier
-     than the other three. All four move together, so there is no second
-     weight on the screen to read against. */
-  font-weight: 600;
+     ⚠️ SO THIS RULE IS NO LONGER SAFE TO EDIT ALONE. The vw coefficient
+     above was derived against THIS cut's width. Put the weight back up and
+     the longest line grows with it, and the entrance peak goes past the
+     measure — see the fills under the clamp before touching either. */
+  font-weight: var(--w-display);
 
   /* tight, because the block is meant to read as one object rather than
      as five rows that happen to be stacked. The air between the rows is
      the slab's row-gap, not the leading. */
   line-height: 0.86;
   text-transform: uppercase;
+
+  /* ⚠️ THE NEGATIVE TRACKING IS WHAT PAID FOR THE TYPE SIZE, and it is not
+     a stylistic flourish that can be dropped on its own. The block is a
+     fixed set of words that must not wrap, so the only way the type gets
+     bigger is if the longest line gets narrower — and tightening is the
+     only lever left that does not touch the copy, the breaks or the
+     weight. Measured on the governing line at 1440: 0em rests at 88.6% of
+     the measure, -0.03em at 83.3%, which is what let the vw term go from
+     7.2 to 8. Take this out and leave the clamp alone and the entrance
+     runs the ink off the screen — see the fills below.
+
+     ⚠️ AND IT IS WRITTEN IN TWO FILES. Passage.tsx animates letter-spacing
+     as an INLINE style on this element (the entrance opens the tracking
+     and lets it settle), and an inline style beats this rule for the whole
+     life of the page. LINE_REST there must carry the same number; if the
+     two disagree the block settles on framer's value and this one only
+     ever shows pre-hydration and under reduced motion.
+
+     0.03em against a face set in capitals: caps are traditionally
+     letterspaced OUT rather than in, and this is deliberately a shade
+     rather than a squeeze — at 1440 it is 3.3px on a 110px em. Past about
+     0.04em the counters start closing on this face and it reads as
+     condensed rather than as set tight. */
+  letter-spacing: -0.03em;
 
   /* THE SIZE IS A CLAMP AND NOT A FITTER, and that is a deliberate
      downgrade from the prototype. A fitter measures the rendered ink and
@@ -402,54 +424,82 @@
      an afternoon and a 1920 screen ran the type at 70px in a box that
      wanted 134 — the lines stranded in the middle of a mostly empty
      measure, which is not the arrangement, it is the arrangement failing.
-     The ceiling is 12rem now and 7.2vw does not reach it until ~2670px.
+     The ceiling is 12rem now and 8vw does not reach it until ~2400px.
 
      ⚠️ NOTHING WRAPS, SO THE LONGEST LINE GOVERNS THE SIZE OF ALL OF THEM,
-     and the three long lines are within HALF A POINT of each other:
-     measured at 1440 against the real face, 73.7 / 73.8 / 74.2 / 46.6% of
-     the measure. That is a deliberately fragile arrangement and it is the
-     one thing to know before touching either the copy or the captions —
-     lengthening any of the first three lines, or widening the caption on
-     line 1 or 2, makes THAT line the governing one and shrinks the whole
-     block to pay for it. WHAT in Passage.tsx is the narrowest caption in
-     the set for exactly this reason.
+     and the three long lines are within a point and a half of each other.
+     Measured at 1440 against the real face at the settled tracking, as a
+     share of the measure: 89.2 / 89.2 / 89.8 / 70.7%. That is a
+     deliberately fragile arrangement and it is the one thing to know
+     before touching either the copy or the captions — lengthening any of
+     the first three lines, or widening the caption on line 1 or 2, makes
+     THAT line the governing one and shrinks the whole block to pay for it.
+     WHAT in Passage.tsx is the narrowest caption in the set for exactly
+     this reason.
 
-     ⚠️ 7.2 PUTS THE GOVERNING LINE AT ABOUT 86% OF THE MEASURE, and the
-     coefficient is derived from that rather than chosen. It ran at 6.2 for
-     a version, which left the block filling 82% — three-quarters of a
-     screen of type with a fifth of the measure standing empty either side,
-     which reads as type that failed to fit rather than type that was
-     placed. 86 is full enough to be the setting and short of the flush
-     edges the justified block used to have.
+     ⚠️ THE REST IS NOT THE FRAME TO SIZE AGAINST, AND THAT IS THE TRAP.
+     Two things make the ink wider than the settled sentence and both are
+     transient, so neither shows up in a screenshot of the finished block:
+     the ENTRANCE opens the tracking by LINE_TRACK (Passage.tsx), and the
+     SWELL scales .stage by 1 + SWELL across the pin. Measured at 8vw, the
+     governing line's widest frame is the entrance peak at 95.3% of the
+     measure on every desktop width, and 96.6% at 360 where the section's
+     10px padding floor is a larger share of the screen. Those are the
+     numbers the coefficient is set against — not the 89.8% the reader sees
+     at rest.
 
-     ⚠️ AND IT IS ONE COEFFICIENT FOR THE WHOLE RANGE, WHICH IS NEW. The
-     narrow rule at the foot of this file used to carry its own vw term
-     because dropping the captions changed which line governed. It does not
-     any more: line 3 carries no caption, so it governs at every width and
-     the fill is constant apart from the section's padding clamp, which
-     takes a slightly larger share of a phone (measured: 86% at 1440
-     against about 89% at 390). Two coefficients that have to be kept in
-     proportion is a thing this file has got wrong before. */
+     ⚠️ 8 IS WHERE THREE LEVERS LANDED IT, AND IT WAS 7.2. The block is a
+     fixed set of words that must not wrap, so it was already at the
+     largest size its measure allowed; the extra 11% came from making the
+     longest line narrower rather than from letting it run wider. Two of
+     those levers are one rule apart from here — the negative tracking
+     above and the drop from the 600 cut to the 400 — and the third is
+     simply spending the margin they freed. Every frame still sits at or
+     inside the air the 7.2 setting had: 95.3% against 93.6% at the widest
+     desktop frame, 50px of clear cream either side of the ink at 1440
+     against 62px before. ⚠️ THE CEILING IS ABOUT 8.4vw, where the entrance
+     peak reaches 100% and the ink touches the padding; there is nothing
+     past it that does not re-break a line.
+
+     ⚠️ AND IT IS ONE COEFFICIENT FOR THE WHOLE RANGE. The narrow rule at
+     the foot of this file used to carry its own vw term because dropping
+     the captions changed which line governed. It does not: line 3 carries
+     no caption, so it governs at every width and the fill is constant
+     apart from the section's padding clamp, which takes a slightly larger
+     share of a phone. Two coefficients that have to be kept in proportion
+     is a thing this file has got wrong before, and at 8vw one still
+     serves — the phone is the binding case and it is what caps this
+     number, not the desktop. */
   /* ⚠️ IT IS BOUND BY BOTH AXES, AND THE HEIGHT TERM IS NOT DECORATIVE.
      The measure sets how large the type CAN be; the frame sets how large
      it MAY be. On a short laptop the two disagree badly, so `min()` takes
      whichever axis is binding — the width on ordinary screens, the height
      on short ones — and the block never grows into its own margins.
 
-     ⚠️ THE HEIGHT TERM IS TUNED TO BIND ONLY WHEN IT MUST, and it has to
-     move whenever the block's height does. The block is 3.62em tall now
-     (see the note on .stage), so at 20svh a height-governed block occupies
-     72% of the stage — the same fraction it held at 5.43em and 13.4svh.
-     The point of the number is the CROSSOVER, not that fraction: at
-     1920×1080 the width asks 138px and the height allows 216, so the width
-     governs, which is what should happen on an ordinary screen; the height
-     does not take over until about 1440×500. A four-row block simply needs
-     less guarding than a five-row one did. Set it tighter and it starts
-     governing at 16:9 too, and the type gets smaller for no reason the
-     reader can see — which is exactly what happened when the vw term went
-     from 6.2 to 7.2 and this one was left behind. svh rather than vh so a
-     phone's URL bar sliding does not resize the type mid-scroll. */
-  font-size: clamp(1.1rem, min(7.2vw, 20svh), 12rem);
+     ⚠️ THE HEIGHT TERM DID NOT MOVE WITH THE WIDTH TERM, AND THAT IS THE
+     ONE PLACE THIS SETTING BREAKS ITS OWN RULE ON PURPOSE. The rule is
+     real: raise the vw coefficient and leave this behind and the height
+     starts governing on screens where it has no business to, which is
+     exactly what happened when the vw term went 6.2 → 7.2. It stayed at 20
+     anyway, because 20 is not a taste number — it is the largest value the
+     navbar guard on .stage can survive. That guard is
+     `100svh − 3.9em − 108px`, and on a screen where THIS term is the one
+     picking the size it resolves to `H(1 − 0.039k) − 108` for a
+     coefficient k. At k=20 it stays positive down to a 491px-tall window;
+     at 21 it goes negative below 597px, and a negative padding is an
+     invalid declaration that drops silently — taking the guard with it and
+     running the first line under the bar. So 20 is a ceiling, not a
+     preference.
+
+     WHAT IT COSTS. The crossover moves from about 1440×518 to 1440×576, so
+     a slightly taller band of short windows now sizes off the height. 16:9
+     is 0.5625 and nowhere near it, and on those windows the guard is the
+     binding constraint anyway — the type it hands back is type that would
+     not have fitted under the navbar. Verified across ten viewports: the
+     tightest clearance from the bar to the first ink is 16px at 1440×700,
+     and nothing overlaps at any size. svh rather than vh so a phone's URL
+     bar sliding does not resize the type mid-scroll. */
+  font-size: clamp(1.1rem, min(8.15vw, 20svh), 12rem);
 }
 
 .group {
@@ -587,6 +637,50 @@
   color: var(--maroon);
 }
 
+/* ══════════ THE NARROW CAPTION ROW ══════════
+   The three annotations set once, under the claim, where the display type
+   is too small to stand them inside its lines. Rendered only by the narrow
+   copy (see NARROW_CAPTION in Passage.tsx) and hidden here as well, because
+   the wide setting has not budgeted a row for it in any of its three
+   coupled numbers.
+
+   ⚠️ THE TYPE IS ON THE ITEMS AND NOT ON THE ROW, and that is load-bearing
+   rather than tidy. `margin-top` resolves against the element's OWN font
+   size, so a row carrying 7px type would put a 4px gap above itself instead
+   of the half-line of display type it is asking for. The row keeps the
+   slab's inherited size so its margin and its gap are both in em of the
+   DISPLAY face; only the items step down. Same split, same reason, as
+   .tag / .tagInk above. */
+.captionRow {
+  display: none;
+}
+
+.captionItem {
+  font-family: var(--font-sans);
+  font-size: clamp(0.4375rem, 0.66vw, 0.5625rem);
+  font-weight: var(--w-regular);
+  line-height: 1.55;
+  letter-spacing: 0.15em;
+  text-transform: uppercase;
+  white-space: nowrap;
+  color: var(--maroon-soft);
+}
+
+/* the loud half of each caption, kept from the stacked desktop form — it is
+   what tells the venue apart from the listing it carries */
+.captionItem b {
+  font-weight: var(--w-medium);
+  color: var(--maroon);
+}
+
+/* a separator between items rather than a character in the copy, so the
+   string stays derived from the three arrays */
+.captionItem:not(:last-child)::after {
+  content: "·";
+  margin-left: 0.9em;
+  opacity: 0.55;
+}
+
 /* ══════════ NARROW ══════════
    ⚠️ THE BREAKPOINT IS 900 AND IT IS NOT A DEVICE WIDTH, IT IS WHERE THE
    CAPTION STOPS BEING AN ASIDE. The annotation is sized off the viewport
@@ -611,18 +705,76 @@
     display: none;
   }
 
-  /* ⚠️ THERE IS NO font-size HERE ANY MORE, AND ITS ABSENCE IS THE POINT.
-     Every previous version of this query carried its own clamp, because
-     the line that governed the type size changed when the captions went
-     away. It does not now: line 3 ("SEVEN DIFFERENT KITCHENS") carries no
-     caption, so it governs at 1920 and at 390 alike and one coefficient
-     serves the whole range. Restoring a size here means re-deriving it
-     against the wide rule and keeping the two in proportion for ever
-     after — see the note on .line before doing it.
+  .captionRow {
+    display: flex;
+    justify-content: center;
+    align-items: baseline;
+    flex-wrap: wrap;
+    gap: 0.13em;
+    margin: 0.55em 0 0;
+  }
 
-     The block is a smaller share of a phone screen than of a laptop's, and
-     that is not a bug to tune out: five authored rows that must not wrap
-     can only be as large as the longest of them allows. */
+  /* ⚠️ THIS QUERY CARRIES ITS OWN SIZE AGAIN, AND THIS TIME IT HAS TO.
+     The note that stood here said the absence of a font-size was the point
+     — that line 3 governed at 1920 and at 390 alike, so one coefficient
+     served the whole range. That was true while both breakpoints set the
+     SAME four lines. They do not: below 900px the copy is re-broken over
+     seven rows (LINES_NARROW in Passage.tsx), so a different line governs
+     and the old warning about keeping two coefficients in proportion no
+     longer applies — they are not describing the same sentence.
+
+     WHAT GOVERNS NOW IS THE CLAIM, not a concession. Measured against the
+     real face at the entrance's open tracking: "SEVEN DIFFERENT" is 6.967em
+     and "ONE STANDARD" plus its ellipsis is 7.869em, so the shortest line in
+     the block is the one setting the size for all seven. That is the price
+     of not breaking the claim in half, and it is paid on purpose — see
+     LINES_NARROW.
+
+     ⚠️ 11.4 IS SET AGAINST THE NARROWEST SCREEN, NOT THE COMMONEST ONE, for
+     the same reason the wide coefficient is: the entrance peak is the
+     widest frame and nothing here may wrap. The measure is the viewport
+     less .section's padding clamp, which is at its 10px floor below ~1740,
+     so the small end is where the padding is the largest share and the fill
+     is tightest. At the peak: 95.7% at 320, 95.0% at 360, 94.5% at 390 and
+     91.8% at 900. The ceiling is about 11.9, where 320 touches its padding.
+
+     ⚠️ AND THE svh TERM CAME DOWN FROM 20 TO 7.5, WHICH IS NOT A TWEAK. It
+     is the term that stops the block growing into the frame on a short
+     window, and it scales with the ROW COUNT: the slab is 6.93em here
+     against 3.62em wide, so the same coefficient would put seven rows at
+     nearly twice the share of the screen four rows take. Worked through on
+     the binding case, a 900×600 window, where the height governs and the
+     navbar is 50px: at 7.5 the type sets at 45px and the first line lands
+     78px down, 28px clear of the bar. At 8.9 that clearance falls to about
+     14px. At the wide rule's 20 the guard below resolves NEGATIVE, and a
+     negative padding is an invalid declaration that drops silently — taking
+     the guard with it and running the first line under the bar. */
+  .line {
+    font-size: clamp(1.1rem, min(11.4vw, 7.5svh), 12rem);
+  }
+
+  /* ⚠️ IDENTICAL TO .line's, AND FOR THE SAME REASON IT IS WIDE. .slab
+     inherits its em from .stage for the row gap while each row resolves its
+     own from .line; if the two disagree the gaps and the guard are
+     measuring a different type size from the one on the screen.
+
+     THE GUARD'S em TERM IS THE ROW COUNT AND IT MOVED WITH IT. Seven rows
+     at 0.86 plus six 0.02em gaps is 6.14em, the caption row's half-line of
+     air is 0.55em and the caption itself about 0.24em: 6.93em of block, and
+     7.3em is that with a margin. */
+  .stage {
+    font-size: clamp(1.1rem, min(11.4vw, 7.5svh), 12rem);
+    padding-bottom: min(22svh, calc(100svh - 7.3em - 108px));
+  }
+
+  /* ⚠️ 0.02em AND NOT 0.06em, BECAUSE THE RAG IS DOING THE SEPARATING NOW.
+     The wide gap exists so four rows of near-identical length read as four
+     lengths rather than as one mass. Here the lengths alternate long-short
+     six times over, so the block is already legible as seven rows and the
+     wide gap would only spend height the type wants. */
+  .slab {
+    row-gap: 0.02em;
+  }
 
   /* a phone screen is taller than it is wide, so the same fraction of it
      is a much bigger lip of card; 8svh reads as the same gesture. */

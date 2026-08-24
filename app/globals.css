@@ -356,6 +356,22 @@
      display roles back to Contralto — Helvetica cannot offer it. */
   --font-display-big: "contralto-big", "contralto-medium", "Times New Roman", serif;
 
+  /* ⚠️ CONTRALTO'S WEIGHT IS A TOKEN OF ITS OWN, AND IT IS NOT ON THE
+     HELVETICA SCALE. --w-regular / --w-medium / --w-bold were drawn for the
+     text family and this face does not share their steps: contralto-big
+     ships 300 / 400 / 600 / 700 / 900 and has NO 500, so every rule that
+     asked it for --w-medium was silently getting the 400 cut. That is the
+     defect this token closes — one place to set the wordmark voice, and a
+     number the face actually owns.
+
+     ⚠️ AND ON THIS FACE THE WEIGHT IS ALSO A WIDTH. The cuts get wider as
+     they get heavier — measured, 300 sets 4.9% narrower than 600 and 2.1%
+     narrower than 400 — so changing this number relays out every display
+     block that fills its measure. Blocks with a JS fitter re-fit
+     themselves; blocks on a clamp simply come up short of the edge they
+     were composed against. Re-measure the wordmarks after touching it. */
+  --w-display: 300;
+
   /* NEWSREADER ON THE DISPLAY ROLES, CONTRALTO ONLY ON THE WORDMARK.
      A logotype is artwork, not a typeface role, so Contralto does not have
      to set the section headings just because it draws MAGINHAWA. Now that
@@ -1114,7 +1130,7 @@ html::-webkit-scrollbar {
    so it keeps the brand's Contralto voice (big optical cut) */
 .wordmark {
   font-family: var(--font-display-big);
-  font-weight: var(--w-regular);
+  font-weight: var(--w-display);
   line-height: 0.82;
   letter-spacing: -0.01em;
   text-transform: uppercase;

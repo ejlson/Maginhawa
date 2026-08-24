@@ -31,11 +31,23 @@
 .head {
   display: flex;
   flex-direction: column;
-  align-items: flex-start;
-  /* the gap between the label and the display line is deliberately TIGHT —
-     they read as one lockup, and the air that separates the head from the
-     entries is the rule's margin below, not this */
-  gap: var(--space-xs-y);
+  /* ⚠️ STRETCH, NOT flex-start, AND IT IS WHAT LETS THE CAPTION REACH THE
+     RIGHT EDGE. Each child here is wrapped in a <Reveal>, i.e. a plain div
+     with no width of its own; under `flex-start` that div shrank to its
+     contents — measured 1213px against a 1360px measure — so `.masthead`'s
+     `width: 100%` was 100% OF THE WRONG BOX and the auto margin inside it
+     had no free space to absorb. The caption simply sat against the
+     wordmark and `margin-left: auto` computed to 0px.
+
+     It costs nothing elsewhere: the only other child is .headRule, which
+     already declares `width: 100%`. */
+  align-items: stretch;
+  /* ⚠️ NO GAP ANY MORE, and the removal is a fix rather than a tidy. It held
+     the old "Blog" eyebrow off the display line; with the eyebrow gone the
+     head has exactly two children — the masthead and the rule — so this and
+     .headRule's own margin were two numbers describing ONE distance, and
+     they summed: 12.6 + 30.6 = 43.2px measured. The rule's margin owns it
+     alone now. */
   /* .page's padding already clears the fixed nav, so the head only needs a
      small breath of its own above. The bottom is now the RULE's job — see
      .headRule's margin — rather than a pad here, which is what stops the
@@ -65,13 +77,8 @@
    than a horizontal lockup's — at cap height it reads as a speck rather
    than as a mark. A square sitting proud of the caps is the standard
    setting for a bullet-style mark in a label row, which is its role here. */
-.labelMark {
-  height: 2.6em;
-  width: auto;
-  flex: none;
-  display: block;
-  object-fit: contain;
-}
+/* `.labelMark` — the 2.6em group mark that rode the old "Blog" eyebrow —
+   went with it. Nothing else on this page draws a logotype. */
 
 /* THE DISPLAY LINE — the page's <h1>, at the chapter scale.
 
@@ -91,30 +98,125 @@
    The clamp and the 1.1 leading now live in globals as --t-chapter /
    --lh-chapter, shared with both home chapters, so the three heads
    cannot drift apart. Same values, one name. */
-.title {
+/* ═══ THE MASTHEAD — the page's name in Contralto, a caption beside it ═══
+   At the user's instruction. It replaces `.title`, which set the sentence
+   "Stories, openings, and ideas shaping the Maginhawa Group." at 65.6px as
+   though it were the page's heading — and it was never a heading, it was a
+   description of what the archive holds. Now the page has a NAME, and the
+   sentence is set as the caption it is.
+
+   ⚠️ `last baseline`, NOT `baseline`, at the user's instruction that the
+   caption's bottom sit level with the wordmark's. A flex row aligns FIRST
+   baselines by default, so a two-line caption put line ONE on the wordmark's
+   baseline and hung line two 19.3px below it — measured. `last baseline`
+   aligns the caption's final line instead, which is what "bottom in line
+   with" actually means for a block of type: the two baselines that close the
+   lockup are the same one.
+
+   `flex-end` is declared first as the fallback: an engine that cannot parse
+   `last baseline` drops that line and bottom-aligns the boxes, which lands
+   within a few pixels of the same place.
+
+   ⚠️ IT WRAPS, AND THE CAPTION NEEDS A FLOOR TO MAKE IT. The wordmark is
+   max-content by nature — its width IS the point — and it grows with the
+   window: measured, "MAGINHAWA BLOG" sets a constant 7.29x the font-size in
+   this cut, so at 375 it is 328px inside a 343px measure and there is
+   nothing left for a caption beside it. Without a floor the caption simply
+   shrinks to its longest word and hangs off the right edge — measured at
+   375 before this rule, a 90px box starting 21px PAST the measure.
+
+   `min-width: 20ch` is what converts that squeeze into a wrap: below the
+   width where 20 characters fit, the caption cannot sit on the line and
+   takes its own. */
+.masthead {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: flex-end;
+  align-items: last baseline;
+  gap: clamp(12px, 1.6vh, 20px) clamp(20px, 3vw, 48px);
+  width: 100%;
+}
+
+/* ⚠️ THIS IS /about's "WHO IS MAGINHAWA?" CLAMP AND WEIGHT, WRITTEN OUT, at
+   the user's instruction that the two be the same size. It is a COPY and not
+   a shared token, for the reason About.module.css gives about /careers'
+   headline: the number lives on that page's own `.openTitle`, and hoisting
+   it would put a page-specific size in globals for three consumers. The cost
+   is that these declarations have to be changed together — at 1440 x 900 all
+   three land at 121.5px, where the vh term binds rather than the vw one.
+
+   ⚠️ --w-display, NOT --w-medium. Contralto ships 300 / 400 / 600 / 700 /
+   900 and has NO 500, so a rule asking this face for --w-medium is silently
+   getting the 400 cut. The token is the one number the wordmark voice is set
+   from — see the banner over it in globals.css, including the warning that
+   on this face weight is also WIDTH.
+
+   `text-wrap: nowrap` because "MAGINHAWA BLOG" is a wordmark: broken over two
+   lines it stops being one. At the narrow end the clamp's 2.4rem floor is
+   what keeps that promise. */
+.mastheadWord {
   margin: 0;
-  max-width: 17.7em;
-  font-family: var(--font-display);
-  font-weight: var(--w-regular);
-  font-size: var(--t-chapter);
-  line-height: var(--lh-chapter);
-  letter-spacing: var(--tr-display);
+  font-family: var(--font-display-big);
+  font-weight: var(--w-display);
+  font-size: clamp(2.4rem, min(12vw, 13.5vh), 12rem);
+  line-height: 0.94;
+  letter-spacing: -0.012em;
+  text-transform: uppercase;
+  text-wrap: nowrap;
   color: var(--maroon);
 }
 
-/* THE HAIRLINE that closes the head and opens the entries. Full band
-   width, so it stretches rather than fitting the type above it: a rule
-   that stops at the text's right edge reads as an underline of the
-   sentence, and this one is a boundary for the whole chapter.
-   --rule is the site's hairline token (3.53:1, held to 1.4.11's 3:1 for a
-   non-text boundary) — the same line Discover's head and the story
-   strip's byline draw. */
+/* THE DIVIDER LABEL'S VOICE, at the user's instruction — same face, size,
+   tracking, caps and ink as "Earlier Entries" further down the page. The one
+   thing it does not take is `white-space: nowrap`: that label is three words
+   on a hairline and this one is a sentence in whatever column the wordmark
+   leaves it. */
+/* ⚠️ IT HANGS OFF THE MEASURE'S RIGHT EDGE, at the user's instruction that
+   its right align with the rule under it. `margin-left: auto` is what does
+   the moving — it eats the free space the wordmark leaves, so the caption's
+   box ends where .headRule ends rather than starting where the wordmark
+   stops. Measured before this rule, the caption finished 146.9px short of
+   the rule's right end.
+
+   AND IT SETS FLUSH RIGHT, which is the half that makes the alignment
+   visible. Ragged right, only the LONGEST line reaches the edge — here
+   "SHAPING THE MAGINHAWA GROUP." — and the line above it stops 28px short,
+   so the thing being aligned to the rule is a ragged edge. Flush right puts
+   both lines on it.
+
+   `flex: 0 1 auto` rather than a grow: with `margin-left: auto` doing the
+   positioning, an item that grew would have no free space left to push
+   against and would simply sit against the wordmark again. */
+.mastheadNote {
+  margin: 0;
+  margin-left: auto;
+  flex: 0 1 auto;
+  min-width: 20ch;
+  max-width: 34ch;
+  text-align: right;
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  line-height: var(--lh-body);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--maroon);
+  opacity: 0.55;
+}
+
 .headRule {
   display: block;
   width: 100%;
   height: 1px;
   background: var(--rule);
-  margin-top: clamp(22px, 3.4vh, 40px);
+  /* ⚠️ MATCHED TO THE "EARLIER ENTRIES" LINE, at the user's instruction, and
+     that line has two gaps rather than one. Measured at 1440 x 900: the plate
+     ends 39px above it and the first card starts 33.6px below it. 36px is
+     the middle of that pair, which is what makes all three read as the same
+     piece of air — the head's rule and the list's rule are the same object
+     twice, so a reader who sees them differently spaced sees a mistake.
+     It was 43.2px, of which 12.6 came from a flex gap on .head — see the
+     note there for why that gap is gone rather than reduced. */
+  margin-top: clamp(24px, 4vh, 36px);
 }
 
 /* ═══════════════════ THE ENTRY IS A PLATE, NOT A CARD ═══════════════
@@ -218,12 +320,11 @@
 .featured {
   --blog-photo-radius: var(--radius-tile);
   position: relative;
-  display: grid;
-  grid-template-columns: minmax(0, 1.05fr) minmax(0, 0.95fr);
-  align-items: stretch;
-  column-gap: clamp(24px, 3.2vw, 56px);
-  /* only reached when the lede stacks — see the 640 query */
-  row-gap: clamp(18px, 2.4vh, 28px);
+  /* ⚠️ BLOCK, NOT GRID. This was a two-column row — 1.05fr of photograph
+     beside 0.95fr of stacked type — and the type is on the photograph now.
+     The columns, their gap and the stacking query at 640 all went with it:
+     one box has no row to break. */
+  display: block;
   text-decoration: none;
   color: inherit;
   /* a shade more air than the card carried (was clamp(20px, 2.6vh, 34px)):
@@ -240,53 +341,97 @@
    gives one composition for any length of copy. */
 .featuredMedia {
   position: relative;
-  /* ⚠️ THE CROP IS DECLARED HERE. IT USED TO BE WHATEVER THE PHOTOGRAPH WAS.
-     There was no `aspect-ratio` on this box and no definite height, so the
-     `height: 100%` on the image below resolved to `auto` and the picture
-     rendered at its own intrinsic proportion — the plate then grew to fit it
-     and the body column stretched to match. The lede was therefore as tall
-     as whatever file the newest entry happened to carry.
 
-     Every `*-web.jpg` in public/blog is a 733x1100 PORTRAIT derivative, so
-     the lede came out 1.5x taller than it was wide: 1406px on a 1920 screen,
-     which put the headline near the fold and the "Earlier entries" line two
-     screens down. The one entry that did not was the Belly story, whose
-     image was deliberately re-cut LANDSCAPE because it was the page-1 lede
-     (see the long note on it in lib/blog.ts) — that is, the layout only ever
-     held because one photograph was hand-fitted to it.
+  /* ⚠️ 24:9 — FLAT, AND THE TYPE ON IT IS WHY. This was 3:2 when the plate
+     was the wider half of a two-column row; at the full 1360px measure 3:2
+     is a 907px picture, which is a screen and a half of photograph before
+     the archive starts. The crop opens twice on the way down for the reason
+     the home page's does — see the query at 1100 — because a flat plate on
+     a narrow window is a letterbox with no room under it for the block.
 
-     Declaring the ratio here moves that from the picture to the page. The
-     image already carries `object-fit: cover`, so any file — portrait,
-     landscape, square — is cropped to this shape instead of setting it, and
-     nobody writing a post has to know that the newest one lands in a
-     different frame from the rest.
+     ⚠️ 21:9, OPENED FROM 24:9 AT THE USER'S INSTRUCTION TO GIVE THE LEDE
+     MORE HEIGHT. At 1360 that is 583px against 510, and the cap below moved
+     with it or the extra 73px would simply have been clipped off — a
+     max-height is what actually sets this plate's height at three of the
+     four corners, so raising the ratio without raising the cap changes
+     nothing at all. --vc-ramp-h came DOWN in the same edit: the block on the
+     ramp did not grow, so holding 78% of a taller plate would have been
+     blurring another 100px of photograph to clear type that was already
+     clear.
 
-     3:2 LANDSCAPE, not the 4:5 the grid cards take. Those are 331px columns
-     where a tall plate makes the photograph the entry; this is half the page
-     beside a headline, and a portrait crop at that width is a wall.
+     THE CROP IS DECLARED HERE, not left to the file. Every `*-web.jpg` in
+     public/blog is a 733x1100 PORTRAIT derivative, so with no ratio on this
+     box the lede came out 1.5x taller than it was wide — the layout only
+     ever held because ONE photograph had been hand-cut landscape for it.
+     `object-fit: cover` on the image means any file is cropped to this
+     shape instead of setting it. */
+  aspect-ratio: 21 / 9;
 
-     `max-height` IS THE HEIGHT BUDGET, and it is what keeps the promise the
-     floor below was written for: head + lede + the "Earlier entries" rule on
-     one screen. Past roughly 1400px wide, 3:2 alone would out-grow the
-     viewport again, and the cap simply widens the crop instead. */
-  aspect-ratio: 3 / 2;
   /* ⚠️ `width: 100%` IS WHAT MAKES THE CAP WIDEN THE CROP INSTEAD OF
      SHRINKING THE PLATE. With only a ratio and a max-height, the box keeps
-     3:2 and gives up WIDTH to obey the cap — measured at 1920, an 840px
-     picture sitting in a 937px column with 97px of cream beside it, which
-     reads as a broken grid rather than as a crop. Declaring the width makes
-     the height the thing that yields: full column, slightly wider than 3:2
-     on a big screen, still one screen tall. */
+     24:9 and gives up WIDTH to obey the cap, leaving cream down one side —
+     which reads as a broken grid rather than as a crop. Declaring the width
+     makes the height the thing that yields. */
   width: 100%;
-  max-height: min(58vh, 560px);
-  /* THE FLOOR, kept — the row is `align-items: stretch`, so the featured
-     entry is as tall as the taller of this and the body column, and on a
-     narrow screen the ratio alone would leave the picture shorter than the
-     type beside it. */
-  min-height: clamp(240px, 30vh, 380px);
+
+  /* THE HEIGHT BUDGET, and it is what keeps the promise the old lede's cap
+     was written for: head, lede and the "Earlier Entries" rule on one
+     screen. 600px is the tallest this plate goes at any width; 68vh is what
+     holds it on a short laptop. ⚠️ IT IS ALSO LOAD-BEARING FOR THE RAMP —
+     see --vc-ramp-h below, whose share is solved against the CAPPED height,
+     not against the ratio, and at 1280 x 720 and below the cap is what
+     binds. */
+  max-height: min(68vh, 600px);
+  min-height: clamp(280px, 34vh, 400px);
+
   overflow: hidden;
   border-radius: var(--blog-photo-radius);
   background: var(--placeholder);
+
+  /* ── THE RAMP'S DEPTH — the one variable that crosses into
+     VenueCard.module.css's `.rampBlur` / `.rampScrim` ──
+
+     ⚠️ 66%, DOWN FROM 78% WHEN THE CROP OPENED TO 21:9. The block on the
+     ramp did not change; the plate got 100px taller, so the same clearance
+     costs a smaller share — and a share is what this is, so leaving it at 78
+     would have blurred another 100px of photograph for nothing. The px floor
+     did NOT come down: on a phone it is the floor and not the share that
+     clears the block.
+
+     IT IS FITTED TO THE BLOCK RATHER THAN PICKED. What has to
+     hold at every width is ramp >= block, where the block is 2*padding +
+     tag + 2*gap + two headline lines + the pill — all clamps against the
+     plate's own cqi, so it can be solved. The worst case is NOT the widest
+     window: the block's cqi terms hit their pixel ceilings on a wide plate
+     while max-height above stops the plate growing with them, so the
+     margin is thinnest on a SHORT wide screen. Measured on the running
+     page, headline forced to the worst realistic string — 62 characters,
+     two lines — at every corner:
+
+       1440 x 900   plate 1360 x 480   ramp 374   block 275   ✔ 99
+       1280 x 720   plate 1208 x 403   ramp 314   block 275   ✔ 40
+       1101 x 800   plate 1039 x 390   ramp 304   block 264   ✔ 40
+       1024 x 768   plate  967 x 430   ramp 335   block 260   ✔ 76   16:9
+        641 x 800   plate  605 x 340   ramp 265   block 212   ✔ 53   16:9
+        375 x 812   plate  343 x 257   ramp 201   block 166   ✔ 35   4:3
+
+     The two thin margins are 1280 x 720 and 1101 — a short wide window and
+     the last width before the crop opens — and 40px is about a line and a
+     half of the tag above the headline. 62%, the share the home page's
+     full-measure plate was once solved at, puts both of those corners
+     NEGATIVE: at 1280 x 720 the ramp is 250 against a 275px block, which
+     is the headline's first line sitting on bare photograph at about
+     1.2:1.
+
+     A TALLER RAMP IS NOT A DARKER ONE. `.rampBlur`'s mask runs transparent
+     → 0.4 at 32% → opaque at 62%, so raising the height mostly extends the
+     transparent lead-in; the fully dark band at the bottom is unchanged.
+     That is why this is the cheap lever and the crop is not.
+
+     ⚠️ THE HEADLINE'S TWO-LINE CLAMP IS WHAT MAKES THIS SOLVABLE — see
+     .featuredTitle. Remove it and the block has no upper bound and neither
+     number here means anything. */
+  --vc-ramp-h: min(100%, max(66%, 200px));
 }
 
 .featuredMedia img {
@@ -309,45 +454,85 @@
   }
 }
 
-/* NO PADDING — the column gap is the only air between the photograph and
-   the copy now (see .featured), and a padding here would be a second
-   number describing the same distance. The type block centres against the
-   picture's height, so the tag line starts inboard of the photograph's top
-   edge rather than aligning to it: the lede reads as one composition
-   rather than as two columns beginning at the same y. */
-.featuredBody {
+/* THE TYPE BLOCK, SEATED IN THE PLATE'S BOTTOM EDGE. It was `.featuredBody`,
+   a centred column in the row's right half; it is absolute now, inside the
+   picture, sitting on the ramp.
+
+   ⚠️ SIZED IN cqi, AGAINST THE PLATE. `.featuredMedia` is the inline-size
+   container, so the padding and the gap track the PICTURE rather than the
+   window — which is what lets the ramp share above be a number that holds
+   when the crop opens at 1100 and the plate suddenly gets taller. A vw term
+   here would drift out of that solution at every breakpoint.
+
+   `align-items: flex-start` keeps the pill content-width: stretched to the
+   block it would read as a form's submit button. */
+.featuredBlock {
+  position: absolute;
+  z-index: 4;
+  left: 0;
+  right: 0;
+  bottom: 0;
   display: flex;
   flex-direction: column;
-  justify-content: center;
-  gap: 15px;
+  align-items: flex-start;
+  gap: clamp(8px, 2cqi, 18px);
+  padding: clamp(18px, 3.2cqi, 40px);
 }
 
+/* CREAM ON THE RAMP, not maroon at 65% on cream. The shadow is the house
+   scrim: the ramp carries the type at the bottom of the plate where it is
+   deepest, but the tag is the block's TOP line and sits where the gradient
+   is still opening. */
 .featuredTag {
+  display: block;
   font-family: var(--font-sans);
   font-weight: var(--w-regular);
   font-size: var(--t-label);
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
-  opacity: 0.65;
+  color: var(--cream);
+  opacity: 0.86;
+  text-shadow: var(--scrim-text);
 }
 
+/* ⚠️ SIZED AGAINST THE PLATE, NOT THE WINDOW — see the banner on
+   .featuredBlock. It was --t-h2, which tops out at 48px and tracks the
+   browser; 6.4cqi against a capped plate lands at 44px and shrinks WITH the
+   picture, which is the only way the ramp solution above survives a crop
+   change.
+
+   ⚠️ TWO LINES, HARD, and 38ch of measure to make two lines enough. The
+   block is absolutely seated in the plate's bottom edge while the ramp under
+   it is a share of the plate's HEIGHT, so the two are not coupled: a
+   headline that runs to three lines grows the block past the ramp's top and
+   its first line ends up on bare photograph at about 1.2:1. Bounding the
+   headline is what makes --vc-ramp-h a number that can be checked.
+
+   38ch RATHER THAN THE 30 IT CARRIED. The outlet leads the headline now, so
+   the string is two or three words longer than the one this lede used to
+   set — "Olive Magazine: Belly named among London's best new restaurants" is
+   62 characters, which at 30ch is three lines and therefore a truncation. */
 .featuredTitle {
   font-family: var(--font-display);
   font-weight: var(--w-regular);
-  font-size: var(--t-h2);
+  font-size: clamp(24px, 6.4cqi, 44px);
   line-height: var(--lh-heading);
   letter-spacing: var(--tr-display);
   margin: 0;
-  max-width: 30ch;
+  max-width: 38ch;
+  color: var(--cream);
+  text-shadow: var(--scrim-text);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+  line-clamp: 2;
+  overflow: hidden;
 }
 
-.featuredExcerpt {
-  font-family: var(--font-sans);
-  font-size: var(--t-body);
-  line-height: var(--lh-body);
-  opacity: 0.85;
-  max-width: 48ch;
-}
+/* THE STANDFIRST IS GONE — there is no room for three lines of summary on a
+   ramp without pushing the headline off the top of it. The archive's cards
+   keep theirs; this plate is the one place on the page where the picture is
+   doing the summarising. */
 
 /* THE LEDE'S ACTION IS THE HOUSE PILL, at the user's instruction: the same
    PillCta the home page's journal head presses ("Read More"), magnet and
@@ -365,7 +550,7 @@
    the eight under it is precisely what made them read as equals. */
 .featuredCta {
   align-self: flex-start;
-  margin-top: clamp(6px, 1vh, 12px);
+  margin-top: clamp(2px, 0.5vh, 8px);
 }
 
 /* ---- grid of remaining entries ----
@@ -397,7 +582,7 @@
 
    THE ENTRIES IN A ROW ARE STILL ONE HEIGHT (the grid's default `stretch`)
    and the slack is still spent below the standfirst, where the action seats
-   itself on the foot — see .cardBtn's `margin-top: auto`. The reason has
+   itself on the foot — see .cardRule's `margin-top: auto`. The reason has
    changed with the material: it is no longer about shadows ending at
    different depths, it is that four "Read article" links landing on four
    different baselines is a ragged row of the one element a reader scans for.
@@ -495,12 +680,25 @@
   /* `flex: 1` is what makes the row's shared height reach the body — the
      entry fills the grid row, the media is fixed by its aspect, and the
      body takes the remainder. Without it the body is content-height, the
-     slack pools UNDER the entry, and .cardBtn's `margin-top: auto` has
+     slack pools UNDER the entry, and .cardRule's `margin-top: auto` has
      nothing to push against. */
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  gap: clamp(10px, 1vw, 14px);
+  /* ⚠️ BOTH OF THESE ARE READ BY A STYLESHEET THIS FILE CANNOT SEE.
+     components/ActionBand.module.css computes the band's negative margin
+     from them — see the contract in ActionBand.tsx — and the home page's
+     strip declares the same pair for the same reason. They live on the card
+     rather than on the control because this column is spaced by
+     --entry-gap too.
+
+     --entry-band is the air INSIDE the ruled band, above and below "Read
+     More": well under the gap between the card's other parts, which is what
+     keeps a control sitting in its own two rules reading as one object
+     rather than as two more gaps with a word floating in them. */
+  --entry-gap: clamp(10px, 1vw, 14px);
+  --entry-band: clamp(5px, 0.52vw, 7.5px);
+  gap: var(--entry-gap);
   padding: clamp(12px, 1.2vw, 16px) 0 0;
 }
 
@@ -646,25 +844,13 @@
    state pinned on by a tap. Two rules of equal specificity meant the
    unguarded one simply won by source order. */
 
-.cardMeta {
-  display: flex;
-  align-items: center;
-  gap: var(--space-xs);
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  opacity: 0.6;
-}
-
-.cardSep {
-  display: inline-block;
-  width: 3px;
-  height: 3px;
-  border-radius: 50%;
-  background: currentColor;
-  opacity: 0.6;
-}
+/* THE META LINE — "Forbes · 11 Feb 2026" — IS GONE, and neither half of it
+   was dropped. The outlet leads the headline (headline() in lib/blog.ts)
+   and the date is on the photograph (PlateDate), which is the home page's
+   arrangement and the reason that card has no meta line either. What the
+   line was costing: a third typographic voice between the headline and the
+   standfirst, on a card that now says the same two things in places where
+   they cost no height at all. */
 
 /* THE HEADLINE LEADS, directly under the photograph — the reference's
    order, and the reason the meta row moved below the rule. It also sets in
@@ -673,84 +859,121 @@
    entry's weight, and --w-regular Contralto at this size read as another
    paragraph. --w-bold is drawn in both families (globals.css notes it is
    "still barely used") and this is what it is for. */
+/* ⚠️ LIGHTER AND SMALLER THAN IT WAS — 700 at --t-h3 (25.6px), now 500 at
+   ~22px — and both halves are consequences of the outlet moving in front of
+   the title. A headline that opens "Condé Nast Traveller: " is two or three
+   words longer than the one this card used to print, and at 25.6px on a
+   316px measure that is a fourth and fifth line. The home page's card sets
+   the same string at 500 and clamps it; this is that decision at this
+   card's width.
+
+   THE CLAMP IS A CEILING, NOT A GRID. Three lines is where a headline stops
+   competing with the photograph above it; what actually aligns the rules
+   across four columns is .cardRule's `margin-top: auto`, not this. */
 .cardTitle {
   font-family: var(--font-display);
-  font-weight: var(--w-bold);
-  font-size: var(--t-h3);
+  font-weight: var(--w-medium);
+  font-size: clamp(1.15rem, 1.55vw, 1.4rem);
   line-height: var(--lh-heading);
   letter-spacing: var(--tr-display);
   margin: 0;
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
+  transition: color 0.3s ease;
 }
 
 /* the reference's hairline, closing the headline and opening the
    standfirst. --rule is the site's own line — the same 3.53:1 the head's
    rule and the "Earlier Entries" row draw, so every hairline on this page
    is one hairline. */
-.cardRule {
+/* THREE REAL ELEMENTS, not ::before/::after on the body, because each has
+   to sit BETWEEN two things — a pseudo-element on the parent cannot.
+
+   ⚠️ ONLY THE FIRST TAKES `margin-top: auto`, and that is the whole
+   difference between them. Every card in a grid row is as tall as the
+   tallest one; `auto` here pushes the rule, the standfirst, the band and
+   the foot rule to the card's own bottom edge, which is the same height on
+   all four. Putting it on the others as well would make each claim the
+   slack in turn and open gaps inside the block.
+
+   THE BLOCK BELOW IT IS A FIXED HEIGHT, which is what makes bottom-anchoring
+   enough: the standfirst is clamped to three lines and everything under it
+   is a rule or a single line of caps. So all four cards in a row carry their
+   three hairlines at identical y — the argument the divider above the grid
+   makes at full width, made again across the columns. */
+.cardRule,
+.cardRuleMid,
+.cardRuleFoot {
   display: block;
   width: 100%;
   height: 1px;
   background: var(--rule);
 }
+.cardRule {
+  margin-top: auto;
+}
 
+/* ⚠️ THREE LINES, RESERVED — A CEILING AND A FLOOR, and the floor is the
+   half that was missing. The clamp alone bounds a standfirst that runs long;
+   it does nothing about one that runs SHORT, and a two-line summary makes
+   the whole bottom block one line shorter. Since .cardRule's `margin-top:
+   auto` anchors that block to the card's foot, a short standfirst does not
+   pull the foot up — it pushes the card's FIRST hairline DOWN by 21px,
+   against neighbours whose standfirsts happen to fill three lines.
+
+   THAT IS THE DEFECT THE USER REPORTED: "the lines under the blog entry
+   title are not aligned". Measured before this rule, row two at 1440:
+   rule tops 1352 / 1331 / 1331 / 1331 — one card 21px out, which across four
+   columns reads as a broken grid rather than as prose.
+
+   `min-height` in em rather than a px number so it tracks --t-small and
+   --lh-body if either moves: 3 x 1.5 = 4.5em = 63px today. Three lines is
+   also where it stops competing with the headline — this is a summary a
+   reader skims on the way to deciding, not the piece. */
 .cardExcerpt {
   font-family: var(--font-sans);
   font-size: var(--t-small);
   line-height: var(--lh-body);
   opacity: 0.78;
+  margin: 0;
+  min-height: calc(3 * var(--lh-body) * 1em);
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 3;
+  line-clamp: 3;
+  overflow: hidden;
 }
 
-/* ---- the entry's action ----
-   "Read article →", set as TYPE rather than as a control — the reference's
-   own treatment, and it replaces the outlined 999px chip this grid used to
-   carry.
+/* "READ ARTICLE →" IS GONE — it is components/ActionBand.* now, the same
+   control the home page's strip closes on, filling maroon rule-to-rule on
+   hover. It was a text link left-aligned under the standfirst: a caption
+   with an arrow after it, which on a card whose whole surface is already
+   clickable was labelling the link rather than being one. The band spans
+   the measure and sits in its own two hairlines, which is what makes it
+   read as the thing you press.
 
-   THE CHIP WAS THE CARD'S AFFORDANCE, and it went with the card. A pill
-   says "press me": it belonged on an object that lifted under the pointer
-   and filled on hover. On a bare plate the only pressable thing is the
-   whole entry, and a second, smaller box inside it would be a button
-   promising something the layout no longer does. The house pill is not
-   lost from this page — the featured lede now carries the real one (see
-   .featuredCta), which is what puts the top story a rank above the
-   archive instead of level with it.
+   ⚠️ THE HEADLINE WARMS TO SAFFRON, which it did not before. The home
+   page's card has always done this and the archive's never did — the same
+   object answering the pointer two different ways on two pages. It also
+   replaces what the arrow's 4px step was for: with the lift, the shadow and
+   the fill all long gone, the type needed ONE hover signal of its own,
+   because the reader's cursor is usually on the copy and not on the plate.
+   The band filling underneath is the loud half of the answer; this is the
+   quiet half.
 
-   `margin-top: auto` seats it at the FOOT of the body on every entry, so
-   the row of actions lines up across four whose standfirsts run to
-   different lengths — see .grid on why that alignment is worth its slack.
-   `align-self: flex-start` keeps it content-width: full-width would read as
-   a form's submit button. */
-.cardBtn {
-  display: inline-flex;
-  align-items: center;
-  gap: var(--lockup-gap-sm);
-  align-self: flex-start;
-  margin-top: auto;
-  /* the body's own gap holds it off the standfirst when the entry is short;
-     this is the extra the FOOT wants once `auto` has pushed it down */
-  padding-top: clamp(6px, 0.8vw, 10px);
-  color: var(--maroon);
-  font-family: var(--font-sans);
-  font-weight: var(--w-regular);
-  font-size: var(--t-small);
-  line-height: var(--lh-flush);
-  white-space: nowrap;
-}
-
-/* THE ONE HOVER SIGNAL THE TYPE CAN GIVE. With the lift, the shadow and
-   the fill all gone, an entry would otherwise answer the pointer with
-   nothing but its photograph's zoom — and the reader's cursor is usually on
-   the type, not the plate. The arrow steps forward by its own width; the
-   distance and the curve are the PillCta arrow's, so the two actions on
-   this page move alike. */
-.cardBtnArrow {
-  display: inline-block;
-  transition: transform 400ms var(--ease-drawer);
-}
-
+   THE BAND'S OWN TRIGGER IS NOT HERE, and that is not an omission: it keys
+   off the ancestor <a> in ActionBand.module.css, which is how one stylesheet
+   drives it on both surfaces. See the note over that rule. */
 @media (hover: hover) and (pointer: fine) {
-  .card:hover .cardBtnArrow {
-    transform: translateX(4px);
+  .card:hover .cardTitle {
+    color: var(--saffron);
   }
+}
+.card:focus-visible .cardTitle {
+  color: var(--saffron);
 }
 
 /* ---- the list's header line: label — rule — filter ----
@@ -1007,21 +1230,44 @@
   cursor: default;
 }
 
+/* ═══ THE LEDE'S CROP OPENS TWICE ON THE WAY DOWN ═══
+   ⚠️ AND BOTH BOUNDARIES ARE COMPOSITION, NOT ARITHMETIC — which is worth
+   stating plainly, because the first draft of this comment claimed the
+   second one was forced and it is not. Measured on the losing side of each
+   boundary with the flatter crop held past it, worst-case headline:
+
+     1101 window   24:9   plate 1039 x 390   ramp 304   block 264   ✔ 40
+      641 window   16:9   plate  605 x 340   ramp 265   block 212   ✔ 53
+
+   Both clear. The ramp share on --vc-ramp-h is solved deep enough that a
+   flat crop never actually runs out of ground for the type, at any width
+   this page sees. So these two numbers are here for the PICTURE:
+
+     · at 1100 a 1000px-wide letterbox 380px tall is a slot rather than a
+       photograph, and the whole argument for putting the type on the plate
+       was that the picture becomes the page's opening statement;
+     · at 640 a 16:9 plate on a phone is 190px of image with a 165px block
+       standing on it — legible, and nothing left to look at.
+
+   The clearances above are what say we can afford to open them. ═══ */
+@media (max-width: 1100px) {
+  .featuredMedia {
+    aspect-ratio: 16 / 9;
+  }
+}
 @media (max-width: 980px) {
   .grid {
     grid-template-columns: repeat(2, minmax(0, 1fr));
   }
 }
 @media (max-width: 640px) {
-  /* the lede stacks — photograph over body, i.e. the grid card's own
-     arrangement at the lede's scale. `max-height: none` used to sit here
-     to release a cap the media no longer has (it is min-height now, and a
-     stacked media is height-driven anyway), so it is gone rather than
-     carried. */
-  .featured {
-    grid-template-columns: 1fr;
-  }
+  /* ⚠️ THE LEDE NO LONGER STACKS, because there is nothing to stack: the
+     `grid-template-columns: 1fr` that used to sit here was releasing a
+     two-column row that is one plate now. What replaces it is the crop
+     opening a second time — see the banner above for the five pixels that
+     make it arithmetic rather than preference. */
   .featuredMedia {
+    aspect-ratio: 4 / 3;
     min-height: clamp(220px, 42vw, 320px);
   }
   .grid {
@@ -1029,11 +1275,3 @@
   }
 }
 
-/* the outlet, at the head of the meta line — see the card in BlogIndex.tsx.
-   One step up in ink from the date beside it, which is all the promotion it
-   needs: same size, same tracking, so the line still reads as one meta row
-   rather than as a label with a caption. */
-.cardSource {
-  color: var(--maroon);
-  opacity: 0.92;
-}
