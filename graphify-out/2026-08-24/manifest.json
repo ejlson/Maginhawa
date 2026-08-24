@@ -30,8 +30,8 @@
     "semantic_hash": ""
   },
   "components/About.tsx": {
-    "mtime": 1787584375.3487039,
-    "ast_hash": "631c5c1dfb54f21b0c1d6eeb57db0450",
+    "mtime": 1787572578.2339165,
+    "ast_hash": "01641232bcaa1f7a88e78e98875235ef",
     "semantic_hash": ""
   },
   "components/AboutIntro.tsx": {
@@ -1340,8 +1340,8 @@
     "semantic_hash": ""
   },
   "components/AboutSplit.tsx": {
-    "mtime": 1787584053.5640697,
-    "ast_hash": "5a24b76114ccff63ff255883d2595bdc",
+    "mtime": 1787583799.3335474,
+    "ast_hash": "c4988bccc02538ed643f73bea5f0bc76",
     "semantic_hash": ""
   },
   "components/StoryStrip.tsx": {

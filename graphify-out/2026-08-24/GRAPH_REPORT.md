@@ -1,7 +1,7 @@
 # Graph Report - Maginhawa  (2026-08-24)
 
 ## Corpus Check
-- 231 files · ~4,602,154 words
+- 231 files · ~4,601,723 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `1c59cc8a`
+- Built from commit: `8d1cff1c`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -476,7 +476,7 @@ Nodes (4): jsonLd, metadata, JobOpening, JOBS
 
 ### Community 136 - "dependencies"
 Cohesion: 0.12
-Nodes (17): framer-motion, gray-matter, dependencies, framer-motion, gray-matter, react, rehype-stringify, remark-rehype (+9 more)
+Nodes (17): framer-motion, gray-matter, dependencies, framer-motion, gray-matter, react, remark-parse, remark-rehype (+9 more)
 
 ### Community 137 - "VideoBackdrop.tsx"
 Cohesion: 0.20

@@ -49,11 +49,13 @@ const CHAPTERS: {
   body: string;
   image: string;
   imageAlt: string;
+  /* object-position for the frame, when a centred crop would cut the
+     subject. The chapter frames are 4/3 with a 128% vertical overscan for
+     the parallax, so a 16/9 photograph keeps only its middle ~59% of width —
+     enough to slice anything living near an edge. Omit for a centred crop. */
+  focus?: string;
   place: string;
   slug?: string;
-  /* no photography yet — render the wordmark on a maroon field instead
-     (the Discover tile's coming-soon treatment) */
-  wordmark?: boolean;
 }[] = [
   {
     year: "1987",
@@ -131,11 +133,22 @@ const CHAPTERS: {
     year: "2026",
     title: "Bunso",
     body: "The youngest of the family: a Filipino-Japanese kissaten and listening jazz bar, opening in London in 2026.",
-    image: "/images/bunso.png",
-    imageAlt: "Bunso wordmark",
+    /* ⚠️ `-shopfront`, AND THE SUFFIX IS LOAD-BEARING — this row read
+       /images/bunso.png, the 670x141 wordmark, and rendered as the
+       coming-soon maroon field instead of a picture. The photograph cannot
+       be called /images/bunso.jpg: Cloudinary public ids drop the extension,
+       so the JPG and the PNG would both resolve to `maginhawa/images/bunso`.
+       See the same note in lib/venueCards.ts, which is where this asset was
+       already live. */
+    image: "/images/bunso-shopfront.jpg",
+    imageAlt: "Bunso shopfront, Hawley Road",
+    /* 71%, AND IT IS MEASURED. The sign on the facade runs from 67.5% to 82%
+       of the source width; a centred crop shows 20.7%-79.3% and cut it to
+       "BUNS". 71% slides the window to 29.4%-88%, which holds the whole
+       wordmark with air after it. Re-measure if the photograph is replaced. */
+    focus: "71% 50%",
     place: "London",
     slug: "bunso",
-    wordmark: true,
   },
 ];
 
@@ -211,9 +224,15 @@ type CoverageRow = {
 // `/images/mamasons-placeholder.jpg`, which was never added, so the grid tile
 // on /restaurants was blank and this guard was quietly covering for it on
 // /about. It now uses the same photograph Discover shows on the home page, so
-// there is a real file behind it and nothing to suppress. Bunso genuinely has
-// no photograph yet — Discover renders it as a maroon field with the wordmark
-// (image: null) rather than a picture — so it stays.
+// there is a real file behind it and nothing to suppress.
+//
+// ⚠️ NOTHING RESOLVES TO THIS PATH TODAY, and the guard is kept anyway. It
+// read as Bunso's — Bunso had no picture, and both the press rows and its
+// timeline chapter fell back to the coming-soon field. It has the shopfront
+// now, on /about as well as its card, so the set matches no record. What it
+// still does is catch the NEXT placeholder: CHAPTERS and lib/restaurants.ts
+// are both hand-edited, and a row naming a file that is not in public/ should
+// render the maroon field rather than a broken <img>. Add the path here.
 const MISSING_IMAGES = new Set(["/images/bunso-placeholder.jpg"]);
 
 /* The restaurants that actually have press, most-covered first, as names.
@@ -412,16 +431,25 @@ function ChapterRow({ chapter }: { chapter: (typeof STORY)[number] }) {
         }`}
         style={reduce ? undefined : { y: figY }}
       >
-        {missing || chapter.wordmark ? (
-          /* no photography yet — the wordmark on a maroon field, which is the
-             coming-soon treatment the Discover tile already uses */
+        {missing ? (
+          /* no photograph on file — the name on a maroon field, which is the
+             coming-soon treatment the Discover tile already uses.
+
+             ⚠️ THE `wordmark` OPT-IN THAT ALSO REACHED HERE IS GONE. Bunso
+             was its only caller and it now has a shopfront, so the flag was
+             a branch no row could take. MISSING_IMAGES is the one way in. */
           <span className={styles.chapterMark} aria-hidden>
             {chapter.title}
           </span>
         ) : (
           <motion.div
             className={styles.chapterImg}
-            style={reduce ? undefined : { y: imgY }}
+            style={
+              {
+                ...(reduce ? {} : { y: imgY }),
+                ...(chapter.focus ? { "--focus": chapter.focus } : {}),
+              } as CSSProperties
+            }
           >
             <Image
               src={chapter.image}
@@ -528,30 +556,47 @@ export default function About() {
              starts. The whole line is Contralto caps — "Who is" used to be
              the UI face, and the question is one utterance.
 
-             "IS" RANGES RIGHT AGAINST MAGINHAWA, and it costs no measuring:
-             `width: max-content` makes the heading exactly as wide as its
-             widest line, which IS "Maginhawa", so ranging line one right lands
-             it flush and keeps it flush if the copy or the size ever change. */}
+             "IS" FOLLOWS "WHO", at the user's instruction. It ranged right
+             against MAGINHAWA's far edge for a version — `width: max-content`
+             makes the heading exactly as wide as its widest line, which IS
+             "Maginhawa", so justifying line one across it was free — and the
+             two words read as two words. Closed up, line one is a phrase. */}
         <section className={styles.opening} aria-label="About Maginhawa Group">
           <div className="container">
             <div className={styles.openGrid}>
               <h1 className={styles.openTitle}>
-                {/* LINE ONE IS A RULE, NOT A RAG. "Who" now starts on
-                    MAGINHAWA's left edge and "is" stays out on its right, so
-                    the line is justified across the heading's own width rather
-                    than ranged to one side — and the gap that opens between
-                    them is where the mark sits. */}
+                {/* TWO ELEMENTS, ONE PHRASE. "Who" and "is" stay separate
+                    spans because the line is a baseline flex row — see
+                    .openLineIs — which is also what lets the gap between them
+                    be declared rather than typed. It is a word-space today;
+                    it was the width of the heading until the user asked for
+                    the two words to sit together. */}
                 <span className={`${styles.openLine} ${styles.openLineIs}`}>
                   <span className={styles.openWho}>Who</span>
                   <span className={styles.openIs}>is</span>
                 </span>
-                {/* THE MARK RIDES THE NAME. It sits on the same baseline as the
-                    capitals rather than beside the line as a separate object,
-                    so the row is one lockup — and because it is inside the
-                    widest line, it is what `width: max-content` now measures,
-                    which is what "is" above ranges itself to. */}
+                <span className={styles.openLine}>Maginhawa</span>
+                {/* THE MARK CLOSES THE QUESTION, at the user's instruction —
+                    it rode the name for a version, which put it in the middle
+                    of the lockup with a line still to come after it. On the
+                    last line it reads as the thing that answers the question
+                    mark rather than as an object parked beside the name.
+
+                    ⚠️ IT STILL SITS ON THE CAPITALS' OWN BASELINE, which is
+                    why this line carries .openLineMark and the name above no
+                    longer does — the class is the baseline flex row, not a
+                    property of the word it used to follow.
+
+                    ⚠️ AND IT STILL COSTS NO WIDTH, which is what keeps the
+                    move free. .openLogo's end margin cancels its width and
+                    its start margin exactly (see About.module.css), so
+                    `width: max-content` on the heading goes on measuring
+                    MAGINHAWA — the longest line — and "is" on line one goes
+                    on ranging to that same edge. Moving the mark to the
+                    SHORTEST line would otherwise have been the one place
+                    that could change the heading's measure. */}
                 <span className={`${styles.openLine} ${styles.openLineMark}`}>
-                  <span>Maginhawa</span>
+                  <span>Group?</span>
                   <span className={styles.openLogo} aria-hidden>
                     <Image
                       src="/logo/maginhawa.png"
@@ -561,7 +606,6 @@ export default function About() {
                     />
                   </span>
                 </span>
-                <span className={styles.openLine}>Group?</span>
               </h1>
 
               {/* THE ASIDE STRETCHES THE ROW. Its film's top sits on the

@@ -91,26 +91,85 @@
   align-items: stretch;
 }
 
+/* ⚠️ END, NOT START, AND THE PAIRING IS THE POINT. The brief is that the
+   foot of "Group?" sits on the foot of the aside's last line ("Made with
+   heritage, served with heart.") — so the headline hangs from the BOTTOM of
+   the row and any slack it leaves opens above it, against the nav, rather
+   than below it. It was `start`, which put the slack under the headline and
+   left the two columns ending at different heights once the type came down
+   to /careers' size.
+
+   ⚠️ align-self ALIGNS BOXES AND THE BRIEF IS ABOUT INK. line-height 0.94
+   on capitals puts the box bottom ABOVE the baseline, and "Group?" carries
+   a descender below it — measured at 1440, the ink ran 27.9px past the box.
+   The nudge below is that difference, in em so it holds at every size. */
 .openGrid > .openTitle {
-  align-self: start;
+  align-self: end;
+
+  /* ⚠️ BASELINES, NOT BOXES, AND THE FIRST ATTEMPT HERE ALIGNED BOXES.
+     `Range.getBoundingClientRect()` does not return the painted glyphs — it
+     returns the FONT's ascent/descent box, and on a display cut at 146px
+     that box hangs some 60px below the letters. Matching it to the aside's
+     equivalent produced two numbers that agreed to 0.3px and a headline
+     sitting a visible 30px high. What the eye aligns is the BASELINE; both
+     terms below are measured against a zero-width inline probe seated on
+     it, not against a bounding rect.
+
+     m = asideSlack − 0.051em, and the two terms are in different units on
+     purpose:
+
+     0.051em is the headline's own box-bottom-to-baseline distance. It is a
+     property of this cut at this leading, so it scales with the clamp and
+     belongs in em (measured 0.0511 at four viewports).
+
+     13.5px is the ASIDE'S BASELINE SLACK — grid row bottom to the baseline
+     of "Made with heritage…". That is the aside's geometry, it does not
+     scale with this type, and so it cannot be written in this element's em.
+
+     ⚠️ AND THE SLACK IS NOT ONE NUMBER BELOW ~1300px — SEE THE QUERY AT THE
+     FOOT OF THIS FILE. It steps from +13.5px to −14.6px, i.e. the aside's
+     last line starts falling OUTSIDE the row rather than sitting inside it.
+     That step is pre-existing and is NOT caused by the type size: measured
+     with the headline forced back to its old `clamp(3rem, 10.2vw, 12rem)`,
+     the slack is identical at every width. Something in the aside gains a
+     line's worth of height there and hangs it below the row. It wants its
+     own fix; this compensates for it so the alignment holds either way. */
+  margin-bottom: calc(13.5px - 0.051em);
 }
 
 /* `width: max-content` makes the heading exactly as wide as its widest line,
-   which IS "Maginhawa" — so ranging line one right (below) lands "IS" flush
-   with MAGINHAWA's right edge with no measuring at all, and keeps it flush if
-   the copy or the size ever change. */
+   which IS "Maginhawa" — so the box hugs the type rather than the column, and
+   `align-self: end` below has a real foot to seat. It used to earn its place
+   twice over: line one was justified across this width so "IS" ranged flush
+   with MAGINHAWA's right edge. "Is" now follows "Who" at the user's
+   instruction, so the ranging is gone — but the measure is still what the
+   grid, the end-alignment and .openLogo's margin trick all work against. */
 .openTitle {
   margin: 0;
   width: max-content;
   max-width: 100%;
   font-family: var(--font-display-big);
-  font-weight: var(--w-medium);
+  font-weight: var(--w-display);
   /* MEASURED, NOT GUESSED. "MAGINHAWA" is the widest line and its width is a
      constant 5.01x the font-size in this cut, so the ceiling is set from the
      column it has to live in: at 1920 the left track is 1472px, and 12rem
      lands the line at 65% of it. The old 6.5rem cap filled 35% — the headline
      stopped growing at 1280 and every wider screen just added empty cream. */
-  font-size: clamp(3rem, 10.2vw, 12rem);
+  /* ⚠️ THIS IS /careers' HEADLINE CLAMP, WRITTEN OUT, AT THE USER'S
+     INSTRUCTION — the two opening titles are meant to be the same size, and
+     they were not: this ran 10.2vw against JoinUs's
+     `min(12vw, 13.5vh)`, which at 1440x900 is 146.9px against 121.5px.
+     The vh term is what made them differ — /careers bounds its headline by
+     the FRAME as well as the measure, and that is the term that binds on an
+     ordinary laptop.
+
+     ⚠️ IT IS A COPY AND NOT A SHARED TOKEN, and the copy is deliberate:
+     --hero-title-size lives on JoinUs's own `.hero`, so hoisting it would
+     put a page-specific number in globals for two consumers. The cost is
+     that these two declarations have to be changed together. If a third
+     page ever wants this size, hoist it then.
+     Source: --hero-title-size in JoinUs.module.css. */
+  font-size: clamp(2.4rem, min(12vw, 13.5vh), 12rem);
   line-height: 0.94;
   letter-spacing: -0.012em;
   text-transform: uppercase;
@@ -119,11 +178,18 @@
 
 .openLine { display: block; }
 
-/* JUSTIFIED ACROSS THE HEADING'S OWN WIDTH. `width: max-content` on .openTitle
-   makes that width MAGINHAWA's, so "Who" landing on flex-start and "is" pushed
-   out by `margin-left: auto` puts one on each edge of the widest line. Baseline
-   alignment rather than centre: the mark between them is set on the same
-   baseline as the capitals, so it sits in the line rather than floating in it. */
+/* TWO WORDS, ONE PHRASE. "Is" sits a word-space after "Who" at the user's
+   instruction — the line reads as the opening of the question rather than as
+   two words hung on opposite edges.
+
+   ⚠️ IT WAS JUSTIFIED HERE UNTIL NOW, and the retired version is worth
+   knowing because the mechanism is still in the file: `margin-left: auto` on
+   .openIs pushed it out to MAGINHAWA's right edge, which `width: max-content`
+   on .openTitle made free to do. Nothing needs re-measuring to go back —
+   swap the margin below for `auto`.
+
+   Baseline rather than centre alignment: whatever sits in this row has to be
+   set on the capitals' own baseline, not floated against their boxes. */
 .openLineIs {
   display: flex;
   align-items: baseline;
@@ -131,8 +197,13 @@
 
 /* ONE LINE, NOT A LINE AND A PICTURE. `align-items: baseline` seats the mark
    on the capitals' own baseline, and `flex-wrap: nowrap` with a `flex: none`
-   mark means it can never drop below the name however narrow the column gets
-   — it is part of the word, not an item that follows it. */
+   mark means it can never drop below the line however narrow the column gets
+   — it is part of the row, not an item that follows it.
+
+   ⚠️ THIS CLASS MOVED WITH THE MARK. It sat on the MAGINHAWA line while the
+   mark rode the name; the mark now closes "Group?" at the user's
+   instruction, so it sits on the last line and the name is a plain block
+   again. It is the baseline flex row, not a property of any one word. */
 .openLineMark {
   display: flex;
   align-items: baseline;
@@ -143,9 +214,12 @@
   flex: none;
 }
 
+/* 0.24em, NOT A LITERAL SPACE. The two words are separate elements so the
+   markup can hold the line as a row; the gap has to be declared, and at this
+   size a word-space in the display cut measures about a quarter of the em. */
 .openIs {
   flex: none;
-  margin-left: auto;
+  margin-left: 0.24em;
 }
 
 /* SIZED IN em, SO IT TRACKS THE TYPE. The heading is fitted by a clamp across
@@ -154,10 +228,15 @@
    capitals beside it rather than as an image dropped next to them.
 
    AND IT CONTRIBUTES NO WIDTH, which is the whole of the second problem it
-   caused. `width: max-content` on the heading measures its widest line, and
-   with the mark in flow that line became MAGINHAWA + mark — so "is", which
-   ranges to that width, drifted right and came to rest over the mark instead
-   of over the final A. The end margin cancels the start margin and the box
+   caused, and which is also what let the mark move lines for free. `width:
+   max-content` on the heading measures its widest line, and with the mark in
+   flow that line became MAGINHAWA + mark — so "is", which ranges to that
+   width, drifted right and came to rest over the mark instead of over the
+   final A. ⚠️ THE MARK NOW SITS ON "GROUP?", THE SHORTEST LINE, where a mark
+   that DID cost width would have been free to make that line the widest one
+   and move the heading's whole right edge. Verified after the move: "is"
+   lands within 0.0px of MAGINHAWA's right edge at 1920, 1440, 1280, 1024 and
+   960. The end margin cancels the start margin and the box
    exactly (0.22 + 0.62 - 0.84 = 0), so the line measures as the word alone
    while the mark still paints beyond it, still on the baseline the flex row
    gives it. Overflow rather than layout: nothing between here and .page clips
@@ -245,15 +324,32 @@
   color: var(--maroon);
 }
 
+/* ⚠️ THE ASIDE'S FOOT SLACK FLIPS SIGN HERE, and this query exists only to
+   follow it. See the note on .openGrid > .openTitle: above ~1300px the last
+   line of the aside sits 13.5px INSIDE the grid row, below it the same line
+   hangs 14.6px OUTSIDE. Both are constants — measured at 1280, 1100, 1024
+   and 960 the figure is −14.6 every time — so the correction is a constant
+   too, and the headline's ink stays on that line through the step.
+
+   ⚠️ 1300 IS A WRAP POINT, NOT A DESIGN BREAKPOINT, which is the one thing
+   to know before trusting it: the step is the aside's prose taking an extra
+   line. Change that copy, or the column, and this number has to be
+   re-measured. Fixing the overflow itself would let both this query and the
+   px term above go. */
+@media (max-width: 1300px) {
+  .openGrid > .openTitle {
+    margin-bottom: calc(-14.6px - 0.051em);
+  }
+}
+
 @media (max-width: 900px) {
   .openGrid { grid-template-columns: 1fr; align-items: start; }
-  /* the right-ranged "IS" only means anything while the two lines share a
-     width; stacked, the heading is simply left-hung */
+  /* stacked, the heading gives up hugging its widest line and takes the
+     column — there is nothing beside it to keep a measure against */
   .openTitle { width: 100%; }
-  /* stacked, there is no shared width to justify against, so the line simply
-     closes up; the mark stays on the name either way */
-  .openLineIs { justify-content: flex-start; }
-  .openIs { margin-left: 0.24em; }
+  /* NB: this query used to close the gap between "Who" and "is" — line one was
+     justified above 900px and only closed up here. Both widths read the same
+     now, so the override went with it. */
 }
 
 /* ---- pinned video scope ----
@@ -467,7 +563,7 @@
 .heroLineTop,
 .heroLineBottom {
   font-family: var(--font-display-big);
-  font-weight: var(--w-medium);
+  font-weight: var(--w-display);
   font-size: var(--hero-display-size);
   line-height: 0.86;
   letter-spacing: -0.01em;
@@ -611,7 +707,7 @@
 .storyTitle {
   margin: 0;
   font-family: var(--font-display-big);
-  font-weight: var(--w-medium);
+  font-weight: var(--w-display);
   font-size: clamp(3rem, 13vw, 12rem);
   line-height: 0.92;
   letter-spacing: -0.02em;
@@ -734,7 +830,15 @@
 .figPort { aspect-ratio: 5 / 6; }
 
 .chapterImg { position: absolute; inset-inline: 0; top: -14%; height: 128%; }
-.chapterImg img { width: 100%; height: 100%; object-fit: cover; display: block; }
+/* --focus is the chapter's own object-position, set only where a centred crop
+   would cut the subject — see `focus` on CHAPTER in About.tsx. */
+.chapterImg img {
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  object-position: var(--focus, 50% 50%);
+  display: block;
+}
 
 /* no photography yet — the wordmark on a maroon field, the coming-soon
    treatment the Discover tile already uses */
@@ -747,6 +851,7 @@
   text-align: center;
   background: var(--maroon);
   font-family: var(--font-display-big);
+  font-weight: var(--w-display);
   font-size: var(--t-h3);
   color: var(--cream);
 }
@@ -754,7 +859,7 @@
 .chapterYear {
   margin: 0;
   font-family: var(--font-display-big);
-  font-weight: var(--w-medium);
+  font-weight: var(--w-display);
   font-size: clamp(2rem, 3.8vw, 3.25rem);
   line-height: 1;
   font-variant-numeric: tabular-nums;
@@ -799,6 +904,19 @@
     padding-right: 0;
   }
   .chapter > * { grid-row: auto; grid-column: 1; }
+  /* ⚠️ AND THE COLUMNS HAVE TO BE UNSAID AT THE SAME WEIGHT. The line above
+     is `.chapter > *` — 0-1-0 — and the rules it means to cancel are
+     `.chapterL .chapterFig` and friends at 0-2-0. A media query adds no
+     specificity, so the frame stayed pinned to column 1 and the text to
+     column 2: the grid was still TWO tracks below 900px, the picture's track
+     shrank to 0px, and every chapter photograph was invisible on a phone.
+     The row above was doing nothing; these four are what stack it. (The
+     `text-align` line below was already written at 0-2-0 for exactly this
+     reason — the column rules were the ones that got missed.) */
+  .chapterL .chapterFig,
+  .chapterR .chapterFig,
+  .chapterL .chapterText,
+  .chapterR .chapterText { grid-column: 1; }
   .chapterR .chapterText { text-align: left; }
   .chapterR .chapterBody { margin-left: 0; }
   .chapterFig { max-width: 420px; }
@@ -838,7 +956,7 @@
 .ownerName {
   margin: 1.25rem 0 0;
   font-family: var(--font-display-big);
-  font-weight: var(--w-medium);
+  font-weight: var(--w-display);
   font-size: clamp(1.6rem, 2.6vw, 2rem);
   line-height: 1;
   color: var(--cream);
