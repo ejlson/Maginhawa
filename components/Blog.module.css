@@ -1447,6 +1447,18 @@
 
 .section {
   --cascade-beat: 70ms;
+
+  /* ⚠️ A SECOND BEAT, AND A DELIBERATE BREACH of "THE BEAT IS ONE NUMBER"
+     above. The animation-judgment pass measured the rail as the fastest
+     entrance on the page — a 350ms fade directly under a 1.15s plate
+     ceremony — and the user approved slowing it to 500ms on an 80ms beat
+     ("Quiet Arrivals" sheet). Stretching --cascade-beat itself would have
+     retimed the head's type cascade too, which nobody judged wrong; so the
+     rail, which already rides its own GATE (data-rail, not data-in), now
+     rides its own CLOCK. The principle survives narrowed: one beat per
+     gate. If the head's cadence is ever retuned, these two are again the
+     numbers to move together. */
+  --rail-beat: 80ms;
 }
 
 /* THE MASKS THAT ONLY CLIP. These three wrap a single line that DESCENDS,
@@ -1698,11 +1710,18 @@
 }
 
 /* THE INK — the rail. Five small cards and the label above them arrive by
-   a 350ms fade on the same seats they always held (--i 0…5 on
-   --cascade-beat), so the row still reads left to right; nothing sweeps,
+   a 500ms fade on the same seats they always held (--i 0…5 on
+   --rail-beat), so the row still reads left to right; nothing sweeps,
    nothing descends, nothing settles. A card this size gets one quiet verb.
    The divider label loses its mask descent for the same reason — it is a
-   12px caption, not a lockup. */
+   12px caption, not a lockup.
+
+   ⚠️ 500ms ON 80ms WAS 350ms ON 70ms — retimed at the user's instruction
+   after the animation-judgment pass called this the fastest entrance on
+   the page, sitting under a 1.15s plate. Same keyframe, same ease, same
+   order; the whole cascade now runs ~900ms (5 x 80 + 500) against ~630ms
+   before. The beat is the rail's own knob — see --rail-beat where the
+   cascade constants live. */
 .section:not([data-rail]) .entryMedia,
 .section:not([data-rail]) .entryBodyMask,
 .section:not([data-rail]) .dividerLabel {
@@ -1711,8 +1730,8 @@
 .section[data-rail] .entryMedia,
 .section[data-rail] .entryBodyMask,
 .section[data-rail] .dividerLabel {
-  animation: blogFade 350ms ease-out
-    calc(var(--i, 0) * var(--cascade-beat)) backwards;
+  animation: blogFade 500ms ease-out
+    calc(var(--i, 0) * var(--rail-beat)) backwards;
 }
 
 /* THE DESCENT — the two single lines that are part of a plate lockup.

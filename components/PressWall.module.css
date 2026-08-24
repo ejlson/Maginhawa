@@ -471,6 +471,62 @@
   height: calc(var(--press-base) * var(--s, 1));
 }
 
+/* ── MICHELIN, SLIGHTLY LARGER AND IN ITS OWN RED, at the user's
+   instruction — the flower IS the credential, so it is the one mark
+   exempt from the ink below. x1.18 on top of its measured 1.15 scale is
+   22 x 1.15 x 1.18 ≈ 26px of ink against the lane's 22. The seat hook is
+   data-mark="michelin" (set in PressWall.tsx, where the same test picks
+   the raw <img> branch — the exemption is one condition in two places;
+   keep them agreeing). */
+.logoSeat[data-mark="michelin"] {
+  height: calc(var(--press-base) * var(--s, 1) * 1.18);
+}
+.logoSeat[data-mark="michelin"] .logo {
+  background-color: transparent;
+  -webkit-mask: none;
+  mask: none;
+  opacity: 1;
+}
+
+/* ═══════════ THE INK — the band's entrance, third form ═══════════
+   Each seat fades from absent to present once — 400ms on a 60ms stagger,
+   user-approved off the "Quiet Arrivals" sheet (option P1) — and then the
+   lane is exactly the furniture it was: no translate, no scale, no clip.
+   The ripple's ~1.2s total (13 x 60 + 400) sits between the journal rail's
+   900ms and the plates' 1.15s ceremonies, which is where a fourteen-seat
+   roll call belongs.
+
+   THE MECHANISM IS THE JOURNAL'S, WHOLE (see the three-gate block in
+   Blog.module.css): the parked state is a real declaration keyed off the
+   gate's absence, so it stops applying the instant [data-in] lands and the
+   `backwards` fill is what holds the delay dark. The seat is animated
+   rather than .logo because the masked marks' .logo already carries its
+   own resting opacity — animating the parent composes with it instead of
+   fighting it, and it covers the Michelin <img> branch with the same rule.
+
+   ⚠️ [data-instant] MUST STAY BELOW [data-in] — one class, one attribute
+   on both, so SOURCE ORDER IS THE MECHANISM, exactly as the ⚠️ over the
+   journal's release block warns. Moving it up silently re-runs the ripple
+   on every reload. */
+.section:not([data-in]) .logoSeat {
+  opacity: 0;
+}
+.section[data-in] .logoSeat {
+  animation: pressInk 400ms ease-out calc(var(--i, 0) * 60ms) backwards;
+}
+.section[data-instant] .logoSeat {
+  animation: none;
+}
+
+@keyframes pressInk {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
+}
+
 /* ── THE MARKS ARE AT FULL STRENGTH AND IN THEIR OWN COLOUR, at the user's
    instruction. `filter: grayscale(1)` and `opacity: 0.72` are both gone.
 
@@ -636,6 +692,20 @@
    Recognition table lists every outlet in text. */
 @media (prefers-reduced-motion: reduce) {
   .track {
+    animation: none;
+  }
+
+  /* THE INK STAYS, THE RIPPLE GOES — the journal's regime, restated here:
+     opacity is the one verb reduced motion keeps on this page, so the
+     parked lane still fades in when the gate lands, as one quiet surface
+     with no stagger. The already-played path holds under this query for
+     the same reason it holds outside it — without the [data-instant] rule
+     a reduced-motion reader would watch the 400ms fade replay on every
+     reload, which is the exact thing the storage key exists to stop. */
+  .section[data-in] .logoSeat {
+    animation: pressInk 400ms ease-out backwards;
+  }
+  .section[data-instant] .logoSeat {
     animation: none;
   }
 }
