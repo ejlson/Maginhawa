@@ -132,5 +132,84 @@ await post({ ...good, message: "x".repeat(9000) });
 const longestX = Math.max(...(sentPayload?.text.match(/x+/g) ?? [""]).map((m) => m.length));
 check("9000-char message is clamped to 5000", longestX === 5000, `longest run ${longestX}`);
 
+/* ── 11-16, THE THROTTLE ───────────────────────────────────────────────────
+   The limiter is a binding, so it is stubbed the same way `fetch` is: the
+   handler cannot tell this from the platform's, which is what makes these
+   cases worth anything. `asked` records the key so the IP-header case can
+   assert on WHICH identity was counted, not merely that counting happened. */
+let asked = null;
+const limiter = (verdict) => ({
+  limit: async ({ key }) => {
+    asked = key;
+    if (verdict === "throw") throw new Error("limiter unavailable");
+    return { success: verdict };
+  },
+});
+const withIp = (env, ip, body = good) =>
+  onRequest({
+    env,
+    request: new Request("https://x/api/contact", {
+      method: "POST",
+      body: JSON.stringify(body),
+      headers: ip ? { "CF-Connecting-IP": ip } : {},
+    }),
+  });
+
+// 11 — over the limit: refused, and nothing reaches the provider
+sentPayload = null;
+asked = null;
+const over = await withIp({ ...ENV, CONTACT_RATELIMIT: limiter(false) }, "203.0.113.9");
+const overBody = await over.json();
+check("over the limit → 429", over.status === 429, `got ${over.status}`);
+check("429 carries retry:true (client shows the email fallback)", overBody.retry === true);
+check("429 sets Retry-After", over.headers.get("retry-after") === "60", over.headers.get("retry-after"));
+check("nothing is sent when throttled", sentPayload === null);
+
+// 12 — the key is the address Cloudflare sets, and it is per-caller
+check("keyed on CF-Connecting-IP", asked === "contact:203.0.113.9", String(asked));
+
+// 13 — ⚠️ the forgeable header must NOT be what we count. A limiter keyed on
+//      X-Forwarded-For is defeated by typing a different one each request.
+asked = null;
+await onRequest({
+  env: { ...ENV, CONTACT_RATELIMIT: limiter(true) },
+  request: new Request("https://x/api/contact", {
+    method: "POST",
+    body: JSON.stringify(good),
+    headers: { "X-Forwarded-For": "198.51.100.7" },
+  }),
+});
+check("X-Forwarded-For is ignored", asked === "contact:unknown", String(asked));
+
+// 14 — under the limit: business as usual
+sentPayload = null;
+const under = await withIp({ ...ENV, CONTACT_RATELIMIT: limiter(true) }, "203.0.113.9");
+check("under the limit → delivered", under.status === 200 && sentPayload !== null);
+
+// 15 — NO BINDING IS NOT AN OUTAGE. A deployment that cannot throttle still
+//      sends every real enquiry; only a deployment that cannot SEND says 503.
+sentPayload = null;
+const unbound = await withIp(ENV, "203.0.113.9");
+check("no binding → still delivered (fails open)", unbound.status === 200 && sentPayload !== null);
+
+// 16 — and neither is a limiter that falls over
+sentPayload = null;
+const broken = await withIp({ ...ENV, CONTACT_RATELIMIT: limiter("throw") }, "203.0.113.9");
+check("limiter throwing → still delivered", broken.status === 200 && sentPayload !== null);
+
+// 17 — ⚠️ THE ORDERING CLAIM, ASSERTED. The throttle is documented as running
+//      ahead of request.json(); an unparseable body proves it. If the parse
+//      came first this would be 400 ("could not be read"), and a flood would
+//      still be buying our JSON parser.
+const garbage = await onRequest({
+  env: { ...ENV, CONTACT_RATELIMIT: limiter(false) },
+  request: new Request("https://x/api/contact", {
+    method: "POST",
+    body: "{not json",
+    headers: { "CF-Connecting-IP": "203.0.113.9" },
+  }),
+});
+check("throttle precedes the body parse", garbage.status === 429, `got ${garbage.status}`);
+
 console.log(`\n${pass} passed, ${fail} failed`);
 process.exit(fail ? 1 : 0);

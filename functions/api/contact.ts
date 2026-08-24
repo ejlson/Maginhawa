@@ -32,6 +32,11 @@
  *   CONTACT_FROM     (plain)   the verified sender, e.g. "Maginhawa Group
  *                              <website@mgnhw.com>"
  *
+ * And ONE BINDING, which is not an environment variable and is not set on
+ * that screen: CONTACT_RATELIMIT, declared in wrangler.toml's [[ratelimits]]
+ * block. Unlike the three above, a deployment missing it still sends mail —
+ * see the note above the check itself for why that asymmetry is deliberate.
+ *
  * ⚠️ CONTACT_FROM MUST BE ON A DOMAIN VERIFIED IN RESEND, and that is a DNS
  * job, not a code one — Resend gives you the records to add. An unverified
  * sender does not bounce, it is REFUSED at the API and every enquiry fails
@@ -46,10 +51,19 @@
 /* Minimal local types. The real ones live in @cloudflare/workers-types, and
    that package is a large dependency to add for four field names in a file
    the Next build only ever type-checks — it never bundles or runs it. */
+
+/* The platform's rate-limit binding, which is a single method. `success` is
+   false once the key has spent its allowance for the current period. */
+type RateLimit = { limit(input: { key: string }): Promise<{ success: boolean }> };
+
 type Env = {
   RESEND_API_KEY?: string;
   CONTACT_TO?: string;
   CONTACT_FROM?: string;
+  /* OPTIONAL ON PURPOSE — see the note above the check in handlePost. A
+     deployment with no binding sends mail unthrottled rather than not at
+     all. */
+  CONTACT_RATELIMIT?: RateLimit;
 };
 
 type Ctx = { request: Request; env: Env };
@@ -59,13 +73,21 @@ type Ctx = { request: Request; env: Env };
    the CLIENT whether offering the email address as a fallback is the right
    move — it always is, but a validation failure should be fixed in the form
    instead. */
-const json = (status: number, body: Record<string, unknown>) =>
+const json = (
+  status: number,
+  body: Record<string, unknown>,
+  /* only the 429 sets anything here (Retry-After); the parameter exists so
+     that one branch does not have to hand-build a Response and re-state the
+     two headers every other branch gets for free */
+  extra?: Record<string, string>,
+) =>
   new Response(JSON.stringify(body), {
     status,
     headers: {
       "content-type": "application/json; charset=utf-8",
       /* the browser must never reuse a submission response */
       "cache-control": "no-store",
+      ...extra,
     },
   });
 
@@ -74,6 +96,13 @@ const json = (status: number, body: Record<string, unknown>) =>
    form's validation is a suggestion. Anything can POST to this URL. */
 const MAX = { name: 100, email: 254, message: 5000 } as const;
 const EMAIL = /^[^\s@]+@[^\s@]+\.[^\s@]+$/;
+
+/* ⚠️ THIS NUMBER IS NOT THE LIMIT — IT ONLY REPORTS IT. The window and the
+   allowance are set in wrangler.toml's [[ratelimits]] block, because the
+   counting happens in the platform, not here. This constant exists so the
+   429 can put an honest number in `Retry-After`, and it MUST be changed in
+   step with `period` there; nothing detects a disagreement. */
+const WINDOW_SECONDS = 60;
 
 const clean = (v: unknown, max: number) =>
   typeof v === "string" ? v.trim().slice(0, max) : "";
@@ -90,6 +119,75 @@ async function handlePost({ request, env }: Ctx): Promise<Response> {
         "The contact form is not configured on this deployment. Set RESEND_API_KEY, CONTACT_TO and CONTACT_FROM in the Pages project.",
       retry: true,
     });
+  }
+
+  /* ── THE THROTTLE, AND IT SITS AHEAD OF EVERY OTHER CHECK ──
+     The honeypot and the three-second timer below stop the laziest bots and
+     nothing else: both are one line of work to defeat, and neither costs an
+     attacker anything to retry. Until this, the only ceiling on how many
+     times a stranger could make us call Resend was how fast they could type
+     `curl` — which is somebody else's quota, our sending reputation, and
+     the inbox a real enquiry has to be found in.
+
+     ⚠️ IT RUNS BEFORE `request.json()`, WHICH IS THE POINT OF PUTTING IT
+     HERE. A throttled caller must not get us to parse a body first;
+     otherwise the cheap half of the flood still costs us the parse.
+
+     ⚠️ `CF-Connecting-IP` IS THE ONLY HEADER HERE THAT CANNOT BE FORGED.
+     Cloudflare SETS it at the edge, overwriting whatever the client sent.
+     `X-Forwarded-For` is client-supplied and would let one attacker mint a
+     fresh identity per request by changing a header — a rate limiter keyed
+     on it is worse than none, because it reads as protection. The docs warn
+     against keying on IP at all since households share one; that advice is
+     for APIs that have a user ID to key on instead, and an anonymous form
+     has nothing else. The cost of the shared case is bounded and known: a
+     second person behind the same address within the minute is told to
+     email us, which the fallback already offers them.
+
+     ── WHY A MISSING BINDING SENDS THE MAIL ANYWAY ──
+     Unlike RESEND_API_KEY above, this is not answered with a 503. A
+     deployment that cannot send is broken and must say so; a deployment
+     that cannot throttle still delivers every real enquiry, and taking the
+     form offline over a missing limiter would lose the business the form
+     exists for. It is logged rather than silent, so `wrangler tail` says
+     plainly that the protection is not there — the failure mode this guards
+     against is not "unthrottled", it is "unthrottled and nobody knew".
+
+     The same reasoning covers a limiter that throws: the enquiry goes
+     through. A rate limiter outage must not become a contact-form outage. */
+  const limiter = env.CONTACT_RATELIMIT;
+  if (!limiter) {
+    console.error(
+      "contact: CONTACT_RATELIMIT is not bound — this deployment accepts enquiries unthrottled. See [[ratelimits]] in wrangler.toml.",
+    );
+  } else {
+    /* An address is missing only for a request that did not come through
+       Cloudflare, which in production does not happen. Keying those
+       together under one bucket is deliberate: it is a single shared
+       allowance for the anomalous case, not a free pass per caller. */
+    const ip = request.headers.get("CF-Connecting-IP") ?? "unknown";
+    let allowed = true;
+    try {
+      ({ success: allowed } = await limiter.limit({ key: `contact:${ip}` }));
+    } catch (err) {
+      console.error(`contact: rate limiter failed, allowing through — ${err}`);
+    }
+    if (!allowed) {
+      /* 429 with `retry: true` lands in the client's fallback branch — see
+         the note on `res.status === 400` in components/Contact.tsx — so the
+         reader is given the email address rather than sent back to fields
+         that were never wrong. `Retry-After` is the machine-readable half
+         of the same sentence. */
+      return json(
+        429,
+        {
+          error:
+            "That is more messages than we can take from one place at once. Please email us instead.",
+          retry: true,
+        },
+        { "retry-after": String(WINDOW_SECONDS) },
+      );
+    }
   }
 
   let body: Record<string, unknown>;

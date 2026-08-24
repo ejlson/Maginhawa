@@ -51,3 +51,35 @@ compatibility_date = "2026-08-14"
 [assets]
 directory = "./out"
 not_found_handling = "404-page"
+
+
+# ── THE ENQUIRY FORM'S THROTTLE ──────────────────────────────────────────────
+# Read by the CONTACT_RATELIMIT binding in functions/api/contact.ts, which
+# spends one token per POST keyed on the sender's CF-Connecting-IP. Three a
+# minute is far more than a person writing to a restaurant will ever need and
+# far less than a flood needs to be worth running.
+#
+# ⚠️ `period` TAKES 10 OR 60 AND NOTHING ELSE. The platform rejects any other
+# value; there is no 30 and no 300.
+#
+# ⚠️ AND IT IS DUPLICATED IN CODE. contact.ts carries WINDOW_SECONDS purely so
+# its 429 can name a number in `Retry-After`. The counting is done here, not
+# there — change one and change the other, because nothing detects the
+# disagreement and the only symptom is a Retry-After that lies.
+#
+# ⚠️ THE COUNTERS ARE PER-LOCATION, NOT GLOBAL, and that is the platform's
+# design rather than a setting: each colo counts its own. A distributed flood
+# therefore gets three per minute per colo it reaches. This is abuse
+# mitigation, not an accounting boundary — Cloudflare says as much — and the
+# alternative that IS global is a Durable Object per key, which is a stateful
+# paid dependency for a form that takes a handful of messages a week.
+#
+# `namespace_id` is an account-wide integer, and two bindings sharing one
+# share their counters. Nothing else on this account uses 1001.
+[[ratelimits]]
+name = "CONTACT_RATELIMIT"
+namespace_id = "1001"
+
+  [ratelimits.simple]
+  limit = 3
+  period = 60
