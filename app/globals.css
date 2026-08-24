@@ -671,6 +671,48 @@
      echo, tuned subtle so it never reads as a rubber-band bounce. */
   --ease-bounce: cubic-bezier(0.34, 1.16, 0.6, 1);
 
+  /* ══════════ DURATION SCALE ══════════
+     The companion to the curves above, and it exists for the same reason
+     they do: the stylesheets were already agreeing with each other by
+     copy-paste. Audited before this block landed — `0.3s` appeared 25
+     times, `0.32s` 10, `0.2s` 9, `0.25s` 8 — four values doing one job
+     ("a state change") in four spellings, with no way to move them
+     together.
+
+     THE WHOLE SCALE IS SLOWER THAN WHAT IT REPLACED, at the user's
+     instruction ("slower, smoother and more controlled"), by roughly
+     ×1.4 in the middle. That is a deliberate register, not a fudge
+     factor: an editorial page is read, not operated, and motion that
+     resolves in a third of a second reads as UI acknowledging a click.
+     What this scale is tuned for is motion you can WATCH — the eye has
+     time to follow the thing that moved from where it was to where it
+     went, which is what "controlled" means here.
+
+     ⚠️ --dur-tap DID NOT GET SLOWER, and must not. It is press/active
+     feedback — the frame that says "the control heard you". Anything
+     over ~180ms there stops reading as a response and starts reading as
+     lag, and slowing the page's storytelling is not a licence to slow
+     its controls. If a value is on a :active rule, it belongs here.
+
+     Pick by SURFACE SIZE, not by property: the further a thing travels
+     and the more of the screen it covers, the longer it may take. */
+  --dur-tap: 0.16s;      /* :active feedback — deliberately NOT slowed */
+  --dur-quick: 0.26s;    /* ink on small type: a link colour, an underline */
+  --dur-snug: 0.34s;     /* a small fade, an icon, a dot */
+  --dur-base: 0.44s;     /* the default state change — grounds, borders */
+  --dur-mid: 0.52s;      /* transform on a small object: a lift, a nudge */
+  --dur-slow: 0.62s;     /* transform on a large one: a card, a photograph */
+  --dur-glide: 0.78s;    /* a panel arriving, a menu item taking its place */
+  --dur-drawer: 0.95s;   /* the full-surface moves — sheets, covers, curtains */
+  --dur-chapter: 1.15s;  /* a chapter's worth of movement, staggered under it */
+
+  /* Stagger steps for the sequences built out of the above. Slower here is
+     the point too: a wave whose members are 42ms apart arrives as one
+     event, and one whose members are 56ms apart arrives as a sequence you
+     can count. */
+  --stagger-tight: 56ms;  /* long lists — About's rows, the menu's links */
+  --stagger-wide: 0.12s;  /* short ones — a chapter's three or four parts */
+
   /* CORNER RADIUS — two tiers.
      --radius-tile is the softer rounding on photography and editorial frames
      (Discover tiles, Blog plates, the About card). --radius-card is the

@@ -118,7 +118,7 @@
   inset: calc(-1 * var(--entry-band)) 0;
   background: var(--maroon);
   clip-path: inset(0 0 100% 0);
-  transition: clip-path 400ms var(--ease-drawer);
+  transition: clip-path var(--dur-slow) var(--ease-drawer);
   pointer-events: none;
 }
 

@@ -725,7 +725,7 @@
   text-align: left;
   cursor: pointer;
   --role-indent: 0px;
-  transition: background-color 0.32s ease;
+  transition: background-color var(--dur-base) var(--ease-state);
 }
 
 /* THE INDENT, OFF THE LAYOUT PATH. This used to animate `padding-inline`,
@@ -764,7 +764,7 @@
   line-height: var(--lh-heading);
   letter-spacing: -0.005em;
   translate: var(--role-indent);
-  transition: translate 0.32s ease;
+  transition: translate var(--dur-base) var(--ease-out);
 }
 
 .roleMeta {
@@ -773,7 +773,7 @@
   line-height: var(--lh-snug);
   opacity: 0.82;
   translate: calc(var(--role-indent) * 0.2 / 4.6);
-  transition: translate 0.32s ease;
+  transition: translate var(--dur-base) var(--ease-out);
 }
 
 .roleType {
@@ -785,7 +785,7 @@
   opacity: 0.62;
   white-space: nowrap;
   translate: calc(var(--role-indent) * -2.6 / 4.6);
-  transition: translate 0.32s ease;
+  transition: translate var(--dur-base) var(--ease-out);
 }
 
 .roleChev {
@@ -796,8 +796,8 @@
   place-items: center;
   opacity: 0.7;
   translate: calc(var(--role-indent) * -1);
-  transition: translate 0.32s ease, transform 0.36s var(--ease-entrance),
-    opacity 0.3s ease;
+  transition: translate var(--dur-base) var(--ease-out), transform var(--dur-mid) var(--ease-entrance),
+    opacity var(--dur-base) var(--ease-out);
 }
 .roleChev svg { width: 14px; height: 14px; }
 .roleChevOpen { transform: rotate(180deg); opacity: 1; }
@@ -874,7 +874,7 @@
   text-transform: uppercase;
   border-radius: 999px;
   cursor: pointer;
-  transition: background 0.3s ease, color 0.3s ease;
+  transition: background var(--dur-base) var(--ease-state), color var(--dur-base) var(--ease-state);
 }
 
 .roleApplyBtn:hover,
@@ -1401,7 +1401,7 @@
   border-bottom: 1px solid rgba(47, 0, 0, 0.35);
   padding: 0.5em 0;
   cursor: pointer;
-  transition: border-color 0.3s ease;
+  transition: border-color var(--dur-base) var(--ease-state);
   /* the field label above already carries the caps treatment and the quiet
      tone — reset both on this second label, because what sits inside it is a
      VALUE (the chosen filename) and a value is full-strength ink */
@@ -1440,7 +1440,7 @@
   text-transform: uppercase;
   opacity: 0.62;
   flex: none;
-  transition: color 0.3s ease, opacity 0.3s ease;
+  transition: color var(--dur-base) var(--ease-state), opacity var(--dur-base) var(--ease-out);
 }
 
 .fileTrigger:hover {
@@ -1558,7 +1558,7 @@
   line-height: var(--lh-body);
   padding: 0.5em 0;
   outline: none;
-  transition: border-color 0.3s ease;
+  transition: border-color var(--dur-base) var(--ease-state);
   width: 100%;
   appearance: none;
 }
@@ -1606,7 +1606,7 @@
   align-items: baseline;
   column-gap: clamp(10px, 1.2vw, 16px);
   border-bottom: 1px solid rgba(47, 0, 0, 0.35);
-  transition: border-color 0.3s ease;
+  transition: border-color var(--dur-base) var(--ease-state);
 }
 
 /* one underline, one focus state — whichever of the two has the caret */

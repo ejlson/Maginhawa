@@ -99,7 +99,7 @@ function CyclingWord({
                     opacity: k === i ? 1 : 0,
                   }
             }
-            transition={{ duration: 0.85, ease: EASE }}
+            transition={{ duration: 1.1, ease: EASE }}
           >
             {w}
           </motion.span>
@@ -138,7 +138,7 @@ export default function Interlude() {
           }
           whileInView={{ opacity: 1, transform: "translateY(0px)" }}
           viewport={{ once: true, amount: 0.5 }}
-          transition={{ duration: 0.9, ease: EASE }}
+          transition={{ duration: 1.15, ease: EASE }}
         >
           One family, seven{" "}
           <CyclingWord active={inView} reduce={reduce} />.

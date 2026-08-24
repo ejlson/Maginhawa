@@ -129,7 +129,7 @@ export default function FAQ() {
                   id={`faq-answer-${i}`}
                   initial={false}
                   animate={{ height: isOpen ? "auto" : 0, opacity: isOpen ? 1 : 0 }}
-                  transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+                  transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
                   style={{ overflow: "hidden" }}
                 >
                   <p className={styles.answer}>{it.a}</p>

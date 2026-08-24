@@ -754,7 +754,7 @@ const PHOTO_PAN_RATIO = 0.024;
    ⚠️ NOT for anything that lands against a hard edge (a drawer on a
    viewport wall, a sheet at the top of the screen). This plate lands in open
    air on both axes, which is what makes even a sub-pixel overshoot safe. */
-const EXPAND_SPRING = { type: "spring", duration: 0.55, bounce: 0.06 } as const;
+const EXPAND_SPRING = { type: "spring", duration: 0.72, bounce: 0.04 } as const;
 
 /* ── HOW THE GRID GETS OUT OF THE WAY ──
    The room lights drop AND the shelf steps back. Doing both is the point,
@@ -1788,7 +1788,7 @@ function ExpandedCard({
     animate: { opacity: 1 },
     exit: { opacity: 0, transition: { duration: 0.15, ease: "easeOut" } },
     transition: {
-      duration: 0.26,
+      duration: 0.34,
       ease: EASE,
       delay: reduce ? 0 : 0.12,
     },
@@ -1799,7 +1799,7 @@ function ExpandedCard({
     animate: { opacity: 1 },
     exit: { opacity: 0, transition: { duration: 0.15, ease: "easeOut" } },
     transition: {
-      duration: 0.22,
+      duration: 0.3,
       ease: EASE,
       delay: reduce ? 0 : 0.3,
     },
@@ -1827,7 +1827,7 @@ function ExpandedCard({
            0.35s it finished at roughly the same moment the plate landed and
            read as part of the card's arrival rather than as the response to
            the press. */
-        transition={{ duration: 0.28, ease: "easeOut" }}
+        transition={{ duration: 0.36, ease: "easeOut" }}
         onClick={onClose}
       />
 

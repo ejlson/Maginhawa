@@ -140,7 +140,7 @@
   text-underline-offset: 0.18em;
   text-decoration-thickness: 1px;
   text-decoration-color: var(--rule);
-  transition: text-decoration-color 0.2s var(--ease-out);
+  transition: text-decoration-color var(--dur-quick) var(--ease-out);
 }
 
 .prose a:hover,

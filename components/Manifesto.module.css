@@ -698,7 +698,7 @@
 .key {
   font-style: italic;
   color: var(--maroon);
-  transition: color 0.8s var(--ease-state) 0.2s;
+  transition: color var(--dur-chapter) var(--ease-state) 0.2s;
 }
 
 .statement[data-lit="on"] .key {

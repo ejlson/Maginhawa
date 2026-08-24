@@ -104,9 +104,56 @@ const PORTRAIT_LINE = ["Where it began.", "Camden, 1987."];
    Every fact is already on the site: the 1987 Camden kitchen and Chef Omar
    are in /about's metadata and structured data, the three kitchens are the
    site's own description. No venue count — TODOS.md item 7 still records
-   "seven rooms vs eight tiles" as unreconciled. */
+   "seven rooms vs eight tiles" as unreconciled.
+
+   ══════════ THE LEAD WAS EXPANDED, at the user's instruction ══════════
+   ⚠️ ITS FIRST SENTENCE IS LOAD-BEARING AND IS UNCHANGED. It is the hero's
+   cover line, verbatim — components/Hero.tsx sets out the echo at length
+   and the rule that comes with it: the sentence changes in BOTH places or
+   not at all. Everything AFTER the full stop is this paragraph's own, which
+   is exactly why the expansion could happen here and could not happen in
+   the hero.
+
+   WHAT THE OLD VERSION WAS MISSING. It made the claim and then never
+   answered it. "The food we grew up on" is a specific promise — whose
+   childhood, which evenings, cooked how — and the paragraph went straight
+   past it into a tricolon about the room. Worse, the tricolon's third leg
+   ("a plate that tastes like somebody's home") was the vaguest line in it
+   and sat in the emphatic position: "somebody" is nobody, and a restaurant
+   that tells you its food tastes homely has told you nothing another
+   restaurant could not also say.
+
+   WHAT REPLACED IT is the same argument with the middle filled in — what
+   the dishes are (the ones made on ordinary evenings), in what quantity
+   (for a house, not a table), and by people with a stake in whether you
+   ate. The third leg now names a MOTIVE rather than a flavour: the plate is
+   too hot because somebody wanted you to have it. And the close reaches
+   past "the same faces" to the thing a group founded in 1987 can actually
+   claim — those faces arriving first with their parents and later with
+   their children.
+
+   IT NAMES NO CUISINE, AND THAT IS DELIBERATE. Enumerating dishes here
+   would pull the paragraph Filipino, and the group is Filipino,
+   Filipino-Japanese AND Caribbean — the record below and the three doors
+   above it carry that, each in a form that gives every room equal footing.
+   A belief paragraph that quietly speaks for only two thirds of the
+   estate is worse writing than one that stays universal.
+
+   LENGTH: 585 characters, up from 302, and it was measured rather than
+   estimated because .readingBlock faces a full-height film panel and a
+   paragraph that outgrows it would break the split rather than just look
+   long. Rendered (probe, lead paragraph vs the panel opposite):
+
+     1920   6 lines   block 349px   panel 1140px
+     1440   6 lines   block 336px   panel  946px
+     1024   8 lines   block 350px   panel  804px
+      390  11 lines   block 429px   panel  474px
+
+   The block clears the panel at every width, mobile included, with nothing
+   clipped and no viewport overflow. 390 is the one to re-measure if this
+   grows again — it is the width where the two are closest. */
 const PARA_LEAD =
-  "We cook the food we grew up on, for people we treat like family. A table you are not hurried from, a room that is easy to be in, and a plate that tastes like somebody's home. It is the only way we have ever known how to do this, and it is the reason the same faces come back year after year.";
+  "We cook the food we grew up on, for people we treat like family. Not a polite version of it: the dishes made for us on ordinary evenings, in the quantities you cook for a house rather than a table, by people who took it personally if you left still hungry. A table you are not hurried from, a room that is easy to be in, and a plate that arrives while it is still too hot because somebody wanted you to have it. It is the only way any of us has ever learned to feed people, and it is why the same faces come back year after year, first with their parents and later with their children.";
 const PARA_FINE =
   "From one Camden kitchen in 1987 to a family of dining rooms across North London - Filipino, Filipino-Japanese and Caribbean, each with its own character - still run by the same family, and still led by Chef Omar. Every room keeps its own menu, its own regulars and its own way of doing things. What they share is the standard they are held to, and the people who set it.";
 

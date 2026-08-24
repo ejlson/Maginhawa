@@ -7,7 +7,7 @@ import {
   useTransform,
 } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
-import { lenisRef } from "@/lib/SmoothScroll";
+import { JUMP, lenisRef } from "@/lib/SmoothScroll";
 import { useRouteTransition } from "./PageTransition";
 import styles from "./Hero.module.css";
 import PillCta from "./PillCta";
@@ -39,7 +39,12 @@ function scrollToSection(hash: string, pass = 0) {
     el.scrollIntoView({ behavior: "smooth", block: "start" });
     return;
   }
+  /* JUMP carries the duration + easing this used to inherit from the Lenis
+     constructor. They are not there any more — the wheel path reads the same
+     two options and was being eased by them, which is the bug lib/SmoothScroll
+     documents — so an anchor jump has to ask for them by name. */
   lenis.scrollTo(el as HTMLElement, {
+    ...JUMP,
     onComplete: () => {
       if (pass >= 2) return;
       const top = el.getBoundingClientRect().top;
@@ -260,7 +265,7 @@ export default function Hero({ started }: { started: boolean }) {
             className={styles.mark}
             initial={{ opacity: 0, y: 14 }}
             animate={{ opacity: started ? 1 : 0, y: started ? 0 : 14 }}
-            transition={{ duration: 0.9, ease: "easeOut", delay: 0.25 }}
+            transition={{ duration: 1.15, ease: "easeOut", delay: 0.25 }}
           >
             Maginhawa
           </motion.h1>
@@ -269,7 +274,7 @@ export default function Hero({ started }: { started: boolean }) {
             className={styles.copy}
             initial={{ opacity: 0, y: 10 }}
             animate={{ opacity: started ? 1 : 0, y: started ? 0 : 10 }}
-            transition={{ duration: 0.8, ease: "easeOut", delay: 0.45 }}
+            transition={{ duration: 1.05, ease: "easeOut", delay: 0.45 }}
           >
             {/* ══════════ THE CLAIM, IN ONE LINE ══════════
                 At the user's instruction, and it is the redesign blueprint's

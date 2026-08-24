@@ -14,7 +14,7 @@ import styles from "./Footer.module.css";
 import PillCta from "./PillCta";
 import { useRouteTransition } from "./PageTransition";
 import { CONTACT, SOCIALS } from "@/lib/contact";
-import { lenisRef } from "@/lib/SmoothScroll";
+import { JUMP, lenisRef } from "@/lib/SmoothScroll";
 
 const EASE = [0.22, 1, 0.36, 1] as const;
 
@@ -78,20 +78,23 @@ const closeInk = (slot: [number, number]): [number, number] => [
    against the opening edge, and that differential is the part that reads as
    weight settling rather than a panel being uncovered.
 
-   A full second, slower than anything else on the page, and once only. This
+   A second and a quarter, slower than anything else on the page, and once
+   only (it was a flat second until the pass that slowed the site — Reveal's
+   wipe is 1.15s now, and this has to stay the longest to keep the claim in
+   this sentence true). This
    is the terminal element — the reader has arrived, and nothing follows it
    that a replay could belong to. */
 const WORDMARK_MASK: Variants = {
   hidden: { clipPath: "inset(100% 0% 0% 0%)" },
   shown: {
     clipPath: "inset(0% 0% 0% 0%)",
-    transition: { duration: 1, ease: EASE },
+    transition: { duration: 1.25, ease: EASE },
   },
 };
 
 const WORDMARK_RISE: Variants = {
   hidden: { y: "30%" },
-  shown: { y: "0%", transition: { duration: 1, ease: EASE } },
+  shown: { y: "0%", transition: { duration: 1.25, ease: EASE } },
 };
 
 /* Reduced motion keeps the arrival and drops every pixel of travel — and
@@ -99,7 +102,7 @@ const WORDMARK_RISE: Variants = {
    edge crossing the screen; only the fade is honestly motionless. */
 const WORDMARK_FADE: Variants = {
   hidden: { opacity: 0 },
-  shown: { opacity: 1, transition: { duration: 0.5, ease: EASE } },
+  shown: { opacity: 1, transition: { duration: 0.65, ease: EASE } },
 };
 
 // every label carries a real destination; internal routes go through the
@@ -240,7 +243,11 @@ export default function Footer() {
   // shared instance when it exists and fall back to native smooth scrolling
   // (e.g. before hydration, or with Lenis disabled for reduced motion).
   const scrollToTop = () => {
-    if (lenisRef.current) lenisRef.current.scrollTo(0);
+    // JUMP, not the constructor's defaults — it no longer has any, because
+    // the wheel path was reading them too (see lib/SmoothScroll). Back-to-top
+    // from the end of a 20,000px page is the longest journey on the site and
+    // the one the eased in-out was chosen for.
+    if (lenisRef.current) lenisRef.current.scrollTo(0, { ...JUMP });
     else window.scrollTo({ top: 0, behavior: "smooth" });
   };
 

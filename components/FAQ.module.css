@@ -172,7 +172,7 @@
   font-size: var(--t-body);
   letter-spacing: 0;
   line-height: var(--lh-snug);
-  transition: transform 0.3s var(--ease-out);
+  transition: transform var(--dur-base) var(--ease-out);
 }
 
 /* only the hover shift lives on the wrapper now — the open state is drawn
@@ -186,7 +186,7 @@
   display: grid;
   place-items: center;
   transform: translateX(var(--chev-shift));
-  transition: transform 0.36s var(--ease-out);
+  transition: transform var(--dur-mid) var(--ease-out);
   opacity: 0.65;
 }
 
@@ -201,8 +201,8 @@
 .iconBar {
   transform-origin: 50% 50%;
   transition:
-    transform 0.36s var(--ease-out),
-    opacity 0.28s var(--ease-out);
+    transform var(--dur-mid) var(--ease-out),
+    opacity var(--dur-snug) var(--ease-out);
 }
 
 .chevOpen {

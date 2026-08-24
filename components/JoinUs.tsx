@@ -907,7 +907,7 @@ export default function JoinUs() {
                 className={styles.heroLabels}
                 initial={{ opacity: reduce ? 1 : 0 }}
                 animate={{ opacity: beat3 ? 1 : 0 }}
-                transition={{ duration: 0.7, ease: [0.23, 1, 0.32, 1] }}
+                transition={{ duration: 0.9, ease: [0.23, 1, 0.32, 1] }}
               >
                 <HeroLabel>Careers</HeroLabel>
                 {/* The count is gone. It was the only number on the page that
@@ -1119,7 +1119,7 @@ export default function JoinUs() {
                         id={`role-detail-${i}`}
                         initial={false}
                         animate={{ height: isOpen ? "auto" : 0, opacity: isOpen ? 1 : 0 }}
-                        transition={{ duration: 0.42, ease: [0.22, 1, 0.36, 1] }}
+                        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
                         style={{ overflow: "hidden" }}
                       >
                         <div className={styles.roleDetail}>
@@ -1449,7 +1449,7 @@ export default function JoinUs() {
                         initial={{ opacity: 0, y: 8 }}
                         animate={{ opacity: 1, y: 0 }}
                         exit={{ opacity: 0 }}
-                        transition={{ duration: 0.4 }}
+                        transition={{ duration: 0.52 }}
                       >
                         <strong>Attach your CV, then send.</strong>
                         Your email client is opening with the application

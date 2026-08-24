@@ -53,11 +53,20 @@ const WIPES = [
   "inset(0 0 100% 0)",
 ];
 
-// choreography: cover 560ms → (route change) → 250ms hold while the new
-// page paints and is scrolled to top → reveal 600ms. Happy path ≤ ~1.6s.
-const COVER_MS = 560;
+/* choreography: cover 640ms → (route change) → 250ms hold while the new
+   page paints and is scrolled to top → reveal 720ms. Happy path ≤ ~1.8s.
+
+   ── 640/720, UP FROM 560/600, in the pass that slowed the site ──
+   and only that far. The curtain is the one piece of motion on the site a
+   reader is WAITING BEHIND rather than watching: every millisecond added
+   here is a millisecond before they see the page they asked for. So it
+   takes the smallest share of the slowdown of anything in this pass — about
+   a sixth, against the ~40% the reading surfaces took — and the reveal takes
+   more of it than the cover, because by then the new page is already
+   underneath and the time is spent showing it rather than withholding it. */
+const COVER_MS = 640;
 const HOLD_MS = 250;
-const REVEAL_MS = 600;
+const REVEAL_MS = 720;
 // hard fallback for the push if the cover animation stalls entirely
 const PUSH_FALLBACK_MS = 820;
 // centre-image cycle cadence while the curtain is up
@@ -148,7 +157,7 @@ const DEAD_ROUTE_MS = 1600;
    IT IS DERIVED FROM THE HAPPY PATH, not chosen. The curtain covers for
    COVER_MS, the route lands, and HOLD_MS later the machine leaves `cover` for
    `reveal`. So on any navigation that behaves, `cover` is over by
-   COVER_MS + HOLD_MS = 810ms, and an indicator armed after that can never
+   COVER_MS + HOLD_MS = 890ms, and an indicator armed after that can never
    flash on a fast one — it is not a short delay hiding a fast case, it is a
    deadline the fast case has already passed.
 

@@ -443,8 +443,8 @@
      clock the venue card's photograph uses */
   transform: scale(1);
   transition:
-    transform 700ms var(--ease-drawer),
-    opacity 0.55s var(--ease-entrance);
+    transform var(--dur-drawer) var(--ease-drawer),
+    opacity var(--dur-glide) var(--ease-entrance);
 }
 
 @media (hover: hover) and (pointer: fine) {
@@ -661,8 +661,8 @@
      shimmer's own cycle so the handover reads as a settle, not a blink. */
   transform: scale(1);
   transition:
-    transform 700ms var(--ease-drawer),
-    opacity 0.55s var(--ease-entrance);
+    transform var(--dur-drawer) var(--ease-drawer),
+    opacity var(--dur-glide) var(--ease-entrance);
 }
 
 /* the type under the plate. NO PADDING and no ground of its own — the copy
@@ -882,7 +882,7 @@
   -webkit-line-clamp: 3;
   line-clamp: 3;
   overflow: hidden;
-  transition: color 0.3s ease;
+  transition: color var(--dur-base) var(--ease-state);
 }
 
 /* the reference's hairline, closing the headline and opening the
@@ -1053,7 +1053,7 @@
   white-space: nowrap;
   color: var(--maroon);
   opacity: 0.75;
-  transition: opacity 0.25s ease;
+  transition: opacity var(--dur-snug) var(--ease-out);
 }
 
 .filterTrigger:hover,
@@ -1065,7 +1065,7 @@
   width: 0.85em;
   height: 0.85em;
   display: block;
-  transition: transform 0.3s var(--ease-entrance);
+  transition: transform var(--dur-base) var(--ease-entrance);
 }
 
 .filterTrigger[aria-expanded="true"] .chevron {
@@ -1126,7 +1126,9 @@
   white-space: nowrap;
   color: var(--maroon);
   opacity: 0.7;
-  transition: opacity 0.2s ease, background-color 0.2s ease;
+  transition:
+    opacity var(--dur-quick) var(--ease-out),
+    background-color var(--dur-quick) var(--ease-state);
 }
 
 .filterOption:hover,
@@ -1172,7 +1174,7 @@
   font-variant-numeric: tabular-nums;
   color: var(--maroon);
   opacity: 0.55;
-  transition: opacity 0.25s ease, color 0.25s ease;
+  transition: opacity var(--dur-snug) var(--ease-out), color var(--dur-snug) var(--ease-state);
 }
 
 .pageNum:hover,
@@ -1206,8 +1208,11 @@
   align-items: center;
   justify-content: center;
   cursor: pointer;
-  transition: background-color 0.3s ease, color 0.3s ease, transform 0.12s ease,
-    opacity 0.3s ease;
+  transition:
+    background-color var(--dur-base) var(--ease-state),
+    color var(--dur-base) var(--ease-state),
+    transform var(--dur-tap) var(--ease-out),
+    opacity var(--dur-base) var(--ease-out);
 }
 
 .pageArrow svg {

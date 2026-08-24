@@ -245,7 +245,7 @@ export default function Nav({
         .join(" ")}
       initial={{ opacity: 0, y: -24 }}
       animate={show ? { opacity: 1, y: 0 } : { opacity: 0, y: -24 }}
-      transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+      transition={{ duration: 0.72, ease: [0.22, 1, 0.36, 1] }}
       /* the bar drops in, which means it is written into the server HTML as
          opacity 0 and stays there if no script runs — i.e. a reader without
          JavaScript would have no navigation at all. The <noscript> block in
@@ -311,7 +311,7 @@ export default function Nav({
         <span className={styles.glyph} aria-hidden>
           <motion.span
             animate={menuOpen ? { rotate: 45, y: 5 } : { rotate: 0, y: 0 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
           />
           <motion.span
             animate={menuOpen ? { opacity: 0 } : { opacity: 1 }}
@@ -319,7 +319,7 @@ export default function Nav({
           />
           <motion.span
             animate={menuOpen ? { rotate: -45, y: -5 } : { rotate: 0, y: 0 }}
-            transition={{ duration: 0.35, ease: [0.22, 1, 0.36, 1] }}
+            transition={{ duration: 0.45, ease: [0.22, 1, 0.36, 1] }}
           />
         </span>
       </button>

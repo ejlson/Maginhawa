@@ -154,7 +154,7 @@
   text-decoration: underline;
   text-underline-offset: 0.25em;
   text-decoration-color: color-mix(in srgb, var(--cream) 39%, transparent);
-  transition: text-decoration-color 0.3s var(--ease-out);
+  transition: text-decoration-color var(--dur-base) var(--ease-out);
 }
 
 .infoLink:hover,
@@ -223,7 +223,7 @@
   line-height: var(--lh-body);
   padding: 0.45em 0;
   outline: none;
-  transition: border-color 0.3s ease;
+  transition: border-color var(--dur-base) var(--ease-state);
 }
 
 /* the message box keeps the same hairline-underline treatment as the single

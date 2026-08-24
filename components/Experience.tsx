@@ -62,8 +62,14 @@ export default function Experience({ journal }: { journal?: BlogEntry[] }) {
       setLocked(true);
       return;
     }
-    // hero wordmark animates up over ~1.1s once the intro ends — hold here
-    const t = setTimeout(() => setLocked(false), 1300);
+    /* hero wordmark animates up over ~1.4s once the intro ends — hold here.
+       ⚠️ IT TRACKS Hero.tsx's OWN TIMING and has to be moved with it: the
+       wordmark is `delay: 0.25` + `duration: 1.15`, so it lands at 1400ms
+       and this is that plus a frame or two of margin. It was 1300 against a
+       0.9s duration; the pass that slowed the site to 1.15 would have
+       unlocked the page 100ms before the name finished arriving — which is
+       exactly the thing this lock exists to prevent. */
+    const t = setTimeout(() => setLocked(false), 1500);
     return () => clearTimeout(t);
   }, [intro]);
 

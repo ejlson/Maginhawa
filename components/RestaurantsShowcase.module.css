@@ -68,7 +68,7 @@
 /* crossfade between the two views (both stay mounted) */
 .stage,
 .cards {
-  transition: opacity 0.5s ease, transform 0.5s var(--ease-entrance);
+  transition: opacity var(--dur-glide) var(--ease-out), transform var(--dur-glide) var(--ease-entrance);
 }
 .stage[data-hidden="true"] {
   opacity: 0;
@@ -247,7 +247,7 @@
   color: var(--cream);
   opacity: 0.55;
   cursor: pointer;
-  transition: opacity 0.3s ease;
+  transition: opacity var(--dur-base) var(--ease-out);
   -webkit-tap-highlight-color: transparent;
 }
 .viewToggle button[data-active="true"] {
@@ -257,14 +257,14 @@
   width: 16px;
   height: 16px;
   overflow: visible;
-  transition: transform 0.25s var(--ease-out);
+  transition: transform var(--dur-snug) var(--ease-out);
 }
 
 /* the icons themselves move: the wheel fans its lines open, the grid
    spreads its four tiles toward the corners */
 .viewToggle svg line,
 .viewToggle svg rect {
-  transition: transform 0.35s var(--ease-out);
+  transition: transform var(--dur-mid) var(--ease-out);
 }
 
 /* ---- walk-in note, bottom-RIGHT ----
@@ -340,7 +340,7 @@
   /* two short lines rather than one long one and an orphan */
   text-wrap: balance;
   color: var(--cream);
-  transition: color 0.42s var(--ease-out);
+  transition: color var(--dur-slow) var(--ease-out);
 }
 
 /* Card view swaps the INK, not the ground — and only where the ground is
@@ -494,7 +494,7 @@
   color: var(--cream);
   opacity: 0.5;
   cursor: pointer;
-  transition: opacity 0.3s ease;
+  transition: opacity var(--dur-base) var(--ease-out);
   -webkit-tap-highlight-color: transparent;
 }
 .step:hover {
@@ -642,7 +642,10 @@
   letter-spacing: var(--tr-label);
   white-space: nowrap;
   cursor: pointer;
-  transition: background 0.35s ease, color 0.35s ease, border-color 0.35s ease;
+  transition:
+    background var(--dur-mid) var(--ease-state),
+    color var(--dur-mid) var(--ease-state),
+    border-color var(--dur-mid) var(--ease-state);
   -webkit-tap-highlight-color: transparent;
 }
 .actBtn:hover:not(:disabled) {
@@ -655,7 +658,7 @@
   cursor: not-allowed;
 }
 .actBtn span {
-  transition: transform 0.4s var(--ease-entrance);
+  transition: transform var(--dur-slow) var(--ease-entrance);
 }
 .actBtn:hover span {
   transform: translateX(4px);

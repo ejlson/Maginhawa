@@ -28,17 +28,22 @@
   opacity: 0;
   visibility: hidden;
   /* visibility is delayed out so the fade can finish before the sheet
-     leaves the a11y tree; on the way in it flips immediately */
+     leaves the a11y tree; on the way in it flips immediately.
+     ⚠️ THE DELAY IS THE FADE'S OWN DURATION, as a var rather than a copy of
+     its number. It was a literal 0.4s matching a literal 0.4s fade, and the
+     two drifted apart the moment the fade moved onto the duration scale —
+     a sheet that goes `visibility: hidden` while it is still a third
+     opaque does not fade out, it disappears. */
   transition:
-    opacity 0.4s linear,
-    visibility 0s linear 0.4s;
+    opacity var(--dur-slow) linear,
+    visibility 0s linear var(--dur-slow);
 }
 
 .sheet[data-open="true"] {
   opacity: 1;
   visibility: visible;
   transition:
-    opacity 0.4s linear,
+    opacity var(--dur-slow) linear,
     visibility 0s;
 }
 
@@ -78,11 +83,11 @@
   opacity: 0;
   transform: translateY(15px);
   transition:
-    opacity 0.42s var(--ease-entrance),
-    transform 0.55s var(--ease-entrance);
+    opacity var(--dur-slow) var(--ease-entrance),
+    transform var(--dur-glide) var(--ease-entrance);
   /* --i is set per item in Menu.tsx; the sheet's own fade runs 400ms, so
      the first link lands just after it and the last at ~350ms */
-  transition-delay: calc(var(--i) * 58ms + 120ms);
+  transition-delay: calc(var(--i) * var(--stagger-tight) + 120ms);
 }
 
 .sheet[data-open="true"] .item {
@@ -112,8 +117,8 @@
   opacity: 0;
   transform: translateY(10px);
   transition:
-    opacity 0.5s var(--ease-entrance) 0.42s,
-    transform 0.6s var(--ease-entrance) 0.42s;
+    opacity var(--dur-glide) var(--ease-entrance) 0.42s,
+    transform var(--dur-glide) var(--ease-entrance) 0.42s;
 }
 
 .sheet[data-open="true"] .foot {

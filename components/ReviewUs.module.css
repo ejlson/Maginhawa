@@ -226,7 +226,7 @@
   border-left: 1px solid color-mix(in srgb, var(--cream) 22%, transparent);
   text-decoration: none;
   color: inherit;
-  transition: background-color 0.32s ease;
+  transition: background-color var(--dur-base) var(--ease-state);
 }
 
 /* The full-width orphan turns on its side: a card that wide with the name
@@ -278,7 +278,7 @@
   display: flex;
   flex-direction: column;
   gap: var(--space-2xs);
-  transition: transform 0.32s var(--ease-out);
+  transition: transform var(--dur-base) var(--ease-out);
 }
 
 .itemName {
@@ -307,7 +307,7 @@
   letter-spacing: var(--tr-label);
   text-transform: uppercase;
   opacity: 0.75;
-  transition: opacity 0.3s ease, transform 0.32s var(--ease-out);
+  transition: opacity var(--dur-base) var(--ease-out), transform var(--dur-base) var(--ease-out);
 }
 
 .itemCta svg {
@@ -322,7 +322,7 @@
 
 .itemArrow {
   display: inline-block;
-  transition: transform 0.32s ease;
+  transition: transform var(--dur-base) var(--ease-out);
 }
 
 .item:hover .itemArrow,

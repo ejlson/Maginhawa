@@ -793,8 +793,8 @@
 
   transform: scale(1);
   transition:
-    transform 400ms var(--ease-drawer),
-    box-shadow 400ms var(--ease-drawer);
+    transform var(--dur-slow) var(--ease-drawer),
+    box-shadow var(--dur-slow) var(--ease-drawer);
 }
 
 /* THE PAN LAYER — see .mediaPan in AboutSplit.module.css for the budget
@@ -816,7 +816,7 @@
 /* next/image renders the <img>; `fill` gives it the absolute inset */
 .frontPhotoImg {
   object-fit: cover;
-  transition: transform 700ms var(--ease-drawer);
+  transition: transform var(--dur-drawer) var(--ease-drawer);
 }
 
 /* ── THE VENUE'S MARK, and it is /blog's now rather than VenueCard's ──
@@ -1150,7 +1150,7 @@
 
 .entryPhoto {
   object-fit: cover;
-  transition: transform 700ms var(--ease-drawer);
+  transition: transform var(--dur-drawer) var(--ease-drawer);
 }
 
 /* ⚠️ BOTH GROW, AND THAT IS WHAT ALIGNS THE HAIRLINES. `.strip` is a flex
@@ -1213,7 +1213,7 @@
   -webkit-line-clamp: 3;
   line-clamp: 3;
   overflow: hidden;
-  transition: color 0.3s ease;
+  transition: color var(--dur-base) var(--ease-state);
 }
 
 /* TWO REAL ELEMENTS, not ::before/::after on the body, because each has to

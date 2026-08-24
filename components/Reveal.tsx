@@ -75,7 +75,11 @@ export default function Reveal({
     hidden: { clipPath: `inset(100% 0 0 0 round ${clip}px)` },
     shown: {
       clipPath: "inset(0% 0 0 0 round 0px)",
-      transition: { duration: 0.9, ease: [0.22, 1, 0.36, 1], delay },
+      /* 1.15s — the site's --dur-chapter, and the wipe is the reveal that
+         most deserves it: it is a hard edge travelling the full height of a
+         photograph, which is the one entrance on the page a reader can
+         actually FOLLOW rather than just notice has happened. */
+      transition: { duration: 1.15, ease: [0.22, 1, 0.36, 1], delay },
     },
   };
 
@@ -84,6 +88,9 @@ export default function Reveal({
         hidden: { opacity: 0 },
         shown: {
           opacity: 1,
+          /* NOT slowed with the rest of the pass, deliberately. A reader on
+             reduced motion asked for less movement, not for a longer one —
+             the fade is here only so content does not pop in. */
           transition: { duration: 0.4, ease: "easeOut", delay },
         },
       }
@@ -96,12 +103,25 @@ export default function Reveal({
           y: 0,
           filter: "blur(0px)",
           transition: {
-            // the rise settles on a gentle spring — smooth with a whisper of
-            // bounce (the Apple/Emil feel); opacity + blur ride a clean
-            // ease-out so the fade and de-blur never overshoot
-            y: { type: "spring", stiffness: 150, damping: 19, mass: 1, delay },
-            opacity: { duration: 0.7, ease: [0.23, 1, 0.32, 1], delay },
-            filter: { duration: 0.8, ease: [0.23, 1, 0.32, 1], delay },
+            /* The rise settles on a gentle spring — a whisper of bounce (the
+               Apple/Emil feel); opacity + blur ride a clean ease-out so the
+               fade and de-blur never overshoot.
+
+               ── DURATION + BOUNCE, WAS stiffness 150 / damping 19 ──
+               Same spring, said in the units the rest of the site already
+               uses (JoinUs's SPLIT_SPRING, Discover's EXPAND_SPRING), and
+               retuned for the "slower, smoother, more controlled" pass.
+               The old pair worked out at a damping ratio of 0.78 — i.e.
+               bounce ≈ 0.22, which is a good deal more overshoot than the
+               comment's "whisper" claims. 0.04 is the whisper it meant: the
+               block still lands rather than stopping dead, and it lands
+               once instead of settling through a visible wobble.
+               1s rather than ~0.45s because this is the entrance EVERY
+               chapter on the site is built out of — it sets the register
+               more than any other number in this file. */
+            y: { type: "spring", duration: 1, bounce: 0.04, delay },
+            opacity: { duration: 0.95, ease: [0.23, 1, 0.32, 1], delay },
+            filter: { duration: 1.05, ease: [0.23, 1, 0.32, 1], delay },
           },
         },
       };

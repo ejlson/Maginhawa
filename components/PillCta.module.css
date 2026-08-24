@@ -239,8 +239,26 @@
      the note above was written to protect; the next request for a faster
      merge has to re-fit linear() so the relax keeps its milliseconds while
      the approach gives up more of its own, and that is a different edit
-     from this one. Do not simply type a smaller number here. */
-  --cta-dur: 700ms;
+     from this one. Do not simply type a smaller number here.
+
+     ── AND THE ROAD TURNED ROUND: --dur-drawer NOW, i.e. 950ms ──
+     At the user's instruction, in a pass that slowed the whole site
+     ("slower, smoother and more controlled"). The floor above only ever
+     bound the FAST direction, so this needs no re-fit: linear() is
+     normalised, every stage keeps its share, and each one simply gets
+     more clock than the 700ms fit gave it:
+       approach  0 → 55%    523ms
+       fuse     55 → 80%    238ms
+       relax    80 → 96%    152ms
+       settled  96 → 100%    38ms
+     It is the 950 the first paragraph describes, arrived at from the other
+     side — "the approach alone runs half a second, which is what makes the
+     contact land as an event". It is now the scale's --dur-drawer rather
+     than its own number, so a future retune of the site's register carries
+     the CTA with it instead of leaving it behind. The 700ms floor still
+     stands underneath: going back BELOW it is still the edit this comment
+     says not to make with a bare number. */
+  --cta-dur: var(--dur-drawer);
 
   /* ── THE FUSION CURVE ──
      Two droplets do not meet at a constant speed. They drift, they touch,
@@ -479,7 +497,7 @@
 .arrow {
   width: 55%;
   height: 10px;
-  transition: transform 340ms var(--ease-bounce);
+  transition: transform var(--dur-mid) var(--ease-bounce);
 }
 
 /* ══════════════════════════ THE CLOSE ══════════════════════════════════

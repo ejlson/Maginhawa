@@ -51,7 +51,7 @@
   text-transform: uppercase;
   color: var(--maroon-soft);
   text-decoration: none;
-  transition: color 0.2s var(--ease-out);
+  transition: color var(--dur-quick) var(--ease-out);
 }
 
 .backTop:hover,
@@ -63,7 +63,7 @@
    feedback on a control rather than decoration */
 .backArrow,
 .footArrow {
-  transition: transform 0.25s var(--ease-out);
+  transition: transform var(--dur-snug) var(--ease-out);
 }
 
 .backTop:hover .backArrow,
@@ -263,7 +263,7 @@
   text-underline-offset: 0.18em;
   text-decoration-thickness: 1px;
   text-decoration-color: var(--rule);
-  transition: text-decoration-color 0.2s var(--ease-out);
+  transition: text-decoration-color var(--dur-quick) var(--ease-out);
 }
 
 .prose a:hover,
@@ -320,7 +320,7 @@
   min-width: 0;
   color: var(--maroon-soft);
   text-decoration: none;
-  transition: color 0.2s var(--ease-out);
+  transition: color var(--dur-quick) var(--ease-out);
 }
 
 .footLink:hover,
@@ -370,7 +370,7 @@
   text-transform: uppercase;
   color: var(--maroon-soft);
   text-decoration: none;
-  transition: color 0.2s var(--ease-out);
+  transition: color var(--dur-quick) var(--ease-out);
 }
 
 .backFoot:hover,

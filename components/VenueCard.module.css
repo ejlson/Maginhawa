@@ -175,8 +175,8 @@
   box-shadow: var(--shadow-card);
   transform: scale(1);
   transition:
-    transform 400ms var(--ease-drawer),
-    box-shadow 400ms var(--ease-drawer);
+    transform var(--dur-slow) var(--ease-drawer),
+    box-shadow var(--dur-slow) var(--ease-drawer);
 }
 
 /* ═══ THE SQUARE — /restaurants' grid, and the only thing about that card
@@ -321,7 +321,7 @@
      carrying a layout consequence for an effect it does not use. `none`
      leaves that page byte-identical. */
   translate: var(--photo-translate, none);
-  transition: scale 700ms var(--ease-drawer);
+  transition: scale var(--dur-drawer) var(--ease-drawer);
 }
 
 /* pointer zoom — hover-capable, fine-pointer devices only. Touch gets a
@@ -373,7 +373,7 @@
    scale, which is a missing nicety, not a break.) */
 .cardSurface:has(.plateHit:active) {
   transform: scale(0.985);
-  transition-duration: 120ms;
+  transition-duration: var(--dur-tap);
 }
 
 /* the focus ring rides the card's own edge. An outline is NOT clipped by
@@ -424,7 +424,7 @@
   );
   opacity: 0;
   pointer-events: none;
-  transition: opacity 700ms var(--ease-drawer);
+  transition: opacity var(--dur-drawer) var(--ease-drawer);
 }
 
 /* ---------- hover film ---------- */
@@ -452,7 +452,7 @@
   /* resting clip is OPEN, so the exit fades a full frame rather than a
      circle that has already snapped shut */
   clip-path: circle(145% at var(--wipe-x) var(--wipe-y));
-  transition: opacity 260ms linear;
+  transition: opacity var(--dur-snug) linear;
   pointer-events: none;
 }
 
@@ -467,7 +467,7 @@
 .hoverClipOn {
   opacity: 1;
   clip-path: circle(145% at var(--wipe-x) var(--wipe-y));
-  transition: clip-path 520ms var(--ease-entrance);
+  transition: clip-path var(--dur-glide) var(--ease-entrance);
 }
 
 /* ═══════════════════ THE RAMP — the card's bottom material ═══════════
@@ -651,8 +651,8 @@
   opacity: 0;
   transform: translateY(10px);
   transition:
-    opacity 700ms var(--ease-drawer),
-    transform 700ms var(--ease-drawer);
+    opacity var(--dur-drawer) var(--ease-drawer),
+    transform var(--dur-drawer) var(--ease-drawer);
   pointer-events: none;
 }
 
@@ -1417,11 +1417,11 @@
   overflow: hidden;
   transform: translateX(6px);
   transition:
-    max-width 380ms var(--ease-drawer),
-    padding 380ms var(--ease-drawer),
-    margin 380ms var(--ease-drawer),
-    opacity 220ms var(--ease-drawer),
-    transform 380ms var(--ease-drawer);
+    max-width var(--dur-mid) var(--ease-drawer),
+    padding var(--dur-mid) var(--ease-drawer),
+    margin var(--dur-mid) var(--ease-drawer),
+    opacity var(--dur-quick) var(--ease-drawer),
+    transform var(--dur-mid) var(--ease-drawer);
 }
 
 /* the open state — hover for fine pointers, focus-within for keyboards
@@ -1505,10 +1505,10 @@
   cursor: pointer;
   -webkit-tap-highlight-color: transparent;
   transition:
-    background-color 400ms var(--ease-drawer),
-    border-color 400ms var(--ease-drawer),
-    transform 400ms var(--ease-drawer),
-    color 400ms var(--ease-drawer);
+    background-color var(--dur-slow) var(--ease-drawer),
+    border-color var(--dur-slow) var(--ease-drawer),
+    transform var(--dur-slow) var(--ease-drawer),
+    color var(--dur-slow) var(--ease-drawer);
 }
 
 /* THE SECONDARIES — a cream OUTLINE, and there are now two of them:
@@ -1570,7 +1570,7 @@
 
 .cardBtn:active {
   transform: scale(0.97);
-  transition-duration: 120ms;
+  transition-duration: var(--dur-tap);
 }
 
 /* ---------- the block, one size up ---------- */

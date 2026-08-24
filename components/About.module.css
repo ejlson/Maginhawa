@@ -739,9 +739,9 @@
   opacity: 0;
   transform: translateY(0.4em);
   transition:
-    opacity 0.9s cubic-bezier(0.22, 1, 0.36, 1),
-    transform 0.9s cubic-bezier(0.22, 1, 0.36, 1);
-  transition-delay: calc(var(--i, 0) * 42ms);
+    opacity var(--dur-chapter) cubic-bezier(0.22, 1, 0.36, 1),
+    transform var(--dur-chapter) cubic-bezier(0.22, 1, 0.36, 1);
+  transition-delay: calc(var(--i, 0) * var(--stagger-tight));
 }
 
 .storyTitle[data-lit] .fitChar {
@@ -1166,8 +1166,8 @@
     transform: translateY(-50%) scale(0.96);
     transform-origin: right center;
     transition:
-      opacity 0.35s var(--ease-entrance),
-      transform 0.35s var(--ease-entrance);
+      opacity var(--dur-mid) var(--ease-entrance),
+      transform var(--dur-mid) var(--ease-entrance);
   }
 
   /* ON ROW HOVER — the whole row is the target, not the image. `.coverageRow`
@@ -1198,14 +1198,14 @@
   color: var(--maroon);
   opacity: 0.4;
   transition:
-    opacity 0.3s ease,
-    color 0.3s ease;
+    opacity var(--dur-base) var(--ease-out),
+    color var(--dur-base) var(--ease-state);
 }
 
 .coverageArrow svg {
   width: 22px;
   height: 10px;
-  transition: transform 0.4s var(--ease-out);
+  transition: transform var(--dur-slow) var(--ease-out);
 }
 
 /* subtle by design: the arrow slides a few px and warms to saffron —

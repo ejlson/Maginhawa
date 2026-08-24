@@ -75,7 +75,7 @@
   padding: 9px 18px;
   border-radius: 999px;
   cursor: pointer;
-  transition: background 0.3s ease, color 0.3s ease;
+  transition: background var(--dur-base) var(--ease-state), color var(--dur-base) var(--ease-state);
   white-space: nowrap;
   display: inline-flex;
   align-items: center;
