@@ -49,6 +49,31 @@ export const entryLinkProps = (entry: BlogEntry) =>
     ? ({ target: "_blank", rel: "noopener noreferrer" } as const)
     : {};
 
+/* ═══ THE HEADLINE A CARD PRINTS — the outlet, then the story ═══
+   "Forbes: last-minute Valentine's guide picks Café Mama & Sons". On a feed
+   where every entry links OUT, the masthead is the credential: "Forbes"
+   earns attention and "11 Feb 2026" does not, so the outlet leads the
+   headline and the date goes on the photograph.
+
+   ⚠️ THE PREFIX IS CONDITIONAL, and that is the whole function. Most of
+   these titles ALREADY open with their outlet — "The Observer: Filipino
+   baked goods…", "Forbes' last-minute Valentine's guide…". Prefixing
+   unconditionally would print the outlet twice on every one of them. Only
+   a handful actually need it, which is exactly the ratio that makes an
+   unguarded version look fine in one card and wrong in four.
+
+   The test is a case-insensitive PREFIX match rather than an exact one so
+   that a possessive ("Forbes'") still counts as the outlet having led.
+
+   Kept here rather than in a component for the reason entryLinkProps is —
+   both card surfaces set this string now: the home page's strip and /blog's
+   archive grid. */
+export function headline(entry: BlogEntry) {
+  const t = entry.title.trim();
+  const s = entry.source.trim();
+  return t.toLowerCase().startsWith(s.toLowerCase()) ? t : `${s}: ${t}`;
+}
+
 // Hand-picked coverage: the strongest entries from the press tracker plus
 // the stories the venues published themselves. Easy to extend — add an
 // object, the UI orders the feed by date.

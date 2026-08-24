@@ -53,6 +53,16 @@ function scrollToSection(hash: string, pass = 0) {
 // stay mounted the whole time; the swap only flips visibility, so there's
 // no loading gap or flash between clips.
 //
+// ⚠️ THE CUT IS THE USER'S CHOICE, AND A DISSOLVE WAS TRIED AND REMOVED.
+// The motion crit's Finding 04 argued a hard splice reads as a glitch and
+// shipped a 600ms opacity crossfade; the user asked for it to come out.
+// A cut is a legitimate piece of film grammar — kitchens cut, montages
+// cut — and it is faster and cleaner than a blend of two moving frames,
+// which can read as mush. If the splice ever bothers again, the stronger
+// alternative is not the dissolve back but ONE longer single-take clip
+// (see the redesign blueprint) — a film that never needs a transition at
+// all.
+//
 // ⚠️ ONLY THE FIRST ONE IS PRELOADED, AND ON A PHONE THAT IS THE DIFFERENCE
 // BETWEEN A PAGE AND A DOWNLOAD. Both carried `preload="auto"`, which fetches
 // each file in full: 9.3MB + 7.4MB = 16.7MB pulled down the wire before the
@@ -261,39 +271,41 @@ export default function Hero({ started }: { started: boolean }) {
             animate={{ opacity: started ? 1 : 0, y: started ? 0 : 10 }}
             transition={{ duration: 0.8, ease: "easeOut", delay: 0.45 }}
           >
-            {/* the identifying sentence, as one paragraph rather than three
-                clause spans: at 15px it sets as a caption and the clause
-                breaks that mattered at 80px would now be arbitrary rags */}
-            {/* ⚠️ TWO LINES, AND THE LENGTH IS LOAD-BEARING. The caption
-                column is only as tall as the wordmark's cap-to-baseline
-                (see .lockup), and the alignment the design asks for holds
-                only while this paragraph plus the control FIT inside that
-                height. Measured at 1440: cap height 106px against a
-                two-line caption (44) + gap (14) + pill (44) = 102. A third
-                line makes the column the taller of the two, the wordmark
-                stretches to it, and the button's foot leaves the baseline.
-                THE LENGTH CEILING IS GONE with the side-by-side layout.
-                Three earlier drafts were cut to 62 characters because the
-                caption had to fit inside the wordmark's cap height; on its
-                own row it does not, so the cuisines are back and the line
-                about the Camden kitchen with them. It sets in three lines
-                on the nav's measure.
+            {/* ══════════ THE CLAIM, IN ONE LINE ══════════
+                At the user's instruction, and it is the redesign blueprint's
+                Chapter 01 landing early: the first screen now ANSWERS the
+                question it used to only gesture at. The old caption was an
+                inventory — "Seven rooms across North London — Filipino,
+                Filipino-Japanese and Caribbean. It began with one Camden
+                kitchen in 1987…" — three lines of what and where, and no
+                why. This is the why, in twelve words.
+
+                ⚠️ THE LINE IS ABOUTSPLIT's OPENING SENTENCE, VERBATIM, AND
+                THE ECHO IS THE DEVICE, NOT A COLLISION. It is the group's
+                thesis: spoken once at the top of the page as the claim, and
+                met again four screens down where the story chapter expands
+                it ("…A table you are not hurried from…"). A magazine runs
+                its cover line into the feature the same way. Do not "fix"
+                either copy to differ from the other — if the sentence ever
+                changes, it changes in BOTH places or the echo dies.
+
+                WHAT THE OLD CAPTION CARRIED IS NOT LOST: the cuisines and
+                the eight rooms are the Rooms chapter's whole job, and the
+                Camden-1987 dateline is the story chapter's first caption.
+                The hero no longer summarises the page; it opens it.
 
                 IT STILL DOES NOT TRANSLATE THE WORD ABOVE IT. "Tagalog for
-                comfort" is the Manifesto's line, three chapters down;
-                spending it here would cash the payoff that chapter exists
-                to deliver.
+                comfort" is the Manifesto's line, chapters down; spending it
+                here would cash the payoff that chapter exists to deliver.
+                The hero shows the word, the Manifesto explains it.
 
-                IT DELIBERATELY DOES NOT TRANSLATE THE WORD ABOVE IT. "Tagalog
-                for comfort" was the obvious caption and it is the Manifesto's
-                line, three chapters down; spending it here would cash the
-                payoff that chapter exists to deliver. The hero shows the
-                word, the Manifesto explains it. */}
+                (The old length ceiling — 62 characters, when the caption
+                had to fit inside the wordmark's cap height — is moot twice
+                over: the layout that imposed it is gone, and this line is
+                63 characters anyway.) */}
             <p className={styles.sentence}>
-              Seven rooms across North London - Filipino, Filipino-Japanese
-              and Caribbean. It began with one Camden kitchen in 1987 and it
-              is still the same family cooking, room by room, night after
-              night.
+              We cook the food we grew up on, for people we treat like
+              family.
             </p>
 
             {/* ── THE HOUSE ACTION, at the user's instruction ──

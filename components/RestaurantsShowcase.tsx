@@ -892,7 +892,7 @@ export default function RestaurantsShowcase() {
   const item = RESTAURANTS[active];
 
   return (
-    <main className={styles.page}>
+    <main id="main-content" className={styles.page}>
       <Nav
         started
         menuOpen={menuOpen}

@@ -20,6 +20,7 @@ import PillCta from "./PillCta";
 import Reveal from "./Reveal";
 import SplitWords from "./SplitWords";
 import styles from "./JoinUs.module.css";
+import { asset } from "@/lib/media";
 import { JOBS } from "@/lib/jobs";
 import { lenisRef } from "@/lib/SmoothScroll";
 
@@ -869,7 +870,7 @@ export default function JoinUs() {
       />
       <Menu open={menuOpen} onClose={() => setMenuOpen(false)} />
 
-      <main className={styles.page} data-nav-theme="light">
+      <main id="main-content" className={styles.page} data-nav-theme="light">
 
         {/* ---- careers hero — a sentence with a photograph inside it ----
              THE COMPOSITION IS A FLEX COLUMN AND THE <h1> IS `display:
@@ -969,25 +970,68 @@ export default function JoinUs() {
                   style={{ y: frameY, scale: frameScale, opacity: frameFade }}
                 >
                   <motion.div className={styles.heroPan} style={{ y: panY }}>
-                    <Image
-                      className={styles.heroImg}
-                      src="/images/careers-hero.jpg"
-                      alt="A chef plating clams and seafood at the pass in a Maginhawa kitchen"
-                      width={1920}
-                      height={1080}
-                      /* The band is the container's full width, i.e.
-                         100vw minus twice --grid-margin, and --grid-margin is
-                         clamp(16px, 2.8vw, 40px) — so the breakpoints here
-                         are the clamp's own corners (570px and 1428px), not
-                         invented ones. Plain "100vw" over-asks by up to 5.6%
-                         at every width, which on a single 1920-wide hero is
-                         the difference between candidates. The frame's
-                         entrance scale never exceeds 1, so the rendered
-                         width never exceeds the band's and `sizes` still
-                         describes the largest box the image is drawn at. */
-                      sizes="(max-width: 570px) calc(100vw - 32px), (max-width: 1428px) 94.4vw, calc(100vw - 80px)"
-                      priority
-                    />
+                    {/* THE BAND IS FILM NOW, AND THE STILL IS ITS POSTER.
+                        The picture that was here — careers-hero.jpg — is a
+                        frame of belly-hero.mp4, so playing the clip is the
+                        same composition in motion rather than a different
+                        one: the pass, the hands, the clams. Keeping it as
+                        `poster` means the first paint is unchanged, the
+                        frame never shows bare --maroon while the film
+                        buffers, and the reduced-motion branch below is
+                        rendering the same photograph the poster shows.
+
+                        `asset()` HANDS VIDEO PATHS BACK UNTOUCHED — film is
+                        served by the host, not the CDN, and the reason is
+                        the quota arithmetic in lib/media.ts. It is still
+                        written through `asset()` so this call site reads
+                        like every other piece of media on the site, and so
+                        the poster (a photograph, which DOES go to the CDN)
+                        picks up f_auto and a width. */}
+                    {reduce ? (
+                      <Image
+                        className={styles.heroImg}
+                        src="/images/careers-hero.jpg"
+                        alt="A chef plating clams and seafood at the pass in a Maginhawa kitchen"
+                        width={1920}
+                        height={1080}
+                        /* The band is the container's full width, i.e.
+                           100vw minus twice --grid-margin, and --grid-margin is
+                           clamp(16px, 2.8vw, 40px) — so the breakpoints here
+                           are the clamp's own corners (570px and 1428px), not
+                           invented ones. Plain "100vw" over-asks by up to 5.6%
+                           at every width, which on a single 1920-wide hero is
+                           the difference between candidates. The frame's
+                           entrance scale never exceeds 1, so the rendered
+                           width never exceeds the band's and `sizes` still
+                           describes the largest box the image is drawn at. */
+                        sizes="(max-width: 570px) calc(100vw - 32px), (max-width: 1428px) 94.4vw, calc(100vw - 80px)"
+                        priority
+                      />
+                    ) : (
+                      /* `role="img"` + `aria-label` rather than a bare
+                         <video>: this element carries no information the
+                         page does not also say in words, but it IS the
+                         hero's picture, and dropping it out of the tree
+                         entirely would leave a screen reader with two lines
+                         of headline and nothing between them. The label is
+                         the alt text the still was carrying, verbatim.
+
+                         `muted` is not a preference — autoplay is blocked
+                         without it everywhere — and `playsInline` stops iOS
+                         taking the clip fullscreen. */
+                      <video
+                        className={styles.heroImg}
+                        src={asset("/videos/belly-hero.mp4")}
+                        poster={asset("/images/careers-hero.jpg", { width: 1920 })}
+                        role="img"
+                        aria-label="A chef plating clams and seafood at the pass in a Maginhawa kitchen"
+                        autoPlay
+                        muted
+                        loop
+                        playsInline
+                        preload="auto"
+                      />
+                    )}
                   </motion.div>
                   {/* the caption's ground */}
                   <div className={styles.heroScrim} aria-hidden />
@@ -1132,18 +1176,28 @@ export default function JoinUs() {
                 words of argument aimed at someone who has already decided to
                 apply. Three columns of ~30 words is also the shape this copy
                 was written in. */}
-            {/* `data-nav-theme="light"`, and it is STATED rather than
-                inherited. The band was a dark ground and carried "dark" for
-                it — the navbar samples what is UNDER the bar (Nav.tsx:
-                elementFromPoint at 24,56 then `.closest`), so on the maroon
-                it had to be told to stop painting maroon ink. The ground is
-                a step off the cream now (see `.reasons`), so the bar's own
-                light treatment is the correct one and "dark" would have
-                painted cream ink on a near-cream band — the same failure
-                the attribute was added to prevent, pointing the other way.
-                Left explicit rather than deleted so the next change of
-                ground has the sampler's rule in front of it. */}
-            <ul className={styles.reasons} data-nav-theme="light">
+            {/* `data-nav-theme="dark"`, and it MUST track `--plate`. The
+                navbar samples what is under the bar and paints against it:
+                Nav.tsx reads `elementFromPoint(24, barHeight + 4)` and walks
+                up with `.closest("[data-nav-theme]")`, so whatever this list
+                claims is what the bar believes it is sitting on. The cards
+                are the ink again, so the bar has to stop painting maroon
+                type over them; when they were a tint this said "light" for
+                exactly the opposite reason.
+
+                x = 24 IS WHY THIS MATTERS ON PHONES SPECIFICALLY. The probe
+                is a fixed 24px from the left edge, and the first card starts
+                at --grid-margin — clamp(16px, 2.8vw, 40px), which is under
+                24px below an 857px viewport. So from a phone up to a small
+                laptop the probe lands INSIDE card 01 and this attribute
+                decides the bar's colour; above that it lands in the page
+                margin, finds no host, and the bar falls through to "blend"
+                over the cream, which is what it should do there anyway.
+
+                Stated rather than inherited, and kept next to the note, so
+                the next change of ground has the sampler's rule in front of
+                it. */}
+            <ul className={styles.reasons} data-nav-theme="dark">
               {PILLARS.map((pl, i) => (
                 <Reveal as="li" key={pl.mark} className={styles.reason} delay={i * 0.07}>
                   <span className={styles.reasonMark}>{pl.mark}</span>

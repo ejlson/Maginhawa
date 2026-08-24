@@ -147,19 +147,26 @@
 .button {
   font-family: var(--font-sans);
   font-weight: var(--w-medium);
-  font-size: var(--t-button);
+  /* --t-small (14px), not --t-button (15–17px). Three controls share a
+     420px card and the pill is chrome on a notice, not a call to action —
+     the Footer's invitation pill is the page's closing gesture and earns
+     the larger size; this one is a form control that should sit quietly
+     under two lines of copy. */
+  font-size: var(--t-small);
   line-height: var(--lh-flush);
   white-space: nowrap;
   color: var(--btn-ink);
   background: var(--btn-fill);
-  border: none;
+  /* a transparent border at rest, so the outlined variant below can turn it
+     on without the two pills differing in HEIGHT — a border added only to
+     one would make it 2px taller and break the row */
+  border: 1px solid transparent;
   border-radius: 999px;
-  /* 0.6em across, not 1.4em: three pills share a 420px card, so the
-     horizontal padding is what decides whether "Preferences" fits on one
-     line. The pill's IDENTITY is its radius, its fill and its recess, none
-     of which change here — only the side padding, which is the one value
-     that can give without the control becoming a different object. */
-  padding: 0.85em 0.6em;
+  /* tightened with the type. 0.6em across because three pills share a
+     420px card and the horizontal padding is what decides whether
+     "Preferences" fits on one line. The pill's IDENTITY is its radius, its
+     fill and its recess — none of those change, only the scale. */
+  padding: 0.72em 0.6em;
   cursor: pointer;
   box-shadow: inset 0 2px 12px rgba(47, 0, 0, 0.14);
   transition: box-shadow 320ms var(--ease-out);
@@ -287,6 +294,38 @@
 .checkbox:focus-visible {
   outline: 2px solid var(--cream);
   outline-offset: 2px;
+}
+
+/* ── THE OUTLINED VARIANT — Preferences / Save ONLY ──
+   ⚠️ THIS IS THE ONE CONTROL THAT MAY LOOK DIFFERENT, AND THE REASON IS
+   LEGAL, NOT AESTHETIC. Accept and Decline are the two consent answers and
+   the ICO requires refusing to be as easy as accepting, so those two stay
+   identical — a filled Accept beside an outlined Decline is precisely the
+   pattern that fails. Preferences/Save is not an answer; it opens the
+   detail. It can therefore carry the quieter treatment, and giving it to
+   the middle control is what lets the row have variety at all.
+   ⚠️ DO NOT MOVE THIS CLASS ONTO Accept OR Decline.
+
+   currentColor for the edge, so it follows whichever ground the card is on
+   and cannot fall below the 3:1 a control's boundary owes. Cream on the
+   72% wash measures 5.85:1. */
+.buttonOutline {
+  background: transparent;
+  color: var(--btn-fill);
+  border-color: currentColor;
+  /* the filled pill's recess would be invisible on a transparent ground and
+     reads as a smudge where the two meet */
+  box-shadow: none;
+}
+
+.buttonOutline:hover:not(:disabled) {
+  background: var(--btn-fill);
+  color: var(--btn-ink);
+  box-shadow: none;
+}
+
+.buttonOutline:active:not(:disabled) {
+  box-shadow: inset 0 4px 18px rgba(47, 0, 0, 0.3);
 }
 
 /* ── phones: the card becomes a full-width sheet at the foot ──

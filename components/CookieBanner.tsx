@@ -7,13 +7,14 @@ import {
   analyticsConfigured,
   consentRequired,
   marketingConfigured,
+  needsAsking,
   NO_CONSENT,
   readConsent,
   readDismissed,
   setConsent,
   setDismissed,
   subscribeConsent,
-  type ConsentCategories,
+  type ConsentRecord,
 } from "@/lib/consent";
 
 /* ── THE CONSENT BANNER ──
@@ -42,7 +43,7 @@ import {
  *    three here are the same pill on three equal grid tracks.
  */
 export default function CookieBanner() {
-  const [consent, setLocal] = useState<ConsentCategories | null>(null);
+  const [consent, setLocal] = useState<ConsentRecord | null>(null);
   const [dismissed, setLocalDismissed] = useState(false);
   const [ready, setReady] = useState(false);
   const [showPrefs, setShowPrefs] = useState(false);
@@ -54,15 +55,32 @@ export default function CookieBanner() {
   const [marketingOn, setMarketingOn] = useState(false);
 
   useEffect(() => {
-    setLocal(readConsent());
+    const existing = readConsent();
+    setLocal(existing);
     setLocalDismissed(readDismissed());
+    /* Seed the switches from any answer this visitor has ALREADY given.
+       This is not a pre-tick: a pre-tick is us assuming consent nobody
+       expressed, whereas this is showing someone the choice they made last
+       time so that being asked about a NEW purpose does not silently reset
+       the old one. A reader who accepted analytics and is now being asked
+       about marketing should not have to re-grant analytics to keep it. */
+    if (existing) {
+      setAnalyticsOn(existing.analytics);
+      setMarketingOn(existing.marketing);
+      /* They have answered before, so the detail is the point of showing
+         this again — open on the panel rather than the summary. */
+      setShowPrefs(true);
+    }
     setReady(true);
     return subscribeConsent(setLocal);
   }, []);
 
   if (!consentRequired) return null;
   if (!ready) return null;
-  if (consent !== null || dismissed) return null;
+  /* ⚠️ needsAsking, NOT `consent !== null`. A stored record does not mean
+     every purpose has been answered — see ConsentRecord in lib/consent.ts
+     for the failure that replaced. */
+  if (!needsAsking(consent) || dismissed) return null;
 
   const close = () => {
     setDismissed();
@@ -159,7 +177,13 @@ export default function CookieBanner() {
 
       {/* Three equal tracks. Accept and Decline are the two answers and are
           identical; Preferences/Save shares their style because a control
-          that opens the detail should not look like an afterthought. */}
+          that opens the detail should not look like an afterthought.
+
+          ⚠️ THE TWO ANSWERS SIT TOGETHER, at the user's instruction — Decline
+          reads immediately to the right of Accept rather than across the row
+          from it. Accept and Decline are the same question answered two ways,
+          so the eye should not have to cross a third control to find the
+          second one; Preferences opens the detail and now trails them both. */}
       <div className={styles.actions}>
         <button type="button" className={styles.button} onClick={acceptAll}>
           Accept
@@ -167,17 +191,19 @@ export default function CookieBanner() {
         <button
           type="button"
           className={styles.button}
+          onClick={() => setConsent(NO_CONSENT)}
+        >
+          Decline
+        </button>
+        <button
+          type="button"
+          /* the outlined variant — see the ⚠️ on .buttonOutline for why this
+             control, and ONLY this control, may differ from the other two */
+          className={`${styles.button} ${styles.buttonOutline}`}
           onClick={() => (showPrefs ? save() : setShowPrefs(true))}
           aria-expanded={showPrefs ? undefined : false}
         >
           {showPrefs ? "Save" : "Preferences"}
-        </button>
-        <button
-          type="button"
-          className={styles.button}
-          onClick={() => setConsent(NO_CONSENT)}
-        >
-          Decline
         </button>
       </div>
     </aside>
@@ -196,7 +222,7 @@ export default function CookieBanner() {
  * cookies already written, which is why the copy says to clear them and
  * does not pretend otherwise. */
 export function ConsentControl() {
-  const [consent, setLocal] = useState<ConsentCategories | null>(null);
+  const [consent, setLocal] = useState<ConsentRecord | null>(null);
   const [ready, setReady] = useState(false);
 
   useEffect(() => {
@@ -208,8 +234,12 @@ export function ConsentControl() {
   if (!consentRequired) return null;
 
   const current = consent ?? NO_CONSENT;
-  const flip = (key: keyof ConsentCategories, value: boolean) =>
-    setConsent({ ...current, [key]: value });
+  const flip = (key: "analytics" | "marketing", value: boolean) =>
+    setConsent({
+      analytics: current.analytics,
+      marketing: current.marketing,
+      [key]: value,
+    });
 
   const rows = [
     {

@@ -73,6 +73,71 @@ export type VenueCardItem = {
   badge?: string;
   badgeLabel?: string;
   menuPages?: string[];
+  /** the logo's intrinsic aspect (PNG w/h) and the fraction of its box the
+   *  LETTERFORMS occupy — see LOGO_OPTICS below. Both are consumed as CSS
+   *  custom properties by the card's crown. */
+  logoAspect?: number;
+  logoInkRatio?: number;
+};
+
+/* ══════════ THE LOGO OPTICS — MEASURED, NOT CHOSEN ══════════════════════
+   Read this before touching a number.
+
+   THE PROBLEM THESE SOLVE. The crown masks each venue's PNG into a slot and
+   fits it by height. Fitting the WHOLE LOCKUP to one flat slot equalises
+   the bounding box, which is not what a reader sees: it equalises the
+   crest, the strapline and the rule box along with the name. Measured at
+   the flat 30px slot the grid shipped with, the actual letterforms came out
+
+       bintang 11.7  cafemama 12.1  guanabana 12.8  mamasons 13.0
+       ramo 17.3     hoodwood 17.6  belly 21.0      bunso 30.0
+
+   — a 2.6x spread, and Bintang's script was near-illegible on its dark
+   photograph. The grid read as two weight classes: single-line wordmarks
+   at full size, multi-element lockups shrunk to fit their own furniture.
+
+   HOW THEY ARE DERIVED. `logoInkRatio` is the height of what the eye reads
+   as THE NAME, over the PNG's full height, measured off the alpha channel
+   (the same channel the CSS mask uses). Sizing the slot as
+   `cap / logoInkRatio` then puts every venue's letterforms at the same
+   height and lets the lockup take whatever room its subordinate matter
+   needs — which is why Bintang's slot is ~2.5x Bunso's and that is correct
+   rather than a bug.
+
+   WHAT COUNTS AS SUBORDINATE, per mark, because this is the judgement half:
+     bintang    the tiger crest above the script is ornament — the NAME is
+                the script (104 of 267px).
+     guanabana  the rule box is a frame; the NAME is the text inside it
+                (101 of 236px).
+     mamasons   "Dirty Ice Cream" and its two rules are a strapline; the
+                NAME is the MAMASONS caps (104 of 240px).
+     ramo       the (R) and the brush swash overshoot the letters; the NAME
+                is the RAMO caps (149 of 259px).
+     cafemama   "& SONS" IS part of the name, set in a script that rides
+                taller than the CAFE MAMA caps. Neither extreme is right:
+                the caps alone (68px) over-weights the mark until it
+                overflows the narrow card, and the full ink extent (103px)
+                under-weights it against HOODWOOD. 85px is the midpoint and
+                it is a judgement, not a measurement — the one number here
+                that is.
+     hoodwood / belly / bunso   single-line wordmarks; the name is the mark.
+
+   ⚠️ THE ASPECT IS THE PNG'S, INCLUDING ITS TRANSPARENT PADDING, because
+   that is what `mask-size` scales. The padding varies enormously across
+   this set (Bunso has none at all, Bintang has ~14% vertically), which is
+   exactly why the box cannot be the unit of measure.
+
+   ⚠️ RE-MEASURE IF AN ASSET IS RE-EXPORTED. A re-crop changes both numbers
+   silently — nothing errors, the mark just renders at the wrong size. */
+const LOGO_OPTICS: Record<string, { aspect: number; inkRatio: number }> = {
+  bintang: { aspect: 453 / 267, inkRatio: 104 / 267 },
+  guanabana: { aspect: 900 / 236, inkRatio: 101 / 236 },
+  mamasons: { aspect: 900 / 240, inkRatio: 104 / 240 },
+  ramo: { aspect: 810 / 259, inkRatio: 149 / 259 },
+  hoodwood: { aspect: 900 / 170, inkRatio: 100 / 170 },
+  cafemama: { aspect: 900 / 169, inkRatio: 85 / 169 },
+  belly: { aspect: 900 / 224, inkRatio: 157 / 224 },
+  bunso: { aspect: 670 / 141, inkRatio: 141 / 141 },
 };
 
 /* THE CARD-ONLY EXTRAS, keyed by canonical slug. Anything the canonical
@@ -218,6 +283,8 @@ export function venueCard(slug: string): VenueCardItem | null {
     badge: x.badge,
     badgeLabel: x.badgeLabel,
     menuPages: r.menuPages,
+    logoAspect: LOGO_OPTICS[r.slug]?.aspect,
+    logoInkRatio: LOGO_OPTICS[r.slug]?.inkRatio,
   };
 }
 

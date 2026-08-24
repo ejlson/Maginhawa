@@ -57,8 +57,27 @@ export default function Contact({ standalone = false }: ContactProps) {
   const [values, setValues] = useState<Values>(EMPTY);
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState("");
-  const [sent, setSent] = useState(false);
+  /* ── A PHASE, NOT A BOOLEAN ──
+     `sent` used to be true/false because there were only two outcomes: the
+     draft opened, or the form had errors. Real delivery has four states a
+     reader must be able to tell apart — idle, in flight, delivered, and
+     failed-but-your-words-are-safe — and the last two look nothing alike.
+     A boolean would have had to be two booleans, and two booleans have a
+     fourth combination that means nothing. */
+  const [phase, setPhase] = useState<"idle" | "sending" | "sent" | "failed">(
+    "idle",
+  );
   const formRef = useRef<HTMLFormElement>(null);
+
+  /* Stamped when the form mounts and sent with the message: the function
+     rejects anything that arrives within three seconds of the page
+     rendering, which no human typing an enquiry ever does. See the note on
+     it in functions/api/contact.ts. */
+  const mountedAt = useRef(Date.now());
+
+  /* the honeypot, kept out of React's controlled-input dance — nothing
+     should ever type into it, so nothing needs to re-render when it changes */
+  const trapRef = useRef<HTMLInputElement>(null);
 
   /* ── WHEN A FIELD RE-VALIDATES ──
      On change, but ONLY once it has already failed. Validating every
@@ -86,7 +105,7 @@ export default function Contact({ standalone = false }: ContactProps) {
       }
     };
 
-  const handleSubmit = (ev: React.FormEvent<HTMLFormElement>) => {
+  const handleSubmit = async (ev: React.FormEvent<HTMLFormElement>) => {
     ev.preventDefault();
 
     const found = validate(values);
@@ -94,7 +113,7 @@ export default function Contact({ standalone = false }: ContactProps) {
 
     const keys = Object.keys(found) as (keyof Errors)[];
     if (keys.length) {
-      setSent(false);
+      setPhase("idle");
       /* THE COUNT IS THE WHOLE POINT OF THIS SENTENCE. A live region that
          says "there is a problem" tells a screen-reader user something
          they already knew; a count tells them how much work is ahead and
@@ -120,44 +139,98 @@ export default function Contact({ standalone = false }: ContactProps) {
       return;
     }
 
-    /* ── DELIVERY IS A mailto: HAND-OFF, AND THAT IS A DECISION ──
-       This site is a STATIC EXPORT (next.config.mjs, `output: "export"`)
-       — there is no server of ours at request time, so there is nothing
-       here that could receive a POST. The three ways out of that are a
-       third-party form service, a serverless function, or handing the
-       message to the reader's own email client. This is the third, and
-       it is what the careers form already does (JoinUs.tsx), so the site
-       now answers both forms the same way.
+    /* ── DELIVERY ──
+       POST to /api/contact, which is a Cloudflare Pages Function sitting
+       beside the exported site (functions/api/contact.ts). It is the same
+       origin, so `connect-src \'self\'` in public/_headers already allows it
+       and no CSP change was needed to turn this on.
 
-       WHAT IT BUYS: no new data processor to name in the privacy notice,
-       no API key in the bundle, no CSP change — `form-action 'self'` in
-       public/_headers would block a cross-origin POST anyway — and the
-       message arrives from the reader's real address, so replying works.
+       ⚠️ THIS REPLACED A `mailto:` HAND-OFF, and the reason is the sentence
+       that hand-off had to print: "nothing reaches us until you press send".
+       It was honest, and it meant a form on a restaurant\'s contact page did
+       not contact anybody — it opened a draft, and a reader on a phone with
+       no mail account configured got nothing at all.
 
-       WHAT IT COSTS, STATED PLAINLY TO THE READER RATHER THAN HIDDEN:
-       nothing is actually sent until they press send in their own mail
-       app, and if they have no mail client configured nothing opens at
-       all. Both cases are covered by the card the success branch renders
-       — which is why it says "should now be open" and offers the address
-       as a fallback, rather than claiming "message sent". A form that
-       lies about delivery is worse than one that does not send. */
-    const subject = `Website enquiry — ${values.firstName} ${values.lastName}`.trim();
-    const body = [
-      `Name: ${values.firstName} ${values.lastName}`.trim(),
-      `Email: ${values.email}`,
-      "",
-      "Message:",
-      values.message,
-    ].join("\n");
+       WHAT SURVIVES OF IT is the failure branch below. If the function
+       cannot deliver, the message is not lost and the reader is not told it
+       was sent: they get the address and the words they typed, still in the
+       fields, to copy. A form that lies about delivery is worse than one
+       that does not send. */
+    setPhase("sending");
+    setStatus("Sending your message…");
 
-    window.location.href = `mailto:${CONTACT.email}?subject=${encodeURIComponent(
-      subject,
-    )}&body=${encodeURIComponent(body)}`;
+    /* A REQUEST THAT CANNOT HANG. Without this, a dead network leaves the
+       button spinning for the browser\'s own timeout — over a minute on some
+       — with nothing on screen to say so. Fifteen seconds is far longer than
+       the function needs and short enough to still feel like an answer. */
+    const abort = new AbortController();
+    const timer = window.setTimeout(() => abort.abort(), 15000);
 
-    setSent(true);
-    setStatus(
-      `A draft email to ${CONTACT.email} has been opened in your email app. It is not sent until you send it.`,
-    );
+    try {
+      const res = await fetch("/api/contact", {
+        method: "POST",
+        headers: { "content-type": "application/json" },
+        signal: abort.signal,
+        body: JSON.stringify({
+          firstName: values.firstName,
+          lastName: values.lastName,
+          email: values.email,
+          message: values.message,
+          startedAt: mountedAt.current,
+          // the honeypot: empty for every human who ever fills this in
+          company: trapRef.current?.value ?? "",
+        }),
+      });
+
+      const data = (await res.json().catch(() => ({}))) as {
+        ok?: boolean;
+        error?: string;
+        retry?: boolean;
+      };
+
+      if (res.ok && data.ok) {
+        setPhase("sent");
+        /* THE FIELDS ARE CLEARED ONLY HERE. On failure they are deliberately
+           left full — see the branch below. */
+        setValues(EMPTY);
+        setStatus(
+          `Thank you — your message has been sent. We reply to ${CONTACT.email} enquiries within a couple of days.`,
+        );
+        return;
+      }
+
+      /* ⚠️ THE TEST IS THE STATUS, NOT THE `retry` FLAG, and that distinction
+         is a bug that was here for about ten minutes. `retry` only exists in
+         responses OUR function writes. Anything else that can answer this
+         URL — the host\'s 404 page when the function is not deployed, a proxy
+         error, a 502 from the edge — has no such field, so `!data.retry` was
+         true for all of them and every infrastructure failure was reported to
+         the reader as "please check the form", pointing them at fields that
+         were perfectly correct.
+
+         A 400 is the only answer that means the form is wrong, and even then
+         only when it arrives with a sentence to show. Everything else is our
+         problem and gets the fallback. */
+      if (res.status === 400 && data.error) {
+        setPhase("idle");
+        setStatus(data.error);
+        return;
+      }
+
+      setPhase("failed");
+      setStatus(
+        `We could not send that just now. Your message is still in the form — please email it to ${CONTACT.email} instead.`,
+      );
+    } catch {
+      /* An abort and a dead network land here alike, and to the reader they
+         are the same event: it did not go. */
+      setPhase("failed");
+      setStatus(
+        `We could not reach the site just now. Your message is still in the form — please email it to ${CONTACT.email} instead.`,
+      );
+    } finally {
+      window.clearTimeout(timer);
+    }
   };
 
   return (
@@ -269,6 +342,35 @@ export default function Contact({ standalone = false }: ContactProps) {
                  messages under each field. */
               noValidate
             >
+              {/* ── THE HONEYPOT ──
+                  A real field, in the DOM, that no person can see, reach by
+                  keyboard or hear: `.trap` takes it out of the layout,
+                  tabIndex -1 skips it, and aria-hidden keeps it out of the
+                  accessibility tree. The simplest bots fill every input they
+                  find, and the function drops anything that arrives with
+                  this one filled.
+
+                  ⚠️ NOT `type="hidden"` and NOT `display: none`. Both are
+                  the first things a scraper learns to skip; a text input
+                  that is merely positioned away is not. `autoComplete="off"`
+                  stops a password manager helpfully filling it for someone.
+                  The label exists because an unlabelled input is a defect
+                  even when it is a trap. */}
+              <div className={styles.trap} aria-hidden>
+                <label htmlFor="contact-company">
+                  Company — please leave this empty
+                </label>
+                <input
+                  ref={trapRef}
+                  id="contact-company"
+                  name="company"
+                  type="text"
+                  tabIndex={-1}
+                  autoComplete="off"
+                  defaultValue=""
+                />
+              </div>
+
               <div className={styles.field}>
                 <span className={styles.fieldLabel} id="contact-name-label">
                   Name
@@ -404,8 +506,17 @@ export default function Contact({ standalone = false }: ContactProps) {
                     type="submit" rather than an href: this posts the form.
                     See the note on Props in PillCta.tsx for why that is a
                     separate arm of the union rather than an `as` prop. */}
-                <PillCta type="submit" tone="cream">
-                  Submit
+                {/* THE LABEL IS THE PROGRESS INDICATOR. A spinner beside an
+                    unchanged "Submit" leaves the button looking pressable and
+                    invites the second press that sends the message twice;
+                    `disabled` plus a label that has changed says the same
+                    thing once, in the place the reader is already looking. */}
+                <PillCta
+                  type="submit"
+                  tone="cream"
+                  disabled={phase === "sending"}
+                >
+                  {phase === "sending" ? "Sending…" : "Submit"}
                 </PillCta>
               </div>
 
@@ -422,14 +533,13 @@ export default function Contact({ standalone = false }: ContactProps) {
                 {status}
               </p>
 
-              {sent && (
+              {phase === "sent" && (
                 <div className={styles.sentCard}>
-                  <strong>Your email app should now be open.</strong>
+                  <strong>Thank you — your message is on its way.</strong>
                   <span>
-                    We have filled in a draft to {CONTACT.email} for you.{" "}
-                    <em>Nothing reaches us until you press send.</em> If
-                    nothing opened, your browser may not have an email app
-                    set up — write to us directly at{" "}
+                    It has been sent to {CONTACT.email}, and we usually reply
+                    within a couple of days. If it is urgent, or you would
+                    rather not wait, write to us directly at{" "}
                     <a
                       className={styles.sentLink}
                       href={`mailto:${CONTACT.email}`}
@@ -440,6 +550,42 @@ export default function Contact({ standalone = false }: ContactProps) {
                   </span>
                 </div>
               )}
+
+              {/* ── THE FAILURE CARD ──
+                  ⚠️ THE FIELDS ARE STILL FULL BEHIND THIS, deliberately. The
+                  worst version of this moment is a form that clears itself
+                  and then admits it could not send: the reader has lost what
+                  they wrote and has to type it again to complain about it.
+                  The mailto link carries the whole message as well, so one
+                  press moves it into their own mail app with nothing
+                  retyped. */}
+              {phase === "failed" && (
+                <div className={styles.sentCard}>
+                  <strong>We could not send that.</strong>
+                  <span>
+                    Nothing has been lost — your message is still in the form
+                    above. Please send it to{" "}
+                    <a
+                      className={styles.sentLink}
+                      href={`mailto:${CONTACT.email}?subject=${encodeURIComponent(
+                        `Website enquiry — ${values.firstName} ${values.lastName}`.trim(),
+                      )}&body=${encodeURIComponent(
+                        [
+                          `Name: ${values.firstName} ${values.lastName}`.trim(),
+                          `Email: ${values.email}`,
+                          "",
+                          values.message,
+                        ].join("\n"),
+                      )}`}
+                    >
+                      {CONTACT.email}
+                    </a>{" "}
+                    instead — that link opens a draft with everything already
+                    filled in.
+                  </span>
+                </div>
+              )}
+
             </form>
           </Reveal>
         </div>

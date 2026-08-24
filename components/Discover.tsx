@@ -5,6 +5,8 @@ import {
   AnimatePresence,
   motion,
   useReducedMotion,
+  useScroll,
+  useTransform,
 } from "framer-motion";
 import {
   useCallback,
@@ -29,7 +31,6 @@ import styles from "./Discover.module.css";
    belongs beside the block it scales. */
 import card from "./VenueCard.module.css";
 import VenueCard, { VenueBlock } from "./VenueCard";
-import SplitWords from "./SplitWords";
 import MenuOverlay from "./MenuOverlay";
 import { venueCards, type VenueCardItem } from "@/lib/venueCards";
 import { getRestaurant } from "@/lib/restaurants";
@@ -54,7 +55,7 @@ import { asset } from "@/lib/media";
    machine, the page hold, the settle travel, the per-word split measurement
    and the fitted title size that only existed so the two words could clear a
    centred deck. What is left is a grid that scrolls in like every other
-   chapter on the site (see `cellVariants`) and a heading that rises out of
+   chapter on the site (see ARRIVE_FROM) and a heading that rises out of
    its own word masks on an observer.
 
    WHAT SURVIVES IT, and why, because each one looks orphaned otherwise:
@@ -387,6 +388,17 @@ const ITEMS: DiscoverItem[] = venueCards().map((v) => {
    the viewport rather than from the card's width, which is the real fix the
    0.76 note describes and the only one that stops this constant being a
    compromise between two window shapes. */
+/* ══════════ 0.82 AGAIN — THE PORTRAIT EXPERIMENT IS CLOSED ══════════
+   The plate went 4:5 upright for one day (Setting A of the portrait
+   study, chosen and then iterated at the user's word: inset grid, width
+   derived from viewport height, two enlargements) — and, seen live at
+   full size, the user chose the original proportions back, full-span:
+   "make the restaurant cards wider and fill the full span of the page."
+   So the constant returns to the value the whole derivation above solved,
+   and the grid returns to the page's measure (see .grid). What SURVIVES
+   from the portrait day, because it was never about the ratio: the settle
+   entrance, the completion-at-framing arrival ranges, and the tightened
+   head. */
 const PLATE_RATIO = 0.82;
 
 // shared enter curve for the head's staged rise
@@ -416,10 +428,20 @@ const EASE = [0.22, 1, 0.36, 1] as const;
    assembly, where the flying plate's layoutId morph WAS the cell's
    entrance and any slide of the cell underneath it would have fought the
    flight. With no flight, every cell takes the slide. */
-/* ══ THE ENTRANCE IS A CLIP WIPE. ══
-   Each card's RECTANGLE opens from its own bottom edge. The card does not
-   move, does not fade and does not scale — only the window it is seen
-   through grows, bottom to top.
+/* ══ THE ENTRANCE WAS A CLIP WIPE — RETIRED; THE SETTLE LIVES AT
+   ARRIVE_FROM. ══ Everything below in this block is the wipe's own
+   history, kept because its two lessons (the resting-inset shear, framer
+   owning inline clipPath) are portable; nothing below is current
+   behaviour.
+
+   Each card's RECTANGLE opened from its own bottom edge — the card did
+   not move, fade or scale; only the window grew.
+
+   ⚠️ THAT SENTENCE WAS A LIE UNTIL THE MOTION CRIT'S FINDING 03. The
+   stylesheet's inset sat in the bottom slot, so the window actually grew
+   top-down — against the card's own upward arrival — and nobody had
+   compared the prose to the paint. The flip landed days before the wipe
+   itself retired.
 
    THIS IS NOT THE ENTRANCE THAT WAS REMOVED. That one was the 110vw slide
    described below, taken out at the user's instruction, and nothing here
@@ -446,7 +468,8 @@ const EASE = [0.22, 1, 0.36, 1] as const;
    clear is silently undone (measured — the property was back to
    `inset(0%)` on the next commit). Animating `--wipe` instead leaves framer
    writing a VARIABLE, which no stylesheet has to fight, and lets the
-   stylesheet decide whether a clip exists at all: `.cell[data-wiping]`
+   stylesheet decide whether a clip exists at all: a `.cell[data-wiping]`
+   rule (since retired with the wipe)
    carries it, and Tile drops that attribute when the wipe lands. See
    Discover.module.css.
 
@@ -493,10 +516,12 @@ const EASE = [0.22, 1, 0.36, 1] as const;
    reads as a band opening rather than as four separate cards. Preserve that
    ratio if these move again.
 
-   The arrival closes at GRID_LEAD_S + 1×ROW + 3×COL + DURATION
-   = 0.26 + 0.32 + 0.42 + 0.92 ≈ 1.92s, against the lede's ≈1.41s. The row
-   term is ×1 and not ×3 because of the two-row seating above — an earlier
-   version of this note had it as ×3 and overstated the close by 0.4s.
+   ⚠️ THE ARITHMETIC BELOW IS THE SHAPE'S, NOT A SCHEDULE. It used to close
+   the arrival at GRID_LEAD_S + 1×ROW + 3×COL + DURATION ≈ 1.92s against the
+   lede's ≈1.41s. Those seconds are no longer spent by anything — the same
+   1×ROW + 3×COL spread and the same spread : card ratio are spent against
+   the scroll instead. The row term is ×1 and not ×3 because of the two-row
+   seating above, and that part is still load-bearing.
 
    THE TOTAL DOES NOT GROW ON NARROW SCREENS. GRID_COLS is a constant 4 even
    where the CSS grid sets one column, so the delay pattern stays two groups
@@ -505,19 +530,162 @@ const WIPE_DURATION_S = 0.92;
 const WIPE_ROW_STEP_S = 0.32;
 const WIPE_COL_STEP_S = 0.14;
 
-const cellVariants = {
-  hidden: { "--wipe": "100%" },
-  show: (c: { d: number }) => ({
-    "--wipe": "0%",
-    transition: {
-      duration: WIPE_DURATION_S,
-      // --ease-entrance, cubic-bezier(.22,1,.36,1), as framer's array form
-      ease: [0.22, 1, 0.36, 1],
-      delay: c?.d ?? 0,
-    },
-  }),
-  exit: { "--wipe": "0%" },
-};
+/* ══════════ THE WAVE IS SPENT ON SCROLL NOW, NOT ON THE CLOCK ══════════
+
+   ⚠️ THE THREE NUMBERS ABOVE ARE NO LONGER READ BY ANYTHING. They are kept
+   because every comment in this file quotes them and because they still
+   define the SHAPE below — but the cascade they used to time is gone, and
+   the paragraphs above that talk in seconds describe the shape, not the
+   mechanism. Do not re-wire a `transition` to them.
+
+   WHY IT HAD TO CHANGE, measured rather than argued
+   (scripts/probe-home-flow.mjs, 1440×900):
+
+     · the section's one `IntersectionObserver` — threshold 0.05 with a
+       −16% bottom rootMargin — fires at scrollY ≈ 190, where the section
+       is still 84% BELOW THE FOLD and the hero owns the screen.
+     · the cascade then runs on the CLOCK: last card at
+       0.26 + 0.32 + 3×0.14 = 1.0s, plus a 0.92s card ≈ 1.92s.
+     · a reader moving at an ordinary ~800px/s is at scrollY ≈ 1800 by
+       then — PAST the whole chapter. The grid's entrance was, for anyone
+       not sitting still, an animation that happened off screen.
+     · and for anyone who WAS sitting still it was worse in the other
+       direction: the grid finished opening before it had arrived, so the
+       stretch from scrollY 560 to 1000 measured a mean motion energy of
+       7.5 against a page mean of 68 — nearly half a screen of scrolling
+       with nothing moving at all. It was the page's second-longest dead
+       run.
+
+   THE FIX IS NOT A DIFFERENT TRIGGER. Any threshold has the same defect:
+   the cascade's length is fixed in seconds and the reader's arrival is
+   measured in pixels, so the two can only agree at one scroll speed. The
+   wave is spent against the SCROLL instead, exactly as the statement
+   chapter spends its words (see Manifesto.tsx `slotStart`) — so the grid
+   opens as it is scrolled to, at any speed, in either direction.
+
+   THE SHAPE IS PRESERVED EXACTLY, which is the point of doing it this way
+   rather than picking new numbers. Every ratio the notes above derive is
+   carried over into progress space:
+     · spread : card  =  0.74s : 0.92s  →  3 × COL_LEAD : the card's span
+     · row : col      =  0.32  : 0.14   →  the card's own height : COL_LEAD
+   so a row still reads as a band opening rather than four separate cards,
+   and a plate is still opening when the last one starts. The row term is
+   the LAYOUT now — a card's height plus the grid gap — which is why only
+   the column survives as a number. */
+
+/* ══ THE RANGE IS PER-CARD, AND IT HAD TO BECOME SO ══
+   The first scrubbed version gave the whole GRID one range and seated each
+   card in it by `row × ROW_STEP + col × COL_STEP`, with GRID_COLS fixed at
+   4. That is the seating the retired time cascade used, and it is fine on a
+   clock — the whole cascade lasted 1.9s, so a seat being slightly wrong
+   cost milliseconds. Spent against scroll it is wrong twice over, and both
+   faults were measured at 390×844 (scripts/probe-discover-wave.mjs,
+   which exists to keep them fixed):
+
+     · THE CARDS OPENED OUT OF ORDER. GRID_COLS is a constant 4 even where
+       the stylesheet renders ONE column, so cell 4 — "row 1, column 0" —
+       seated at 0.238, ahead of cell 3's 0.312. In a single column those
+       two are simply the fourth and fifth cards down the page, and the
+       reader watched the fifth open while the fourth above it was still
+       shut.
+     · AND THEY OPENED NOWHERE NEAR THEMSELVES. One range across a 2418px
+       stack means each card's slot is a fraction of the whole column, not
+       of its own arrival: cell 0 was 64% shut with its top at 301px, in the
+       middle of the screen, and took another 700px of scroll to finish.
+
+   EACH CARD NOW OWNS ITS OWN RANGE, measured on its own top edge. The
+   vertical order is then not a computation at all — it is the layout, and
+   it is right at every breakpoint by construction, with no column constant
+   to keep in step with a stylesheet.
+
+   WHAT IS LEFT TO STAGGER IS THE ROW, and only the row: four cards in one
+   row share a top edge, so without a term they would open in lockstep. Each
+   column starts COL_LEAD of a viewport later than the one before it.
+   ⚠️ A LATER COLUMN NEEDS A SMALLER FRACTION, not a bigger one: the offsets
+   are distances DOWN the screen, so `start 0.92` is reached before
+   `start 0.71`. Getting that backwards runs the wave right to left.
+
+   THE SHAPE IS STILL THE OLD ONE. The row step is now supplied by geometry
+   — a card's height plus the grid gap, ~300px at 1440 — and COL_LEAD is set
+   so the wave across a row stays the same fraction of a card that the
+   seconds gave it: 3 × COL_LEAD against the card's own span was 0.42s
+   against 0.92s, about 46%. */
+
+/* ══════════ THE ENTRANCE IS A SETTLE NOW — THE WIPE IS RETIRED ══════════
+   At the user's instruction ("I don't like our current cards-arrive
+   animation"), and the replacement is not an invention: it is the page's
+   own PLATE grammar. Every large photograph on this site lands the same
+   way — the About film's DRIFT and the journal's blogDrift both settle
+   from a slight overscan (−4% / 1.1) into their frame while the plate
+   inks — and the venue cards now do exactly that, at card scale: the cell
+   INKS from 0 → 1 over the first half of its arrival while the PHOTOGRAPH
+   inside settles from 1.06 → 1 across the whole of it, and the caption
+   block inks a beat behind the picture. One family of gestures, hero to
+   booking.
+
+   WHAT DIED WITH THE WIPE, so nobody re-derives it: the clip-path window,
+   the `data-wiping` attribute and its two-way latch, the `--wipe` variable,
+   and the .cell clip rule in Discover.module.css. The two lessons that
+   block taught are portable and stay true — a resting `inset(0%)` shears
+   the hover lift's shadow, and framer re-writes an inline `clipPath` after
+   onAnimationComplete — but nothing here clips any more, so neither trap
+   can bite this entrance.
+
+   WHY THE SETTLE IS SAFE WHERE A CARD TRANSFORM IS NOT. The morph measures
+   `.tileMedia`, and this file has twice recorded that a transform on a
+   measured box corrupts the morph's rect. The settle never touches it: the
+   OPACITY sits on the cell (opacity does not move a rect), and the SCALE
+   sits on the photograph INSIDE the card, driven through the same CSS-var
+   channel the parallax pan already uses (--photo-enter beside --photo-base;
+   VenueCard multiplies them). The measured box never animates. */
+
+/* how far down the screen a card's top edge is when its settle starts, and
+   where it has got to when it finishes. 0.92 is just inside the fold; 0.45
+   is the upper middle, so a card is inked and at rest well before it is
+   read. At 900 tall that is 423px of scroll for a card — the settle rides
+   slightly slower than the page, the same relationship the wipe had. */
+const ARRIVE_FROM = 0.92;
+/* ⚠️ 0.45 → 0.66, AND IT IS A VISIBILITY FIX, NOT A TASTE CHANGE. The
+   section is designed to be READ FRAMED — all eight cards on one screen —
+   and a reader who frames it stops scrolling, so a card whose range
+   completes above ~62% of the window NEVER completes for them. Measured on
+   the user's own screenshot at 1080 tall: Café Mama, Belly and Bunso sat
+   with plates and no captions, permanently, because their (column-led)
+   ranges still had a third to run at the natural stop. Ending at 0.66 —
+   with the lead shrunk below — puts every card's completion at or below
+   the position the framed section actually gives it. */
+const ARRIVE_TO = 0.66;
+
+/* the settle's two spans, as fractions of the arrival: the ink finishes at
+   0.45 (a card at half-ink is being read as broken, so it clears early —
+   the READ_INK argument in AboutSplit), the caption starts as the ink ends
+   and the photograph settles across the whole range, still moving faintly
+   after the card is legible — the overhang that DRIFT's note calls "a
+   panel that simply stops" avoiding. */
+const INK_SLOT: [number, number] = [0, 0.45];
+/* caption end pulled 0.8 → 0.66: at 0.8 a card low on the screen carried
+   its photograph with no name for a third of its climb, and a reader who
+   stops mid-wave reads that as missing content rather than as sequence
+   ("the full content of the cards cannot be seen", at the user's
+   instruction). The beat survives — picture first, words after — but the
+   words now land while the card is still low. */
+const CAPTION_SLOT: [number, number] = [0.3, 0.55];
+const SETTLE_FROM = 1.06;
+
+/* the row's internal wave, per column, as a fraction of the viewport.
+   0.07 is 63px at 900, so first card to last across a four-up row is 189px
+   of scroll against a 423px card — the 46% the seconds above worked out to.
+   ⚠️ IT IS BOUNDED BY ARRIVE_TO: the last column's range is shifted down by
+   (cols − 1) × this, and a shift past WIPE_TO would put a card's finish
+   above the top of the screen. At four columns and 0.07 the last column
+   ends at 0.24, with room to spare. */
+/* 0.07 → 0.04: the wave survives (4 columns still read left to right)
+   but the last column's whole range now shifts only 0.12 down-screen, so
+   Bunso finishes where a framed reader can see it finish. Bounded by the
+   same ARRIVE_TO arithmetic as ever. */
+const COL_LEAD = 0.04;
+
+
 
 /* ══ PARALLAX INSIDE THE FRAME ══
    The photograph travels slower than the card holding it, so the grid gains
@@ -549,20 +717,20 @@ const cellVariants = {
 const PHOTO_OVERSCAN = 1.07;
 const PHOTO_PAN_RATIO = 0.024;
 
-/* HOW LONG THE PICTURES WAIT FOR THE TYPE.
-   The chapter reads top-down — label, sentence, then the grid — and all
-   three now hang off one `inView`, so the order has to be spent as delay
-   rather than assumed from the markup. The head's two heading words leave
-   at 0 and 0.09s and the lede starts at 0.1s; the grid holding this long
-   puts the first card's wipe under the lede's fourth or fifth word, which
-   is late enough to read as a consequence of the sentence and early enough
-   that the band is never just standing there.
+/* THE PICTURES NO LONGER WAIT FOR THE TYPE — THE PAGE DOES THAT.
+   A `GRID_LEAD_S = 0.26` stood here: the delay the grid's cascade held so
+   the chapter would read top-down (label, sentence, pictures) rather than
+   arriving all at once. It is removed with the cascade — the grid's wipe is
+   spent against the SCROLL now (see ARRIVE_FROM), and the head is simply 208px
+   further up the page than the first plate is, so the reader reaches it
+   first at every speed. A lead in seconds was the clock's way of expressing
+   an order the layout already has.
 
-   The arrival's full arithmetic lives on the WIPE_* block above, which owns
-   the steps and the duration; the lede lands at 0.1 + 14×0.04 + 0.75 ≈ 1.41s
-   and the last plate at ≈1.92s, so the type settles first and the pictures
-   go on arriving behind it. */
-const GRID_LEAD_S = 0.26;
+   ⚠️ THE HEAD IS STILL ON `inView` and still lands in ≈1.41s. That is
+   correct and deliberate: it is one lockup, it fits on one screen, and a
+   scrubbed heading is a heading that never quite settles. The rule the rest
+   of this pass follows is that content taller than a screen is scrubbed and
+   a lockup shorter than one is timed. */
 
 /* ══ THE MORPH ══════════════════════════════════════════════════════
    Quick, interruptible mid-flight (a spring keeps its velocity when
@@ -663,6 +831,34 @@ export default function Discover() {
      A plain ref is enough now: one list, one height, nothing to swap. */
   const setGridEl = useCallback((el: HTMLUListElement | null) => {
     gridRef.current = el;
+  }, []);
+
+  /* ── HOW MANY COLUMNS THE STYLESHEET IS ACTUALLY RENDERING ──
+     Read off the computed grid rather than assumed, because it is the only
+     thing that stands between a card's index and its place in the reading
+     order, and the answer changes four times on the way down to a phone
+     (see .grid in Discover.module.css: 1 / 2 / 3 / 4).
+
+     ⚠️ GRID_COLS IS NOT THIS AND MUST NOT BE USED FOR IT. That constant is
+     deliberately fixed at 4 at every width — its own note says so — and the
+     retired cascade could afford that because a wrong seat cost a few
+     milliseconds. It costs the wave its ORDER now: at one column, a "row 1,
+     column 0" seat lands ahead of a "row 0, column 3" seat, and the fifth
+     card down opens while the fourth is still shut. Measured at 390×844.
+     GRID_COLS still serves the recede's distance-from-the-finger, which is
+     a different question and is happy with a constant. */
+  const [cols, setCols] = useState(GRID_COLS);
+  useEffect(() => {
+    const grid = gridRef.current;
+    if (!grid) return;
+    const read = () => {
+      const n = getComputedStyle(grid).gridTemplateColumns.split(" ").filter(Boolean).length;
+      setCols((was) => (was === n || n < 1 ? was : n));
+    };
+    read();
+    const ro = new ResizeObserver(read);
+    ro.observe(grid);
+    return () => ro.disconnect();
   }, []);
 
   /* one-shot entrance reveal. It watches the SECTION rather than the ul —
@@ -960,47 +1156,59 @@ export default function Discover() {
             </span>
           </span>
         </h2>
-        {/* ── THE DISPLAY LINE BUILDS AGAIN, at the user's instruction ──
-            It was <SplitWords>, then it was flat text "at the user's
-            instruction", and it is <SplitWords> again for the same reason
-            the first note gave: at this size it has type worth building.
-            The intervening flat version is not worth reconstructing.
+        {/* ══ THE DISPLAY LINE INKS IN PLACE, BY CLAUSE ══
+            It arrives where it stands, out of focus, and resolves — the
+            manifesto statement's ink bleed (ScrubWord, Manifesto.tsx),
+            taken here at the user's instruction that the chapter heads and
+            the statement share one entrance verb. The lineage matters:
+            this was <SplitWords> — fifteen word-masks descending on a 40ms
+            stagger — which the motion crit's Finding 01 retired (for a
+            full second the sentence had no baseline, every word caught at
+            a different height exactly while the eye was on it; none of the
+            editorial benchmarks animates type per-word). The clause-descent
+            that replaced it fixed the per-word shear but still moved the
+            line while the eye was on it; the same Finding is the argument
+            for going the rest of the way. Focus changes in place, so the
+            sentence keeps its baseline for the whole entrance.
 
-            IT TAKES `on`, NOT whileInView, AND THAT IS THE WHOLE POINT.
-            SplitWords' own observer would be a THIRD trigger in a chapter
-            that now has exactly one — the heading's masks, this line and
-            the grid's wipe all hang off `inView`, so the chapter arrives in
-            an order instead of as three things that happen to be nearby.
-            An independent observer here would fire on this paragraph's own
-            rect and un-sequence the head from the pictures under it, which
-            is the defect the whole pass exists to remove.
+            TWO SPANS STILL, AUTHORED AT THE CLAUSE BREAK. The measure was
+            already tuned so the line breaks after "stores," at every width
+            in the sweep, so the clause boundary IS the line boundary and
+            the head keeps its downward reading cadence — mark, "Our",
+            "restaurants", clause, clause, 0.09s apart — with the stagger
+            now carried by the resolve rather than by travel. The
+            .ledeLineMask wrappers remain as the line boxes but NO LONGER
+            CLIP — see their rule in Discover.module.css for why they must
+            never clip again (a blurred glyph's halo paints outside its own
+            box; a clip shears the bleed into hard edges).
 
-            THE LEAD IS SPENT ON THE TYPE. This starts a beat after the
-            label and the grid waits GRID_LEAD_S behind it, so the chapter
-            reads top-down: name, sentence, pictures. See GRID_LEAD_S.
-
-            ⚠️ THE MASKS CHANGE THE MEASURE, so `.lede`'s max-width is not
-            free of this. SplitWords sets the word gap as a 0.24em
-            margin-right rather than a natural space (~0.25–0.28em on this
-            face), so a line of masks is fractionally NARROWER than the same
-            line of plain text, and .lede's measure was tuned to break at
-            the clause boundary — after "stores,". Measured after this
-            change: the break still lands there at every width in the sweep.
-            Retune the measure and check that break, not just the height. */}
-        {/* ⚠️ `down`, AT THE USER'S INSTRUCTION — this line comes down out of
-            its masks, the way the label above it now does. It is the shared
-            component's prop rather than a flip inside it: SplitWords is the
-            site's word-mask grammar and /about, /careers and the deck's nine
-            chapter bodies all still build upward. The magnitude is untouched
-            (the mask's padding is symmetric); only the sign moves. */}
-        <SplitWords
-          as="p"
-          className={styles.lede}
-          text="Explore our family of restaurants and stores, where tradition is served with a modern twist."
-          on={inView}
-          delay={0.1}
-          down
-        />
+            SAME TRIGGER AS EVERYTHING ELSE IN THE HEAD. The spans key off
+            `titleOn` — the chapter's single latch — for the reason the old
+            note gave: an independent observer here would un-sequence the
+            head from the pictures under it. And the same no-script trade as
+            .titleWord: the park lives in the stylesheet, the text stays in
+            the DOM for find-in-page and AT, and reduced motion unparks both
+            lines in the same media block that unparks the title. */}
+        <p className={styles.lede}>
+          <span className={styles.ledeLineMask}>
+            <span
+              className={styles.ledeLine}
+              style={{ "--ll-i": 0 } as CSSProperties}
+              data-on={titleOn ? "on" : undefined}
+            >
+              Explore our family of restaurants and stores,
+            </span>
+          </span>{" "}
+          <span className={styles.ledeLineMask}>
+            <span
+              className={styles.ledeLine}
+              style={{ "--ll-i": 1 } as CSSProperties}
+              data-on={titleOn ? "on" : undefined}
+            >
+              where tradition is served with a modern twist.
+            </span>
+          </span>
+        </p>
 
         {/* THE MIDDLE HAIRLINE. It closes the head and opens the grid, which is
             the one place on this chapter a rule earns its keep: it is INSIDE
@@ -1045,10 +1253,6 @@ export default function Discover() {
              one has no state worth interpolating in JS. Off under reduced
              motion, where the backdrop does the whole job by itself. */
           data-dimmed={!reduce && active ? "on" : undefined}
-          variants={{ hidden: {}, show: {}, exit: {} }}
-          initial="hidden"
-          animate={inView ? "show" : "hidden"}
-          exit="exit"
         >
           {ITEMS.map((it, i) => {
             /* WHEN THIS CELL'S WIPE STARTS. Rows lead, columns follow
@@ -1073,20 +1277,16 @@ export default function Discover() {
                steps and the duration live on WIPE_* above; see that block
                for why they are the size they are.
 
-               EVERY CELL CARRIES GRID_LEAD_S ON TOP, which is what makes the
-               chapter read top-down rather than all at once. */
-            const motionCustom = reduce
-              ? { d: 0 }
-              : (() => {
-                  const row = Math.floor(i / GRID_COLS);
-                  const col = i % GRID_COLS;
-                  return {
-                    d:
-                      GRID_LEAD_S +
-                      row * WIPE_ROW_STEP_S +
-                      col * WIPE_COL_STEP_S,
-                  };
-                })();
+               ⚠️ ONLY THE COLUMN IS COMPUTED. The row used to be too —
+               `GRID_LEAD_S + row×ROW_S + col×COL_S`, spent by framer as a
+               `transition.delay`, and then briefly as a seat in one shared
+               scroll range. Both are gone: each card measures its own
+               arrival, so the row is the LAYOUT and needs no arithmetic. See
+               the block over ARRIVE_FROM for what that fixed. The lead went
+               with them — a cascade that has to wait for the type above it
+               was solving a problem the scroll solves by itself, since the
+               head is simply further up the page than the grid is. */
+            const col = reduce ? 0 : i % cols;
             /* HOW FAR THIS CELL IS FROM THE ONE THE READER PRESSED, in grid
                steps — the recede travels outward from the finger, so the
                delay has to be a distance on the LAYOUT and not a distance in
@@ -1108,7 +1308,11 @@ export default function Discover() {
                 key={it.slug}
                 item={it}
                 index={i}
-                motionCustom={motionCustom}
+                /* this card's place in its own row. The range, and the
+                   `useTransform` that turns it into a clip, live in Tile —
+                   a hook cannot be called from inside this `.map`, the same
+                   constraint Manifesto.tsx records over its own ScrubWord. */
+                col={reduce ? undefined : col}
                 onOpen={() => setActive(it)}
                 onMenu={() => setMenuFor(it.slug)}
                 open={openIndex === i}
@@ -1169,7 +1373,7 @@ export default function Discover() {
 function Tile({
   item,
   index,
-  motionCustom,
+  col,
   onOpen,
   onMenu,
   open,
@@ -1181,7 +1385,11 @@ function Tile({
      across on, and the `data-plate` attribute the probes measure the
      card's rectangle through. */
   index: number;
-  motionCustom: { d: number };
+  /** this card's column in the grid as it is actually being rendered, or
+   *  undefined under reduced motion — where the cell simply renders open and
+   *  no clip is ever installed. It is the ONLY part of the wave that is
+   *  computed; the rest is the card's own position on the page. */
+  col?: number;
   onOpen: () => void;
   /** opens the venue's menu pages — the page owns the overlay, the card only
    *  says which venue it is asking for */
@@ -1196,10 +1404,73 @@ function Tile({
   recedeDelay: number;
 }) {
   const reduce = useReducedMotion();
-  /* whether this cell is still being wiped open. It starts true so the card
-     is clipped shut on the very first paint — including the server's, which
-     is what stops eight cards flashing whole and then wiping. */
-  const [wiping, setWiping] = useState(true);
+
+  /* ── THIS CELL'S SLICE OF THE GRID'S RANGE ──
+     `useTransform` clamps at both ends, so the cell is fully shut for the
+     whole of the range before its seat and fully open for the whole of it
+     after — no guard needed, and nothing to reset when the reader turns
+     round.
+
+     ⚠️ NO EASE, AND THE ENTRANCE CURVE WAS TRIED FIRST AND MEASURED WRONG.
+     The obvious move was to keep --ease-entrance — cubic-bezier(.22,1,.36,1),
+     the exact curve the retired transition carried — so one card would open
+     with the identical shape and only its clock would change. It does not
+     work on a scrub, and the reason is the curve's whole point: it spends
+     most of itself in the first third. Spent against TIME that reads as
+     decisiveness. Spent against SCROLL it means the card is essentially
+     open a quarter of the way through its own slot and the other
+     three-quarters do nothing — the burst-then-nothing pattern this pass
+     exists to remove, reproduced inside every individual card. Measured
+     (scripts/probe-home-flow.mjs) it put a 3935-unit snap at scrollY 800,
+     the largest single step anywhere on the page, with one cell's clip edge
+     travelling 1315px in a 40px step.
+
+     Linear is also what this site's other two scrubs already do —
+     Manifesto's ScrubWord and Passage's SlabLine both map straight through
+     with no ease — and it is the correct default for anything the reader is
+     driving with their own hand: the edge tracks the wheel 1:1, so the
+     gesture belongs to them rather than to a curve arguing with them.
+     The SHAPE is now carried by the span and the seats, which is where it
+     belongs on a scrub.
+
+     ⚠️ THE RANGE IS THIS CARD'S OWN, and it is measured on the cell rather
+     than on the grid — see the block over ARRIVE_FROM for the two faults
+     that forced it. Opacity does not change an element's bounding box, so
+     the cell can safely be the target of the range that drives its own ink;
+     a TRANSFORM on it could not be, and AboutSplit.tsx records the version
+     of this trap that is — which is why the settle's scale lives on the
+     photograph inside the card, not on any measured box.
+
+     REDUCED MOTION STILL RUNS THE HOOKS, because hooks cannot be called
+     conditionally — it simply never applies the styles, so the values are
+     computed and ignored and the cards are plainly present. */
+  /* ⚠️ GATED ON MOUNT — the sitewide rule, learned the hard way in three
+     other files: framer renders a motion value's progress-0 reading into
+     the SERVER's HTML, and progress 0 here means `opacity: 0`. Withheld
+     until mount, the no-script page and any load whose hydration dies get
+     eight plainly visible cards; the flash this trades for is ~nil because
+     the grid's top edge sits ~1176px down a 900-tall window, so no cell is
+     on screen when the styles land. A reader who deep-links INTO the
+     chapter finds those cells already past their own range, so they mount
+     settled. */
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+
+  const cellRef = useRef<HTMLLIElement>(null);
+  const lead = (col ?? 0) * COL_LEAD;
+  const { scrollYProgress: arriving } = useScroll({
+    target: cellRef,
+    offset: [`start ${ARRIVE_FROM - lead}`, `start ${ARRIVE_TO - lead}`],
+  });
+
+  /* the settle's three strands, one range. All linear — see the NO-EASE
+     block above — and all reversible: scroll back up and the card recedes
+     the way it came, no latch to manage because nothing clips. */
+  const cardInk = useTransform(arriving, INK_SLOT, [0, 1]);
+  const photoSettle = useTransform(arriving, [0, 1], [SETTLE_FROM, 1]);
+  const captionInk = useTransform(arriving, CAPTION_SLOT, [0, 1]);
+
+  const settled = mounted && !reduce;
 
   /* ═══════════════════════════════════════════════════════════════════
      THE CARD IS <VenueCard> NOW, AND EVERYTHING THIS FUNCTION USED TO DO
@@ -1235,34 +1506,25 @@ function Tile({
      the retired assembly intro's job and it is not passed, so the card's
      three prop objects stay at their `{}` default and the whole card
      simply renders. The entrance it does take is the CELL's — see
-     cellVariants; the card travels in from the screen edge as one object,
-     which is what an unstaged card should do.
+     scrubbed settle (see ARRIVE_FROM); the card inks and its photograph
+     lands as one object, which is what an unstaged card should do.
      ═══════════════════════════════════════════════════════════════════ */
   return (
     <motion.li
+      ref={cellRef}
       className={styles.cell}
-      /* THE ATTRIBUTE IS WHAT MAKES THE CLIP EXIST. The stylesheet only
-         clips a cell while this is on, so dropping it when the wipe lands
-         leaves the card with NO clip-path rather than a resting `inset(0%)`
-         — which would shear the hover lift and its shadow off at the cell's
-         edge forever. See the note on cellVariants for why the clip is
-         driven through a variable instead of animating clip-path directly.
-
-         REDUCED MOTION NEVER TURNS IT ON, and takes no variants either, so
-         the cards are simply present from the first paint and nothing about
-         them waits on an observer that may never fire. */
-      data-wiping={!reduce && wiping ? "on" : undefined}
       /* the recede's two hooks. `data-open` is the exemption and carries no
          style of its own; the delay is a custom property because the value
          is per-cell and a stylesheet cannot compute a distance. */
       data-open={open ? "on" : undefined}
-      style={{ ["--recede-delay" as string]: `${recedeDelay}s` }}
-      variants={reduce ? undefined : cellVariants}
-      custom={motionCustom}
-      /* `show` is the only state that lands — guarding on it stops an
-         interrupted run from un-clipping a cell that is still shut. */
-      onAnimationComplete={(definition) => {
-        if (definition === "show") setWiping(false);
+      /* ⚠️ THE INK RIDES THE CELL, the one element the morph never
+         measures; the settle rides the photograph via --photo-enter on the
+         seat below. Both are WITHHELD UNTIL MOUNT — framer renders a motion
+         value's current reading into the SERVER's HTML, which is how the
+         old wipe once shipped eight invisible cards. See `mounted`. */
+      style={{
+        ["--recede-delay" as string]: `${recedeDelay}s`,
+        ...(settled ? { opacity: cardInk } : null),
       }}
     >
       {/* NO HOVER HANDLERS ON THIS ELEMENT ANY MORE. They opened the film
@@ -1283,8 +1545,22 @@ function Tile({
         /* padding-top carries the plate's aspect from PLATE_RATIO — the
            stylesheet's 143.33% is only the fallback. Inline because the
            same number must also size the expansion, and a value stated in
-           the stylesheet AND in the component is a value that drifts. */
+           the stylesheet AND in the component is a value that drifts.
+
+           ── AND THE SETTLE'S CHANNEL RIDES THE SAME PROP ── the var
+           mechanism the parallax pan already drives through this seat
+           (--photo-base/--photo-pan): VenueCard's .photo multiplies
+           --photo-enter into its scale, and the caption block reads
+           --card-ink. Both default to 1 in the card's stylesheet, so
+           /restaurants and the expansion — which never see these vars —
+           are byte-identical. Withheld until mount like the cell's ink. */
         style={{
+          ...(settled
+            ? {
+                ["--photo-enter" as string]: photoSettle,
+                ["--card-ink" as string]: captionInk,
+              }
+            : null),
           /* --radius-tile, matching the story band, at the user's request.
              This box is `overflow: visible`, so its own corner paints
              nothing — the visible curve is VenueCard's .cardSurface inside
@@ -1318,6 +1594,14 @@ function Tile({
           onMenu={onMenu}
           clip={item.clip}
           blurb={item.blurb}
+          /* THE SPLIT ACTIONS — home grid only. One cream Book pill at
+             rest (or none, for a venue with no booking); the full Menu /
+             Visit / Book set unfolds on hover or focus. /restaurants and
+             the expansion keep the "row" default and are untouched. */
+          actions="split"
+          /* the warm grade — home grid only; see [data-grade] in
+             VenueCard.module.css */
+          grade
         />
       </motion.div>
     </motion.li>
@@ -1329,7 +1613,7 @@ function Tile({
    redesign — the block prints an address and two stats now, and neither
    the strip nor the `.metaClip` motion this note used to point at exists
    anywhere. The manifesto's word-mask grammar still runs this chapter's
-   heading and its standfirst; see the <h2> and <SplitWords> above. */
+   heading and its standfirst; see the <h2> and the .lede spans above. */
 
 /* The App Store morph: the plate's rectangle becomes a centred detail card.
    The card element shares the plate's layoutId, so Framer Motion FLIPs it

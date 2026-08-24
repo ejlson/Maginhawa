@@ -344,6 +344,12 @@
    spent nowhere else on that screen, so the eye still has exactly one place
    to land. Cream on it measures 4.55:1, clear of the 4.5 floor this
    uppercase label answers to. */
+/* ── THE SURFACE RULE, so the next call site does not guess ──
+   On CREAM grounds → the default tone (maroon fill, cream ink).
+   On DARK / MAROON / FILM grounds → tone="cream" (cream fill, maroon ink).
+   Home page census: AboutSplit + Blog = default; Hero + Reservations +
+   Footer = cream. Saffron/accent are film-only exceptions and currently
+   have no home-page call site. */
 /* ── CREAM ON A PHOTOGRAPH ──
    The hero sits on film, where both of the tones above are dark inks on a
    dark ground: the label reads and the PILL disappears, so the control
@@ -359,7 +365,11 @@
 /* ── SAFFRON, ON FILM ONLY ── see the note on --annatto in globals.css: the
    palette retired this orange because it blurs into maroon ink, and the one
    place that argument does not reach is a pill on a photograph. Cream on it
-   is 4.89:1. */
+   is 4.89:1.
+   NO LONGER USED ON THE HOME PAGE: the Reservations finale moved to
+   tone="cream" in the button-grammar pass, which removed the last orange
+   from that page. The class stays for any future film ground that wants a
+   chromatic pill. */
 .saffron {
   --cta-fill: var(--annatto);
   --cta-ink: var(--cream);
@@ -569,4 +579,20 @@
   .arrow {
     transition: none;
   }
+}
+
+/* ── HELD, WHILE SOMETHING IS IN FLIGHT ──
+   Used by the contact form's submit between the press and the answer. Dimmed
+   rather than greyed: this control has one filled colour and a "disabled
+   grey" would be a second palette entry existing for one state. The cursor
+   is the honest part — `not-allowed` says the press will not land, which is
+   the thing a dimmed pill alone leaves ambiguous.
+
+   ⚠️ `pointer-events: none` IS NOT USED HERE. It would take the cursor with
+   it, and a control that looks pressed-out but shows a normal arrow reads as
+   a rendering fault rather than as a state. `disabled` already stops the
+   click; this only has to make it visible. */
+.cta:disabled {
+  opacity: 0.55;
+  cursor: not-allowed;
 }

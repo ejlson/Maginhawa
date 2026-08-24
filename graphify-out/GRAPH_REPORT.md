@@ -1,16 +1,16 @@
-# Graph Report - Maginhawa  (2026-08-20)
+# Graph Report - Maginhawa  (2026-08-24)
 
 ## Corpus Check
-- 215 files · ~4,568,726 words
+- 241 files · ~4,608,115 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1551 nodes · 1924 edges · 168 communities (123 shown, 45 thin omitted)
-- Extraction: 97% EXTRACTED · 3% INFERRED · 0% AMBIGUOUS · INFERRED: 50 edges (avg confidence: 0.66)
+- 1649 nodes · 2046 edges · 191 communities (142 shown, 49 thin omitted)
+- Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 50 edges (avg confidence: 0.68)
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `409edd8f`
+- Built from commit: `d88d3c59`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 
@@ -129,59 +129,70 @@
 - probe-hero-clip-swap.mjs
 - probe-404.mjs
 - probe-timeline-contrast.mjs
-- SplitWords.tsx
 - optimize-press-logos.mjs
 - shoot
 - PillCta.tsx
 - scripts
+- gray-matter
 - press.ts
 - a-note-on-service.mdx
-- VideoBackdrop.tsx
-- unist-util-visit
+- SplitWords.tsx
 - package.json
 - layout.tsx
 - CustomCursor.tsx
-- remark-smartypants
-- shoot-sections.mjs
+- VideoBackdrop.tsx
+- remark-rehype
+- CustomCursor.tsx
+- Contact.tsx
+- _tmp-seam-lr.mjs
+- Blog.tsx
+- react
+- remark-rehype
+- framer-motion
 - probe-blog-index.mjs
+- _tmp-about-sweep.mjs
 - JoinUs.tsx
+- _tmp-ink-rail.mjs
+- SplitWords.tsx
+- VideoBackdrop.tsx
+- shoot-sections.mjs
 
 ## God Nodes (most connected - your core abstractions)
-1. `asset()` - 29 edges
-2. `getRestaurant()` - 18 edges
-3. `Maginhawa Group — Content Guide` - 18 edges
+1. `asset()` - 31 edges
+2. `Maginhawa Group — Content Guide` - 19 edges
+3. `getRestaurant()` - 17 edges
 4. `compilerOptions` - 16 edges
 5. `include` - 16 edges
 6. `Menu()` - 12 edges
 7. `q()` - 12 edges
 8. `Design Plan — brand fit and audience needs` - 12 edges
-9. `BlogIndexInner()` - 10 edges
-10. `PillCta()` - 10 edges
+9. `BlogIndexInner()` - 11 edges
+10. `PillCta()` - 11 edges
 
 ## Surprising Connections (you probably didn't know these)
+- `Blog()` --indirect_call--> `frame()`  [INFERRED]
+  components/Blog.tsx → scripts/probe-indent-hover.mjs
 - `CardMedia()` --calls--> `asset()`  [EXTRACTED]
   components/BlogIndex.tsx → lib/media.ts
 - `RoomFilter()` --indirect_call--> `slug()`  [INFERRED]
   components/BlogIndex.tsx → scripts/shoot-sections.mjs
 - `BlogIndexInner()` --indirect_call--> `p()`  [INFERRED]
   components/BlogIndex.tsx → scripts/probe-band-about-press.mjs
-- `JoinUs()` --indirect_call--> `room()`  [INFERRED]
-  components/JoinUs.tsx → scripts/probe-discover-arrival.mjs
-- `JoinUs()` --indirect_call--> `q()`  [INFERRED]
-  components/JoinUs.tsx → scripts/probe-timeline.mjs
+- `CustomCursor()` --indirect_call--> `frame()`  [INFERRED]
+  components/CustomCursor.tsx → scripts/probe-indent-hover.mjs
 
 ## Import Cycles
 - None detected.
 
-## Communities (168 total, 45 thin omitted)
+## Communities (191 total, 49 thin omitted)
 
 ### Community 0 - "user-account-core-06dbaa1bcfe1a542-min.en-US.js"
 Cohesion: 0.05
-Nodes (39): 10. Home page copy, 11. Navigation & footer links, 12. Images & video, 13. Page titles & SEO, 14. Publishing your changes, 15. Known placeholders, 16. Troubleshooting, 1. Before you start (+31 more)
+Nodes (43): 10. Home page copy, 11. Navigation & footer links, 12. Images & video, 13. Page titles & SEO, 14. Publishing your changes, 15. Known placeholders, 16. Troubleshooting, 17. The enquiry form (+35 more)
 
 ### Community 1 - "common-dabb52f27fbf7211-min.en-US.js"
-Cohesion: 0.16
-Nodes (12): cellVariants, DiscoverDisplay, DiscoverItem, DISPLAY, EASE, EXPAND_SPRING, ITEMS, VenueBlock() (+4 more)
+Cohesion: 0.10
+Nodes (24): VenueMark(), VenueMark(), CAPTION_SLOT, Discover(), DiscoverDisplay, DiscoverItem, DISPLAY, EASE (+16 more)
 
 ### Community 2 - "8018.js"
 Cohesion: 0.20
@@ -248,12 +259,12 @@ Cohesion: 0.29
 Nodes (4): maxR, minL, sampled, steps
 
 ### Community 29 - "posts.ts"
-Cohesion: 0.16
-Nodes (19): BlogPage(), metadata, generateMetadata(), generateStaticParams(), JournalPostPage(), Home(), sitemap(), renderMarkdown() (+11 more)
+Cohesion: 0.09
+Nodes (20): jsonLd, metadata, About(), ChapterRow(), CHAPTERS, COVERAGE_GROUPS, CoverageRow, COVERED_RESTAURANTS (+12 more)
 
 ### Community 31 - "BlogIndex.tsx"
-Cohesion: 0.06
-Nodes (33): About(), CHAPTERS, COVERAGE_GROUPS, CoverageRow, COVERED_RESTAURANTS, MISSING_IMAGES, narrowServerSnapshot(), narrowSnapshot() (+25 more)
+Cohesion: 0.21
+Nodes (11): ContactPage(), mapUrl(), VISITABLE, DarkZone(), ITEMS, Menu(), getNavTheme(), LINKS (+3 more)
 
 ### Community 33 - "compilerOptions"
 Cohesion: 0.05
@@ -272,8 +283,8 @@ Cohesion: 0.13
 Nodes (14): argv, brightestGround(), CR(), failed, HOME, L(), lin(), open() (+6 more)
 
 ### Community 41 - "PageTransition.tsx"
-Cohesion: 0.12
-Nodes (18): Film(), metadata, ExpandedCard(), MenuOverlay(), EASE, MARKS, ORDER, PressWall() (+10 more)
+Cohesion: 0.13
+Nodes (16): Film(), metadata, MenuOverlay(), MARKS, ORDER, PressWall(), houseRules(), pipeline (+8 more)
 
 ### Community 42 - "probe-videoscale.mjs"
 Cohesion: 0.17
@@ -292,8 +303,8 @@ Cohesion: 0.36
 Nodes (6): failed, open(), R, s(), seatGrid(), walk()
 
 ### Community 51 - "probe-timeline-contrast.mjs"
-Cohesion: 0.27
-Nodes (14): CustomCursor(), CASES, centreOf(), diff(), frame(), layoutCost(), layoutCount(), midFlight() (+6 more)
+Cohesion: 0.29
+Nodes (13): CASES, centreOf(), diff(), frame(), layoutCost(), layoutCount(), midFlight(), open() (+5 more)
 
 ### Community 55 - "probe-about-open.mjs"
 Cohesion: 0.07
@@ -308,12 +319,12 @@ Cohesion: 0.11
 Nodes (17): armReveals(), consoleErrors, failures, L, lin(), lum(), newErrors, out (+9 more)
 
 ### Community 61 - "RestaurantsShowcase.tsx"
-Cohesion: 0.23
-Nodes (11): Blog(), buildRail(), CATEGORY_LABEL, HOME_SLUGS, LedeCard(), RailRow(), seat(), BLOG (+3 more)
+Cohesion: 0.39
+Nodes (7): clean(), Ctx, Env, handlePost(), json(), MAX, onRequest()
 
 ### Community 62 - "jsonld.tsx"
-Cohesion: 0.18
-Nodes (14): CLAUSE_BREAK, EYEBROW_IN, INLINE, KEY_WORDS, Manifesto(), Piece, PIECES, SCRUB_OFFSET (+6 more)
+Cohesion: 0.19
+Nodes (9): DOORS, Common, MAGNET, PillCta(), Props, MAGNET_SPRING, MagnetOptions, useMagnet() (+1 more)
 
 ### Community 63 - "Product"
 Cohesion: 0.18
@@ -352,16 +363,16 @@ Cohesion: 0.40
 Nodes (4): bits, h, half, top
 
 ### Community 82 - "Manifesto.tsx"
-Cohesion: 0.13
-Nodes (15): CARDS, LOOP, MID, nameList(), project(), NOTE: one video ships today (hero-draft3). Drop a per-restaurant clip in, RESTAURANTS, RestaurantsShowcase() (+7 more)
+Cohesion: 0.16
+Nodes (11): CARDS, LOOP, MID, nameList(), project(), NOTE: one video ships today (hero-draft3). Drop a per-restaurant clip in, RESTAURANTS, RestaurantsShowcase() (+3 more)
 
 ### Community 83 - "shoot-about-rules.mjs"
-Cohesion: 0.11
-Nodes (20): CONTACT_LINKS, EASE, EXPLORE, FootLink, FootLinkA(), LEGAL, WORDMARK_FADE, WORDMARK_MASK (+12 more)
+Cohesion: 0.17
+Nodes (12): FootLinkA(), CLIPS, Hero(), CURTAIN, IMAGES, Navigate, PageTransition(), Phase (+4 more)
 
 ### Community 84 - "restaurants.ts"
-Cohesion: 0.18
-Nodes (4): jsonLd, metadata, jsonLd, metadata
+Cohesion: 0.16
+Nodes (19): BlogPage(), metadata, generateMetadata(), generateStaticParams(), JournalPostPage(), Home(), sitemap(), renderMarkdown() (+11 more)
 
 ### Community 88 - "shoot-pass.mjs"
 Cohesion: 0.47
@@ -372,8 +383,8 @@ Cohesion: 1.00
 Nodes (3): s(), shoot(), walk()
 
 ### Community 91 - "RestaurantsShowcase.tsx"
-Cohesion: 0.19
-Nodes (9): jsonLd, metadata, jsonLd, metadata, Pending(), analyticsConfigured, CONTACT, SOCIALS (+1 more)
+Cohesion: 0.07
+Nodes (36): jsonLd, metadata, displayFace, metadata, textFace, jsonLd, metadata, ConsentControl() (+28 more)
 
 ### Community 92 - "press.ts"
 Cohesion: 0.13
@@ -385,35 +396,35 @@ Nodes (14): argv, CRF, files, IMAGE_EXT, jobs, ONLY, ORIGINALS, PUBLIC (+6 more)
 
 ### Community 97 - "AboutSplit.tsx"
 Cohesion: 0.12
-Nodes (16): DOOR_IN, DOOR_ROW, DOOR_WIPE, DOORS, DRAWER, DRIFT, EASE, FADE (+8 more)
+Nodes (18): AboutSplit(), Door(), DOORS, DRAWER, DRIFT, EASE, FADE, HEAD_IN (+10 more)
 
 ### Community 98 - "seek-offset-search.mjs"
 Cohesion: 0.13
 Nodes (13): band, bandFiles, CUT, cuts, diff, full, fullFiles, luma() (+5 more)
 
 ### Community 99 - "PillCta.tsx"
-Cohesion: 0.34
-Nodes (11): Analytics(), Window, ConsentControl(), CookieBanner(), ConsentState, listeners, readConsent(), readDismissed() (+3 more)
+Cohesion: 0.18
+Nodes (14): CLAUSE_BREAK, EYEBROW_IN, INLINE, KEY_WORDS, Manifesto(), Piece, PIECES, SCRUB_OFFSET (+6 more)
 
 ### Community 101 - "q"
-Cohesion: 0.12
-Nodes (14): displayFace, metadata, textFace, Mode, FILTERS, GlassFilters(), KEEP, LENS_MAP (+6 more)
+Cohesion: 0.08
+Nodes (35): ActionBand(), Blog(), buildChapter(), Entry(), Front(), HOME_SLUGS, seat(), BlogIndexInner() (+27 more)
 
 ### Community 102 - "Reveal.tsx"
 Cohesion: 0.12
 Nodes (12): boardGone, firstFilm, frames, fullBleed, maxDrift, n1(), parseHole(), recorder() (+4 more)
 
 ### Community 103 - "getRestaurant"
-Cohesion: 0.24
-Nodes (9): VenueMark(), VenueMark(), Discover(), JournalPost(), getRestaurant(), Extras, VenueAddress, venueCard() (+1 more)
+Cohesion: 0.13
+Nodes (16): CLOSE_CTA, CLOSE_INVITE, CLOSE_MARK, CLOSE_OFFSET, closeInk(), CONTACT_LINKS, EASE, EXPLORE (+8 more)
 
 ### Community 104 - "zoom-loader-handover.mjs"
 Cohesion: 0.22
 Nodes (5): CREAM, frames, MAROON, report, trace
 
 ### Community 108 - "Passage.tsx"
-Cohesion: 0.10
-Nodes (24): buildMark(), clamp01(), InkMark(), MARK_ON, n2(), Passage(), Pt, RingGeom (+16 more)
+Cohesion: 0.25
+Nodes (5): all, bands, big, flatRuns, keys
 
 ### Community 109 - "ReviewUs.tsx"
 Cohesion: 0.07
@@ -428,16 +439,16 @@ Cohesion: 0.11
 Nodes (15): all, analyse(), argv, CATS, FAT, LABEL, NAMES, NOGPURASTER (+7 more)
 
 ### Community 112 - "page.tsx"
-Cohesion: 0.17
-Nodes (13): AboutSplit(), ContactPage(), mapUrl(), VISITABLE, DarkZone(), HERO_INSETS, ITEMS, Menu() (+5 more)
+Cohesion: 0.29
+Nodes (4): ENV, good, longestX, out
 
 ### Community 113 - "page.tsx"
 Cohesion: 0.33
 Nodes (5): bytes, rows, t0, total, urls
 
 ### Community 114 - "page.tsx"
-Cohesion: 0.07
-Nodes (27): ALPHABET, EASE_OUT, FlipLetter(), LETTERS, Loader(), SHUTTERS, SMOOTH, Vp (+19 more)
+Cohesion: 0.12
+Nodes (13): analyse(), argv, GEOMETRY, HEADLESS, holeW(), LABEL, once(), pct() (+5 more)
 
 ### Community 118 - "probe-screencast-control.mjs"
 Cohesion: 0.22
@@ -460,12 +471,12 @@ Cohesion: 0.22
 Nodes (8): d0, fb, gapAt(), partials, perWidth, seat(), seatP(), widths
 
 ### Community 134 - "getRestaurant"
-Cohesion: 0.19
-Nodes (9): jsonLd, metadata, REVIEWABLE, reviewUrl(), ReviewUs(), Restaurant, RESTAURANTS, SLUG_BY_NAME (+1 more)
+Cohesion: 0.12
+Nodes (20): dotSlots(), em(), filmReaches(), Line, LINE_SLOTS_NARROW, LINE_SLOTS_WIDE, LINE_TRACK, LINE_TRACK_NARROW (+12 more)
 
 ### Community 135 - "page.tsx"
 Cohesion: 0.33
-Nodes (4): FEATURED_OUTLETS, HIGHLIGHT_QUOTES, PRESS_INDEX, PressMention
+Nodes (4): jsonLd, metadata, Pending(), LEGAL_ENTITY
 
 ### Community 136 - "dependencies"
 Cohesion: 0.12
@@ -488,52 +499,80 @@ Cohesion: 0.25
 Nodes (3): rows, sample(), TIMES
 
 ### Community 155 - "PillCta.tsx"
-Cohesion: 0.17
-Nodes (9): DOORS, Common, MAGNET, PillCta(), Props, Reservations(), MAGNET_SPRING, MagnetOptions (+1 more)
+Cohesion: 0.18
+Nodes (5): buckets, dead, energy, long, steps
 
 ### Community 156 - "scripts"
 Cohesion: 0.29
 Nodes (7): scripts, build, dev, lighthouse, lint, press-logos, start
 
-### Community 158 - "press.ts"
+### Community 157 - "gray-matter"
+Cohesion: 0.16
+Nodes (9): Contact(), ContactProps, EMPTY, Errors, validate(), Values, ITEMS, Reveal() (+1 more)
+
+### Community 160 - "SplitWords.tsx"
+Cohesion: 0.29
+Nodes (3): rows, TARGETS, TIMES
+
+### Community 162 - "package.json"
+Cohesion: 0.33
+Nodes (5): name, overrides, sharp, private, version
+
+### Community 164 - "CustomCursor.tsx"
+Cohesion: 0.60
+Nodes (5): clean(), handlePost(), json(), MAX, onRequest()
+
+### Community 165 - "VideoBackdrop.tsx"
+Cohesion: 0.19
+Nodes (9): jsonLd, metadata, REVIEWABLE, reviewUrl(), ReviewUs(), Restaurant, RESTAURANTS, SLUG_BY_NAME (+1 more)
+
+### Community 169 - "Contact.tsx"
 Cohesion: 0.67
 Nodes (3): lenis, SmoothScroll(), lenis
 
-### Community 162 - "package.json"
-Cohesion: 0.50
-Nodes (3): name, private, version
+### Community 170 - "_tmp-seam-lr.mjs"
+Cohesion: 0.15
+Nodes (15): HERO_INSETS, ALPHABET, EASE_OUT, FlipLetter(), LETTERS, Loader(), SHUTTERS, SMOOTH (+7 more)
 
-### Community 164 - "CustomCursor.tsx"
-Cohesion: 0.20
-Nodes (12): BlogIndexInner(), buildFilters(), CardMedia(), navigate(), pageCountFor(), postsForPage(), queryListeners, ROOM_NAME (+4 more)
+### Community 171 - "Blog.tsx"
+Cohesion: 0.18
+Nodes (6): breaches, fail, flat, restaurants, travel, worst
 
-### Community 174 - "shoot-sections.mjs"
-Cohesion: 0.83
-Nodes (3): armReveals(), open(), s()
+### Community 177 - "_tmp-about-sweep.mjs"
+Cohesion: 0.29
+Nodes (3): base, errs, rel
 
 ### Community 178 - "JoinUs.tsx"
-Cohesion: 0.06
-Nodes (25): jsonLd, metadata, clamp01(), DIAL_CODES, DIGITS, FlipDigit(), HERO_LINES, inkBox() (+17 more)
+Cohesion: 0.11
+Nodes (16): jsonLd, metadata, clamp01(), DIAL_CODES, DIGITS, FlipDigit(), HERO_LINES, inkBox() (+8 more)
+
+### Community 182 - "SplitWords.tsx"
+Cohesion: 0.40
+Nodes (3): EASE, emWordStart(), SplitWords()
+
+### Community 183 - "VideoBackdrop.tsx"
+Cohesion: 0.43
+Nodes (4): Clip, clipStyle(), useVisiblePlayback(), VideoBackdrop()
 
 ## Knowledge Gaps
-- **728 isolated node(s):** `jsonLd`, `metadata`, `metadata`, `jsonLd`, `metadata` (+723 more)
+- **756 isolated node(s):** `jsonLd`, `metadata`, `metadata`, `jsonLd`, `metadata` (+751 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **45 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **49 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `q()` connect `VideoBackdrop.tsx` to `VideoBackdrop.tsx`, `probe-404.mjs`, `JoinUs.tsx`, `probe-timeline-contrast.mjs`, `shoot`, `press.ts`?**
-  _High betweenness centrality (0.047) - this node is a cross-community bridge._
-- **Why does `JoinUs()` connect `JoinUs.tsx` to `VideoBackdrop.tsx`?**
-  _High betweenness centrality (0.041) - this node is a cross-community bridge._
-- **Why does `SmoothScroll()` connect `press.ts` to `probe-timeline-contrast.mjs`, `shoot-about-rules.mjs`, `q`?**
-  _High betweenness centrality (0.030) - this node is a cross-community bridge._
+  _High betweenness centrality (0.048) - this node is a cross-community bridge._
+- **Why does `JoinUs()` connect `JoinUs.tsx` to `PageTransition.tsx`, `VideoBackdrop.tsx`?**
+  _High betweenness centrality (0.045) - this node is a cross-community bridge._
+- **Why does `SmoothScroll()` connect `Contact.tsx` to `probe-timeline-contrast.mjs`, `shoot-about-rules.mjs`, `RestaurantsShowcase.tsx`?**
+  _High betweenness centrality (0.038) - this node is a cross-community bridge._
 - **What connects `jsonLd`, `metadata`, `metadata` to the rest of the system?**
-  _728 weakly-connected nodes found - possible documentation gaps or missing edges._
+  _756 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `user-account-core-06dbaa1bcfe1a542-min.en-US.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.05 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.045454545454545456 - nodes in this community are weakly interconnected._
+- **Should `common-dabb52f27fbf7211-min.en-US.js` be split into smaller, more focused modules?**
+  _Cohesion score 0.10098522167487685 - nodes in this community are weakly interconnected._
 - **Should `probe-timeline.mjs` be split into smaller, more focused modules?**
   _Cohesion score 0.05 - nodes in this community are weakly interconnected._
-- **Should `probe-band-about-press.mjs` be split into smaller, more focused modules?**
-  _Cohesion score 0.10098522167487685 - nodes in this community are weakly interconnected._

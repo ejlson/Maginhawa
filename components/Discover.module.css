@@ -99,10 +99,33 @@
      block because of the hairline closing it. */
   /* NAMED for .topRule, which subtracted it so the opening hairline could
      sit 18px off the head rather than a full gap away. That rule is
-     deleted, so nothing reads this any more — it is kept because it is the
-     honest name for what the gap is, and the next thing seated against the
-     head will want it. The value has never changed. */
-  --sec-gap: clamp(26px, 3.8vh, 44px);
+     deleted, so .headRule is what reads this now — it is kept because it is
+     the honest name for what the gap is, and the next thing seated against
+     the head will want it. */
+  /* ── AND THE VALUE FINALLY MOVES, at the user's instruction: the air
+     under .headRule now matches the air under Blog's "Earlier Entries"
+     divider, so the page's two internal hairlines are bracketed the same
+     way. clamp(26px, 3.8vh, 44px) was 34px at 900 against Blog's 24 — the
+     one rule read attached to its grid, the other floating off it. */
+  /* ── THE AIR EITHER SIDE OF .headRule, BORROWED FROM BLOG ──
+     Blog's "Earlier Entries" divider is a hairline seated in a label row,
+     with --step-arc: clamp(10px, 1.7vh, 22px) of margin above the row and
+     the same below it. What a reader sees there is that clamp PLUS half
+     the label row, because the rule is centred in it — measured ink-to-rule
+     at 1440x900 by scripts/probe-home-spacing.mjs's method: 23.9px, equal
+     on both sides. This states that number in Blog's own terms rather than
+     freezing it, so a retune of --step-arc carries across.
+
+     ⚠️ 8.6px IS HALF THE LABEL ROW, not a nudge: (18.19 - 1) / 2 with the
+     label at its current size. It is spelled in px because there is no
+     label on this side of the page to take it from. */
+  /* tightened ~30% at the user's instruction ("reduce the gaps in the
+     header") — the head's three seams (label→lede, lede→rule, rule→grid)
+     all derive from this pair, so one edit moves them together and the
+     Blog-parity note above still describes the RELATIONSHIP, at a snugger
+     setting. */
+  --rule-air: calc(clamp(7px, 1.15vh, 15px) + 8.6px);
+  --sec-gap: var(--rule-air);
   gap: var(--sec-gap);
   /* the entrance choreography slides cells in from PAST the viewport
      edges (±110vw) — clip the x-axis so off-screen tiles never widen the
@@ -205,7 +228,7 @@
      NAMED because .headRule subtracts it — see the note there. Value
      unchanged: it now points at the global --space-xs-y, which holds the
      same clamp this line used to spell out. */
-  --head-gap: var(--space-xs-y);
+  --head-gap: calc(var(--space-xs-y) * 0.65);
   gap: var(--head-gap);
 }
 
@@ -301,6 +324,61 @@
    The clamp and the 1.1 leading now live in globals as --t-chapter /
    --lh-chapter, shared with the journal's lede and /blog's title, so the
    three chapter heads cannot drift apart. Same values, one name. */
+/* ══ THE LEDE'S TWO LINES INK IN PLACE — THEY NO LONGER DESCEND ══
+   Still by CLAUSE, still in the title's grammar: parked in the stylesheet,
+   released by `data-on`, staggered by an index the markup declares. The
+   DESCENT went at the user's instruction that the chapter heads take the
+   manifesto statement's ink bleed (ScrubWord, Manifesto.tsx): each clause
+   arrives in place, out of focus, and resolves. Finding 01 of the motion
+   crit is the supporting argument — none of the editorial benchmarks
+   animates type per-word, and a travelling display line has no baseline
+   while the eye is on it; the per-word version died of that here already,
+   and resolving in place is the verb that cannot shear at all.
+
+   ⚠️ THE MASK NO LONGER CLIPS, AND MUST NOT. Its clip-path —
+   inset(0 -0.2em -0.3em -0.12em), Blog's .labelWordMask idiom — existed to
+   hide the parked line above the clip while stating the descender bleed.
+   With nothing travelling there is nothing to hide, and a clip here now
+   SHEARS THE BLEED: a blurred glyph paints its halo outside its own box by
+   the blur radius, so any clip turns the soft entrance into hard
+   rectangular sides (the exact fault .wordMask in Manifesto.module.css
+   went `overflow: visible` for). The element stays — it is the line box
+   the clause pair wraps in — it just does nothing but hold the line.
+
+   0.11em IS BLUR_MAX_EM — Manifesto's measured radius, in em of the line's
+   OWN size so perceived softness holds across --t-chapter's clamp; the
+   four ink-bleed sites (Manifesto, AboutSplit, Blog, this) share it.
+
+   PARKED AT opacity: 0, NOT ScrubWord's 0.14 FLOOR: the floor is a scrub
+   affordance (the ghost shows where the scrubbed sentence is going). This
+   is a latch — before `titleOn` the ghost would just stand there under the
+   title words, which park fully hidden. One head, one parked state.
+
+   `filter: none` AT REST, NOT blur(0) — blur(0) still installs a filter, a
+   containing block and a composited layer (Blog.tsx's Finding 02 note).
+   The transition interpolates none ⇄ blur() through the lacuna value
+   blur(0), per the Filter Effects spec, so the resolve is still smooth —
+   verified in the entrance probe. */
+.ledeLineMask {
+  display: block;
+}
+.ledeLine {
+  display: block;
+  opacity: 0;
+  filter: blur(0.11em);
+  /* one beat after the label's second word (title steps land at 0 and
+     0.09s), then the clauses 0.09s apart — the head reads downward in one
+     cadence: mark, "Our", "restaurants", clause, clause. The cadence
+     survived the change of verb untouched. */
+  transition:
+    opacity 0.85s var(--ease-entrance) calc(0.1s + var(--ll-i, 0) * 0.09s),
+    filter 0.85s var(--ease-entrance) calc(0.1s + var(--ll-i, 0) * 0.09s);
+}
+.ledeLine[data-on="on"] {
+  opacity: 1;
+  filter: none;
+}
+
 .lede {
   margin: 0;
   max-width: 17.7em;
@@ -335,14 +413,20 @@
    THE MARGIN SUBTRACTS THE HEAD'S OWN GAP, which is why --head-gap is
    named: this rule is the last item of a flex column, so the gap is already
    between it and the display line and the margin only has to make up the
-   difference. `calc(18px - var(--head-gap))` states the intent — "18px
-   under the type, whatever the lockup's gap is" — and survives a retune of
-   that clamp. Same construction as .topRule above. */
+   difference. The calc states the intent — "--rule-air under the type,
+   whatever the lockup's gap is" — and survives a retune of that clamp.
+   Same construction as .topRule above.
+
+   ⚠️ THE 18px IS NOW --rule-air, at the user's instruction, and the two
+   sides of this rule are the same measure for the first time: the air below
+   it (--sec-gap) reads the same token. Both are Blog's divider gap — see
+   --rule-air on .section for where 23.9px comes from. The 18px the
+   paragraph above argues for is what it replaced. */
 .headRule {
   width: 100%;
   height: 1px;
   background: var(--rule);
-  margin-top: calc(18px - var(--head-gap));
+  margin-top: calc(var(--rule-air) - var(--head-gap));
 }
 
 /* ── .footRule IS GONE, at the user's instruction ──
@@ -525,6 +609,15 @@
     transition: none;
     will-change: auto;
   }
+  /* fully inked and standing — the ink bleed's park is opacity + filter
+     now, so both are neutralised; no blur ever renders under reduced
+     motion. (.ledeLineMask needs no release any more: its base rule
+     stopped clipping when the descent went.) */
+  .ledeLine {
+    opacity: 1;
+    filter: none;
+    transition: none;
+  }
   .titleRise {
     transition: none;
   }
@@ -632,7 +725,13 @@
 @media (min-width: 981px) {
   .grid {
     grid-template-columns: repeat(4, 1fr);
-    /* the global 12-col grid's gutter between the tiles */
+    /* ══ FULL SPAN AGAIN — the portrait inset is closed ══
+       For one day this grid took a measured width derived from the
+       viewport's height (portrait plates, one-screen fit; then enlarged
+       twice). The user, seeing it live, chose the original full-measure
+       landscape grid back. The page-gutter columns return; the slightly
+       opened row gap stays, for the shadow-reach reason above the two-up
+       block. */
     column-gap: var(--grid-gutter);
     row-gap: clamp(12px, 1.25vw, 18px);
   }
@@ -668,27 +767,32 @@
    cell goes back to having no clip at all.
 
    THE FALLBACK IS 0%, NOT 100%, and that is a deliberate failure mode. If
-   the script never runs, framer never writes --wipe and the cell renders
-   fully open: no animation, but eight readable cards. A 100% fallback would
-   fail the other way, leaving an empty grid on any page where hydration
-   died. The parked state comes from framer's own `initial="hidden"`, which
-   is emitted into the server's HTML, so the honest first paint is still a
-   closed card.
+   the script never runs, nothing writes --wipe and the cell renders fully
+   open: no animation, but eight readable cards. A 100% fallback would fail
+   the other way, leaving an empty grid on any page where hydration died.
+
+   ⚠️ THAT SENTENCE WAS FALSE FOR AS LONG AS THE ENTRANCE WAS A VARIANT, and
+   it is worth recording because the rule it states is right and the
+   mechanism under it was not. The parked state used to come from framer's
+   `initial="hidden"`, and framer emits that into the SERVER's HTML — so
+   every cell shipped as `data-wiping="on" style="--wipe:100%"` and the
+   fallback above could never be reached. A page with no script showed eight
+   blank cards, silently. Discover.tsx now withholds both the attribute and
+   the variable until after mount, so the no-script state is a plain
+   unclipped card and this note describes what actually happens.
 
    `round` IS ABSENT ON PURPOSE — the visible corner belongs to
    .cardSurface inside this box, so a square clip only ever cuts at or
    outside a corner the reader can see. */
-.cell[data-wiping="on"] {
-  clip-path: inset(0% 0% var(--wipe, 0%) 0%);
-}
-
-@media (prefers-reduced-motion: reduce) {
-  /* belt to the component's brace: it never sets the attribute under this
-     query, and if it somehow did, the cell still would not clip */
-  .cell[data-wiping="on"] {
-    clip-path: none;
-  }
-}
+/* ══ NO CLIP RULE ANY MORE — THE WIPE IS RETIRED ══
+   `.cell[data-wiping]` stood here, carrying the entrance clip and two
+   hard-won lessons (a resting `inset(0%)` shears the hover lift's shadow;
+   the fallback had to be open-not-shut for no-script readers). The wipe
+   went at the user's instruction and the entrance is a SETTLE now — cell
+   ink + photograph landing from 1.06, all driven from Discover.tsx through
+   --photo-enter/--card-ink on the seat, consumed in VenueCard.module.css.
+   Nothing in this file animates the entrance any more; this note is the
+   pointer for whoever greps for the old attribute. */
 
 /* ── THE SHELF STEPS BACK ──
    While a card is open the grid behind it scales down and dims, in a wave

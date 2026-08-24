@@ -165,8 +165,9 @@
    bottom could be 12px because Blog's own clamp(64px, 9vh, 132px) top
    followed immediately and owned that side.
 
-   WHERE IT SITS NOW: directly under Blog and directly above Reservations.
-   Both of those facts reverse.
+   WHERE IT SITS NOW: directly under Blog and directly above <Passage />
+   (the pinned handover — NOT <Reservations>, which follows Passage; see
+   Experience.tsx). Both of those facts reverse.
 
    TOP IS 0 BECAUSE THE JOURNAL ALREADY PAID. Blog's bottom padding is
    clamp(64px, 9vh, 132px) — the very same expression. Keeping a matching
@@ -176,20 +177,41 @@
    the journal's padding is symmetric with its own top and should stay that
    way.
 
-   BOTTOM OWNS THE WHOLE GAP BECAUSE RESERVATIONS OWNS NOTHING. It declares
-   `margin-top: 0` and no top padding at all — it is the film, and it starts
-   at its own first pixel. Left at --grid-gutter the mastheads would sit 12px
-   off the film's edge, which is the caption-stuck-to-a-picture reading again
-   with the picture on the other side.
+   ⚠️ AND THE NEIGHBOUR BELOW HAS CHANGED AGAIN — IT IS <Passage /> NOW,
+   NOT THE FILM. The note above still reads as if the mastheads hand
+   straight to <Reservations>; they do not. What follows is the pinned
+   handover, and that section declares `padding-top: 0` precisely because
+   this padding is meant to be the entire seam between the two.
 
-   NET: the marquee keeps a chapter's air on both sides, one paid by the
-   journal above and one by itself below. If either neighbour changes, this
-   is the declaration to re-derive — it is a statement about who its
-   neighbours are, not a free-standing choice. */
+   ⚠️ SO THIS IS ONLY HALF THE GAP THE READER SEES, and the other half
+   cannot be touched. <Passage> centres its slab in a full-viewport sticky
+   stage, so it brings its own air above the type — 59px at 1920x1080 —
+   and that air is ALSO the distance from the top of the screen to the
+   first line once the section pins. The navbar is 56px tall. There are
+   three pixels in it. Seat the type any higher and the sentence runs
+   under the bar, which is why every request to close this gap has to be
+   answered here rather than there.
+
+   MEASURED AT 1920x1080, across three passes at this: 97px of padding here
+   plus 59px of Passage's centring made 156px between the last masthead and
+   the first letter. It went to 35px (117px total), and now to 17px. That
+   is about half a masthead's own height — the marquee and the sentence are
+   as close as this side can put them, and what remains of the gap is on
+   Passage's side and is the navbar's, not spare.
+
+   ⚠️ DO NOT RESTORE THE CHAPTER-SIZED VALUE without re-deriving Passage's
+   side with it. The old clamp(64px, 9vh, 132px) is still the right number
+   for a marquee above an ordinary block; it is the wrong one above a
+   section that already centres its own contents in a viewport. */
 .section {
-  padding: 0 var(--pad-x) clamp(64px, 9vh, 132px);
+  padding: 0 var(--pad-x) clamp(14px, 1.6vh, 26px);
   background: none;
   color: var(--maroon);
+  /* THE PRESS INK — the one colour all the masked marks paint in (see
+     .logo below). One step deeper than --maroon so it reads as an INK
+     beside the type rather than as the brand colour repeated thirteen
+     times; Michelin is exempt and keeps its red. */
+  --press-ink: color-mix(in srgb, var(--maroon) 82%, #000);
 }
 
 /* ── THE DESKTOP INDENT IS GONE, AND IT COST SOMETHING. Say plainly what.
@@ -248,6 +270,38 @@
 }
 
 /* ---------- the drifting lane ---------- */
+/* ═══════════ THE BAND — a hairline above the marks and one below ═══════
+
+   At the user's instruction, and it is the arrangement the studies called
+   the ruled band. Before this the lane floated in open cream with no edges
+   at all: the only section on the page whose boundaries were nothing but
+   the gap either side of it.
+
+   ⚠️ THE RULES SIT ON --grid-gutter, NOT ON THIS SECTION'S --pad-x. The
+   section is padded to --pad-x (--grid-margin, 40px at 1440) but every
+   other edge a reader can see down this stretch of the page — AboutSplit's
+   film, the journal's photograph, the journal's own archive rule — is on
+   --grid-gutter's 12px. A hairline inset 28px further than the rule above
+   it reads as a mistake, so the band pulls itself back out to the page
+   margin proper. The negative margin is that difference, written as the
+   subtraction rather than as −28px so it survives either token moving.
+
+   THE LANE STILL BLEEDS PAST IT. `.lane` keeps its own
+   `margin-inline: calc(-1 * var(--pad-x))` and its edge masks, so the marks
+   run to the viewport edges and fade there while the rules stop at the
+   margin. Bounded band, unbounded marks — which is the point: a lane that
+   ended flush with its own rules would read as a finished row rather than
+   as something passing through.
+
+   44px INSIDE THE RULES at 900 — about one masthead's own height, which is
+   what stops the marks reading as type crammed between two lines. */
+.band {
+  margin-inline: calc(var(--grid-gutter) - var(--pad-x));
+  border-top: 1px solid var(--rule);
+  border-bottom: 1px solid var(--rule);
+  padding-block: clamp(26px, 4.9vh, 52px);
+}
+
 /* ONE LANE, RECOVERED. What was here: three hand-set rows of mastheads, each
    justified flush to both page margins with the membership solved against
    measured ink so the three gaps came out within 1.7px of each other. All of
@@ -268,7 +322,22 @@
 .lane {
   position: relative;
   /* out to the viewport edges, undoing the section's own page margin */
-  margin-inline: calc(-1 * var(--pad-x));
+  /* ⚠️ THE BLEED IS MEASURED FROM THE BAND, NOT FROM THE SECTION, and that
+     changed when the band arrived. This was `-1 * var(--pad-x)`, which
+     cancelled the section's own padding exactly and put the lane's edges on
+     the viewport's. The lane no longer sits in the section — it sits in
+     `.band`, which has already pulled itself back out to --grid-gutter — so
+     subtracting --pad-x now overshoots by the difference between the two
+     tokens and the lane hangs off the page.
+
+     MEASURED: at 390 that difference is 4px (--pad-x floors at 16, the
+     gutter is 12), the lane ran from −4 to 394 in a 390 viewport, and the
+     document gained 4px of horizontal scroll — which every full-width
+     element then inherited, so the nav, the menu sheet and the page
+     transition curtain all measured 394 wide too. Cancelling the BAND's
+     inset instead puts the edges back on the viewport, where the lane's own
+     mask fades them. */
+  margin-inline: calc(-1 * var(--grid-gutter));
   overflow: hidden;
   -webkit-mask-image: linear-gradient(
     90deg,
@@ -314,17 +383,99 @@
      cap multiplies it by the widest aspect the set contains. One
      declaration, so a change to the lane's size cannot move one and leave
      the other behind. */
-  --press-base: clamp(18px, 2vw, 36px);
-  gap: clamp(28px, 4vw, 72px);
-  padding-right: clamp(28px, 4vw, 72px);
-  animation: pressDrift 72s linear infinite;
+  /* ⚠️ RAISED FROM clamp(18px, 2vw, 36px) AT THE USER'S INSTRUCTION, and
+     the constraint it has to clear is the FADE WINDOW, not the measure:
+     the widest mark is base x 15.6 and it has to fit between the lane's
+     two edge masks, or a masthead is fading in at one end while the next
+     fades out at the other. Desktop masks 10% either side, so the test is
+     base x 15.6 <= 0.80 x 100vw. Checked at the corners:
+
+         1920   56px (capped)   874px  <=  1536   OK
+         1440   44.6px          696px  <=  1152   OK
+          900   27.9px          435px  <=   720   OK
+          701   26px (floor)    406px  <=   561   OK
+
+     ⚠️ BROUGHT BACK DOWN AT THE USER'S INSTRUCTION. It went 18px→26px
+     base / 2vw→3.1vw / 36px→56px cap in one step and that was too far: at
+     1920 the mastheads were 56px of seat against a 165px sentence one
+     section below, which read as two competing statements rather than as a
+     credential and then a claim. 2.4vw sits between the two — 34.6px at
+     1440 against the 28.8px it started at and the 44.6px it reached.
+
+     The floor is 20px because 2.4vw stops moving below about 840px, and it
+     matches what the phone block at the foot of this file holds, so the
+     size is now continuous across that breakpoint rather than stepping. */
+  /* ── FLAT 22px NOW, NOT A CLAMP, at the user's instruction ──
+     The unification pass asked for ONE equalised x-height across the
+     lane, and a viewport-fluid base means the "one size" is a different
+     one at every width — the per-mark `scale` values in lib/press.ts are
+     the measured optical equaliser and they stay untouched; this is the
+     constant they multiply. 22px sits at the old clamp's lower-middle
+     (it resolved 34.6px at 1440), so the lane reads quieter beside the
+     journal above it. The fade-window inequality above still clears
+     everywhere: widest mark = 22 x 15.6 = 343px against a 0.80 x 100vw
+     window, i.e. safe down to 429px — and below 700px the phone block
+     re-sets the base anyway. */
+  --press-base: 22px;
+  /* ⚠️ OPENED UP AT THE USER'S INSTRUCTION — clamp(28px, 4vw, 72px) →
+     clamp(42px, 6vw, 108px), so 57.6px at 1440 becomes 86.4px. The marks
+     themselves do not change: --press-base is untouched and this is air.
+
+     ⚠️ THE PAD MUST STAY EXACTLY EQUAL TO THE GAP. It is not a decorative
+     margin — twenty-eight marks in one row have twenty-seven gaps, so half
+     the track is fourteen marks plus thirteen and a half gaps while one
+     copy is fourteen plus fourteen. A trailing pad of precisely one gap is
+     what makes -50% land on an identical frame. Change one, change both,
+     and never round them differently. */
+  gap: clamp(42px, 6vw, 108px);
+  padding-right: clamp(42px, 6vw, 108px);
+  /* ⚠️ THE DURATION IS A SPEED, SO IT MOVES WITH THE MARKS. This was 72s
+     against the old base. Bigger marks make a longer track, and a longer
+     track covered in the same time is a faster lane — measured at 1440 the
+     track has moved twice with it — 6411px at the original size, 9127px
+     when the marks were enlarged, and 7430px now they have come back down.
+     The number to hold is the SPEED, (track width / 2) / duration, and it
+     is 44.3px/s: the pace this lane was tuned at and the pace the phone
+     block at the foot of this file is written against. Holding 103s
+     through the last change would have left it drifting at 36px/s, which
+     is not the same lane running smaller marks, it is a slower lane.
+     84s against 7430px was 44.2 at the time; the gap change below moved
+     it to 93s. Re-measure whenever --press-base or the gap moves; do not
+     carry the duration forward.
+
+     ⚠️ AND THE GAP JUST MOVED, so this did too: opening the lane's air took
+     the track at 1440 from 7430px to 8235px, and holding 84s would have
+     left it drifting at 49px/s — a faster lane wearing the same marks,
+     which is exactly the mistake this note exists to prevent. 4118 ÷ 44.3
+     is 93. A 1440 screen is still crossed in 32s.
+
+     ⚠️ THE BASE THEN WENT FLAT AT 22px AND THE DURATION DELIBERATELY DID
+     NOT MOVE — a knowing exception to the rule this note enforces. The
+     shorter marks shorten the half-track (~3060px at 1440), so 93s now
+     drifts at ~33px/s instead of 44.3. That is a SLOWER lane, and it is
+     accepted rather than corrected: the unification pass asked for an
+     unhurried credential (the floor it set was "no faster than one loop
+     per 40s", which 93s clears three times over). If the pace ever reads
+     wrong, re-derive from px/s as above — but the number to hold is now a
+     decision, not the old 44.3. */
+  animation: pressDrift 93s linear infinite;
   will-change: transform;
 }
 
-/* The lane does NOT pause on hover. It is a credential drifting past, not a
-   menu — and it sits in the middle of a scrolling page, so the cursor lands
-   on it constantly without being aimed there. A line that stops dead every
-   time the pointer crosses it reads as a bug, not a courtesy. */
+/* ── THE LANE PAUSES ON HOVER NOW, at the user's instruction — a
+   REVERSAL of the position this comment used to argue. The old text held
+   that a marquee in the middle of a scrolling page stops dead under an
+   unaimed cursor and reads as a bug; the user weighed that against being
+   able to actually READ a masthead mid-drift and chose readability. The
+   pause is scoped to fine pointers only (a phone cannot hover, and a
+   stray tap must not park the lane), and `animation-play-state` resumes
+   from exactly where it stopped — no jump, no restart. Reduced-motion
+   readers already have a parked lane and are unaffected. */
+@media (hover: hover) and (pointer: fine) {
+  .lane:hover .track {
+    animation-play-state: paused;
+  }
+}
 
 @keyframes pressDrift {
   from {
@@ -356,6 +507,65 @@
 .logoSeat {
   flex: none;
   height: calc(var(--press-base) * var(--s, 1));
+}
+
+/* ── MICHELIN KEEPS ITS RED AND NOTHING ELSE, at the user's instruction ──
+   The flower IS the credential, so this is the one mark exempt from the
+   ink below. It is NOT exempt from the lane's size: it sat at x1.18 on top
+   of its scale (≈26px against the lane's 22) for one pass and the boost is
+   removed as visually inert — Michelin is a compact near-square among
+   thirteen wide wordmarks, so extra HEIGHT reads as a slightly bigger
+   square rather than as emphasis, while costing the lane its one common
+   x-height. The colour alone carries the accent, which is the thing a
+   reader actually notices.
+
+   The seat hook is data-mark="michelin" (set in PressWall.tsx, where the
+   same test picks the raw <img> branch — the exemption is one condition in
+   two places; keep them agreeing). */
+.logoSeat[data-mark="michelin"] .logo {
+  background-color: transparent;
+  -webkit-mask: none;
+  mask: none;
+  opacity: 1;
+}
+
+/* ═══════════ THE INK — the band's entrance, third form ═══════════
+   Each seat fades from absent to present once — 400ms on a 60ms stagger,
+   user-approved off the "Quiet Arrivals" sheet (option P1) — and then the
+   lane is exactly the furniture it was: no translate, no scale, no clip.
+   The ripple's ~1.2s total (13 x 60 + 400) sits between the journal rail's
+   900ms and the plates' 1.15s ceremonies, which is where a fourteen-seat
+   roll call belongs.
+
+   THE MECHANISM IS THE JOURNAL'S, WHOLE (see the three-gate block in
+   Blog.module.css): the parked state is a real declaration keyed off the
+   gate's absence, so it stops applying the instant [data-in] lands and the
+   `backwards` fill is what holds the delay dark. The seat is animated
+   rather than .logo because the masked marks' .logo already carries its
+   own resting opacity — animating the parent composes with it instead of
+   fighting it, and it covers the Michelin <img> branch with the same rule.
+
+   ⚠️ [data-instant] MUST STAY BELOW [data-in] — one class, one attribute
+   on both, so SOURCE ORDER IS THE MECHANISM, exactly as the ⚠️ over the
+   journal's release block warns. Moving it up silently re-runs the ripple
+   on every reload. */
+.section:not([data-in]) .logoSeat {
+  opacity: 0;
+}
+.section[data-in] .logoSeat {
+  animation: pressInk 400ms ease-out calc(var(--i, 0) * 60ms) backwards;
+}
+.section[data-instant] .logoSeat {
+  animation: none;
+}
+
+@keyframes pressInk {
+  from {
+    opacity: 0;
+  }
+  to {
+    opacity: 1;
+  }
 }
 
 /* ── THE MARKS ARE AT FULL STRENGTH AND IN THEIR OWN COLOUR, at the user's
@@ -429,12 +639,39 @@
    scale x aspect the current set contains, so a future mark with a more
    pathological frame than The Independent's 10.32:1 is still caught here.
    If a new logo ever looks squashed, it is this number it exceeded. */
+/* ── ONE INK, BY MASK — the re-normalisation the note above said was
+   retired, brought back at the user's instruction BY A DIFFERENT
+   MECHANISM. The grayscale filter it describes reduced fourteen palettes
+   to fourteen GREYS; this reduces them to ONE ink: the element is a span
+   whose background-color is --press-ink, masked by the mark's own alpha
+   (--press-mark, set inline in PressWall.tsx) — the exact mechanism the
+   venue-card logos use. No filter chain can do this: the sources are
+   rasters with fourteen different baked-in colours and no shared channel
+   but alpha. 0.85 alpha is the "ink, not sticker" step back into the
+   page; Michelin is exempt above and keeps full colour.
+
+   ⚠️ A MASKED SPAN HAS NO INTRINSIC SIZE — `aspect-ratio: var(--ar)`
+   (the embedded PNG's measured w/h from lib/press.ts) is what gives the
+   box the mark's own shape at the seat's height. The sources carry
+   `preserveAspectRatio="none"`, so a wrong ratio distorts SILENTLY;
+   that is why the numbers are measured data, not guesses.
+
+   The max-width cap survives as the guard rail it always was — at base
+   22 it is 343px and the widest mark (The Independent, aspect 10.29 x
+   seat 31.7px = 326px) clears it by 17px. Re-check on any base change:
+   this cap has silently shrunk a mark before (see the note above).
+   `object-fit: contain` is inert on the spans and kept for the one
+   <img> in the lane (Michelin). */
 .logo {
   height: 100%;
-  width: auto;
+  aspect-ratio: var(--ar, auto);
   max-width: calc(var(--press-base) * 15.6);
   object-fit: contain;
   display: block;
+  background-color: var(--press-ink);
+  opacity: 0.85;
+  -webkit-mask: var(--press-mark) no-repeat center / contain;
+  mask: var(--press-mark) no-repeat center / contain;
   user-select: none;
 }
 
@@ -490,16 +727,23 @@
     );
   }
   .track {
-    /* 20px, up from the 18px floor. The widest mark is then 20 × 15.6 =
-       312px against a 343px clear window — a whole masthead with air on
-       both sides, which is the thing that was not true before. Do not push
-       this further without re-checking that inequality. */
-    --press-base: 20px;
-    /* one pass in 120s rather than 72. The track grows to ~4100px with the
-       larger marks, so this is ~17px/s — a screen crossed every 23s
-       against the desktop lane's 32s, close enough that the two read as
-       the same drift rather than as two different speeds. */
-    animation-duration: 120s;
+    /* 18px against the desktop's flat 22 — the same one-size argument at
+       phone scale. The widest mark is then 18 × 15.6 = 281px against a
+       343px clear window (0.88 × 390) — a whole masthead with air on both
+       sides. Do not push this further without re-checking that
+       inequality. */
+    --press-base: 18px;
+    /* ⚠️ THIS ONE IS TUNED ON A SCREEN-CROSSING TIME, NOT ON px/s, and the
+       distinction matters: a phone's lane is the same marks over a fifth of
+       the measure, so matching the desktop's 44.3px/s would send them past
+       far too quickly to read. What is held is ~23s to cross the screen,
+       against the desktop lane's 32s — close enough that the two read as
+       the same drift rather than as two different speeds.
+
+       Re-derived after the gap opened up: the half-track at 390 went from
+       ~2075px to 2271px, so 120s would now cross the screen in 20.6s.
+       2271 ÷ (390 ÷ 23) is 134. */
+    animation-duration: 134s;
   }
 }
 
@@ -507,8 +751,13 @@
    The drift is back, so this block is back with it. The track keeps its
    doubled markup — harmless, it simply overflows behind the mask — and never
    travels, which leaves the first fourteen marks parked exactly where the
-   animation would have started. The section's other motion is its entrance,
-   which PressWall.tsx gates on `useReducedMotion` in JS.
+   animation would have started. The section's OTHER motion is its
+   entrance, which PressWall.tsx owns in JS (it reads `useScroll` /
+   `useMotionValueEvent` from framer-motion) — see the banner there for the
+   third and current version of it. This block governs the drift and the
+   hover pause above it, both pure CSS; it does not reach the entrance, and
+   a reduced-motion reader's protection from that half lives in the
+   component.
 
    ⚠️ THE READER LOSES THE MARKS THAT WOULD HAVE DRIFTED PAST. A still lane
    shows only what fits the viewport, and unlike the wall it replaced there
@@ -517,6 +766,20 @@
    Recognition table lists every outlet in text. */
 @media (prefers-reduced-motion: reduce) {
   .track {
+    animation: none;
+  }
+
+  /* THE INK STAYS, THE RIPPLE GOES — the journal's regime, restated here:
+     opacity is the one verb reduced motion keeps on this page, so the
+     parked lane still fades in when the gate lands, as one quiet surface
+     with no stagger. The already-played path holds under this query for
+     the same reason it holds outside it — without the [data-instant] rule
+     a reduced-motion reader would watch the 400ms fade replay on every
+     reload, which is the exact thing the storage key exists to stop. */
+  .section[data-in] .logoSeat {
+    animation: pressInk 400ms ease-out backwards;
+  }
+  .section[data-instant] .logoSeat {
     animation: none;
   }
 }

@@ -2,7 +2,7 @@ import type { Metadata } from "next";
 import Link from "next/link";
 import LegalPage, { Pending } from "@/components/LegalPage";
 import { ConsentControl } from "@/components/CookieBanner";
-import { analyticsConfigured } from "@/lib/consent";
+import { analyticsConfigured, marketingConfigured } from "@/lib/consent";
 import { CONTACT } from "@/lib/contact";
 import { LEGAL_ENTITY, LEGAL_UPDATED } from "@/lib/legal";
 import { SITE_URL } from "@/lib/site";
@@ -71,6 +71,44 @@ export default function PrivacyPage() {
         title="Privacy Notice"
         standfirst="What this website collects, why, who else sees it, and what you can ask us to do about it."
       >
+        {/* ── A SUMMARY, AND IT IS NOT A SUBSTITUTE FOR THE NOTICE ──
+            Added after reviewing this against a standard privacy-policy
+            template (Termly's), which opens the same way. The reason it is
+            worth having is that almost nobody reads a privacy notice
+            end-to-end; a reader arrives with ONE question, usually "do you
+            sell my data" or "what did you just set". Six lines they will
+            actually read beats twelve sections they will not.
+            ⚠️ EVERY CLAIM HERE IS REPEATED IN FULL BELOW. A summary that
+            says something the body does not is the worst kind of error in
+            this document, because the summary is the part that gets read. */}
+        <h2>The short version</h2>
+        <ul>
+          <li>
+            <strong>We do not sell your personal information</strong>, and we
+            never share it with anyone for their own marketing.
+          </li>
+          <li>
+            <strong>No cookies are set until you agree to them.</strong> If you
+            decline, or ignore the banner, no analytics or advertising script
+            is loaded at all.
+          </li>
+          <li>
+            <strong>We have no accounts and no passwords.</strong> This site
+            stores nothing about you on a server of ours — there isn&rsquo;t
+            one.
+          </li>
+          <li>
+            The only information you actively give us arrives by{" "}
+            <strong>ordinary email</strong>, because our forms open a draft in
+            your own email app rather than posting anywhere.
+          </li>
+          <li>
+            You can ask us for a copy of what we hold, or to delete it, at any
+            time — free, at{" "}
+            <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a>.
+          </li>
+        </ul>
+
         <h2>Who we are</h2>
         <p>
           Maginhawa Group is a London family of restaurants. For the purposes
@@ -212,6 +250,71 @@ export default function PrivacyPage() {
               the control below. Withdrawing stops any further measurement
               immediately.
             </p>
+            {marketingConfigured && (
+              <>
+                <h3>Advertising and marketing cookies</h3>
+                <p>
+                  If you accept marketing cookies, we use three advertising
+                  tools. All three are off unless you switch them on, and each
+                  sets its own cookies:
+                </p>
+                <ul>
+                  <li>
+                    <strong>Meta pixel</strong> (Facebook and Instagram) — lets
+                    us show our restaurants to people who have visited this
+                    site, and tells us whether an Instagram ad led to a
+                    booking. Sets <strong>_fbp</strong>, which expires after 3
+                    months.
+                  </li>
+                  <li>
+                    <strong>TikTok pixel</strong> — the same, for TikTok ads.
+                    Sets <strong>_ttp</strong>, which expires after 13 months.
+                  </li>
+                  <li>
+                    <strong>Google Ads</strong> — measures whether a Google ad
+                    led to a booking, and allows us to show ads to people who
+                    have been here before. Uses the Google cookies described
+                    above together with Google&rsquo;s own advertising cookies.
+                  </li>
+                </ul>
+                <p>
+                  These tools work by recognising your browser on other
+                  websites and apps, which is what makes them different in kind
+                  from the analytics above.{" "}
+                  <strong>
+                    Our lawful basis is your consent, and you can withdraw it at
+                    any time using the control below.
+                  </strong>
+                </p>
+
+                <h3>Meta as a joint controller</h3>
+                <p>
+                  For the data collected by the Meta pixel, Maginhawa Group Ltd
+                  and Meta Platforms Ireland Limited are{" "}
+                  <strong>joint controllers</strong>. In plain terms, we decide
+                  together what is collected and why: we choose to install the
+                  pixel and what to measure, and Meta determines how it
+                  processes what it receives.
+                </p>
+                <p>
+                  Under our arrangement with Meta, Meta is responsible for
+                  giving you your data-protection rights over the information it
+                  holds — access, erasure and the rest — because Meta holds it
+                  and we do not. You can exercise those rights directly through
+                  your Facebook or Instagram settings, and you can object to
+                  this kind of advertising in Meta&rsquo;s{" "}
+                  <a
+                    href="https://www.facebook.com/settings?tab=ads"
+                    target="_blank"
+                    rel="noopener noreferrer"
+                  >
+                    ad preferences
+                  </a>
+                  . You can also raise anything with us and we will pass it on.
+                </p>
+              </>
+            )}
+
             <ConsentControl />
           </>
         ) : (
@@ -259,6 +362,22 @@ export default function PrivacyPage() {
             <strong>Cloudinary</strong> may serve our photography, and receives
             your IP address when it does.
           </li>
+          {/* ⚠️ NAMED HERE BECAUSE THE ENQUIRY FORM ACTUALLY SENDS NOW. It
+              used to open a draft in the reader's own mail app, which added
+              no processor at all — the message never touched a third party
+              until they pressed send in their own client. It is delivered by
+              us now (functions/api/contact.ts), and the company that carries
+              it has to be named. Unconditional, unlike the analytics entries
+              below: those describe cookies a reader can decline, and this
+              describes what happens to a message they chose to send. */}
+          <li>
+            <strong>Resend</strong> delivers the messages sent through our
+            enquiry form. What you typed into the form — your name, your email
+            address and your message — passes through Resend on its way to our
+            inbox. Nothing from the form is stored on this website. Resend is
+            based in the United States; the transfer is covered by their
+            standard contractual clauses.
+          </li>
           {analyticsConfigured ? (
             <li>
               <strong>Google</strong> provides Google Analytics, and receives
@@ -276,6 +395,17 @@ export default function PrivacyPage() {
                 browser add-on
               </a>
               .
+            </li>
+          ) : null}
+          {marketingConfigured ? (
+            <li>
+              <strong>Meta, TikTok and Google Ads</strong> receive your IP
+              address, the pages you view and their own cookie identifiers —{" "}
+              <em>only</em> if you accepted marketing cookies. All three are
+              based outside the UK; those transfers rely on the UK extension to
+              the EU–US Data Privacy Framework and on standard contractual
+              clauses. See the joint-controller note above for Meta in
+              particular.
             </li>
           ) : null}
           <li>
@@ -359,6 +489,81 @@ export default function PrivacyPage() {
               <Pending what="ICO registration reference" />.
             </>
           )}
+        </p>
+
+        <h2>How we keep your information safe</h2>
+        <p>
+          The strongest security measure this site has is how little it does.
+          There is no database, no login, no password and no server of ours
+          running at request time — the whole site is a set of static files, so
+          there is no store of customer data here to breach.
+        </p>
+        <p>Beyond that:</p>
+        <ul>
+          <li>
+            Everything is served over <strong>HTTPS</strong> and the site is
+            HSTS-preloaded, so a browser will not connect to it insecurely even
+            if asked to.
+          </li>
+          <li>
+            A <strong>Content Security Policy</strong> restricts what the page
+            is allowed to load and where it may send anything, which is what
+            stops an injected script from quietly shipping data elsewhere.
+          </li>
+          <li>
+            The site cannot be framed by another site, and browsers are told
+            not to guess at file types — the two settings behind most
+            clickjacking and content-sniffing attacks.
+          </li>
+          <li>
+            Enquiries and applications reach us as ordinary email and are
+            protected by our email provider&rsquo;s security, and by the access
+            controls on the accounts that read them.
+          </li>
+        </ul>
+        <p>
+          No method of transmission over the internet is completely secure, and
+          we cannot promise otherwise. If you ever believe something has gone
+          wrong, tell us at{" "}
+          <a href={`mailto:${CONTACT.email}`}>{CONTACT.email}</a> and we will
+          look into it.
+        </p>
+
+        <h2>Other websites we link to</h2>
+        <p>
+          We link out to our restaurants&rsquo; own sites, to booking platforms,
+          to Google Maps, to our Instagram and to publications who have written
+          about us. Once you follow one of those links you are on somebody
+          else&rsquo;s site, under their privacy policy, and we have no control
+          over and no responsibility for what they collect. A link from us is
+          not an endorsement of their privacy practices.
+        </p>
+
+        <h2>Automated decisions and profiling</h2>
+        <p>
+          <strong>
+            We do not make any decision about you by automated means, and we do
+            not profile you.
+          </strong>{" "}
+          Nothing on this site scores, ranks or sorts individual people, and no
+          decision affecting you is taken without a person involved. If you
+          accept marketing cookies, the advertising platforms named above build
+          their own audiences on their own systems — that is their processing,
+          described in their policies, and it is the one thing declining
+          marketing cookies switches off entirely.
+        </p>
+
+        <h2>Do Not Track and Global Privacy Control</h2>
+        <p>
+          Most browsers can send a &ldquo;Do Not Track&rdquo; signal. There is
+          still no agreed standard for what a website should do with it, so —
+          like most sites — we do not respond to it specifically. We would
+          rather not claim to honour a signal whose meaning nobody agrees on.
+        </p>
+        <p>
+          It makes no practical difference here: nothing is tracked on this site
+          unless you have actively accepted it, which is a stronger position
+          than responding to the signal would give you.
         </p>
 
         <h2>Children</h2>

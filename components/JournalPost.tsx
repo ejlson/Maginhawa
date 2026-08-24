@@ -90,7 +90,7 @@ export default function JournalPost({
       />
       <Menu open={menuOpen} onClose={() => setMenuOpen(false)} />
 
-      <main className={styles.page}>
+      <main id="main-content" className={styles.page}>
         <article className={styles.doc}>
           {/* ── THE WAY BACK, OFFERED BEFORE THE PIECE AND AGAIN AFTER IT ──
               A reader who arrived on a post from a search result has no

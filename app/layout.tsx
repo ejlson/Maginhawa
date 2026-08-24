@@ -273,6 +273,16 @@ export default function RootLayout({
               filter: none !important;
               clip-path: none !important;
               transform: none !important;
+              /* ⚠️ AND THE MASK, which is NOT the same reset as clip-path
+                 even though it hides the same way. AboutSplit's panel sweeps
+                 with a gradient mask now (see MEDIA there): the boundary is
+                 a custom property, and a rule here cannot put a custom
+                 property back — it can only take the mask away. Without
+                 this line the group's story arrives as an empty rectangle
+                 for a reader with scripts off, which is exactly the failure
+                 this whole block exists to prevent. */
+              -webkit-mask-image: none !important;
+              mask-image: none !important;
             }
 
             [data-nojs-hide] { display: none !important; }
@@ -281,6 +291,26 @@ export default function RootLayout({
         </noscript>
       </head>
       <body className="is-loading">
+        {/* ── SKIP TO CONTENT ──
+            The FIRST focusable thing in the document, which is the whole
+            requirement (WCAG 2.4.1): a keyboard or screen-reader user
+            arriving on any route can jump the nav and the menu trigger in
+            one Tab instead of walking them on every page.
+
+            It is invisible until focused — see .skipLink in globals.css. It
+            is NOT `display: none`, which would remove it from the tab order
+            and make it useless; it is positioned off-screen and comes back
+            on :focus, which is the only version of this pattern that works.
+
+            ⚠️ EVERY ROUTE'S <main> CARRIES id="main-content". A skip link
+            pointing at an id that does not exist on the current page is
+            worse than none: focus goes nowhere and the reader has no way to
+            tell. The lab routes deliberately do not have it — they are
+            noindexed prototypes, not pages anyone navigates. */}
+        <a className="skipLink" href="#main-content">
+          Skip to content
+        </a>
+
         {/* Lenis lives at the root so the smooth-scroll feel is consistent
             on every route, not just the home page. */}
         <SmoothScroll>

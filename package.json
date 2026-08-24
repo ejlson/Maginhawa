@@ -32,7 +32,10 @@
     "chrome-launcher": "^1.2.1",
     "lighthouse": "^13.4.1",
     "puppeteer-core": "^23.11.1",
-    "sharp": "^0.34.5",
+    "sharp": "^0.35.3",
     "typescript": "^5.7.3"
+  },
+  "overrides": {
+    "sharp": "^0.35.3"
   }
 }

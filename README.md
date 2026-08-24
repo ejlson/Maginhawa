@@ -39,6 +39,7 @@ There are two kinds of content file:
 14. [Publishing your changes](#14-publishing-your-changes)
 15. [Known placeholders](#15-known-placeholders)
 16. [Troubleshooting](#16-troubleshooting)
+17. [The enquiry form](#17-the-enquiry-form)
 
 ---
 
@@ -820,8 +821,52 @@ Things that are visibly wrong on the live site and need real values.
 | Email `info@mgnhw.com` | [lib/contact.ts:11](lib/contact.ts#L11) | Not a real inbox. Careers mail goes to `hr@mgnhw.com`, which is real. |
 | Office hours | [lib/contact.ts:16](lib/contact.ts#L16) | Assumed, not confirmed. |
 | LinkedIn & Facebook | [lib/contact.ts:31](lib/contact.ts#L31) | Blank, so they show as plain text. Add URLs to make them links. |
-| Contact form doesn't send | [components/Contact.tsx:88](components/Contact.tsx#L88) | Submitting does nothing and says nothing — a reader can fill it in, press Send, and reasonably believe the message arrived. Needs a form service connected. |
 | Mamasons & Bunso photography | `lib/restaurants.ts` | `image` points at `mamasons-placeholder.jpg` and `bunso-placeholder.jpg`, **which don't exist**. The site is written to skip them rather than show a broken image, so this is invisible today — but adding the two files (under those exact names) turns the photography on everywhere at once. |
+
+---
+
+## 17. The enquiry form
+
+`/contact` sends for real. The form posts to `/api/contact`, which is a
+**Cloudflare Pages Function** — [functions/api/contact.ts](functions/api/contact.ts) —
+that runs beside the site and hands the message to **Resend**, which emails it
+to you. Nothing is stored anywhere.
+
+That function is the only part of this site that runs when someone visits. The
+pages are all static files; this is one small script the host runs on request.
+
+### It needs three settings, in Cloudflare
+
+Pages → your project → **Settings** → **Environment variables**:
+
+| Name | Type | Value |
+| --- | --- | --- |
+| `RESEND_API_KEY` | **Secret** | The key from [resend.com/api-keys](https://resend.com/api-keys) |
+| `CONTACT_TO` | Plain text | Where enquiries should land, e.g. `info@mgnhw.com` |
+| `CONTACT_FROM` | Plain text | The address they are sent *from*, e.g. `Maginhawa Group <website@mgnhw.com>` |
+
+Set them for **Production** (and Preview, if you want the form working on
+preview deploys), then redeploy — environment variables are read when the
+function runs, but a redeploy is the reliable way to be sure.
+
+> **`CONTACT_FROM` has to be a domain you have verified in Resend.** Resend
+> gives you a few DNS records to add; until they are in place, every message
+> fails. This is the single most likely reason the form stops working, and it
+> is not something a code change can fix.
+
+### What a reader sees if it is not set up
+
+Nothing dishonest, which is the point. The form does not claim to have sent
+anything: it says it could not send, leaves everything they typed in the
+fields, and offers a link that opens the same message in their own email app
+with all of it filled in. Same on a network failure.
+
+### Changing where enquiries go
+
+Change `CONTACT_TO` in Cloudflare. Do **not** change the email in
+[lib/contact.ts](lib/contact.ts) expecting it to move the form — that address
+is the one printed on the page for people who prefer to write directly, and it
+is fine for the two to differ.
 
 ---
 
@@ -874,3 +919,9 @@ carousel's `RESTAURANTS`. Compare the strings character by character — accents
 
 **Everything looks broken after pulling changes.**
 Run `npm install` — someone may have added a dependency.
+
+**The contact form says it could not send.**
+Almost always one of the three Cloudflare settings in
+[section 17](#17-the-enquiry-form) — most often `CONTACT_FROM` on a domain
+Resend has not verified yet. Nothing the reader typed is lost when this
+happens; they are offered the email address instead.

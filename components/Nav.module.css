@@ -167,7 +167,7 @@
      against a bright frame — verified on a phone shot over a white plate.
      The big cut carries a real 600 (see the font block in globals.css), so
      this is a drawn weight rather than a synthesised one. */
-  font-weight: 600;
+  font-weight: var(--w-display);
   font-size: clamp(19px, 2.3vh, 26px);
   line-height: var(--lh-flush);
   letter-spacing: 0.06em;

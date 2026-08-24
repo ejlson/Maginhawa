@@ -233,13 +233,27 @@
        the line count    caps are ~15% wider than the mixed case they
                          replaced; the wrap floor below is the check. */
   font-family: var(--font-display-big);
-  /* 600 — THE WORDMARK'S WEIGHT, not About's --w-medium. Asked for
-     explicitly, and Contralto's big cut carries a real drawn 600 (see the
-     font block in globals.css and `.logoWord` in Nav.module.css), so this is
-     a cut rather than a synthesised weight. --w-medium is 500, which font
-     matching resolves DOWN to the 400 in this family — the visible gap
-     between the hero and MAGINHAWA in the bar above it. */
-  font-weight: 600;
+  /* ⚠️ 400, AND IT WAS 600. Both were asked for explicitly, at different
+     times; this is the later instruction — match <Passage>'s slab on the
+     home page, which sets the sentence at --w-regular. Same family either
+     way (both are --font-display-big), so this is a like-for-like swap of
+     cut, not of face, and Contralto's big carries real drawn weights at
+     300, 400, 600, 700 and 900 — 400 is a cut, not a synthesis.
+
+     ⚠️ WHAT GOES WITH IT: the hero no longer matches MAGINHAWA in the bar
+     above. The note this replaces chose 600 precisely because it did, and
+     called the alternative "the visible gap between the hero and MAGINHAWA
+     in the bar". That gap is back, deliberately — the headline now agrees
+     with the home page's biggest statement instead of with the wordmark.
+     If someone reverses this again, reverse the reasoning too rather than
+     leaving both notes standing.
+
+     WHAT IT DOES NOT BREAK, both re-measured after the change rather than
+     argued: the wrap floor (a lighter cut is NARROWER, so the two-line
+     guarantee moves further from failing, not closer) and `.heroLabels`'
+     0.212em seat on the ink top of "WHERE" (a function of the face's
+     ascender-to-cap, which the weight does not move). */
+  font-weight: var(--w-display);
   text-transform: uppercase;
   /* 7rem, up from 5.6rem. The ceiling here has always been the FOLD and not
      taste — the caption is the third beat of the entrance and it lives inside
@@ -1010,78 +1024,274 @@
    then puts the columns back on the page's own content edges, so the three
    reasons still line up with the roles above them. */
 .reasons {
-  /* the ground, named once so the tones below can be mixed INTO it rather
-     than guessed against it — the three of them all read this */
-  --band: color-mix(in srgb, var(--maroon) 10%, var(--cream));
+  /* THE GROUND IS THE PAGE'S OWN, at the user's instruction. The band that
+     stood here — 10% of the ink mixed into the cream, 1.211:1 against the
+     page, full-bleed to both viewport edges — is gone, and with it the whole
+     mat/plate relationship: there is no mount any more, only three cards on
+     the cream.
+
+     WHICH MOVES THE STEP ONTO THE CARDS, and that is not a side effect, it
+     is the trade. A card is a change of surface; if the page and the card
+     are both cream there is no card. So the tone the band was carrying is
+     now carried by `--plate` below, and the reader crosses that step three
+     times, at three objects, instead of once at a horizontal.
+
+     AND THE CARD IS THE INK ITSELF, chosen from five grounds shot side by
+     side on the page. Two lighter tints were tried in front of this one and
+     both failed the same way, at the same place: the band's own 10% mix
+     (1.211:1) and then --placeholder (1.265:1) were calibrated as SURFACES
+     UNDER TYPE, and a surface that quiet works as a full-bleed horizontal —
+     where the edge runs the whole viewport and has a screen's width to be
+     read across — but not as three objects with a 2px corner. On a phone,
+     where a card is 115px wide and the tone is the only thing separating a
+     card from a column of text, a 1.2:1 step nearly disappears. The ink is
+     13.06:1 against the page. There is no width at which it fails to read.
+
+     AND IT GIVES BACK WHAT CLEARING THE BAND TOOK. The full-bleed strip was
+     the strongest close this section had; three pale cards did not end the
+     roles index the way one edge-to-edge horizontal did. Three dark ones do,
+     because the weight is the same weight — it is simply in three pieces
+     with the page showing between them, which is a lighter arrangement of
+     the same emphasis than the solid band was.
+
+     ⚠️ AND IT IS THE WEIGHT THAT WAS ONCE ASKED DOWN. The band shipped as
+     solid --maroon and was taken to a tint for being too loud (the argument
+     is in the deleted `.reasons` note and is not wrong). What has changed is
+     the SHAPE, not the taste: a strip that crossed the whole viewport had no
+     cream in it anywhere, where three cards are half page. If this ever
+     reads heavy again, the fix is `--plate` and `--plate-ink` and nothing
+     else — see below.
+
+     THE ALTERNATIVES, AND WHY NOT: a cream card with a hairline reads as a
+     form field at 1440 and as a spreadsheet at 390, where three 115px
+     outlines are all rule and no surface — and a drawn stroke is not how
+     this page separates things. Tint AND hairline is both at once, with the
+     line adding nothing the tone had not already said.
+
+     WHAT IS LOST WITH THE BAND, STATED PLAINLY: a full-bleed horizontal was
+     the strongest close this section had, and three cards do not read as an
+     ending the way one edge-to-edge strip does. The `.form` column narrowing
+     below is the section's announcement again, as it was before the band
+     existed.
+
+     AND THE FULL-BLEED RIGGING GOES WITH IT. `margin: 0 calc(var(--grid-margin)
+     * -1)` with a matching `padding-inline` was how the band escaped
+     `.container` without touching `width: 100vw` (which would have included
+     the Windows scrollbar and hung the strip 7-8px past both edges). With no
+     background there is nothing left to bleed, so both halves are deleted
+     rather than left cancelling each other out — and the cards land on the
+     page's content edges by simply being in the container, still in line
+     with the roles index above them.
+
+     THE VERTICAL PADDING GOES TOO, AND THAT RESTORES A SYMMETRY. It was the
+     mount's air. Without it, `--strip-gap` on `.form` is the only owner of
+     the gap above these cards and this margin the only owner of the gap
+     below — one token, both sides, which is exactly the arrangement the
+     band's own comment was written to protect. */
+  /* THE CARD IS TWO TOKENS, AND EVERY TONE ON IT IS A MIX OF THEM. Nothing
+     below names a colour directly: the mark, the title and the body are all
+     written as relationships to this pair, so a change of card ground is a
+     change of these two lines and the whole card re-tunes itself. That is
+     not a flourish — this section has now crossed four grounds (cream, solid
+     maroon, two tints, and back to the ink), and every one of those moves
+     previously meant re-deriving three hexes by hand and getting one of them
+     wrong. Ratios measured on this pair are under each rule. */
+  --plate: var(--maroon);
+  --plate-ink: var(--cream);
 
   list-style: none;
-  margin: 0 calc(var(--grid-margin) * -1) var(--strip-gap);
-  padding: clamp(48px, 6.5vh, 88px) var(--grid-margin);
-  background: var(--band);
-  color: var(--maroon);
+  margin: 0 0 var(--strip-gap);
+  padding: 0;
+  color: var(--plate-ink);
   display: grid;
+  /* THREE ACROSS AT EVERY WIDTH, at the user's instruction. This fell to two
+     columns at 980 and one at 600; both cancellations are deleted and the
+     row never breaks again. What carries it down to a phone is not this
+     line — it is that every size inside a card is a fraction of THAT CARD
+     rather than of the viewport. See `.reason`'s container. */
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  gap: clamp(28px, 4vw, 64px);
+  /* the gap is PAGE showing between cards now, not mount, so it stays tight:
+     the cards' own padding does most of the separating. 24 + 34 + 34 is
+     already 92px between the two columns of text at 1440, against the 64px
+     the bare band had. */
+  gap: clamp(6px, 1.6vw, 24px);
 }
 
+/* ---- THE PLATE, AND THE ONE THING THAT MAKES A THREE-UP SURVIVE A PHONE ----
+   `container-type: inline-size` is not decoration here, it is the whole
+   mechanism. Three columns on a 390pt phone leave each card 115px wide, and
+   every type token on this page is sized against the VIEWPORT: --t-h3's
+   floor is 20px and --t-small is a flat 14px, neither of which knows the
+   card got narrow, so both would have overflowed a 96px measure. Making the
+   card a query container lets the mark, the title and the body be a fraction
+   of the CARD instead — one continuous system from 390 to 2560 with no
+   breakpoint anywhere in it, and each size still clamped to exactly the
+   value it renders at on desktop today.
+
+   THE UNITS GO ON THE CHILDREN, NEVER HERE. An element is never its own
+   query container — `cqi` in a rule on `.reason` would silently resolve
+   against an ancestor container or the viewport, which is the bug this
+   whole block exists to avoid. So the padding and the stack gap below are
+   viewport-fluid, and only `.reasonMark` / `.reasonTitle` / `.reasonBody`
+   read the container.
+
+   THE STACK GAP IS IN vw, WHICH LOOKS WRONG AND IS NOT. It was
+   clamp(8px, 1.2vh, 14px) and vh is this file's convention for vertical
+   air. But the three things it separates are now sized by the card's WIDTH,
+   so a gap pinned to the viewport's height would hold 10px between a 25px
+   mark and a 14.5px title on a phone — the one place the type shrank. It
+   has to track the same dimension the type does. ---- */
 .reason {
   display: flex;
   flex-direction: column;
-  gap: clamp(8px, 1.2vh, 14px);
+  gap: clamp(4px, 1vw, 14px);
+  container-type: inline-size;
+  background: var(--plate);
+  /* 2px — and it is --radius-tile rather than a literal, because that token
+     is already this project's word for exactly this: "photography +
+     editorial frames — a printed plate, not an app-card curve". The reasons
+     are now plates, so they take the plate's corner. */
+  border-radius: var(--radius-tile);
+  /* 34px at 1440 down to ~8.6px at 390, tracking the card's own width. At
+     the bottom it is small in absolute terms and correct in proportion: 9px
+     on a 115px card is the same inset 34px is on a 437px one. The 2.2vw is
+     a shade under the 2.4 it was — it buys the phone ~2px of measure, which
+     is a fifth of a line and the only thing padding can usefully contribute
+     to making this shorter. */
+  padding: clamp(8px, 2.2vw, 34px);
 }
 
 /* the mark is a numeral in the display face at heading scale — the same
-   treatment the cut band used, and the only accent in the section.
-   THE WORKAROUND IS GONE WITH THE DARK GROUND. On the maroon this was
-   `--saffron` mixed 45% into the cream, because raw accent on the ink
-   measures 2.02:1 and globals.css forbids it outright. A light ground lifts
-   that constraint, so the accent can be a token again — and it is
-   --saffron-ink rather than --saffron, by the number: the ink measures
-   6.45:1 on the band where the accent proper makes 5.33:1. 6.45 is within a
-   hundredth of BOTH the 6.46:1 the accent makes on the cream page and the
-   6.39:1 the mixed mark made on the dark band, so the numerals carry the
-   weight they have carried through both grounds. */
+   treatment it has had through every ground this copy has crossed, and
+   still the only accent in the section.
+
+   THE ACCENT CANNOT BE A RAW TOKEN ON THIS GROUND, and globals.css says so
+   outright: --saffron on the ink measures 2.02:1 and --saffron-ink 1.67:1,
+   and nothing may set raw accent type on the maroon. The documented
+   workaround is the one PressWall uses — mix the accent TOWARD the ground
+   first — and 45% of the accent in the cream measures 6.35:1 here.
+
+   THAT NUMBER IS THE POINT, NOT THE MIX. This numeral has been held to the
+   same ratio through every ground the section has crossed: 6.46:1 for the
+   accent proper on the cream page, 6.45:1 for --saffron-ink on the light
+   band, 6.17:1 on --placeholder, 6.35:1 here. The mark carries the same
+   weight it always has; only the recipe changes with the surface.
+
+   IT MIXES INTO --plate-ink, NOT INTO --cream, which is what makes it swap
+   with the ground. On a light card the same expression resolves toward that
+   card's ink and would need re-deriving; the two tokens at the top are the
+   only lines that decide it.
+
+   THE SIZE IS --t-h2's CEILING, RESOLVED AGAINST THE CARD. 3rem is exactly
+   what --t-h2 clamps to from 1412px up, so the desktop mark is unchanged.
+   22cqi rather than 26 is part of shortening the phone: at a 98px measure
+   it is a 21.6px numeral instead of a 25px one, and it reaches the ceiling
+   at roughly an 830px viewport rather than a 730px one — still one
+   continuous ramp, just a shallower one. The floor drops with it so a 320pt
+   phone is not held above its own proportion. */
 .reasonMark {
   font-family: var(--font-display);
   font-weight: var(--w-medium);
-  font-size: var(--t-h2);
+  font-size: clamp(1.1rem, 22cqi, 3rem);
   line-height: var(--lh-flush);
   letter-spacing: -0.012em;
-  color: var(--saffron-ink);
+  color: color-mix(in srgb, var(--saffron) 45%, var(--plate-ink));
 }
 
-/* the title takes the band's own `color: var(--maroon)` by inheritance —
-   10.78:1. It was 13.06:1 as cream on the ink, the palette's headline pair;
-   the ink on a ground one step down is the same pair with the step taken
-   out of it, which is the whole cost of the lighter band and it is nowhere
-   near any floor. */
+/* the title takes `color: var(--plate-ink)` by inheritance — cream on the
+   ink, 13.06:1, which is the palette's headline pair at full strength and
+   the most this line has ever measured. The two tints cost it: 10.78:1 on
+   the band's 10% mix and 10.33:1 on --placeholder, both of them the same
+   pair with a step taken out. Going back to the ink hands the step back.
+
+   1.6rem is --t-h3's ceiling, so nothing changes from 1280px up. 15cqi is
+   the constraint below that, and it is set by ONE WORD: "Hospitality," is
+   the longest unbreakable string in PILLARS, and at 15% of a 96px card it
+   sets ~83px against 96px of measure. `overflow-wrap` is the backstop for
+   a narrower phone than any in the matrix — it costs nothing until a word
+   genuinely cannot fit, and a broken word is better than one that runs out
+   through the card's edge. No `hyphens` on the title: a hyphenated display
+   serif at heading scale reads as a fault, not as setting. */
 .reasonTitle {
   font-family: var(--font-display);
   font-weight: var(--w-medium);
-  font-size: var(--t-h3);
+  font-size: clamp(0.9rem, 15cqi, 1.6rem);
   line-height: var(--lh-heading);
   letter-spacing: -0.005em;
   margin: 0;
+  overflow-wrap: break-word;
 }
 
 /* an explicit tone, not `opacity: 0.85` — the same correction the two helper
    lines on this page got. A composited alpha is a contrast you have to
    compute; this one is measured.
-   RE-DERIVED TWICE NOW, and both times by RATIO rather than by channels.
-   It was rgba(47, 0, 0, 0.78) on the cream (8.97:1), then 82% cream in the
-   maroon (9.16:1) when the band went dark. What that pair actually said was
-   "70% of the title's ratio" — 9.16 against the title's 13.06 — and that is
-   the quantity carried across, not either hex. 85% of the ink mixed into
-   the band measures 7.52:1 against the title's 10.78:1: the same 70%, so
-   the softening reads at the same strength on a ground with less room in
-   it. Comfortably over the 4.5:1 the size needs either way. */
+   THE QUANTITY IS "70% OF THE TITLE'S RATIO", AND IT IS THE ONLY THING
+   CARRIED ACROSS GROUNDS. Never a hex: this line has been
+   rgba(47, 0, 0, 0.78) on the cream (8.97:1), 82% cream in the maroon
+   (9.15:1), and 85% ink in a tint (7.27:1), and what those three have in
+   common is not a colour, it is 70% — 9.15 against the title's 13.06 here,
+   70.1%. Comfortably over the 4.5:1 the size needs at either end of its
+   clamp, with the most headroom it has had on any of the four grounds.
+
+   THE COEFFICIENT IS 82% ON THE INK AND 85% ON A TINT, and that asymmetry
+   is real rather than an oversight: the same fraction does not buy the same
+   ratio going down from cream as going up from maroon, because contrast is
+   not linear in the mix. The expression below is written from --plate-ink
+   into --plate, so it points the right way whichever the ground is; only
+   the number wants checking when the pair changes.
+
+   THE MEASURE IS THE CARD'S, AND THE ch CAP IS GONE. 0.875rem is --t-small,
+   so desktop is unchanged; 11.6cqi takes over below about a 430px viewport.
+
+   THIS IS THE LEVER THAT SHORTENS THE PHONE, and it is worth saying why it
+   is the only one. A card's height is its line COUNT times its leading, and
+   at three columns on a 390pt screen the measure is fixed at ~98px — so the
+   count is set by the type size alone, and height falls with roughly the
+   SQUARE of it. Trimming padding and gaps moves single pixels; 12.5cqi to
+   11.6cqi drops the body from twelve lines to eleven, and the tighter
+   leading below takes ~1.4px off each of those. Between them the card comes
+   down about 20% at 390 and rather more at 320. The rest of the height is
+   simply the copy: three paragraphs of ~30 words do not get shorter without
+   cutting words or shrinking type past legibility, and 11.4px on a phone is
+   already the floor of what this should be asked to do.
+   `max-width: 42ch` used to sit here and had to go WITH the card, not
+   despite it. Measured: 42ch is 370px in this face at 14px, which is
+   1440's content width to the pixel — so it never bound on the bare band at
+   desktop, and above that it bound hard: 159px of it left unset inside a
+   529px plate at 1920. A paragraph stopping well short of a visible right
+   edge reads as an unfinished card; on a bare band the same slack read as
+   column gutter, which is why the cap was harmless before and is not now.
+   The plate's padding is the measure instead — 42ch at 1440, 60ch at 1920.
+   It does run long on a 2560 monitor, and that is this page's behaviour
+   everywhere: `.container` has no max-width at all, so the roles index
+   above stretches with it too. One rule for the section, not two.
+   `hyphens` earns its place at the narrow end specifically — at ~15ch,
+   "restaurants." and "Guanabana," are a third of a line each, and the rag
+   without it is worse than the hyphens are. lang="en-GB" is on <html>, which
+   is what makes `auto` do anything at all. */
 .reasonBody {
   font-family: var(--font-sans);
-  font-size: var(--t-small);
-  line-height: var(--lh-body);
-  color: color-mix(in srgb, var(--maroon) 85%, var(--band));
+  font-size: clamp(0.7rem, 11.6cqi, 0.875rem);
+  /* LEADING IN cqi, SO IT TIGHTENS WITH THE CARD AND NOT WITH A BREAKPOINT.
+     --lh-body's 1.5 is right for a 42ch desktop measure and too airy for a
+     17ch phone one, where the rag is doing the separating already. A unitless
+     ratio cannot vary; a length in cqi can, and it lands on 1.5 exactly where
+     --lh-body would: 21px is 1.5 x --t-small, so from a ~155px measure up
+     (roughly a 600px viewport) this IS --lh-body, and below it the ratio eases
+     to about 1.33 at 390 and 1.30 at 320.
+     THE FLOOR IS IN em, NOT px, AND THAT MATTERS AT THE BOTTOM. A 14px floor
+     was tried and measured 1.25 at 320 — too tight — because down there the
+     font size is sitting on ITS floor too, and two independent px floors do
+     not know about each other. 1.3em is the same floor expressed as a
+     relationship, so the tightest the leading can ever get is 1.3 of
+     whatever the type actually resolved to. */
+  line-height: clamp(1.3em, 15.5cqi, 21px);
+  color: color-mix(in srgb, var(--plate-ink) 82%, var(--plate));
   margin: 0;
-  max-width: 42ch;
+  overflow-wrap: break-word;
+  -webkit-hyphens: auto;
+  hyphens: auto;
+  text-wrap: pretty;
 }
 
 /* (`.threshold` lived here — one hairline at the full measure, a sibling of
@@ -1495,15 +1705,13 @@
 
 /* ---- Responsive ---- */
 @media (max-width: 980px) {
-  /* THREE REASONS DO NOT FIT IN THREE COLUMNS at 774px — each becomes a
-     19ch measure, which is a poem rather than a paragraph. Two columns, with
-     the third dropping under the first, keeps a readable line and keeps the
-     band from becoming a tall stack that competes with the form for the
-     screen. */
-  .reasons {
-    grid-template-columns: repeat(2, minmax(0, 1fr));
-    gap: clamp(26px, 4vh, 40px) clamp(28px, 4vw, 48px);
-  }
+  /* (`.reasons` fell to two columns here, and to one at 600. Both are gone:
+     the row is three across at every width now, at the user's instruction,
+     and the cards size their own type against themselves rather than
+     against the viewport — so there is nothing left for a breakpoint to
+     correct. See `.reason`. The note the two-column rule carried was true
+     of BARE type in a 774px measure, where each reason became a 19ch line;
+     it is the constraint the container query answers instead.) */
   /* the form column is already narrower than the tablet measure — it just
      stops being a NARROWING, so it takes the measure it is given. 640 rather
      than 560: the pairs still have to hold a dial code beside a number.
@@ -1541,10 +1749,6 @@
 }
 
 @media (max-width: 600px) {
-  .reasons {
-    grid-template-columns: 1fr;
-    gap: clamp(24px, 3.4vh, 34px);
-  }
   .formShell {
     max-width: none;
   }

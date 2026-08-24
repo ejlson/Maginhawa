@@ -81,7 +81,7 @@
 .numeral {
   margin: 0;
   font-family: var(--font-display-big);
-  font-weight: 600;
+  font-weight: var(--w-display);
   /* BOUNDED ON BOTH AXES. 14vw alone is a width rule, and on a short wide
      window (1440x700, a laptop with a browser's worth of chrome) it drew a
      202px numeral into a 600px page. `min()` hands the smaller of the two

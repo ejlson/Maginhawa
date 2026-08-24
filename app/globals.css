@@ -143,14 +143,27 @@
      rather than a reference to it, and it would have survived this one the
      same way, quietly drawing the previous palette's rule across the new
      ground. It is a color-mix of the token now, so it cannot drift again.
-     THE ALPHA IS BACK TO 0.55. It went to 0.62 under the green ink because
-     55% of THAT ink measured 2.99:1 and missed 1.4.11's 3:1 bar by a hair.
-     The maroon is far darker, so 55% now measures 3.53:1 — within two
-     hundredths of the 3.55:1 this hairline has weighed since the beginning.
-     Re-measured rather than carried: 62% of the maroon would have made
-     4.33:1, a rule visibly heavier than the one every layout was drawn
-     against. */
-  --rule: color-mix(in srgb, var(--maroon) 55%, transparent);
+     ⚠️ THE ALPHA IS 0.68 NOW, at the user's instruction that the lines read
+     darker, and it is the first time this hairline has been deliberately
+     heavier rather than held at its historical weight. The run, re-measured
+     on the current pair (#411613 on #f5e9e0) rather than carried forward:
+
+       55%  3.53:1   the weight every layout on the site was drawn against
+       62%  4.31:1   what the green ink briefly needed to clear 1.4.11
+       68%  5.16:1   here
+       72%  5.83:1   the next step, if this still reads light
+
+     IT IS GLOBAL AND THAT IS THE POINT — 29 uses across the stylesheets, so
+     every rule on the page moves together: the journal's card rules and its
+     archive divider, the press band's two hairlines, the chapter heads,
+     the tables. A darker line in one chapter and the old weight in the next
+     is the fault this token exists to prevent.
+
+     Still a color-mix of --maroon rather than a literal. This was
+     rgba(23, 37, 27, 0.55) once — the OLD ink's channels, frozen — and it
+     survived a palette swap only because nobody noticed it was a copy
+     rather than a reference. It cannot drift again. */
+  --rule: color-mix(in srgb, var(--maroon) 68%, transparent);
 
   /* BOTTLE GREEN — the accent, and it has changed side of the wheel.
      hsl(158, 37%, 26.3%). It was an annatto orange, hsl(17, 60%, 40%), which
@@ -342,6 +355,22 @@
      300 / 600 / 900. That range is the argument for eventually giving the
      display roles back to Contralto — Helvetica cannot offer it. */
   --font-display-big: "contralto-big", "contralto-medium", "Times New Roman", serif;
+
+  /* ⚠️ CONTRALTO'S WEIGHT IS A TOKEN OF ITS OWN, AND IT IS NOT ON THE
+     HELVETICA SCALE. --w-regular / --w-medium / --w-bold were drawn for the
+     text family and this face does not share their steps: contralto-big
+     ships 300 / 400 / 600 / 700 / 900 and has NO 500, so every rule that
+     asked it for --w-medium was silently getting the 400 cut. That is the
+     defect this token closes — one place to set the wordmark voice, and a
+     number the face actually owns.
+
+     ⚠️ AND ON THIS FACE THE WEIGHT IS ALSO A WIDTH. The cuts get wider as
+     they get heavier — measured, 300 sets 4.9% narrower than 600 and 2.1%
+     narrower than 400 — so changing this number relays out every display
+     block that fills its measure. Blocks with a JS fitter re-fit
+     themselves; blocks on a clamp simply come up short of the edge they
+     were composed against. Re-measure the wordmarks after touching it. */
+  --w-display: 300;
 
   /* NEWSREADER ON THE DISPLAY ROLES, CONTRALTO ONLY ON THE WORDMARK.
      A logotype is artwork, not a typeface role, so Contralto does not have
@@ -864,6 +893,8 @@ html {
 body {
   background: var(--cream);
   color: var(--maroon);
+  /* the grain overlay below is absolutely positioned against this box */
+  position: relative;
   font-family: var(--font-sans);
   font-size: 16px;
   line-height: 1.4;
@@ -872,23 +903,62 @@ body {
   overflow-x: clip;
 }
 
-/* PAPER GRAIN — a fixed, static fractal-noise wash over the whole page so
-   the cream reads as stock, not as a flat hex value. One compositor layer,
-   never animated, never repainted; multiply keeps it a texture (it darkens
-   micro-speckles) rather than a grey film. Sits above every chapter and
-   below nothing that matters — the nav, modals and films all gain the same
-   print feel. */
+/* ══════════ THE PAPER GRAIN ══════════
+   A whisper of stock under the ink, at the user's instruction — the one
+   "effect" the editorial references actually use (WatchHouse's cream reads
+   as paper, not as a hex value). Everything here is chosen against the two
+   ways this device goes wrong:
+
+   · IT SCROLLS WITH THE PAGE, position: absolute over the whole document,
+     not position: fixed — grain is IN the paper, so it must travel with
+     the ink. A fixed overlay reads as frosted glass over a screen (and
+     would also poison scripts/probe-scroll-feel.mjs: content that moves
+     under a static texture never cancels in the shifted diff; a scrolling
+     texture cancels perfectly and the probes stay honest).
+   · IT IS STATIC. Animated grain is the film-look; shimmering noise over
+     the scrub choreography would read as rendering error. One turbulence
+     tile, stitched seamless, repeated.
+   · 5% OPACITY UNDER MULTIPLY, measured against both grounds: on the
+     cream it is a texture the eye accepts without finding; on the maroon
+     footer and the films it is fainter still and reads as stock, not
+     sensor noise. Multiply is what buys the extra two points — a
+     normal-blend wash goes grey past 3%; a multiplied one just deepens
+     the speckle. Past ~8% the cream starts to look unwashed — that is the
+     failure mode, and the number to hold.
+
+   ⚠️ TWO SESSIONS WROTE THIS RULE ON THE SAME DAY and the file briefly
+     carried both — a fixed 5%-multiply version and a scrolling 3% one,
+     with the later rule silently winning the cascade. This is the merge:
+     the SCROLLING position (the probe argument below is not optional),
+     the multiply blend and 240px tile from the fixed version, one rule.
+
+   ABOVE ALL CONTENT (z-index 9999, the grid overlay's own tier),
+   pointer-events: none. Above the nav and the menu too, deliberately: the
+   page is one sheet of paper and its chrome is printed on the same sheet.
+   The loader and the page-transition curtain mount on <body>'s stacking
+   context as later siblings at their own z — grain over them is the same
+   sheet, and at 3% it is imperceptible on their maroon.
+
+   ⚠️ THE TILE IS AN INLINE SVG feTurbulence — no asset, no fetch, ~700
+   bytes. `stitchTiles='stitch'` is what makes the 240px tile seamless;
+   remove it and every tile edge prints. */
 body::after {
   content: "";
-  position: fixed;
+  position: absolute;
   inset: 0;
-  z-index: 2000;
   pointer-events: none;
-  opacity: 0.05;
-  mix-blend-mode: multiply;
+  z-index: 9999;
   background-image: url("data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' width='240' height='240'%3E%3Cfilter id='n'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.85' numOctaves='2' stitchTiles='stitch'/%3E%3CfeColorMatrix type='saturate' values='0'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23n)'/%3E%3C/svg%3E");
   background-size: 240px 240px;
+  /* multiply, from the parallel session's version of this rule: the
+     speckle DARKENS the ground instead of laying grey over it, which is
+     what ink-on-stock actually does — and it is why the opacity can sit a
+     touch higher than a normal-blend wash could. */
+  mix-blend-mode: multiply;
+  opacity: 0.05;
 }
+
+
 
 /* Lenis smooth scroll */
 html.lenis,
@@ -1060,7 +1130,7 @@ html::-webkit-scrollbar {
    so it keeps the brand's Contralto voice (big optical cut) */
 .wordmark {
   font-family: var(--font-display-big);
-  font-weight: var(--w-regular);
+  font-weight: var(--w-display);
   line-height: 0.82;
   letter-spacing: -0.01em;
   text-transform: uppercase;
@@ -1189,4 +1259,33 @@ html::-webkit-scrollbar {
   html.glass-cursor * {
     cursor: none;
   }
+}
+
+/* ═══ SKIP TO CONTENT ═══
+   Off-screen until focused. `left: -9999px` rather than `display: none` or
+   `visibility: hidden` — both of those remove the element from the tab
+   order, which defeats the only purpose it has. On focus it lands in the
+   top-left corner over everything, including the fixed nav (z-index 80) and
+   the cookie card (250).
+   The colours are the dark-zone pair, so it reads as part of the site the
+   moment it appears rather than as a browser default. */
+.skipLink {
+  position: fixed;
+  top: 0;
+  left: -9999px;
+  z-index: 400;
+  padding: 0.75em 1.25em;
+  background: var(--maroon);
+  color: var(--cream);
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  font-weight: var(--w-medium);
+  border-radius: 0 0 var(--radius-card) 0;
+  text-decoration: none;
+}
+
+.skipLink:focus {
+  left: 0;
+  outline: 2px solid var(--cream);
+  outline-offset: -4px;
 }

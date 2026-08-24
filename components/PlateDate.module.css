@@ -1,0 +1,52 @@
+/* ── THE DATE, ON THE PLATE ──
+   Bottom-right, opposite the venue's mark, and it carries its own ground
+   for the same reason the mark does: cream type on an arbitrary photograph
+   is not legible by default. A bare cream date on a bright plate measures
+   about 1.2:1, i.e. it is not there.
+
+   THE INSET IS THE MARK'S, MIRRORED. Both surfaces set their venue mark at
+   clamp(10px, 1.4vw, 16px) from the plate's top-left; this is the same
+   expression off the bottom-right, so the two corners read as a pair rather
+   than as two independent decisions. */
+.date {
+  position: absolute;
+  right: clamp(10px, 1.4vw, 16px);
+  bottom: clamp(10px, 1.4vw, 16px);
+  z-index: 2;
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--cream);
+  text-shadow: var(--scrim-text);
+  pointer-events: none;
+}
+
+/* THE WASH. The mark's, mirrored — a radial from the corner it sits in.
+   ⚠️ IN TRANSPARENT MAROON RATHER THAN THE `transparent` KEYWORD, because
+   sRGB interpolation toward transparent BLACK greys the fade: the keyword
+   is rgba(0,0,0,0), and every intermediate stop carries some of that black.
+   Stated as maroon at 0% the hue holds all the way out.
+
+   SIZED IN cqi — against the PLATE, not the viewport, so the wash is the
+   same fraction of the photograph on a 258px home card and a 316px archive
+   card. See the note in PlateDate.tsx about why this only works as a child
+   of the media box. */
+.date::before {
+  content: "";
+  position: absolute;
+  right: calc(-1 * clamp(10px, 1.4vw, 16px));
+  bottom: calc(-1 * clamp(10px, 1.4vw, 16px));
+  z-index: -1;
+  width: 100cqi;
+  height: clamp(56px, 30cqi, 104px);
+  background: radial-gradient(
+    100% 100% at 100% 100%,
+    color-mix(in srgb, var(--maroon) 70%, transparent) 0%,
+    color-mix(in srgb, var(--maroon) 62%, transparent) 34%,
+    color-mix(in srgb, var(--maroon) 34%, transparent) 72%,
+    color-mix(in srgb, var(--maroon) 12%, transparent) 90%,
+    color-mix(in srgb, var(--maroon) 0%, transparent) 100%
+  );
+  pointer-events: none;
+}

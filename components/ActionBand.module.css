@@ -1,0 +1,177 @@
+/* ── THE ACTION, BETWEEN THE TWO RULES ──
+   Label at one end, arrow at the other, the full width of the card.
+   `space-between` rather than a gap, because what makes this read as a
+   control rather than as a caption is the arrow being AT the card's edge —
+   the same arrangement the lede's pill makes at a larger size. */
+.band {
+  /* THE AIR AT THE ENDS OF THE LINE, held at all times — at the user's
+     instruction, after the hovered band showed what flush type inside a
+     filled block looks like. It was tried as a hover-only step first and
+     the permanent version is the better one: type that moves sideways
+     under a wipe asks to be read twice.
+
+     ⚠️ THE HEADLINE AND THE TWO RULES STAY FLUSH to the card's measure and
+     so does the maroon panel — this insets the LINE, not the band. Slightly
+     wider than --entry-band, because a filled bar wants more air across
+     than down.
+
+     Declared here rather than on the card because this stylesheet is the
+     only thing that reads it; --entry-band and --entry-gap come the other
+     way, off the card's body, because the card's own layout is computed
+     from them too. */
+  --entry-fill-pad: clamp(8px, 0.76vw, 11px);
+
+  /* ⚠️ NEGATIVE, AND IT IS A SUBTRACTION FROM THE CARD'S FLEX GAP RATHER
+     THAN A SMALLER GAP. `gap` is one value for the whole column and the
+     rules, the headline and the band are all spaced by it; pulling the
+     action toward both rules with its own margin is the only way to tighten
+     THIS seam without loosening or tightening every other one. Resolves to
+     --entry-band above and below at every width, because whatever the gap
+     contributes is cancelled first. */
+  margin-block: calc(var(--entry-band) - var(--entry-gap));
+  /* the containing block for .sweep, which reaches back OUT of this box by
+     exactly the margin above to meet the two rules */
+  position: relative;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  /* ⚠️ PADDING, NOT A NARROWER BOX. The band still spans the full measure —
+     it has to, because .sweep is positioned against this element's padding
+     box and the maroon fill is meant to reach the card's edges like the
+     rules above and below it. Only the two ends of the line step in. */
+  padding-inline: var(--entry-fill-pad);
+  gap: var(--space-xs);
+  font-family: var(--font-sans);
+  font-weight: var(--w-regular);
+  font-size: var(--t-small);
+  line-height: var(--lh-flush);
+  letter-spacing: var(--tr-label);
+  text-transform: uppercase;
+  color: var(--maroon);
+}
+
+/* ⚠️ IT USED TO NUDGE FORWARD 4px ON HOVER, and the fill took that move
+   over. Two reasons it did not survive, and neither is that the nudge was
+   bad. The band now answers the pointer by filling maroon, which is a far
+   louder statement of "this is a control" than 4px of arrow; and against
+   the ends the line holds — see --entry-fill-pad — an arrow that advanced
+   would sit 4px from the block's right edge while the word held 11px from
+   its left, which on a 257px bar reads as a bar set crooked. */
+.arrow {
+  flex: none;
+  width: 32px;
+  height: 10px;
+}
+
+/* ⚠️ THE LABEL IS WRAPPED AND ITS TEXT BOX IS TRIMMED, AND THAT IS WHAT
+   MAKES THE BAND SYMMETRICAL TO THE PIXEL.
+
+   THE BOXES WERE ALREADY EXACT AND THE INK WAS NOT. Measured at 1440x900:
+
+       rule → action box   7.49px above, 7.49px below   ✔
+       rule → arrow ink    7.49px above, 7.49px below   ✔
+       rule → WORD ink     6.20px above, 7.83px below   ✘
+
+   The word is the odd one out because "READ MORE" is all caps: its ink runs
+   from cap-height to the baseline, and a font's line box reserves room for
+   an ascender above the caps and a descender below the baseline that this
+   string never uses. The box is centred; the letters inside it are not.
+
+   `text-box: trim-both cap alphabetic` cuts the line box down to exactly
+   that cap-to-baseline band, so the box the flex line centres IS the ink.
+   ⚠️ IT NEEDS ITS OWN ELEMENT: a bare text node becomes an anonymous flex
+   item and cannot be styled. Hence the span in ActionBand.tsx — it exists
+   for this rule and for nothing else.
+
+   Where `text-box` is not supported the span is inert and the band falls
+   back to the 1.6px asymmetry above, which is the state it shipped in. */
+.label {
+  display: block;
+  text-box: trim-both cap alphabetic;
+}
+
+/* ── THE SWEEP — the band fills, rule to rule, on the way down ──
+   A maroon panel wipes DOWNWARD from the hairline above "Read More" to the
+   hairline below it, carrying a cream copy of the line with it. It is the
+   only fill on either card, and it lands on the one part of them that is
+   shaped like a control.
+
+   ⚠️ IT REACHES BACK OUT OF ITS OWN BOX, and the amount is not a guess.
+   .band pulls itself to --entry-band from each rule with the negative
+   margin above, so a panel inset by -(--entry-band) top and bottom touches
+   both rules exactly — at every width and on both surfaces, because it is
+   the same expression rather than a second number tuned to match the first.
+   The rules themselves stay OUTSIDE the fill: they are --rule, which is
+   maroon at 68%, and inside the panel they would simply disappear.
+
+   ⚠️ ONE PROPERTY DRIVES THE PANEL AND THE INK, and that is why the ink is
+   in here rather than beside it. Two transitions on two elements can drift
+   by a frame; a clip on their common parent cannot. The word turns cream
+   at the precise pixel the edge crosses it.
+
+   IT RETRACTS THE WAY IT CAME. A wipe that continues downward on the way
+   out needs a second resting state — collapsed at the BOTTOM — which a
+   pure CSS transition has no way to reach. Reversing is the honest version
+   of the move rather than an approximation of a different one. */
+.sweep {
+  position: absolute;
+  inset: calc(-1 * var(--entry-band)) 0;
+  background: var(--maroon);
+  clip-path: inset(0 0 100% 0);
+  transition: clip-path 400ms var(--ease-drawer);
+  pointer-events: none;
+}
+
+/* THE CREAM COPY, seated on the real line to the pixel. `inset` here is the
+   exact inverse of the panel's, so this box IS .band's box — same height,
+   same top, same flex arrangement — and the two settings of the line sit on
+   top of one another rather than near one another.
+
+   ⚠️ THE SAME PADDING AS .band, AND IT IS LOAD-BEARING. This box is the
+   panel's child, not the band's, so it inherits the custom properties but
+   none of the box. Without it the cream line would sit flush while the
+   maroon line under it sat inset, and the wipe would read as the words
+   jumping sideways rather than changing colour — the one failure this whole
+   arrangement exists to avoid. */
+.ink {
+  position: absolute;
+  inset: var(--entry-band) 0;
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  padding-inline: var(--entry-fill-pad);
+  gap: var(--space-xs);
+  color: var(--cream);
+}
+
+/* ⚠️ THE ANCESTOR ANCHOR IS THE TRIGGER, AND IT IS AN ELEMENT SELECTOR ON
+   PURPOSE. CSS modules hash class names, so a rule written in Blog.module.css
+   could never reach a class declared in this file — `.entry:hover .sweep`
+   would compile to two different hashes and match nothing. `a:hover` is the
+   one part of the selector the compiler leaves alone, which is what lets a
+   single stylesheet drive this control on two pages.
+
+   IT IS ALSO THE RIGHT TRIGGER, not just the reachable one. The whole plate
+   is one anchor on both surfaces — this band is an aria-hidden span inside
+   it — so a fill that answered only a pointer sitting on those 25px would
+   be advertising a second target that does not exist. Hovering the band is
+   hovering the card, so the reader who goes for the words still gets it. */
+@media (hover: hover) and (pointer: fine) {
+  a:hover .sweep {
+    clip-path: inset(0 0 0 0);
+  }
+}
+
+/* keyboard parity — outside the hover query, so keyboards on touch hybrids
+   still get it */
+a:focus-visible .sweep {
+  clip-path: inset(0 0 0 0);
+}
+
+/* THE BAND STILL FILLS — it is a state, not a flourish, and the cream copy
+   needs the panel under it either way. Only the travel goes. */
+@media (prefers-reduced-motion: reduce) {
+  .sweep {
+    transition: none;
+  }
+}

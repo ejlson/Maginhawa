@@ -52,6 +52,11 @@ skills-lock.json
 # to answer one question during one session and are dead the moment it is
 # answered. The committed probes are scripts/probe-*.mjs and scripts/shoot-*.mjs.
 scripts/.tmp-*
+# ⚠️ AND THE UNDERSCORE SPELLING, which is the one that actually gets
+# typed. Twelve `_tmp-` probes sat untracked-but-UNIGNORED above this
+# line, one `git add -A` away from landing on main, because the rule
+# only ever matched the dot. Same throwaway meaning, same treatment.
+scripts/_tmp-*
 
 # Lighthouse reports (npm run lighthouse -- <url>)
 lighthouse-report.html

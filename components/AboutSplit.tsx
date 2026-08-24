@@ -1,9 +1,11 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   motion,
+  type MotionValue,
+  useMotionTemplate,
   useMotionValueEvent,
   useReducedMotion,
   useScroll,
@@ -14,6 +16,11 @@ import styles from "./AboutSplit.module.css";
 import PillCta from "./PillCta";
 import { asset } from "@/lib/media";
 import { getRestaurant } from "@/lib/restaurants";
+import {
+  PARALLAX_OFFSET,
+  PARALLAX_PCT,
+  PARALLAX_SCALE,
+} from "@/lib/drift";
 
 /**
  * The group's story, as a 50/50 split — photograph left, text right.
@@ -53,8 +60,9 @@ const HEADING = "Everything we know about hospitality, we learned at home.";
    A FOURTH CHANGE NEEDS A NEW ASSET, or a swap out of the story band. */
 const PORTRAIT = "/images/careers-hero.jpg";
 
-/* THE PANEL IS A LOOPING CLIP NOW, with the photograph kept as its poster
-   and as the reduced-motion still.
+/* THE PANEL IS A LOOPING CLIP NOW, with the photograph kept as the
+   reduced-motion still ONLY — it is no longer the clip's poster. See the
+   <video>: the panel is the film or it is nothing.
 
    WEIGHT IS THE STANDING CONSTRAINT ON THIS SLOT, whatever fills it. The
    panel has held three films now — tile-guanabana.mp4 (2.8MB), then
@@ -204,22 +212,30 @@ const FADE: Variants = {
    145% is not a round number — it is derived from the 0.3em the mask is
    padded by to protect descenders ("Where it began." has a `g`), exactly as
    SplitWords derives it. Move one and move the other.
-   +0.55s AFTER THE SWEEP IS A HAND-OFF, and it is the offset the sweep's
-   direction buys. The mask runs 1.15s from MEDIA_IN on --ease-entrance,
-   which is heavily front-loaded: measured on the real render it has
-   uncovered 90% of the frame 0.35s in, so the band this caption sits in —
-   the bottom fifth — is
-   clear well before this fires. Both lines land onto a picture that is
-   already there, with no clip edge to ride and none to avoid, while the
-   sweep's tail and the drift's settle are both still visibly moving.
-   THAT IS ONLY TRUE WHILE THE SWEEP RUNS DOWN. Reverse MEDIA and this
+   +0.7s AFTER THE SWEEP IS A HAND-OFF, and it is the offset the sweep's
+   direction buys. The requirement is that both lines land onto a picture
+   that is ALREADY THERE, with no reveal edge to ride and none to avoid —
+   and it is a real requirement rather than a nicety, because `.mediaLine`
+   is a sibling of `.mediaFrame` and is therefore OUTSIDE the mask. The
+   caption is never masked; it would simply be type sitting on a part of the
+   frame the sweep had not reached yet.
+
+   ⚠️ IT WAS +0.55s, DERIVED FROM A CURVE THAT IS GONE. That number was
+   solved against --ease-entrance, which had uncovered 90% of the frame
+   0.35s in and ~96% by 0.55s — the caption's band is the bottom 22%
+   (measured: its top edge sits at 78% of the frame's height), so the edge
+   had long since passed it. On the flatter SWEEP curve the edge is only at
+   ~86% at 0.55s, i.e. still crossing the middle of the caption's own band.
+   0.7s is the same rule re-solved: ~95% uncovered, which with a 6% feather
+   means the ramp's trailing tail is already off the bottom edge.
+   THE RULE ALSO DEPENDS ON THE SWEEP RUNNING DOWN. Reverse MEDIA and this
    number is wrong by most of the duration, because the caption's band is
    then the FIRST thing uncovered rather than the last. */
 const LINE: Variants = {
   hidden: { transform: "translateY(145%)" },
   shown: (i: number) => ({
     transform: "translateY(0%)",
-    transition: { duration: 0.7, ease: EASE, delay: MEDIA_IN + 0.55 + i * 0.08 },
+    transition: { duration: 0.7, ease: EASE, delay: MEDIA_IN + 0.7 + i * 0.08 },
   }),
 };
 
@@ -257,25 +273,107 @@ const LINE: Variants = {
    Change one of these two numbers and re-solve the other. */
 const DRAWER = [0.32, 0.72, 0, 1] as const;
 
-/* THE MASK. `clipPath` and not a scaleY on an overlay: an overlay would
-   have to be painted in the ramp's colour and would then need its own fade,
-   and the site already has an element whose whole job is that edge.
+/* ══════ THE SWEEP GETS ITS OWN CURVE, AND IT IS THE ONE THING ON THIS
+   PAGE THAT EARNS ONE ══════
+   Every other reveal on the site rides --ease-entrance, and it is right
+   there because what those reveals ease is OPACITY or a 28px lift —
+   properties whose last 10% is invisible, so a curve that spends 65% of its
+   duration on that last 10% costs nothing.
 
-   ⚠️ IT IS ON `.mediaFrame` AND NOT ON `.media`, AND THAT IS THE SAME TRAP
-   DOOR_WIPE's note records: `clip-path` clips an element's ENTIRE
-   rendering, box-shadow included, and it stays on the element as an inline
-   style once the animation rests. Wiping `.media` directly would clip the
-   card shadow off the picture permanently. `.mediaFrame` exists for exactly
-   this and for nothing else — it was deleted when the animation came out
-   and it comes back with it.
+   THIS ONE EASES AN EDGE ACROSS 876px, and the crawl is the whole gesture.
+   Measured on the real render at 1440×900 (scripts/_tmp-about-sweep.mjs),
+   --ease-entrance put the edge
 
-   BOTH KEYFRAMES SPELL EVERY SIDE THE SAME WAY. `inset(0% 0 100% 0)` and
-   `inset(0% 0 0% 0)` interpolate; a mismatched unit count does not. */
+       25% down the frame at  +67ms      50% at +150ms
+       75%                    +283ms     90% at +449ms
+       99%                    +751ms    100% at +1058ms
+
+   — 438px in the first 150ms (≈2900px/s), then 88px over the remaining
+   900ms. That is not a sweep, it is a POP with a long invisible tail: the
+   reader sees the panel snap open and then sees nothing at all for two
+   thirds of a 1.15s animation.
+
+   THIS IS --ease-state, ALREADY IN THE HOUSE SET, and it is the flattest
+   curve in it: peak velocity 2.70× the mean, against 4.54× for
+   --ease-entrance and 4.22× for --ease-drawer. globals.css names it for
+   "colour/border changes where --ease-in-out's near-linear middle reads as
+   a snap" — the same property that makes it right for a travelling edge,
+   which is why this is a REUSE rather than a thirteenth curve. It has a
+   real (short) acceleration, so the panel BEGINS rather than appears, and
+   it reaches 99% at 87% of the duration instead of 65%.
+   Written as a tuple rather than read from the token for the same reason
+   EASE and DRAWER above are: neither runtime can read the other's spelling.
+
+   ⚠️ 0.95s, DOWN FROM 1.15s, AND THE TWO ARE NOT COMPARABLE. The old
+   number was nominal — the gesture a reader could actually see ran ~450ms
+   and the rest was the crawl. Re-measured on the same probe, the edge now
+   sits 25% down at +234ms, 50% at +337ms, 75% at +467ms, 90% at +601ms,
+   99% at +834ms and lands at +934ms: visibly travelling for the whole
+   duration, so the PERCEIVED sweep gets LONGER while the animation gets
+   shorter.
+
+   THE VALUE IS SOLVED, NOT PICKED. DRIFT below is the settle that has to
+   overrun this, and its own curve is front-loaded enough that it is only
+   ever going to be late by a little: measured, it is 88.9% done at 600ms
+   and 98.5% at 1100ms. Landing the edge at 90% inside that window leaves
+   the drift ~8.8px of the panel's 79px of travel still to spend after the
+   sweep has visibly finished — the overhang this chapter was built around,
+   preserved WITHOUT touching DRIFT_DUR or the shadow that hangs off it
+   (SETTLED). Retime this and re-derive against DRIFT, not against taste. */
+const SWEEP = [0.4, 0.05, 0.2, 1] as const;
+
+/* HOW SOFT THE EDGE IS, as a percentage of the frame's height (≈53px of
+   876 at 1440×900). It is the one number the mask below and the stylesheet
+   both have to agree on — see `--sweep-feather` in AboutSplit.module.css,
+   where the gradient is actually drawn, and note that this constant only
+   sets where the travel STARTS. */
+const FEATHER = 6;
+
+/* THE MASK, AND THE EDGE IS FEATHERED NOW.
+   `clipPath` used to draw this and the reason it is gone is what it looks
+   like on FILM: a razor-sharp, aliased horizontal line stair-stepping down
+   over moving video at ~1000px/s, which reads as a rendering artefact
+   rather than as a reveal. Over a still photograph it was fine; the panel
+   has been a looping clip since the poster came off (see VIDEO), and this
+   is the half of that change that never followed.
+
+   A 6% ALPHA RAMP RATHER THAN A DISSOLVE. The panel is a printed plate in
+   this design language (--radius-tile is 2px precisely so it reads as one),
+   and a soft dissolve is the wrong metaphor for uncovering one. 53px of
+   ramp is enough that the edge has no line in it and short enough that the
+   plate still has a defined top edge the whole way down.
+
+   ⚠️ IT IS A MASK ON `.mediaFrame`, AND BOTH HALVES OF THAT MATTER.
+   — A MASK, not a clip, because a clip cannot be soft.
+   — ON `.mediaFrame`, and that is the SAME TRAP DOOR_WIPE's note records:
+     `mask-image`, exactly like `clip-path`, applies to an element's ENTIRE
+     rendering, box-shadow included, and whatever framer writes stays on the
+     element as an inline style once the animation rests. Masking `.media`
+     directly would take the card shadow off this picture permanently.
+     `.mediaFrame` exists for exactly this and for nothing else.
+
+   ⚠️ WHAT ANIMATES IS THE CUSTOM PROPERTY, NOT `mask-image`. The gradient
+   is declared once in the stylesheet and reads `--sweep`; framer only moves
+   that one number. This is the house rule from Framer-owns-the-inline-style
+   — animate a custom property and let CSS own the real one — and here it
+   also buys the reduced-motion and no-JS paths for free: `.mediaFrame`
+   DEFAULTS to `--sweep: 100%`, i.e. fully uncovered, so a reader whom
+   `pick()` has swapped onto FADE (which touches opacity and nothing else)
+   sees a whole picture rather than an empty box. Only the `hidden` variant
+   masks anything, exactly as the clip-path did.
+
+   THE TRAVEL RUNS FROM −FEATHER, NOT FROM 0. A gradient holds its first
+   colour everywhere above the first stop, so at `--sweep: 0%` the ramp
+   itself would still be sitting on the frame's top edge and the picture
+   would be part-visible before the animation starts. Starting the opaque
+   stop one feather-height above the frame puts the whole ramp off the top.
+   BOTH KEYFRAMES ARE PERCENTAGES for the same reason the old insets both
+   spelled every side: matched units interpolate, mismatched ones do not. */
 const MEDIA: Variants = {
-  hidden: { clipPath: "inset(0% 0 100% 0)" },
+  hidden: { "--sweep": `-${FEATHER}%` },
   shown: {
-    clipPath: "inset(0% 0 0% 0)",
-    transition: { duration: 1.15, ease: EASE, delay: MEDIA_IN },
+    "--sweep": "100%",
+    transition: { duration: 0.95, ease: SWEEP, delay: MEDIA_IN },
   },
 };
 
@@ -363,11 +461,64 @@ const HEAD_LIFT = `-${LIFT_VH * 100}vh`;
    none. It also survives anything that moves the heading — a copy change, a
    type retune, a new breakpoint — none of which a solved constant would. */
 
-/* THE HEADING'S INK, and it is deliberately not its travel. It fades and
-   unblurs in the first sixth of the range — while it is still sitting in
-   the manifesto — because the reader is meant to notice it arrive there,
-   as a line of the chapter above, before it starts moving anywhere. */
-const HEAD_IN: [number, number] = [0.02, 0.16];
+/* THE HEADING'S INK, and it is deliberately not its travel.
+
+   ⚠️ THE GATE HAS NOW MOVED TWICE AND BOTH ENDS WERE WRONG. It was
+   [0.02, 0.16], which started inking while the Manifesto still owned 98% of
+   the screen — the heading arrived as a line of the CHAPTER ABOVE and did so
+   inside the page's fixed depth-of-field band (globals.css .scrollBlur), i.e.
+   defocused. The fix was 0.40, and 0.40 overcorrected: the user's read is
+   that the line now appears too late and too far from the chapter above.
+
+   ⚠️ THE BAND IS 40px, NOT 40% — WHICH IS THE MEASUREMENT THAT SETTLED THIS.
+   `.scrollBlur` is a fixed strip at the FOOT of the viewport, 40px tall. The
+   constraint was therefore never "the section must own 40% of the screen",
+   it was "the heading must not be sitting in the bottom 40px when it inks" —
+   and those are very different numbers. Walked across four viewports, the
+   heading's own bottom edge clears the band at:
+
+       1440x900    p ≥ 0.15 (2px)    0.20 → 33px
+       1280x720    p ≥ 0.25 (20px)   0.30 → 44px
+       1440x700    p ≥ 0.30 (12px)   0.35 → 36px   ← the binding case
+       1920x1080   clear from 0.10
+
+   A short laptop is the case that binds, because the heading is a fixed
+   fraction of a shorter screen. 0.30 is the earliest start that is clear of
+   the band on ALL of them, so it is a floor rather than a preference — take
+   it lower and the first frames of the fade land in the blur on 1440x700,
+   which is the exact defect the 0.40 revision existed to remove.
+
+   THE SPAN IS UNCHANGED at 0.16, preserved through both revisions; only the
+   start has ever moved. headY stays on the full [0, 1] range — it is a
+   parallax lift, not the entrance, and re-ranging it would make the heading
+   travel 19vh while visible. */
+/* ⚠️ EARLIER AGAIN, at the user's instruction — and this one is the first
+   value that is NOT free of the blur band, so the trade is recorded here
+   rather than discovered later. Walked the seam at 25px steps, the heading's
+   own bottom edge clears the 40px .scrollBlur strip from:
+
+       1920x1080  p >= 0.029      1024x768  p >= 0.131
+       1440x900   p >= 0.162      1280x720  p >= 0.233
+       1440x700   p >= 0.297   <- the binding case, and it binds alone
+
+   0.30 was therefore the earliest value clear EVERYWHERE, which is why it
+   was chosen. 0.22 buys the earlier arrival the user asked for at the cost
+   of the heading's last line sitting in the band on SHORT viewports only
+   (~700px tall), and only across the first sliver of its fade, where it is
+   near-transparent anyway. Every viewport 768px and taller is still clean.
+   If short-window defocus is ever reported, 0.30 is the value to return to
+   — not 0.02, which was the original defect. */
+const HEAD_IN: [number, number] = [0.22, 0.38];
+
+/* HOW FAR OUT OF FOCUS THE HEADING STARTS — the manifesto statement's ink
+   bleed (see BLUR_MAX_EM in Manifesto.tsx), applied here at the user's
+   instruction so the two display lines arrive by the same verb. The radius
+   is in em of the element's OWN size, deliberately not px: `.heading` runs
+   a clamp (--split-title-size), and a fixed radius that reads as "soft" at
+   the top of the clamp is a smear at the bottom. 0.11em is Manifesto's
+   measured value and nothing about this heading's size range justified
+   retuning it — the two clamps overlap almost entirely. */
+const BLUR_MAX_EM = 0.11;
 
 /* HOW EARLY THE PICTURE GOES, at the user's instruction. The rule was "when
    the heading's top line is level with the picture's top line", i.e. a gap
@@ -408,13 +559,47 @@ const GATE_HYSTERESIS = 48;
 const STACKED = "(max-width: 900px)";
 
 /* the two ends of the stacked gate's dead band, as fractions of the window:
-   the picture opens once its top edge is 80% of the way up the screen and
-   closes again only at 95%, so a reader parked on the boundary — or Lenis's
+   the picture opens once its top edge is 95% of the way down the screen and
+   closes again only at 110%, so a reader parked on the boundary — or Lenis's
    own inertial wobble — cannot re-trigger a 1.15s entrance on every frame.
    Same job as GATE_HYSTERESIS, expressed in the units this branch measures
-   in. */
-const STACK_OPEN = 0.8;
-const STACK_SHUT = 0.95;
+   in.
+
+   ⚠️ THE BAND MOVED DOWN, 0.80/0.95 → 0.95/1.10, AND IT CLOSED A DEAD RUN.
+   At 390×844 the statement above finishes its scrub at scrollY ≈ 3583 and
+   this gate was not opening until the figure's top reached 80% of the
+   window, at ≈ 3719 — with the head's own flight overridden to
+   `transform: none` on this layout, NOTHING on the page moved in between.
+   Measured (scripts/probe-home-flow.mjs at 390×844): scrollY 3600 → 3880,
+   280px at a mean motion energy of 0.6. It was the page's only true dead
+   run on a phone.
+
+   0.95 is the fold, which is where every other arrival on this page is now
+   set — Discover's cards at `start 0.92`, the journal's rail at RAIL_AT,
+   the footer's band at CLOSE_OFFSET. The picture sweeps as it comes into
+   the frame rather than a sixth of a screen later.
+
+   ⚠️ AND THE SHUT END HAD TO MOVE WITH IT, to 1.10, or the band would have
+   collapsed to nothing and taken the anti-flicker guarantee with it. Past
+   1.0 simply means "not until the figure is properly below the screen
+   again", which is the right place to put the closing edge of a gesture
+   that plays on arrival. Keep the 0.15 between them. */
+const STACK_OPEN = 0.95;
+const STACK_SHUT = 1.1;
+
+/* ══════════ THE SETTLE, AS ONE NUMBER BOTH SIDES READ ══════════
+   The panel's four animations do not finish together: the mask is done at
+   MEDIA_IN + 1.15, the caption's second line at MEDIA_IN + 1.78, and the
+   counter-drift — the longest of them on purpose — at MEDIA_IN + 1.7.
+   THE DRIFT IS THE LAST THING MOVING, so this is the instant the picture is
+   genuinely at rest, and it is the instant the shadow is now allowed to
+   exist (see MOUNT).
+   It is spelled as a sum of the drift's own two terms rather than as 2.15,
+   so retiming the settle cannot leave the shadow arriving over a picture
+   that is still travelling. DRIFT reads DRIFT_DUR too — change it there and
+   the shadow follows. */
+const DRIFT_DUR = 1.7;
+const SETTLED = MEDIA_IN + DRIFT_DUR;
 
 /* THE MOUNT — the card shadow's arrival, and nothing else.
    The picture's box used to sit on the cream as a filled rectangle wearing a
@@ -425,15 +610,24 @@ const STACK_SHUT = 0.95;
    (`.mediaShadow` — see the derivation in the stylesheet, including the two
    routes that were implemented and failed), and this fades it in.
 
-   ⚠️ IT IS TIMED TO THE SWEEP'S TAIL, NOT ITS START, and that is the whole
-   craft in this variant. The opacity ramps around the WHOLE rectangle at
-   once — an element cannot know how much of its sibling is uncovered — so
-   bringing it up from t=0 would put a half-strength shadow around a
-   mostly-empty box, which is the same defect at 50% rather than at 100%.
-   --ease-entrance is heavily front-loaded: measured on the real render the
-   mask has uncovered ~88% of the frame 0.4s after it starts, which is why
-   this is MEDIA_IN + 0.4 and not a number of its own. Starting there means
-   the shadow only ever traces an edge with a picture behind it.
+   ⚠️ IT WAITS FOR THE WHOLE ENTRANCE NOW, at the user's instruction: the
+   shadow is not to appear until the animation is done and the film has
+   fully settled. So the delay is SETTLED — the drift's own finish, which is
+   the last movement in the panel — and not a number of its own.
+
+   WHAT IT USED TO BE, because the argument still holds and only the answer
+   changed: MEDIA_IN + 0.4, derived from the sweep rather than from the
+   gate. The opacity ramps around the WHOLE rectangle at once — an element
+   cannot know how much of its sibling is uncovered — so bringing it up from
+   t=0 would put a half-strength shadow around a mostly-empty box, and
+   --ease-entrance is front-loaded enough that the mask has uncovered ~88%
+   of the frame 0.4s in. That was the EARLIEST moment the shadow could trace
+   an edge with a picture behind it. It is now held to the LATEST: nothing
+   is cast until nothing is moving.
+   The cost is that the panel spends its last ~0.55s (the drift's overhang
+   past the mask) as a picture with no mount under it. That is the trade the
+   instruction asks for — a shadow that answers a settled object rather than
+   one that travels with it.
 
    PLAIN OPACITY, so `pick()`'s reduced-motion swap needs no special case:
    FADE animates exactly this property and the shadow simply arrives. */
@@ -441,7 +635,7 @@ const MOUNT: Variants = {
   hidden: { opacity: 0 },
   shown: {
     opacity: 1,
-    transition: { duration: 0.7, ease: EASE, delay: MEDIA_IN + 0.4 },
+    transition: { duration: 0.7, ease: EASE, delay: SETTLED },
   },
 };
 
@@ -449,6 +643,9 @@ const MOUNT: Variants = {
    1.15s — so the picture is still settling for half a second after the edge
    has gone. That overhang is the gesture; matching the two durations gives
    back a panel that simply stops.
+   ⚠️ ITS DURATION IS DRIFT_DUR AND IS READ BY THE SHADOW. This is the last
+   movement in the panel, so MOUNT hangs its delay off the end of it — see
+   SETTLED. Retime this and the shadow retimes with it.
    --ease-drawer rather than --ease-entrance, because this is the slow
    settle and not the arrival: the drawer curve keeps moving at the end
    where the entrance curve has already parked. */
@@ -457,7 +654,7 @@ const DRIFT: Variants = {
   shown: {
     y: "0%",
     scale: 1,
-    transition: { duration: 1.7, ease: DRAWER, delay: MEDIA_IN },
+    transition: { duration: DRIFT_DUR, ease: DRAWER, delay: MEDIA_IN },
   },
 };
 
@@ -501,143 +698,219 @@ const DRIFT: Variants = {
    to the heading's own retired rise. If the flight is ever reverted, this
    variant comes back with HEADING_V. */
 
-/* ── the reading block, on its OWN trigger ──/* ── the reading block, on its OWN trigger ──
-   A DELIBERATE DEPARTURE from a single chain, and worth stating plainly.
-   This section is a full screen, so a reader who has only just brought its
-   top edge into view cannot see the bottom of the text column at all — a
-   global t=1.15 beat would play the whole reading block off-screen and it
-   would be finished and static by the time anyone reached it. It keeps its
-   relative order (paragraph, prints, footnote) and starts when it is
-   actually approached. */
-/* ══════════ THE READING BLOCK SETTLES DOWNWARD ══════════
-   All three parts of this column — this paragraph, the row of prints, and
-   the fine paragraph below them — now arrive by dropping a few pixels into
-   place instead of rising into it. At the user's instruction, and the
-   direction is the whole of the change.
+/* ══════════ WHAT THE READING COLUMN USED TO BE ══════════
+   Five variant objects stood here — PARA, DOOR_WIPE, DOOR_IN, DOOR_ROW and
+   PARA_FINE_V — orchestrated by one `whileInView` on `.readingBlock` with
+   `{ once: true, amount: 0.2 }` and sequenced in real-time delays. They are
+   deleted rather than left standing, because a variant nothing reads is the
+   sort of thing a later reader trusts. What they knew is kept here, because
+   the slots below reproduce it exactly:
 
-   ⚠️ THIS WENT DOWNWARD FOR ONE PASS AND CAME BACK. The argument for
-   descending was that the chapter's other gestures descend — HEAD_LIFT is
-   negative, so the heading perches ~38vh up and travels down, and the
-   photograph's mask sweeps down (see MEDIA). It was overruled: "have that
-   upwards appearing animation". The direction is now the house one again,
-   and the house is consistent about it — Reveal.tsx rises 28px, and every
-   other reveal on the site rises with it. This column was the odd one out
-   while it dropped, which is the opposite of what the change was for.
+   · THE COLUMN RISES, IT DOES NOT DROP. It settled downward for one pass —
+     the argument being that the chapter's other gestures descend (HEAD_LIFT
+     is negative, MEDIA's mask sweeps down) — and was overruled: "have that
+     upwards appearing animation". The house is consistent about it;
+     Reveal.tsx rises 28px and every other reveal on the site rises with it.
 
-   24px AND NOT 16. "Start up a bit higher" — so the travel is LONGER than
-   the 16px this originally ran, not just re-signed. On --ease-entrance,
-   which spends most of itself in the first third, 24px is still felt rather
-   than watched: the type is essentially in place by ~250ms. Past ~32px it
-   stops reading as a settle and starts reading as a slide.
+   · 24px AND NOT 16. "Start up a bit higher" — a LONGER travel, not just a
+     re-signed one. Past ~32px it stops reading as a settle and starts
+     reading as a slide. READ_RISE carries it.
 
-   THE DURATION IS UNCHANGED AT 0.7s, deliberately. Emil's rule is that UI
-   animation stays under 300ms — and it exempts editorial and explanatory
-   motion, which this is: it happens once, on a marketing page, on scroll,
-   and 0.7s is what every other reveal on this site runs (Reveal.tsx's
-   opacity). Speeding this one up alone would make it the odd chapter out,
-   which is the opposite of the ask. */
-const PARA: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  shown: { opacity: 1, y: 0, transition: { duration: 0.7, ease: EASE } },
-};
+   · THE ORDER IS LEAD, PRINTS, FOOTNOTE, and the footnote used to sit at a
+     0.22s delay rather than 0.35: at 0.35 it read as a fourth separate
+     event arriving after the row had finished, rather than as the last part
+     of one column settling. The slots keep that overlap.
 
-/* THE PRINTS WIPE, so the footnote pictures rhyme with the photograph at
-   quarter scale — the same gesture, a third of the duration.
+   · THE ROW DROPS AS ONE OBJECT. The travel was on the <ul>, never on each
+     <li>, and that is the difference between a third gesture and a free
+     one: each print already carries a fade AND a wipe, and a translate on
+     the <li> would make three ideas compete on one element — the case
+     Reveal.tsx is explicit about. The <ul> still carries the travel below.
+     THE <li> CARRIES THE FADE ONLY. It briefly also held the pop's `scale`;
+     that went with the pop (see THE PRINTS WIPE AGAIN), and the wipe lives
+     on `.doorClip` rather than here, so the <li> is a single idea again.
 
-   THE CLIP IS ON AN INNER SPAN AND THIS IS NOT TIDINESS. `clip-path` clips
-   an element's ENTIRE rendering, box-shadow included, and it stays on the
-   element as an inline style once the animation rests — so wiping
-   .doorFrame directly would leave `inset(0% 0 0 0)` sitting there
-   permanently and all three prints would silently lose --shadow-card.
-   Nothing about that failure looks like an animation bug, which is why it
-   is written down here. */
-/* THE WIPE UNCOVERS BOTTOM-UP, which is what "that upwards appearing
-   animation" means for a picture: the top inset shrinks from 100% to 0, so
-   the print is revealed from its bottom edge upward, travelling with the
-   row that is rising underneath it.
+   · NO OPACITY ON THE ROW. The prints fade themselves; fading the container
+     as well doubles the ramp and the row arrives muddier than its prints.
 
-   ⚠️ IT WAS FLIPPED DOWNWARD FOR ONE PASS AND IS BACK. Worth recording,
-   because the note above still claims these prints "rhyme with the
-   photograph at quarter scale — the same gesture", and MEDIA's sweep runs
-   DOWN. That claim is NOT true and never was: the doors rise, the big
-   photograph falls. It is left that way deliberately now rather than by
-   accident — the doors belong to the copy column and move with it, and the
-   photograph is its own object on the other side of the split.
+   · THE PRINTS STEPPED 0.07s APART and uncovered BOTTOM-UP, travelling with
+     the row rising underneath them. ⚠️ An older note claimed they "rhyme
+     with the photograph at quarter scale — the same gesture"; that was
+     never true, because MEDIA's sweep runs DOWN. The doors belong to the
+     copy column and move with it; the photograph is its own object on the
+     other side of the split. Kept deliberately, not by accident.
+     ⚠️ THE BOTTOM-UP UNCOVER IS GONE, at the user's instruction — the
+     prints pop now. The step survives; only what it steps changed. */
 
-   BOTH KEYFRAMES CARRY THE % ON THE SAME SLOT. `inset(100% 0 0 0)` →
-   `inset(0% 0 0 0)` interpolates; mixing a unitless 0 into the animated
-   slot is the failure Reveal.tsx documents, where the clip cuts on the
-   first frame instead of animating and looks like a reveal that never
-   fired. */
-const DOOR_WIPE: Variants = {
-  hidden: { clipPath: "inset(100% 0 0 0)" },
-  shown: (i: number) => ({
-    clipPath: "inset(0% 0 0 0)",
-    transition: { duration: 0.6, ease: EASE, delay: 0.08 + i * 0.07 },
-  }),
-};
+/* ══════════ THE READING COLUMN ARRIVES ON THE SCROLL NOW ══════════
 
-/* The frame itself fades on the same beat. Without it the reader sees an
-   empty --placeholder box wearing a shadow before its picture arrives,
-   which reads as a failed image rather than as a reveal. Two properties
-   rather than one, against Reveal's "three ideas competing" note — but the
-   fade here is preventing a pop, not adding a second gesture. */
-const DOOR_IN: Variants = {
-  hidden: { opacity: 0 },
-  shown: (i: number) => ({
-    opacity: 1,
-    transition: { duration: 0.35, ease: EASE, delay: 0.08 + i * 0.07 },
-  }),
-};
+   REDUCED MOTION TAKES NONE OF IT and never did take the wipes: `pick()`
+   swapped every one of the five retired variants for FADE, so that path was
+   always a plain crossfade and still is — <Door> and the two paragraphs
+   hand FADE straight to it. The slots below are the ordinary path only.
 
-/* ══════════ THE ROW DROPS AS ONE OBJECT ══════════
-   The travel is on the <ul>, NOT on each <li>, and that is the difference
-   between this being a third gesture and being a free one.
+   WHAT WAS WRONG WITH THE TIME CASCADE. The block rode one `whileInView`
+   with `{ once: true, amount: 0.2 }` and spent the rest as real-time
+   delays. Measured with the stepped probe (scripts/probe-home-flow.mjs,
+   1440×900), the whole column — paragraph, three prints and the footnote —
+   landed inside ONE 40px step:
 
-   Each print already carries TWO — a fade (DOOR_IN) and a clip wipe
-   (DOOR_WIPE) — and DOOR_IN's own note concedes it is at two "against
-   Reveal's 'three ideas competing' warning", justified because the fade is
-   preventing a pop rather than adding a gesture. Putting a translate on the
-   <li> as well would make it three on one element, which is the case
-   Reveal.tsx is explicit about: "a picture that rises, de-blurs AND wipes at
-   once is three ideas competing over 800ms".
+       y=2440   energy 444   li:150  li#2:142  para:76
+       y=2480   energy 507   li#3:188  paraFine:142  li#2:71
 
-   On the container it is one gesture on a DIFFERENT object. The row settles
-   as a single artefact — a strip of three prints laid on the page — while
-   each print uncovers on its own stagger inside it. Nothing about any
-   individual door changed.
+   against a page mean of 68. It was the largest single-step movement
+   anywhere on the home page: five elements arriving in eighty pixels of
+   scroll, and then 440px (y 2560 → 3000) in which nothing in the chapter
+   moved at all. A burst and then a vacuum, which is the pattern this whole
+   pass exists to remove.
 
-   NO OPACITY HERE. The three <li> already fade themselves; fading the
-   container as well would double the ramp and make the row arrive muddier
-   than its own prints. */
-const DOOR_ROW: Variants = {
-  hidden: { y: 24 },
-  shown: {
-    y: 0,
-    transition: { duration: 0.7, ease: EASE, delay: 0.09 },
-  },
-};
+   THE SLOTS ARE POSITIONS IN `inView`, the range PARALLAX_OFFSET already
+   opens on this section (`start end` → `end start`, 1800px of scroll at
+   1440×900). Reusing it rather than opening a fifth `useScroll` is not
+   only economy — the picture's pan is measured on the same range, so the
+   column and the photograph beside it are now literally on one clock.
 
-/* The fine paragraph closes the block. −10 to match the two above it, and
-   the delay comes in from 0.35s to 0.22s: at 0.35 it read as a fourth,
-   separate event arriving after the row had finished, rather than as the
-   last part of one column settling. 0.22 keeps the order legible — lead,
-   prints, footnote — without the block coming apart into three. */
-const PARA_FINE_V: Variants = {
-  hidden: { opacity: 0, y: 24 },
-  shown: {
-    opacity: 1,
-    y: 0,
-    transition: { duration: 0.7, ease: EASE, delay: 0.22 },
-  },
-};
+   ⚠️ THEY ARE MEASURED ON `sectionRef`, WHICH DOES NOT MOVE. The reading
+   block carries `bodyY` (up to −16vh of rise plus the drift), and
+   `getBoundingClientRect` includes transforms — so a range targeting the
+   block itself would feed its own travel back into the progress driving it.
+   Passage.tsx records the same trap.
+
+   WHERE THEY USED TO LAND, solved against the measured seats (the block's
+   foot is aligned with the photograph's at document 3557):
+
+       para      [0.38, 0.53]   y 2453 → 2723   top of the para enters at
+                                                the foot of the screen and
+                                                settles at ~66% of it
+       doors     [0.44, 0.62]   y 2561 → 2885   +0.025 per print, so the
+                                                row still reads left to
+                                                right rather than as a bar
+       fine      [0.52, 0.68]   y 2705 → 2993   closes the block just as
+                                                the journal's own arrival
+                                                opens beneath it
+
+   That was 540px of scroll for what used to be 80, and it covered the dead
+   run exactly. It also meant THE CHAPTER WAS NEVER WHOLE — which is what
+   the numbers below fix.
+
+   ══ 0.5 IS THE ONLY SCROLL POSITION THIS SECTION IS COMPLETE AT ══
+   `.section` is min-height 100svh, so at every desktop viewport it is
+   EXACTLY one screen — and a one-screen section is whole at exactly one
+   scroll position: its top on the viewport top. On this range (`start end`
+   → `end start`, i.e. viewport + section) that position is always
+
+       progress = vh / (vh + sectionH) = 0.5
+
+   viewport-independent, because the two terms are the same number. Every
+   slot above ENDED PAST IT. Measured at 1920×1080 by
+   scripts/probe-home-flow.mjs's method, parked at exactly that scroll:
+
+       para       settled (y 4.8 left to run)          ✔
+       doors      clipped 66.7% / 80.6% / 94.4%        ✘ barely uncovered
+       fine       opacity 0, y 24, bottom at 1092px    ✘ invisible, below
+                                                        the fold by its
+                                                        own travel
+
+   So the reader could see the head and the picture, or the settled reading
+   column, but never both: scroll far enough for the footnote to ink and
+   the heading had already left the top. That is the defect, and it is a
+   TIMING one — at rest the block's foot lands at 1068px of 1080, i.e. the
+   layout fits with 12px to spare.
+
+   ── WHERE THEY LAND NOW ──
+   Everything closes by 0.485, a hair inside the park, and the ORDER and
+   the overlap are unchanged:
+
+       para      [0.33, 0.42]    starts just under the fold and is ~40%
+                                 inked by the time its top clears it
+       doors     [0.39, 0.455]   +0.015 per print — a smaller step than
+                                 the old 0.025 because the window is
+                                 smaller; the row still reads left to right
+       fine      [0.40, 0.475]   essentially settled as it comes into view
+
+   THE DOOR ROW IS SEATED AGAINST THE FOLD, NOT AGAINST THE PARA. Its top
+   crosses the foot of the screen at progress 0.392 (measured), and 0.39 is
+   that number less a frame — so the print starts its pop at 0.865 of full
+   size just as the reader can first see it, and the whole gesture is
+   watched rather than spent below the fold. Move this slot earlier and the
+   pop happens off screen; move it later and it runs out of runway before
+   the park.
+
+   ⚠️ WHAT THE GEOMETRY ALLOWS, so the next retune does not fight it. These
+   elements sit at the FOOT of a one-screen section, so the scroll in which
+   they are both on screen and still moving is bounded and small:
+
+       reading block top   enters at 0.363   ~296px of scroll to the park
+       door row top        enters at 0.411   ~192px
+       footnote top        enters at 0.469   ~ 68px
+
+   The footnote's arrival is therefore close to unwatchable at any timing —
+   which is why it is given the shortest slot and asked only to be finished
+   rather than to perform. Widening these slots does not buy a slower
+   reveal; it buys an unfinished chapter again.
+
+   AND THE CHAPTER IS NOT DEAD AFTER 0.485. The picture's pan and drift are
+   scrubbed across the WHOLE range on the same clock (see the note on
+   `.mediaDrift`), so the half of the range this column no longer occupies
+   still has the photograph moving in it. That was the objection to the old
+   80px burst — a vacuum after it — and it does not apply here.
+
+   THE FADE CLEARS BEFORE THE TRAVEL DOES, at 55% of each slot. This is
+   body copy: type that is still at half opacity while a reader is trying
+   to read it is a worse fault than type that is still settling. The
+   signature is drift.ts's — legible early, then still moving. */
+const READ_PARA_SLOT: [number, number] = [0.33, 0.42];
+const READ_DOORS_SLOT: [number, number] = [0.39, 0.455];
+const READ_DOOR_STEP = 0.015;
+const READ_FINE_SLOT: [number, number] = [0.4, 0.475];
+
+/* the fraction of a slot the fade takes, against the travel's whole */
+const READ_INK = 0.55;
+
+/* the rise, in px — PARA's 24 and for PARA's reasons. See its note: 24
+   rather than 16 was asked for directly, and past ~32 it stops reading as
+   a settle and starts reading as a slide. */
+const READ_RISE = 24;
+
+/* ══════════ THE PRINTS WIPE AGAIN — DOWNWARD THIS TIME ══════════
+   At the user's instruction, chosen as "E" from a study of six options for
+   this row. The print is uncovered from the TOP DOWN, like a photograph
+   coming off a press: `inset(0% 0% 100% 0%)` travelling to `inset(0%)`.
+
+   ⚠️ THIS IS NOT A REVERT, AND THE DIRECTION IS THE WHOLE DIFFERENCE. There
+   was a wipe here before and it was rejected — "slowly pop out rather than
+   swipe up" — but that one ran `inset(100% 0 0 0) → 0`, uncovering the
+   print BOTTOM-UP. Swiping up under a fixed frame is what read badly; the
+   shutter falling from the top does not, and it is the gesture that was
+   chosen from the study on its own merits. Do not "restore" the old
+   direction on the strength of the old note.
+
+   WHAT THE POP COST, and why the study moved off it: the pop grew the whole
+   tile from 0.86 with a 1.035 overshoot, so the row's three objects changed
+   SIZE inside a reading column that is itself still rising (doorsY). Two
+   travels in one lockup. The shutter moves nothing — only its own clip
+   changes — so the column's arrival is the only motion in the frame, and it
+   sits beside the Manifesto's ink settle one chapter above as a second
+   reveal rather than a second travel.
+
+   THE SHADOW ARGUMENT THAT SENT THE POP TO THE <li> IS SPENT, because
+   nothing scales now. The clip goes back where `.doorClip` was built for it
+   and the frame keeps --shadow-card, which is exactly the arrangement the
+   stylesheet's warning has been protecting through three gestures. */
+
+/* a slot's fade window: the first READ_INK of it */
+const inkOf = (slot: [number, number]): [number, number] => [
+  slot[0],
+  slot[0] + (slot[1] - slot[0]) * READ_INK,
+];
 
 export default function AboutSplit() {
   const reduce = useReducedMotion();
 
-  /* THE FILM'S HANDLE. A ref and not state: the only thing anything does
-     with this element is call play() on it once, and a state update here
-     would re-render a section that has a whole choreography mid-flight. */
+  /* THE FILM'S HANDLE. A ref and not state: the only things anything does
+     with this element are warm it on approach and play() it at the gate,
+     and a state update here would re-render a section that has a whole
+     choreography mid-flight. */
   const clipRef = useRef<HTMLVideoElement>(null);
 
   /* ══════════ THE SCROLL-BOUND DRIFT ══════════
@@ -717,16 +990,123 @@ export default function AboutSplit() {
      variant of its own — it is a pure orchestrator for PARA / DOOR_ROW /
      DOOR_IN — so this transform has the element to itself, and the two
      compose the way the picture's entrance and scrub do: outer box travels,
-     inner boxes ink in. */
-  const bodyY = useTransform(chapter, [0.1, 1], ["-16vh", "0vh"]);
-  const headOpacity = useTransform(chapter, HEAD_IN, [0, 1]);
-  const headBlur = useTransform(
-    chapter,
-    HEAD_IN,
-    ["blur(8px)", "blur(0px)"]
+     inner boxes ink in.
+
+     ⚠️ THE SECOND TERM IS GONE — see the note where the exit drift was.
+     This is the whole of the column's travel again. */
+  /* ⚠️ NUMBERS, NOT vh STRINGS, because a second term is added to it below.
+     The endpoints and the range are unchanged — `useTransform` clamps the
+     same way either side of the unit — so the approach reads exactly as it
+     did; only the type of the value moved. */
+  /* −16 AGAIN. It was cut to −6 while the drift ran upward and carried
+     part of the same envelope; the drift travelled down from the seat and
+     the two stopped sharing a budget, so the rise came back to the value
+     the note above derives — and the drift is now gone entirely (see
+     below), which leaves this as the column's whole travel. */
+  const bodyRise = useTransform(chapter, [0.1, 1], [-16, 0]);
+
+  /* ══════════ THE EXIT DRIFT IS GONE ══════════
+     At the user's instruction: this chapter "stays in its correct place"
+     once the reader has arrived. It still RISES on the approach — that is
+     `bodyRise` above, an entrance — and then it holds.
+
+     WHAT WAS HERE, in case it is ever wanted back (it is in git): the
+     reading column travelled down as the section was passed, and how far
+     was MEASURED rather than chosen — the distance that brought the three
+     doors' bottom edge level with the photograph's, read off the render on
+     every resize because it depends on where the paragraph wraps. The trick
+     worth keeping is why the measurement was taken between `.readingBlock`
+     and `.doors` rather than between the doors and the photograph: both of
+     those sit inside the drifting transform, so it is common to both rects
+     and cancels in the subtraction, leaving a pure layout number at any
+     scroll position. Measuring against the photograph would have meant
+     discounting two different transforms and getting a different answer
+     every frame.
+
+     ⚠️ THREE THINGS WENT WITH IT AND ONE DID NOT. The `useScroll` on the
+     passage, the measured `driftVh` state with its resize and font-ready
+     listeners, and the ref on the doors are all deleted. `z-index: 1` on
+     `.section` STAYS — see the stylesheet, where the note now says why it
+     is no longer load-bearing but is still correct. */
+  /* ══════════ AND THE FILM PANS ══════════
+     The quietest of this chapter's gestures and the only one that never
+     stops. See lib/drift.ts for why the pan is bounded by the scale it
+     rides on — the scale itself is on `.mediaPan` in the stylesheet,
+     because it does not change and has no business being a motion value. */
+  const { scrollYProgress: inView } = useScroll({
+    target: sectionRef,
+    offset: PARALLAX_OFFSET,
+  });
+  const mediaPanY = useTransform(
+    inView,
+    [0, 1],
+    [`${-PARALLAX_PCT}%`, `${PARALLAX_PCT}%`],
   );
 
+  /* ── AND THE READING COLUMN'S THREE ARRIVALS, ON THE SAME RANGE ──
+     See the block over READ_PARA_SLOT for the measurement that replaced the
+     `whileInView` cascade with these. The prints' own wipes are inside
+     <Door>, because a hook cannot be called from the `.map` that builds
+     them. */
+  /* ⚠️ GATED ON MOUNT, for the reason PressWall.tsx and Blog.tsx both give:
+     framer server-renders a motion value at its progress-0 reading, and at
+     progress 0 this column is transparent. A scrub that never attaches —
+     JavaScript off, or a hydration that dies — would leave the chapter's
+     whole reading column invisible with nothing in the console to say so.
+
+     ⚠️ IT WAS ALREADY SHIPPING THAT WAY AND THIS FIXES IT RATHER THAN
+     PRESERVING IT. The `whileInView` cascade this replaced carried
+     `initial="hidden"`, which framer also emits into the server's HTML —
+     verified in the raw response, `style="opacity:0"` on `.para` — and with
+     no script there was no observer to fire it either. The scrub is not
+     what introduced the fault; it is what made it worth fixing while the
+     lines were being rewritten anyway. */
+  const [mounted, setMounted] = useState(false);
+  useEffect(() => setMounted(true), []);
+  const scrubbing = mounted && !reduce;
+
+  const paraOpacity = useTransform(inView, inkOf(READ_PARA_SLOT), [0, 1]);
+  const paraY = useTransform(inView, READ_PARA_SLOT, [READ_RISE, 0]);
+  /* the row travels as ONE object and its prints uncover inside it — the
+     arrangement DOOR_ROW's note argues for, carried over unchanged. */
+  const doorsY = useTransform(inView, READ_DOORS_SLOT, [READ_RISE, 0]);
+  const fineOpacity = useTransform(inView, inkOf(READ_FINE_SLOT), [0, 1]);
+  const fineY = useTransform(inView, READ_FINE_SLOT, [READ_RISE, 0]);
+
+  /* the two terms, summed — the rise the chapter arrives on plus the drift
+     it leaves on. Composed here rather than as two nested transformed
+     elements because one element carrying one transform is one projection
+     node, and this subtree already has plenty. */
+  /* ⚠️ ONE TERM AGAIN. This summed the approach rise and the exit drift,
+     which is why `bodyRise` is a number rather than a vh string — two units
+     cannot be added inside one `y`. The drift is gone; the number-and-
+     suffix shape is kept because it costs nothing and the alternative is
+     touching a transform whose endpoints are derived four notes up. */
+  const bodyY = useTransform(bodyRise, (rise: number) => `${rise}vh`);
+  const headOpacity = useTransform(chapter, HEAD_IN, [0, 1]);
+  /* ══ THE HEADING RESOLVES AS IT INKS — the manifesto's ink bleed, at the
+     user's instruction that the three chapter heads and the statement share
+     one entrance verb. Blur BLUR_MAX_EM → 0 on exactly HEAD_IN, the ink's
+     own range, so the fade and the focus pull read as ONE gesture in two
+     channels — this is the shape ScrubWord (Manifesto.tsx) established.
+
+     ⚠️ NOT ON headY's RANGE. The lift runs the full [0, 1] because it is a
+     PARALLAX, not the entrance (see the note over HEAD_IN); a blur riding
+     that range would leave the heading defocused for the whole chapter.
+
+     ⚠️ A `headBlur` STOOD HERE ONCE AND WAS DELETED at the motion crit's
+     Finding 02 — four separate blurs on one page turned a cinematic device
+     into a rendering artifact. What returns is not that blur: Finding 01
+     ("none of the editorial benchmarks animates type per-word; a
+     travelling display line has no baseline while the eye is on it") is
+     the argument FOR resolving in place, and the site now spends its
+     entrance blur on one consistent verb rather than four ad-hoc ones. The
+     Passage → Reservations focus pull remains the page's one held blur. */
+  const headBlurEm = useTransform(chapter, HEAD_IN, [BLUR_MAX_EM, 0]);
+  const headFilter = useMotionTemplate`blur(${headBlurEm}em)`;
+
   const mediaRef = useRef<HTMLElement>(null);
+  const readingRef = useRef<HTMLDivElement>(null);
 
   /* ⚠️ THE ONE PIECE OF STATE IN THE WHOLE CHOREOGRAPHY, and it is a GATE
      rather than a scrub. The picture's entrance is a timed animation — a
@@ -830,6 +1210,99 @@ export default function AboutSplit() {
         : delta >= -GATE_LEAD
     );
   });
+
+  /* ══════════ THE FILM IS WARMED ON APPROACH AND RUN AT THE GATE ══════════
+     THE PANEL SHOWS THE CLIP AND NOTHING ELSE, at the user's instruction.
+     It used to show two things in a row: the mask uncovered `poster`, the
+     hand-picked photograph, and the film replaced it a beat later when the
+     entrance completed. Removing the poster is only half of that fix — a
+     <video> with no poster and no decoded frame paints NOTHING, so the
+     sweep would have uncovered bare --placeholder instead. The element has
+     to be holding a frame BEFORE the mask starts to move.
+
+     SO THE WORK IS SPLIT ACROSS THE TWO MOMENTS THE CHAPTER ALREADY HAS:
+       · APPROACH (an IntersectionObserver on the figure, with a viewport
+         and a half of rootMargin — well below the fold, and a long way
+         ahead of the gate). The element is promoted to `preload="auto"` and
+         reloaded, so the fetch and the first-frame decode both happen
+         during the run-up.
+       · THE GATE (`swept`). play(), and the sweep uncovers moving film.
+
+     ⚠️ THIS IS WHAT KEEPS THE OLD PERFORMANCE ARGUMENT INTACT rather than
+     discarding it. The note this replaces was right: about-big.mp4 is
+     5.0MB, and starting that fetch-and-decode on the same frames the mask
+     and the drift are animating drops both of them on a laptop. That is
+     exactly why the decode is moved EARLIER instead of the play() being
+     moved earlier on its own — by the time the gate opens there is nothing
+     left to decode, and play() on a warm element is free.
+
+     ⚠️ THE WARM IS AN OBSERVER AND NOT `chapter`, AND THAT WAS A BUG THE
+     FIRST TIME. `useScroll` CLAMPS its progress to [0, 1], so while the
+     section is entirely below the fold the value sits pinned at 0 and emits
+     no change events at all — a handler hung off it does not fire until the
+     section's top edge is ALREADY entering the window, which on a fast
+     scroll is the same tick the gate opens. The observer fires a viewport
+     and a half earlier and cannot be starved that way.
+     150% of the viewport in each direction is the runway: ~1350px at
+     1440×900 ON TOP OF the one viewport the chapter's own range spends
+     before the gate.
+
+     ⚠️ `load()` RESTARTS THE ELEMENT, so it is latched and the observer
+     disconnects itself. Called twice it would re-seek to zero and the panel
+     would open on a stuck first frame.
+
+     REDUCED MOTION NEVER GETS HERE. `reduce` renders the <Image> instead
+     and `clipRef` is null, so the observer never attaches and the promotion
+     to `auto` never happens. `reduce` is in the deps because framer resolves
+     it to `null` on the first client render and to a boolean after, and the
+     <video> only exists on one side of it.
+
+     ⚠️ THAT IS NOT THE SAME AS "REDUCED MOTION NEVER FETCHES THE FILM", and
+     the difference is worth stating because the obvious reading of the line
+     above is wrong. `reduce` is `null` for the first client render, so the
+     <video> DOES mount for a beat before it is swapped for the <Image>, and
+     the element's own `preload="metadata"` is enough for Chrome to open a
+     `bytes=0-` range on it. Measured under
+     `Emulation.setEmulatedMedia prefers-reduced-motion: reduce`: 2.86MB
+     pulled (the dev build's copy, the whole file), with no <video> left in
+     the DOM at the end of it.
+     THIS PREDATES THE WARM-UP — the same measurement on HEAD returns the
+     same 2.86MB — so it is flagged here rather than fixed here. The fix is
+     to gate the mount on `reduce === false` instead of on falsiness, which
+     is a hydration change with its own trap (a deferred preference strands
+     framer's variant keys) and does not belong in a change about a poster
+     and a shadow. */
+  const warmed = useRef(false);
+  useEffect(() => {
+    const clip = clipRef.current;
+    const host = mediaRef.current;
+    if (!clip || !host || warmed.current) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting) || warmed.current) return;
+        warmed.current = true;
+        clip.preload = "auto";
+        clip.load();
+        io.disconnect();
+      },
+      { rootMargin: "150% 0px" },
+    );
+    io.observe(host);
+    return () => io.disconnect();
+  }, [reduce]);
+
+  useEffect(() => {
+    /* ⚠️ NOT GUARDED ON A "PLAYED ONCE" LATCH, and it must not be. `swept`
+       REVERSES — scrolling back up puts the panel away and approaching it
+       again replays the whole entrance — so this effect re-runs, and the
+       film has to be running each time the mask opens. play() on an element
+       that is already playing resolves immediately and does nothing.
+       The catch swallows the rejection a browser throws if it decides the
+       gesture requirements are not met; the panel is decorative and a still
+       first frame is an acceptable floor. */
+    if (!swept) return;
+    void clipRef.current?.play().catch(() => {});
+  }, [swept]);
 
   /* ══════════ THE PANEL DOES NOT MOVE WITH THE PAGE ══════════
      Both scroll-linked travels are gone, at the user's instruction: the
@@ -936,23 +1409,29 @@ export default function AboutSplit() {
           <motion.div
             className={styles.mediaFrame}
             variants={pick(MEDIA)}
-            /* ⚠️ THE CLIP'S PLAYBACK HANGS OFF THIS, AND IT IS NOT A
-               FLOURISH. about-big.mp4 is 5.0MB; `preload="metadata"`
-               keeps the frames off the wire until something asks to play,
-               and starting that decode on the same frames the mask and the
-               drift are animating drops both of them on a laptop. So the
-               film starts when the entrance has finished, exactly as it did
-               before the animation was removed.
-               THIS IS ALSO WHY `autoPlay` IS GONE AGAIN. It was added
-               BECAUSE the wipe went — with no animation there was no
-               completion to hang this on, and the clip would have sat on
-               its poster forever. Put the wipe back and the handler is the
-               correct owner again. Delete this and the panel is a still. */
-            onAnimationComplete={() => {
-              void clipRef.current?.play().catch(() => {});
-            }}
+            /* ⚠️ `onAnimationComplete` IS GONE FROM HERE, AND IT WAS THE
+               DEFECT. It started the film when the mask had finished, which
+               is precisely why the reader saw the poster photograph sweep
+               in and only then turn into a clip. Playback now belongs to the
+               gate two hooks up — see the film's warm-and-play block — and
+               nothing on this element does anything but mask. */
           >
             <motion.div className={styles.mediaDrift} variants={pick(DRIFT)}>
+              {/* ⚠️ A SEPARATE BOX FOR THE PAN, and it has to be.
+                  `.mediaDrift` already owns `y` and `scale` for the
+                  entrance's counter-drift; a scroll parallax written onto
+                  the same element would be the same two properties fighting
+                  over one transform, and the entrance would win for its
+                  first 1.7s and then hand over with a jump. Two boxes, one
+                  property each, composed by the browser. */}
+              <motion.div
+                className={styles.mediaPan}
+                style={
+                  reduce
+                    ? undefined
+                    : { y: mediaPanY, scale: PARALLAX_SCALE }
+                }
+              >
               {/* .mediaScrub IS GONE WITH THE SCRUB IT CARRIED. It was a
                   third box for one reason: the entrance settle and the
                   scroll scrub both wrote `y`, and one element cannot hold
@@ -986,15 +1465,29 @@ export default function AboutSplit() {
                 <video
                   ref={clipRef}
                   className={styles.mediaVideo}
-                  /* the film from the CDN when one is configured; the poster
-                     stays the hand-picked portrait rather than becoming a
-                     rendered frame, because this one was CHOSEN — see the
-                     chapter's own note on PORTRAIT */
+                  /* the film from the CDN when one is configured */
                   src={asset(VIDEO)}
-                  poster={asset(PORTRAIT)}
+                  /* ⚠️ NO `poster`, AT THE USER'S INSTRUCTION, and this is
+                     the visible half of the change the warm-up above pays
+                     for. It carried asset(PORTRAIT) — the same photograph
+                     the reduced-motion branch renders — so the sweep
+                     uncovered a STILL, and the film only replaced it when
+                     the entrance finished. The reader saw a picture and
+                     then a video: one panel arriving twice. With no poster
+                     the element paints its first decoded FRAME, so what the
+                     mask uncovers is already the film.
+                     PORTRAIT is still the reduced-motion still and still the
+                     one CHOSEN frame; it is simply no longer shown to a
+                     reader who is about to be shown the clip. */
                   muted
                   loop
                   playsInline
+                  /* ⚠️ THE ATTRIBUTE IS THE COLD DEFAULT AND THE WARM-UP
+                     OVERRIDES IT. `metadata` is what the markup ships (and
+                     what the server renders) so the home page never fetches
+                     5.0MB it may not reach; the approach handler promotes
+                     this element to `auto`. Hard-code `auto` here and the
+                     clip starts downloading behind the hero. */
                   preload="metadata"
                   aria-hidden
                 />
@@ -1009,6 +1502,7 @@ export default function AboutSplit() {
                 scrim that slid and scaled with the photograph would take its
                 guaranteed 200px band with it, and that band is what the
                 caption's contrast floor is measured against. */}
+              </motion.div>
             <div className={styles.mediaScrim} aria-hidden />
           </motion.div>
 
@@ -1056,8 +1550,12 @@ export default function AboutSplit() {
               lockup fades in as one thing, but `filter` on this box would put
               a blur pass over <PillCta>, whose neck is a split CSS-blur and
               SVG-threshold goo — a parent filter is exactly the kind of thing
-              that composites it wrong. The blur stays on the heading's own
-              element, where it only has type under it. */}
+              that composites it wrong. The ink bleed's filter goes on the
+              heading's own element, where it only has type under it — and
+              nothing between the heading and the page clips, so the blur
+              halo (which paints OUTSIDE the glyph boxes by the radius) is
+              never sheared into hard edges. Do not add `overflow: hidden`
+              anywhere on this branch. */}
           <motion.div
             ref={leadRef}
             className={styles.lead}
@@ -1080,7 +1578,10 @@ export default function AboutSplit() {
             <motion.h2
               ref={headRef}
               className={styles.heading}
-              style={reduce ? undefined : { filter: headBlur }}
+              /* the ink bleed's focus pull — see headBlurEm above. Same
+                 gate as the lockup's style: reduced motion renders static
+                 and fully inked, with no filter installed at all. */
+              style={reduce ? undefined : { filter: headFilter }}
             >
               {/* THE EM-DASH IS DECORATION AND IS HIDDEN FROM THE ACCESSIBLE
                   NAME. Left in the text it would be announced as "em dash"
@@ -1103,78 +1604,177 @@ export default function AboutSplit() {
             </div>
           </motion.div>
 
-          {/* THE SECOND TRIGGER — see PARA above for why this block does not
-              ride the section's chain. Its own `amount` is safe where the
-              section's would not be: this is a few hundred pixels tall and
-              always shorter than a viewport, so the ratio is reachable. */}
+          {/* ⚠️ NO SECOND TRIGGER ANY MORE. This block rode its own
+              `whileInView` with `{ once: true, amount: 0.2 }` and spent the
+              rest of the column as real-time delays; the measurement that
+              retired it is over READ_PARA_SLOT. What is left of the old
+              arrangement is the REDUCED-MOTION path, which still needs a
+              trigger because it has no scroll range to hang off — hence the
+              props below being spread only in that branch. */}
           <motion.div
             className={styles.readingBlock}
+            ref={readingRef}
             /* REDUCED MOTION GETS NO TRANSFORM AT ALL — the same rule the
                picture's scrub and the plate's travel follow. */
             style={reduce ? undefined : { y: bodyY }}
-            initial="hidden"
-            whileInView="shown"
-            /* 0.2 AND NOT 0.4, at the user's instruction ("start up a bit
-               higher"): `amount` is the fraction of THIS BLOCK that has to
-               be on screen before the rise fires, so a smaller number fires
-               it earlier — the column begins settling while it is still low
-               in the window rather than once it is nearly centred. It stays
-               an `amount` rather than a margin because this block is a few
-               hundred pixels tall and always shorter than a viewport, so the
-               ratio is always reachable; the deadlock the section-level note
-               warns about cannot happen here. */
-            viewport={{ once: true, amount: 0.2 }}
+            {...(reduce
+              ? {
+                  initial: "hidden" as const,
+                  whileInView: "shown" as const,
+                  viewport: { once: true, amount: 0.2 },
+                }
+              : null)}
           >
-            <motion.p className={styles.para} variants={pick(PARA)}>
+            <motion.p
+              className={styles.para}
+              variants={reduce ? FADE : undefined}
+              style={scrubbing ? { opacity: paraOpacity, y: paraY } : undefined}
+            >
               {PARA_LEAD}
             </motion.p>
 
-            <motion.ul className={styles.doors} variants={pick(DOOR_ROW)}>
+            {/* THE ROW DROPS AS ONE OBJECT — DOOR_ROW's argument, carried
+                over to the scrub unchanged: one gesture on the container,
+                and each print uncovers on its own step inside it. */}
+            <motion.ul
+              className={styles.doors}
+              style={scrubbing ? { y: doorsY } : undefined}
+            >
               {DOORS.map((d, i) => (
-                <motion.li key={d.slug} variants={pick(DOOR_IN)} custom={i}>
-                  {/* THE VENUE'S OWN SITE, IN A NEW TAB. These pointed at
-                      `/restaurants/<slug>` — this site's page for the room —
-                      and that route has been removed, so the door opens onto
-                      the restaurant's own site instead. It is a real external
-                      link rather than a routed one, so `<a>` rather than
-                      `<Link>`, with `noopener` for the same reason every
-                      other outbound link here carries it.
-                      The accessible name says where it goes: a door that
-                      leaves the site should say so before it is pressed, not
-                      after. */}
-                  <a
-                    href={SITE_BY_SLUG[d.slug]}
-                    target="_blank"
-                    rel="noopener noreferrer"
-                    className={styles.door}
-                    aria-label={`${d.label} — visit the restaurant's website, opens in a new tab`}
-                  >
-                    <span className={styles.doorFrame}>
-                      <motion.span
-                        className={styles.doorClip}
-                        variants={pick(DOOR_WIPE)}
-                        custom={i}
-                      >
-                        <Image
-                          className={styles.doorImg}
-                          src={d.src}
-                          alt=""
-                          fill
-                          sizes="150px"
-                        />
-                      </motion.span>
-                    </span>
-                  </a>
-                </motion.li>
+                <Door
+                  key={d.slug}
+                  door={d}
+                  index={i}
+                  href={SITE_BY_SLUG[d.slug]}
+                  reduce={!!reduce}
+                  scrubbing={scrubbing}
+                  range={inView}
+                />
               ))}
             </motion.ul>
 
-            <motion.p className={styles.paraFine} variants={pick(PARA_FINE_V)}>
+            <motion.p
+              className={styles.paraFine}
+              variants={reduce ? FADE : undefined}
+              style={scrubbing ? { opacity: fineOpacity, y: fineY } : undefined}
+            >
               {PARA_FINE}
             </motion.p>
           </motion.div>
         </div>
       </div>
     </motion.section>
+  );
+}
+
+/* ══════════ ONE PRINT ══════════
+   It is a component and not three lines inside the `.map` for exactly one
+   reason: its clip is a `useTransform`, and a hook cannot be called from
+   inside a loop. Manifesto.tsx's ScrubWord exists for the same reason and
+   says so in the same words.
+
+   IT CLIPS AGAIN — see THE PRINTS WIPE AGAIN for why, and note the clip is
+   back on the inner span exactly as the stylesheet's warning requires: a
+   `clip-path` anywhere but `.doorClip` costs all three prints their
+   --shadow-card permanently, because box-shadow paints outside the border
+   box and a clip takes it with everything else.
+
+   THE PRINT FADES WITH ITS OWN WINDOW rather than only growing. Without
+   the fade the reader sees an empty --placeholder box wearing a shadow
+   before its picture arrives, which reads as a failed image — DOOR_IN's
+   note, and it has survived two changes of gesture now. */
+function Door({
+  door,
+  index,
+  href,
+  reduce,
+  scrubbing,
+  range,
+}: {
+  door: (typeof DOORS)[number];
+  index: number;
+  href: string;
+  /** the reader asked for less motion: take the plain crossfade */
+  reduce: boolean;
+  /** ⚠️ NOT `!reduce`. This is false before mount as well, so the styles the
+   *  scrub writes never reach the server's HTML — see the note over
+   *  `scrubbing` in the component above for the fault that forces it. The
+   *  two are separate because they want different fallbacks: reduced motion
+   *  wants the crossfade, an unmounted render wants nothing at all. */
+  scrubbing: boolean;
+  /** the section's `inView` progress — see READ_DOORS_SLOT */
+  range: MotionValue<number>;
+}) {
+  const slot: [number, number] = [
+    READ_DOORS_SLOT[0] + index * READ_DOOR_STEP,
+    READ_DOORS_SLOT[1] + index * READ_DOOR_STEP,
+  ];
+  const opacity = useTransform(range, inkOf(slot), [0, 1]);
+
+  /* ══════════ THE SHUTTER, BACK ON THE INNER SPAN ══════════
+     The print is UNCOVERED from the top down — the picture comes off a
+     press. The pop it replaces grew the whole tile from 0.86 with an
+     overshoot; this moves nothing at all, which is the point: it is the one
+     gesture in the chapter that cannot shift the reading column it sits in,
+     and it sits quietly beside the ink settle now running one chapter above
+     (two reveals rather than two travels).
+
+     ⚠️ IT GOES ON `.doorClip`, NEVER ON `.doorFrame`, and the stylesheet has
+     carried that warning through two changes of gesture. `box-shadow` paints
+     OUTSIDE the border box and `clip-path` clips it — so a clip on the frame
+     costs all three prints their --shadow-card permanently, not just while
+     the animation runs. The inner span exists for this.
+
+     ⚠️ AND THE FADE STAYS. It is tempting to make this clip-only, since a
+     wipe is a complete gesture on its own — but the frame carries the shadow
+     and the --placeholder ground, and those are NOT clipped by the inner
+     span. Without the fade the reader gets an empty box wearing a shadow
+     while the picture wipes in, which reads as a failed image. That is
+     DOOR_IN's note and it has now survived three gestures. */
+  const shutter = useTransform(range, slot, [100, 0]);
+  const clipPath = useMotionTemplate`inset(0% 0% ${shutter}% 0%)`;
+
+  return (
+    <motion.li
+      variants={reduce ? FADE : undefined}
+      style={reduce ? undefined : { opacity }}
+    >
+      {/* THE VENUE'S OWN SITE, IN A NEW TAB. These pointed at
+          `/restaurants/<slug>` — this site's page for the room — and that
+          route has been removed, so the door opens onto the restaurant's own
+          site instead. It is a real external link rather than a routed one,
+          so `<a>` rather than `<Link>`, with `noopener` for the same reason
+          every other outbound link here carries it.
+          The accessible name says where it goes: a door that leaves the site
+          should say so before it is pressed, not after. */}
+      <a
+        href={href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={styles.door}
+        aria-label={`${door.label} — visit the restaurant's website, opens in a new tab`}
+      >
+        <span className={styles.doorFrame}>
+          {/* THE CLIP IS BACK ON THIS SPAN and the frame above is plain
+              again — see the shutter note over `clipPath`. The frame keeps
+              the shadow and the ground precisely because it is NOT the
+              element being clipped. `scrubbing` and not `!reduce`: before
+              mount the style must not be written at all, or the server's
+              HTML ships three prints clipped to nothing. */}
+          <motion.span
+            className={styles.doorClip}
+            style={scrubbing ? { clipPath } : undefined}
+          >
+            <Image
+              className={styles.doorImg}
+              src={door.src}
+              alt=""
+              fill
+              sizes="150px"
+            />
+          </motion.span>
+        </span>
+      </a>
+    </motion.li>
   );
 }

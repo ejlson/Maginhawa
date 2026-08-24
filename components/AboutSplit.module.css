@@ -94,7 +94,37 @@
      SIDES OF THE PICTURE ARE --grid-gutter — 12px to each screen edge and
      12px down to the fold — which was the same number as the gap between
      the band's photographs, and the requirement the user set. */
+  /* ⚠️ THE GUTTER, AND IT IS BACK TO THE GUTTER. For one pass this carried
+     clamp(96px, 13vh, 160px) as a runway for the reading column's drift —
+     a block that ends below its section is painted over by the next
+     section's cream, so the fine print was being cut mid-sentence. That
+     worked and it was the wrong lever: the padding comes out of a section
+     that is exactly one screen, so it took 117px off the PHOTOGRAPH, which
+     is not a thing the drift is allowed to charge for.
+
+     THE PAINT ORDER IS THE RIGHT LEVER. `position: relative; z-index: 1`
+     below puts this section above the journal in the stacking order, so the
+     column can travel past its own bottom edge and still be drawn. It lands
+     on the journal's cream — which is this section's cream, the same
+     token — so there is nothing to see but the type continuing to move.
+
+     The sides and the top keep the gutter for the reasons above. */
   padding: var(--grid-gutter);
+
+  /* ⚠️ POSITIONED SO IT PAINTS ABOVE THE JOURNAL — AND IT IS NO LONGER
+     LOAD-BEARING, WHICH IS WHY IT IS STILL HERE RATHER THAN DELETED.
+     Sibling sections are drawn in document order, so the one BELOW covers
+     anything the one above overflows, and the reading column used to
+     overflow as it drifted out; the drift is gone at the user's
+     instruction and nothing overflows any more. What this still does is
+     keep the guarantee that a future overhang is drawn rather than covered
+     — the failure it prevented was silent (type cut mid-sentence by the
+     next chapter's cream, with nothing in the DOM to show for it), so the
+     property stays. This is inside `.afterHero`, which already establishes
+     its own stacking
+     context over the pinned hero, so nothing above the fold is affected. */
+  position: relative;
+  z-index: 1;
 }
 
 /* ── THE OPENING RULE IS GONE, at the user's instruction ──
@@ -214,12 +244,15 @@
    background, no radius, no shadow — because .media already carries all
    three and a second copy is a second thing to keep in step.
 
-   ⚠️ .mediaFrame IS THE ONLY ELEMENT THE CLIP MAY TOUCH. `clip-path` clips
-   an element's ENTIRE rendering, box-shadow included, and it stays on the
-   element as an inline style once the animation rests — so a clip on .media
-   would take the card shadow off this picture permanently, and nothing
-   about that failure looks like an animation bug. Both of this file's
-   wiping animations are written this way; see DOOR_WIPE's note too.
+   ⚠️ .mediaFrame IS THE ONLY ELEMENT THE MASK MAY TOUCH. `mask-image`,
+   exactly like the `clip-path` that used to draw this, applies to an
+   element's ENTIRE rendering, box-shadow included, and whatever framer
+   writes stays on the element as an inline style once the animation rests —
+   so a mask on .media would take the card shadow off this picture
+   permanently, and nothing about that failure looks like an animation bug.
+   Both of this file's wiping animations are written this way; see
+   DOOR_WIPE's note too (the prints still use a real clip-path — they are
+   small, still, and want a hard edge).
 
    BOTH ARE `position: absolute; inset: 0` FOR THE SAME REASON .mediaVideo
    is: .media's height is governed by the grid row, and a box in normal flow
@@ -227,10 +260,47 @@
 .mediaFrame {
   position: absolute;
   inset: 0;
+
+  /* ══════════ THE SWEEP'S EDGE IS DRAWN HERE ══════════
+     framer animates ONE NUMBER — `--sweep`, the position of the reveal
+     boundary as a percentage of this box's height — and the gradient below
+     turns it into a soft edge. See MEDIA in AboutSplit.tsx for why the edge
+     is feathered at all and why the animation is a custom property rather
+     than the mask itself.
+
+     ⚠️ THE DEFAULT IS 100%, i.e. FULLY UNCOVERED, AND THAT IS LOAD-BEARING.
+     The old clip-path existed only as an inline style written by the
+     `hidden` variant, so a reader that variant never reaches simply never
+     had one. A mask declared in the stylesheet does not have that property:
+     if it defaulted to hidden, then reduced motion — where `pick()` swaps
+     MEDIA for FADE, which touches opacity and nothing else — would leave
+     `--sweep` parked at its start value and the panel permanently empty.
+     Same for the no-JS path, whose <noscript> reset in app/layout.tsx
+     clears `clip-path` and `transform` but cannot clear a mask.
+     Defaulting to the END of the travel makes "nobody animated this" mean
+     "the picture is simply there", which is what both of those paths want.
+
+     ⚠️ 6% IS DUPLICATED FROM FEATHER IN AboutSplit.tsx and cannot be read
+     from here: the variant has to start the travel one feather-height above
+     the frame (`-6%`) so the ramp itself is off the top edge before the
+     sweep begins. Change one and change the other. */
+  --sweep: 100%;
+  --sweep-feather: 6%;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 var(--sweep),
+    transparent calc(var(--sweep) + var(--sweep-feather))
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 var(--sweep),
+    transparent calc(var(--sweep) + var(--sweep-feather))
+  );
+
   /* THE PICTURE'S CORNER AND ITS CLIP, both moved down from .media so that
      box can paint nothing at rest — see the note there. Rounding the box
-     that is already being clip-pathed costs nothing: `clip-path` and
-     `border-radius` compose, the inset mask cuts the top edge and the radius
+     that is already being masked costs nothing: the mask and
+     `border-radius` compose, the gradient takes the top edge and the radius
      keeps the corners. */
   overflow: hidden;
   border-radius: var(--radius-tile);
@@ -251,6 +321,28 @@
 .mediaDrift {
   position: absolute;
   inset: 0;
+}
+
+/* ⚠️ THE PAN'S SCALE LIVES HERE, NOT IN THE MOTION VALUE. It never
+   changes, so it has no business being animated — and putting it on the
+   same element that carries the scroll-driven `y` is what lets the browser
+   compose the two into one transform without either overwriting the other.
+
+   1.08 IS THE PAN'S BUDGET, not a taste number. An image that fills its
+   frame exactly has nothing in reserve; the overhang a scale S buys is
+   (S − 1) / 2 in each direction, so 1.08 permits a 4% pan and lib/drift.ts
+   spends 3.5%. Raise one and raise the other, or the frame's own ground
+   shows at the trailing edge. */
+.mediaPan {
+  position: absolute;
+  inset: 0;
+  /* ⚠️ THE SCALE IS NOT HERE, AND IT USED TO BE. framer writes the whole
+     `transform` property inline when it animates `y`, so a `scale()` left
+     in the stylesheet is not composed with the pan — it is REPLACED by it,
+     silently, and the picture pans with nothing in reserve until its frame
+     shows at the trailing edge. It travels in the same motion style as the
+     pan instead; see PARALLAX_SCALE in lib/drift.ts. */
+  will-change: transform;
 }
 
 /* .mediaScrub IS DELETED. It was the scroll-bound drift's own box — a third
@@ -420,8 +512,14 @@
      what does the work on a normal window (5vh → 8vh is 45px → 72px at
      900 tall), and the ceiling moves with it so a tall window keeps the
      same relationship instead of clipping back to the old value. */
-  padding: clamp(40px, 8vh, 104px) clamp(16px, 2vw, 40px)
-    clamp(20px, 3vh, 44px) clamp(16px, 2vw, 34px);
+  /* ⚠️ NO BOTTOM PADDING, at the user's instruction that the reading
+     column's foot line up with the photograph's. `.copy` and `.media` are
+     stretched siblings of the same grid, so they are exactly as tall as
+     each other, and any bottom padding here is the exact distance by which
+     the fine print sits ABOVE the picture's bottom edge. It was
+     clamp(20px, 3vh, 44px) — 27px out of line at a 900-tall window. */
+  padding: clamp(40px, 8vh, 104px) clamp(16px, 2vw, 40px) 0
+    clamp(16px, 2vw, 34px);
 }
 
 /* heading and pill travel together at the top */
@@ -584,15 +682,20 @@
      properties that never change. */
 }
 
-/* ⚠️ THE PRINT'S CLIP WINDOW, AND IT IS A SEPARATE ELEMENT FOR ONE HARD
-   REASON: `clip-path` clips an element's ENTIRE rendering, box-shadow
+/* ⚠️ NOTHING CLIPS IN HERE ANY MORE — the prints pop rather than wipe (see
+   DOOR_POP_FROM in AboutSplit.tsx) — BUT THE REASON THIS ELEMENT EXISTS IS
+   NOT SPENT, so it is written in the present tense for whoever puts a clip
+   back: `clip-path` clips an element's ENTIRE rendering, box-shadow
    included, and Motion leaves the resolved value on the element as an
-   inline style once the animation rests. Running the wipe on .doorFrame
+   inline style once the animation rests. Running a wipe on .doorFrame
    itself would therefore leave `inset(0% 0 0 0)` sitting there forever and
    all three prints would quietly lose --shadow-card — a permanent visual
    regression produced by a finished animation, which is close to
    undiagnosable if you are looking at the motion rather than at the shadow.
-   The clip lives in here; the shadow stays out there.
+   A clip belongs in here; the shadow stays out there.
+
+   IT ALSO STILL EARNS ITS KEEP WITHOUT A CLIP: <Image fill> needs a
+   positioned box, which this is.
 
    `border-radius: inherit` keeps .doorImg's own `inherit` resolving to the
    frame's --radius-tile now that this sits between them. */

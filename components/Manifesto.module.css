@@ -80,36 +80,48 @@
      THAT box — so the sentence would sit half the top pad low and the
      "properly centred" this was changed for would be off by ~28px at
      1440×900. Equal pads, real centre. */
-  /* ── 92svh, DOWN FROM 100, at the user's instruction: "bring the About
-     section closer" ── The distance between this chapter's statement and the
-     next one's photograph is this section's own bottom half, so shortening
-     the section is the only thing that closes it. 90svh takes ~90px out at
-     1440×900, split by the bias below into ~45px off each end — so the seam
-     ABOVE closes too, which is the other instruction this file is carrying.
+  /* ── 76svh, DOWN FROM 92, at the user's instruction: "reduce the gap above
+     and below the manifesto" ── The section is far taller than the sentence
+     inside it and `justify-content: center` splits the slack evenly, so this
+     number IS the gap at both ends; the padding below is the small change
+     and this is the large one.
 
-     ⚠️ IT CANNOT GO MUCH FURTHER, AND THE FLOOR IS NOT A TASTE JUDGEMENT.
-     The band below the statement is where AboutSplit's heading perches
-     before it flies (HEAD_LIFT there), and that perch is fixed against the
-     WINDOW, not against this section: the heading's top lands at ~0.71·vh
-     whatever this section does. So the statement's bottom edge has to stay
-     above that, with air:
+     ⚠️ THE OLD FLOOR WAS REAL AND IS NOW OBSOLETE — READ THIS BEFORE
+     RESTORING 92. The band below the statement is where AboutSplit's heading
+     perches before it flies, and that perch is fixed against the WINDOW, not
+     against this section, so shortening the section eats the heading's
+     clearance. The previous note recorded 90svh as unusable: clearance fell
+     to 52px at 1440×900 and 31px at 1440×800.
 
-         band below  ≥  vh − perchTop + clearance  ≈  315px at 1440×900
+     What changed is not this file. AboutSplit's HEAD_IN moved from [0.02…]
+     to [0.22…], so the heading now inks LATER and therefore LOWER, and it no
+     longer needs this section's height to clear the statement. Re-measured
+     at 76svh with a 20px-step walk (probe in the session scratchpad):
 
-     Measured before this change the band was 402px with 151px of clearance.
-     90svh was tried first and spends too much of it: the clearance fell to
-     52px at 1440×900 and 31px at 1440×800, where the heading is 189px tall
-     in a 251px band and the two lines start reading as one crowded block.
-     92svh keeps most of the gain and roughly 75px of air at both.
+         1440×900   gap above 182px   below 198px   perch clearance 106px
+         1440×800   gap above 141px   below 154px   perch clearance  76px
 
-     ⚠️ THE 1440×800 CASE IS THE ONE THAT BINDS, not the common one — a short
-     window makes the heading WRAP TALLER while giving it less room to sit
-     in, so it is squeezed from both ends at once. Check it before taking
-     another percent off this number. And if the gap still reads as too wide,
-     the lever is HEAD_LIFT — perch the heading lower and this floor comes
-     down with it — not this number on its own. */
-  min-height: 92svh;
-  padding: clamp(24px, 4vh, 56px) var(--pad-x);
+     76px at the binding short window is the same "roughly 75px of air" the
+     old note accepted at 92svh — the clearance was bought back by the gate,
+     not spent. The gaps came down 254→182 and 270→198 at 1440×900.
+
+     ⚠️ 1440×800 STILL BINDS, for the reason the old note gave: a short window
+     wraps the heading taller while giving it less room. Do not take another
+     percent off this without re-running the perch measurement, and if the
+     gap still reads wide, the lever is HEAD_LIFT — perch the heading lower —
+     not this number alone. */
+  min-height: 76svh;
+  /* ⚠️ TIGHTER TOP AND BOTTOM, at the user's instruction — was
+     clamp(24px, 4vh, 56px), now clamp(14px, 2.2vh, 32px), i.e. 36px → 20px
+     at 900. Read it with the seam arithmetic above: this pad does not stand
+     alone at either end, it STACKS — with Discover's bottom padding above
+     (54px at 900) and with whatever follows below. The seam to the grid
+     therefore goes 153px → 137px rather than to the 20px this number says.
+     That is still above the ~130px floor the note above records, which is
+     the point at which the sentence starts reading as crowded against the
+     last row of photographs rather than as a chapter of its own. Do not
+     trim this further without re-running scripts/probe-home-seam.mjs. */
+  padding: clamp(14px, 2.2vh, 32px) var(--pad-x);
   /* NO CLOSING RULE. A full-width hairline used to sit on this section's
      bottom border box, between the statement and Our Restaurants. It was
      drawing a boundary the page does not have: the statement and the
@@ -212,9 +224,19 @@
    SIZED IN em, SO IT IS THE TYPE THAT DECIDES. The statement's own font-size
    is a clamp against the viewport, so a px height would be a different
    proportion at every breakpoint — large enough to break the line at 2.4rem
-   and lost in it at 5.2rem. 0.62em holds the picture between the x-height
-   and the cap height of the line it sits in, at every size, which is the
-   proportion that reads as punctuation rather than as an inserted object.
+   and lost in it at 5.2rem.
+
+   ⚠️ 0.62em → 0.86em, at the motion crit's Finding 01. At 0.62em the
+   pictures sat between the x-height and the cap height and read as
+   punctuation — which in practice meant they read as STICKERS: 15px chips
+   a reader could mistake for emoji. The reference this device comes from
+   (thisisstudiox's statement) runs its inline emphasis at full line
+   presence; the picture is meant to interrupt the sentence on purpose.
+   0.86em is the PORTRAIT's height — the ceiling this file already proved
+   safe ("both under the 0.92em line box", below) — so the landscape now
+   claims the same presence without touching the leading. ⚠️ DO NOT GO
+   PAST 0.86em: the portrait's own note is explicit that anything taller
+   requires opening the leading first, and every line pays for that.
 
    THE ASPECT IS FIXED AND THE CROP IS `cover`, because the four source
    photographs are not the same shape and four different rectangles in one
@@ -230,15 +252,16 @@
    restaurant cards and the About panel carry. A softer corner here would be
    the only rounded thing on the page. */
 /* ══════════ THE PICTURES HAVE A DECISIVE ORIENTATION ══════════
-   3 / 2 AND NOT 4 / 3. At 0.62em the old 1.33 read as neither portrait nor
-   landscape — a square-ish chip rather than a photograph set in the line.
+   3 / 2 AND NOT 4 / 3. At the old sticker size the old 1.33 read as neither
+   portrait nor landscape — a square-ish chip rather than a photograph set
+   in the line.
    3:2 is the aspect two of the four sources already are, and it is the SAME
    aspect as the three door prints in AboutSplit.module.css, so the two
    places on the home page that set a small photograph into type now cut
    them from the same stock. */
 .inlineImage {
   display: inline-block;
-  height: 0.62em;
+  height: 0.86em;
   aspect-ratio: 3 / 2;
   /* the mask hugs this box and owns both the seat in the line and the gap
      beside it — see .imageMask. `top` because the mask's line box is zero
@@ -268,8 +291,8 @@
 
    So the mask now states its height, drops the strut, and drops the block
    padding with it — a photograph has no descenders to protect, which is the
-   only thing that padding was ever for. 0.62em landscape, 0.86em portrait,
-   both under the 0.92em line box, so a picture can no longer paint outside
+   only thing that padding was ever for. 0.86em landscape and portrait both,
+   under the 0.92em line box, so a picture can no longer paint outside
    its own line whatever it is doing.
 
    ⚠️ THE MASK NOW CARRIES THE BASELINE SEAT. `.wordMask` is
@@ -312,7 +335,7 @@
      than nearly true. */
   display: inline-flex;
   line-height: 0;
-  height: 0.62em;
+  height: 0.86em;
   /* both shorthands, because `.wordMask` sets both as shorthands and a
      longhand here would only cancel the half it names */
   padding: 0;
@@ -363,8 +386,18 @@
    heading */
 .statement {
   margin: 0;
-  font-family: var(--font-display);
-  font-weight: var(--w-regular);
+  /* ⚠️ CONTRALTO, AT THE DISPLAY WEIGHT, at the user's instruction. This
+     setting used to run on --font-display (the Freight/Garamond stack) at
+     --w-regular; it now speaks the same voice as the wordmark and the
+     Passage slab. --w-display is Contralto's OWN weight step (300) and is
+     not on the text family's scale — see the token's note in globals.css,
+     and note that on this face the weight is also a width, so the measure
+     moves when it changes.
+     THE WRAP IS FROZEN by useLockedLines below: a face change changes what
+     gets locked, so the line count here is a measured result and not a
+     given. Re-check it if this moves again. */
+  font-family: var(--font-display-big);
+  font-weight: var(--w-display);
   /* LARGER. The statement no longer shares its row with a support
      paragraph, so it has the full measure to itself and can be set at the
      weight the page's other chapter openings carry.
@@ -576,7 +609,17 @@
    line rides up. */
 .wordMask {
   display: inline-block;
-  overflow: hidden;
+  /* ⚠️ NOT `hidden` ANY MORE, AND THE BLUR IS THE REASON. This clipped for
+     as long as the words TRAVELLED — the clip was the window they rose out
+     of. The travel went at the motion crit, leaving a clip that clipped
+     nothing, and the ink settle then gave it something to clip after all:
+     a blurred glyph paints its halo OUTSIDE its own box, by the blur radius
+     in every direction, so `hidden` sheared the soft edge off every word
+     and the sentence came up out of focus with hard rectangular sides.
+     There is nothing left for this box to contain — it exists now only to
+     carry the accent class and the ink latch's colour hook — so it lets the
+     ink through instead. */
+  overflow: visible;
   /* ⚠️ THE BLOCK PADDING IS 0.02em NOW, DOWN FROM 0.06em/0.22em, and it is
      the other half of the leading change on .statement — read the two
      together or neither makes sense. The old numbers protected descenders
