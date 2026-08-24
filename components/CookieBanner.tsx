@@ -177,10 +177,23 @@ export default function CookieBanner() {
 
       {/* Three equal tracks. Accept and Decline are the two answers and are
           identical; Preferences/Save shares their style because a control
-          that opens the detail should not look like an afterthought. */}
+          that opens the detail should not look like an afterthought.
+
+          ⚠️ THE TWO ANSWERS SIT TOGETHER, at the user's instruction — Decline
+          reads immediately to the right of Accept rather than across the row
+          from it. Accept and Decline are the same question answered two ways,
+          so the eye should not have to cross a third control to find the
+          second one; Preferences opens the detail and now trails them both. */}
       <div className={styles.actions}>
         <button type="button" className={styles.button} onClick={acceptAll}>
           Accept
+        </button>
+        <button
+          type="button"
+          className={styles.button}
+          onClick={() => setConsent(NO_CONSENT)}
+        >
+          Decline
         </button>
         <button
           type="button"
@@ -191,13 +204,6 @@ export default function CookieBanner() {
           aria-expanded={showPrefs ? undefined : false}
         >
           {showPrefs ? "Save" : "Preferences"}
-        </button>
-        <button
-          type="button"
-          className={styles.button}
-          onClick={() => setConsent(NO_CONSENT)}
-        >
-          Decline
         </button>
       </div>
     </aside>

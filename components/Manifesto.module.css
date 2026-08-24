@@ -374,8 +374,18 @@
    heading */
 .statement {
   margin: 0;
-  font-family: var(--font-display);
-  font-weight: var(--w-regular);
+  /* ⚠️ CONTRALTO, AT THE DISPLAY WEIGHT, at the user's instruction. This
+     setting used to run on --font-display (the Freight/Garamond stack) at
+     --w-regular; it now speaks the same voice as the wordmark and the
+     Passage slab. --w-display is Contralto's OWN weight step (300) and is
+     not on the text family's scale — see the token's note in globals.css,
+     and note that on this face the weight is also a width, so the measure
+     moves when it changes.
+     THE WRAP IS FROZEN by useLockedLines below: a face change changes what
+     gets locked, so the line count here is a measured result and not a
+     given. Re-check it if this moves again. */
+  font-family: var(--font-display-big);
+  font-weight: var(--w-display);
   /* LARGER. The statement no longer shares its row with a support
      paragraph, so it has the full measure to itself and can be set at the
      weight the page's other chapter openings carry.

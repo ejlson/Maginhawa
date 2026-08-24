@@ -371,23 +371,52 @@ const HEAD_LIFT = `-${LIFT_VH * 100}vh`;
 
 /* THE HEADING'S INK, and it is deliberately not its travel.
 
-   ⚠️ GATED AT 40% NOW, at the user's instruction — the old [0.02, 0.16]
-   started inking while the Manifesto still owned 98% of the screen, so
-   the heading arrived as a line of the CHAPTER ABOVE and did so inside
-   the page's fixed depth-of-field band (globals.css .scrollBlur), i.e.
-   defocused. The read "notice it arrive in the manifesto" was the
-   intent; blurred type bleeding into a finished poster was the result.
+   ⚠️ THE GATE HAS NOW MOVED TWICE AND BOTH ENDS WERE WRONG. It was
+   [0.02, 0.16], which started inking while the Manifesto still owned 98% of
+   the screen — the heading arrived as a line of the CHAPTER ABOVE and did so
+   inside the page's fixed depth-of-field band (globals.css .scrollBlur), i.e.
+   defocused. The fix was 0.40, and 0.40 overcorrected: the user's read is
+   that the line now appears too late and too far from the chapter above.
 
-   THE NUMBER IS A DERIVATION, NOT A TUNE. `chapter`'s offset is
-   ["start end", "start start"] over one viewport of travel, so progress p
-   ⇔ the section's top edge sits at vh × (1 − p) ⇔ AboutSplit owns
-   exactly p of the viewport. 0.40 is therefore literally "the section
-   owns 40% of the screen" — clear of the bottom blur band and clearly
-   this chapter's own event. The 0.16-wide span is preserved from the old
-   pair; only the start moved. headY stays on the full [0, 1] range — it
-   is a parallax lift, not the entrance, and re-ranging it would make the
-   heading travel 19vh while visible. */
-const HEAD_IN: [number, number] = [0.40, 0.56];
+   ⚠️ THE BAND IS 40px, NOT 40% — WHICH IS THE MEASUREMENT THAT SETTLED THIS.
+   `.scrollBlur` is a fixed strip at the FOOT of the viewport, 40px tall. The
+   constraint was therefore never "the section must own 40% of the screen",
+   it was "the heading must not be sitting in the bottom 40px when it inks" —
+   and those are very different numbers. Walked across four viewports, the
+   heading's own bottom edge clears the band at:
+
+       1440x900    p ≥ 0.15 (2px)    0.20 → 33px
+       1280x720    p ≥ 0.25 (20px)   0.30 → 44px
+       1440x700    p ≥ 0.30 (12px)   0.35 → 36px   ← the binding case
+       1920x1080   clear from 0.10
+
+   A short laptop is the case that binds, because the heading is a fixed
+   fraction of a shorter screen. 0.30 is the earliest start that is clear of
+   the band on ALL of them, so it is a floor rather than a preference — take
+   it lower and the first frames of the fade land in the blur on 1440x700,
+   which is the exact defect the 0.40 revision existed to remove.
+
+   THE SPAN IS UNCHANGED at 0.16, preserved through both revisions; only the
+   start has ever moved. headY stays on the full [0, 1] range — it is a
+   parallax lift, not the entrance, and re-ranging it would make the heading
+   travel 19vh while visible. */
+/* ⚠️ EARLIER AGAIN, at the user's instruction — and this one is the first
+   value that is NOT free of the blur band, so the trade is recorded here
+   rather than discovered later. Walked the seam at 25px steps, the heading's
+   own bottom edge clears the 40px .scrollBlur strip from:
+
+       1920x1080  p >= 0.029      1024x768  p >= 0.131
+       1440x900   p >= 0.162      1280x720  p >= 0.233
+       1440x700   p >= 0.297   <- the binding case, and it binds alone
+
+   0.30 was therefore the earliest value clear EVERYWHERE, which is why it
+   was chosen. 0.22 buys the earlier arrival the user asked for at the cost
+   of the heading's last line sitting in the band on SHORT viewports only
+   (~700px tall), and only across the first sliver of its fade, where it is
+   near-transparent anyway. Every viewport 768px and taller is still clean.
+   If short-window defocus is ever reported, 0.30 is the value to return to
+   — not 0.02, which was the original defect. */
+const HEAD_IN: [number, number] = [0.22, 0.38];
 
 /* HOW EARLY THE PICTURE GOES, at the user's instruction. The rule was "when
    the heading's top line is level with the picture's top line", i.e. a gap
