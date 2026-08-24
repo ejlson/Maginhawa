@@ -161,8 +161,12 @@
   "159": "a-note-on-service.mdx",
   "160": "VideoBackdrop.tsx",
   "161": "unist-util-visit",
+  "162": "SmoothScroll",
   "163": "layout.tsx",
   "164": "CustomCursor.tsx",
+  "165": "gray-matter",
+  "166": "remark-gfm",
+  "167": "unist-util-visit",
   "174": "shoot-sections.mjs",
   "175": "probe-blog-index.mjs",
   "178": "JoinUs.tsx"

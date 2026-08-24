@@ -175,8 +175,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_contact_page",
-      "community": 134,
-      "community_name": "getRestaurant",
+      "community": 158,
+      "community_name": "press.ts",
       "norm_label": "page.tsx"
     },
     {
@@ -186,8 +186,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "app_contact_page_jsonld",
-      "community": 134,
-      "community_name": "getRestaurant",
+      "community": 158,
+      "community_name": "press.ts",
       "norm_label": "jsonld"
     },
     {
@@ -197,8 +197,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "app_contact_page_metadata",
-      "community": 134,
-      "community_name": "getRestaurant",
+      "community": 158,
+      "community_name": "press.ts",
       "norm_label": "metadata"
     },
     {
@@ -208,8 +208,8 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "app_contact_page_page",
-      "community": 134,
-      "community_name": "getRestaurant",
+      "community": 158,
+      "community_name": "press.ts",
       "norm_label": "page()"
     },
     {
@@ -681,8 +681,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_layout",
-      "community": 101,
-      "community_name": "q",
+      "community": 158,
+      "community_name": "press.ts",
       "norm_label": "layout.tsx"
     },
     {
@@ -692,8 +692,8 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "app_layout_displayface",
-      "community": 101,
-      "community_name": "q",
+      "community": 158,
+      "community_name": "press.ts",
       "norm_label": "displayface"
     },
     {
@@ -703,8 +703,8 @@
       "source_location": "L79",
       "_origin": "ast",
       "id": "app_layout_textface",
-      "community": 101,
-      "community_name": "q",
+      "community": 158,
+      "community_name": "press.ts",
       "norm_label": "textface"
     },
     {
@@ -714,8 +714,8 @@
       "source_location": "L85",
       "_origin": "ast",
       "id": "app_layout_metadata",
-      "community": 101,
-      "community_name": "q",
+      "community": 158,
+      "community_name": "press.ts",
       "norm_label": "metadata"
     },
     {
@@ -725,8 +725,8 @@
       "source_location": "L171",
       "_origin": "ast",
       "id": "app_layout_rootlayout",
-      "community": 101,
-      "community_name": "q",
+      "community": 158,
+      "community_name": "press.ts",
       "norm_label": "rootlayout()"
     },
     {
@@ -879,8 +879,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_robots",
-      "community": 134,
-      "community_name": "getRestaurant",
+      "community": 158,
+      "community_name": "press.ts",
       "norm_label": "robots.ts"
     },
     {
@@ -890,8 +890,8 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "app_robots_robots",
-      "community": 134,
-      "community_name": "getRestaurant",
+      "community": 158,
+      "community_name": "press.ts",
       "norm_label": "robots()"
     },
     {
@@ -1294,7 +1294,7 @@
       "label": "PORTRAIT_LINE",
       "file_type": "code",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L90",
+      "source_location": "L133",
       "_origin": "ast",
       "id": "components_aboutsplit_portrait_line",
       "community": 97,
@@ -1305,7 +1305,7 @@
       "label": "DOORS",
       "file_type": "code",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L127",
+      "source_location": "L170",
       "_origin": "ast",
       "id": "components_aboutsplit_doors",
       "community": 97,
@@ -1316,7 +1316,7 @@
       "label": "SITE_BY_SLUG",
       "file_type": "code",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L138",
+      "source_location": "L181",
       "_origin": "ast",
       "id": "components_aboutsplit_site_by_slug",
       "community": 97,
@@ -1327,7 +1327,7 @@
       "label": "EASE",
       "file_type": "code",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L169",
+      "source_location": "L212",
       "_origin": "ast",
       "id": "components_aboutsplit_ease",
       "community": 97,
@@ -1338,7 +1338,7 @@
       "label": "FADE",
       "file_type": "code",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L189",
+      "source_location": "L232",
       "_origin": "ast",
       "id": "components_aboutsplit_fade",
       "community": 97,
@@ -1349,7 +1349,7 @@
       "label": "LINE",
       "file_type": "code",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L218",
+      "source_location": "L261",
       "_origin": "ast",
       "id": "components_aboutsplit_line",
       "community": 97,
@@ -1360,7 +1360,7 @@
       "label": "DRAWER",
       "file_type": "code",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L258",
+      "source_location": "L301",
       "_origin": "ast",
       "id": "components_aboutsplit_drawer",
       "community": 97,
@@ -1371,7 +1371,7 @@
       "label": "MEDIA",
       "file_type": "code",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L274",
+      "source_location": "L317",
       "_origin": "ast",
       "id": "components_aboutsplit_media",
       "community": 97,
@@ -1382,7 +1382,7 @@
       "label": "HEAD_IN",
       "file_type": "code",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L370",
+      "source_location": "L413",
       "_origin": "ast",
       "id": "components_aboutsplit_head_in",
       "community": 97,
@@ -1393,7 +1393,7 @@
       "label": "MOUNT",
       "file_type": "code",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L440",
+      "source_location": "L483",
       "_origin": "ast",
       "id": "components_aboutsplit_mount",
       "community": 97,
@@ -1404,7 +1404,7 @@
       "label": "DRIFT",
       "file_type": "code",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L455",
+      "source_location": "L498",
       "_origin": "ast",
       "id": "components_aboutsplit_drift",
       "community": 97,
@@ -1415,7 +1415,7 @@
       "label": "PARA",
       "file_type": "code",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L539",
+      "source_location": "L582",
       "_origin": "ast",
       "id": "components_aboutsplit_para",
       "community": 97,
@@ -1426,7 +1426,7 @@
       "label": "DOOR_WIPE",
       "file_type": "code",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L572",
+      "source_location": "L615",
       "_origin": "ast",
       "id": "components_aboutsplit_door_wipe",
       "community": 97,
@@ -1437,7 +1437,7 @@
       "label": "DOOR_IN",
       "file_type": "code",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L585",
+      "source_location": "L628",
       "_origin": "ast",
       "id": "components_aboutsplit_door_in",
       "community": 97,
@@ -1448,7 +1448,7 @@
       "label": "DOOR_ROW",
       "file_type": "code",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L613",
+      "source_location": "L656",
       "_origin": "ast",
       "id": "components_aboutsplit_door_row",
       "community": 97,
@@ -1459,7 +1459,7 @@
       "label": "PARA_FINE_V",
       "file_type": "code",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L626",
+      "source_location": "L669",
       "_origin": "ast",
       "id": "components_aboutsplit_para_fine_v",
       "community": 97,
@@ -1470,7 +1470,7 @@
       "label": "AboutSplit()",
       "file_type": "code",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L635",
+      "source_location": "L678",
       "_origin": "ast",
       "id": "components_aboutsplit_aboutsplit",
       "community": 83,
@@ -1913,8 +1913,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_customcursor",
-      "community": 101,
-      "community_name": "q",
+      "community": 161,
+      "community_name": "unist-util-visit",
       "norm_label": "customcursor.tsx"
     },
     {
@@ -1924,8 +1924,8 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "components_customcursor_mode",
-      "community": 101,
-      "community_name": "q",
+      "community": 161,
+      "community_name": "unist-util-visit",
       "norm_label": "mode"
     },
     {
@@ -1935,8 +1935,8 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "components_customcursor_customcursor",
-      "community": 135,
-      "community_name": "page.tsx",
+      "community": 161,
+      "community_name": "unist-util-visit",
       "norm_label": "customcursor()"
     },
     {
@@ -2078,8 +2078,8 @@
       "source_location": "L1415",
       "_origin": "ast",
       "id": "components_discover_expandedcard",
-      "community": 41,
-      "community_name": "PageTransition.tsx",
+      "community": 1,
+      "community_name": "common-dabb52f27fbf7211-min.en-US.js",
       "norm_label": "expandedcard()"
     },
     {
@@ -2287,8 +2287,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_glassfilters",
-      "community": 101,
-      "community_name": "q",
+      "community": 158,
+      "community_name": "press.ts",
       "norm_label": "glassfilters.tsx"
     },
     {
@@ -2298,8 +2298,8 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "components_glassfilters_map",
-      "community": 101,
-      "community_name": "q",
+      "community": 158,
+      "community_name": "press.ts",
       "norm_label": "map()"
     },
     {
@@ -2309,8 +2309,8 @@
       "source_location": "L42",
       "_origin": "ast",
       "id": "components_glassfilters_lens_map",
-      "community": 101,
-      "community_name": "q",
+      "community": 158,
+      "community_name": "press.ts",
       "norm_label": "lens_map"
     },
     {
@@ -2320,8 +2320,8 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "components_glassfilters_pill_map",
-      "community": 101,
-      "community_name": "q",
+      "community": 158,
+      "community_name": "press.ts",
       "norm_label": "pill_map"
     },
     {
@@ -2331,8 +2331,8 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "components_glassfilters_keep",
-      "community": 101,
-      "community_name": "q",
+      "community": 158,
+      "community_name": "press.ts",
       "norm_label": "keep"
     },
     {
@@ -2342,8 +2342,8 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "components_glassfilters_filters",
-      "community": 101,
-      "community_name": "q",
+      "community": 158,
+      "community_name": "press.ts",
       "norm_label": "filters"
     },
     {
@@ -2353,8 +2353,8 @@
       "source_location": "L68",
       "_origin": "ast",
       "id": "components_glassfilters_glassfilters",
-      "community": 101,
-      "community_name": "q",
+      "community": 158,
+      "community_name": "press.ts",
       "norm_label": "glassfilters()"
     },
     {
@@ -4267,8 +4267,8 @@
       "source_location": "L14",
       "_origin": "ast",
       "id": "lib_smoothscroll_smoothscroll",
-      "community": 101,
-      "community_name": "q",
+      "community": 162,
+      "community_name": "SmoothScroll",
       "norm_label": "smoothscroll()"
     },
     {
@@ -4619,8 +4619,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_jsonld",
-      "community": 134,
-      "community_name": "getRestaurant",
+      "community": 158,
+      "community_name": "press.ts",
       "norm_label": "jsonld.tsx"
     },
     {
@@ -4630,8 +4630,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "lib_jsonld_orgsameas",
-      "community": 134,
-      "community_name": "getRestaurant",
+      "community": 158,
+      "community_name": "press.ts",
       "norm_label": "orgsameas"
     },
     {
@@ -4641,8 +4641,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "lib_jsonld_organizationjsonld",
-      "community": 101,
-      "community_name": "q",
+      "community": 158,
+      "community_name": "press.ts",
       "norm_label": "organizationjsonld()"
     },
     {
@@ -4652,8 +4652,8 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "lib_jsonld_websitejsonld",
-      "community": 101,
-      "community_name": "q",
+      "community": 158,
+      "community_name": "press.ts",
       "norm_label": "websitejsonld()"
     },
     {
@@ -5125,8 +5125,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_site",
-      "community": 134,
-      "community_name": "getRestaurant",
+      "community": 158,
+      "community_name": "press.ts",
       "norm_label": "site.ts"
     },
     {
@@ -5444,8 +5444,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "users_ethanjameslegson_work_maginhawa_maginhawa_package_dependencies_gray_matter",
-      "community": 136,
-      "community_name": "dependencies",
+      "community": 165,
+      "community_name": "gray-matter",
       "norm_label": "gray-matter"
     },
     {
@@ -5455,8 +5455,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "gray_matter",
-      "community": 136,
-      "community_name": "dependencies",
+      "community": 165,
+      "community_name": "gray-matter",
       "norm_label": "gray-matter"
     },
     {
@@ -5466,8 +5466,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "users_ethanjameslegson_work_maginhawa_maginhawa_package_dependencies_lenis",
-      "community": 101,
-      "community_name": "q",
+      "community": 162,
+      "community_name": "SmoothScroll",
       "norm_label": "lenis"
     },
     {
@@ -5477,8 +5477,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "lenis",
-      "community": 101,
-      "community_name": "q",
+      "community": 162,
+      "community_name": "SmoothScroll",
       "norm_label": "lenis"
     },
     {
@@ -5488,8 +5488,8 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "users_ethanjameslegson_work_maginhawa_maginhawa_package_dependencies_next",
-      "community": 158,
-      "community_name": "press.ts",
+      "community": 136,
+      "community_name": "dependencies",
       "norm_label": "next"
     },
     {
@@ -5499,8 +5499,8 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "next",
-      "community": 158,
-      "community_name": "press.ts",
+      "community": 136,
+      "community_name": "dependencies",
       "norm_label": "next"
     },
     {
@@ -5510,8 +5510,8 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "users_ethanjameslegson_work_maginhawa_maginhawa_package_dependencies_react",
-      "community": 160,
-      "community_name": "VideoBackdrop.tsx",
+      "community": 136,
+      "community_name": "dependencies",
       "norm_label": "react"
     },
     {
@@ -5521,8 +5521,8 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "react",
-      "community": 160,
-      "community_name": "VideoBackdrop.tsx",
+      "community": 136,
+      "community_name": "dependencies",
       "norm_label": "react"
     },
     {
@@ -5576,8 +5576,8 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "users_ethanjameslegson_work_maginhawa_maginhawa_package_dependencies_remark_gfm",
-      "community": 136,
-      "community_name": "dependencies",
+      "community": 166,
+      "community_name": "remark-gfm",
       "norm_label": "remark-gfm"
     },
     {
@@ -5587,8 +5587,8 @@
       "source_location": "L21",
       "_origin": "ast",
       "id": "remark_gfm",
-      "community": 136,
-      "community_name": "dependencies",
+      "community": 166,
+      "community_name": "remark-gfm",
       "norm_label": "remark-gfm"
     },
     {
@@ -5664,8 +5664,8 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "users_ethanjameslegson_work_maginhawa_maginhawa_package_dependencies_unified",
-      "community": 161,
-      "community_name": "unist-util-visit",
+      "community": 136,
+      "community_name": "dependencies",
       "norm_label": "unified"
     },
     {
@@ -5675,8 +5675,8 @@
       "source_location": "L25",
       "_origin": "ast",
       "id": "unified",
-      "community": 161,
-      "community_name": "unist-util-visit",
+      "community": 136,
+      "community_name": "dependencies",
       "norm_label": "unified"
     },
     {
@@ -5686,8 +5686,8 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "users_ethanjameslegson_work_maginhawa_maginhawa_package_dependencies_unist_util_visit",
-      "community": 136,
-      "community_name": "dependencies",
+      "community": 167,
+      "community_name": "unist-util-visit",
       "norm_label": "unist-util-visit"
     },
     {
@@ -5697,8 +5697,8 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "unist_util_visit",
-      "community": 136,
-      "community_name": "dependencies",
+      "community": 167,
+      "community_name": "unist-util-visit",
       "norm_label": "unist-util-visit"
     },
     {
@@ -7036,7 +7036,7 @@
       "label": "out",
       "file_type": "code",
       "source_file": "scripts/probe-about-film-gate.mjs",
-      "source_location": "L41",
+      "source_location": "L69",
       "_origin": "ast",
       "id": "scripts_probe_about_film_gate_out",
       "community": 135,
@@ -7047,7 +7047,7 @@
       "label": "say()",
       "file_type": "code",
       "source_file": "scripts/probe-about-film-gate.mjs",
-      "source_location": "L42",
+      "source_location": "L70",
       "_origin": "ast",
       "id": "scripts_probe_about_film_gate_say",
       "community": 135,
@@ -7058,12 +7058,34 @@
       "label": "run()",
       "file_type": "code",
       "source_file": "scripts/probe-about-film-gate.mjs",
-      "source_location": "L55",
+      "source_location": "L83",
       "_origin": "ast",
       "id": "scripts_probe_about_film_gate_run",
       "community": 135,
       "community_name": "page.tsx",
       "norm_label": "run()"
+    },
+    {
+      "label": "filmTable()",
+      "file_type": "code",
+      "source_file": "scripts/probe-about-film-gate.mjs",
+      "source_location": "L286",
+      "_origin": "ast",
+      "id": "scripts_probe_about_film_gate_filmtable",
+      "community": 135,
+      "community_name": "page.tsx",
+      "norm_label": "filmtable()"
+    },
+    {
+      "label": "PASSES",
+      "file_type": "code",
+      "source_file": "scripts/probe-about-film-gate.mjs",
+      "source_location": "L292",
+      "_origin": "ast",
+      "id": "scripts_probe_about_film_gate_passes",
+      "community": 135,
+      "community_name": "page.tsx",
+      "norm_label": "passes"
     },
     {
       "label": "probe-about-maroon-seams.mjs",
@@ -10372,8 +10394,8 @@
       "source_location": "L95",
       "_origin": "ast",
       "id": "scripts_probe_indent_hover_frame",
-      "community": 135,
-      "community_name": "page.tsx",
+      "community": 51,
+      "community_name": "probe-timeline-contrast.mjs",
       "norm_label": "frame()"
     },
     {
@@ -14200,8 +14222,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scripts_probe_videoscale",
-      "community": 82,
-      "community_name": "Manifesto.tsx",
+      "community": 160,
+      "community_name": "VideoBackdrop.tsx",
       "norm_label": "probe-videoscale.mjs"
     },
     {
@@ -14211,8 +14233,8 @@
       "source_location": "L34",
       "_origin": "ast",
       "id": "scripts_probe_videoscale_root",
-      "community": 82,
-      "community_name": "Manifesto.tsx",
+      "community": 160,
+      "community_name": "VideoBackdrop.tsx",
       "norm_label": "root"
     },
     {
@@ -14222,8 +14244,8 @@
       "source_location": "L36",
       "_origin": "ast",
       "id": "scripts_probe_videoscale_film",
-      "community": 82,
-      "community_name": "Manifesto.tsx",
+      "community": 160,
+      "community_name": "VideoBackdrop.tsx",
       "norm_label": "film"
     },
     {
@@ -14233,8 +14255,8 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "scripts_probe_videoscale_argv",
-      "community": 82,
-      "community_name": "Manifesto.tsx",
+      "community": 160,
+      "community_name": "VideoBackdrop.tsx",
       "norm_label": "argv"
     },
     {
@@ -14244,8 +14266,8 @@
       "source_location": "L39",
       "_origin": "ast",
       "id": "scripts_probe_videoscale_arg",
-      "community": 82,
-      "community_name": "Manifesto.tsx",
+      "community": 160,
+      "community_name": "VideoBackdrop.tsx",
       "norm_label": "arg()"
     },
     {
@@ -14255,8 +14277,8 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "scripts_probe_videoscale_savedir",
-      "community": 82,
-      "community_name": "Manifesto.tsx",
+      "community": 160,
+      "community_name": "VideoBackdrop.tsx",
       "norm_label": "savedir"
     },
     {
@@ -14266,8 +14288,8 @@
       "source_location": "L48",
       "_origin": "ast",
       "id": "scripts_probe_videoscale_variants",
-      "community": 82,
-      "community_name": "Manifesto.tsx",
+      "community": 160,
+      "community_name": "VideoBackdrop.tsx",
       "norm_label": "variants"
     },
     {
@@ -14277,8 +14299,8 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "scripts_probe_videoscale_cats",
-      "community": 82,
-      "community_name": "Manifesto.tsx",
+      "community": 160,
+      "community_name": "VideoBackdrop.tsx",
       "norm_label": "cats"
     },
     {
@@ -14299,8 +14321,8 @@
       "source_location": "L159",
       "_origin": "ast",
       "id": "scripts_probe_videoscale_server",
-      "community": 82,
-      "community_name": "Manifesto.tsx",
+      "community": 160,
+      "community_name": "VideoBackdrop.tsx",
       "norm_label": "server"
     },
     {
@@ -14310,8 +14332,8 @@
       "source_location": "L191",
       "_origin": "ast",
       "id": "scripts_probe_videoscale_run",
-      "community": 82,
-      "community_name": "Manifesto.tsx",
+      "community": 160,
+      "community_name": "VideoBackdrop.tsx",
       "norm_label": "run()"
     },
     {
@@ -14321,8 +14343,8 @@
       "source_location": "L234",
       "_origin": "ast",
       "id": "scripts_probe_videoscale_analyse",
-      "community": 82,
-      "community_name": "Manifesto.tsx",
+      "community": 160,
+      "community_name": "VideoBackdrop.tsx",
       "norm_label": "analyse()"
     },
     {
@@ -14332,8 +14354,8 @@
       "source_location": "L303",
       "_origin": "ast",
       "id": "scripts_probe_videoscale_out",
-      "community": 82,
-      "community_name": "Manifesto.tsx",
+      "community": 160,
+      "community_name": "VideoBackdrop.tsx",
       "norm_label": "out"
     },
     {
@@ -19628,7 +19650,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L635",
+      "source_location": "L678",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_aboutsplit",
@@ -19639,7 +19661,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L585",
+      "source_location": "L628",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_aboutsplit",
@@ -19650,7 +19672,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L613",
+      "source_location": "L656",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_aboutsplit",
@@ -19661,7 +19683,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L572",
+      "source_location": "L615",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_aboutsplit",
@@ -19672,7 +19694,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L127",
+      "source_location": "L170",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_aboutsplit",
@@ -19683,7 +19705,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L258",
+      "source_location": "L301",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_aboutsplit",
@@ -19694,7 +19716,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L455",
+      "source_location": "L498",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_aboutsplit",
@@ -19705,7 +19727,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L169",
+      "source_location": "L212",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_aboutsplit",
@@ -19716,7 +19738,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L189",
+      "source_location": "L232",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_aboutsplit",
@@ -19727,7 +19749,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L370",
+      "source_location": "L413",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_aboutsplit",
@@ -19738,7 +19760,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L218",
+      "source_location": "L261",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_aboutsplit",
@@ -19749,7 +19771,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L274",
+      "source_location": "L317",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_aboutsplit",
@@ -19760,7 +19782,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L440",
+      "source_location": "L483",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_aboutsplit",
@@ -19771,7 +19793,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L539",
+      "source_location": "L582",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_aboutsplit",
@@ -19782,7 +19804,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L626",
+      "source_location": "L669",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_aboutsplit",
@@ -19793,7 +19815,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L90",
+      "source_location": "L133",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_aboutsplit",
@@ -19804,7 +19826,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L138",
+      "source_location": "L181",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_aboutsplit",
@@ -19901,7 +19923,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "components/AboutSplit.tsx",
-      "source_location": "L1015",
+      "source_location": "L1118",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_aboutsplit_aboutsplit",
@@ -28980,7 +29002,18 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/probe-about-film-gate.mjs",
-      "source_location": "L41",
+      "source_location": "L286",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_probe_about_film_gate",
+      "target": "scripts_probe_about_film_gate_filmtable",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/probe-about-film-gate.mjs",
+      "source_location": "L69",
       "weight": 1.0,
       "_origin": "ast",
       "source": "scripts_probe_about_film_gate",
@@ -28991,7 +29024,18 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/probe-about-film-gate.mjs",
-      "source_location": "L55",
+      "source_location": "L292",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "scripts_probe_about_film_gate",
+      "target": "scripts_probe_about_film_gate_passes",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "contains",
+      "confidence": "EXTRACTED",
+      "source_file": "scripts/probe-about-film-gate.mjs",
+      "source_location": "L83",
       "weight": 1.0,
       "_origin": "ast",
       "source": "scripts_probe_about_film_gate",
@@ -29002,7 +29046,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "scripts/probe-about-film-gate.mjs",
-      "source_location": "L42",
+      "source_location": "L70",
       "weight": 1.0,
       "_origin": "ast",
       "source": "scripts_probe_about_film_gate",
@@ -29015,7 +29059,7 @@
       "confidence": "INFERRED",
       "confidence_score": 0.8,
       "source_file": "scripts/probe-about-film-gate.mjs",
-      "source_location": "L145",
+      "source_location": "L239",
       "weight": 1.0,
       "_origin": "ast",
       "source": "scripts_probe_about_film_gate_run",
@@ -39248,5 +39292,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "57295dfaca9887604f8f3c5b75165c442cd83f18"
+  "built_at_commit": "fd02ff560e17e96d04a68d15c58596d82dfc3990"
 }

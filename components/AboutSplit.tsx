@@ -81,6 +81,49 @@ const PORTRAIT = "/images/careers-hero.jpg";
    fetches. */
 const VIDEO = "/videos/about-big.mp4";
 
+/* ── AND IT IS NOT FETCHED UNTIL THE CHAPTER IS APPROACHING ──
+   The film used to carry `preload="metadata"`, above a comment claiming that
+   kept "the frames off the wire until something asks to play". MEASURED
+   against the production export (scripts/probe-about-film-gate.mjs, cold
+   pass), that claim was WRONG IN BOTH DIRECTIONS and worth stating precisely,
+   because the wrong half of it is the half that looks alarming:
+
+     · `metadata` does NOT mean the header alone. Chrome opened one
+       open-ended range on about-big.mp4 at 1.3s — with the chapter still
+       2,606px below a 900px fold — and took the moov atom plus the first
+       0.81 seconds of frames: 393,216 B written by the server, 265,907 B
+       actually consumed by the client. Frames, on the wire, for an
+       aria-hidden decoration most readers never reach.
+     · It is NOT the 5.0MB it first appeared to be. That number is an
+       artefact of summing `content-length` across a `bytes=0-` response the
+       client abandoned: the server truthfully announced 4,985,905 bytes
+       remaining, and the client took half a megabyte of them and hung up.
+       See the probe's own banner — it now counts what moved, not what was
+       promised.
+
+   SO THE COST IS ~0.4MB AND NOT ~5MB, AND IT IS STILL WORTH NOTHING HERE.
+   Every other deferred film on this site already costs exactly zero until it
+   is wanted: Reservations' backdrop (VideoBackdrop's warm gate), the venue
+   cards' hover clips (no `src` at all until a pointer arrives), the hero's
+   second clip (promoted at WARM_AT). This panel was the last `preload
+   ="metadata"` on the site — the one place still paying a fraction of a
+   megabyte for a picture the reader may never scroll to.
+
+   150% OF THE VIEWPORT, WHICH IS THE HOUSE NUMBER AND NOT A NEW ONE. It is
+   VideoBackdrop's WARM_MARGIN, chosen there for the same job and reasoned out
+   at length in that file's banner: at a 900px fold this starts the fetch
+   1,350px out, which is a couple of seconds of ordinary scrolling, and the
+   film only needs its opening frames by the time the entrance hands over.
+   A partly-buffered film is not a failure mode either — `play()` starts when
+   it can and the poster is the same photograph, so the panel is never empty.
+
+   ⚠️ THE OBSERVER WATCHES THE SECTION AND NOT THE FILM, AND THAT IS NOT A
+   PREFERENCE. `.mediaFrame` animates a clip-path, and a clip-path zeroes its
+   own subtree's intersection ratio — the panel is clipped to nothing until
+   `swept` latches, so an observer on the <video> would report 0 forever and
+   the film would never be fetched at all. The section is never clipped. */
+const FILM_WARM_MARGIN = "150% 0px";
+
 /* TWO LINES, DELIBERATELY. The caption was one sentence ("One room in
    Camden, 1987."); it is now a statement and its location, set larger, so
    it reads as the picture's title rather than as a note under it. The break
@@ -727,6 +770,63 @@ export default function AboutSplit() {
     offset: ["start end", "start start"],
   });
 
+  /* ══════════ THE FILM'S FETCH, GATED ON THE CHAPTER'S APPROACH ══════════
+     See FILM_WARM_MARGIN for what this is buying and what was measured. The
+     element ships `preload="none"`, which costs nothing at all, and this
+     promotes it once the section is within a viewport and a half.
+
+     A DOM WRITE AND NOT A STATE UPDATE. Everything in this chapter that could
+     re-render mid-choreography is deliberately kept out of React — see the
+     note on `clipRef` — and a fetch is not a state to be maintained anyway.
+     The observer is one-shot: it disconnects on the first intersection, so
+     there is nothing to keep in sync and nothing to tear down twice.
+
+     ⚠️ THE `preload === "auto"` GUARD IS WHAT MAKES `load()` SAFE. It resets
+     an element to zero, and the entrance calls play() on this same element
+     (see onAnimationComplete). The two cannot normally race — the gate fires
+     a viewport and a half out, the entrance fires once the sweep completes,
+     and no scroll gets from one to the other in a frame — but a reader
+     landing with the chapter already on screen puts both in the same batch.
+     One-shot plus the guard means the second caller is a no-op rather than a
+     film snapped back to its first frame.
+
+     `preferenceKnown` IS IN THE DEPS BECAUSE THE ELEMENT DOES NOT EXIST ON
+     THE FIRST PASS. The film mounts only once the preference is known and is
+     `false` (see the gate above), so this runs, finds no film, and returns;
+     the flag flipping is what re-runs it against an element that is really
+     there. Under reduced motion there is never a film and this stays a
+     no-op for the life of the component, which is correct — that reader is
+     looking at the still. */
+  useEffect(() => {
+    const film = clipRef.current;
+    const section = sectionRef.current;
+    if (!film) return;
+
+    const warm = () => {
+      if (film.preload === "auto") return;
+      film.preload = "auto";
+      film.load();
+    };
+
+    // no IntersectionObserver: fetch it rather than ship a panel whose film
+    // can only ever be started by play() with nothing buffered behind it
+    if (!section || typeof IntersectionObserver === "undefined") {
+      warm();
+      return;
+    }
+
+    const gate = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting)) return;
+        gate.disconnect();
+        warm();
+      },
+      { rootMargin: FILM_WARM_MARGIN },
+    );
+    gate.observe(section);
+    return () => gate.disconnect();
+  }, [preferenceKnown]);
+
   /* the flight itself — one lerp, and `useTransform` clamps at both ends, so
      the heading is parked in the manifesto above the range and sitting in its
      own layout below it */
@@ -975,12 +1075,15 @@ export default function AboutSplit() {
             className={styles.mediaFrame}
             variants={pick(MEDIA)}
             /* ⚠️ THE CLIP'S PLAYBACK HANGS OFF THIS, AND IT IS NOT A
-               FLOURISH. about-big.mp4 is 5.0MB; `preload="metadata"`
-               keeps the frames off the wire until something asks to play,
-               and starting that decode on the same frames the mask and the
-               drift are animating drops both of them on a laptop. So the
-               film starts when the entrance has finished, exactly as it did
-               before the animation was removed.
+               FLOURISH. Starting a 5.0MB file's decode on the same frames
+               the mask and the drift are animating drops both of them on a
+               laptop. So the film starts when the entrance has finished,
+               exactly as it did before the animation was removed.
+               THE FETCH IS SOMEBODY ELSE'S JOB and happens earlier — see
+               FILM_WARM_MARGIN and the observer that uses it. This handler
+               used to claim `preload="metadata"` kept the frames off the
+               wire; it did not, and the measurement that says so is in the
+               constant's note.
                THIS IS ALSO WHY `autoPlay` IS GONE AGAIN. It was added
                BECAUSE the wipe went — with no animation there was no
                completion to hang this on, and the clip would have sat on
@@ -1017,7 +1120,9 @@ export default function AboutSplit() {
                   muted
                   loop
                   playsInline
-                  preload="metadata"
+                  /* nothing at all until the chapter approaches — see
+                     FILM_WARM_MARGIN, which is what promotes this */
+                  preload="none"
                   aria-hidden
                 />
               ) : (
