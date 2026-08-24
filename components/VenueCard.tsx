@@ -134,6 +134,17 @@ export type VenueCardProps = {
   furnitureMotion?: MotionProps;
   glassMotion?: MotionProps;
   actionMotion?: MotionProps;
+  /** HOW THE ACTION ROW BEHAVES. "row" (the default) is today's shape —
+   *  every control visible at rest, primaryAction() picking the fill —
+   *  and is byte-identical in behaviour for /restaurants and the
+   *  expansion. "split" is the home grid's: a single cream Book pill at
+   *  rest (or nothing, for a venue with no booking), splitting into
+   *  Menu / Visit / Book on hover or focus-within. See VenueBlock. */
+  actions?: "row" | "split";
+  /** the warm photographic grade — a static filter + multiply wash over
+   *  the picture and the hover film only, never the type or the pills.
+   *  Opt-in so /restaurants stays ungraded; the home grid passes it. */
+  grade?: boolean;
 };
 
 export default function VenueCard({
@@ -151,6 +162,8 @@ export default function VenueCard({
   furnitureMotion = {},
   glassMotion = {},
   actionMotion = {},
+  actions = "row",
+  grade,
 }: VenueCardProps) {
   const reduce = useReducedMotion();
 
@@ -236,6 +249,7 @@ export default function VenueCard({
   return (
     <div
       className={`${styles.cardSurface}${square ? ` ${styles.square}` : ""}`}
+      data-grade={grade ? "on" : undefined}
       onMouseEnter={filmable ? onEnter : undefined}
       onMouseLeave={filmable ? onLeave : undefined}
     >
@@ -349,8 +363,26 @@ export default function VenueCard({
              venue in text as well, and that is not a duplicate worth
              fixing: one is a logotype a reader recognises and the other is
              the string search and a screen reader need. Announcing the
-             mark is what makes the picture mean something. */
-          <span className={styles.cardLogo} role="img" aria-label={item.name}>
+             mark is what makes the picture mean something.
+
+             `--la` / `--lr` ARE THE MARK'S MEASURED OPTICS (see LOGO_OPTICS
+             in lib/venueCards.ts): its intrinsic aspect, and the fraction
+             of its box the LETTERFORMS occupy. The crown sizes the slot as
+             cap / --lr, so every venue's name renders at the same height
+             whatever furniture its lockup carries around it. Absent on a
+             venue with no measurement, where the CSS fallbacks keep the
+             old flat-slot behaviour. */
+          <span
+            className={styles.cardLogo}
+            role="img"
+            aria-label={item.name}
+            style={
+              {
+                ...(item.logoAspect ? { "--la": item.logoAspect } : null),
+                ...(item.logoInkRatio ? { "--lr": item.logoInkRatio } : null),
+              } as React.CSSProperties
+            }
+          >
             <span
               className={styles.cardLogoMark}
               style={{ "--ov-logo-url": `url(${asset(item.logo)})` } as React.CSSProperties}
@@ -423,6 +455,7 @@ export default function VenueCard({
           onMenu={onMenu}
           menuHref={menuHref}
           actionMotion={actionMotion}
+          actions={actions}
         />
       </motion.div>
     </div>
@@ -465,6 +498,7 @@ export function VenueBlock({
   onMenu,
   menuHref,
   actionMotion = {},
+  actions = "row",
 }: {
   item: VenueCardItem;
   /** the story ON HOVER, seated above the block over the shade's band —
@@ -519,6 +553,9 @@ export function VenueBlock({
   onMenu?: () => void;
   menuHref?: string;
   actionMotion?: MotionProps;
+  /** see the prop on VenueCardProps — "split" is the home grid's resting
+   *  Book pill that opens into the full set on hover/focus. */
+  actions?: "row" | "split";
 }) {
   /* ONE read of the canonical record for the block's one ACTION. It comes
      from the data rather than from the page, which is the whole point of
@@ -557,6 +594,31 @@ export function VenueBlock({
   const visit =
     rest?.website && rest.website !== action?.href
       ? { label: "Visit", href: rest.website }
+      : null;
+
+  /* ═══ THE SPLIT PATH'S OWN DERIVATIONS — "split" only ═══
+     The split row does NOT run through primaryAction(): that funnel
+     promotes SOMETHING to the fill for every venue (Visit, Opening soon),
+     where the split's resting state is "Book, or nothing" — a card with no
+     booking shows no pill at rest and offers its set on hover. The three
+     are derived independently so each renders only where it has something
+     behind it:
+       book   — bookable venues only (bintang/guanabana/ramo/belly today);
+                the resting cream pill.
+       visitS — the venue's own site, always a ghost in the hover set.
+                Bunso keeps its "OPENING SOON" wording here — that label is
+                content that exists nowhere else, demoted from a fill to a
+                ghost because a coming-soon room has nothing to Book.
+       menu   — the same `menu` derivation the row path uses, above.
+     The "row" path and the expansion still run primaryAction() untouched. */
+  const split = actions === "split";
+  const book =
+    split && rest?.bookable && rest.bookingUrl && !rest.comingSoon
+      ? { label: "Book", href: rest.bookingUrl }
+      : null;
+  const visitSplit =
+    split && rest?.website
+      ? { label: rest.comingSoon ? "Opening soon" : "Visit", href: rest.website }
       : null;
 
   /* THE STAT, right of the name — an icon and a value and NOTHING ELSE.
@@ -616,7 +678,79 @@ export function VenueBlock({
      ~365px, so the foot stacks from there down — see the container query in
      VenueCard.module.css, which carries the measured table. Add a fourth
      control and that threshold has to be re-measured, not guessed. */
-  const controls =
+  /* ═══ THE SPLIT ROW — the home grid's controls ═══
+     EVERY CARD RESTS WITH EXACTLY ONE CONTROL, at the user's instruction:
+     the cream Book pill where the venue takes bookings, and otherwise the
+     venue's primary available action as a GHOST outline in the same
+     bottom-right seat (Visit for Mamasons/Hoodwood/Café Mama, "Opening
+     soon" for Bunso). Under the pointer — or keyboard focus anywhere in
+     the card — the rest of the set unfolds to its left, staggered
+     Menu-then-Visit, always reading MENU · VISIT · BOOK, right-anchored.
+
+     ⚠️ THE ORDER BELOW IS LOAD-BEARING, AND THE STYLESHEET DEPENDS ON IT.
+     The pills render menu → visit → book and members are only ever
+     omitted, so the LAST child is always the venue's primary action. The
+     collapse rule is `.cardBtnGhost:not(:last-child)`, which is what
+     leaves exactly one pill standing on all eight cards without this file
+     having to nominate one. Reorder these three and that rule breaks —
+     see the block comment on .actionRow[data-split].
+
+     The unfold is pure CSS; `data-act` is the stagger hook. Touch readers
+     get the resting pill and no unfold; the expansion (always "row")
+     still offers the full set, and the whole card is the press target
+     that opens it. */
+  const splitControls =
+    menu || visitSplit || book ? (
+      <motion.div className={styles.actionRow} data-split="" {...actionMotion}>
+        {menu ? (
+          menuHref ? (
+            <Link
+              href={menuHref}
+              className={`${styles.cardBtn} ${styles.cardBtnGhost}`}
+              data-act="menu"
+              aria-label={`Menu — ${item.name}`}
+            >
+              Menu
+            </Link>
+          ) : (
+            <button
+              type="button"
+              className={`${styles.cardBtn} ${styles.cardBtnGhost}`}
+              data-act="menu"
+              onClick={onMenu}
+              aria-label={`Menu — ${item.name}`}
+            >
+              Menu
+            </button>
+          )
+        ) : null}
+        {visitSplit ? (
+          <a
+            href={visitSplit.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`${styles.cardBtn} ${styles.cardBtnGhost}`}
+            data-act="visit"
+            aria-label={`Visit ${item.name}'s website`}
+          >
+            {visitSplit.label}
+          </a>
+        ) : null}
+        {book ? (
+          <a
+            href={book.href}
+            target="_blank"
+            rel="noopener noreferrer"
+            className={`${styles.cardBtn} ${styles.cardBtnFill}`}
+            aria-label={`${book.label} — ${item.name}`}
+          >
+            {book.label}
+          </a>
+        ) : null}
+      </motion.div>
+    ) : null;
+
+  const rowControls =
     action || menu || visit ? (
       <motion.div className={styles.actionRow} {...actionMotion}>
         {menu ? (
@@ -671,6 +805,8 @@ export function VenueBlock({
         ) : null}
       </motion.div>
     ) : null;
+
+  const controls = split ? splitControls : rowControls;
 
   /* ═══ THE PLATE FORM — READ UPWARD ═══
      The story, then where the room is and what it is, then the hairline,

@@ -826,6 +826,59 @@
   mask: var(--ov-logo-url) no-repeat left top / contain;
 }
 
+/* ═══ ONE OPTICAL SIZE FOR ALL EIGHT MARKS — the home grid only ═══
+   THE SLOT IS SIZED FROM THE LETTERFORMS, NOT FROM THE BOX, and that is
+   the whole idea. `contain` on a flat slot equalises each mark's BOUNDING
+   BOX, which silently equalises Bintang's crest and Mamasons' strapline
+   along with the names: measured at the flat 30px slot this rule used to
+   carry, the actual letterforms ran 11.7px (bintang) to 30.0px (bunso), a
+   2.6x spread that read as two weight classes on one grid.
+
+       height = --vc-logo-cap / --lr
+
+   `--lr` is the fraction of the mark's box its NAME occupies, measured off
+   the alpha channel per venue; `--la` is the PNG's intrinsic aspect. Both
+   are set inline from LOGO_OPTICS in lib/venueCards.ts, where the
+   per-mark derivation and its one judgement call are written out. The
+   division is what makes a lockup with furniture sit TALLER — Bintang's
+   slot is ~2.5x Bunso's — so that their letterforms match.
+
+   ⚠️ WIDTH IS DERIVED, NOT GUESSED, AND `contain` IS THE SAFETY NET. The
+   box is set to exactly the mask's natural width at that height
+   (slot x --la) plus a 1px cushion so the HEIGHT is always the binding
+   axis and the ink fills the slot exactly. `max-width: 100%` then means a
+   crown too narrow for the computed width scales the whole mark DOWN
+   proportionally instead of clipping it — which the previous
+   `mask-size: auto 100%` in a fixed 160px box could not do, and which is
+   the failure mode a re-exported asset would otherwise hit silently.
+
+   ⚠️ THE CAP IS CONTAINER-RELATIVE so the marks track the CARD, not the
+   viewport (the same lesson the clamps above record). 8cqi is bounded by
+   the widest mark clearing the narrowest crown: Café Mama has the largest
+   width-per-cap coefficient at 10.6, and 8cqi keeps it inside the crown at
+   the tightest 4-up (card 230px at a 981px viewport) with ~4px to spare.
+   The 20px ceiling is where the letterforms stop growing on wide cards.
+   Re-check that coefficient before raising either number.
+
+   SCOPED TO :not(.square) DELIBERATELY: /restaurants shares this component
+   and this pass is the home page's. The square grid keeps the contain-fit
+   clamps above; unify later if the equalised slot earns it. */
+.cardSurface:not(.square) .cardLogo {
+  --vc-logo-cap: clamp(15px, 8cqi, 20px);
+  height: calc(var(--vc-logo-cap) / var(--lr, 0.588));
+}
+.cardSurface:not(.square) .cardLogoMark {
+  height: 100%;
+  width: calc(
+    (var(--vc-logo-cap) / var(--lr, 0.588)) * var(--la, 5.294) + 1px
+  );
+  max-width: 100%;
+  -webkit-mask-size: contain;
+  mask-size: contain;
+  -webkit-mask-position: left center;
+  mask-position: left center;
+}
+
 /* the Michelin credential as a STICKER on the card's top-right corner —
    pressed on at a slight tilt, the way a guide sticker rides a
    restaurant's window. A flex item of .cardCrown rather than an
@@ -1309,8 +1362,110 @@
    single control on the four venues with no menu on file over to the
    right-hand edge, where it would read as floating rather than as seated.
    `:last-child:not(:first-child)` states exactly that condition. */
-.actionRow > :last-child:not(:first-child) {
+.actionRow:not([data-split]) > :last-child:not(:first-child) {
   margin-left: auto;
+}
+
+/* ═══ THE SPLIT ROW — the home grid's actions (`actions="split"`) ═══
+   EVERY CARD RESTS WITH EXACTLY ONE CONTROL, at the user's instruction.
+   The booking venues rest on their cream Book pill; the four with no
+   booking (Mamasons, Hoodwood, Café Mama, Bunso — Bunso's reads "Opening
+   soon") rest on their primary available action as a GHOST outline in the
+   same bottom-right seat. On hover or focus the rest of the set unfolds to
+   its left, always reading MENU · VISIT · BOOK.
+
+   ⚠️ ":not(:last-child)" IS THE WHOLE RULE, and it is worth stating why it
+   is sufficient. VenueBlock renders the row in a fixed order — menu, then
+   visit, then book — and only ever omits members. So the LAST child is
+   always the venue's primary action by construction: Book where there is
+   one, else Visit/Opening soon, else Menu. Collapsing every ghost EXCEPT
+   the last therefore leaves exactly one pill standing on all eight cards,
+   without the component having to nominate one. Change the render order in
+   VenueCard.tsx and this rule has to be revisited with it.
+
+   THIS ALSO CLOSED A REAL DEFECT. When the resting state could be empty,
+   the four non-booking cards still reserved the row's height, leaving a
+   dark empty band under the cuisine line at the middle widths (measured
+   30px x 281px at 1280 and 26px x 221px at 1024). A row that always holds
+   one pill has nothing to reserve.
+
+   Collapsing by max-width keeps the pills in normal flow, so an open set
+   pushes LEFT and can never overlap the name lockup.
+
+   ⚠️ THE GAP IS margin-right ON THE COLLAPSING PILLS, not a flex `gap` and
+   not margin-left. A flex gap is paid either side of a zero-width child,
+   so three phantom gaps would float the resting pill off the right edge;
+   margin-LEFT would do the same to the pill that survives. Hanging the gap
+   off the collapsing element means it is spent only while that element is
+   open, and the resting pill always sits flush to the row's right edge.
+   The auto-push rule above is scoped :not([data-split]) for the same
+   reason — an auto margin here would fight the animated one.
+
+   ⚠️ THE STAGGER IS DECLARED IN THE OPEN STATE ONLY, so the close runs
+   undelayed and the set collapses as one object. Same principle as
+   PillCta's arrow delay. */
+.actionRow[data-split] {
+  gap: 0;
+  position: relative;
+}
+.actionRow[data-split] .cardBtnGhost:not(:last-child) {
+  max-width: 0;
+  padding-inline: 0;
+  margin-right: 0;
+  border-width: 0;
+  opacity: 0;
+  overflow: hidden;
+  transform: translateX(6px);
+  transition:
+    max-width 380ms var(--ease-drawer),
+    padding 380ms var(--ease-drawer),
+    margin 380ms var(--ease-drawer),
+    opacity 220ms var(--ease-drawer),
+    transform 380ms var(--ease-drawer);
+}
+
+/* the open state — hover for fine pointers, focus-within for keyboards
+   (declared separately below, OUTSIDE the media query, so hybrids keep
+   it). 10rem clears the widest label ("Opening soon") while staying tight
+   enough that the max-width animation tracks the real width closely. */
+@media (hover: hover) and (pointer: fine) {
+  .cardSurface:hover .actionRow[data-split] .cardBtnGhost:not(:last-child) {
+    max-width: 10rem;
+    padding-inline: 0.9em;
+    margin-right: clamp(6px, 0.7vw, 8px);
+    border-width: 1px;
+    opacity: 1;
+    transform: none;
+  }
+  .cardSurface:hover
+    .actionRow[data-split]
+    .cardBtnGhost:not(:last-child)[data-act="visit"] {
+    transition-delay: 70ms;
+  }
+  /* the open-state rule above outranks the pill's OWN hover/active
+     transforms (.cardBtnGhost:hover's swell, .cardBtn:active's press) on
+     specificity, so both are restated here — the split pills keep the
+     same per-pill feedback the row dialect has. */
+  .cardSurface:hover .actionRow[data-split] .cardBtnGhost:hover {
+    transform: scale(1.03);
+    transition-delay: 0ms;
+  }
+  .cardSurface:hover .actionRow[data-split] .cardBtnGhost:active {
+    transform: scale(0.97);
+  }
+}
+.cardSurface:focus-within .actionRow[data-split] .cardBtnGhost:not(:last-child) {
+  max-width: 10rem;
+  padding-inline: 0.9em;
+  margin-right: clamp(6px, 0.7vw, 8px);
+  border-width: 1px;
+  opacity: 1;
+  transform: none;
+}
+.cardSurface:focus-within
+  .actionRow[data-split]
+  .cardBtnGhost:not(:last-child)[data-act="visit"] {
+  transition-delay: 70ms;
 }
 
 /* THE SHARED PILL. Both controls are the same box; only the fill differs.
@@ -1336,6 +1491,9 @@
   padding: 0 0.9em;
   border-radius: 999px;
   border: 1px solid transparent;
+  /* NO DISC on card pills — they are shortcuts inside a card, not chapter
+     CTAs; the pill-plus-disc lockup is reserved for the latter. The type
+     below is the label voice these pills have always carried. */
   font-family: var(--font-mono);
   font-weight: var(--w-medium);
   font-size: 0.75rem;
@@ -1971,5 +2129,70 @@
     transform: none;
     transition: none;
   }
+  /* the split row's unfold is stripped the same way: the ghost pills
+     still APPEAR on hover/focus — they are state, not animation — they
+     simply arrive instantly instead of sliding out. */
+  .actionRow[data-split] .cardBtnGhost:not(:last-child) {
+    transition: none;
+    transform: none;
+  }
 }
 
+
+/* ═══ THE WARM GRADE — `grade` prop, the home grid only ═══
+   Two layers, both STATIC (no animated filters — see the decision recorded
+   in Discover.tsx about re-rasterising eight photographs per frame; a
+   one-time rasterisation is a different thing, but measure the settle and
+   the hover wipe before trusting that):
+     1. a gentle filter on the PICTURE LAYERS ONLY — the photo, the hover
+        film and the maroon fallback — so the still and the film take the
+        identical grade and a hover never shifts colour temperature;
+     2. a 10% burnt-orange multiply wash painted as the card's own ::after
+        at z-index 0. WHAT IT ACTUALLY COVERS, stated exactly, because an
+        earlier version of this note got it wrong: .rampBlur and .rampScrim
+        carry NO z-index (position: absolute, so z-index: auto) and are
+        ordinary children, while ::after is generated content and therefore
+        the LAST child — so all three sit in the same painting layer and
+        tree order decides. The wash paints OVER the two ramp layers, not
+        under them. That is fine and is why the multiply is only 10%: it
+        tints the ramp's own darkening by a hair rather than sitting beneath
+        it. What the wash never reaches is the layer above it, and that is
+        the load-bearing half — .plateHit (z 2), .cardTop (z 3), .cardCrown
+        (z 4) and .glass (z 5) all carry a real z-index above 0, so the
+        type, the pills, the venue mark and the Michelin sticker are never
+        graded.
+        ⚠️ If the ramp ever needs to sit ABOVE the wash, give it a real
+        z-index (1) rather than reordering the DOM — the two ramp layers
+        must stay siblings in their current order for the backdrop-filter
+        reason recorded on them.
+   ⚠️ .cardSurface's own `transform: scale(1)` is what bounds the multiply
+   to the card (a stacking context); it is load-bearing for this rule —
+   see the note where it is declared.
+   ⚠️ Do NOT move the filter onto .cardSurface itself: it would grade the
+   type and create a containing block the layoutId morph measures through. */
+.cardSurface[data-grade] .photo,
+.cardSurface[data-grade] .hoverClip,
+.cardSurface[data-grade] .fallback {
+  /* saturate 0.88 -> 0.94 at the user's instruction: the heavier
+     desaturation was flattening the two cards that carry real colour
+     (Guanabana's blue skylight, Mamasons' pink neon) into the same brown
+     register as everything else. The sepia/brightness/contrast terms are
+     unchanged — they are the part that does the warming without draining
+     the subject. */
+  filter: sepia(0.13) saturate(0.94) brightness(0.98) contrast(0.99);
+}
+
+.cardSurface[data-grade]::after {
+  content: "";
+  position: absolute;
+  inset: 0;
+  z-index: 0;
+  background: #c75b33;
+  /* 0.10 -> 0.05 at the user's instruction. At a tenth the multiply was
+     doing more than warming: it was pulling every photograph toward one
+     hue, which is the thing that made the grid read as processed rather
+     than as graded. Half of it still ties the eight together. */
+  opacity: 0.05;
+  mix-blend-mode: multiply;
+  pointer-events: none;
+}

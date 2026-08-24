@@ -369,11 +369,25 @@ const HEAD_LIFT = `-${LIFT_VH * 100}vh`;
    none. It also survives anything that moves the heading — a copy change, a
    type retune, a new breakpoint — none of which a solved constant would. */
 
-/* THE HEADING'S INK, and it is deliberately not its travel. It fades and
-   unblurs in the first sixth of the range — while it is still sitting in
-   the manifesto — because the reader is meant to notice it arrive there,
-   as a line of the chapter above, before it starts moving anywhere. */
-const HEAD_IN: [number, number] = [0.02, 0.16];
+/* THE HEADING'S INK, and it is deliberately not its travel.
+
+   ⚠️ GATED AT 40% NOW, at the user's instruction — the old [0.02, 0.16]
+   started inking while the Manifesto still owned 98% of the screen, so
+   the heading arrived as a line of the CHAPTER ABOVE and did so inside
+   the page's fixed depth-of-field band (globals.css .scrollBlur), i.e.
+   defocused. The read "notice it arrive in the manifesto" was the
+   intent; blurred type bleeding into a finished poster was the result.
+
+   THE NUMBER IS A DERIVATION, NOT A TUNE. `chapter`'s offset is
+   ["start end", "start start"] over one viewport of travel, so progress p
+   ⇔ the section's top edge sits at vh × (1 − p) ⇔ AboutSplit owns
+   exactly p of the viewport. 0.40 is therefore literally "the section
+   owns 40% of the screen" — clear of the bottom blur band and clearly
+   this chapter's own event. The 0.16-wide span is preserved from the old
+   pair; only the start moved. headY stays on the full [0, 1] range — it
+   is a parallax lift, not the entrance, and re-ranging it would make the
+   heading travel 19vh while visible. */
+const HEAD_IN: [number, number] = [0.40, 0.56];
 
 /* HOW EARLY THE PICTURE GOES, at the user's instruction. The rule was "when
    the heading's top line is level with the picture's top line", i.e. a gap

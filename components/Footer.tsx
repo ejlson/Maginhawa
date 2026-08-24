@@ -11,6 +11,7 @@ import {
   type Variants,
 } from "framer-motion";
 import styles from "./Footer.module.css";
+import PillCta from "./PillCta";
 import { useRouteTransition } from "./PageTransition";
 import { CONTACT, SOCIALS } from "@/lib/contact";
 import { lenisRef } from "@/lib/SmoothScroll";
@@ -278,25 +279,21 @@ export default function Footer() {
           >
             Got any questions? Contact us.
           </motion.h2>
-          {/* One pill — label and arrow share a single cream capsule; hover
-              widens the pill and deepens its recess (see Footer.module.css) */}
+          {/* THE HOUSE ACTION, replacing the footer's bespoke capsule.
+              This was `Link.inviteCta` — its own cream pill with an inline
+              arrow INSIDE the capsule and an inset-recess hover, the last
+              one-off button on the home page. It now speaks the site
+              grammar: PillCta, cream on the dark ground, detached disc at
+              rest with the house fuse-on-hover close. The label stays
+              sentence case in JSX; `.cta`'s text-transform sets the caps,
+              exactly as the hero's call site does. The scroll scrub still
+              drives the motion wrapper OUTSIDE PillCta's host, which is
+              safe — the host is never transformed by the control
+              itself. */}
           <motion.div style={closeStyle(ctaOpacity, ctaY)}>
-          <Link href="/contact" className={styles.inviteCta}>
-            <span className={styles.ctaMain}>Get in touch</span>
-            <span className={styles.ctaArrow} aria-hidden>
-              <svg
-                viewBox="0 0 24 24"
-                fill="none"
-                stroke="currentColor"
-                strokeWidth="1.6"
-                strokeLinecap="round"
-                strokeLinejoin="round"
-              >
-                <path d="M5 12h13" />
-                <path d="M13 6l6 6-6 6" />
-              </svg>
-            </span>
-          </Link>
+            <PillCta href="/contact" tone="cream">
+              Get in touch
+            </PillCta>
           </motion.div>
 
           {/* the direct line — papatom's closing move: for a relationship

@@ -7,7 +7,7 @@ import {
   useScroll,
   useTransform,
 } from "framer-motion";
-import { useEffect, useRef } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./Reservations.module.css";
 import VideoBackdrop from "./VideoBackdrop";
 import PillCta from "./PillCta";
@@ -24,6 +24,37 @@ import PillCta from "./PillCta";
    web-sized derivative of this clip is the fix, not a different restaurant —
    the choice of room is editorial and belongs to the page. */
 const CLIP = "/videos/mamasons-hero.mp4";
+
+/* ══════════ WHERE THE GROWTH IS ALLOWED TO START ══════════
+   ⚠️ THIS WAS A FLAT 0.58 AND IT WAS COSTING THE DESKTOP HALF ITS RUNWAY.
+   The plate must still be a small card at the frame the reader first sees
+   it, which is the frame it is seated under the sentence — and that frame
+   is `--pin-peep` as a fraction of the viewport, which <Passage> derives
+   per screen and now publishes on documentElement. Measured, it runs 0.30
+   at 1920 to 0.52 on a phone.
+
+   A single constant therefore has to clear the PHONE, and 0.58 did. On a
+   1440 desktop, where the card is seated at 0.334, that spent 0.25 of the
+   approach — 225px of scroll — holding a card still that had been sitting
+   there since it appeared, and left the growth itself only 0.42 to run in.
+   That is why the plate opened out as fast as it did: not because the
+   animation was quick, but because it was starting late.
+
+   POST_SEAT IS THE BEAT THAT REMAINS, and it is deliberately not zero. The
+   card holding its small size for a moment AFTER it has begun to cross the
+   sentence is the composition study 12 showed; deriving the start without
+   it would delete that beat rather than shorten it. 0.14 keeps about 126px
+   of it at 1440 where there used to be 225.
+
+   ⚠️ THE CAP IS WHAT MAKES THIS SAFE, AND IT IS THE OLD CONSTANT. On a
+   narrow screen the seat is already at 0.52 and 0.52 + 0.14 would push the
+   hold PAST where it is now, i.e. make the phone's growth faster — the
+   opposite of what was asked. Clamping to the old value means no screen
+   can come out worse than it was: the phone lands exactly where it did,
+   the desktop gets the runway back, and the fallback below (used if the
+   fraction never arrives) is the old behaviour exactly. */
+const ENTER_HOLD_MAX = 0.58;
+const POST_SEAT = 0.14;
 
 export default function Reservations() {
   const ref = useRef<HTMLElement>(null);
@@ -86,7 +117,41 @@ export default function Reservations() {
      That is the composition study 12 showed and it reads well; it is not
      an oversight. Seal it earlier and the plate is already growing while
      it is still the thing being looked at. */
-  const enter = useTransform(approach, [0, 0.58, 1], [0, 0, 1]);
+  /* ⚠️ READ AFTER PAINT, NOT DURING THE EFFECT. <Passage> writes the
+     fraction from its own layout effect and the two components' effects
+     are not ordered, so a synchronous read here can miss the first write.
+     A rAF defer puts this after the frame that write lands in, and the
+     resize path is deferred the same way for the same reason. Until it
+     lands the fallback is ENTER_HOLD_MAX, which is the behaviour this
+     section shipped with. */
+  const [holdEnd, setHoldEnd] = useState(ENTER_HOLD_MAX);
+  useEffect(() => {
+    let raf = 0;
+    const read = () => {
+      const seat = parseFloat(
+        getComputedStyle(document.documentElement).getPropertyValue(
+          "--pin-peep-frac"
+        )
+      );
+      setHoldEnd(
+        Number.isFinite(seat) && seat > 0
+          ? Math.min(seat + POST_SEAT, ENTER_HOLD_MAX)
+          : ENTER_HOLD_MAX
+      );
+    };
+    const defer = () => {
+      cancelAnimationFrame(raf);
+      raf = requestAnimationFrame(read);
+    };
+    defer();
+    window.addEventListener("resize", defer);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("resize", defer);
+    };
+  }, []);
+
+  const enter = useTransform(approach, [0, holdEnd, 1], [0, 0, 1]);
 
   /* ⚠️ THE SIDES SEAL EARLY, ON THEIR OWN RAMP. The plate's bottom edge
      crosses the foot of the screen at approach 0.819 and cannot be made to
@@ -107,7 +172,7 @@ export default function Reservations() {
      IN Reservations.module.css MUST MOVE WITH IT, or the top will seal
      early (leaving the plate's top edge off-screen while cream still shows
      at the sides) or late (the band this whole arrangement removes). */
-  const sealX = useTransform(approach, [0, 0.58, 0.82], [0, 0, 1]);
+  const sealX = useTransform(approach, [0, holdEnd, 0.82], [0, 0, 1]);
 
   /* ══════════ THE INVITATION'S ENTRANCE ══════════
      "Where will you begin?" and its pill are sized for full bleed and
@@ -365,25 +430,29 @@ export default function Reservations() {
  * had three of them. The whole control — nesting, magnet, clip geometry —
  * moved to PillCta; what is left here is a call and a seat.
  *
- * `tone="accent"` is the ONE thing this call site varies, and it is not a
+ * The tone is the ONE thing this call site varies, and it is not a
  * preference. This is the only instance standing on a photograph: the
  * default maroon fill is very nearly the film under its own scrim, so the
- * pill would read as a hole rather than an action. The accent keeps it the
- * one saturated thing on the screen, which is what it always was.
+ * pill would read as a hole rather than an action.
  */
-/* SAFFRON AND LARGE, at the user's instruction. The tone is the retired
-   annatto orange, reintroduced for this control alone — see the note on
-   --annatto in globals.css for why the palette's argument against it (an
-   orange blurs into maroon ink) does not reach a pill sitting on a
-   photograph. `large` takes the control from 40px to 52px: this is the last
-   action on the page and the only thing on its screen, and at the default
-   size it read as a chip on a full-bleed film. */
+/* CREAM AND LARGE, at the user's instruction — and the third tone this
+   seat has carried. It shipped as the green accent, then as saffron (the
+   retired annatto orange, argued back in for one pill on a photograph).
+   The button-grammar pass ended that: this was the page's only orange, so
+   `tone="cream"` removes annatto from the home page entirely. On the dark
+   film under its scrim the cream fill is the only opaque object on the
+   frame, the same argument the hero's CTA makes — see the surface rule in
+   PillCta.module.css. The fused pill-and-disc close is untouched: it is
+   the house hover, here as everywhere. `large` takes the control from
+   40px to 52px: this is the last action on the page and the only thing on
+   its screen, and at the default size it read as a chip on a full-bleed
+   film. */
 function MagneticCta() {
   return (
     <PillCta
       href="/restaurants"
       className={styles.magnetHost}
-      tone="saffron"
+      tone="cream"
       size="large"
     >
       Pick a restaurant

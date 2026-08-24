@@ -1584,6 +1584,14 @@ function Tile({
           onMenu={onMenu}
           clip={item.clip}
           blurb={item.blurb}
+          /* THE SPLIT ACTIONS — home grid only. One cream Book pill at
+             rest (or none, for a venue with no booking); the full Menu /
+             Visit / Book set unfolds on hover or focus. /restaurants and
+             the expansion keep the "row" default and are untouched. */
+          actions="split"
+          /* the warm grade — home grid only; see [data-grade] in
+             VenueCard.module.css */
+          grade
         />
       </motion.div>
     </motion.li>
