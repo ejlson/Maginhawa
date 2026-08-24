@@ -420,6 +420,16 @@ const HEAD_LIFT = `-${LIFT_VH * 100}vh`;
    — not 0.02, which was the original defect. */
 const HEAD_IN: [number, number] = [0.22, 0.38];
 
+/* HOW FAR OUT OF FOCUS THE HEADING STARTS — the manifesto statement's ink
+   bleed (see BLUR_MAX_EM in Manifesto.tsx), applied here at the user's
+   instruction so the two display lines arrive by the same verb. The radius
+   is in em of the element's OWN size, deliberately not px: `.heading` runs
+   a clamp (--split-title-size), and a fixed radius that reads as "soft" at
+   the top of the clamp is a smear at the bottom. 0.11em is Manifesto's
+   measured value and nothing about this heading's size range justified
+   retuning it — the two clamps overlap almost entirely. */
+const BLUR_MAX_EM = 0.11;
+
 /* HOW EARLY THE PICTURE GOES, at the user's instruction. The rule was "when
    the heading's top line is level with the picture's top line", i.e. a gap
    of exactly zero; this opens it while the heading is still 140px short of
@@ -984,12 +994,26 @@ export default function AboutSplit() {
      touching a transform whose endpoints are derived four notes up. */
   const bodyY = useTransform(bodyRise, (rise: number) => `${rise}vh`);
   const headOpacity = useTransform(chapter, HEAD_IN, [0, 1]);
-  /* ⚠️ `headBlur` IS DELETED, NOT ZEROED — the heading arrives by flight
-     and ink alone. blur(0px) still installs a filter and a composited
-     layer, so removing the transform is the only true removal. Why it went:
-     the motion crit's Finding 02 — four separate blurs on one page turned a
-     cinematic device into a rendering artifact. The one that stays is the
-     Passage → Reservations focus pull, which this deletion is protecting. */
+  /* ══ THE HEADING RESOLVES AS IT INKS — the manifesto's ink bleed, at the
+     user's instruction that the three chapter heads and the statement share
+     one entrance verb. Blur BLUR_MAX_EM → 0 on exactly HEAD_IN, the ink's
+     own range, so the fade and the focus pull read as ONE gesture in two
+     channels — this is the shape ScrubWord (Manifesto.tsx) established.
+
+     ⚠️ NOT ON headY's RANGE. The lift runs the full [0, 1] because it is a
+     PARALLAX, not the entrance (see the note over HEAD_IN); a blur riding
+     that range would leave the heading defocused for the whole chapter.
+
+     ⚠️ A `headBlur` STOOD HERE ONCE AND WAS DELETED at the motion crit's
+     Finding 02 — four separate blurs on one page turned a cinematic device
+     into a rendering artifact. What returns is not that blur: Finding 01
+     ("none of the editorial benchmarks animates type per-word; a
+     travelling display line has no baseline while the eye is on it") is
+     the argument FOR resolving in place, and the site now spends its
+     entrance blur on one consistent verb rather than four ad-hoc ones. The
+     Passage → Reservations focus pull remains the page's one held blur. */
+  const headBlurEm = useTransform(chapter, HEAD_IN, [BLUR_MAX_EM, 0]);
+  const headFilter = useMotionTemplate`blur(${headBlurEm}em)`;
 
   const mediaRef = useRef<HTMLElement>(null);
   const readingRef = useRef<HTMLDivElement>(null);
@@ -1436,8 +1460,12 @@ export default function AboutSplit() {
               lockup fades in as one thing, but `filter` on this box would put
               a blur pass over <PillCta>, whose neck is a split CSS-blur and
               SVG-threshold goo — a parent filter is exactly the kind of thing
-              that composites it wrong. The blur stays on the heading's own
-              element, where it only has type under it. */}
+              that composites it wrong. The ink bleed's filter goes on the
+              heading's own element, where it only has type under it — and
+              nothing between the heading and the page clips, so the blur
+              halo (which paints OUTSIDE the glyph boxes by the radius) is
+              never sheared into hard edges. Do not add `overflow: hidden`
+              anywhere on this branch. */}
           <motion.div
             ref={leadRef}
             className={styles.lead}
@@ -1457,7 +1485,14 @@ export default function AboutSplit() {
                 lockup's top edge is the same thing today only because the
                 heading is its first child. State the element the rule is
                 about. */}
-            <motion.h2 ref={headRef} className={styles.heading}>
+            <motion.h2
+              ref={headRef}
+              className={styles.heading}
+              /* the ink bleed's focus pull — see headBlurEm above. Same
+                 gate as the lockup's style: reduced motion renders static
+                 and fully inked, with no filter installed at all. */
+              style={reduce ? undefined : { filter: headFilter }}
+            >
               {/* THE EM-DASH IS DECORATION AND IS HIDDEN FROM THE ACCESSIBLE
                   NAME. Left in the text it would be announced as "em dash"
                   before every reading of the heading. */}

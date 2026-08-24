@@ -35,7 +35,9 @@ import styles from "./Blog.module.css";
    local and carries its own ground. */
 import card from "./VenueCard.module.css";
 import PillCta from "./PillCta";
-import { BLOG, entryLinkProps, type BlogEntry } from "@/lib/blog";
+import { BLOG, entryLinkProps, headline, type BlogEntry } from "@/lib/blog";
+import ActionBand from "./ActionBand";
+import PlateDate from "./PlateDate";
 import { getRestaurant } from "@/lib/restaurants";
 import { asset } from "@/lib/media";
 import {
@@ -308,29 +310,6 @@ function Front({
   );
 }
 
-/* ═══ THE OUTLET LEADS THE HEADLINE ═══
-   At the user's instruction the outlet moves out of the meta line and in
-   front of the title — "The Sauce: Where to spend Lunar New Year in
-   London" — so the credential is read before the claim rather than after
-   it, which is how a press feed is actually scanned.
-
-   ⚠️ AND IT IS GUARDED, BECAUSE MOST OF THESE TITLES ALREADY CARRY IT.
-   Four of the five entries on the home page are written "Time Out: the ten
-   London restaurants…", "Ham & High: Kentish Town's Belly…", "The
-   Observer: Filipino baked goods…", "Forbes' last-minute Valentine's
-   guide…". Prefixing unconditionally would print the outlet twice on every
-   one of them. Only `the-sauce-cny` actually needs the prefix today, which
-   is exactly the kind of ratio that makes an unguarded version look fine in
-   one card and wrong in four.
-
-   The test is a case-insensitive prefix match rather than an exact one so
-   that a possessive ("Forbes'") still counts as the outlet having led. */
-function headline(post: BlogEntry) {
-  const t = post.title.trim();
-  const s = post.source.trim();
-  return t.toLowerCase().startsWith(s.toLowerCase()) ? t : `${s}: ${t}`;
-}
-
 /* ═══ AN EARLIER ENTRY — /blog's grid card, compact ═══
    A 4:5 plate with the venue's mark on it, then the type beneath on the
    cream: headline, a hairline, and the outlet leading the date.
@@ -369,13 +348,9 @@ function Entry({ post, beat }: { post: BlogEntry; beat: number }) {
           draggable={false}
         />
         <VenueMark slug={post.restaurant} small />
-        {/* THE DATE, ON THE PICTURE. It was the back half of a meta line
-            under the headline; on the plate it costs the card no height and
-            it balances the venue's mark in the opposite corner. It carries
-            its own ground — see .entryDate — for the reason the mark does:
-            cream type on an arbitrary photograph is not legible by
-            default. */}
-        <span className={styles.entryDate}>{post.dateLabel}</span>
+        {/* THE DATE, ON THE PICTURE — shared with /blog's archive card, which
+            makes the same move for the same reason. See PlateDate.tsx. */}
+        <PlateDate>{post.dateLabel}</PlateDate>
       </div>
 
       {/* ⚠️ THE MASK WRAPS THE WHOLE BODY, NOT THE HEADLINE. A clip has to
@@ -403,24 +378,15 @@ function Entry({ post, beat }: { post: BlogEntry; beat: number }) {
               headline — announcing "Read More" after it would offer the
               same link twice — and it is a <span> because the whole card is
               the anchor and nesting anchors is invalid. */}
-          <span className={styles.entryAction} aria-hidden>
-            {/* the label is wrapped so its text box can be trimmed to the
-                cap-to-baseline band — see .entryActionLabel for the
-                measurements that made a plain text node insufficient */}
-            <span className={styles.entryActionLabel}>Read More</span>
-            <svg
-              className={styles.entryActionArrow}
-              viewBox="0 0 32 10"
-              fill="none"
-              stroke="currentColor"
-              strokeWidth="1"
-              strokeLinecap="round"
-              strokeLinejoin="round"
-            >
-              <path d="M0 5 H26" />
-              <path d="M22 1 L26 5 L22 9" />
-            </svg>
-          </span>
+          {/* THE ACTION, BETWEEN THE RULES. The meta line that stood here
+              is gone: its outlet leads the headline now and its date is on
+              the picture, which left the band holding nothing.
+
+              ⚠️ IT READS --entry-gap AND --entry-band OFF .entryBody. The
+              band's own margin is computed from them — see the contract in
+              ActionBand.tsx — so those two declarations are load-bearing
+              for a stylesheet this file does not import. */}
+          <ActionBand />
 
           <span className={styles.entryRuleFoot} aria-hidden />
         </span>
@@ -968,12 +934,27 @@ export default function Blog({ journal = BLOG }: { journal?: BlogEntry[] }) {
               </span>
             </h2>
 
-            {/* ⚠️ THIS ONE SWEEPS, IT DOES NOT DESCEND. A block hidden behind
-                a top-tight mask has to travel its own height, and this one's
-                is not knowable — it is three lines in this column at 1440
-                and five at 390. That is a ~190px fall on a phone for a
-                gesture that is 20px on the label above it. So the mask
-                sweeps and the type drifts against it. */}
+            {/* ⚠️ THIS ONE INKS IN PLACE — it neither sweeps nor descends.
+                It swept for a long time (the mask ran blogSweepDown while
+                the type drifted 0.22em against it), and the reason it could
+                never DESCEND still stands and still bounds any future
+                gesture here: a block hidden behind a top-tight mask has to
+                travel its own height, and this one's is not knowable — three
+                lines in this column at 1440 and five at 390, a ~190px fall
+                on a phone for a gesture that is 20px on the label above it.
+                The sweep went at the user's instruction that the chapter
+                heads take the manifesto statement's ink bleed (blur → sharp,
+                in place; see ScrubWord in Manifesto.tsx), and Finding 01 of
+                the motion crit is the argument that supports it: a
+                travelling display line has no baseline while the eye is on
+                it. Focus changes in place, so this one keeps its baseline
+                the whole way.
+                THE WRAPPER STAYS BUT NO LONGER CLIPS — it owns the lockup
+                gap above the sentence and nothing else now. It must never
+                clip again: a blurred glyph paints its halo OUTSIDE its own
+                box by the blur radius, and any clip here would shear the
+                soft edge into hard rectangular sides mid-entrance. The
+                keyframes are blogInkBleed in Blog.module.css. */}
             <div className={styles.ledeMask}>
               <p className={styles.lede}>
                 Stories, openings, and ideas shaping the Maginhawa Group.

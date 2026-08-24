@@ -1174,8 +1174,12 @@
 }
 
 .entryBody {
-  /* NAMED BECAUSE THE ACTION BAND HAS TO SUBTRACT FROM IT — see
-     .entryAction. Everything else in the card is spaced on --entry-gap. */
+  /* ⚠️ BOTH OF THESE ARE READ BY A STYLESHEET THIS FILE CANNOT SEE.
+     components/ActionBand.module.css computes the band's negative margin
+     from them — see the contract in ActionBand.tsx — and /blog's archive
+     card declares the same pair for the same reason. They live on the card
+     rather than on the control because the card's own column is spaced by
+     --entry-gap too. */
   --entry-gap: clamp(8px, 0.9vw, 12px);
   /* the air INSIDE the ruled band, above and below "Read More", cut at the
      user's instruction: a control sitting in its own two rules wants to
@@ -1238,111 +1242,13 @@
   margin-top: auto;
 }
 
-/* ── THE DATE, ON THE PLATE ──
-   Bottom-right, opposite the venue's mark, and it carries its own ground
-   for the same reason the mark does: cream type on an arbitrary photograph
-   is not legible by default. The wash is the mark's, mirrored — a radial
-   from the corner it sits in, in transparent maroon rather than the
-   `transparent` keyword, because sRGB interpolation toward transparent
-   BLACK greys the fade. */
-.entryDate {
-  position: absolute;
-  right: clamp(10px, 1.4vw, 16px);
-  bottom: clamp(10px, 1.4vw, 16px);
-  z-index: 2;
-  font-family: var(--font-sans);
-  font-size: var(--t-label);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  color: var(--cream);
-  text-shadow: var(--scrim-text);
-  pointer-events: none;
-}
-
-.entryDate::before {
-  content: "";
-  position: absolute;
-  right: calc(-1 * clamp(10px, 1.4vw, 16px));
-  bottom: calc(-1 * clamp(10px, 1.4vw, 16px));
-  z-index: -1;
-  width: 100cqi;
-  height: clamp(56px, 30cqi, 104px);
-  background: radial-gradient(
-    100% 100% at 100% 100%,
-    color-mix(in srgb, var(--maroon) 70%, transparent) 0%,
-    color-mix(in srgb, var(--maroon) 62%, transparent) 34%,
-    color-mix(in srgb, var(--maroon) 34%, transparent) 72%,
-    color-mix(in srgb, var(--maroon) 12%, transparent) 90%,
-    color-mix(in srgb, var(--maroon) 0%, transparent) 100%
-  );
-  pointer-events: none;
-}
-
-/* ── THE ACTION, BETWEEN THE TWO RULES ──
-   Label at one end, arrow at the other, the full width of the card. It
-   replaces the outlet-and-date line that used to sit here: the outlet
-   leads the headline now and the date is on the picture, so the band
-   between the rules was left holding nothing.
-
-   `space-between` rather than a gap, because what makes this read as a
-   control rather than as a caption is the arrow being AT the card's edge —
-   the same arrangement the lede's pill makes at a larger size. */
-.entryAction {
-  /* ⚠️ NEGATIVE, AND IT IS A SUBTRACTION FROM THE FLEX GAP RATHER THAN A
-     SMALLER GAP. `gap` is one value for the whole column and the rules,
-     the headline and the band are all spaced by it; pulling the action
-     toward both rules with its own margin is the only way to tighten THIS
-     seam without loosening or tightening every other one. Resolves to
-     --entry-band above and below at every width, because whatever the gap
-     contributes is cancelled first. */
-  margin-block: calc(var(--entry-band) - var(--entry-gap));
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-  gap: var(--space-xs);
-  font-family: var(--font-sans);
-  font-weight: var(--w-regular);
-  font-size: var(--t-small);
-  line-height: var(--lh-flush);
-  letter-spacing: var(--tr-label);
-  text-transform: uppercase;
-  color: var(--maroon);
-}
-
-.entryActionArrow {
-  flex: none;
-  width: 32px;
-  height: 10px;
-  transition: transform 400ms var(--ease-drawer);
-}
-
-/* ⚠️ THE LABEL IS WRAPPED AND ITS TEXT BOX IS TRIMMED, AND THAT IS WHAT
-   MAKES THE BAND SYMMETRICAL TO THE PIXEL.
-
-   THE BOXES WERE ALREADY EXACT AND THE INK WAS NOT. Measured at 1440×900
-   with the negative margin above in place:
-
-       rule → action box   5.00px above, 5.00px below   ✔
-       rule → arrow ink    7.50px above, 7.50px below   ✔
-       rule → WORD ink     6.20px above, 7.83px below   ✘
-
-   The word is the odd one out because "READ MORE" is all caps: its ink runs
-   from cap-height to the baseline, and a font's line box reserves room for
-   an ascender above the caps and a descender below the baseline that this
-   string never uses. The box is centred; the letters inside it are not.
-
-   `text-box: trim-both cap alphabetic` cuts the line box down to exactly
-   that cap-to-baseline band, so the box the flex line centres IS the ink.
-   ⚠️ IT NEEDS ITS OWN ELEMENT: the label used to be a bare text node, which
-   becomes an anonymous flex item and cannot be styled. Hence the span in
-   Blog.tsx — it exists for this rule and for nothing else.
-
-   Where `text-box` is not supported the span is inert and the band falls
-   back to the 1.6px asymmetry above, which is the state it shipped in. */
-.entryActionLabel {
-  display: block;
-  text-box: trim-both cap alphabetic;
-}
+/* THE DATE ON THE PLATE and THE ACTION BAND both left this file — they
+   are components/PlateDate.* and components/ActionBand.*, shared with
+   /blog's archive card, which makes the same two moves for the same
+   reasons. What stayed behind is the pair of custom properties on
+   .entryBody above: the band's margin is computed from --entry-gap and
+   --entry-band, and this card's own column is spaced by them too, so they
+   belong to the card rather than to the control. */
 
 /* ---------- hover ---------- */
 /* The lede answers as a venue card does — a lift on a deeper shadow with
@@ -1378,9 +1284,6 @@
   }
   .entry:hover .entryTitle {
     color: var(--saffron);
-  }
-  .entry:hover .entryActionArrow {
-    transform: translateX(4px);
   }
 }
 
@@ -1463,9 +1366,13 @@
 
 /* THE MASKS THAT ONLY CLIP. These three wrap a single line that DESCENDS,
    so the clip is all they do and it stays put; the masks that SWEEP
-   (.ledeMask, .frontTitleMask, .entryBodyMask) declare
+   (.frontTitleMask, .entryBodyMask) declare
    no base clip at all, because the animation is their clip and they should
    be unclipped once it ends.
+   (.ledeMask left the sweeping list when the lede went to the ink bleed —
+   it clips NOTHING now, in any state, and must stay that way: a blurred
+   glyph paints its halo outside its own box by the radius, and any clip on
+   this wrapper shears the bleed into hard edges. See blogInkBleed.)
 
    The negative bottom inset is the descender bleed — 0.3em, the same
    number SplitWords uses, and the one -110% is derived against. */
@@ -1516,29 +1423,64 @@
   }
 }
 
-/* THE DISPLAY LINE DOES NOT DESCEND, AND THE REASON IS ITS LINE COUNT.
-   A block hidden behind a top-tight mask has to travel its own full
-   height, and this one's height is not knowable: measured on the real
-   render it is two lines from 768 up (breaking before "Maginhawa") and
-   FIVE at 390, where the 12px chapter margin is the binding constraint
-   rather than the 17.7em measure. That is a 189px fall on a phone for a
-   gesture that is 20px on the label beside it.
+/* THE SETTLE — kept for .frontTitle, which still sweeps-and-settles. The
+   0.22em is the drift the featured headline runs against its own mask;
+   the LEDE no longer rides this pair (see blogInkBleed below).
 
-   So the lede takes the OTHER downward pair instead — the mask sweeps and
-   the type drifts against it, the same two-element arrangement
-   AboutSplit's photograph uses. The travel is 0.22em whatever the line
-   count, and the reveal edge still runs down.
-
-   THE RULE THIS SETS, for anything added to the head later: type descends
-   when its travel is bounded by a line or two (the chapter word, a rail
-   headline under its 2-line clamp); type sweeps when its height is a
-   function of the measure. */
+   THE RULE THE OLD PAIRING SET still bounds the featured card: type
+   descends when its travel is bounded by a line or two (the chapter word,
+   a rail headline under its 2-line clamp); type sweeps when its height is
+   a function of the measure. The measurement that keeps DESCEND off the
+   table for measure-height blocks survives too: a block hidden behind a
+   top-tight mask has to travel its own full height, and the lede's is not
+   knowable — two lines from 768 up (breaking before "Maginhawa") and FIVE
+   at 390, a 189px fall on a phone for a gesture that is 20px on the label
+   beside it. */
 @keyframes blogSettle {
   from {
     transform: translateY(-0.22em);
   }
   to {
     transform: translateY(0);
+  }
+}
+
+/* THE INK BLEED — the display line arrives IN PLACE, out of focus, and
+   resolves; the manifesto statement's entrance (ScrubWord, Manifesto.tsx),
+   taken here at the user's instruction that the chapter heads and the
+   statement share one verb. Finding 01 of the motion crit is the argument:
+   none of the editorial benchmarks animates type per-word, and a
+   travelling display line has no baseline while the eye is on it. Focus
+   changes in place, so the sentence keeps its baseline the whole way —
+   which retired the sweep+settle pair this line ran (blogSweepDown on the
+   mask, blogSettle on the type).
+
+   0.11em IS BLUR_MAX_EM — Manifesto's measured radius, in em of the
+   element's OWN size rather than px, so the perceived softness holds
+   across --t-chapter's clamp. The four ink-bleed sites (Manifesto,
+   AboutSplit, this, Discover) share the number; retune all or none.
+
+   FROM 0, NOT FROM ScrubWord's 0.14 FLOOR, and the difference is the
+   clock. The floor is a scrub affordance — a ghost that shows the reader
+   where the scrubbed sentence is going while their wheel drives it. This
+   entrance is a LATCH: before data-in the line would simply stand at 0.14
+   forever, a faint smudge below the fold with no scrub to explain it, so
+   it parks invisible like everything else on its gate.
+
+   blur(0) IN THE to-FRAME, NOT none — none does not interpolate inside
+   keyframes in every engine. The fill is `backwards`, so the moment the
+   animation ends every declaration here stops applying and the resting
+   lede carries NO filter at all — which is what Finding 02 demands
+   (blur(0px) at rest still installs a filter, a containing block and a
+   composited layer). */
+@keyframes blogInkBleed {
+  from {
+    opacity: 0;
+    filter: blur(0.11em);
+  }
+  to {
+    opacity: 1;
+    filter: blur(0);
   }
 }
 
@@ -1568,9 +1510,8 @@
   display: block;
   --i: 1;
 }
-.ledeMask {
-  --i: 2;
-}
+/* no --i on .ledeMask any more — the wrapper stopped animating when the
+   lede went to the ink bleed; the seat belongs to the type alone */
 .lede {
   --i: 2;
 }
@@ -1691,8 +1632,10 @@
    same 900ms ceremony as the full-bleed film — which flattens the scale
    hierarchy the sweep exists to serve. The budget now: PLATES SWEEP,
    FURNITURE INKS. The rail's own block is below, on blogFade. */
+/* ⚠️ .ledeMask IS GONE FROM BOTH LISTS — the lede inks in place now (see
+   blogInkBleed) and its wrapper must never clip again: the bleed's halo
+   paints outside the glyph boxes and a sweep here would shear it. */
 .section:not([data-in]) .labelMark,
-.section:not([data-in]) .ledeMask,
 .section:not([data-in]) .ctaHost,
 .section:not([data-plate]) .frontPhoto,
 .section:not([data-plate]) .frontTitleMask,
@@ -1700,7 +1643,6 @@
   clip-path: inset(0 0 100% 0);
 }
 .section[data-in] .labelMark,
-.section[data-in] .ledeMask,
 .section[data-in] .ctaHost,
 .section[data-plate] .frontPhoto,
 .section[data-plate] .frontTitleMask,
@@ -1748,15 +1690,28 @@
     calc(var(--i, 0) * var(--cascade-beat)) backwards;
 }
 
-/* THE SETTLE — every block that wraps, drifting against its own mask and
-   outlasting it */
-.section:not([data-in]) .lede,
+/* THE SETTLE — the featured headline, drifting against its own mask and
+   outlasting it. The lede used to be the pair's other member; it rides the
+   ink block below now. */
 .section:not([data-plate]) .frontTitle {
   transform: translateY(-0.22em);
 }
-.section[data-in] .lede,
 .section[data-plate] .frontTitle {
   animation: blogSettle 1000ms var(--ease-drawer)
+    calc(var(--i, 0) * var(--cascade-beat)) backwards;
+}
+
+/* THE INK BLEED — the display line, in place. Parked invisible and out of
+   focus; data-in resolves it on its own seat of the same beat. 900ms on
+   --ease-entrance — the head's sweep duration, so the cascade's rhythm is
+   unchanged even though the verb is not. See the argument over
+   @keyframes blogInkBleed. */
+.section:not([data-in]) .lede {
+  opacity: 0;
+  filter: blur(0.11em);
+}
+.section[data-in] .lede {
+  animation: blogInkBleed 900ms var(--ease-entrance)
     calc(var(--i, 0) * var(--cascade-beat)) backwards;
 }
 
@@ -1798,7 +1753,6 @@
    animation that would have travelled between them. */
 .section[data-instant] .labelMark,
 .section[data-instant] .labelWord,
-.section[data-instant] .ledeMask,
 .section[data-instant] .lede,
 .section[data-instant] .ctaHost,
 .section[data-instant] .frontPhoto,
@@ -1910,9 +1864,14 @@
   .dividerLabelMask {
     clip-path: none;
   }
+  /* .ledeMask is out of both lists here too — with the ink bleed it has no
+     base clip, transform or animation to neutralise, and fading the
+     wrapper AND its child was compounding two 400ms fades on one line.
+     `filter: none` joins the park because the ink bleed's base park is
+     `opacity + filter` and reduced motion must never blur — the fade
+     alone carries the arrival. */
   .section:not([data-in]) .labelMark,
   .section:not([data-in]) .labelWord,
-  .section:not([data-in]) .ledeMask,
   .section:not([data-in]) .lede,
   .section:not([data-in]) .ctaHost,
   .section:not([data-in]) .frontPhoto,
@@ -1928,11 +1887,11 @@
   .section:not([data-rail]) .entryBody {
     clip-path: none;
     transform: none;
+    filter: none;
     opacity: 0;
   }
   .section[data-in] .labelMark,
   .section[data-in] .labelWord,
-  .section[data-in] .ledeMask,
   .section[data-in] .lede,
   .section[data-in] .ctaHost,
   .section[data-in] .frontPhoto,
@@ -1965,7 +1924,6 @@
      has to stay next to the fade it belongs to. */
   .section[data-instant] .labelMark,
   .section[data-instant] .labelWord,
-  .section[data-instant] .ledeMask,
   .section[data-instant] .lede,
   .section[data-instant] .ctaHost,
   .section[data-instant] .frontPhoto,

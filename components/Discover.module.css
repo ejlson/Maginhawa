@@ -324,32 +324,59 @@
    The clamp and the 1.1 leading now live in globals as --t-chapter /
    --lh-chapter, shared with the journal's lede and /blog's title, so the
    three chapter heads cannot drift apart. Same values, one name. */
-/* ══ THE LEDE'S TWO LINE-MASKS ══
-   The sentence descends by CLAUSE — each line one object out of one mask —
-   in the title's own grammar: parked in the stylesheet, released by
-   `data-on`, staggered by an index the markup declares. See the note over
-   the spans in Discover.tsx for why the word-mask version died (motion
-   crit, Finding 01: sentences must not shear while being read).
+/* ══ THE LEDE'S TWO LINES INK IN PLACE — THEY NO LONGER DESCEND ══
+   Still by CLAUSE, still in the title's grammar: parked in the stylesheet,
+   released by `data-on`, staggered by an index the markup declares. The
+   DESCENT went at the user's instruction that the chapter heads take the
+   manifesto statement's ink bleed (ScrubWord, Manifesto.tsx): each clause
+   arrives in place, out of focus, and resolves. Finding 01 of the motion
+   crit is the supporting argument — none of the editorial benchmarks
+   animates type per-word, and a travelling display line has no baseline
+   while the eye is on it; the per-word version died of that here already,
+   and resolving in place is the verb that cannot shear at all.
 
-   THE MASK CLIPS WITH clip-path, NOT overflow, so the descender bleed can
-   be stated: 0 above (the parked line must be fully hidden), 0.3em below
-   for descenders mid-flight, and a hair each side for italic overhang —
-   Blog's .labelWordMask idiom, same numbers. */
+   ⚠️ THE MASK NO LONGER CLIPS, AND MUST NOT. Its clip-path —
+   inset(0 -0.2em -0.3em -0.12em), Blog's .labelWordMask idiom — existed to
+   hide the parked line above the clip while stating the descender bleed.
+   With nothing travelling there is nothing to hide, and a clip here now
+   SHEARS THE BLEED: a blurred glyph paints its halo outside its own box by
+   the blur radius, so any clip turns the soft entrance into hard
+   rectangular sides (the exact fault .wordMask in Manifesto.module.css
+   went `overflow: visible` for). The element stays — it is the line box
+   the clause pair wraps in — it just does nothing but hold the line.
+
+   0.11em IS BLUR_MAX_EM — Manifesto's measured radius, in em of the line's
+   OWN size so perceived softness holds across --t-chapter's clamp; the
+   four ink-bleed sites (Manifesto, AboutSplit, Blog, this) share it.
+
+   PARKED AT opacity: 0, NOT ScrubWord's 0.14 FLOOR: the floor is a scrub
+   affordance (the ghost shows where the scrubbed sentence is going). This
+   is a latch — before `titleOn` the ghost would just stand there under the
+   title words, which park fully hidden. One head, one parked state.
+
+   `filter: none` AT REST, NOT blur(0) — blur(0) still installs a filter, a
+   containing block and a composited layer (Blog.tsx's Finding 02 note).
+   The transition interpolates none ⇄ blur() through the lacuna value
+   blur(0), per the Filter Effects spec, so the resolve is still smooth —
+   verified in the entrance probe. */
 .ledeLineMask {
   display: block;
-  clip-path: inset(0 -0.2em -0.3em -0.12em);
 }
 .ledeLine {
   display: block;
-  transform: translateY(-115%);
+  opacity: 0;
+  filter: blur(0.11em);
   /* one beat after the label's second word (title steps land at 0 and
      0.09s), then the clauses 0.09s apart — the head reads downward in one
-     cadence: mark, "Our", "restaurants", clause, clause. */
-  transition: transform 0.85s var(--ease-entrance)
-    calc(0.1s + var(--ll-i, 0) * 0.09s);
+     cadence: mark, "Our", "restaurants", clause, clause. The cadence
+     survived the change of verb untouched. */
+  transition:
+    opacity 0.85s var(--ease-entrance) calc(0.1s + var(--ll-i, 0) * 0.09s),
+    filter 0.85s var(--ease-entrance) calc(0.1s + var(--ll-i, 0) * 0.09s);
 }
 .ledeLine[data-on="on"] {
-  transform: translateY(0);
+  opacity: 1;
+  filter: none;
 }
 
 .lede {
@@ -582,12 +609,14 @@
     transition: none;
     will-change: auto;
   }
+  /* fully inked and standing — the ink bleed's park is opacity + filter
+     now, so both are neutralised; no blur ever renders under reduced
+     motion. (.ledeLineMask needs no release any more: its base rule
+     stopped clipping when the descent went.) */
   .ledeLine {
-    transform: none;
+    opacity: 1;
+    filter: none;
     transition: none;
-  }
-  .ledeLineMask {
-    clip-path: none;
   }
   .titleRise {
     transition: none;

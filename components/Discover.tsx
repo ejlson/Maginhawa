@@ -1156,21 +1156,31 @@ export default function Discover() {
             </span>
           </span>
         </h2>
-        {/* ══ THE DISPLAY LINE DESCENDS BY CLAUSE, NOT BY WORD ══
-            This was <SplitWords> — fifteen word-masks descending on a 40ms
-            stagger — and the motion crit's Finding 01 retired that grammar
-            here: for a full second the sentence had no baseline, every word
-            caught at a different height exactly while the eye was on it.
-            None of the editorial benchmarks animates type per-word.
+        {/* ══ THE DISPLAY LINE INKS IN PLACE, BY CLAUSE ══
+            It arrives where it stands, out of focus, and resolves — the
+            manifesto statement's ink bleed (ScrubWord, Manifesto.tsx),
+            taken here at the user's instruction that the chapter heads and
+            the statement share one entrance verb. The lineage matters:
+            this was <SplitWords> — fifteen word-masks descending on a 40ms
+            stagger — which the motion crit's Finding 01 retired (for a
+            full second the sentence had no baseline, every word caught at
+            a different height exactly while the eye was on it; none of the
+            editorial benchmarks animates type per-word). The clause-descent
+            that replaced it fixed the per-word shear but still moved the
+            line while the eye was on it; the same Finding is the argument
+            for going the rest of the way. Focus changes in place, so the
+            sentence keeps its baseline for the whole entrance.
 
-            TWO MASKS, AUTHORED AT THE CLAUSE BREAK. The measure was already
-            tuned so the line breaks after "stores," at every width in the
-            sweep (the old note here proved it), so the clause boundary IS
-            the line boundary and each line can descend as ONE object —
-            baseline intact, same direction, same ease, same cadence as the
-            title words above (0.09s apart, one beat after the label). At
-            narrow widths a clause may wrap to two lines and the pair
-            descends together, which is chunkier and still never shears.
+            TWO SPANS STILL, AUTHORED AT THE CLAUSE BREAK. The measure was
+            already tuned so the line breaks after "stores," at every width
+            in the sweep, so the clause boundary IS the line boundary and
+            the head keeps its downward reading cadence — mark, "Our",
+            "restaurants", clause, clause, 0.09s apart — with the stagger
+            now carried by the resolve rather than by travel. The
+            .ledeLineMask wrappers remain as the line boxes but NO LONGER
+            CLIP — see their rule in Discover.module.css for why they must
+            never clip again (a blurred glyph's halo paints outside its own
+            box; a clip shears the bleed into hard edges).
 
             SAME TRIGGER AS EVERYTHING ELSE IN THE HEAD. The spans key off
             `titleOn` — the chapter's single latch — for the reason the old
