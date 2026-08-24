@@ -1,7 +1,7 @@
 "use client";
 
 import Image from "next/image";
-import { useRef, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import {
   motion,
   useMotionValueEvent,
@@ -640,6 +640,44 @@ export default function AboutSplit() {
      would re-render a section that has a whole choreography mid-flight. */
   const clipRef = useRef<HTMLVideoElement>(null);
 
+  /* ⚠️ THE FILM IS GATED ON A POST-MOUNT FLAG AND NOT ON `reduce` ALONE,
+     BECAUSE THE SERVER CANNOT KNOW THE ANSWER AND STILL HAS TO EMIT SOMETHING.
+     framer's useReducedMotion() is `null` server-side (utils/reduced-motion/
+     state.mjs, verbatim: "Returns `null` server-side") and a real boolean from
+     the client's FIRST render — its `initPrefersReducedMotion()` runs before
+     the useState that captures it. So a plain `reduce ?` branch asks a
+     question the server answers with null, null is falsy, and the SERVED HTML
+     carries the <video> to every reader alive. Under `output: "export"` that
+     HTML is the artefact that ships, so the preload scanner opened a range on
+     about-big.mp4 while parsing — measured at the whole 5.0MB — and React
+     only swapped the element in afterwards. The bytes were already gone.
+
+     TWO CONDITIONS, AND EACH ONE IS LOAD-BEARING:
+       `preferenceKnown`  false on the server AND on the client's first
+                          render, so the two agree and hydration has nothing
+                          to reconcile. Gating on `reduce === false` by
+                          itself would only MOVE the mismatch — off the
+                          reduced-motion reader and onto everyone else.
+       `reduce === false` an explicit false rather than a falsy test, so a
+                          null can never read as "motion is fine". Belt and
+                          braces given the flag above, and it is the property
+                          that actually keeps the film off the wire.
+
+     PASSIVE EFFECT, NOT LAYOUT. A layout effect would warn on the server, and
+     it would buy nothing: the panel is clipped to nothing by MEDIA.hidden
+     until `swept` latches on scroll, so no reader sees the beat before the
+     swap. What renders in it is the still — the same photograph the film
+     carries as its poster, in the same absolutely-positioned box — so there
+     is no empty frame and nothing to shift.
+
+     THE ONE THING NOT TO DO HERE is route `pick()` through this flag.
+     `reduce` is captured once and never changes, so the variant objects are
+     stable for the life of the component; swapping them after mount instead
+     animates only the keys the NEW set names and freezes the rest at their
+     hidden values — a clip-path stranded shut, permanently. */
+  const [preferenceKnown, setPreferenceKnown] = useState(false);
+  useEffect(() => setPreferenceKnown(true), []);
+
   /* ══════════ THE SCROLL-BOUND DRIFT ══════════
      The picture keeps moving inside its frame for as long as the panel is on
      screen — the frame is fixed, only what is in it travels. At the user's
@@ -960,23 +998,7 @@ export default function AboutSplit() {
                   the picture hangs directly off the drift — and the 1.15
                   scale that box paid to cover the scrub's excursion goes
                   with it, uncropping 15% of the photograph. */}
-              {reduce ? (
-                /* REDUCED MOTION GETS THE STILL, not a paused video. A
-                   <video> with autoplay suppressed shows its poster, which
-                   would be the same picture — but it would also download the
-                   clip to do it. Rendering the image outright means the
-                   5.0MB never ships to a reader who asked for less
-                   movement. `pick()` has already swapped both variants above
-                   for the chapter's plain FADE, so this box neither masks
-                   nor drifts; it just arrives. */
-                <Image
-                  className={styles.mediaImg}
-                  src={PORTRAIT}
-                  alt="A Maginhawa Group dining room"
-                  fill
-                  sizes="(max-width: 900px) 100vw, 50vw"
-                />
-              ) : (
+              {preferenceKnown && reduce === false ? (
                 /* DECORATIVE, so aria-hidden and no controls: it carries no
                    information the text beside it does not.
                    `muted` is not a style choice — autoplay is blocked
@@ -997,6 +1019,30 @@ export default function AboutSplit() {
                   playsInline
                   preload="metadata"
                   aria-hidden
+                />
+              ) : (
+                /* THE STILL IS THE DEFAULT ARM NOW, and it is three readers'
+                   picture rather than one's: the reduced-motion reader, who
+                   keeps it for good; the reader with no JS, for whom this
+                   render is the only one there will ever be (see the
+                   <noscript> restoration in app/layout.tsx); and everyone
+                   else, for the single beat before the film takes over.
+                   A <video> with autoplay suppressed would show this same
+                   photograph as its poster — but it would download the 5.0MB
+                   to do it, which is the whole reason the arms are this way
+                   round.
+                   `loading="lazy"` is what makes the beat free for the third
+                   reader: the chapter is far below the fold, so the still is
+                   never fetched before the swap removes it. Under reduced
+                   motion `pick()` has already swapped both variants above for
+                   the chapter's plain FADE, so this box neither masks nor
+                   drifts; it just arrives. */
+                <Image
+                  className={styles.mediaImg}
+                  src={PORTRAIT}
+                  alt="A Maginhawa Group dining room"
+                  fill
+                  sizes="(max-width: 900px) 100vw, 50vw"
                 />
               )}
             </motion.div>
