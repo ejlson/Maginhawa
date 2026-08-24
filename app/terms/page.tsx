@@ -4,6 +4,7 @@ import LegalPage, { Pending } from "@/components/LegalPage";
 import { CONTACT } from "@/lib/contact";
 import { LEGAL_ENTITY, LEGAL_UPDATED } from "@/lib/legal";
 import { SITE_URL } from "@/lib/site";
+import { StructuredData } from "@/lib/StructuredData";
 
 /* ⚠️ A DRAFT WRITTEN FROM THE CODE, NOT LEGAL ADVICE — the same caveat the
  * banner on app/privacy/page.tsx sets out at length.
@@ -53,10 +54,7 @@ export const metadata: Metadata = {
 export default function TermsPage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <StructuredData data={jsonLd} />
       <LegalPage
         title="Terms of Use"
         standfirst="The terms on which you may use this website — what it is, what it isn’t, and where our responsibility begins and ends."

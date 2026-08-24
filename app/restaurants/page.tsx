@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import RestaurantsShowcase from "@/components/RestaurantsShowcase";
 import { RESTAURANTS } from "@/lib/restaurants";
 import { SITE_URL } from "@/lib/site";
+import { StructuredData } from "@/lib/StructuredData";
 
 /* ⚠️ THIS FILE USED TO BE THREE LINES, AND EVERY ONE OF ITS GAPS WAS A
    SILENT SEO DEFECT. What was here:
@@ -93,10 +94,7 @@ export const metadata: Metadata = {
 export default function RestaurantsPage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <StructuredData data={jsonLd} />
       <RestaurantsShowcase />
     </>
   );

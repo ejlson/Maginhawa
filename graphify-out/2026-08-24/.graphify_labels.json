@@ -173,6 +173,7 @@
   "171": "Blog.tsx",
   "172": "react",
   "173": "remark-rehype",
+  "174": "framer-motion",
   "175": "probe-blog-index.mjs",
   "176": "remark-rehype",
   "177": "_tmp-about-sweep.mjs",
@@ -183,6 +184,10 @@
   "182": "SplitWords.tsx",
   "183": "VideoBackdrop.tsx",
   "184": "shoot-sections.mjs",
+  "185": "_tmp-braid.mjs",
+  "186": "_tmp-shots.mjs",
   "187": "probe-home-seams.mjs",
-  "189": "_tmp-about-geo.mjs"
+  "188": "_tmp-verify-narrow.mjs",
+  "189": "_tmp-about-geo.mjs",
+  "190": "_tmp-sweep-reduce.mjs"
 }

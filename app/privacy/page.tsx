@@ -6,6 +6,7 @@ import { analyticsConfigured, marketingConfigured } from "@/lib/consent";
 import { CONTACT } from "@/lib/contact";
 import { LEGAL_ENTITY, LEGAL_UPDATED } from "@/lib/legal";
 import { SITE_URL } from "@/lib/site";
+import { StructuredData } from "@/lib/StructuredData";
 
 /* ⚠️ THIS IS A DRAFT WRITTEN FROM THE CODE, NOT LEGAL ADVICE.
  *
@@ -63,10 +64,7 @@ export const metadata: Metadata = {
 export default function PrivacyPage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <StructuredData data={jsonLd} />
       <LegalPage
         title="Privacy Notice"
         standfirst="What this website collects, why, who else sees it, and what you can ask us to do about it."

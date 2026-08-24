@@ -4,6 +4,7 @@ import JournalPost from "@/components/JournalPost";
 import { getAdjacentPosts, getPost, getPosts } from "@/lib/posts";
 import { renderMarkdown } from "@/lib/markdown";
 import { SITE_URL } from "@/lib/site";
+import { StructuredData } from "@/lib/StructuredData";
 
 /* ═══ ONE ROUTE, ONE POST, WRITTEN AT BUILD TIME ═══
  *
@@ -101,10 +102,7 @@ export default async function JournalPostPage({
 
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <StructuredData data={jsonLd} />
       <JournalPost
         entry={post.entry}
         readingMinutes={post.readingMinutes}

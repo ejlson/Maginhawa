@@ -54,8 +54,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_blog_slug_page",
-      "community": 84,
-      "community_name": "restaurants.ts",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "page.tsx"
     },
     {
@@ -65,8 +65,8 @@
       "source_location": "L22",
       "_origin": "ast",
       "id": "app_blog_slug_page_generatestaticparams",
-      "community": 84,
-      "community_name": "restaurants.ts",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "generatestaticparams()"
     },
     {
@@ -76,8 +76,8 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "app_blog_slug_page_generatemetadata",
-      "community": 84,
-      "community_name": "restaurants.ts",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "generatemetadata()"
     },
     {
@@ -87,8 +87,8 @@
       "source_location": "L64",
       "_origin": "ast",
       "id": "app_blog_slug_page_journalpostpage",
-      "community": 84,
-      "community_name": "restaurants.ts",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "journalpostpage()"
     },
     {
@@ -98,8 +98,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_blog_page",
-      "community": 84,
-      "community_name": "restaurants.ts",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "page.tsx"
     },
     {
@@ -109,8 +109,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "app_blog_page_metadata",
-      "community": 84,
-      "community_name": "restaurants.ts",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "metadata"
     },
     {
@@ -120,8 +120,8 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "app_blog_page_blogpage",
-      "community": 84,
-      "community_name": "restaurants.ts",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "blogpage()"
     },
     {
@@ -175,8 +175,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_contact_page",
-      "community": 91,
-      "community_name": "RestaurantsShowcase.tsx",
+      "community": 157,
+      "community_name": "gray-matter",
       "norm_label": "page.tsx"
     },
     {
@@ -186,8 +186,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "app_contact_page_jsonld",
-      "community": 91,
-      "community_name": "RestaurantsShowcase.tsx",
+      "community": 157,
+      "community_name": "gray-matter",
       "norm_label": "jsonld"
     },
     {
@@ -197,8 +197,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "app_contact_page_metadata",
-      "community": 91,
-      "community_name": "RestaurantsShowcase.tsx",
+      "community": 157,
+      "community_name": "gray-matter",
       "norm_label": "metadata"
     },
     {
@@ -208,8 +208,8 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "app_contact_page_page",
-      "community": 91,
-      "community_name": "RestaurantsShowcase.tsx",
+      "community": 157,
+      "community_name": "gray-matter",
       "norm_label": "page()"
     },
     {
@@ -769,8 +769,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_page",
-      "community": 84,
-      "community_name": "restaurants.ts",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "page.tsx"
     },
     {
@@ -780,8 +780,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "app_page_home",
-      "community": 84,
-      "community_name": "restaurants.ts",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "home()"
     },
     {
@@ -901,8 +901,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_sitemap",
-      "community": 84,
-      "community_name": "restaurants.ts",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "sitemap.ts"
     },
     {
@@ -912,8 +912,8 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "app_sitemap_sitemap",
-      "community": 84,
-      "community_name": "restaurants.ts",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "sitemap()"
     },
     {
@@ -1121,8 +1121,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_aboutintro",
-      "community": 157,
-      "community_name": "gray-matter",
+      "community": 29,
+      "community_name": "posts.ts",
       "norm_label": "aboutintro.tsx"
     },
     {
@@ -1132,8 +1132,8 @@
       "source_location": "L95",
       "_origin": "ast",
       "id": "components_aboutintro_aboutintro",
-      "community": 157,
-      "community_name": "gray-matter",
+      "community": 29,
+      "community_name": "posts.ts",
       "norm_label": "aboutintro()"
     },
     {
@@ -1429,8 +1429,8 @@
       "source_location": "L177",
       "_origin": "ast",
       "id": "components_blog_venuemark",
-      "community": 1,
-      "community_name": "common-dabb52f27fbf7211-min.en-US.js",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "venuemark()"
     },
     {
@@ -1550,8 +1550,8 @@
       "source_location": "L221",
       "_origin": "ast",
       "id": "components_blogindex_venuemark",
-      "community": 1,
-      "community_name": "common-dabb52f27fbf7211-min.en-US.js",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "venuemark()"
     },
     {
@@ -1726,8 +1726,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_contactpage",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 157,
+      "community_name": "gray-matter",
       "norm_label": "contactpage.tsx"
     },
     {
@@ -1737,8 +1737,8 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "components_contactpage_visitable",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 157,
+      "community_name": "gray-matter",
       "norm_label": "visitable"
     },
     {
@@ -1748,8 +1748,8 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "components_contactpage_mapurl",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 157,
+      "community_name": "gray-matter",
       "norm_label": "mapurl()"
     },
     {
@@ -1759,8 +1759,8 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "components_contactpage_contactpage",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 157,
+      "community_name": "gray-matter",
       "norm_label": "contactpage()"
     },
     {
@@ -1836,8 +1836,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_darkzone",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 135,
+      "community_name": "page.tsx",
       "norm_label": "darkzone.tsx"
     },
     {
@@ -1847,8 +1847,8 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "components_darkzone_darkzone",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 135,
+      "community_name": "page.tsx",
       "norm_label": "darkzone()"
     },
     {
@@ -2023,8 +2023,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_faq",
-      "community": 157,
-      "community_name": "gray-matter",
+      "community": 29,
+      "community_name": "posts.ts",
       "norm_label": "faq.tsx"
     },
     {
@@ -2034,8 +2034,8 @@
       "source_location": "L11",
       "_origin": "ast",
       "id": "components_faq_items",
-      "community": 157,
-      "community_name": "gray-matter",
+      "community": 29,
+      "community_name": "posts.ts",
       "norm_label": "items"
     },
     {
@@ -2045,8 +2045,8 @@
       "source_location": "L51",
       "_origin": "ast",
       "id": "components_faq_plusminus",
-      "community": 157,
-      "community_name": "gray-matter",
+      "community": 29,
+      "community_name": "posts.ts",
       "norm_label": "plusminus()"
     },
     {
@@ -2056,8 +2056,8 @@
       "source_location": "L67",
       "_origin": "ast",
       "id": "components_faq_faq",
-      "community": 157,
-      "community_name": "gray-matter",
+      "community": 29,
+      "community_name": "posts.ts",
       "norm_label": "faq()"
     },
     {
@@ -2617,8 +2617,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_journalpost",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 135,
+      "community_name": "page.tsx",
       "norm_label": "journalpost.tsx"
     },
     {
@@ -2628,8 +2628,8 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "components_journalpost_journalpost",
-      "community": 1,
-      "community_name": "common-dabb52f27fbf7211-min.en-US.js",
+      "community": 135,
+      "community_name": "page.tsx",
       "norm_label": "journalpost()"
     },
     {
@@ -2639,8 +2639,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_legalpage",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 135,
+      "community_name": "page.tsx",
       "norm_label": "legalpage.tsx"
     },
     {
@@ -2650,8 +2650,8 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "components_legalpage_legalpage",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 135,
+      "community_name": "page.tsx",
       "norm_label": "legalpage()"
     },
     {
@@ -3002,8 +3002,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_menu",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 83,
+      "community_name": "shoot-about-rules.mjs",
       "norm_label": "menu.tsx"
     },
     {
@@ -3013,8 +3013,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "components_menu_items",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 83,
+      "community_name": "shoot-about-rules.mjs",
       "norm_label": "items"
     },
     {
@@ -3024,8 +3024,8 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "components_menu_menu",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 83,
+      "community_name": "shoot-about-rules.mjs",
       "norm_label": "menu()"
     },
     {
@@ -3057,8 +3057,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_nav",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 83,
+      "community_name": "shoot-about-rules.mjs",
       "norm_label": "nav.tsx"
     },
     {
@@ -3068,8 +3068,8 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "components_nav_theme",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 83,
+      "community_name": "shoot-about-rules.mjs",
       "norm_label": "theme"
     },
     {
@@ -3079,8 +3079,8 @@
       "source_location": "L33",
       "_origin": "ast",
       "id": "components_nav_getnavtheme",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 83,
+      "community_name": "shoot-about-rules.mjs",
       "norm_label": "getnavtheme()"
     },
     {
@@ -3090,8 +3090,8 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "components_nav_links",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 83,
+      "community_name": "shoot-about-rules.mjs",
       "norm_label": "links"
     },
     {
@@ -3101,8 +3101,8 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "components_nav_uselinksleft",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 83,
+      "community_name": "shoot-about-rules.mjs",
       "norm_label": "uselinksleft()"
     },
     {
@@ -3112,8 +3112,8 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "components_nav_nav",
-      "community": 31,
-      "community_name": "BlogIndex.tsx",
+      "community": 83,
+      "community_name": "shoot-about-rules.mjs",
       "norm_label": "nav()"
     },
     {
@@ -3340,7 +3340,7 @@
       "label": "LINE_SLOTS_NARROW",
       "file_type": "code",
       "source_file": "components/Passage.tsx",
-      "source_location": "L519",
+      "source_location": "L526",
       "_origin": "ast",
       "id": "components_passage_line_slots_narrow",
       "community": 134,
@@ -3351,7 +3351,7 @@
       "label": "em()",
       "file_type": "code",
       "source_file": "components/Passage.tsx",
-      "source_location": "L622",
+      "source_location": "L629",
       "_origin": "ast",
       "id": "components_passage_em",
       "community": 134,
@@ -3362,7 +3362,7 @@
       "label": "LINE_TRACK",
       "file_type": "code",
       "source_file": "components/Passage.tsx",
-      "source_location": "L623",
+      "source_location": "L630",
       "_origin": "ast",
       "id": "components_passage_line_track",
       "community": 134,
@@ -3373,7 +3373,7 @@
       "label": "LINE_TRACK_NARROW",
       "file_type": "code",
       "source_file": "components/Passage.tsx",
-      "source_location": "L624",
+      "source_location": "L631",
       "_origin": "ast",
       "id": "components_passage_line_track_narrow",
       "community": 134,
@@ -3384,7 +3384,7 @@
       "label": "measurePinPeep()",
       "file_type": "code",
       "source_file": "components/Passage.tsx",
-      "source_location": "L816",
+      "source_location": "L823",
       "_origin": "ast",
       "id": "components_passage_measurepinpeep",
       "community": 134,
@@ -3395,7 +3395,7 @@
       "label": "filmReaches()",
       "file_type": "code",
       "source_file": "components/Passage.tsx",
-      "source_location": "L853",
+      "source_location": "L860",
       "_origin": "ast",
       "id": "components_passage_filmreaches",
       "community": 134,
@@ -3406,7 +3406,7 @@
       "label": "measureBlurStart()",
       "file_type": "code",
       "source_file": "components/Passage.tsx",
-      "source_location": "L864",
+      "source_location": "L871",
       "_origin": "ast",
       "id": "components_passage_measureblurstart",
       "community": 134,
@@ -3417,7 +3417,7 @@
       "label": "measureFadeEnd()",
       "file_type": "code",
       "source_file": "components/Passage.tsx",
-      "source_location": "L882",
+      "source_location": "L889",
       "_origin": "ast",
       "id": "components_passage_measurefadeend",
       "community": 134,
@@ -3428,7 +3428,7 @@
       "label": "SlabLine()",
       "file_type": "code",
       "source_file": "components/Passage.tsx",
-      "source_location": "L898",
+      "source_location": "L905",
       "_origin": "ast",
       "id": "components_passage_slabline",
       "community": 134,
@@ -3439,7 +3439,7 @@
       "label": "Dot()",
       "file_type": "code",
       "source_file": "components/Passage.tsx",
-      "source_location": "L982",
+      "source_location": "L989",
       "_origin": "ast",
       "id": "components_passage_dot",
       "community": 134,
@@ -3450,7 +3450,7 @@
       "label": "Passage()",
       "file_type": "code",
       "source_file": "components/Passage.tsx",
-      "source_location": "L1008",
+      "source_location": "L1015",
       "_origin": "ast",
       "id": "components_passage_passage",
       "community": 134,
@@ -3607,8 +3607,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_reservations",
-      "community": 183,
-      "community_name": "VideoBackdrop.tsx",
+      "community": 62,
+      "community_name": "jsonld.tsx",
       "norm_label": "reservations.tsx"
     },
     {
@@ -3629,8 +3629,8 @@
       "source_location": "L450",
       "_origin": "ast",
       "id": "components_reservations_magneticcta",
-      "community": 183,
-      "community_name": "VideoBackdrop.tsx",
+      "community": 62,
+      "community_name": "jsonld.tsx",
       "norm_label": "magneticcta()"
     },
     {
@@ -3794,8 +3794,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_reveal",
-      "community": 157,
-      "community_name": "gray-matter",
+      "community": 29,
+      "community_name": "posts.ts",
       "norm_label": "reveal.tsx"
     },
     {
@@ -3805,8 +3805,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "components_reveal_revealprops",
-      "community": 157,
-      "community_name": "gray-matter",
+      "community": 29,
+      "community_name": "posts.ts",
       "norm_label": "revealprops"
     },
     {
@@ -3816,8 +3816,8 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "components_reveal_reveal",
-      "community": 157,
-      "community_name": "gray-matter",
+      "community": 29,
+      "community_name": "posts.ts",
       "norm_label": "reveal()"
     },
     {
@@ -3882,8 +3882,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_splitwords",
-      "community": 182,
-      "community_name": "SplitWords.tsx",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "splitwords.tsx"
     },
     {
@@ -3893,8 +3893,8 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "components_splitwords_space",
-      "community": 182,
-      "community_name": "SplitWords.tsx",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "space()"
     },
     {
@@ -3904,8 +3904,8 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "components_splitwords_emwordstart",
-      "community": 182,
-      "community_name": "SplitWords.tsx",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "emwordstart()"
     },
     {
@@ -3915,8 +3915,8 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "components_splitwords_ease",
-      "community": 182,
-      "community_name": "SplitWords.tsx",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "ease"
     },
     {
@@ -3926,8 +3926,8 @@
       "source_location": "L72",
       "_origin": "ast",
       "id": "components_splitwords_readabletext",
-      "community": 182,
-      "community_name": "SplitWords.tsx",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "readabletext()"
     },
     {
@@ -3937,8 +3937,8 @@
       "source_location": "L122",
       "_origin": "ast",
       "id": "components_splitwords_splitwords",
-      "community": 182,
-      "community_name": "SplitWords.tsx",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "splitwords()"
     },
     {
@@ -4916,8 +4916,8 @@
       "source_location": "L110",
       "_origin": "ast",
       "id": "lib_markdown_rendermarkdown",
-      "community": 84,
-      "community_name": "restaurants.ts",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "rendermarkdown()"
     },
     {
@@ -5026,8 +5026,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_posts",
-      "community": 84,
-      "community_name": "restaurants.ts",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "posts.ts"
     },
     {
@@ -5037,8 +5037,8 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "lib_posts_posts_dir",
-      "community": 84,
-      "community_name": "restaurants.ts",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "posts_dir"
     },
     {
@@ -5048,8 +5048,8 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "lib_posts_journalpost",
-      "community": 84,
-      "community_name": "restaurants.ts",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "journalpost"
     },
     {
@@ -5059,8 +5059,8 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "lib_posts_categories",
-      "community": 84,
-      "community_name": "restaurants.ts",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "categories"
     },
     {
@@ -5070,8 +5070,8 @@
       "source_location": "L87",
       "_origin": "ast",
       "id": "lib_posts_date_label",
-      "community": 84,
-      "community_name": "restaurants.ts",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "date_label"
     },
     {
@@ -5081,8 +5081,8 @@
       "source_location": "L98",
       "_origin": "ast",
       "id": "lib_posts_wordstominutes",
-      "community": 84,
-      "community_name": "restaurants.ts",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "wordstominutes()"
     },
     {
@@ -5092,8 +5092,8 @@
       "source_location": "L108",
       "_origin": "ast",
       "id": "lib_posts_fail",
-      "community": 84,
-      "community_name": "restaurants.ts",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "fail()"
     },
     {
@@ -5103,8 +5103,8 @@
       "source_location": "L112",
       "_origin": "ast",
       "id": "lib_posts_toentry",
-      "community": 84,
-      "community_name": "restaurants.ts",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "toentry()"
     },
     {
@@ -5114,8 +5114,8 @@
       "source_location": "L207",
       "_origin": "ast",
       "id": "lib_posts_getposts",
-      "community": 84,
-      "community_name": "restaurants.ts",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "getposts()"
     },
     {
@@ -5125,8 +5125,8 @@
       "source_location": "L236",
       "_origin": "ast",
       "id": "lib_posts_getpost",
-      "community": 84,
-      "community_name": "restaurants.ts",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "getpost()"
     },
     {
@@ -5136,8 +5136,8 @@
       "source_location": "L250",
       "_origin": "ast",
       "id": "lib_posts_getjournal",
-      "community": 84,
-      "community_name": "restaurants.ts",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "getjournal()"
     },
     {
@@ -5147,8 +5147,8 @@
       "source_location": "L279",
       "_origin": "ast",
       "id": "lib_posts_getadjacentposts",
-      "community": 84,
-      "community_name": "restaurants.ts",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "getadjacentposts()"
     },
     {
@@ -5235,8 +5235,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_restaurants",
-      "community": 165,
-      "community_name": "VideoBackdrop.tsx",
+      "community": 1,
+      "community_name": "common-dabb52f27fbf7211-min.en-US.js",
       "norm_label": "restaurants.ts"
     },
     {
@@ -5279,8 +5279,8 @@
       "source_location": "L245",
       "_origin": "ast",
       "id": "lib_restaurants_venueaction",
-      "community": 165,
-      "community_name": "VideoBackdrop.tsx",
+      "community": 1,
+      "community_name": "common-dabb52f27fbf7211-min.en-US.js",
       "norm_label": "venueaction"
     },
     {
@@ -5301,8 +5301,8 @@
       "source_location": "L282",
       "_origin": "ast",
       "id": "lib_restaurants_slug_by_name",
-      "community": 165,
-      "community_name": "VideoBackdrop.tsx",
+      "community": 82,
+      "community_name": "Manifesto.tsx",
       "norm_label": "slug_by_name"
     },
     {
@@ -5642,8 +5642,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "package_dependencies_gray_matter",
-      "community": 136,
-      "community_name": "dependencies",
+      "community": 31,
+      "community_name": "BlogIndex.tsx",
       "norm_label": "gray-matter"
     },
     {
@@ -5653,8 +5653,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "gray_matter",
-      "community": 136,
-      "community_name": "dependencies",
+      "community": 31,
+      "community_name": "BlogIndex.tsx",
       "norm_label": "gray-matter"
     },
     {
@@ -5708,8 +5708,8 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "package_dependencies_react",
-      "community": 167,
-      "community_name": "remark-rehype",
+      "community": 136,
+      "community_name": "dependencies",
       "norm_label": "react"
     },
     {
@@ -5719,8 +5719,8 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "react",
-      "community": 167,
-      "community_name": "remark-rehype",
+      "community": 136,
+      "community_name": "dependencies",
       "norm_label": "react"
     },
     {
@@ -6140,292 +6140,6 @@
       "community": 116,
       "community_name": "_dbg.mjs",
       "norm_label": "yfor()"
-    },
-    {
-      "label": "_tmp-about-sweep.mjs",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-about-sweep.mjs",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "scripts_tmp_about_sweep",
-      "community": 177,
-      "community_name": "_tmp-about-sweep.mjs",
-      "norm_label": "_tmp-about-sweep.mjs"
-    },
-    {
-      "label": "errs",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-about-sweep.mjs",
-      "source_location": "L27",
-      "_origin": "ast",
-      "id": "scripts_tmp_about_sweep_errs",
-      "community": 177,
-      "community_name": "_tmp-about-sweep.mjs",
-      "norm_label": "errs"
-    },
-    {
-      "label": "to()",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-about-sweep.mjs",
-      "source_location": "L38",
-      "_origin": "ast",
-      "id": "scripts_tmp_about_sweep_to",
-      "community": 177,
-      "community_name": "_tmp-about-sweep.mjs",
-      "norm_label": "to()"
-    },
-    {
-      "label": "isOpen()",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-about-sweep.mjs",
-      "source_location": "L55",
-      "_origin": "ast",
-      "id": "scripts_tmp_about_sweep_isopen",
-      "community": 177,
-      "community_name": "_tmp-about-sweep.mjs",
-      "norm_label": "isopen()"
-    },
-    {
-      "label": "pct()",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-about-sweep.mjs",
-      "source_location": "L111",
-      "_origin": "ast",
-      "id": "scripts_tmp_about_sweep_pct",
-      "community": 177,
-      "community_name": "_tmp-about-sweep.mjs",
-      "norm_label": "pct()"
-    },
-    {
-      "label": "ty()",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-about-sweep.mjs",
-      "source_location": "L125",
-      "_origin": "ast",
-      "id": "scripts_tmp_about_sweep_ty",
-      "community": 62,
-      "community_name": "jsonld.tsx",
-      "norm_label": "ty()"
-    },
-    {
-      "label": "rel",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-about-sweep.mjs",
-      "source_location": "L147",
-      "_origin": "ast",
-      "id": "scripts_tmp_about_sweep_rel",
-      "community": 177,
-      "community_name": "_tmp-about-sweep.mjs",
-      "norm_label": "rel"
-    },
-    {
-      "label": "base",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-about-sweep.mjs",
-      "source_location": "L148",
-      "_origin": "ast",
-      "id": "scripts_tmp_about_sweep_base",
-      "community": 177,
-      "community_name": "_tmp-about-sweep.mjs",
-      "norm_label": "base"
-    },
-    {
-      "label": "_tmp-braid.mjs",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-braid.mjs",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "scripts_tmp_braid",
-      "community": 185,
-      "community_name": "_tmp-braid.mjs",
-      "norm_label": "_tmp-braid.mjs"
-    },
-    {
-      "label": "find()",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-braid.mjs",
-      "source_location": "L6",
-      "_origin": "ast",
-      "id": "scripts_tmp_braid_find",
-      "community": 185,
-      "community_name": "_tmp-braid.mjs",
-      "norm_label": "find()"
-    },
-    {
-      "label": "_tmp-ink-rail.mjs",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-ink-rail.mjs",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "scripts_tmp_ink_rail",
-      "community": 179,
-      "community_name": "_tmp-ink-rail.mjs",
-      "norm_label": "_tmp-ink-rail.mjs"
-    },
-    {
-      "label": "trace",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-ink-rail.mjs",
-      "source_location": "L31",
-      "_origin": "ast",
-      "id": "scripts_tmp_ink_rail_trace",
-      "community": 179,
-      "community_name": "_tmp-ink-rail.mjs",
-      "norm_label": "trace"
-    },
-    {
-      "label": "_tmp-ink-rail2.mjs",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-ink-rail2.mjs",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "scripts_tmp_ink_rail2",
-      "community": 180,
-      "community_name": "_tmp-ink-rail2.mjs",
-      "norm_label": "_tmp-ink-rail2.mjs"
-    },
-    {
-      "label": "_tmp-narrow-ems.mjs",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-narrow-ems.mjs",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "scripts_tmp_narrow_ems",
-      "community": 189,
-      "community_name": "_tmp-about-geo.mjs",
-      "norm_label": "_tmp-narrow-ems.mjs"
-    },
-    {
-      "label": "_tmp-rail3.mjs",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-rail3.mjs",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "scripts_tmp_rail3",
-      "community": 181,
-      "community_name": "_tmp-rail3.mjs",
-      "norm_label": "_tmp-rail3.mjs"
-    },
-    {
-      "label": "_tmp-seamwalk.mjs",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-seamwalk.mjs",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "scripts_tmp_seamwalk",
-      "community": 176,
-      "community_name": "remark-rehype",
-      "norm_label": "_tmp-seamwalk.mjs"
-    },
-    {
-      "label": "jump()",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-seamwalk.mjs",
-      "source_location": "L22",
-      "_origin": "ast",
-      "id": "scripts_tmp_seamwalk_jump",
-      "community": 176,
-      "community_name": "remark-rehype",
-      "norm_label": "jump()"
-    },
-    {
-      "label": "_tmp-shots.mjs",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-shots.mjs",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "scripts_tmp_shots",
-      "community": 186,
-      "community_name": "_tmp-shots.mjs",
-      "norm_label": "_tmp-shots.mjs"
-    },
-    {
-      "label": "find()",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-shots.mjs",
-      "source_location": "L6",
-      "_origin": "ast",
-      "id": "scripts_tmp_shots_find",
-      "community": 186,
-      "community_name": "_tmp-shots.mjs",
-      "norm_label": "find()"
-    },
-    {
-      "label": "_tmp-sweep-diag.mjs",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-sweep-diag.mjs",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "scripts_tmp_sweep_diag",
-      "community": 152,
-      "community_name": "SplitWords.tsx",
-      "norm_label": "_tmp-sweep-diag.mjs"
-    },
-    {
-      "label": "run()",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-sweep-diag.mjs",
-      "source_location": "L11",
-      "_origin": "ast",
-      "id": "scripts_tmp_sweep_diag_run",
-      "community": 152,
-      "community_name": "SplitWords.tsx",
-      "norm_label": "run()"
-    },
-    {
-      "label": "_tmp-sweep-reduce.mjs",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-sweep-reduce.mjs",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "scripts_tmp_sweep_reduce",
-      "community": 190,
-      "community_name": "_tmp-sweep-reduce.mjs",
-      "norm_label": "_tmp-sweep-reduce.mjs"
-    },
-    {
-      "label": "_tmp-sweep-shot.mjs",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-sweep-shot.mjs",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "scripts_tmp_sweep_shot",
-      "community": 168,
-      "community_name": "CustomCursor.tsx",
-      "norm_label": "_tmp-sweep-shot.mjs"
-    },
-    {
-      "label": "MS",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-sweep-shot.mjs",
-      "source_location": "L19",
-      "_origin": "ast",
-      "id": "scripts_tmp_sweep_shot_ms",
-      "community": 168,
-      "community_name": "CustomCursor.tsx",
-      "norm_label": "ms"
-    },
-    {
-      "label": "_tmp-verify-narrow.mjs",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-verify-narrow.mjs",
-      "source_location": "L1",
-      "_origin": "ast",
-      "id": "scripts_tmp_verify_narrow",
-      "community": 188,
-      "community_name": "_tmp-verify-narrow.mjs",
-      "norm_label": "_tmp-verify-narrow.mjs"
-    },
-    {
-      "label": "find()",
-      "file_type": "code",
-      "source_file": "scripts/_tmp-verify-narrow.mjs",
-      "source_location": "L7",
-      "_origin": "ast",
-      "id": "scripts_tmp_verify_narrow_find",
-      "community": 188,
-      "community_name": "_tmp-verify-narrow.mjs",
-      "norm_label": "find()"
     },
     {
       "label": "audit-type.mjs",
@@ -25633,7 +25347,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/Passage.tsx",
-      "source_location": "L982",
+      "source_location": "L989",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_passage",
@@ -25655,7 +25369,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/Passage.tsx",
-      "source_location": "L622",
+      "source_location": "L629",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_passage",
@@ -25666,7 +25380,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/Passage.tsx",
-      "source_location": "L853",
+      "source_location": "L860",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_passage",
@@ -25688,7 +25402,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/Passage.tsx",
-      "source_location": "L519",
+      "source_location": "L526",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_passage",
@@ -25710,7 +25424,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/Passage.tsx",
-      "source_location": "L623",
+      "source_location": "L630",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_passage",
@@ -25721,7 +25435,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/Passage.tsx",
-      "source_location": "L624",
+      "source_location": "L631",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_passage",
@@ -25754,7 +25468,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/Passage.tsx",
-      "source_location": "L864",
+      "source_location": "L871",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_passage",
@@ -25765,7 +25479,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/Passage.tsx",
-      "source_location": "L882",
+      "source_location": "L889",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_passage",
@@ -25776,7 +25490,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/Passage.tsx",
-      "source_location": "L816",
+      "source_location": "L823",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_passage",
@@ -25798,7 +25512,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/Passage.tsx",
-      "source_location": "L1008",
+      "source_location": "L1015",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_passage",
@@ -25809,7 +25523,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "components/Passage.tsx",
-      "source_location": "L898",
+      "source_location": "L905",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_passage",
@@ -25865,7 +25579,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "components/Passage.tsx",
-      "source_location": "L1071",
+      "source_location": "L1078",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_passage_passage",
@@ -25877,7 +25591,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "components/Passage.tsx",
-      "source_location": "L928",
+      "source_location": "L935",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_passage_slabline",
@@ -25889,7 +25603,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "components/Passage.tsx",
-      "source_location": "L1111",
+      "source_location": "L1118",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_passage_passage",
@@ -25901,7 +25615,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "components/Passage.tsx",
-      "source_location": "L870",
+      "source_location": "L877",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_passage_measureblurstart",
@@ -25913,7 +25627,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "components/Passage.tsx",
-      "source_location": "L892",
+      "source_location": "L899",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_passage_measurefadeend",
@@ -25925,7 +25639,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "components/Passage.tsx",
-      "source_location": "L1140",
+      "source_location": "L1147",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_passage_passage",
@@ -25937,7 +25651,7 @@
       "context": "call",
       "confidence": "EXTRACTED",
       "source_file": "components/Passage.tsx",
-      "source_location": "L1147",
+      "source_location": "L1154",
       "weight": 1.0,
       "_origin": "ast",
       "source": "components_passage_passage",
@@ -28673,18 +28387,6 @@
       "target": "scripts_probe_indent_hover_frame"
     },
     {
-      "relation": "indirect_call",
-      "context": "argument",
-      "confidence": "INFERRED",
-      "confidence_score": 0.8,
-      "source_file": "lib/useMagnet.ts",
-      "source_location": "L139",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "lib_usemagnet_usemagnet",
-      "target": "scripts_tmp_about_sweep_ty"
-    },
-    {
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/venueCards.ts",
@@ -29453,160 +29155,6 @@
       "_origin": "ast",
       "source": "scripts_dbg_yfor",
       "target": "scripts_dbg_band",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/_tmp-about-sweep.mjs",
-      "source_location": "L148",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "scripts_tmp_about_sweep",
-      "target": "scripts_tmp_about_sweep_base",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/_tmp-about-sweep.mjs",
-      "source_location": "L27",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "scripts_tmp_about_sweep",
-      "target": "scripts_tmp_about_sweep_errs",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/_tmp-about-sweep.mjs",
-      "source_location": "L55",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "scripts_tmp_about_sweep",
-      "target": "scripts_tmp_about_sweep_isopen",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/_tmp-about-sweep.mjs",
-      "source_location": "L111",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "scripts_tmp_about_sweep",
-      "target": "scripts_tmp_about_sweep_pct",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/_tmp-about-sweep.mjs",
-      "source_location": "L147",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "scripts_tmp_about_sweep",
-      "target": "scripts_tmp_about_sweep_rel",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/_tmp-about-sweep.mjs",
-      "source_location": "L38",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "scripts_tmp_about_sweep",
-      "target": "scripts_tmp_about_sweep_to",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/_tmp-about-sweep.mjs",
-      "source_location": "L125",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "scripts_tmp_about_sweep",
-      "target": "scripts_tmp_about_sweep_ty",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/_tmp-braid.mjs",
-      "source_location": "L6",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "scripts_tmp_braid",
-      "target": "scripts_tmp_braid_find",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/_tmp-ink-rail.mjs",
-      "source_location": "L31",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "scripts_tmp_ink_rail",
-      "target": "scripts_tmp_ink_rail_trace",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/_tmp-seamwalk.mjs",
-      "source_location": "L22",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "scripts_tmp_seamwalk",
-      "target": "scripts_tmp_seamwalk_jump",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/_tmp-shots.mjs",
-      "source_location": "L6",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "scripts_tmp_shots",
-      "target": "scripts_tmp_shots_find",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/_tmp-sweep-diag.mjs",
-      "source_location": "L11",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "scripts_tmp_sweep_diag",
-      "target": "scripts_tmp_sweep_diag_run",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/_tmp-sweep-shot.mjs",
-      "source_location": "L19",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "scripts_tmp_sweep_shot",
-      "target": "scripts_tmp_sweep_shot_ms",
-      "confidence_score": 1.0
-    },
-    {
-      "relation": "contains",
-      "confidence": "EXTRACTED",
-      "source_file": "scripts/_tmp-verify-narrow.mjs",
-      "source_location": "L7",
-      "weight": 1.0,
-      "_origin": "ast",
-      "source": "scripts_tmp_verify_narrow",
-      "target": "scripts_tmp_verify_narrow_find",
       "confidence_score": 1.0
     },
     {
@@ -41342,5 +40890,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "d88d3c598a23119deec30c1ca73beb930e0efb14"
+  "built_at_commit": "8d2c4b5151ede3004ba3630eaf425ee0ccc45725"
 }

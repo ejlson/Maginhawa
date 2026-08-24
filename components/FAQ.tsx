@@ -4,6 +4,7 @@ import { motion } from "framer-motion";
 import { useState } from "react";
 import Reveal from "./Reveal";
 import styles from "./FAQ.module.css";
+import { StructuredData } from "@/lib/StructuredData";
 
 // Tight set of practical questions guests ask before they visit. Adds an
 // `FAQPage` Schema.org block (rendered with the answers) so Google's FAQ rich
@@ -79,10 +80,7 @@ export default function FAQ() {
 
   return (
     <section className={styles.section} id="faq">
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <StructuredData data={jsonLd} />
       {/* Two columns: the heading holds the left rail and the questions run
           down the right — the accordion is the content, the heading is the
           frame. Previously the head spanned the full width and the list sat

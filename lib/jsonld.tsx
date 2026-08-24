@@ -7,6 +7,7 @@ import { RESTAURANTS } from "./restaurants";
 import { PRESS } from "./press";
 
 import { SITE_URL } from "./site";
+import { StructuredData } from "./StructuredData";
 
 const orgSameAs = [
   "https://www.instagram.com/maginhawagroup/",
@@ -47,12 +48,7 @@ export function OrganizationJsonLd() {
       url: r.website ?? `${SITE_URL}/restaurants`,
     })),
   };
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
-    />
-  );
+  return <StructuredData data={data} />;
 }
 
 export function WebSiteJsonLd() {
@@ -65,12 +61,7 @@ export function WebSiteJsonLd() {
     inLanguage: "en-GB",
     publisher: { "@id": `${SITE_URL}/#organization` },
   };
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
-    />
-  );
+  return <StructuredData data={data} />;
 }
 
 /* `RestaurantJsonLd` STOOD HERE AND IS GONE WITH ITS ONLY CALLER, the
@@ -110,10 +101,5 @@ export function GroupPressJsonLd() {
       })),
     },
   };
-  return (
-    <script
-      type="application/ld+json"
-      dangerouslySetInnerHTML={{ __html: JSON.stringify(data) }}
-    />
-  );
+  return <StructuredData data={data} />;
 }

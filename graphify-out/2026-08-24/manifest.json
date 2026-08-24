@@ -1340,8 +1340,8 @@
     "semantic_hash": ""
   },
   "components/AboutSplit.tsx": {
-    "mtime": 1787588905.895968,
-    "ast_hash": "d256dbb8ca7a24c28ec492a4c18c1b33",
+    "mtime": 1787589910.7067738,
+    "ast_hash": "5bc5c2bbe6ce93512aa3ad74d1d8c76b",
     "semantic_hash": ""
   },
   "components/StoryStrip.tsx": {
@@ -1590,8 +1590,8 @@
     "semantic_hash": ""
   },
   "components/Passage.tsx": {
-    "mtime": 1787569547.33997,
-    "ast_hash": "c70a36ff439d449fadee7481f9722a45",
+    "mtime": 1787589685.7154825,
+    "ast_hash": "f687dfb4d85aaa0181cdaef08353d8d1",
     "semantic_hash": ""
   },
   "lib/site.ts": {
@@ -2019,19 +2019,9 @@
     "ast_hash": "9f18c0a2733bb619b662408bb038bb23",
     "semantic_hash": ""
   },
-  "scripts/_tmp-about-geo.mjs": {
-    "mtime": 1787588238.222483,
-    "ast_hash": "690ac724ab8fadf9bb4eda3ab9118059",
-    "semantic_hash": ""
-  },
   "scripts/_tmp-about-sweep.mjs": {
     "mtime": 1787588592.7249575,
     "ast_hash": "ffd3b23861ab58ede1740db3930323a4",
-    "semantic_hash": ""
-  },
-  "scripts/_tmp-about-sweep-frames.mjs": {
-    "mtime": 1787588924.4363365,
-    "ast_hash": "66a2c69bc28d9dd16141ee56196b57ae",
     "semantic_hash": ""
   },
   "scripts/_tmp-sweep-diag.mjs": {
@@ -2040,8 +2030,33 @@
     "semantic_hash": ""
   },
   "scripts/_tmp-sweep-shot.mjs": {
-    "mtime": 1787589297.2536998,
-    "ast_hash": "88ba6e28385315e0e59ac35d02783b6e",
+    "mtime": 1787589704.0639708,
+    "ast_hash": "e2a18d4b305149974a421229573201e6",
+    "semantic_hash": ""
+  },
+  "scripts/_tmp-braid.mjs": {
+    "mtime": 1787590061.803024,
+    "ast_hash": "bd90a45a831ae2480dd9719a05725f58",
+    "semantic_hash": ""
+  },
+  "scripts/_tmp-narrow-ems.mjs": {
+    "mtime": 1787589385.7862072,
+    "ast_hash": "d79304c275956c3d323f80d9f386fcdc",
+    "semantic_hash": ""
+  },
+  "scripts/_tmp-shots.mjs": {
+    "mtime": 1787590140.9734943,
+    "ast_hash": "500b3574b7aa1952c32b4f073647de41",
+    "semantic_hash": ""
+  },
+  "scripts/_tmp-sweep-reduce.mjs": {
+    "mtime": 1787589815.8649461,
+    "ast_hash": "ffc50edfcd592dcd390e3939a6bae3a7",
+    "semantic_hash": ""
+  },
+  "scripts/_tmp-verify-narrow.mjs": {
+    "mtime": 1787589836.2746432,
+    "ast_hash": "d4a46e02a55f50baa44fabe6ac491afa",
     "semantic_hash": ""
   }
 }

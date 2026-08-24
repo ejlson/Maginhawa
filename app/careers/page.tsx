@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import JoinUs from "@/components/JoinUs";
 import { JOBS } from "@/lib/jobs";
 import { SITE_URL } from "@/lib/site";
+import { StructuredData } from "@/lib/StructuredData";
 
 // Schema.org ItemList of open JobPostings — Google can lift this into the
 // careers job search panel and AI search summaries.
@@ -64,10 +65,7 @@ export const metadata: Metadata = {
 export default function CareersPage() {
   return (
     <>
-      <script
-        type="application/ld+json"
-        dangerouslySetInnerHTML={{ __html: JSON.stringify(jsonLd) }}
-      />
+      <StructuredData data={jsonLd} />
       <JoinUs />
     </>
   );
