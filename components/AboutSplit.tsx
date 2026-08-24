@@ -5,6 +5,7 @@ import { useEffect, useRef, useState } from "react";
 import {
   motion,
   type MotionValue,
+  useMotionTemplate,
   useMotionValueEvent,
   useReducedMotion,
   useScroll,
@@ -59,8 +60,9 @@ const HEADING = "Everything we know about hospitality, we learned at home.";
    A FOURTH CHANGE NEEDS A NEW ASSET, or a swap out of the story band. */
 const PORTRAIT = "/images/careers-hero.jpg";
 
-/* THE PANEL IS A LOOPING CLIP NOW, with the photograph kept as its poster
-   and as the reduced-motion still.
+/* THE PANEL IS A LOOPING CLIP NOW, with the photograph kept as the
+   reduced-motion still ONLY — it is no longer the clip's poster. See the
+   <video>: the panel is the film or it is nothing.
 
    WEIGHT IS THE STANDING CONSTRAINT ON THIS SLOT, whatever fills it. The
    panel has held three films now — tile-guanabana.mp4 (2.8MB), then
@@ -485,6 +487,20 @@ const STACKED = "(max-width: 900px)";
 const STACK_OPEN = 0.95;
 const STACK_SHUT = 1.1;
 
+/* ══════════ THE SETTLE, AS ONE NUMBER BOTH SIDES READ ══════════
+   The panel's four animations do not finish together: the mask is done at
+   MEDIA_IN + 1.15, the caption's second line at MEDIA_IN + 1.78, and the
+   counter-drift — the longest of them on purpose — at MEDIA_IN + 1.7.
+   THE DRIFT IS THE LAST THING MOVING, so this is the instant the picture is
+   genuinely at rest, and it is the instant the shadow is now allowed to
+   exist (see MOUNT).
+   It is spelled as a sum of the drift's own two terms rather than as 2.15,
+   so retiming the settle cannot leave the shadow arriving over a picture
+   that is still travelling. DRIFT reads DRIFT_DUR too — change it there and
+   the shadow follows. */
+const DRIFT_DUR = 1.7;
+const SETTLED = MEDIA_IN + DRIFT_DUR;
+
 /* THE MOUNT — the card shadow's arrival, and nothing else.
    The picture's box used to sit on the cream as a filled rectangle wearing a
    shadow for the whole of the sweep that uncovers it, which read as a frame
@@ -494,15 +510,24 @@ const STACK_SHUT = 1.1;
    (`.mediaShadow` — see the derivation in the stylesheet, including the two
    routes that were implemented and failed), and this fades it in.
 
-   ⚠️ IT IS TIMED TO THE SWEEP'S TAIL, NOT ITS START, and that is the whole
-   craft in this variant. The opacity ramps around the WHOLE rectangle at
-   once — an element cannot know how much of its sibling is uncovered — so
-   bringing it up from t=0 would put a half-strength shadow around a
-   mostly-empty box, which is the same defect at 50% rather than at 100%.
-   --ease-entrance is heavily front-loaded: measured on the real render the
-   mask has uncovered ~88% of the frame 0.4s after it starts, which is why
-   this is MEDIA_IN + 0.4 and not a number of its own. Starting there means
-   the shadow only ever traces an edge with a picture behind it.
+   ⚠️ IT WAITS FOR THE WHOLE ENTRANCE NOW, at the user's instruction: the
+   shadow is not to appear until the animation is done and the film has
+   fully settled. So the delay is SETTLED — the drift's own finish, which is
+   the last movement in the panel — and not a number of its own.
+
+   WHAT IT USED TO BE, because the argument still holds and only the answer
+   changed: MEDIA_IN + 0.4, derived from the sweep rather than from the
+   gate. The opacity ramps around the WHOLE rectangle at once — an element
+   cannot know how much of its sibling is uncovered — so bringing it up from
+   t=0 would put a half-strength shadow around a mostly-empty box, and
+   --ease-entrance is front-loaded enough that the mask has uncovered ~88%
+   of the frame 0.4s in. That was the EARLIEST moment the shadow could trace
+   an edge with a picture behind it. It is now held to the LATEST: nothing
+   is cast until nothing is moving.
+   The cost is that the panel spends its last ~0.55s (the drift's overhang
+   past the mask) as a picture with no mount under it. That is the trade the
+   instruction asks for — a shadow that answers a settled object rather than
+   one that travels with it.
 
    PLAIN OPACITY, so `pick()`'s reduced-motion swap needs no special case:
    FADE animates exactly this property and the shadow simply arrives. */
@@ -510,7 +535,7 @@ const MOUNT: Variants = {
   hidden: { opacity: 0 },
   shown: {
     opacity: 1,
-    transition: { duration: 0.7, ease: EASE, delay: MEDIA_IN + 0.4 },
+    transition: { duration: 0.7, ease: EASE, delay: SETTLED },
   },
 };
 
@@ -518,6 +543,9 @@ const MOUNT: Variants = {
    1.15s — so the picture is still settling for half a second after the edge
    has gone. That overhang is the gesture; matching the two durations gives
    back a panel that simply stops.
+   ⚠️ ITS DURATION IS DRIFT_DUR AND IS READ BY THE SHADOW. This is the last
+   movement in the panel, so MOUNT hangs its delay off the end of it — see
+   SETTLED. Retime this and the shadow retimes with it.
    --ease-drawer rather than --ease-entrance, because this is the slow
    settle and not the arrival: the drawer curve keeps moving at the end
    where the entrance curve has already parked. */
@@ -526,7 +554,7 @@ const DRIFT: Variants = {
   shown: {
     y: "0%",
     scale: 1,
-    transition: { duration: 1.7, ease: DRAWER, delay: MEDIA_IN },
+    transition: { duration: DRIFT_DUR, ease: DRAWER, delay: MEDIA_IN },
   },
 };
 
@@ -595,13 +623,12 @@ const DRIFT: Variants = {
 
    · THE ROW DROPS AS ONE OBJECT. The travel was on the <ul>, never on each
      <li>, and that is the difference between a third gesture and a free
-     one: each print already carries a fade AND a pop, and a translate on
+     one: each print already carries a fade AND a wipe, and a translate on
      the <li> would make three ideas compete on one element — the case
      Reveal.tsx is explicit about. The <ul> still carries the travel below.
-     ⚠️ THE <li> IS NOT FREE ANY MORE — the pop's `scale` is on it (see
-     DOOR_POP_FROM). Scale and translate compose without fighting because
-     Motion writes them into one transform, but a THIRD idea here would be
-     the one this paragraph warns about.
+     THE <li> CARRIES THE FADE ONLY. It briefly also held the pop's `scale`;
+     that went with the pop (see THE PRINTS WIPE AGAIN), and the wipe lives
+     on `.doorClip` rather than here, so the <li> is a single idea again.
 
    · NO OPACITY ON THE ROW. The prints fade themselves; fading the container
      as well doubles the ramp and the row arrives muddier than its prints.
@@ -745,36 +772,31 @@ const READ_INK = 0.55;
    a settle and starts reading as a slide. */
 const READ_RISE = 24;
 
-/* ══════════ THE PRINTS POP, THEY NO LONGER WIPE ══════════
-   At the user's instruction: "slowly pop out rather than swipe up". What
-   was there was `clip-path: inset(100% 0 0 0)` travelling to 0 — the print
-   uncovering bottom-up inside a fixed frame, so the box was always full
-   size and only its contents arrived. A pop is the opposite: the whole
-   object is small and grows into place, frame, photograph and cast shadow
-   together.
+/* ══════════ THE PRINTS WIPE AGAIN — DOWNWARD THIS TIME ══════════
+   At the user's instruction, chosen as "E" from a study of six options for
+   this row. The print is uncovered from the TOP DOWN, like a photograph
+   coming off a press: `inset(0% 0% 100% 0%)` travelling to `inset(0%)`.
 
-   THAT IS WHY THE SCALE MOVED UP TO THE <li> and did not stay where the
-   clip was. `.doorClip` exists only because clip-path would have taken
-   --shadow-card with it (the warning is still on .doorClip in the
-   stylesheet, and still worth heeding if a clip is ever put back) — but a
-   SHADOW THAT DOES NOT GROW WITH ITS OBJECT reads as the picture sliding
-   out from under a fixed cast, which is the exact tell that makes a pop
-   look cheap. Scaling the <li> takes the shadow with it for free.
+   ⚠️ THIS IS NOT A REVERT, AND THE DIRECTION IS THE WHOLE DIFFERENCE. There
+   was a wipe here before and it was rejected — "slowly pop out rather than
+   swipe up" — but that one ran `inset(100% 0 0 0) → 0`, uncovering the
+   print BOTTOM-UP. Swiping up under a fixed frame is what read badly; the
+   shutter falling from the top does not, and it is the gesture that was
+   chosen from the study on its own merits. Do not "restore" the old
+   direction on the strength of the old note.
 
-   THE OVERSHOOT IS WHAT MAKES IT A POP rather than a zoom, and on a scrub
-   it has to be spelled out as a keyframe: a spring cannot be used here
-   (scroll-driven springs fight the wheel on the way back up — this file
-   makes that argument twice already, over PILL and the retired head rise).
-   Three stops instead: 0.86 → 1.035 at 72% of the slot → 1. The reader
-   reads that shape as weight, and it is reversible, which a spring is not.
+   WHAT THE POP COST, and why the study moved off it: the pop grew the whole
+   tile from 0.86 with a 1.035 overshoot, so the row's three objects changed
+   SIZE inside a reading column that is itself still rising (doorsY). Two
+   travels in one lockup. The shutter moves nothing — only its own clip
+   changes — so the column's arrival is the only motion in the frame, and it
+   sits beside the Manifesto's ink settle one chapter above as a second
+   reveal rather than a second travel.
 
-   0.86 AND NOT SOMETHING BOLDER: these are 180px prints at the foot of the
-   column, not hero objects. Below ~0.8 the row reads as three things
-   flying in; above ~0.92 the gesture stops registering as anything. */
-const DOOR_POP_FROM = 0.86;
-const DOOR_POP_OVER = 1.035;
-/* where in the slot the overshoot peaks, as a fraction of its whole */
-const DOOR_POP_CREST = 0.72;
+   THE SHADOW ARGUMENT THAT SENT THE POP TO THE <li> IS SPENT, because
+   nothing scales now. The clip goes back where `.doorClip` was built for it
+   and the frame keeps --shadow-card, which is exactly the arrangement the
+   stylesheet's warning has been protecting through three gestures. */
 
 /* a slot's fade window: the first READ_INK of it */
 const inkOf = (slot: [number, number]): [number, number] => [
@@ -785,9 +807,10 @@ const inkOf = (slot: [number, number]): [number, number] => [
 export default function AboutSplit() {
   const reduce = useReducedMotion();
 
-  /* THE FILM'S HANDLE. A ref and not state: the only thing anything does
-     with this element is call play() on it once, and a state update here
-     would re-render a section that has a whole choreography mid-flight. */
+  /* THE FILM'S HANDLE. A ref and not state: the only things anything does
+     with this element are warm it on approach and play() it at the gate,
+     and a state update here would re-render a section that has a whole
+     choreography mid-flight. */
   const clipRef = useRef<HTMLVideoElement>(null);
 
   /* ══════════ THE SCROLL-BOUND DRIFT ══════════
@@ -1074,6 +1097,99 @@ export default function AboutSplit() {
     );
   });
 
+  /* ══════════ THE FILM IS WARMED ON APPROACH AND RUN AT THE GATE ══════════
+     THE PANEL SHOWS THE CLIP AND NOTHING ELSE, at the user's instruction.
+     It used to show two things in a row: the mask uncovered `poster`, the
+     hand-picked photograph, and the film replaced it a beat later when the
+     entrance completed. Removing the poster is only half of that fix — a
+     <video> with no poster and no decoded frame paints NOTHING, so the
+     sweep would have uncovered bare --placeholder instead. The element has
+     to be holding a frame BEFORE the mask starts to move.
+
+     SO THE WORK IS SPLIT ACROSS THE TWO MOMENTS THE CHAPTER ALREADY HAS:
+       · APPROACH (an IntersectionObserver on the figure, with a viewport
+         and a half of rootMargin — well below the fold, and a long way
+         ahead of the gate). The element is promoted to `preload="auto"` and
+         reloaded, so the fetch and the first-frame decode both happen
+         during the run-up.
+       · THE GATE (`swept`). play(), and the sweep uncovers moving film.
+
+     ⚠️ THIS IS WHAT KEEPS THE OLD PERFORMANCE ARGUMENT INTACT rather than
+     discarding it. The note this replaces was right: about-big.mp4 is
+     5.0MB, and starting that fetch-and-decode on the same frames the mask
+     and the drift are animating drops both of them on a laptop. That is
+     exactly why the decode is moved EARLIER instead of the play() being
+     moved earlier on its own — by the time the gate opens there is nothing
+     left to decode, and play() on a warm element is free.
+
+     ⚠️ THE WARM IS AN OBSERVER AND NOT `chapter`, AND THAT WAS A BUG THE
+     FIRST TIME. `useScroll` CLAMPS its progress to [0, 1], so while the
+     section is entirely below the fold the value sits pinned at 0 and emits
+     no change events at all — a handler hung off it does not fire until the
+     section's top edge is ALREADY entering the window, which on a fast
+     scroll is the same tick the gate opens. The observer fires a viewport
+     and a half earlier and cannot be starved that way.
+     150% of the viewport in each direction is the runway: ~1350px at
+     1440×900 ON TOP OF the one viewport the chapter's own range spends
+     before the gate.
+
+     ⚠️ `load()` RESTARTS THE ELEMENT, so it is latched and the observer
+     disconnects itself. Called twice it would re-seek to zero and the panel
+     would open on a stuck first frame.
+
+     REDUCED MOTION NEVER GETS HERE. `reduce` renders the <Image> instead
+     and `clipRef` is null, so the observer never attaches and the promotion
+     to `auto` never happens. `reduce` is in the deps because framer resolves
+     it to `null` on the first client render and to a boolean after, and the
+     <video> only exists on one side of it.
+
+     ⚠️ THAT IS NOT THE SAME AS "REDUCED MOTION NEVER FETCHES THE FILM", and
+     the difference is worth stating because the obvious reading of the line
+     above is wrong. `reduce` is `null` for the first client render, so the
+     <video> DOES mount for a beat before it is swapped for the <Image>, and
+     the element's own `preload="metadata"` is enough for Chrome to open a
+     `bytes=0-` range on it. Measured under
+     `Emulation.setEmulatedMedia prefers-reduced-motion: reduce`: 2.86MB
+     pulled (the dev build's copy, the whole file), with no <video> left in
+     the DOM at the end of it.
+     THIS PREDATES THE WARM-UP — the same measurement on HEAD returns the
+     same 2.86MB — so it is flagged here rather than fixed here. The fix is
+     to gate the mount on `reduce === false` instead of on falsiness, which
+     is a hydration change with its own trap (a deferred preference strands
+     framer's variant keys) and does not belong in a change about a poster
+     and a shadow. */
+  const warmed = useRef(false);
+  useEffect(() => {
+    const clip = clipRef.current;
+    const host = mediaRef.current;
+    if (!clip || !host || warmed.current) return;
+    const io = new IntersectionObserver(
+      (entries) => {
+        if (!entries.some((e) => e.isIntersecting) || warmed.current) return;
+        warmed.current = true;
+        clip.preload = "auto";
+        clip.load();
+        io.disconnect();
+      },
+      { rootMargin: "150% 0px" },
+    );
+    io.observe(host);
+    return () => io.disconnect();
+  }, [reduce]);
+
+  useEffect(() => {
+    /* ⚠️ NOT GUARDED ON A "PLAYED ONCE" LATCH, and it must not be. `swept`
+       REVERSES — scrolling back up puts the panel away and approaching it
+       again replays the whole entrance — so this effect re-runs, and the
+       film has to be running each time the mask opens. play() on an element
+       that is already playing resolves immediately and does nothing.
+       The catch swallows the rejection a browser throws if it decides the
+       gesture requirements are not met; the panel is decorative and a still
+       first frame is an acceptable floor. */
+    if (!swept) return;
+    void clipRef.current?.play().catch(() => {});
+  }, [swept]);
+
   /* ══════════ THE PANEL DOES NOT MOVE WITH THE PAGE ══════════
      Both scroll-linked travels are gone, at the user's instruction: the
      picture is to be still as the reader passes the chapter.
@@ -1179,21 +1295,12 @@ export default function AboutSplit() {
           <motion.div
             className={styles.mediaFrame}
             variants={pick(MEDIA)}
-            /* ⚠️ THE CLIP'S PLAYBACK HANGS OFF THIS, AND IT IS NOT A
-               FLOURISH. about-big.mp4 is 5.0MB; `preload="metadata"`
-               keeps the frames off the wire until something asks to play,
-               and starting that decode on the same frames the mask and the
-               drift are animating drops both of them on a laptop. So the
-               film starts when the entrance has finished, exactly as it did
-               before the animation was removed.
-               THIS IS ALSO WHY `autoPlay` IS GONE AGAIN. It was added
-               BECAUSE the wipe went — with no animation there was no
-               completion to hang this on, and the clip would have sat on
-               its poster forever. Put the wipe back and the handler is the
-               correct owner again. Delete this and the panel is a still. */
-            onAnimationComplete={() => {
-              void clipRef.current?.play().catch(() => {});
-            }}
+            /* ⚠️ `onAnimationComplete` IS GONE FROM HERE, AND IT WAS THE
+               DEFECT. It started the film when the mask had finished, which
+               is precisely why the reader saw the poster photograph sweep
+               in and only then turn into a clip. Playback now belongs to the
+               gate two hooks up — see the film's warm-and-play block — and
+               nothing on this element does anything but mask. */
           >
             <motion.div className={styles.mediaDrift} variants={pick(DRIFT)}>
               {/* ⚠️ A SEPARATE BOX FOR THE PAN, and it has to be.
@@ -1244,15 +1351,29 @@ export default function AboutSplit() {
                 <video
                   ref={clipRef}
                   className={styles.mediaVideo}
-                  /* the film from the CDN when one is configured; the poster
-                     stays the hand-picked portrait rather than becoming a
-                     rendered frame, because this one was CHOSEN — see the
-                     chapter's own note on PORTRAIT */
+                  /* the film from the CDN when one is configured */
                   src={asset(VIDEO)}
-                  poster={asset(PORTRAIT)}
+                  /* ⚠️ NO `poster`, AT THE USER'S INSTRUCTION, and this is
+                     the visible half of the change the warm-up above pays
+                     for. It carried asset(PORTRAIT) — the same photograph
+                     the reduced-motion branch renders — so the sweep
+                     uncovered a STILL, and the film only replaced it when
+                     the entrance finished. The reader saw a picture and
+                     then a video: one panel arriving twice. With no poster
+                     the element paints its first decoded FRAME, so what the
+                     mask uncovers is already the film.
+                     PORTRAIT is still the reduced-motion still and still the
+                     one CHOSEN frame; it is simply no longer shown to a
+                     reader who is about to be shown the clip. */
                   muted
                   loop
                   playsInline
+                  /* ⚠️ THE ATTRIBUTE IS THE COLD DEFAULT AND THE WARM-UP
+                     OVERRIDES IT. `metadata` is what the markup ships (and
+                     what the server renders) so the home page never fetches
+                     5.0MB it may not reach; the approach handler promotes
+                     this element to `auto`. Hard-code `auto` here and the
+                     clip starts downloading behind the hero. */
                   preload="metadata"
                   aria-hidden
                 />
@@ -1427,11 +1548,11 @@ export default function AboutSplit() {
    inside a loop. Manifesto.tsx's ScrubWord exists for the same reason and
    says so in the same words.
 
-   IT NO LONGER CLIPS — see DOOR_POP_FROM for why the wipe became a scale
-   and why the scale sits on the <li> rather than on the inner span the
-   clip needed. The inner span's warning is still live in the stylesheet:
-   anything that puts a `clip-path` back has to put it back in there, or
-   all three prints lose --shadow-card the moment the animation rests.
+   IT CLIPS AGAIN — see THE PRINTS WIPE AGAIN for why, and note the clip is
+   back on the inner span exactly as the stylesheet's warning requires: a
+   `clip-path` anywhere but `.doorClip` costs all three prints their
+   --shadow-card permanently, because box-shadow paints outside the border
+   box and a clip takes it with everything else.
 
    THE PRINT FADES WITH ITS OWN WINDOW rather than only growing. Without
    the fade the reader sees an empty --placeholder box wearing a shadow
@@ -1464,19 +1585,34 @@ function Door({
     READ_DOORS_SLOT[1] + index * READ_DOOR_STEP,
   ];
   const opacity = useTransform(range, inkOf(slot), [0, 1]);
-  /* THE CREST IS AN ABSOLUTE POSITION IN `range`, not a fraction of it —
-     useTransform's input list has to be monotonic in the value it reads,
-     and `range` is the section's progress, not the slot's. */
-  const scale = useTransform(
-    range,
-    [slot[0], slot[0] + (slot[1] - slot[0]) * DOOR_POP_CREST, slot[1]],
-    [DOOR_POP_FROM, DOOR_POP_OVER, 1],
-  );
+
+  /* ══════════ THE SHUTTER, BACK ON THE INNER SPAN ══════════
+     The print is UNCOVERED from the top down — the picture comes off a
+     press. The pop it replaces grew the whole tile from 0.86 with an
+     overshoot; this moves nothing at all, which is the point: it is the one
+     gesture in the chapter that cannot shift the reading column it sits in,
+     and it sits quietly beside the ink settle now running one chapter above
+     (two reveals rather than two travels).
+
+     ⚠️ IT GOES ON `.doorClip`, NEVER ON `.doorFrame`, and the stylesheet has
+     carried that warning through two changes of gesture. `box-shadow` paints
+     OUTSIDE the border box and `clip-path` clips it — so a clip on the frame
+     costs all three prints their --shadow-card permanently, not just while
+     the animation runs. The inner span exists for this.
+
+     ⚠️ AND THE FADE STAYS. It is tempting to make this clip-only, since a
+     wipe is a complete gesture on its own — but the frame carries the shadow
+     and the --placeholder ground, and those are NOT clipped by the inner
+     span. Without the fade the reader gets an empty box wearing a shadow
+     while the picture wipes in, which reads as a failed image. That is
+     DOOR_IN's note and it has now survived three gestures. */
+  const shutter = useTransform(range, slot, [100, 0]);
+  const clipPath = useMotionTemplate`inset(0% 0% ${shutter}% 0%)`;
 
   return (
     <motion.li
       variants={reduce ? FADE : undefined}
-      style={reduce ? undefined : { opacity, scale }}
+      style={reduce ? undefined : { opacity }}
     >
       {/* THE VENUE'S OWN SITE, IN A NEW TAB. These pointed at
           `/restaurants/<slug>` — this site's page for the room — and that
@@ -1494,13 +1630,16 @@ function Door({
         aria-label={`${door.label} — visit the restaurant's website, opens in a new tab`}
       >
         <span className={styles.doorFrame}>
-          {/* A PLAIN <span> AGAIN — the wipe that used to live on it is now
-              a scale on the <li> (see DOOR_POP_FROM). It is kept rather
-              than flattened away because <Image fill> needs a positioned
-              box and .doorImg's `border-radius: inherit` resolves through
-              it; a motion element with nothing to animate is what this file
-              deletes elsewhere. */}
-          <span className={styles.doorClip}>
+          {/* THE CLIP IS BACK ON THIS SPAN and the frame above is plain
+              again — see the shutter note over `clipPath`. The frame keeps
+              the shadow and the ground precisely because it is NOT the
+              element being clipped. `scrubbing` and not `!reduce`: before
+              mount the style must not be written at all, or the server's
+              HTML ships three prints clipped to nothing. */}
+          <motion.span
+            className={styles.doorClip}
+            style={scrubbing ? { clipPath } : undefined}
+          >
             <Image
               className={styles.doorImg}
               src={door.src}
@@ -1508,7 +1647,7 @@ function Door({
               fill
               sizes="150px"
             />
-          </span>
+          </motion.span>
         </span>
       </a>
     </motion.li>
