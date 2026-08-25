@@ -78,6 +78,12 @@ export type VenueCardItem = {
    *  custom properties by the card's crown. */
   logoAspect?: number;
   logoInkRatio?: number;
+  /** the DRAWN artwork's bounding box as a fraction of the PNG, width and
+   *  height — i.e. what is left once the transparent padding is taken off.
+   *  Only <Spines> reads these; see the block over LOGO_INK below for what
+   *  they fix and why the card does not need them. */
+  logoInkW?: number;
+  logoInkH?: number;
 };
 
 /* ══════════ THE LOGO OPTICS — MEASURED, NOT CHOSEN ══════════════════════
@@ -138,6 +144,54 @@ const LOGO_OPTICS: Record<string, { aspect: number; inkRatio: number }> = {
   cafemama: { aspect: 900 / 169, inkRatio: 85 / 169 },
   belly: { aspect: 900 / 224, inkRatio: 157 / 224 },
   bunso: { aspect: 670 / 141, inkRatio: 141 / 141 },
+};
+
+/* ══════════ WHERE THE ARTWORK ACTUALLY STARTS ══════════════════════════
+   The DRAWN bounding box of each PNG, as a fraction of the file — width
+   and height — measured off the alpha channel at a threshold of 12/255.
+   Everything outside it is transparent padding.
+
+   WHAT THIS IS FOR, and it is a different problem from LOGO_OPTICS above.
+   That table equalises how BIG each name renders. This one fixes where it
+   SITS. `mask-size: contain` fits the whole file, padding included, so a
+   mark is pushed right and up by however much transparent margin its
+   export happens to carry — and these carry very different amounts:
+
+     bunso                             0.00% — no padding at all
+     guanabana mamasons hoodwood
+     cafemama belly                    3.67% left, and 13.7–19.5% bottom
+     ramo                              3.70%
+     bintang                           3.97%
+
+   As a fraction that looks harmless. Rendered on the phone's band, where
+   the marks are between 61 and 148px wide, it is an indent of 0 to 5.4px
+   — Bunso flush against the location line beneath it, Café Mama five and
+   a half pixels adrift, and every other venue somewhere in between. The
+   bottom padding does the same to the gap above that line.
+
+   <Spines> uses these to size its box to the ARTWORK rather than to the
+   file, so every mark's left edge and baseline land on the same axis as
+   the type under it.
+
+   ⚠️ THE CARD DOES NOT NEED THEM and must not start using them casually.
+   Its crown anchors `left top` inside a fixed-width slot and the note on
+   .cardLogoMark records that the eight ink edges already land within
+   1.2px of each other there — because that slot's width does not vary by
+   venue, so the padding scales identically across the set. It is the
+   band's per-venue sizing that turns one shared percentage into eight
+   different pixel offsets.
+
+   ⚠️ RE-MEASURE IF AN ASSET IS RE-EXPORTED, exactly as for LOGO_OPTICS. A
+   re-crop changes these silently and the mark simply drifts. */
+const LOGO_INK: Record<string, { w: number; h: number }> = {
+  bintang: { w: 0.9183, h: 0.8614 },
+  guanabana: { w: 0.9267, h: 0.7203 },
+  mamasons: { w: 0.9267, h: 0.7250 },
+  ramo: { w: 0.9259, h: 0.7683 },
+  hoodwood: { w: 0.9267, h: 0.6118 },
+  cafemama: { w: 0.9267, h: 0.6095 },
+  belly: { w: 0.9267, h: 0.7054 },
+  bunso: { w: 1.0, h: 1.0 },
 };
 
 /* THE CARD-ONLY EXTRAS, keyed by canonical slug. Anything the canonical
@@ -285,6 +339,8 @@ export function venueCard(slug: string): VenueCardItem | null {
     menuPages: r.menuPages,
     logoAspect: LOGO_OPTICS[r.slug]?.aspect,
     logoInkRatio: LOGO_OPTICS[r.slug]?.inkRatio,
+    logoInkW: LOGO_INK[r.slug]?.w,
+    logoInkH: LOGO_INK[r.slug]?.h,
   };
 }
 

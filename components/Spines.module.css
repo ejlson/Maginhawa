@@ -103,6 +103,13 @@
      Task time for the gesture after both: ~400–530ms over three runs,
      against ~570ms before.
 
+     THE OPEN-STATE GRADIENTS ARE FREE, re-measured after they landed
+     because they paint on the very box whose height animates: 372 / 482 /
+     395 / 482ms of task time over four runs, against 400 / 434 / 531 for
+     the same code without them. Identical within the noise, and layout
+     stayed under 1ms a frame throughout. Gradients repaint cheaply; it was
+     never paint-per-se that cost, it was re-rastering eight photographs.
+
      ⚠️ DO NOT CERTIFY THIS WITH A FRAME COUNT. Per-frame rAF sampling on
      this page is too noisy to read: identical code returned 1, 11 and 12
      over-budget frames on three runs at 4× CPU throttle, and 0 then 9 at
@@ -167,19 +174,55 @@
    Ramo's blue door with no contrast at all. 52% is where all eight hold. */
 /* THE RAMP BELONGS TO THE PICTURE, so it is pinned to the same box for the
    same reason — a gradient that resizes is a gradient that repaints. It
-   ends where the photograph ends; below that the band is already ink. */
+   ends where the photograph ends; below that the band is already ink.
+
+   THE HORIZONTAL RUN IS A CUSTOM PROPERTY because the open state layers a
+   second gradient over it, and restating this one there would be two
+   spellings of the ramp that drift apart. */
 .ramp {
-  position: absolute;
-  top: 0;
-  left: 0;
-  right: 0;
-  height: var(--spine-h);
-  background: linear-gradient(
+  --ramp-x: linear-gradient(
     to right,
     color-mix(in srgb, var(--maroon) 92%, transparent) 0%,
     color-mix(in srgb, var(--maroon) 78%, transparent) 42%,
     color-mix(in srgb, var(--maroon) 52%, transparent) 100%
   );
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--spine-h);
+  background: var(--ramp-x);
+}
+
+/* ═══ WHAT THE DISCLOSURE OPENS ONTO ═════════════════════════════════════
+   ONLY IN THE OPEN STATE, and that is not a shortcut — it is the only
+   state with the problem. Closed, the band IS the photograph: 75px of band
+   over 75px of picture, so there is no ground to see and no seam to hide.
+   Shrunk to 66 the picture is merely clipped. It is at 138 that 63px of
+   plate appears below the photograph, and flat --maroon there read as a
+   solid slab dropping out from under the picture.
+
+   TWO GRADIENTS, because a hard edge and a flat field are two faults:
+     · the picture's bottom ~40% dissolves into the ink, so the photograph
+       ends by fading rather than by stopping. Layered OVER --ramp-x, which
+       goes on doing its horizontal job underneath.
+     · the plate carries a vertical gradient rather than one tone — exactly
+       --maroon at the seam so it meets the fade with no step, lifting 10%
+       toward --cream by the bottom edge. An on-palette lift rather than a
+       new colour, and small enough to read as depth instead of as a second
+       surface. */
+.spine[data-open="on"] {
+  background: linear-gradient(
+    to bottom,
+    var(--maroon) 54%,
+    color-mix(in srgb, var(--maroon) 90%, var(--cream)) 100%
+  );
+}
+
+.spine[data-open="on"] .ramp {
+  background:
+    linear-gradient(to bottom, transparent 58%, var(--maroon) 100%),
+    var(--ramp-x);
 }
 
 /* the press target — the whole band, under the controls in paint order */
@@ -218,24 +261,75 @@
   pointer-events: none;
 }
 
+/* ═══ THE LOCATION LINE IS ON ONE AXIS DOWN THE WHOLE LIST ════════════════
+   The marks are genuinely different heights — Bintang's box is 31px
+   because its lockup carries a crest above the script, Belly's is 14
+   because the wordmark IS the mark — and centring the pair as one unit
+   therefore pushed the type below it down by however tall the mark
+   happened to be. Measured: the location line's top ranged over 8.5px
+   across the eight, against pills that hold a 37.5px axis exactly.
+
+   A column of small caps reading down a list wants one axis. So the block
+   takes a FIXED height and hangs its content from the bottom: the type
+   lands in the same place on all eight and the marks, which are
+   heterogeneous objects anyway, float above it.
+
+   ⚠️ 49px IS THE TALLEST STACK PLUS A PIXEL — Bintang's 31px artwork, the
+   6px gap and an 11.2px line. A taller lockup would overflow it silently,
+   so re-derive if --ink-h moves or an asset is re-exported. The band has
+   75px, so there is room to grow this if that day comes. */
 .who {
+  --who-h: 49px;
   flex: 1 1 auto;
   min-width: 0;
-  display: block;
+  height: var(--who-h);
+  display: flex;
+  flex-direction: column;
+  justify-content: flex-end;
 }
 
 /* THE MARK'S SLOT, sized from the letterforms exactly as .cardLogo does:
    cap / --lr, so every venue's NAME renders at one height whatever
    furniture its lockup carries. The fallbacks keep a flat slot for a mark
    with no measurement on file. */
+/* ═══ THE SLOT IS THE ARTWORK, NOT THE FILE ══════════════════════════════
+   TWO MEASUREMENTS, TWO JOBS, and conflating them is what put the marks
+   out of alignment in the first place.
+
+     --lr  (LOGO_OPTICS)  how much of the file the NAME occupies. Divides
+                          the target ink height to give the height the
+                          whole file must render at for the name to come
+                          out 14px. This is what makes Bintang's script
+                          and Bunso's wordmark read at one size.
+     --iw / --ih (LOGO_INK)  how much of the file is DRAWN at all. The rest
+                          is transparent padding, and these exports carry
+                          between 0% and 3.97% of it on the left and up to
+                          19.5% on the bottom.
+
+   `mask-size: contain` fits the FILE, so the padding is inside the box and
+   the ink starts wherever the export happens to put it — measured on the
+   phone, an indent of 0px (Bunso) to 5.4px (Café Mama) against the
+   location line directly beneath, and a bottom gap varying by the same
+   amount. Eight marks, eight different left edges, on a list whose whole
+   readability depends on one hard left axis.
+
+   So the box is sized to the DRAWN rectangle and the mask is scaled up to
+   crop the padding away: at `100%/--iw` by `100%/--ih` the artwork exactly
+   fills the box, and `center` is the correct position for it because every
+   one of these exports pads symmetrically (Bintang is 3.97/4.19 — 0.07px
+   of asymmetry at render size, which is nothing). The element's edges are
+   then the ink's edges, so the left axis and the gap under it are the same
+   for all eight without a per-venue nudge anywhere. */
 .markSlot {
   --ink-h: 14px;
+  /* the height the whole FILE renders at, so the name comes out --ink-h */
+  --file-h: calc(var(--ink-h) / var(--lr, 0.5));
   display: block;
-  height: calc(var(--ink-h) / var(--lr, 0.5));
-  width: calc((var(--ink-h) / var(--lr, 0.5)) * var(--la, 3.2));
+  height: calc(var(--file-h) * var(--ih, 1));
+  width: calc(var(--file-h) * var(--la, 3.2) * var(--iw, 1));
   /* the widest lockup in the set (Café Mama, 5.3 : 1) would otherwise run
-     into the pills. `contain` re-fits inside the capped box rather than
-     overflowing it — the same relationship .cardLogoMark keeps. */
+     into the pills. The mask is width-fitted at that point, so the crop
+     stays exact — it simply renders smaller. */
   max-width: min(176px, 100%);
 }
 
@@ -244,8 +338,10 @@
   width: 100%;
   height: 100%;
   background-color: var(--cream);
-  -webkit-mask: var(--ov-logo-url) no-repeat left center / contain;
-  mask: var(--ov-logo-url) no-repeat left center / contain;
+  -webkit-mask: var(--ov-logo-url) no-repeat center /
+    calc(100% / var(--iw, 1)) calc(100% / var(--ih, 1));
+  mask: var(--ov-logo-url) no-repeat center /
+    calc(100% / var(--iw, 1)) calc(100% / var(--ih, 1));
 }
 
 /* a venue with no mark on file still gets its name, in the display face */
