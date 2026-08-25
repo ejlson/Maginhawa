@@ -6,6 +6,7 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion, type MotionProps } from "framer-motion";
 import styles from "./VenueCard.module.css";
 import { getRestaurant, primaryAction } from "@/lib/restaurants";
+import { splitActions } from "@/lib/venueActions";
 import type { VenueCardItem } from "@/lib/venueCards";
 import { asset } from "@/lib/media";
 
@@ -571,7 +572,14 @@ export function VenueBlock({
      the same height and the block's height is identical either way (the
      probe asserts the eight heights agree to within a pixel). */
   const hasMenu = Boolean(item.menuPages && item.menuPages.length > 0);
-  const menu = hasMenu && (onMenu || menuHref) ? "Menu" : null;
+  /* ONE READ OF THE AVAILABILITY RULE, shared with <Spines> — see the split
+     block below and lib/venueActions.ts. `menu` is the same answer either
+     path wants, so both take it from here. */
+  const set = splitActions(rest, {
+    hasMenuPages: hasMenu,
+    menuReachable: Boolean(onMenu || menuHref),
+  });
+  const menu = set.menu ? "Menu" : null;
 
   /* THE VENUE'S OWN SITE, AS A CONTROL OF ITS OWN, at the user's
      instruction: every card offers a way through to the restaurant's
@@ -597,29 +605,19 @@ export function VenueBlock({
       : null;
 
   /* ═══ THE SPLIT PATH'S OWN DERIVATIONS — "split" only ═══
-     The split row does NOT run through primaryAction(): that funnel
-     promotes SOMETHING to the fill for every venue (Visit, Opening soon),
-     where the split's resting state is "Book, or nothing" — a card with no
-     booking shows no pill at rest and offers its set on hover. The three
-     are derived independently so each renders only where it has something
-     behind it:
-       book   — bookable venues only (bintang/guanabana/ramo/belly today);
-                the resting cream pill.
-       visitS — the venue's own site, always a ghost in the hover set.
-                Bunso keeps its "OPENING SOON" wording here — that label is
-                content that exists nowhere else, demoted from a fill to a
-                ghost because a coming-soon room has nothing to Book.
-       menu   — the same `menu` derivation the row path uses, above.
-     The "row" path and the expansion still run primaryAction() untouched. */
+     ⚠️ THE RULE MOVED TO lib/venueActions.ts and this reads it. It is not
+     the only surface printing Menu · Visit · Book any more: the phone
+     renders <Spines> instead of this grid and shows all three at rest, so
+     the two would have been two spellings of one availability rule. Read
+     that file for why each of the three is conditional; nothing about the
+     answers changed in the move.
+
+     The "row" path and the expansion still run primaryAction() untouched —
+     that funnel promotes SOMETHING to a fill for every venue, where the
+     split's resting state is "Book, or nothing". */
   const split = actions === "split";
-  const book =
-    split && rest?.bookable && rest.bookingUrl && !rest.comingSoon
-      ? { label: "Book", href: rest.bookingUrl }
-      : null;
-  const visitSplit =
-    split && rest?.website
-      ? { label: rest.comingSoon ? "Opening soon" : "Visit", href: rest.website }
-      : null;
+  const book = split ? set.book : null;
+  const visitSplit = split ? set.visit : null;
 
   /* THE STAT, right of the name — an icon and a value and NOTHING ELSE.
      No "Per head", no "Today" beneath it: those labels were 40–55px of

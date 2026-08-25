@@ -32,6 +32,13 @@ import styles from "./Discover.module.css";
    belongs beside the block it scales. */
 import card from "./VenueCard.module.css";
 import VenueCard, { VenueBlock } from "./VenueCard";
+/* THE PHONE'S LAYOUT — eight full-width bands instead of eight stacked
+   cards. It is a different arrangement of the same eight records, not a
+   restyle of this one, so it is a component rather than a media query on
+   .grid: a band seats the mark, the neighbourhood and up to three pills on
+   ONE line, and there is no rule you can write on the card's DOM that gets
+   it there. See the banner in Spines.tsx for the measurements. */
+import Spines from "./Spines";
 import MenuOverlay from "./MenuOverlay";
 import { venueCards, type VenueCardItem } from "@/lib/venueCards";
 import { getRestaurant } from "@/lib/restaurants";
@@ -786,6 +793,22 @@ const RECEDE_STEP_S = 0.028;
    together. Keep the two in step. */
 const GRID_COLS = 4;
 
+/* ══════════════ WHERE THE PHONE TAKES OVER ══════════════
+   460px is not a new breakpoint — it is the one .grid already turns at.
+   Above it the stylesheet gives the grid two, three and then four columns,
+   and two-up already puts four cards on a screen; BELOW it the grid is a
+   single column of 358 × 294 cards, which is the 2,418px / 2.86-screen
+   section <Spines> exists to replace. Binding the swap to the same edge is
+   what keeps one layout answering for each width with nothing in between.
+
+   ⚠️ IT IS `max-width: 460px`, NOT 461. .grid's own queries are
+   `min-width: 461px`, so 460 is the last width the single column is asked
+   for and the two must stay complementary — a 461 here would render the
+   bands and the two-up grid's rules at the same time.
+
+   Keep in step with the first @media block in Discover.module.css. */
+const SPINES = "(max-width: 460px)";
+
 /* ══════════════ THE ARRIVAL DRIVER ══════════════
    Eight tiles used to hold eight `useScroll({ target: cellRef })`. This
    replaces all eight with one measurement each, taken once.
@@ -881,6 +904,40 @@ export default function Discover() {
   // full detail card (null = none)
   const [active, setActive] = useState<DiscoverItem | null>(null);
 
+  /* ---- WHICH LAYOUT THIS WIDTH GETS ----
+     ⚠️ STATE AND NOT A REF, AND IT LISTENS RATHER THAN READING ONCE. This
+     decides which subtree renders, so it has to re-render when it changes —
+     a phone rotated from 390 to 844 crosses this edge. `false` until the
+     effect proves otherwise, because there is no matchMedia on the server:
+     the exported HTML therefore always carries the GRID and its eight
+     links, which is the crawlable markup this chapter has always shipped.
+     Blog.tsx and AboutSplit.tsx run the identical pattern on STACKED.
+
+     THE SWAP IS NEVER SEEN. The chapter's top edge sits ~1,176px down the
+     page, so the effect has resolved long before the section is scrolled
+     to — the same argument the Tile's `mounted` gate already makes for
+     withholding its ink. */
+  const [spines, setSpines] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia(SPINES);
+    const read = () => setSpines(mq.matches);
+    read();
+    mq.addEventListener("change", read);
+    return () => mq.removeEventListener("change", read);
+  }, []);
+
+  /* THE EXPANSION IS DESKTOP-ONLY NOW, and this is the seam that enforces
+     it. Nothing on the phone can OPEN it — <Spines> discloses in place and
+     never calls setActive — but a reader who expands a card and then
+     rotates into the band layout would leave `active` set, and
+     <ExpandedCard> would then morph out of a `layoutId` whose tile has just
+     unmounted: framer has no rect to fly from and the card appears from
+     nowhere at the centre of the screen. Closing it on the crossing is one
+     line and removes the whole class of it. */
+  useEffect(() => {
+    if (spines) setActive(null);
+  }, [spines]);
+
   /* ---- THE MENU IS THIS PAGE'S NOW ----
      Both grids used to send the Menu control to `/restaurants/<slug>`, which
      opened the same pages in <MenuOverlay> once the reader got there. That
@@ -945,7 +1002,12 @@ export default function Discover() {
     const ro = new ResizeObserver(read);
     ro.observe(grid);
     return () => ro.disconnect();
-  }, []);
+    /* ⚠️ KEYED ON THE LAYOUT, not empty. The grid unmounts below 460px, so
+       an effect that ran once at mount would either find no grid at all (a
+       phone, first paint) and never look again, or keep an observer on a
+       detached node after the swap. Re-running on the crossing re-attaches
+       it to whichever grid is actually on the page. */
+  }, [spines]);
 
   /* one-shot entrance reveal. It watches the SECTION rather than the ul —
      inherited from the assembly, where the ul could be absent, but still
@@ -1427,6 +1489,24 @@ export default function Discover() {
           grid does not scroll on either axis, so projection is right by
           default. */}
 
+      {/* ══ ONE LIST PER WIDTH, AND ONLY ONE IS EVER MOUNTED ══
+          Not two subtrees with a `display: none` on the loser: that is
+          sixteen photographs for a phone to consider, and next/image would
+          eagerly fetch the hidden set's above-the-fold members. The choice
+          is made in JS on a matchMedia read and only the winner renders.
+
+          THE BANDS TAKE NO ENTRANCE. The grid's is a per-cell scrub — each
+          Tile measures its own arrival and inks through it — and that
+          machinery belongs to a cell that is 294px tall on a page with room
+          to spend. Eight 75px bands occupy less than one screen between
+          them, so a staggered arrival would be eight overlapping ranges
+          inside a single viewport height: every band's range would resolve
+          at once and the stagger would read as a flicker rather than as a
+          cascade. They simply render, which is what the chapter's own note
+          on the retired assembly intro argues an unstaged object should do. */}
+      {spines ? (
+        <Spines items={ITEMS} onMenu={setMenuFor} />
+      ) : (
         <motion.ul
           ref={setGridEl}
           className={styles.grid}
@@ -1507,6 +1587,7 @@ export default function Discover() {
             );
           })}
         </motion.ul>
+      )}
 
       {/* THE CLOSING HAIRLINE IS GONE, at the user's instruction, and with
           it the last of this chapter's three rules to sit on open cream.
