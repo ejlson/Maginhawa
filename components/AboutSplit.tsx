@@ -107,15 +107,17 @@ const PORTRAIT_LINE = ["Where it began.", "Camden, 1987."];
    "seven rooms vs eight tiles" as unreconciled.
 
    ══════════ THE LEAD WAS EXPANDED, at the user's instruction ══════════
-   ⚠️ ITS FIRST SENTENCE IS LOAD-BEARING AND IS UNCHANGED. It is the hero's
-   cover line, verbatim — components/Hero.tsx sets out the echo at length
-   and the rule that comes with it: the sentence changes in BOTH places or
-   not at all. Everything AFTER the full stop is this paragraph's own, which
-   is exactly why the expansion could happen here and could not happen in
-   the hero.
+   ⚠️ ITS FIRST SENTENCE IS LOAD-BEARING. It is the hero's cover line,
+   verbatim — components/Hero.tsx sets out the echo at length and the rule
+   that comes with it: the sentence changes in BOTH places or not at all.
+   It has changed once under that rule, at the user's instruction: "We cook
+   the food we grew up on, for people we treat like family." became the
+   line above, and Hero.tsx moved with it. Everything AFTER the full stop
+   is this paragraph's own, which is exactly why the expansion could happen
+   here and could not happen in the hero.
 
    WHAT THE OLD VERSION WAS MISSING. It made the claim and then never
-   answered it. "The food we grew up on" is a specific promise — whose
+   answered it. The opening sentence makes a specific promise — whose
    childhood, which evenings, cooked how — and the paragraph went straight
    past it into a tricolon about the room. Worse, the tricolon's third leg
    ("a plate that tastes like somebody's home") was the vaguest line in it
@@ -139,7 +141,7 @@ const PORTRAIT_LINE = ["Where it began.", "Camden, 1987."];
    A belief paragraph that quietly speaks for only two thirds of the
    estate is worse writing than one that stays universal.
 
-   LENGTH: 585 characters, up from 302, and it was measured rather than
+   LENGTH: 593 characters, up from 302, and it was measured rather than
    estimated because .readingBlock faces a full-height film panel and a
    paragraph that outgrows it would break the split rather than just look
    long. Rendered (probe, lead paragraph vs the panel opposite):
@@ -151,7 +153,15 @@ const PORTRAIT_LINE = ["Where it began.", "Camden, 1987."];
 
    The block clears the panel at every width, mobile included, with nothing
    clipped and no viewport overflow. 390 is the one to re-measure if this
-   grows again — it is the width where the two are closest. */
+   grows again — it is the width where the two are closest.
+
+   RE-MEASURED when the first sentence changed (585 → 593 characters): the
+   line counts and EVERY block height above came back identical — 6/6/8/11
+   and 349/336/350/429 — checked against a same-probe control run on the
+   old wording, which returned the same four rows to the pixel. The longer
+   opener costs no line at any width, 390 included. (The panel column is
+   set by the viewport, not by this copy, so nothing this change does can
+   move it.) */
 const PARA_LEAD =
   "Food rooted in where we come from, made for the people around the table. Not a polite version of it: the dishes made for us on ordinary evenings, in the quantities you cook for a house rather than a table, by people who took it personally if you left still hungry. A table you are not hurried from, a room that is easy to be in, and a plate that arrives while it is still too hot because somebody wanted you to have it. It is the only way any of us has ever learned to feed people, and it is why the same faces come back year after year, first with their parents and later with their children.";
 const PARA_FINE =
