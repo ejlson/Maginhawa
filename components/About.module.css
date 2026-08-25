@@ -353,7 +353,7 @@
 }
 
 /* ---- pinned video scope ----
-   The video pins to the viewport (sticky, 100svh) while everything in
+   The video pins to the viewport (sticky, 100lvh) while everything in
    .videoContent — hero type, statement/Omar band, story timeline —
    scrolls over it; the sticky releases at the scope's end, just before
    Awards & Recognition. */
@@ -361,10 +361,37 @@
   position: relative;
 }
 
+/* ⚠️ lvh, NOT THE svh THE REST OF THIS FILE USES, AND THE DIFFERENCE IS
+   VISIBLE ON EVERY PHONE. svh is the SMALL viewport — the height a phone has
+   while its URL bar and toolbar are shown. Scroll and that chrome retracts,
+   the visible area grows towards lvh, and a box measured in svh is then
+   SHORTER than the screen it is pinned to. For content that is only sized by
+   the unit (Hero, Interlude, Passage's stage) that is the safe choice: it
+   guarantees the thing fits when the chrome is out. For the one element that
+   has to COVER the screen it is nothing of the sort — the strip it no longer
+   reaches shows .page's cream, right through the story timeline, which is
+   what a reader on an iPhone sees as a cream band under the film.
+
+   lvh is the LARGE viewport, which the visible area can never exceed, so the
+   backdrop can only ever over-cover; the surplus hides behind the chrome when
+   the chrome is there. Nothing is lost to it: the film is object-fit: cover
+   and the backdrop holds no content, so the only effect is a slightly tighter
+   crop. NOT dvh — that resolves to whatever the viewport is RIGHT NOW, so it
+   would rewrite this height and .videoContent's matching negative margin
+   mid-scroll, moving the whole scope under the reader as the bar slides away.
+
+   THE TWO VALUES ARE ONE MEASUREMENT. .videoContent's margin-top must stay
+   the exact negative of this height or the content stops landing on the
+   backdrop's top edge; change one and change the other. The scope's own
+   height is unaffected either way (backdrop + content − backdrop = content),
+   so no scroll position on the page moves. Measured by
+   scripts/probe-about-chromegap.mjs, which models the retraction desktop
+   Chrome does not have: 87px of cream at every stop through the scope
+   before, 0 after. */
 .videoBackdrop {
   position: sticky;
   top: 0;
-  height: 100svh;
+  height: 100lvh;
   overflow: hidden;
 }
 
@@ -389,10 +416,13 @@
 /* content overlays the sticky backdrop via negative margin. Positioned so
    it paints above the backdrop, but with z-index UNTOUCHED (auto): a
    stacking context here would isolate the type's difference blend from
-   the video beneath it. */
+   the video beneath it.
+
+   lvh, matching .videoBackdrop's height exactly — see the note there for why
+   the pair is in the large viewport and why they move together. */
 .videoContent {
   position: relative;
-  margin-top: -100svh;
+  margin-top: -100lvh;
 }
 
 /* THE SETTLE — the film's own arrival, and the only motion in the backdrop.
