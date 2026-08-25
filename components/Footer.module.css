@@ -53,6 +53,15 @@
 
 /* ---------- top band ---------- */
 
+/* The motion wrapper around the mark, named only so the phone can place it.
+   It carries no box of its own at any width — the transform on it is the
+   scroll scrub's (see the note beside it in Footer.tsx), and the sizing is
+   .markLink's. Above 640px it is simply the band's first grid cell, exactly
+   as the unnamed <motion.div> was. */
+.markCell {
+  min-width: 0;
+}
+
 /* no align-self here — it inherits the band's `align-items: end` so the mark
    settles down by the hairline with the blurb and the invitation */
 .markLink {
@@ -184,6 +193,25 @@
   line-height: var(--lh-body);
 }
 
+/* ⚠️ `display: contents` IS LOAD-BEARING HERE, NOT A TIDINESS CHOICE.
+   .brandHold wraps the brand name and the back-to-top button so the phone
+   can stack them into its left column. But the two rails above the phone
+   want those two elements as SEPARATE cells of the `33fr 30fr 37fr` grid —
+   the brand under the mark, the button under the blurb — and a real box
+   around them would collapse both into cell one and leave cell two empty.
+
+   Dissolving the box is what lets one DOM serve both: above 641px the
+   wrapper generates no principal box, so its children are the grid's own
+   items and the desktop layout is bit-for-bit what it was. Below 641px it
+   becomes a flex column and takes a grid cell of its own.
+
+   The same mechanism runs .colGroup below. Both are plain <div>s with no
+   role or semantics to lose — the one real hazard of `display: contents`,
+   which is why it is NOT used on the <nav> in the credit row. */
+.brandHold {
+  display: contents;
+}
+
 .backToTop {
   justify-self: start;
   display: inline-flex;
@@ -252,6 +280,20 @@
     grid-template-columns: repeat(3, minmax(0, 1fr));
     align-items: start;
   }
+}
+
+/* Contact Us + Follow Us, paired for the phone and dissolved everywhere else
+   so `repeat(3, ...)` above still counts three children. See .brandHold for
+   why the box disappears rather than being duplicated in markup. */
+.colGroup {
+  display: contents;
+}
+
+/* Explore's own name. It needs one because the phone places it by hand
+   (column 1, second row) while its two siblings travel inside .colGroup —
+   `:first-child` would work today and break the moment a column is added. */
+.exploreCol {
+  min-width: 0;
 }
 
 /* social entries with no confirmed profile URL — plain text, not a link.
@@ -353,6 +395,37 @@
   margin-top: auto;
 }
 
+/* ══════ THE WORDMARK GETS AIR ABOVE IT ON PHONE AND TABLET ══════
+
+   `margin-top: auto` above reads as though it already guarantees a gap. IT
+   DOES NOT, and the measurement is the reason this rule exists: an auto
+   margin absorbs FREE space, and on a footer that is `min-height: 100svh`
+   with `.top { flex: 1 }` there is none — the top band expands to eat all of
+   it first. Measured at rest on /about, `margin-top` resolves to 0px at both
+   390x844 and 1440x900. The gap you see above the glyphs is not the auto
+   margin; it is the blank the SVG carries over its own cap height.
+
+   That blank is enough at desktop and it is not enough below the rail:
+       1440x900   89px   fine, and untouched by this rule
+       390x844    23px   tight under a 79px full-bleed glyph
+       390x844     0px   /contact, where the footer no longer reserves a
+                         screen (see ContactPage.module.css) and the wordmark
+                         came to rest hard against the last column link
+   So the floor is scoped to max-width 860px — the same edge /contact's own
+   fix uses — and desktop keeps exactly the gap it has always had.
+
+   ⚠️ IT IS PAID FOR OUT OF `.top`, NOT ADDED TO THE FOOTER'S HEIGHT. The
+   footer is pinned to one screen, so every box in it trades space with the
+   others: the footer measured 844px before this rule and 844px after, and
+   the 42px came off the top band's slack. That is the right pocket to take
+   it from — the band is `flex: 1` precisely because it is the elastic one —
+   but it is why the value is a floor and not a larger number. */
+@media (max-width: 860px) {
+  .wordmarkReveal {
+    padding-top: clamp(32px, 5vh, 56px);
+  }
+}
+
 /* The mask layer. Purely a box for the clip to live in — it takes no space of
    its own, and it exists ONLY because the clip cannot go on the wrapper above:
    Chromium hands an element's own clip-path to IntersectionObserver, so a
@@ -429,6 +502,14 @@
    These links are the same size and weight as their neighbours, so they
    answer to the same number, and a second opacity here would multiply into
    it and put them back under the floor. */
+/* The two text runs of the credit row. They carry nothing at desktop — the
+   row is `space-between` and source order places them — and exist so the
+   phone can seat them under their matching legal link. */
+.copy,
+.credit {
+  min-width: 0;
+}
+
 .legal {
   display: flex;
   gap: var(--space-sm);
@@ -450,19 +531,147 @@
   border-bottom-color: currentColor;
 }
 
-/* Phones: the three columns go 2-up rather than one long stack, and the
-   links take a finger-sized pitch. The footer keeps min-height (not height),
-   so it can still grow past the viewport here if it needs to. */
+/* ═════════════ THE PHONE TAKES TWO FULL COLUMNS ═════════════
+
+   What this replaces: `.cols { grid-template-columns: 1fr 1fr }`. Three
+   columns in a 2-up grid is a counting problem with exactly one outcome —
+   Explore and Contact pair up and Follow Us drops to a second row beside an
+   empty cell. The orphan was not a spacing fault and no gap value fixes it.
+
+   THE ARRANGEMENT, at the client's direction:
+       left    the brand, Back to top, then Explore
+       right   Contact Us, then Follow Us
+   Both columns run full, so there is nothing left over to orphan. The two
+   ends deliberately do NOT align — Explore starts three rows below the
+   brand while Contact Us starts level with it — and that stagger is the
+   layout, not a defect to tune out.
+
+   HOW IT IS BUILT — .brandHold and .colGroup stop being `display: contents`
+   and become real boxes here, and only here. Everything above 640px, the
+   tablet rail included, sees the same flattened child list it always did.
+   See the note beside .brandHold for the full argument.
+
+   The footer keeps min-height (not height), so it can still grow past the
+   viewport if it needs to. Measured at 390x844 against the build this
+   replaces: 1018px of footer down to 776px, a 24% cut, with nothing
+   dropped. */
 @media (max-width: 640px) {
-  .cols {
-    grid-template-columns: 1fr 1fr;
-    gap: clamp(18px, 4vw, 28px) 16px;
+  /* ── the mark and the blurb become one lockup ──
+     They were two full-width rows with the band's 34px row gap between
+     them, which spent a third of a screen on a 34px mark sitting alone on
+     a line. Side by side they read as one signature and cost one row.
+     Only the COLUMN gap is set: the row gap stays the band's own, and it
+     is what separates the lockup from the invitation below it. */
+  .top {
+    grid-template-columns: auto minmax(0, 1fr);
+    column-gap: var(--space-sm);
   }
+  .markCell,
+  .blurb {
+    grid-row: 1;
+    /* centred on each other rather than top-aligned — the blurb sets two
+       lines here and the mark is one 34px square, so a shared top edge
+       would hang the mark off the first line */
+    align-self: center;
+  }
+  .markCell {
+    grid-column: 1;
+  }
+  .blurb {
+    grid-column: 2;
+  }
+  .invite {
+    grid-column: 1 / -1;
+    grid-row: 2;
+  }
+
+  /* ── the links band ── */
+  .links {
+    grid-template-columns: 1fr 1fr;
+    /* column gap only; the row gap is the band's, and it is the step
+       between the brand holder and Explore under it */
+    column-gap: 16px;
+    align-items: start;
+  }
+
+  .brandHold {
+    display: flex;
+    flex-direction: column;
+    align-items: flex-start;
+    gap: var(--space-xs-y);
+    grid-column: 1;
+    grid-row: 1;
+  }
+
+  /* the columns' own grid dissolves so its three children are placed
+     directly by .links above — Explore on the left under the brand, the
+     pair on the right */
+  .cols {
+    display: contents;
+  }
+
+  .exploreCol {
+    grid-column: 1;
+    grid-row: 2;
+  }
+
+  /* spans both rows so its two lists flow from the top of the band and
+     seat wherever they end, rather than being pinned to the left column's
+     rows. Explore's five links run slightly longer than these seven
+     shorter ones, so the right column finishes first. */
+  .colGroup {
+    display: flex;
+    flex-direction: column;
+    gap: clamp(22px, 3.4vh, 30px);
+    grid-column: 2;
+    grid-row: 1 / span 2;
+  }
+
   .col a {
     font-size: var(--t-body);
   }
   .col ul {
     gap: var(--lockup-gap-sm);
+  }
+
+  /* ── THE CREDIT ROW STOPS COLLIDING WITH ITSELF ──
+     `.bottomRow` is `space-between` with three children and NO gap. At
+     390px the row has 358px to seat "© Maginhawa Group", "Privacy Terms"
+     and "Website designed by EJ" at --t-label with --tr-label tracking.
+     It does not fit, so the runs touch: the shipped build renders
+     "GroupPrivacy" and "TermsWebsite" with no space between them. That is
+     a rendering fault, not a tight measure.
+
+     Two columns and two rows at the client's direction — Privacy over the
+     copyright on the left, Terms over the credit on the right. Four short
+     runs in four cells cannot touch at any width.
+
+     ⚠️ THE <nav> STAYS A REAL BOX and is spanned across both columns
+     instead of being dissolved. `display: contents` on it would let the
+     two links be placed individually, which is tidier CSS and the wrong
+     trade: it is the one element in here carrying a landmark role, and
+     that is precisely the case where dissolving a box has historically
+     cost semantics. `space-between` inside the span puts the links on the
+     same two edges for free. */
+  .bottomRow {
+    display: grid;
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: var(--space-sm);
+    row-gap: 0.35em;
+  }
+  .legal {
+    grid-column: 1 / -1;
+    grid-row: 1;
+    justify-content: space-between;
+  }
+  .copy {
+    grid-column: 1;
+    grid-row: 2;
+  }
+  .credit {
+    grid-column: 2;
+    grid-row: 2;
+    text-align: right;
   }
 }
 
