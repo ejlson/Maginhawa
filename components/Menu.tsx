@@ -130,13 +130,15 @@ export default function Menu({
         <span className={styles.rule} aria-hidden />
 
         <div className={styles.legal}>
-          {/* the year is read at render, so it is one value on the build
-              server and another in the browser for exactly one day a year —
-              suppressed rather than frozen, because a stale copyright is
-              the worse failure */}
-          <span className={styles.dim} suppressHydrationWarning>
-            &copy; {new Date().getFullYear()} Maginhawa
-          </span>
+          {/* SAME NOTICE THE FOOTER PRINTS, YEAR AND ALL — see the comment
+              on .bottomRow in Footer.tsx. This read `new Date().getFullYear()`
+              under suppressHydrationWarning, which is the static-export
+              hydration bug held at arm's length rather than fixed: the
+              exported HTML carries the build's year and the browser hydrates
+              with the current one. A year is optional in a UK copyright
+              notice, so the overlay claims no date either, and the two places
+              a reader meets the notice now say the same thing. */}
+          <span className={styles.dim}>&copy; Maginhawa Group</span>
 
           {EMAIL && (
             <a className={styles.mail} href={`mailto:${EMAIL}`}>

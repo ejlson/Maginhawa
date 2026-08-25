@@ -60,7 +60,7 @@ const CHAPTERS: {
   {
     year: "1987",
     title: "Bintang opens in Camden",
-    body: "Chef Omar's parents open the original family restaurant on Kentish Town Road — a Filipino kitchen with a fusion accent that becomes a neighbourhood fixture.",
+    body: "Chef Omar's parents open the original family restaurant on Kentish Town Road - a Filipino kitchen with a fusion accent that becomes a neighbourhood fixture.",
     image: "/images/bintang.jpg",
     imageAlt: "Bintang's dining room in Camden",
     place: "Camden",
@@ -210,15 +210,11 @@ type CoverageRow = {
   feature: string;
   restaurants: string[];
   url: string;
-  // resolved hover-image path (bespoke press override, else the first
-  // credited restaurant's photo) — absent when only a missing placeholder
-  // would resolve, so the row simply skips the hover treatment
-  image?: string;
 };
 
-// hover-image guard — this restaurant `image` path is a placeholder that
-// does not exist under /public. Rows resolving to it get no hover image at
-// all rather than a broken <img>.
+// missing-photograph guard — this `image` path is a placeholder that does not
+// exist under /public. A timeline chapter resolving to it renders the maroon
+// coming-soon field rather than a broken <img>.
 //
 // Mamasons has come off this list: lib/restaurants.ts pointed at
 // `/images/mamasons-placeholder.jpg`, which was never added, so the grid tile
@@ -227,12 +223,11 @@ type CoverageRow = {
 // there is a real file behind it and nothing to suppress.
 //
 // ⚠️ NOTHING RESOLVES TO THIS PATH TODAY, and the guard is kept anyway. It
-// read as Bunso's — Bunso had no picture, and both the press rows and its
-// timeline chapter fell back to the coming-soon field. It has the shopfront
-// now, on /about as well as its card, so the set matches no record. What it
-// still does is catch the NEXT placeholder: CHAPTERS and lib/restaurants.ts
-// are both hand-edited, and a row naming a file that is not in public/ should
-// render the maroon field rather than a broken <img>. Add the path here.
+// read as Bunso's — Bunso had no picture, so its timeline chapter fell back to
+// the coming-soon field. It has the shopfront now, so the set matches no
+// record. What it still does is catch the NEXT placeholder: CHAPTERS and
+// lib/restaurants.ts are both hand-edited, and a chapter naming a file that is
+// not in public/ should not render a broken <img>. Add the path here.
 const MISSING_IMAGES = new Set(["/images/bunso-placeholder.jpg"]);
 
 /* The restaurants that actually have press, most-covered first, as names.
@@ -254,17 +249,11 @@ const COVERAGE_GROUPS: { outlet: string; entries: CoverageRow[] }[] = (() => {
   const byOutlet = new Map<string, CoverageRow[]>();
 
   for (const p of PRESS) {
-    // bespoke press image first, else the first credited restaurant's
-    // canonical photo — dropped entirely when only a known-missing
-    // placeholder would resolve
-    const image = p.image ?? getRestaurant(p.restaurants[0])?.image;
-
     const row: CoverageRow = {
       outlet: p.outlet,
       feature: p.feature,
       restaurants: p.restaurants.map((s) => getRestaurant(s)?.name ?? s),
       url: p.url,
-      image: image && !MISSING_IMAGES.has(image) ? image : undefined,
     };
 
     if (!byOutlet.has(p.outlet)) byOutlet.set(p.outlet, []);
@@ -860,21 +849,6 @@ export default function About() {
                                   <path d="M14 1 L18 5 L14 9" />
                                 </svg>
                               </span>
-
-                              {/* hover preview — always mounted, absolutely
-                              positioned (see .coverageThumb) so it floats
-                              between the feature text and the arrow and can
-                              never reflow the row grid; decorative only */}
-                              {row.image && (
-                                <img
-                                  className={styles.coverageThumb}
-                                  src={asset(row.image)}
-                                  alt=""
-                                  aria-hidden
-                                  loading="lazy"
-                                  decoding="async"
-                                />
-                              )}
                             </a>
                           ))}
                         </div>

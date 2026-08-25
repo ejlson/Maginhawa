@@ -20,6 +20,15 @@ export const CONTACT = {
   /** PLACEHOLDER — replace with the real enquiries inbox. */
   email: "info@mgnhw.com",
   /**
+   * Press and media only, handled by the group's PR consultancy rather than
+   * the general inbox above. Unlike its neighbours this one is REAL, which is
+   * why it carries no PLACEHOLDER note — do not sweep it up with them.
+   *
+   * It is deliberately absent from the footer: the footer offers one way in,
+   * and a journalist arrives via /contact where the two are labelled apart.
+   */
+  pressEmail: "lily@amywilliamsconsultancy.com",
+  /**
    * PLACEHOLDER — head-office hours, not restaurant service hours. Each
    * restaurant keeps its own opening times on its detail page.
    */

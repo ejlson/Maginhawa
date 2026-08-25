@@ -1,0 +1,377 @@
+/* ═══ THE SPINES — eight bands, one screen ═══════════════════════════════
+   Rendered only below 461px; see SPINES in Discover.tsx and the banner in
+   Spines.tsx for what it replaces.
+
+   THE HEIGHT BUDGET, measured at 390 × 844 and the reason every number
+   below is what it is:
+
+     844   the viewport
+     -44   status bar
+     -44   the site nav
+     -72   the chapter's eyebrow, rule and heading
+     -34   the home indicator
+     ───
+     650   for eight bands
+
+   8 × 75 + 7 × 4 = 628 closed, and 138 + 7 × 66 + 28 = 628 open. THE TWO
+   SUMS ARE EQUAL ON PURPOSE — see --spine-list-h. The 22px left over is
+   the air under the last band rather than slack to spend. Change --spine-h
+   and re-do both sums. */
+
+.spines {
+  --spine-h: 75px;
+  /* what a band grows to. Seats two address lines and the hours under the
+     who-line without the wordmark having to move: .more starts at 75, so
+     this leaves it 63 for a 32px block. */
+  --spine-open-h: 138px;
+  /* what the other seven give back to pay for it, and the pair is SOLVED
+     rather than chosen: 138 + 7 × 66 = 600, which with the seven 4px gaps
+     is 628 — exactly the closed height. */
+  --spine-shut-h: 66px;
+  --spine-gap: 4px;
+  --spine-list-h: 628px;
+
+  list-style: none;
+  margin: 0;
+  padding: 0;
+  display: flex;
+  flex-direction: column;
+  gap: var(--spine-gap);
+
+  /* ═══ THE LIST'S BOX NEVER CHANGES, AND THAT IS A PERFORMANCE DECISION
+     RATHER THAN A LAYOUT ONE ═══
+     Opening a band animates `height` on eight elements at once — one
+     growing, seven shrinking — and an animated layout property is a
+     relayout every frame. What makes that expensive is not the eight
+     boxes, it is how far the relayout REACHES: with an auto-height list
+     the document's flow below this section is re-solved on every one of
+     those frames, and this page is the one that already does ~165
+     layout-flushing reads a frame under framer's per-handler re-measure.
+
+     Pinning the list to the height both states already sum to stops the
+     propagation at this element: the box the document sees is constant, so
+     nothing downstream moves. `contain: layout` then states it to the
+     engine as a promise rather than leaving it to infer it.
+
+     ⚠️ THE HEIGHT IS ONLY SAFE BECAUSE EVERY BAND IS A FIXED PX. There is
+     no clamp() and no vw in --spine-h, --spine-open-h or --spine-shut-h,
+     so the content cannot outgrow the box at any phone width. Put a fluid
+     unit in any of the three and this pin becomes a clip. */
+  height: var(--spine-list-h);
+  contain: layout;
+}
+
+.spine {
+  position: relative;
+  height: var(--spine-h);
+  overflow: hidden;
+  background: var(--maroon);
+  /* the printed-plate corner the chapter's photography already wears —
+     the same token .cardSurface and the tile seat take */
+  border-radius: var(--radius-tile);
+  /* ⚠️ HEIGHT, AND IT IS NOT THE USUAL MISTAKE — but it was flagged as one,
+     so here is the measurement rather than the argument.
+
+     A transform is the usual answer and is the wrong one here: the band is
+     a photograph under a wordmark and three pills, and a scaleY would
+     squash all four and spring them back. The box genuinely changes size,
+     because the band genuinely reveals content.
+
+     WHERE THE TIME GOES, measured at 390 × 844 across the gesture window
+     with CDP's cumulative counters, against a null control running the
+     same window with no gesture:
+
+       LayoutCount      ~70      one per frame, as expected
+       LayoutDuration   ~50ms    → well under 1ms each. LAYOUT WAS NEVER
+                                   THE COST, so "don't animate a layout
+                                   property" is the right rule pointing at
+                                   the wrong line.
+       TaskDuration     ~570ms   → most of it unaccounted for by style,
+                                   layout or script. That was PAINT: eight
+                                   full-bleed photographs re-rastering
+                                   every frame as their boxes resized.
+
+     Two things answer it and neither is a transform, because the cost was
+     never the property — it was the reach.
+       · `.spines` is pinned to the height both states already sum to, so
+         the relayout stops at this list instead of re-solving the document
+         below it. Verified rather than sampled: the list box reads 628 in
+         both states and document scrollHeight 7096 in both.
+       · the picture and the ramp are pinned to --spine-h, so they hold one
+         raster while the band goes 66 / 75 / 138. Verified the same way:
+         the picture's own box measures 75 in all three states.
+     Task time for the gesture after both: ~400–530ms over three runs,
+     against ~570ms before.
+
+     ⚠️ DO NOT CERTIFY THIS WITH A FRAME COUNT. Per-frame rAF sampling on
+     this page is too noisy to read: identical code returned 1, 11 and 12
+     over-budget frames on three runs at 4× CPU throttle, and 0 then 9 at
+     1×. The cumulative counters above are the stable signal; a frame count
+     needs a null-change control run beside it or it is a coin toss. */
+  transition: height var(--dur-slow) var(--ease-drawer);
+}
+
+.spine[data-open="on"] { height: var(--spine-open-h); }
+.spines[data-any-open] .spine:not([data-open]) { height: var(--spine-shut-h); }
+
+/* ═══ THE PICTURE IS A FIXED RASTER THAT THE BAND CLIPS ═══════════════════
+   next/image `fill` gives this `inset: 0`, which would tie the photograph's
+   box to the band's and re-raster all eight of them on every frame of the
+   open. MEASURED, at 4× CPU throttle over the 760ms gesture: 73 layouts
+   costing 56ms in total — 0.77ms each, i.e. layout was never the problem —
+   against 566ms of task time. The missing ~430ms was paint.
+
+   Pinning the picture to --spine-h decouples it: the img's own box never
+   changes in any of the three states, so there is nothing to re-raster and
+   the band's height change becomes a clip, which the compositor does for
+   free. The maroon ground behind it fills whatever the band grows into —
+   which is also where .more lands, so the address ends up on flat ink
+   rather than on a photograph, and is the more legible for it.
+
+   ⚠️ THIS IS WHY THE CROP SURVIVED THE FIX. The obvious version — letting
+   the picture be --spine-open-h tall and revealing more of it — cannot
+   reproduce these frames: `cover` on a 138-tall box shows more of the
+   source and has only 100.7px of spill against the 75-tall box's 163.7, so
+   Belly's 84% and Bunso's 74% are literally out of range. Keeping the box
+   at 75 keeps every SPINE_FOCAL value exactly as derived. */
+/* THE PINNED BOX. `fill` fills THIS rather than the band, so the picture
+   holds one raster whether its band is 66, 75 or 138 tall. It cannot be
+   done on the <Image> itself — see the note at the call site. */
+.frame {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--spine-h);
+  overflow: hidden;
+}
+
+.photo {
+  object-fit: cover;
+  /* THE BAND IS THE CROP. `object-position` is written per venue from the
+     component — see SPINE_FOCAL — because 358 × 75 cuts almost the whole
+     vertical and three of the eight land on their own shopfront signage. */
+  user-select: none;
+  pointer-events: none;
+}
+
+.fallback {
+  position: absolute;
+  inset: 0;
+  background: var(--maroon);
+}
+
+/* THE RAMP. Dark end left under the wordmark, light end right under the
+   controls — but not as light as it wants to be: measured on the mock at
+   22% ink, a 42%-cream ghost outline sat on Hoodwood's green fascia and
+   Ramo's blue door with no contrast at all. 52% is where all eight hold. */
+/* THE RAMP BELONGS TO THE PICTURE, so it is pinned to the same box for the
+   same reason — a gradient that resizes is a gradient that repaints. It
+   ends where the photograph ends; below that the band is already ink. */
+.ramp {
+  position: absolute;
+  top: 0;
+  left: 0;
+  right: 0;
+  height: var(--spine-h);
+  background: linear-gradient(
+    to right,
+    color-mix(in srgb, var(--maroon) 92%, transparent) 0%,
+    color-mix(in srgb, var(--maroon) 78%, transparent) 42%,
+    color-mix(in srgb, var(--maroon) 52%, transparent) 100%
+  );
+}
+
+/* the press target — the whole band, under the controls in paint order */
+.hit {
+  position: absolute;
+  inset: 0;
+  appearance: none;
+  border: 0;
+  padding: 0;
+  background: none;
+  cursor: pointer;
+  -webkit-tap-highlight-color: transparent;
+}
+.hit:focus-visible {
+  outline: 2px solid var(--cream);
+  outline-offset: -3px;
+  border-radius: var(--radius-tile);
+}
+
+/* ── the who-line and the controls ─────────────────────────────────────
+   ⚠️ TRANSPARENT TO THE POINTER, and it has to be: this layer paints over
+   .hit and would otherwise swallow every press meant for it. The pills
+   inside opt back in, which is exactly what puts Book on top of the
+   open-the-band press. */
+.band {
+  position: absolute;
+  inset: 0;
+  /* pinned to the band's TOP rather than centred, so the who-line and the
+     controls do not travel when the box grows — only the panel below them
+     appears. A row that slides while a panel fades in is two gestures. */
+  height: var(--spine-h);
+  padding: 0 12px 0 14px;
+  display: flex;
+  align-items: center;
+  gap: 12px;
+  pointer-events: none;
+}
+
+.who {
+  flex: 1 1 auto;
+  min-width: 0;
+  display: block;
+}
+
+/* THE MARK'S SLOT, sized from the letterforms exactly as .cardLogo does:
+   cap / --lr, so every venue's NAME renders at one height whatever
+   furniture its lockup carries. The fallbacks keep a flat slot for a mark
+   with no measurement on file. */
+.markSlot {
+  --ink-h: 14px;
+  display: block;
+  height: calc(var(--ink-h) / var(--lr, 0.5));
+  width: calc((var(--ink-h) / var(--lr, 0.5)) * var(--la, 3.2));
+  /* the widest lockup in the set (Café Mama, 5.3 : 1) would otherwise run
+     into the pills. `contain` re-fits inside the capped box rather than
+     overflowing it — the same relationship .cardLogoMark keeps. */
+  max-width: min(176px, 100%);
+}
+
+.mark {
+  display: block;
+  width: 100%;
+  height: 100%;
+  background-color: var(--cream);
+  -webkit-mask: var(--ov-logo-url) no-repeat left center / contain;
+  mask: var(--ov-logo-url) no-repeat left center / contain;
+}
+
+/* a venue with no mark on file still gets its name, in the display face */
+.markText {
+  display: block;
+  font-family: var(--font-display);
+  font-size: 1.125rem;
+  line-height: var(--lh-flush, 1);
+  color: var(--cream);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.area {
+  display: block;
+  margin-top: 6px;
+  font-family: var(--font-mono);
+  font-size: 0.5rem;
+  letter-spacing: var(--tr-label-mono, 0.13em);
+  text-transform: uppercase;
+  color: color-mix(in srgb, var(--cream) 62%, transparent);
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+}
+
+.acts {
+  display: flex;
+  align-items: center;
+  gap: 5px;
+  flex: none;
+  pointer-events: auto;
+}
+
+/* ═══ THE PILLS ARE THE CARD'S ═══════════════════════════════════════════
+   composed, not restated: one radius, one label voice, one hover and
+   :active response across both surfaces. Add a property here only where
+   the BAND differs from the card, and say why. */
+.pill {
+  composes: cardBtn from "./VenueCard.module.css";
+  /* THE DRAWN CONTROL IS 30 TALL — the card's own floor — because eight
+     bands cannot afford the card's 2.4vw ceiling. The TOUCH TARGET is
+     grown back to 44 below, which is the number that actually matters. */
+  min-height: 30px;
+  padding: 0 0.72em;
+  /* the container-query term in .cardBtn's font-size resolves against a
+     container this list does not declare, so it falls back to the vw-less
+     literal. Stated flat here: a band is one width at every phone. */
+  font-size: 0.625rem;
+  position: relative;
+}
+
+/* 44 × 44 WITHOUT A 44px VISUAL. Eight bands of three controls cannot draw
+   a 44px pill — the band is 75 tall — so the hit area is grown with a
+   pseudo-element instead. The band is tall enough to absorb it, and the
+   pills are 5px apart, so no two targets overlap. */
+.pill::after {
+  content: "";
+  position: absolute;
+  left: 0;
+  right: 0;
+  top: 50%;
+  height: 44px;
+  transform: translateY(-50%);
+}
+
+.pillGhost { composes: cardBtnGhost from "./VenueCard.module.css"; }
+.pillFill { composes: cardBtnFill from "./VenueCard.module.css"; }
+
+/* ── what the band gives up when it opens ───────────────────────────── */
+.more {
+  position: absolute;
+  left: 14px;
+  right: 12px;
+  top: var(--spine-h);
+  display: flex;
+  align-items: flex-start;
+  justify-content: space-between;
+  gap: 12px;
+  opacity: 0;
+  /* VISIBILITY AND NOT `display`, and the pair is the whole trick: it takes
+     the panel out of the tab order and off the accessibility tree the way
+     `hidden` would, but it is a DISCRETE property CSS will still
+     transition, so the opacity beside it has a box to interpolate on.
+     Shut, the flip waits out the fade (0s delayed by --dur-snug) so the
+     copy is gone before the box stops being one. */
+  visibility: hidden;
+  transition:
+    opacity var(--dur-snug) var(--ease-drawer),
+    visibility 0s linear var(--dur-snug);
+}
+/* opening, the copy waits for the box instead: the height runs on
+   --dur-slow, and text arriving underneath it mid-flight reads as two
+   separate events rather than one disclosure. */
+.spine[data-open="on"] .more {
+  opacity: 1;
+  visibility: visible;
+  transition:
+    opacity var(--dur-snug) var(--ease-drawer) 90ms,
+    visibility 0s;
+}
+
+.addr {
+  margin: 0;
+  font-size: 0.6875rem;
+  line-height: 1.45;
+  color: color-mix(in srgb, var(--cream) 88%, transparent);
+}
+.addrLine { display: block; }
+
+.hours {
+  flex: none;
+  font-family: var(--font-mono);
+  font-size: 0.5625rem;
+  letter-spacing: var(--tr-label-mono, 0.13em);
+  color: color-mix(in srgb, var(--cream) 62%, transparent);
+  font-variant-numeric: tabular-nums;
+  white-space: nowrap;
+}
+
+/* THE HEIGHT IS THE WHOLE GESTURE, so under reduced motion the band simply
+   IS the size it is. The panel still fades — an opacity change is not
+   vestibular — but with no delay to wait for a flight that no longer
+   happens. */
+@media (prefers-reduced-motion: reduce) {
+  .spine { transition: none; }
+  .more { transition-delay: 0s; }
+}
