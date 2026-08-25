@@ -92,6 +92,13 @@ export const RESTAURANTS: Restaurant[] = [
     image: "/images/guanabana.jpg",
     logo: "/logo/guanabana.png",
     website: "https://www.guanabanarestaurant.com/",
+    /* one A4 sheet, both sides of the room on it. ⚠️ THE LABEL IS THE
+       DATE THE PAGES WERE SUPPLIED, not a revision the menu prints — the
+       same reading the other five carry, none of which state a vintage of
+       their own. If Guanabana starts dating its menus, this takes the
+       menu's date instead. */
+    menuPages: ["/menu/guanabana/menu.png"],
+    menuLabel: "August 2026",
     bookable: true,
     bookingUrl: "https://www.opentable.co.uk/guanabana-reservations-london?restref=79453&lang=en-GB&ot_source=Restaurant%20website",
   },
@@ -106,6 +113,20 @@ export const RESTAURANTS: Restaurant[] = [
     image: "/images/mamasons.jpg",
     logo: "/logo/mamasons.png",
     website: "http://dirtyicecream.co.uk/",
+    /* THE PARLOUR'S THREE IN-STORE SCREENS, in the order a counter reads
+       them: the ice cream first because that is what the room is, then the
+       cold desserts and drinks, then the bakery. They were supplied as
+       "CHINATOWN menu screen 1 .png", "…screen 2.png" and "Right 20aug.png"
+       — renamed to what each one actually prints, because the public_id
+       lib/media.ts derives is the PATH (see publicId there), and a filename
+       carrying spaces and a trailing one before the extension becomes a
+       Cloudinary id nobody can type or purge. */
+    menuPages: [
+      "/menu/mamasons/ice-cream-and-coffee.png",
+      "/menu/mamasons/desserts-and-drinks.png",
+      "/menu/mamasons/baked-goods.png",
+    ],
+    menuLabel: "August 2026",
     bookable: false,
   },
   {
@@ -144,6 +165,21 @@ export const RESTAURANTS: Restaurant[] = [
     image: "/images/hoowood.jpg",
     logo: "/logo/hoodwood.png",
     website: "https://www.hoodwood.co.uk/",
+    /* THE ONE LANDSCAPE MENU IN THE SET — an A3 sheet printed both sides,
+       so the two pages are 2481x1754 where every other venue's are taller
+       than they are wide. The overlay needs no special case for it (the
+       pages are `width: 100%; height: auto`), it simply renders shorter.
+
+       ⚠️ IT WAS SUPPLIED AS A 362MB PRINT PDF and that file is NOT in
+       `public/`. It could not be: <MenuPage> renders <img>, Cloudflare
+       Pages refuses any single file over 25MB, and `kindOf` in
+       lib/media.ts classes .pdf as "other" — so it would have been served
+       whole, from the host, at 362MB, to anyone who pressed Menu. The
+       original is in media-src/originals/menu/ (gitignored, like the film
+       originals) and these are `pdftoppm -r 150` off it. Re-render from
+       there if the artwork changes; do not put the PDF back. */
+    menuPages: ["/menu/hoodwood/page-1.png", "/menu/hoodwood/page-2.png"],
+    menuLabel: "August 2026",
     bookable: false,
   },
   {

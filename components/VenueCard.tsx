@@ -117,13 +117,15 @@ export type VenueCardProps = {
    *  navigates to the venue's page, where the same attribute would be a
    *  lie. It is therefore per-page rather than baked in. */
   pressHasPopup?: React.AriaAttributes["aria-haspopup"];
-  /** THE SECONDARY CONTROL. Either form renders the same cream outline
-   *  pill, and NEITHER renders unless the venue actually carries
-   *  `menuPages` — a "Menu" pill on a venue with no menu on file is the
-   *  dead control this design forbids. `onMenu` is for a page that has a
-   *  <MenuOverlay> mounted already; `menuHref` is for one that does not
-   *  and has to send the reader to the venue's own page. */
-  onMenu?: () => void;
+  /** THE SECONDARY CONTROL — a cream outline pill that renders only where
+   *  the venue actually carries `menuPages`, because a "Menu" pill on a
+   *  venue with no menu on file is the dead control this design forbids.
+   *
+   *  ⚠️ IT IS A LINK, AND `onMenu` IS GONE. This prop used to have a
+   *  callback twin for the pages that mounted a <MenuOverlay>; that
+   *  component no longer exists. The menu is a route (/menus/<slug>, built
+   *  by lib/menu) and both grids pass an href, so there is one branch here
+   *  instead of two. */
   menuHref?: string;
   /** short muted clip that wipes open from the cursor on hover. Hover
    *  furniture: touch never sees it and nothing depends on it. */
@@ -156,7 +158,6 @@ export default function VenueCard({
   onPress,
   pressLabel,
   pressHasPopup,
-  onMenu,
   menuHref,
   clip,
   blurb,
@@ -453,7 +454,6 @@ export default function VenueCard({
              THE EXPANSION STILL PASSES ONE — it has the height for the whole
              record, and it is the object a reader opens to get exactly the
              facts this card no longer prints. */
-          onMenu={onMenu}
           menuHref={menuHref}
           actionMotion={actionMotion}
           actions={actions}
@@ -496,7 +496,6 @@ export function VenueBlock({
   story,
   addressLines,
   plate = false,
-  onMenu,
   menuHref,
   actionMotion = {},
   actions = "row",
@@ -551,7 +550,6 @@ export function VenueBlock({
    *  Requires `story` and `addressLines`. Without them it has no upper half
    *  and the hairline would be a line drawn across a photograph. */
   plate?: boolean;
-  onMenu?: () => void;
   menuHref?: string;
   actionMotion?: MotionProps;
   /** see the prop on VenueCardProps — "split" is the home grid's resting
@@ -567,7 +565,8 @@ export function VenueBlock({
 
   /* THE SECOND CONTROL, and it renders only where there is something
      behind it — both a menu on file AND somewhere for the page to send
-     it. Half the venues carry `menuPages`; the rest render one control
+     it. Seven of the eight carry `menuPages` now; Bunso is the one that
+     does not, and it renders one control
      and that asymmetry costs nothing structurally, because both pills are
      the same height and the block's height is identical either way (the
      probe asserts the eight heights agree to within a pixel). */
@@ -577,7 +576,7 @@ export function VenueBlock({
      path wants, so both take it from here. */
   const set = splitActions(rest, {
     hasMenuPages: hasMenu,
-    menuReachable: Boolean(onMenu || menuHref),
+    menuReachable: Boolean(menuHref),
   });
   const menu = set.menu ? "Menu" : null;
 
@@ -700,27 +699,15 @@ export function VenueBlock({
   const splitControls =
     menu || visitSplit || book ? (
       <motion.div className={styles.actionRow} data-split="" {...actionMotion}>
-        {menu ? (
-          menuHref ? (
-            <Link
-              href={menuHref}
-              className={`${styles.cardBtn} ${styles.cardBtnGhost}`}
-              data-act="menu"
-              aria-label={`Menu — ${item.name}`}
-            >
-              Menu
-            </Link>
-          ) : (
-            <button
-              type="button"
-              className={`${styles.cardBtn} ${styles.cardBtnGhost}`}
-              data-act="menu"
-              onClick={onMenu}
-              aria-label={`Menu — ${item.name}`}
-            >
-              Menu
-            </button>
-          )
+        {menu && menuHref ? (
+          <Link
+            href={menuHref}
+            className={`${styles.cardBtn} ${styles.cardBtnGhost}`}
+            data-act="menu"
+            aria-label={`Menu — ${item.name}`}
+          >
+            Menu
+          </Link>
         ) : null}
         {visitSplit ? (
           <a
@@ -751,25 +738,14 @@ export function VenueBlock({
   const rowControls =
     action || menu || visit ? (
       <motion.div className={styles.actionRow} {...actionMotion}>
-        {menu ? (
-          menuHref ? (
-            <Link
-              href={menuHref}
-              className={`${styles.cardBtn} ${styles.cardBtnGhost}`}
-              aria-label={`Menu — ${item.name}`}
-            >
-              Menu
-            </Link>
-          ) : (
-            <button
-              type="button"
-              className={`${styles.cardBtn} ${styles.cardBtnGhost}`}
-              onClick={onMenu}
-              aria-label={`Menu — ${item.name}`}
-            >
-              Menu
-            </button>
-          )
+        {menu && menuHref ? (
+          <Link
+            href={menuHref}
+            className={`${styles.cardBtn} ${styles.cardBtnGhost}`}
+            aria-label={`Menu — ${item.name}`}
+          >
+            Menu
+          </Link>
         ) : null}
         {/* THE SITE, BETWEEN THE MENU AND THE BOOKING. A second OUTLINE
             pill, not a second fill: the row still has exactly one thing in

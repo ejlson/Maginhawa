@@ -81,7 +81,8 @@
 /* z 300 — ABOVE EVERY MODAL, and it has to be stated rather than inherited.
    The disc was on 200, which is also the home grid's expansion
    (Discover.module.css .expandRoot) and the menu overlay
-   (MenuOverlay.module.css). Both are PORTALED to <body> and therefore
+   (the menu overlay that preceded /menus/<slug>). Both are PORTALED to
+   <body> and therefore
    painted after this layer, so on an equal z-index the later sibling wins
    and the disc was drawn UNDERNEATH the open card. That is not merely a
    cosmetic loss: html.glass-cursor hides the native cursor wherever the

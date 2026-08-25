@@ -39,11 +39,10 @@ import VenueCard, { VenueBlock } from "./VenueCard";
    ONE line, and there is no rule you can write on the card's DOM that gets
    it there. See the banner in Spines.tsx for the measurements. */
 import Spines from "./Spines";
-import MenuOverlay from "./MenuOverlay";
 import { venueCards, type VenueCardItem } from "@/lib/venueCards";
-import { getRestaurant } from "@/lib/restaurants";
 import { lenisRef } from "@/lib/SmoothScroll";
 import { asset } from "@/lib/media";
+import { menuHref } from "@/lib/menu";
 
 /* ══════════════════════════════════════════════════════════════════════
    THE ASSEMBLY INTRO IS GONE, and this note is here so nobody rebuilds it
@@ -938,20 +937,16 @@ export default function Discover() {
     if (spines) setActive(null);
   }, [spines]);
 
-  /* ---- THE MENU IS THIS PAGE'S NOW ----
-     Both grids used to send the Menu control to `/restaurants/<slug>`, which
-     opened the same pages in <MenuOverlay> once the reader got there. That
-     route is gone, and the note that used to sit on `menuHref` argued
-     against mounting an overlay here — "a second modal in a component that
-     already portals an expansion". That argument was about which of two
-     working destinations to prefer; with only one left, the second modal is
-     the whole feature rather than a duplicate of it.
+  /* ---- THE MENU IS NOT THIS PAGE'S ANY MORE ----
+     `menuFor` state and a portaled menu overlay stood here, and the note
+     over them argued that a second modal was justified because the venue
+     route it replaced had been deleted. Both are gone: the menu is a real
+     page at /menus/<slug>, so this component holds no menu state, portals
+     no second modal, and the Menu control is a link like any other.
 
-     They stack rather than fight: the expansion portals to <body> and so
-     does this, and this is mounted after it, so a menu opened from inside an
-     expanded card paints over it and closes back to it. */
-  const [menuFor, setMenuFor] = useState<string | null>(null);
-  const menuRestaurant = menuFor ? getRestaurant(menuFor) : undefined;
+     What that bought, and it is the reason the modal was worth losing: the
+     menu now has a URL to send someone, a document for a crawler to index,
+     and a back button that goes back. */
 
   /* NO VIEW MODE, AND THE HEIGHT MACHINERY WENT WITH IT.
 
@@ -1505,7 +1500,7 @@ export default function Discover() {
           cascade. They simply render, which is what the chapter's own note
           on the retired assembly intro argues an unstaged object should do. */}
       {spines ? (
-        <Spines items={ITEMS} onMenu={setMenuFor} />
+        <Spines items={ITEMS} />
       ) : (
         <motion.ul
           ref={setGridEl}
@@ -1580,7 +1575,7 @@ export default function Discover() {
                    constraint Manifesto.tsx records over its own ScrubWord. */
                 col={reduce ? undefined : col}
                 onOpen={() => setActive(it)}
-                onMenu={() => setMenuFor(it.slug)}
+                menuHref={menuHref(it.slug)}
                 open={openIndex === i}
                 recedeDelay={step * RECEDE_STEP_S}
               />
@@ -1607,28 +1602,11 @@ export default function Discover() {
             key={active.slug}
             item={active}
             onClose={() => setActive(null)}
-            onMenu={() => setMenuFor(active.slug)}
+            menuHref={menuHref(active.slug)}
           />
         )}
       </AnimatePresence>
 
-      {/* PORTALED for the same reason the expansion is: this section sits
-          inside `.afterHero`'s z-index: 1 stacking context, which would trap
-          a fixed overlay under the nav however high its own z-index went.
-          Mounted only while a venue is chosen, so nothing is portaled during
-          SSR and the closed state costs no DOM. */}
-      {menuFor &&
-        !!menuRestaurant?.menuPages?.length &&
-        createPortal(
-          <MenuOverlay
-            open
-            onClose={() => setMenuFor(null)}
-            pages={menuRestaurant.menuPages}
-            restaurantName={menuRestaurant.name}
-            subtitle={menuRestaurant.menuLabel}
-          />,
-          document.body,
-        )}
     </section>
   );
 }
@@ -1642,7 +1620,7 @@ function Tile({
   index,
   col,
   onOpen,
-  onMenu,
+  menuHref: href,
   open,
   recedeDelay,
   registerArrival,
@@ -1659,9 +1637,9 @@ function Tile({
    *  computed; the rest is the card's own position on the page. */
   col?: number;
   onOpen: () => void;
-  /** opens the venue's menu pages — the page owns the overlay, the card only
-   *  says which venue it is asking for */
-  onMenu: () => void;
+  /** where this venue's menu lives — /menus/<slug>, built by the grid from
+   *  lib/menu so the route is spelled once */
+  menuHref: string;
   /** this is the tile whose plate is currently expanded. It is EXEMPT from
    *  the recede — see RECEDE_STEP_S: framer re-measures this exact cell to
    *  fly the card home, and a transform on it at that moment is a transform
@@ -1867,15 +1845,14 @@ function Tile({
           onPress={onOpen}
           pressLabel={`Open ${item.name}`}
           // the press expands the card in place rather than navigating
-          pressHasPopup="dialog"
+          /* ⚠️ NO `pressHasPopup="dialog"` ANY MORE. The card's press used
+             to open a modal and the attribute said so; it opens a PAGE
+             now, and a control that announces a dialog and then navigates
+             is a lie told to exactly the readers who most depend on it. */
           /* passed unconditionally: the card is what knows whether there
              are menu pages behind the control, so the rule lives in one
-             place for both grids. WHERE IT GOES is this page's decision, and
-             it is now an overlay this page mounts rather than a link to the
-             venue's own page — that route is gone. See `menuFor` in
-             Discover for why the second modal is no longer the objection it
-             was. */
-          onMenu={onMenu}
+             place for both grids. */
+          menuHref={href}
           clip={item.clip}
           blurb={item.blurb}
           /* THE SPLIT ACTIONS — home grid only. One cream Book pill at
@@ -1983,12 +1960,12 @@ function Tile({
 function ExpandedCard({
   item,
   onClose,
-  onMenu,
+  menuHref: href,
 }: {
   item: DiscoverItem;
   onClose: () => void;
   /** see Tile's copy of this prop */
-  onMenu: () => void;
+  menuHref: string;
 }) {
   const reduce = useReducedMotion();
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -2327,11 +2304,11 @@ function ExpandedCard({
               plate
               story={item.blurb}
               addressLines={[item.location]}
-              /* the same overlay the tile opens — the expansion sends the
-                 reader to exactly the same place, for the reasons set out
-                 where it does so. It paints OVER this card rather than
-                 replacing it, so closing the menu returns here. */
-              onMenu={onMenu}
+              /* the same destination the tile links to. It NAVIGATES now
+                 rather than painting over this card, so the expansion is
+                 left behind rather than returned to — which is the honest
+                 behaviour for a control that changes the page. */
+              menuHref={href}
             />
           </motion.div>
         </div>

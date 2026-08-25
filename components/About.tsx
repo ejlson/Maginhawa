@@ -94,7 +94,7 @@ const CHAPTERS: {
     slug: "ramo",
   },
   {
-    year: "2019",
+    year: "2025",
     title: "Hoodwood",
     body: "A Caribbean takeaway opens with the Jacket Exchange — trade a winter coat, take a free jerk jacket potato.",
     image: "/images/hoowood.jpg",

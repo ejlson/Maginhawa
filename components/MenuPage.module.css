@@ -1,0 +1,114 @@
+/* ═══ THE MENU ROUTE — /menus/<slug>.
+
+   The whole page is a name, a note and a column of sheets. It is the
+   site's third reading route after /privacy and /terms and it borrows
+   their ground, ink, hairline and type ramp — but almost none of their
+   furniture, because at the user's instruction this route is the menu and
+   nothing else. ═══ */
+.page {
+  background: var(--cream);
+  color: var(--maroon);
+  min-height: 100vh;
+  /* clears the fixed nav — the same value LegalPage.module.css and
+     BlogIndex.module.css use. If the nav's height changes, all three move
+     together or none of them do. */
+  padding-top: clamp(52px, 5.5vh, 76px);
+  padding-inline: var(--pad-x);
+}
+
+/* ⚠️ WIDER THAN --measure, AND ON PURPOSE. The legal routes set 60ch
+   because they hold prose. This column holds SHEETS OF PAPER: at 62ch an
+   A4 menu renders about 560px wide, which is smaller than the phone photo
+   of it a guest would otherwise take. 860px is the widest an A4 page can
+   go before a reader has to move their head to read across it, and it is
+   still narrower than the grid. */
+.doc {
+  max-width: 860px;
+  margin-inline: auto;
+  padding-block: clamp(20px, 3vh, 40px) var(--section-y);
+}
+
+/* THE NAME, AND NOTHING BESIDE IT. No eyebrow, no standfirst, no
+   neighbourhood, no date — all of that was here and all of it went. The
+   hairline under it is the document boundary LegalPage's .head draws;
+   it is what stops the title sitting on bare paper above a photograph. */
+.title {
+  margin: 0 0 clamp(14px, 2vh, 22px);
+  padding-bottom: clamp(12px, 1.8vh, 18px);
+  border-bottom: 1px solid var(--rule);
+  font-family: var(--font-display);
+  font-weight: var(--w-regular);
+  font-size: var(--t-h2);
+  line-height: var(--lh-heading);
+  letter-spacing: -0.01em;
+  text-wrap: balance;
+}
+
+/* the word "menu", for crawlers and screen readers only — see the note in
+   MenuPage.tsx for why the heading says it and the design does not */
+.srOnly {
+  position: absolute;
+  width: 1px;
+  height: 1px;
+  padding: 0;
+  margin: -1px;
+  overflow: hidden;
+  clip: rect(0, 0, 0, 0);
+  white-space: nowrap;
+  border: 0;
+}
+
+/* ── THE STANDING NOTE ──
+   Carried over from the overlay intact: a wash and a lighter rule rather
+   than a second full-strength hairline, because two of those a few lines
+   apart read as a table. Measured against the cream ground the sentence
+   lands at 5.5:1 and the label at 11.9:1, both over the 4.5:1 floor —
+   which matters here because this paragraph is the one legal sentence on
+   the page. */
+.note {
+  margin: 0;
+  padding: clamp(11px, 1.5vh, 15px) clamp(13px, 1.8vw, 18px);
+  background: color-mix(in srgb, var(--maroon) 5%, transparent);
+  border: 1px solid color-mix(in srgb, var(--maroon) 22%, transparent);
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  line-height: var(--lh-snug);
+  color: color-mix(in srgb, var(--maroon) 72%, transparent);
+  text-wrap: pretty;
+}
+
+.noteLabel {
+  font-weight: var(--w-medium);
+  color: var(--maroon);
+}
+
+/* ── THE PAGES ──
+   ⚠️ NO ASPECT RATIO IS SET, AND THAT IS THE DESIGN. The seven venues
+   supply portrait A4, landscape A3 and 9:16 phone screens; any single
+   ratio here would letterbox two of the three. Each sheet takes the full
+   measure and whatever height it needs, so Hoodwood's landscape renders
+   short and Mamasons' screens render tall — which is what those menus
+   ARE, rather than a failure to normalise them.
+
+   `height: auto` with no intrinsic size means the column reflows as each
+   image decodes. Acceptable here and nowhere else: this is the entire
+   content of the route, so there is nothing below to be pushed around,
+   and the first page is eager so the fold is stable by first paint. */
+.pages {
+  display: flex;
+  flex-direction: column;
+  gap: clamp(12px, 2vh, 22px);
+  padding-top: clamp(16px, 2.6vh, 28px);
+}
+
+.sheet {
+  margin: 0;
+}
+
+.sheet img {
+  width: 100%;
+  height: auto;
+  display: block;
+  border-radius: var(--radius-tile);
+  box-shadow: 0 10px 30px -16px rgba(18, 0, 0, 0.26);
+}
