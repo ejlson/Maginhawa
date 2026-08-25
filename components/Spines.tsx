@@ -245,6 +245,10 @@ function Spine({
                 {
                   ...(item.logoAspect ? { "--la": item.logoAspect } : null),
                   ...(item.logoInkRatio ? { "--lr": item.logoInkRatio } : null),
+                  /* the DRAWN box, so the slot can be the artwork rather
+                     than the file — see LOGO_INK in lib/venueCards.ts */
+                  ...(item.logoInkW ? { "--iw": item.logoInkW } : null),
+                  ...(item.logoInkH ? { "--ih": item.logoInkH } : null),
                 } as React.CSSProperties
               }
             >
