@@ -4,9 +4,10 @@ import Image from "next/image";
 import {
   AnimatePresence,
   motion,
+  useMotionValue,
   useReducedMotion,
-  useScroll,
   useTransform,
+  type MotionValue,
 } from "framer-motion";
 import {
   useCallback,
@@ -785,11 +786,96 @@ const RECEDE_STEP_S = 0.028;
    together. Keep the two in step. */
 const GRID_COLS = 4;
 
+/* ══════════════ THE ARRIVAL DRIVER ══════════════
+   Eight tiles used to hold eight `useScroll({ target: cellRef })`. This
+   replaces all eight with one measurement each, taken once.
+
+   WHY, MEASURED. framer registers ONE document scroll listener and its
+   callback re-measures EVERY handler on the page — walking each target's
+   whole `offsetParent` chain summing `offsetTop`
+   (render/dom/scroll/on-scroll-handler.mjs). It does that on every scroll
+   event, for every chapter, on- or off-screen. On the home page that came
+   to 164.6 layout-flushing reads PER FRAME against 0.5 on /restaurants,
+   and ~125 of them were `offsetTop`. 91.5% of the page's style/layout time
+   was forced read-after-write.
+
+   ⚠️ THE WALK IS REDUNDANT BY CONSTRUCTION. A target's offset from the top
+   of the DOCUMENT cannot change because the document was scrolled — only
+   because layout changed. So it is measured on mount and on resize, and a
+   frame costs arithmetic and nothing else.
+
+   ⚠️ AND IT MUST BE THE offsetTop CHAIN, NOT `getBoundingClientRect().top`.
+   They are the same number only until something between the cell and the
+   document is transformed or stuck, and this chapter is pinned. framer's
+   `calcInset` ignores both, so the tuned arrival line
+   (ARRIVE_FROM/ARRIVE_TO, and the ~87% line the whole page shares) is
+   expressed against the inset — a rect would silently retime every card.
+   probe-arrival-parity.mjs holds this to framer's own output. */
+type Arrival = {
+  el: HTMLElement;
+  mv: MotionValue<number>;
+  lead: number;
+  inset: number;
+};
+
+/* framer's `calcInset`, y-axis and HTMLElement chain only — which is all
+   this grid ever has. Stops at documentElement exactly as framer stops at
+   its container. */
+function insetTop(el: HTMLElement): number {
+  let y = 0;
+  let cur: HTMLElement | null = el;
+  while (cur && cur !== document.documentElement) {
+    y += cur.offsetTop;
+    cur = cur.offsetParent as HTMLElement | null;
+  }
+  return y;
+}
+
+/* framer's `resolveOffsets` for the one shape this grid uses:
+   `offset: ["start <a>", "start <b>"]`. BOTH edges name the target's
+   `start`, so `resolveEdge` contributes `inset + targetLength * 0` and the
+   card's own height drops out of the arithmetic entirely.
+
+       oᵢ       = inset − cᵢ·vh
+       progress = clamp(0, 1, (scrollY − o₀) / (o₁ − o₀))
+
+   The column's lead cancels in the denominator, leaving the span a
+   constant (ARRIVE_FROM − ARRIVE_TO) of a viewport for every card — which
+   is the property the stagger was tuned on. */
+function arrivalProgress(
+  inset: number,
+  lead: number,
+  scrollY: number,
+  vh: number,
+): number {
+  const span = (ARRIVE_FROM - ARRIVE_TO) * vh;
+  if (span === 0) return 0;
+  const p = ((ARRIVE_FROM - lead) * vh - (inset - scrollY)) / span;
+  return p < 0 ? 0 : p > 1 ? 1 : p;
+}
+
 export default function Discover() {
   const [inView, setInView] = useState(false);
   const sectionRef = useRef<HTMLElement>(null);
   const gridRef = useRef<HTMLUListElement>(null);
   const reduce = useReducedMotion();
+
+  /* every mounted Tile's arrival, driven from the panning loop below —
+     one rAF for the whole chapter instead of eight scroll subscriptions */
+  const arrivals = useRef<Set<Arrival>>(new Set());
+  const insetsDirty = useRef(false);
+
+  const registerArrival = useCallback((a: Arrival) => {
+    /* MEASURED AND SET SYNCHRONOUSLY, because framer's did too: a reader
+       who deep-links INTO the chapter must find the cards above already
+       settled on their first painted frame, not arriving from 0. */
+    a.inset = insetTop(a.el);
+    a.mv.set(arrivalProgress(a.inset, a.lead, window.scrollY, window.innerHeight));
+    arrivals.current.add(a);
+    return () => {
+      arrivals.current.delete(a);
+    };
+  }, []);
 
   // the App Store expansion — which tile's plate is currently open as the
   // full detail card (null = none)
@@ -960,11 +1046,55 @@ export default function Discover() {
     let raf = 0;
     let live = false;
 
+    /* last value written per seat, so a frame that would rewrite the same
+       string writes nothing at all — see THE WRITE IS THE EXPENSIVE HALF */
+    const written: string[] = new Array(seats.length).fill("");
+    const next: string[] = new Array(seats.length).fill("");
+
+    /* ══ READS ALL FIRST, THEN WRITES — NOT ONE LOOP ══
+       ⚠️ This was a single loop doing `getBoundingClientRect()` and then
+       `setProperty()` per seat, and that shape is a forced synchronous
+       style recalc PER SEAT PER FRAME: the write dirties style, and the
+       NEXT seat's rect read cannot be answered until the engine flushes it
+       again. Eight plates therefore cost eight recalcs a frame instead of
+       one, on every frame the chapter is anywhere near the viewport.
+
+       Measured on the production export at a 4× CPU throttle, scrolling the
+       HERO — where this chapter is off-screen but still inside the gate's
+       rootMargin — 91.5% of ALL style/layout time on the page was forced
+       rather than end-of-frame, and this loop alone was blamed for 1578ms
+       of it. The hero dropped 97% of its frames (p50 33.7ms). Splitting the
+       passes is the whole fix: reads cannot be interleaved with writes if
+       every read has already happened.
+
+       This is the same correction CustomCursor took in July for the same
+       reason; that comment is worth reading beside this one. */
     const paint = () => {
       raf = 0;
       const vh = window.innerHeight;
-      for (const seat of seats) {
-        const r = seat.getBoundingClientRect();
+      const sy = window.scrollY;
+
+      // ── read pass: no writes in here, on any path ──
+      /* the arrivals' only read, and it happens on the frame after a
+         resize rather than on every frame — see THE ARRIVAL DRIVER */
+      if (insetsDirty.current) {
+        insetsDirty.current = false;
+        for (const a of arrivals.current) a.inset = insetTop(a.el);
+      }
+      for (let i = 0; i < seats.length; i++) {
+        const r = seats[i].getBoundingClientRect();
+        /* SEATS THE READER CANNOT SEE ARE SKIPPED. The gate above is a
+           section-level observer and this chapter is several screens tall,
+           so "the section intersects" is true for most of the page while
+           most of its plates are nowhere near the viewport. A plate a
+           screen clear of either edge cannot show a pan, so it does not get
+           one — its last written value stays put and its subtree stays
+           clean. One viewport of slack keeps the value already correct on
+           the frame the plate does arrive. */
+        if (r.bottom < -vh || r.top > vh * 2) {
+          next[i] = written[i];
+          continue;
+        }
         /* +1 when the plate's centre sits at the top of the viewport, −1 at
            the bottom, 0 as it crosses the middle. Normalising by half the
            viewport PLUS half the plate means a tall card on a short screen
@@ -977,11 +1107,28 @@ export default function Discover() {
            it covers less ground than the card does — which is what reads as
            the plate sitting behind the window rather than in it */
         // the plate's own height sets the travel — see PHOTO_PAN_RATIO
-        seat.style.setProperty(
-          "--photo-translate",
-          `0 ${(clamped * r.height * PHOTO_PAN_RATIO).toFixed(2)}px`,
-        );
+        next[i] = `0 ${(clamped * r.height * PHOTO_PAN_RATIO).toFixed(2)}px`;
       }
+
+      /* ── write pass: no reads in here, on any path ──
+         THE WRITE IS THE EXPENSIVE HALF even with the passes split: a
+         custom property on the seat invalidates the whole card subtree, and
+         VenueCard is a deep one. The rounded string is what the engine
+         actually consumes, so comparing it is an exact test of whether the
+         frame would change anything — and a page that is merely sitting
+         still with the chapter on screen now costs nothing at all. */
+      for (let i = 0; i < seats.length; i++) {
+        if (next[i] === written[i]) continue;
+        written[i] = next[i];
+        seats[i].style.setProperty("--photo-translate", next[i]);
+      }
+      /* the arrivals ride in the write pass because a MotionValue that
+         changes schedules framer's own render — which is a write, and
+         must not land between two of the rect reads above */
+      for (const a of arrivals.current) {
+        a.mv.set(arrivalProgress(a.inset, a.lead, sy, vh));
+      }
+
       if (live) raf = requestAnimationFrame(paint);
     };
 
@@ -996,6 +1143,18 @@ export default function Discover() {
         cancelAnimationFrame(raf);
         raf = 0;
       }
+      /* ⚠️ ONE LAST PASS ON THE WAY OUT. The loop is what keeps the
+         arrivals current, so stopping it mid-range would freeze eight
+         cards part-settled — visibly, if the reader flings past the
+         chapter faster than the observer re-fires. Their progress clamps
+         at 0 or 1 the moment the section is clear, so a single update
+         leaves every card at its terminal value and the stopped loop
+         costs nothing to have stopped. */
+      const vh = window.innerHeight;
+      const sy = window.scrollY;
+      for (const a of arrivals.current) {
+        a.mv.set(arrivalProgress(a.inset, a.lead, sy, vh));
+      }
     };
 
     const gate = new IntersectionObserver(
@@ -1006,9 +1165,34 @@ export default function Discover() {
     );
     gate.observe(section);
 
+    /* WHAT MAKES THE CACHED INSET SAFE. It is only stale if layout moved,
+       so anything that can move layout marks it for re-measure on the next
+       frame — a viewport resize, and the document's own height changing
+       under lazy media or a font swap, which no resize event reports.
+       Marking is a boolean; the read happens in the loop's read pass. */
+    const invalidate = () => {
+      insetsDirty.current = true;
+      // a resize while the chapter is parked must still land, or the cards
+      // hold offsets measured against a layout that no longer exists
+      if (!live) {
+        for (const a of arrivals.current) a.inset = insetTop(a.el);
+        const vh = window.innerHeight;
+        const sy = window.scrollY;
+        for (const a of arrivals.current) {
+          a.mv.set(arrivalProgress(a.inset, a.lead, sy, vh));
+        }
+        insetsDirty.current = false;
+      }
+    };
+    window.addEventListener("resize", invalidate, { passive: true });
+    const docRo = new ResizeObserver(invalidate);
+    docRo.observe(document.documentElement);
+
     return () => {
       gate.disconnect();
       stop();
+      window.removeEventListener("resize", invalidate);
+      docRo.disconnect();
       for (const seat of seats) {
         seat.style.removeProperty("--photo-translate");
         seat.style.removeProperty("--photo-base");
@@ -1242,6 +1426,7 @@ export default function Discover() {
           throwing the plate off screen and scaling it with the delta. The
           grid does not scroll on either axis, so projection is right by
           default. */}
+
         <motion.ul
           ref={setGridEl}
           className={styles.grid}
@@ -1308,6 +1493,7 @@ export default function Discover() {
                 key={it.slug}
                 item={it}
                 index={i}
+                registerArrival={registerArrival}
                 /* this card's place in its own row. The range, and the
                    `useTransform` that turns it into a clip, live in Tile —
                    a hook cannot be called from inside this `.map`, the same
@@ -1378,6 +1564,7 @@ function Tile({
   onMenu,
   open,
   recedeDelay,
+  registerArrival,
 }: {
   item: DiscoverItem;
   /* the tile's place in the grid. It used to be the assembly flight's SEAT
@@ -1402,6 +1589,10 @@ function Tile({
   /** seconds this cell waits before stepping back, so the recede travels
    *  outward from the tile that was pressed */
   recedeDelay: number;
+  /** hands this cell's arrival progress to the chapter's own frame loop, in
+   *  place of the `useScroll` each tile used to hold — see THE ARRIVAL
+   *  DRIVER. Returns the unregister. */
+  registerArrival: (a: Arrival) => () => void;
 }) {
   const reduce = useReducedMotion();
 
@@ -1458,10 +1649,22 @@ function Tile({
 
   const cellRef = useRef<HTMLLIElement>(null);
   const lead = (col ?? 0) * COL_LEAD;
-  const { scrollYProgress: arriving } = useScroll({
-    target: cellRef,
-    offset: [`start ${ARRIVE_FROM - lead}`, `start ${ARRIVE_TO - lead}`],
-  });
+  /* ── WAS `useScroll({ target: cellRef, offset: [...] })` ──
+     and the offsets it carried are now arithmetic in `arrivalProgress`,
+     driven from the chapter's own loop. Eight of these were eight scroll
+     subscriptions, and framer re-measures every subscription on the page on
+     every scroll event; see THE ARRIVAL DRIVER for the measurement that
+     made that unaffordable. The value is identical — held to framer's own
+     output by scripts/probe-arrival-parity.mjs — so INK_SLOT, SETTLE_FROM
+     and CAPTION_SLOT below are untouched and mean exactly what they did. */
+  const arriving = useMotionValue(0);
+  useEffect(() => {
+    const el = cellRef.current;
+    // reduced motion never reads these strands (see `settled`), so it never
+    // needs driving either
+    if (!el || reduce) return;
+    return registerArrival({ el, mv: arriving, lead, inset: 0 });
+  }, [registerArrival, lead, reduce, arriving]);
 
   /* the settle's three strands, one range. All linear — see the NO-EASE
      block above — and all reversible: scroll back up and the card recedes

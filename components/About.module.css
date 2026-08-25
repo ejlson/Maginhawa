@@ -1134,8 +1134,6 @@
    48-72px track plus a gutter held open the length of the table to print one
    "2025". Removed rather than emptied; see CoverageRow in About.tsx. */
 .coverageRow {
-  /* anchor for the floating hover thumbnail */
-  position: relative;
   display: grid;
   grid-template-columns:
     clamp(110px, 12vw, 170px)
@@ -1146,78 +1144,6 @@
   padding-block: clamp(2px, 0.35vh, 5px);
   color: inherit;
   text-decoration: none;
-}
-
-/* floating hover thumbnail — the credited restaurant's photo, riding the
-   right end of the row between the feature text and the arrow column.
-   Absolutely positioned with fixed dimensions and opacity 0 at rest, so it
-   overhangs the hairlines (the editorial intent) without ever reflowing
-   the grid — zero layout shift. Hover-only chrome: it stays display:none
-   for touch/coarse pointers and the stacked ≤720px layout. */
-.coverageThumb {
-  display: none;
-}
-
-@media (hover: hover) and (pointer: fine) {
-  .coverageThumb {
-    display: block;
-    position: absolute;
-    /* seat the right edge against the arrow column: arrow track + one
-       column gap (same clamps as the row grid above) */
-    right: calc(clamp(22px, 2vw, 30px) + clamp(16px, 2vw, 36px));
-    /* vertically centred on the row */
-    top: 50%;
-    /* BIGGER — 180 -> 340 at the cap, and the ceiling is what it is because
-       of what is UNDER it rather than what is around it. The rows are
-       ~34-46px tall, so a 227px-tall preview covers five or six of them while
-       it is up; it is absolutely positioned with `pointer-events: none` and a
-       z-index above the hairlines, so none of that reflows or steals a hover
-       — but a preview taller than the block it floats over would be a panel
-       rather than a preview. 340 x 227 is a little under half the table's
-       height at the widest viewport and reads as a photograph rather than as
-       a chip, which is the whole ask. The lower bound rises with it so the
-       narrow end is not left behind: 120 -> 190. */
-    width: clamp(190px, 20vw, 340px);
-    aspect-ratio: 3 / 2;
-    object-fit: cover;
-    border-radius: var(--radius-media);
-    corner-shape: squircle; /* Figma-style corner smoothing (superellipse); falls back to plain rounding */
-    /* the house soft editorial shadow */
-    box-shadow:
-      0 28px 70px -42px rgba(47, 0, 0, 0.55),
-      0 1px 0 rgba(255, 255, 255, 0.5) inset;
-    /* floats over neighbouring rows' hairlines, never catches the cursor */
-    z-index: 2;
-    pointer-events: none;
-    opacity: 0;
-    /* 0.96, not less: the box nearly doubled, so the same FRACTION is now
-       ~14px of travel where it was 7. Scale is a proportion and the eye reads
-       the absolute distance. */
-    transform: translateY(-50%) scale(0.96);
-    transform-origin: right center;
-    transition:
-      opacity var(--dur-mid) var(--ease-entrance),
-      transform var(--dur-mid) var(--ease-entrance);
-  }
-
-  /* ON ROW HOVER — the whole row is the target, not the image. `.coverageRow`
-     is the <a>, so the preview answers to the same box that carries the link,
-     the arrow's slide and the focus ring: one hit area, three responses.
-     :focus-visible is kept beside it so a keyboard reader tabbing the table
-     gets the same preview a pointer does. */
-  .coverageRow:hover .coverageThumb,
-  .coverageRow:focus-visible .coverageThumb {
-    opacity: 1;
-    transform: translateY(-50%) scale(1);
-  }
-}
-
-@media (prefers-reduced-motion: reduce) {
-  /* no scale travel — the thumbnail simply appears */
-  .coverageThumb {
-    transition: none;
-    transform: translateY(-50%);
-  }
 }
 
 /* thin arrow closing each row — quiet at rest, wakes on hover */
@@ -1406,13 +1332,6 @@
 
   /* stacked rows — the arrow would sit as its own awkward line */
   .coverageArrow {
-    display: none;
-  }
-
-  /* the floating thumbnail assumed the four-column row; a narrow window on
-     a fine-pointer machine still matches the hover media above, so assert
-     it away wherever the rows stack */
-  .coverageThumb {
     display: none;
   }
 }

@@ -1223,7 +1223,17 @@ html::-webkit-scrollbar {
   /* dedicated GPU layer — keeps the blur stable when an animated element
      (e.g. MagneticButton's radiating hover fill) sits behind the band */
   transform: translate3d(0, 0, 0);
-  will-change: backdrop-filter;
+  /* ⚠️ NO `will-change: backdrop-filter` ON ANY OF THE THREE BANDS.
+     It was on all of them and it was the wrong property: `will-change`
+     promises the engine that THIS element's own value is about to change,
+     and the blur radius here never changes — 5px, 12px and 22px are
+     constants. What changes is the page moving BEHIND the band, which the
+     hint does nothing for. The `translate3d` above already owns the layer
+     these bands need, so the hint bought no promotion either; it only kept
+     three full-width fixed layers permanently marked as about-to-change,
+     which is paid for in `Layerize` on every scrolled frame (measured at
+     554ms of a 6.8s scroll, 8.2% of the main thread).
+     The bands render identically without it. */
   contain: layout style paint;
 }
 .scrollBlur::before {
@@ -1249,7 +1259,7 @@ html::-webkit-scrollbar {
     rgba(0, 0, 0, 1) 100%
   );
   transform: translate3d(0, 0, 0);
-  will-change: backdrop-filter;
+  /* no will-change here either — see the band above */
   contain: layout style paint;
 }
 .scrollBlur::after {
@@ -1276,7 +1286,7 @@ html::-webkit-scrollbar {
     rgba(0, 0, 0, 1) 100%
   );
   transform: translate3d(0, 0, 0);
-  will-change: backdrop-filter;
+  /* no will-change here either — see the band above */
   contain: layout style paint;
 }
 

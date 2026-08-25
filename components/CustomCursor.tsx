@@ -181,7 +181,46 @@ export default function CustomCursor() {
     };
     // content scrolls under a stationary pointer — re-resolve from the last
     // known coordinates
-    const onScroll = () => schedule();
+    /* ── BUT NOT ON EVERY SCROLL FRAME ──
+       The resolve is a hit test (`elementFromPoint` + `elementsFromPoint`)
+       plus a `getComputedStyle` per layer of the stack, and Lenis emits a
+       scroll event every frame — including through its ~650ms damping
+       tail, long after the reader stopped turning the wheel. That put a
+       full hit test on every frame of every scroll, on every route.
+
+       Measured on the production export while scrolling: ~2 hit tests a
+       frame, 410ms of `HitTest` and 345ms of forced style recalc in a
+       6.8s window, second only to the scroll choreography itself.
+
+       A POINTER MOVE STILL RESOLVES IMMEDIATELY — that is the interaction
+       the reader can actually feel, and it is untouched. This bounds only
+       the scroll-driven re-resolve, which exists to notice that different
+       content has slid under a STATIONARY pointer. At 20Hz the disc
+       adopts a new zone within one frame of a 50ms budget; against a
+       cursor that is already spring-damped, there is nothing to see. */
+    let lastScrollResolve = 0;
+    let trailing = 0;
+    const SCROLL_RESOLVE_MS = 50;
+    const onScroll = () => {
+      const now = performance.now();
+      if (now - lastScrollResolve < SCROLL_RESOLVE_MS) {
+        /* ⚠️ THE TRAILING RESOLVE IS NOT OPTIONAL. A throttle with only a
+           leading edge drops the LAST event of a scroll, and the last one
+           is the only one whose position the reader is left looking at: a
+           scroll that ends 10ms after a resolve would leave the disc
+           holding the zone it had mid-flight until the pointer moved
+           again. Re-armed on each suppressed event, so it fires once,
+           after the scroll actually stops. */
+        clearTimeout(trailing);
+        trailing = window.setTimeout(() => {
+          lastScrollResolve = performance.now();
+          schedule();
+        }, SCROLL_RESOLVE_MS);
+        return;
+      }
+      lastScrollResolve = now;
+      schedule();
+    };
     // parked off-screen, so the next frame resolves to "off" on its own
     const onLeave = () => {
       pos.current = { x: -200, y: -200 };
@@ -193,6 +232,10 @@ export default function CustomCursor() {
     document.documentElement.addEventListener("mouseleave", onLeave);
     return () => {
       cancelAnimationFrame(raf);
+      // paired with the trailing resolve above — an unpaired timer would
+      // fire into an unmounted component and schedule a frame against a
+      // dead ref, on every route change
+      clearTimeout(trailing);
       window.removeEventListener("mousemove", onMove);
       window.removeEventListener("scroll", onScroll);
       document.documentElement.removeEventListener("mouseleave", onLeave);

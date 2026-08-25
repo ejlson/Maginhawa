@@ -309,8 +309,7 @@ export default function Hero({ started }: { started: boolean }) {
                 over: the layout that imposed it is gone, and this line is
                 63 characters anyway.) */}
             <p className={styles.sentence}>
-              We cook the food we grew up on, for people we treat like
-              family.
+              Food rooted in where we come from, made for the people around the table.
             </p>
 
             {/* ── THE HOUSE ACTION, at the user's instruction ──
