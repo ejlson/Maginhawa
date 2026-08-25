@@ -88,6 +88,29 @@ const PLAYED_KEY = "mgnhw:journal-played";
 const STRIP_BEAT = 1;
 const seat = (i: number) => ({ "--i": i }) as CSSProperties;
 
+/* ── THE HEAD'S GESTURE IS A TWO-COLUMN GESTURE, so it comes off when the
+   two columns do ──
+   `.intro` arrives from 16vh up and then lags the page by DRIFT_VH for the
+   rest of the chapter (ARRIVAL_VH and DRIFT_VH in lib/drift.ts). Beside the
+   plate that is a column settling into its seat next to a picture. STACKED
+   there is no seat and nothing to settle beside: the head is simply the
+   thing above the plate, and the same transform drags it up over the
+   masthead on the approach and then trails it down into the photograph
+   below — 16vh of travel is 135px on an 844px screen, and on the user's own
+   phone it put the archive pill outside the head altogether.
+
+   1000, NOT 900, AND IT IS THE STYLESHEET'S NUMBER. Blog.module.css stacks
+   `.top` to one column at exactly this width and strips --front-drop with
+   it; the gesture has to stop at the same instant the layout it describes
+   does, or there is a 100px band where the head flies in a stacked column.
+   ⚠️ DUPLICATED FROM THE STYLESHEET — script cannot read a CSS breakpoint.
+   Change one and change the other.
+
+   THE PLATE'S OWN PAN IS NOT AFFECTED and must not be: `panY` moves the
+   photograph INSIDE its own overflow-hidden frame, so it shifts nothing on
+   the page at any width. Only the head's flight is a two-column claim. */
+const STACKED = "(max-width: 1000px)";
+
 /* THE HOME JOURNAL IS A CHOSEN FEW, not the newest twelve.
 
    It used to be `BLOG.slice(0, 12)` — whatever happened to sit at the top of
@@ -518,6 +541,22 @@ export default function Blog({ journal = BLOG }: { journal?: BlogEntry[] }) {
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
 
+  /* ⚠️ STATE AND NOT A REF, and it listens rather than reading once. This
+     decides whether a style is written at all, so it has to re-render when
+     it changes — a phone rotated from 390 to 844 crosses this breakpoint,
+     and a value cached at mount would leave the head parked at whatever
+     the other layout had last written into it. `false` until the effect
+     proves otherwise, for the same reason `mounted` exists: there is no
+     matchMedia on the server. */
+  const [stacked, setStacked] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia(STACKED);
+    const read = () => setStacked(mq.matches);
+    read();
+    mq.addEventListener("change", read);
+    return () => mq.removeEventListener("change", read);
+  }, []);
+
   /* ── THE ARRIVAL, then the drift ──
      Two ranges on one column, and they hand over cleanly because the first
      ENDS exactly where the second BEGINS: the approach closes when the
@@ -631,6 +670,9 @@ export default function Blog({ journal = BLOG }: { journal?: BlogEntry[] }) {
   );
 
   const drifting = mounted && !reduce;
+  /* the head's own gate: everything `drifting` asks, plus a layout with two
+     columns in it. See STACKED. */
+  const headDrifting = drifting && !stacked;
 
   /* ═══════════ THE STRIP'S GESTURE ═══════════
      Native scroll and swipe do the work on touch; this adds MOUSE
@@ -904,7 +946,7 @@ export default function Blog({ journal = BLOG }: { journal?: BlogEntry[] }) {
           <motion.div
             className={styles.intro}
             style={
-              drifting
+              headDrifting
                 ? { y: introY, opacity: introOpacity }
                 : undefined
             }

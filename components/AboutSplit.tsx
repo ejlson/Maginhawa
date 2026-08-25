@@ -1110,7 +1110,41 @@ export default function AboutSplit() {
      lines were being rewritten anyway. */
   const [mounted, setMounted] = useState(false);
   useEffect(() => setMounted(true), []);
-  const scrubbing = mounted && !reduce;
+
+  /* ── ⚠️ AND STACKED, THE READING COLUMN STAYS WHERE IT IS ──
+     at the user's instruction, and it is the same argument the stylesheet
+     already makes for the heading two rules down (`.lead, .readingBlock {
+     transform: none !important }`): these arrivals are a SPLIT's gestures.
+     Beside a full-height film, the lead, the prints and the footnote rise
+     READ_RISE into a column that has the picture to measure them against,
+     across a range set by the section passing the window. Stacked, the
+     section is twice as tall as the screen and the picture is above the
+     type rather than beside it, so the same range spends the whole column
+     on it: measured at 390x844, the lead was still inking at the point the
+     footnote below it had begun to travel, and scrolling back up put both
+     paragraphs away again. A reader on a phone was watching the words they
+     were trying to read leave and return.
+
+     THE STYLESHEET CANNOT DO THIS ONE. Its override reaches `.lead` and
+     `.readingBlock`, which is every TRANSFORM the split writes — but the
+     three arrivals inside the block are opacity and clip-path as well as
+     `y`, on `.para`, `.doors`, `.paraFine` and each print's `.doorClip`,
+     and no `transform: none` touches those. The gate has to be here.
+
+     ⚠️ STATE AND NOT `stackedMq` BELOW. That ref is read inside a scroll
+     handler and never needs to re-render; this decides whether a style is
+     WRITTEN, so a phone rotated across 900 has to re-render or the column
+     keeps whatever the other layout last left in its style attribute. */
+  const [stacked, setStacked] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia(STACKED);
+    const read = () => setStacked(mq.matches);
+    read();
+    mq.addEventListener("change", read);
+    return () => mq.removeEventListener("change", read);
+  }, []);
+
+  const scrubbing = mounted && !reduce && !stacked;
 
   const paraOpacity = useTransform(inView, inkOf(READ_PARA_SLOT), [0, 1]);
   const paraY = useTransform(inView, READ_PARA_SLOT, [READ_RISE, 0]);
@@ -1662,8 +1696,15 @@ export default function AboutSplit() {
             className={styles.readingBlock}
             ref={readingRef}
             /* REDUCED MOTION GETS NO TRANSFORM AT ALL — the same rule the
-               picture's scrub and the plate's travel follow. */
-            style={reduce ? undefined : { y: bodyY }}
+               picture's scrub and the plate's travel follow.
+               ⚠️ `scrubbing` AND NOT `!reduce`, WHICH IS WHAT IT USED TO BE.
+               The flag carries the breakpoint (stacked, this is dead — the
+               stylesheet neutralises it with `transform: none !important`)
+               AND the mount gate, and the mount gate is the load-bearing
+               half: see the note on the print's fade below for the stale
+               inline style that a flag flipping AFTER the first render
+               leaves welded to the element. */
+            style={scrubbing ? { y: bodyY } : undefined}
             {...(reduce
               ? {
                   initial: "hidden" as const,
@@ -1784,7 +1825,30 @@ function Door({
   return (
     <motion.li
       variants={reduce ? FADE : undefined}
-      style={reduce ? undefined : { opacity }}
+      /* ⚠️ `scrubbing`, NOT `!reduce` — THE FADE AND THE SHUTTER ARE ONE
+         GESTURE AND THEY MUST READ THE SAME FLAG. This was `!reduce` while
+         the clip below was already `scrubbing`, which was survivable only
+         for as long as the two agreed. They stopped agreeing the moment
+         `scrubbing` gained the breakpoint, and the failure was NOT the half
+         of the gesture you would expect:
+
+         FRAMER DOES NOT TAKE THE PROPERTY BACK WHEN THE PROP GOES AWAY. The
+         breakpoint is read in an effect, so the FIRST render is always
+         `stacked === false`: framer wrote `opacity: 0` — the scrub's reading
+         at progress 0 — straight onto the element's style attribute, the
+         effect then flipped the flag, `style` became undefined, and the
+         inline declaration simply stayed. Measured on a phone: all three
+         prints at computed opacity 0, permanently, with a `<ul>` at
+         opacity 1 around them and no clip on any of them. An empty gap
+         between the two paragraphs, which is the whole reason the fade
+         exists (see DOOR_IN).
+
+         `scrubbing` is false BEFORE MOUNT as well, so the property is never
+         written in the first place and there is nothing to take back. That
+         is the same argument the shutter's own note makes about the
+         server's HTML, and it is why every other scrubbed style in this
+         file already reads this flag. */
+      style={scrubbing ? { opacity } : undefined}
     >
       {/* THE VENUE'S OWN SITE, IN A NEW TAB. These pointed at
           `/restaurants/<slug>` — this site's page for the room — and that
