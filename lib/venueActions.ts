@@ -18,9 +18,17 @@
  * still runs primaryAction() and is untouched by this file.
  *
  * What the eight resolve to today:
- *   three   bintang, ramo, belly
- *   two     guanabana (no menuPages), cafemama (not bookable)
- *   one     mamasons, hoodwood (Visit), bunso (Visit, "Opening soon")
+ *   three   bintang, guanabana, ramo, belly
+ *   two     mamasons, cafemama, hoodwood (all walk-in, so no Book)
+ *   one     bunso (Visit, "Opening soon")
+ *
+ * ⚠️ THIS TABLE MOVES WHEN A MENU LANDS. Guanabana, Mamasons and Hoodwood
+ * all gained `menuPages` in August 2026 and each climbed a row without a
+ * line of this file changing — which is the point, but it does mean the
+ * table is a SNAPSHOT rather than a rule. Bunso is the only venue left on
+ * one control, and correctly so: it has not opened, so there is no menu to
+ * print and nothing to book. When it does, it takes `menuPages` and a
+ * booking host like any other and lands on three.
  */
 import type { Restaurant } from "./restaurants";
 

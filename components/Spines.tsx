@@ -40,10 +40,12 @@
 
 import { useCallback, useEffect, useId, useState } from "react";
 import Image from "next/image";
+import Link from "next/link";
 import styles from "./Spines.module.css";
 import { asset } from "@/lib/media";
 import { getRestaurant } from "@/lib/restaurants";
 import { splitActions } from "@/lib/venueActions";
+import { menuHref } from "@/lib/menu";
 import type { VenueCardItem } from "@/lib/venueCards";
 
 /* THE LETTERBOX'S OWN FOCAL POINTS, and they are a different question from
@@ -87,15 +89,12 @@ const SPINE_FOCAL: Record<string, string> = {
 
 export type SpineItem = VenueCardItem & { location?: string };
 
-export default function Spines({
-  items,
-  onMenu,
-}: {
-  items: SpineItem[];
-  /** opens the venue's menu pages — the page owns the overlay, this list
-   *  only says which venue it is asking for. Same contract as the card's. */
-  onMenu: (slug: string) => void;
-}) {
+export default function Spines({ items }: { items: SpineItem[] }) {
+  /* ⚠️ `onMenu` IS GONE FROM THIS COMPONENT'S SIGNATURE. The list used to
+     take a callback and hand a slug back up to whichever page owned the
+     the menu overlay. The menu is a ROUTE now (/menus/<slug>), so the band
+     builds its own href from the slug it already has and the page above it
+     brokers nothing. Every caller that passed `onMenu` dropped it. */
   /* WHICH BAND IS OPEN, BY SLUG rather than by index: the array's order is
      the chapter's business and a slug survives a reorder. Null closes the
      set, which is also what makes the return journey undelayed — every
@@ -136,7 +135,6 @@ export default function Spines({
           item={item}
           open={open === item.slug}
           onToggle={() => toggle(item.slug)}
-          onMenu={() => onMenu(item.slug)}
           panelId={`${listId}-${item.slug}`}
         />
       ))}
@@ -153,19 +151,19 @@ function Spine({
   item,
   open,
   onToggle,
-  onMenu,
   panelId,
 }: {
   item: SpineItem;
   open: boolean;
   onToggle: () => void;
-  onMenu: () => void;
   panelId: string;
 }) {
   const rest = getRestaurant(item.slug);
   const acts = splitActions(rest, {
     hasMenuPages: Boolean(item.menuPages && item.menuPages.length > 0),
-    // this list always owns an overlay to send the press to
+    /* ALWAYS REACHABLE NOW. This used to say "this list owns an overlay to
+       send the press to"; the destination is a route every venue with
+       pages has, so the answer is the same for a different reason. */
     menuReachable: true,
   });
 
@@ -277,14 +275,17 @@ function Spine({
             it. */}
         <span className={styles.acts}>
           {acts.menu ? (
-            <button
-              type="button"
+            /* A LINK, NOT A BUTTON, and the element change is the whole
+               point of the move: this navigates somewhere that exists, so
+               it long-presses, opens in a new tab and copies as a URL like
+               any other link on the site. A <button> could do none of it. */
+            <Link
+              href={menuHref(item.slug)}
               className={`${styles.pill} ${styles.pillGhost}`}
-              onClick={onMenu}
               aria-label={`Menu — ${item.name}`}
             >
               Menu
-            </button>
+            </Link>
           ) : null}
           {acts.visit ? (
             <a

@@ -1,8 +1,26 @@
 {
   "cloud": "mmia7qfr",
   "folder": "maginhawa",
-  "generated": "2026-08-17T11:10:08.595Z",
+  "generated": "2026-08-25T14:07:31.285Z",
   "assets": {
-    "/images/bunso-shopfront.jpg": "maginhawa/images/bunso-shopfront"
+    "/menu/belly/drinks-1.png": "maginhawa/menu/belly/drinks-1",
+    "/menu/belly/food.png": "maginhawa/menu/belly/food",
+    "/menu/bintang/bintang_menu-1.png": "maginhawa/menu/bintang/bintang_menu-1",
+    "/menu/bintang/bintang_menu-2.png": "maginhawa/menu/bintang/bintang_menu-2",
+    "/menu/cafemama/page-1.png": "maginhawa/menu/cafemama/page-1",
+    "/menu/cafemama/page-2.png": "maginhawa/menu/cafemama/page-2",
+    "/menu/cafemama/page-3.png": "maginhawa/menu/cafemama/page-3",
+    "/menu/cafemama/page-4.png": "maginhawa/menu/cafemama/page-4",
+    "/menu/guanabana/menu.png": "maginhawa/menu/guanabana/menu",
+    "/menu/hoodwood/page-1.png": "maginhawa/menu/hoodwood/page-1",
+    "/menu/hoodwood/page-2.png": "maginhawa/menu/hoodwood/page-2",
+    "/menu/mamasons/baked-goods.png": "maginhawa/menu/mamasons/baked-goods",
+    "/menu/mamasons/desserts-and-drinks.png": "maginhawa/menu/mamasons/desserts-and-drinks",
+    "/menu/mamasons/ice-cream-and-coffee.png": "maginhawa/menu/mamasons/ice-cream-and-coffee",
+    "/menu/ramo/alacarte.png": "maginhawa/menu/ramo/alacarte",
+    "/menu/ramo/drinks-1.png": "maginhawa/menu/ramo/drinks-1",
+    "/menu/ramo/drinks-2.png": "maginhawa/menu/ramo/drinks-2",
+    "/menu/ramo/groupset.png": "maginhawa/menu/ramo/groupset",
+    "/menu/ramo/lunch-1.png": "maginhawa/menu/ramo/lunch-1"
   }
 }

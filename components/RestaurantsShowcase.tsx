@@ -1,10 +1,12 @@
 "use client";
 
 import { useCallback, useEffect, useRef, useState } from "react";
+import Link from "next/link";
 import { motion, useAnimationControls } from "framer-motion";
 import styles from "./RestaurantsShowcase.module.css";
 import Nav from "./Nav";
 import Menu from "./Menu";
+import { useRouteTransition } from "./PageTransition";
 import VideoBackdrop from "./VideoBackdrop";
 // THE GRID VIEW'S CARD, shared with the home page's Discover grid. It is
 // the same object at a different aspect — see the derivation in
@@ -21,7 +23,7 @@ import {
   SLUG_BY_NAME,
   getRestaurant,
 } from "@/lib/restaurants";
-import MenuOverlay from "./MenuOverlay";
+import { menuHref } from "@/lib/menu";
 
 // The venues you can simply turn up to. DERIVED, never typed out: booking
 // policy already lives in lib/restaurants.ts, and this page has only just
@@ -229,15 +231,24 @@ export default function RestaurantsShowcase() {
   const [active, setActive] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [view, setView] = useState<"wheel" | "cards">("wheel");
-  // slug of the restaurant whose menu modal is currently open (or null)
-  const [menuFor, setMenuFor] = useState<string | null>(null);
+  /* ⚠️ `menuFor` AND `openMenuFor` ARE GONE. This page owned the slug of
+     whichever venue's menu modal was open, and a helper that resolved a
+     display name to it. The menu is a route now (/menus/<slug>), so there
+     is no open menu to be the state of — `menuLink` below resolves the
+     same display name to an href instead. */
 
-  // helper: open the menu overlay for a given display name, but only if the
-  // restaurant actually has menu pages set in lib/restaurants.ts
-  const openMenuFor = (name: string) => {
+  /* THE SITE'S OWN NAVIGATION, not router.push — every internal press on
+     this site runs through the curtain (Nav, Hero, Footer and Menu all take
+     the same hook). The Menu CONTROLS are real <Link>s, which is the whole
+     point of the route; this is for the card-body press, which is a click
+     handler on a div and has no href to be. */
+  const navigate = useRouteTransition();
+
+  /** the display name's menu page, or null where the venue has no menu */
+  const menuLink = (name: string) => {
     const slug = SLUG_BY_NAME[name];
     const r = slug ? getRestaurant(slug) : undefined;
-    if (slug && r?.menuPages && r.menuPages.length > 0) setMenuFor(slug);
+    return slug && r?.menuPages?.length ? menuHref(slug) : null;
   };
   const hasMenu = (name: string) => {
     const slug = SLUG_BY_NAME[name];
@@ -261,7 +272,6 @@ export default function RestaurantsShowcase() {
     const slug = SLUG_BY_NAME[name];
     return slug ? getRestaurant(slug)?.website : undefined;
   };
-  const menuRestaurant = menuFor ? getRestaurant(menuFor) : undefined;
   const scrollerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
   const copyH = useRef(0); // pixel height of one full copy (N rows)
@@ -1035,18 +1045,23 @@ export default function RestaurantsShowcase() {
                   Book a Table
                 </motion.a>
               )}
-              <motion.button
-                custom={2}
-                initial={{ opacity: 0, y: 10 }}
-                animate={actionsCtl}
-                type="button"
-                className={styles.actBtn}
-                onClick={() => openMenuFor(item.name)}
-                disabled={!hasMenu(item.name)}
-                aria-label={`View ${item.name} menu`}
-              >
-                Menu
-              </motion.button>
+              {/* ⚠️ RENDERED, NOT DISABLED. This was a <button> that stayed
+                  in place greyed out for the venues with no menu — a dead
+                  control the rest of the design forbids, and it only
+                  survived here because a modal has nowhere to send a press.
+                  A route does, so the control is a link where there is a
+                  menu and absent where there is not. */}
+              {hasMenu(item.name) && (
+                <motion.div custom={2} initial={{ opacity: 0, y: 10 }} animate={actionsCtl}>
+                  <Link
+                    href={menuLink(item.name)!}
+                    className={styles.actBtn}
+                    aria-label={`${item.name} menu`}
+                  >
+                    Menu
+                  </Link>
+                </motion.div>
+              )}
             </div>
           </div>
         </div>
@@ -1074,18 +1089,17 @@ export default function RestaurantsShowcase() {
 
             NO EXPANSION HERE. The home grid's card presses open a portalled
             detail overlay; this page has no such thing and inventing one
-            would put a second modal on a page that already portals
-            <MenuOverlay>. The press goes where a reader on this page
-            expects — the venue's own page, through the route transition
-            this component already uses for the wheel's Visit action.
+            would put a modal on a page whose whole job is choosing. The
+            press goes where a reader on this page expects — the venue's own
+            site, or its menu where there is no site.
 
-            THE MENU CONTROL OPENS THE OVERLAY rather than navigating,
+            THE MENU CONTROL NAVIGATES to /menus/<slug>,
             which is this page's own behaviour and is better than the home
             card's link: the pages are already mounted here. It renders
-            only where the venue carries `menuPages`; the four that do not
-            get one control and no disabled stub. That is a real change
-            from the retired tile, which rendered a greyed-out `Menu`
-            button on every venue but Bunso.
+            only where the venue carries `menuPages`; Bunso, the one venue
+            that does not, gets one control and no disabled stub. That is a
+            real change from the retired tile, which rendered a greyed-out
+            `Menu` button on every venue but Bunso.
 
             `data-lenis-prevent`: below 980px this box becomes its own
             scroller (see the media query in the stylesheet), and Lenis
@@ -1134,11 +1148,10 @@ export default function RestaurantsShowcase() {
                      the only one.
 
                      A VENUE WITH NO `website` FALLS BACK TO THE MENU,
-                     which is an overlay this page already mounts, rather
-                     than to a page that does not exist. It is the one
-                     thing a picture of a restaurant can still open in
-                     place, and if there are no menu pages either the
-                     card prints no press at all — `hasMenu` gates it.
+                     which is now a page on this site rather than an
+                     overlay — so the fallback navigates like the primary
+                     case does. If there are no menu pages either, the card
+                     prints no press at all; `hasMenu` gates it.
 
                      A NEW TAB, because every other external destination
                      on this site opens in one (the wheel's Visit, the
@@ -1150,7 +1163,7 @@ export default function RestaurantsShowcase() {
                   onPress={() => {
                     const site = getRestaurant(v.slug)?.website;
                     if (site) window.open(site, "_blank", "noopener,noreferrer");
-                    else setMenuFor(v.slug);
+                    else navigate(menuHref(v.slug));
                   }}
                   /* names the DESTINATION, since the press no longer opens
                      a page on this site */
@@ -1162,7 +1175,7 @@ export default function RestaurantsShowcase() {
                   /* passed unconditionally: the card itself is what knows
                      whether there is a menu behind the control, so the
                      rule lives in one place for both grids */
-                  onMenu={() => setMenuFor(v.slug)}
+                  menuHref={menuHref(v.slug)}
                 />
               </article>
             ))}
@@ -1210,13 +1223,6 @@ export default function RestaurantsShowcase() {
         </p>
       </section>
 
-      <MenuOverlay
-        open={!!menuFor && !!menuRestaurant?.menuPages?.length}
-        onClose={() => setMenuFor(null)}
-        pages={menuRestaurant?.menuPages ?? []}
-        restaurantName={menuRestaurant?.name ?? ""}
-        subtitle={menuRestaurant?.menuLabel}
-      />
     </main>
   );
 }
