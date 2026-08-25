@@ -89,7 +89,32 @@ const SPINE_FOCAL: Record<string, string> = {
 
 export type SpineItem = VenueCardItem & { location?: string };
 
-export default function Spines({ items }: { items: SpineItem[] }) {
+export default function Spines({
+  items,
+  fit,
+}: {
+  items: SpineItem[];
+  /* ⚠️ `fit` SIZES THE BANDS TO THE BOX RATHER THAN TO THE PHONE, and it
+     exists because this list now has two homes with two different amounts
+     of room.
+
+     The default is the DERIVED 75px band — see the height budget at the
+     top of Spines.module.css. That budget assumes the home page's chapter:
+     a section in normal document flow with a whole screen to spend and a
+     72px eyebrow above it.
+
+     /restaurants renders this inside `.cards`, a 100svh sheet with a nav
+     over its top edge and the view toggle and walk-in note pinned over its
+     bottom one — and 100svh on a phone browser is the SMALL viewport, i.e.
+     ~652px with both Safari bars showing, not the 844 the budget was
+     solved against. The eight bands overflowed, the furniture is absolute
+     and does not move, and the last venue was printed under the toggle.
+
+     Set `fit` and the band height comes from the box instead: see
+     `.spines[data-fit="screen"]` in the stylesheet, which reads a
+     --spine-chrome the caller declares. The caller must declare it. */
+  fit?: boolean;
+}) {
   /* ⚠️ `onMenu` IS GONE FROM THIS COMPONENT'S SIGNATURE. The list used to
      take a callback and hand a slug back up to whichever page owned the
      the menu overlay. The menu is a ROUTE now (/menus/<slug>), so the band
@@ -128,6 +153,7 @@ export default function Spines({ items }: { items: SpineItem[] }) {
          bands all doing the same thing is one attribute and a CSS
          transition, not seven pieces of state */
       data-any-open={open ? "on" : undefined}
+      data-fit={fit ? "screen" : undefined}
     >
       {items.map((item) => (
         <Spine

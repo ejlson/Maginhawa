@@ -4,14 +4,20 @@ import { useCallback, useEffect, useRef, useState } from "react";
 import Link from "next/link";
 import { motion, useAnimationControls } from "framer-motion";
 import styles from "./RestaurantsShowcase.module.css";
-import Nav from "./Nav";
-import Menu from "./Menu";
-import { useRouteTransition } from "./PageTransition";
-import VideoBackdrop from "./VideoBackdrop";
+import Nav from "@/components/layout/Nav";
+import Menu from "@/components/layout/Menu";
+import { useRouteTransition } from "@/components/layout/PageTransition";
+import VideoBackdrop from "@/components/ui/VideoBackdrop";
 // THE GRID VIEW'S CARD, shared with the home page's Discover grid. It is
 // the same object at a different aspect — see the derivation in
 // VenueCard.module.css for what a 1:1 card costs against a 3 : 4.3 one.
 import VenueCard from "./VenueCard";
+/* THE PHONE'S CARD LIST. Below 461px this page's grid is one column of
+   358px squares — eight of them, ~2,900px of scrolling inside a sheet that
+   is supposed to BE the choice — so the same bands the home page's
+   "Our Restaurants" chapter swaps to take over here too. One component,
+   one set of measurements, both surfaces. See the swap at SPINES below. */
+import Spines from "./Spines";
 import { venueCards } from "@/lib/venueCards";
 // ALIASED, and it has to be: this file declares its own `RESTAURANTS` below
 // (L70) — the carousel's ordered list with its per-venue video and display
@@ -154,6 +160,20 @@ const N = RESTAURANTS.length;
    record. */
 const CARDS = venueCards();
 
+/* ══════════════ WHERE THE PHONE TAKES OVER ══════════════
+   THE SAME EDGE THE HOME PAGE TURNS AT, and it has to be: `SPINES` in
+   Discover.tsx is the identical string, because both pages are choosing
+   between the identical two objects and a reader who crosses this width on
+   one of them should see the same thing happen on the other.
+
+   ⚠️ IT IS ALSO THE EDGE THIS FILE'S OWN GRID TURNS AT. The last
+   `@media (max-width: 460px)` block in RestaurantsShowcase.module.css is
+   what drops .cardsGrid to a single column, so 460 is the last width the
+   one-column grid is asked for and this swap retires exactly the layout
+   that block describes — nothing in between renders both. Keep the three
+   spellings (here, Discover.tsx, the stylesheet) in step. */
+const SPINES = "(max-width: 460px)";
+
 // many stacked copies → an endless loop. We don't touch scrollTop mid-scroll
 // (that kills inertia and feels janky); instead we silently re-centre on the
 // middle copy once scrolling settles. The jump is a whole-copy multiple, so the
@@ -231,6 +251,28 @@ export default function RestaurantsShowcase() {
   const [active, setActive] = useState(0);
   const [menuOpen, setMenuOpen] = useState(false);
   const [view, setView] = useState<"wheel" | "cards">("wheel");
+
+  /* ---- WHICH CARD LAYOUT THIS WIDTH GETS ----
+     ⚠️ STATE AND NOT A REF, AND IT LISTENS RATHER THAN READING ONCE — it
+     decides which subtree renders, so it has to re-render when it changes;
+     a phone rotated from 390 to 844 crosses this edge. `false` until the
+     effect proves otherwise, because there is no matchMedia on the server:
+     the exported HTML therefore always carries the GRID and its eight
+     links, which is the crawlable markup this page has always shipped and
+     the markup the CollectionPage ItemList in app/restaurants/page.tsx
+     describes. Discover.tsx runs the identical pattern.
+
+     THE SWAP IS NEVER SEEN. The card sheet is `opacity: 0` and inert until
+     the view toggle is pressed, so the effect has resolved long before
+     anything in it is on screen. */
+  const [spines, setSpines] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia(SPINES);
+    const read = () => setSpines(mq.matches);
+    read();
+    mq.addEventListener("change", read);
+    return () => mq.removeEventListener("change", read);
+  }, []);
   /* ⚠️ `menuFor` AND `openMenuFor` ARE GONE. This page owned the slug of
      whichever venue's menu modal was open, and a helper that resolved a
      display name to it. The menu is a route now (/menus/<slug>), so there
@@ -1125,61 +1167,98 @@ export default function RestaurantsShowcase() {
              — unlike `display: none` — leaves the crossfade intact. */
           inert={view !== "cards"}
           data-lenis-prevent
+          /* the sheet's padding answers to the layout inside it — the bands
+             need less air above and below than two rows of squares do, and
+             their own budget is measured against a whole screen. See the
+             `@media (max-width: 460px)` block in the stylesheet. */
+          data-spines={spines ? "on" : undefined}
         >
-          <div className={styles.cardsGrid} data-venue-grid>
-            {CARDS.map((v) => (
-              <article key={v.slug} className={styles.card}>
-                <VenueCard
-                  item={v}
-                  square
-                  /* the column count this grid actually produces, in the
-                     order the media queries fire — see the stylesheet.
-                     `24vw` at the wide end is the 4-up minus its share of
-                     the gutters and the sheet's padding; getting this
-                     wrong is a 4032px decode on a 220px box. */
-                  sizes="(max-width: 460px) calc(100vw - 32px), (max-width: 700px) 46vw, (max-width: 980px) 31vw, 24vw"
-                  /* THE PRESS GOES TO THE VENUE'S OWN SITE, at the user's
-                     instruction — the same destination the card's Visit
-                     pill and the wheel's Visit action already carry, so
-                     the whole card and the control inside it now agree.
-                     It USED to open /restaurants/[slug], and that route
-                     has since been removed outright, so the venue's own
-                     site is no longer the PREFERRED destination — it is
-                     the only one.
+          {/* ══ ONE LIST PER WIDTH, AND ONLY ONE IS EVER MOUNTED ══
+              Not two subtrees with a `display: none` on the loser: that is
+              sixteen photographs for a phone to consider, and next/image
+              would eagerly fetch the hidden set's members. The choice is
+              made in JS on a matchMedia read and only the winner renders.
 
-                     A VENUE WITH NO `website` FALLS BACK TO THE MENU,
-                     which is now a page on this site rather than an
-                     overlay — so the fallback navigates like the primary
-                     case does. If there are no menu pages either, the card
-                     prints no press at all; `hasMenu` gates it.
+              THE BANDS TAKE THE SAME RECORDS THE CARDS DO. <Spines> asks
+              for `VenueCardItem & { location? }`, and `location` is only a
+              fallback for an address that has no `area` — every one of
+              these has one, so `CARDS` is already a valid SpineItem[] and
+              this page invents no second table. (Discover.tsx passes its
+              own display copy in the same slot; both read venueCards().)
 
-                     A NEW TAB, because every other external destination
-                     on this site opens in one (the wheel's Visit, the
-                     card's own pill, every booking link) and a card that
-                     silently replaced the page the grid lives on would be
-                     the one exception. `noopener` with it — window.open
-                     without it hands the opened site a live reference to
-                     this one. */
-                  onPress={() => {
-                    const site = getRestaurant(v.slug)?.website;
-                    if (site) window.open(site, "_blank", "noopener,noreferrer");
-                    else navigate(menuHref(v.slug));
-                  }}
-                  /* names the DESTINATION, since the press no longer opens
-                     a page on this site */
-                  pressLabel={
-                    getRestaurant(v.slug)?.website
-                      ? `Visit ${v.name} — opens their website in a new tab`
-                      : `${v.name} menu`
-                  }
-                  /* passed unconditionally: the card itself is what knows
-                     whether there is a menu behind the control, so the
-                     rule lives in one place for both grids */
-                  menuHref={menuHref(v.slug)}
-                />
-              </article>
-            ))}
-          </div>
+              NO onPress SEAM HERE. The card grid above routes its body
+              press to the venue's own site; a band carries the venue's
+              controls as real pills — Menu, Visit, Book, whichever the
+              venue HAS, via lib/venueActions.ts — so there is nothing for
+              this page to broker and no fourth pressable layer to
+              disagree with them. */}
+          {spines ? (
+            /* `fit` — the bands size to THIS sheet rather than to the
+               home page's whole screen. 100svh on a phone browser is the
+               small viewport (~652px with both Safari bars up), and the
+               nav, the view toggle and the walk-in note are all absolute
+               over it, so the 628px the list is solved for elsewhere
+               overflowed and printed Bunso under the toggle. The sheet
+               declares --spine-chrome; see the derivation in
+               Spines.module.css. */
+            <Spines items={CARDS} fit />
+          ) : (
+            <div className={styles.cardsGrid} data-venue-grid>
+              {CARDS.map((v) => (
+                <article key={v.slug} className={styles.card}>
+                  <VenueCard
+                    item={v}
+                    square
+                    /* the column count this grid actually produces, in the
+                       order the media queries fire — see the stylesheet.
+                       `24vw` at the wide end is the 4-up minus its share of
+                       the gutters and the sheet's padding; getting this
+                       wrong is a 4032px decode on a 220px box. */
+                    sizes="(max-width: 460px) calc(100vw - 32px), (max-width: 700px) 46vw, (max-width: 980px) 31vw, 24vw"
+                    /* THE PRESS GOES TO THE VENUE'S OWN SITE, at the user's
+                       instruction — the same destination the card's Visit
+                       pill and the wheel's Visit action already carry, so
+                       the whole card and the control inside it now agree.
+                       It USED to open /restaurants/[slug], and that route
+                       has since been removed outright, so the venue's own
+                       site is no longer the PREFERRED destination — it is
+                       the only one.
+
+                       A VENUE WITH NO `website` FALLS BACK TO THE MENU,
+                       which is now a page on this site rather than an
+                       overlay — so the fallback navigates like the primary
+                       case does. If there are no menu pages either, the card
+                       prints no press at all; `hasMenu` gates it.
+
+                       A NEW TAB, because every other external destination
+                       on this site opens in one (the wheel's Visit, the
+                       card's own pill, every booking link) and a card that
+                       silently replaced the page the grid lives on would be
+                       the one exception. `noopener` with it — window.open
+                       without it hands the opened site a live reference to
+                       this one. */
+                    onPress={() => {
+                      const site = getRestaurant(v.slug)?.website;
+                      if (site)
+                        window.open(site, "_blank", "noopener,noreferrer");
+                      else navigate(menuHref(v.slug));
+                    }}
+                    /* names the DESTINATION, since the press no longer opens
+                       a page on this site */
+                    pressLabel={
+                      getRestaurant(v.slug)?.website
+                        ? `Visit ${v.name} — opens their website in a new tab`
+                        : `${v.name} menu`
+                    }
+                    /* passed unconditionally: the card itself is what knows
+                       whether there is a menu behind the control, so the
+                       rule lives in one place for both grids */
+                    menuHref={menuHref(v.slug)}
+                  />
+                </article>
+              ))}
+            </div>
+          )}
         </div>
 
         {/* view switch, bottom-left */}

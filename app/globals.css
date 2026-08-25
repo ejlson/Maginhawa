@@ -1154,7 +1154,7 @@ html::-webkit-scrollbar {
    and no pin. The rule also painted the strip between the two chapters so
    the band read as one continuous ground.
 
-   Both jobs are gone: the pin is removed (see Interlude.module.css) and the
+   Both jobs are gone: the pin is removed (see components/archive/Interlude.module.css) and the
    dark band with it, so the strip is simply the page. The rule is deleted
    rather than emptied — a wrapper class with no wrapper is a thing the next
    person has to work out is dead. */

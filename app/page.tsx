@@ -1,4 +1,4 @@
-import Experience from "@/components/Experience";
+import Experience from "@/components/home/Experience";
 import { GroupPressJsonLd } from "@/lib/jsonld";
 import { getJournal } from "@/lib/posts";
 

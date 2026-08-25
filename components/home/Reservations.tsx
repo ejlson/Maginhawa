@@ -9,8 +9,8 @@ import {
 } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import styles from "./Reservations.module.css";
-import VideoBackdrop from "./VideoBackdrop";
-import PillCta from "./PillCta";
+import VideoBackdrop from "@/components/ui/VideoBackdrop";
+import PillCta from "@/components/ui/PillCta";
 
 /* ONE clip, not a cycle. The four that used to rotate here weigh 107MB
    combined; this is the only one the page now pays for, and VideoBackdrop

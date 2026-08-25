@@ -33,13 +33,13 @@
  * back a minimal SVG with no pattern, no `<defs>` and no transform.
  *
  * THE PATHS DO NOT CHANGE. `lib/press.ts` keeps naming `.svg` files and
- * `components/PressWall.tsx` keeps rendering them through `asset()`; not a
+ * `components/home/PressWall.tsx` keeps rendering them through `asset()`; not a
  * line of either moves. Rewriting these as `.png` would have been tidier and
  * would have touched fourteen records and a component for no visible gain —
  * and the files are in git, so this is reversible with `git checkout`.
  *
  * ── HOW THE TARGET SIZE IS DERIVED, RATHER THAN PICKED ──
- * From `components/PressWall.module.css` and `lib/press.ts`:
+ * From `components/home/PressWall.module.css` and `lib/press.ts`:
  *
  *     --press-base: clamp(18px, 2vw, 36px)   → 36px at its largest
  *     .logoSeat  { height: var(--press-base) * var(--s) }

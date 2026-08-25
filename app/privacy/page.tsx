@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import LegalPage, { Pending } from "@/components/LegalPage";
-import { ConsentControl } from "@/components/CookieBanner";
+import LegalPage, { Pending } from "@/components/legal/LegalPage";
+import { ConsentControl } from "@/components/layout/CookieBanner";
 import { analyticsConfigured, marketingConfigured } from "@/lib/consent";
 import { CONTACT } from "@/lib/contact";
 import { LEGAL_ENTITY, LEGAL_UPDATED } from "@/lib/legal";

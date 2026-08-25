@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import JournalPost from "@/components/JournalPost";
+import JournalPost from "@/components/blog/JournalPost";
 import { getAdjacentPosts, getPost, getPosts } from "@/lib/posts";
 import { renderMarkdown } from "@/lib/markdown";
 import { SITE_URL } from "@/lib/site";

@@ -737,7 +737,7 @@ export default function Manifesto() {
           ⚠️ THE MARKS WENT WITH IT AND THEY WERE NOT DECORATION — each was
           sourced (1987 and Camden from /about's structured data, London from
           the group's own city). Nothing else on this page prints them. If
-          they are wanted back, they are three strings in StoryStrip.tsx,
+          they are wanted back, they are three strings in StoryStrip.tsx (components/archive/),
           which is still in the tree and is now rendered by nobody. */}
     </section>
   );

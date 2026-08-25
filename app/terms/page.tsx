@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import Link from "next/link";
-import LegalPage, { Pending } from "@/components/LegalPage";
+import LegalPage, { Pending } from "@/components/legal/LegalPage";
 import { CONTACT } from "@/lib/contact";
 import { LEGAL_ENTITY, LEGAL_UPDATED } from "@/lib/legal";
 import { SITE_URL } from "@/lib/site";

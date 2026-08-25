@@ -1,9 +1,9 @@
 "use client";
 
 import { useState } from "react";
-import Nav from "@/components/Nav";
-import Menu from "@/components/Menu";
-import PillCta from "@/components/PillCta";
+import Nav from "@/components/layout/Nav";
+import Menu from "@/components/layout/Menu";
+import PillCta from "@/components/ui/PillCta";
 import styles from "./not-found.module.css";
 
 /* ---- THE 404 -------------------------------------------------------------

@@ -8,22 +8,22 @@ import {
   useSyncExternalStore,
 } from "react";
 import Image from "next/image";
-import Nav from "./Nav";
-import Menu from "./Menu";
-import Reveal from "./Reveal";
-import PillCta from "./PillCta";
-import Footer from "./Footer";
-import DarkZone from "./DarkZone";
+import Nav from "@/components/layout/Nav";
+import Menu from "@/components/layout/Menu";
+import Reveal from "@/components/ui/Reveal";
+import PillCta from "@/components/ui/PillCta";
+import Footer from "@/components/layout/Footer";
+import DarkZone from "@/components/ui/DarkZone";
 import styles from "./BlogIndex.module.css";
 /* ⚠️ THE RAMP UNDER THE LEDE'S TYPE COMES FROM THE VENUE CARD, and the
    home page's journal chapter imports it the same way. `.rampBlur` must
    precede `.rampScrim` in the DOM — the banner over them in that file
    explains why the blur has to be the layer underneath. Its depth is one
    variable, --vc-ramp-h, declared on the plate. */
-import card from "./VenueCard.module.css";
+import card from "@/components/venues/VenueCard.module.css";
 import { BLOG, entryLinkProps, headline, type BlogEntry } from "@/lib/blog";
-import ActionBand from "./ActionBand";
-import PlateDate from "./PlateDate";
+import ActionBand from "@/components/ui/ActionBand";
+import PlateDate from "@/components/ui/PlateDate";
 import { RESTAURANTS, getRestaurant } from "@/lib/restaurants";
 import { lenisRef } from "@/lib/SmoothScroll";
 import { asset } from "@/lib/media";

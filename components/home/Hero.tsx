@@ -8,9 +8,9 @@ import {
 } from "framer-motion";
 import { useEffect, useRef, useState } from "react";
 import { JUMP, lenisRef } from "@/lib/SmoothScroll";
-import { useRouteTransition } from "./PageTransition";
+import { useRouteTransition } from "@/components/layout/PageTransition";
 import styles from "./Hero.module.css";
-import PillCta from "./PillCta";
+import PillCta from "@/components/ui/PillCta";
 import { asset } from "@/lib/media";
 import { registerIntroFilm } from "@/lib/introWindow";
 

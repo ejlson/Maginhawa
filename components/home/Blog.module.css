@@ -49,7 +49,7 @@
      why its top margin was forced to 0 (a margin would have shown as a strip
      of the band's ground climbing ahead of the journal).
 
-     The pin is gone (see Interlude.module.css), so there is nothing beneath
+     The pin is gone (see components/archive/Interlude.module.css), so there is nothing beneath
      this to be stacked above and no crossing edge to keep flush. `z-index`
      is dropped rather than kept at 1: a stacking level that exists for a
      relationship that no longer exists is the kind of declaration that

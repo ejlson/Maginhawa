@@ -13,7 +13,7 @@ import {
   type Variants,
 } from "framer-motion";
 import styles from "./AboutSplit.module.css";
-import PillCta from "./PillCta";
+import PillCta from "@/components/ui/PillCta";
 import { asset } from "@/lib/media";
 import { getRestaurant } from "@/lib/restaurants";
 import {

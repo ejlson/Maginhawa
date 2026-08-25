@@ -2,13 +2,13 @@
 
 import { useEffect, useState } from "react";
 import Link from "next/link";
-import Nav from "./Nav";
-import Menu from "./Menu";
+import Nav from "@/components/layout/Nav";
+import Menu from "@/components/layout/Menu";
 import Contact from "./Contact";
 import FAQ from "./FAQ";
 import ReviewUs from "./ReviewUs";
-import Footer from "./Footer";
-import DarkZone from "./DarkZone";
+import Footer from "@/components/layout/Footer";
+import DarkZone from "@/components/ui/DarkZone";
 import styles from "./ContactPage.module.css";
 import { RESTAURANTS } from "@/lib/restaurants";
 

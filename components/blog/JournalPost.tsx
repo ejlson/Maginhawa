@@ -3,10 +3,10 @@
 import { useEffect, useState } from "react";
 import Image from "next/image";
 import Link from "next/link";
-import Nav from "./Nav";
-import Menu from "./Menu";
-import Footer from "./Footer";
-import DarkZone from "./DarkZone";
+import Nav from "@/components/layout/Nav";
+import Menu from "@/components/layout/Menu";
+import Footer from "@/components/layout/Footer";
+import DarkZone from "@/components/ui/DarkZone";
 import styles from "./JournalPost.module.css";
 import { getRestaurant } from "@/lib/restaurants";
 import type { BlogEntry } from "@/lib/blog";

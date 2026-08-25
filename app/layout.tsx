@@ -1,14 +1,14 @@
 import type { Metadata } from "next";
 import "./globals.css";
-import PageTransition from "@/components/PageTransition";
-import CustomCursor from "@/components/CustomCursor";
-import GlassFilters from "@/components/GlassFilters";
+import PageTransition from "@/components/layout/PageTransition";
+import CustomCursor from "@/components/ui/CustomCursor";
+import GlassFilters from "@/components/ui/GlassFilters";
 import SmoothScroll from "@/lib/SmoothScroll";
 import { OrganizationJsonLd, WebSiteJsonLd } from "@/lib/jsonld";
 import { SITE_URL } from "@/lib/site";
-import GoogleTag from "@/components/GoogleTag";
-import MarketingPixels from "@/components/MarketingPixels";
-import CookieBanner from "@/components/CookieBanner";
+import GoogleTag from "@/components/analytics/GoogleTag";
+import MarketingPixels from "@/components/analytics/MarketingPixels";
+import CookieBanner from "@/components/layout/CookieBanner";
 import { EB_Garamond, Figtree } from "next/font/google";
 
 /* TWO next/font LOADERS: the DISPLAY voice and, for the first time in a

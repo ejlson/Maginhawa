@@ -40,7 +40,7 @@ import path from "node:path";
 
 const [, , BAND, FULL, FPS = "25"] = process.argv;
 const fps = +FPS;
-const BRIGHTNESS = 0.62; // components/Hero.module.css .video filter
+const BRIGHTNESS = 0.62; // components/home/Hero.module.css .video filter
 
 const OFF_OPEN = 0.345, OFF_HOLD_A = 0.458, OFF_HOLD_B = 0.642, OFF_FULL = 1.475;
 

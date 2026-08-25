@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import RestaurantsShowcase from "@/components/RestaurantsShowcase";
+import RestaurantsShowcase from "@/components/venues/RestaurantsShowcase";
 import { RESTAURANTS } from "@/lib/restaurants";
 import { SITE_URL } from "@/lib/site";
 import { StructuredData } from "@/lib/StructuredData";

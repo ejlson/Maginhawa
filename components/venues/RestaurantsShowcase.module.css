@@ -22,6 +22,14 @@
   overflow: hidden;
   color: var(--cream);
   z-index: 0;
+  /* HOW FAR THE PINNED FURNITURE SITS OFF THE BOTTOM EDGE — the view
+     toggle on the left and the walk-in note on the right, which share one
+     optical line and therefore one inset. It was typed twice; it is read
+     three times now, because the card sheet has to reserve the strip they
+     occupy (see --cards-pad-bottom under the 460px block) and a third
+     spelling of a number two rules already disagreed about waiting to
+     happen is what would put a band back under the toggle. */
+  --furniture-inset: clamp(18px, 4vh, 40px);
 }
 
 /* ---- full-bleed video background ---- */
@@ -212,7 +220,7 @@
 .viewToggle {
   position: absolute;
   left: clamp(20px, 5vw, 60px);
-  bottom: clamp(18px, 4vh, 40px);
+  bottom: var(--furniture-inset);
   z-index: 5;
   display: flex;
   gap: var(--space-4xs);
@@ -319,7 +327,7 @@
 .walkIn {
   position: absolute;
   right: clamp(20px, 5vw, 60px);
-  bottom: clamp(18px, 4vh, 40px);
+  bottom: var(--furniture-inset);
   z-index: 5;
   pointer-events: none;
   max-width: min(34ch, 46vw);
@@ -437,6 +445,98 @@
 @media (max-width: 460px) {
   .cardsGrid {
     grid-template-columns: minmax(0, 1fr);
+  }
+
+  /* ═══ THE SHEET UNDER THE BANDS ═══════════════════════════════════════
+     Below 461px this view is <Spines> and not the grid at all — see SPINES
+     in RestaurantsShowcase.tsx. The rule above still stands because the
+     single-column grid is what the EXPORTED html carries (the swap is a
+     matchMedia read, which has no server); a reader on a phone sees the
+     bands.
+
+     WHY THE PADS SHRINK. <Spines> is 628px tall and fixed — it is solved
+     against a 650px budget, and that budget assumes the list is the only
+     thing on the screen. This sheet's own pads are sized for two rows of
+     square cards clearing the nav and the view toggle, and at 390 × 844
+     they take clamp(64px, 10vh, 100px) + clamp(74px, 11vh, 104px) ≈ 177px
+     off the box — which puts 628px of bands into 667px of sheet with 39px
+     to spare on the tallest phone and overflows every shorter one.
+
+     68 AND 84 ARE MEASURED, not rounded — each clears a real object that
+     paints over this sheet and does not move when it scrolls:
+
+       nav      0 → 60    the site header. 68 leaves 8px of air under it;
+                          anything under 60 put the first band's top edge
+                          BEHIND the nav and the wordmark sat on the
+                          photograph.
+       note     inset    THE NOTE, NOT THE TOGGLE, IS THE TALL ONE — and
+                + 72px   getting that backwards is what left 2.8px of air
+                          at 414 x 715. Both hang off --furniture-inset,
+                          but the toggle is a 44px control while the note
+                          wraps to three 13px lines: 52.6px measured at
+                          every phone width, because its `max-width` keeps
+                          the wrap at three lines throughout. 72 is that
+                          52.6 plus 19px of gutter, and READING the inset
+                          rather than restating it is what makes the
+                          gutter the SAME 19px at 652, 715 and 844 — the
+                          pad and the furniture move together.
+
+     ⚠️ AND THEY ARE ALSO THE LIST'S BUDGET, which is why they are summed
+     into --spine-chrome above rather than left as two padding values.
+     <Spines fit> takes `100svh − chrome` and divides it between its eight
+     bands, so THE PADS DECIDE THE BAND HEIGHT. Growing one shortens the
+     other; typing a band height anywhere else re-opens the overflow.
+
+     WHAT THAT BUYS, and it is the reason this is not simply a scroll. The
+     sheet is 100svh, and 100svh on a phone browser is the SMALL viewport —
+     ~652px with both Safari bars up, not the 844 the CSS pixel count
+     suggests. At 652 the bands come out 59px and the eight of them land in
+     500px with the toggle and the note clear below: one screen, every
+     control live, which is the contract this view has always kept. At 844
+     they are back at their derived 75 and the list centres its slack.
+
+     BELOW ~56px OF BAND the clamp holds and the sheet scrolls instead
+     (`overflow-y: auto`, see the 980px block). That case is still correct
+     rather than merely tolerable: the padding-bottom above is INSIDE the
+     scroll content, so the last band clears the toggle at the end of the
+     travel.
+
+     ⚠️ NOT `justify-content: center` ON A SCROLLING BOX. Centring content
+     taller than its scroller puts the overflow ABOVE the scroll origin,
+     where it cannot be reached. The pads position the list; the sheet
+     scrolls if it must. */
+  .cards[data-spines="on"] {
+    --cards-pad-top: 68px;
+    --cards-pad-bottom: calc(var(--furniture-inset) + 72px);
+    /* WHAT IS NOT THE LIST'S, DECLARED ONCE. <Spines fit> divides
+       `100svh − this` between its eight bands, so the two pads and the
+       band height cannot be typed separately or they drift and the list
+       overflows the sheet by exactly the difference — which is the bug
+       this pair was written to fix. Read, never restated. */
+    --spine-chrome: calc(var(--cards-pad-top) + var(--cards-pad-bottom));
+  }
+
+  /* ⚠️ THE WALK-IN NOTE INVERTS UNDER THE BANDS, and the `min-width: 981px`
+     rule further up is exactly why it has to be restated here.
+
+     That rule keeps the note CREAM below 981 on a measured argument: the
+     corner it sits in has PHOTOGRAPHS SCROLLING THROUGH IT, because a
+     one-column grid of eight square cards is ~2,900px of picture running
+     past that point. Cream read ~6.3:1 against those frames where maroon
+     read 1.83–1.99:1, so cream won the corner and the inversion stopped
+     where the sheet stopped fitting one screen.
+
+     THE BANDS DO NOT SCROLL. They close at 700px inside an 844px sheet, so
+     the bottom strip is flat --cream and cream-on-cream is 1:1 — the note
+     disappears. Same argument as the 981px rule and the same conclusion,
+     arrived at because the ground stopped MOVING rather than because the
+     window got wide. Maroon on --cream is the sheet's own body pair.
+
+     The sibling combinator is deliberate: the note is a sibling of the
+     sheet, not a child of it, so this reads the sheet's layout state from
+     the one element that carries it. */
+  .cards[data-spines="on"] ~ .walkIn[data-view="cards"] {
+    color: var(--maroon);
   }
 }
 

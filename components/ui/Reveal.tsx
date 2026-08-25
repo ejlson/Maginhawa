@@ -60,7 +60,7 @@ export default function Reveal({
      square one. A rhyme that resolves, not a borrowed shape kept.
 
      It also has to be this way round. These frames are DELIBERATELY square
-     — see the note in AboutIntro.module.css — so holding 28px at the end
+     — see the note in components/archive/AboutIntro.module.css — so holding 28px at the end
      would quietly round two pictures the corners were explicitly taken off.
 
      BOTH KEYFRAMES MUST NAME `round`, even the 0 one. A clip-path only

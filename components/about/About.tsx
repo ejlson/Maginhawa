@@ -18,15 +18,15 @@ import {
   useTransform,
   type MotionValue,
 } from "framer-motion";
-import Nav from "./Nav";
-import Menu from "./Menu";
-import Footer from "./Footer";
-import DarkZone from "./DarkZone";
-import Reveal from "./Reveal";
+import Nav from "@/components/layout/Nav";
+import Menu from "@/components/layout/Menu";
+import Footer from "@/components/layout/Footer";
+import DarkZone from "@/components/ui/DarkZone";
+import Reveal from "@/components/ui/Reveal";
 import styles from "./About.module.css";
 /* the native-cursor opt-out that has to travel with every
    data-cursor="default" — see .optOut in that file */
-import cursor from "./CustomCursor.module.css";
+import cursor from "@/components/ui/CustomCursor.module.css";
 import { FEATURED_OUTLETS, PRESS } from "@/lib/press";
 import { getRestaurant } from "@/lib/restaurants";
 import { asset } from "@/lib/media";

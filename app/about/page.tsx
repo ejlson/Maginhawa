@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import About from "@/components/About";
+import About from "@/components/about/About";
 import { SITE_URL } from "@/lib/site";
 import { StructuredData } from "@/lib/StructuredData";
 

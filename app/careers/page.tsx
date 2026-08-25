@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import JoinUs from "@/components/JoinUs";
+import JoinUs from "@/components/careers/JoinUs";
 import { JOBS } from "@/lib/jobs";
 import { SITE_URL } from "@/lib/site";
 import { StructuredData } from "@/lib/StructuredData";

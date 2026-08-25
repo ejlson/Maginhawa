@@ -33,11 +33,11 @@ import styles from "./Blog.module.css";
    in Blog.module.css, because a class can be imported and a variable
    cannot. The crown's `--vc-wash-*` are NOT needed: the mark below is
    local and carries its own ground. */
-import card from "./VenueCard.module.css";
-import PillCta from "./PillCta";
+import card from "@/components/venues/VenueCard.module.css";
+import PillCta from "@/components/ui/PillCta";
 import { BLOG, entryLinkProps, headline, type BlogEntry } from "@/lib/blog";
-import ActionBand from "./ActionBand";
-import PlateDate from "./PlateDate";
+import ActionBand from "@/components/ui/ActionBand";
+import PlateDate from "@/components/ui/PlateDate";
 import { getRestaurant } from "@/lib/restaurants";
 import { asset } from "@/lib/media";
 import {

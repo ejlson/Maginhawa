@@ -1,8 +1,8 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Nav from "./Nav";
-import Menu from "./Menu";
+import Nav from "@/components/layout/Nav";
+import Menu from "@/components/layout/Menu";
 import styles from "./MenuPage.module.css";
 import { asset } from "@/lib/media";
 import { MENU_DISCLAIMER, MENU_DISCLAIMER_LABEL } from "@/lib/menu";

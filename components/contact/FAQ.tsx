@@ -2,7 +2,7 @@
 
 import { motion } from "framer-motion";
 import { useState } from "react";
-import Reveal from "./Reveal";
+import Reveal from "@/components/ui/Reveal";
 import styles from "./FAQ.module.css";
 import { StructuredData } from "@/lib/StructuredData";
 
