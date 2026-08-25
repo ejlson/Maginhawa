@@ -38,6 +38,61 @@
   padding: var(--section-y-sm) var(--grid-margin) 0;
 }
 
+/* ══════ AND THE FOOTER STOPS RESERVING A SCREEN IT NO LONGER FILLS ══════
+
+   The half above hoists the visit block OUT of the footer below 861px — it
+   becomes the page's own closing band rather than a layer stacked into the
+   footer's third track. That is right, and it left a hole behind that took
+   until the phone-footer pass to become obvious.
+
+   `.footer` is `min-height: 100svh` with `.top { flex: 1 }` — deliberately,
+   so the invitation, the rails and the wordmark land inside one viewport.
+   Strip the invitation out and that band still claims its screen, but the
+   only thing left in it is the 34px mark and a two-line blurb. MEASURED at
+   390×844 with the two-column phone footer in place: `.top` resolved to
+   366px around 42px of content — 172px of nothing above the lockup and
+   155px below it, 327px total. The band did not merely look loose; it was
+   almost eight times its own content.
+
+   THE 172px ABOVE IS THE PART THAT LOOKS LIKE A BUG RATHER THAN SLACK, and
+   it is worth naming because `align-items: start` is right there in
+   Footer.module.css and appears to rule it out. It does not. `align-items`
+   places an item inside its ROW; `align-content` places the rows inside the
+   grid, and its initial `normal` behaves as STRETCH — so the single auto row
+   grew to fill everything `flex: 1` handed it, and the lockup's own
+   `align-self: center` (which exists to centre the 34px mark against a
+   two-line blurb) then centred it in a 300px row. Both properties were doing
+   exactly their job; neither was the fault.
+
+   THE FAULT IS THE RESERVATION, so that is what is dropped. A screen-tall
+   close is a promise about a closing STATEMENT, and this route no longer
+   makes one here — it makes it in .visitLayer, above. With the reservation
+   gone there is no free space, so nothing stretches and nothing floats: the
+   band collapses to its content and the hairline follows it up.
+
+   ⚠️ SCOPED TO max-width: 860px ON PURPOSE — the mirror of the min-width
+   query below. At and above 861px the visit block IS in the footer's third
+   track, the band is full, and the screen is earned. Every other route keeps
+   its full-height close at every width; `.footerZone` exists on no other
+   page. */
+@media (max-width: 860px) {
+  .footerZone footer {
+    min-height: 0;
+    /* AND IT NEEDS ITS OWN BOUNDARY BACK. Dropping the reservation above
+       also dropped the only thing separating this footer from the visit
+       block — MEASURED 0px between them, with the mark 38px under a band
+       that had just ended. On every other route the footer opens against a
+       full-bleed film or a screen of slack and needs no help; here it opens
+       directly against the page's last paragraph.
+
+       --section-y-sm is the token for "sections that flow together as one
+       chapter", which is exactly the relationship: the visit block is the
+       footer's suppressed invitation, rehoused. It replaces the footer's own
+       `clamp(24px, 4vh, 56px)` top padding rather than adding to it. */
+    padding-top: var(--section-y-sm);
+  }
+}
+
 @media (min-width: 861px) {
   .footerZone {
     display: grid;

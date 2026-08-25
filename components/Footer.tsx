@@ -266,7 +266,7 @@ export default function Footer() {
             painted span is a transform on the mask's own box, and the glyph
             would travel out from under its own window. The link is the
             band's grid cell and moving it moves the whole cell. */}
-        <motion.div style={closeStyle(markOpacity, markY)}>
+        <motion.div className={styles.markCell} style={closeStyle(markOpacity, markY)}>
           <Link href="/" className={styles.markLink} aria-label="Maginhawa Group — home">
             <span className={styles.mark} aria-hidden />
           </Link>
@@ -327,27 +327,35 @@ export default function Footer() {
 
       {/* LINKS BAND — brand | back to top | the three columns */}
       <div className={styles.links}>
-        <span className={styles.brandName}>Maginhawa</span>
+        {/* ⚠️ THIS WRAPPER IS `display: contents` EVERYWHERE EXCEPT THE PHONE,
+            and that is the whole trick — see .brandHold in the stylesheet.
+            The two rails above want the brand and the button as SEPARATE
+            grid cells (33fr / 30fr); the phone wants them stacked together
+            in one column above Explore. A box that dissolves at 641px is
+            how both get what they want out of one DOM. */}
+        <div className={styles.brandHold}>
+          <span className={styles.brandName}>Maginhawa</span>
 
-        <button type="button" className={styles.backToTop} onClick={scrollToTop}>
-          Back to top
-          <svg
-            className={styles.backArrow}
-            viewBox="0 0 24 24"
-            fill="none"
-            stroke="currentColor"
-            strokeWidth="1.5"
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            aria-hidden
-          >
-            <path d="M12 19V6" />
-            <path d="M6 11l6-6 6 6" />
-          </svg>
-        </button>
+          <button type="button" className={styles.backToTop} onClick={scrollToTop}>
+            Back to top
+            <svg
+              className={styles.backArrow}
+              viewBox="0 0 24 24"
+              fill="none"
+              stroke="currentColor"
+              strokeWidth="1.5"
+              strokeLinecap="round"
+              strokeLinejoin="round"
+              aria-hidden
+            >
+              <path d="M12 19V6" />
+              <path d="M6 11l6-6 6 6" />
+            </svg>
+          </button>
+        </div>
 
         <div className={styles.cols}>
-          <div className={styles.col}>
+          <div className={`${styles.col} ${styles.exploreCol}`}>
             <h3>Explore</h3>
             <ul>
               {EXPLORE.map((i) => (
@@ -358,36 +366,44 @@ export default function Footer() {
             </ul>
           </div>
 
-          <div className={styles.col}>
-            <h3>Contact Us</h3>
-            <ul>
-              {CONTACT_LINKS.map((i) => (
-                <li key={i.label}>
-                  <FootLinkA link={i} />
-                </li>
-              ))}
-              <li className={styles.hours}>{CONTACT.officeHours.days}</li>
-              <li className={styles.hours}>{CONTACT.officeHours.time}</li>
-            </ul>
-          </div>
+          {/* THE OTHER TWO COLUMNS TRAVEL AS A PAIR — and, like .brandHold,
+              this box only exists below 641px. Three columns in a 2-up phone
+              grid is a counting problem with one outcome: the third drops to
+              a second row beside an empty cell. Merging Contact and Follow
+              into one flowing column is what removes the orphan without
+              dropping a list or inventing a third row. */}
+          <div className={styles.colGroup}>
+            <div className={styles.col}>
+              <h3>Contact Us</h3>
+              <ul>
+                {CONTACT_LINKS.map((i) => (
+                  <li key={i.label}>
+                    <FootLinkA link={i} />
+                  </li>
+                ))}
+                <li className={styles.hours}>{CONTACT.officeHours.days}</li>
+                <li className={styles.hours}>{CONTACT.officeHours.time}</li>
+              </ul>
+            </div>
 
-          <div className={styles.col}>
-            <h3>Follow Us</h3>
-            <ul>
-              {SOCIALS.map((s) => (
-                <li key={s.label}>
-                  {s.url ? (
-                    <a href={s.url} target="_blank" rel="noopener noreferrer">
-                      {s.label}
-                    </a>
-                  ) : (
-                    // no confirmed profile yet — rendered as plain text rather
-                    // than a link to nowhere (see lib/contact.ts)
-                    <span className={styles.socialPending}>{s.label}</span>
-                  )}
-                </li>
-              ))}
-            </ul>
+            <div className={styles.col}>
+              <h3>Follow Us</h3>
+              <ul>
+                {SOCIALS.map((s) => (
+                  <li key={s.label}>
+                    {s.url ? (
+                      <a href={s.url} target="_blank" rel="noopener noreferrer">
+                        {s.label}
+                      </a>
+                    ) : (
+                      // no confirmed profile yet — rendered as plain text rather
+                      // than a link to nowhere (see lib/contact.ts)
+                      <span className={styles.socialPending}>{s.label}</span>
+                    )}
+                  </li>
+                ))}
+              </ul>
+            </div>
           </div>
         </div>
       </div>
@@ -449,7 +465,7 @@ export default function Footer() {
             until someone rebuilds. A year is optional in a UK copyright
             notice anyway — the right arises automatically — so the honest
             fix is to not claim a date this build cannot know. */}
-        <span>© Maginhawa Group</span>
+        <span className={styles.copy}>© Maginhawa Group</span>
 
         {/* THE LEGAL ROW. These two routes are reachable from nowhere else
             on the site — they are deliberately absent from the nav, the
@@ -463,7 +479,7 @@ export default function Footer() {
           ))}
         </nav>
 
-        <div>
+        <div className={styles.credit}>
           <span>Website designed by </span>
           <span className={styles.developer}>EJ</span>
         </div>
