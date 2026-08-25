@@ -819,6 +819,25 @@ export default function About() {
                               className={styles.coverageRow}
                             >
                               <span className={styles.coverageRestaurant}>
+                                {/* THE OUTLET AGAIN, AND ONLY THE PHONE EVER
+                                  SEES IT. The wide table gives the outlet a
+                                  column of its own beside the group; stacked
+                                  into one column that column became a header
+                                  line above each entry, and a masthead name
+                                  costs a whole line of a 358px row to say one
+                                  word. Repeated inside the row it shares the
+                                  restaurant tag's line — "MICHELIN GUIDE ·
+                                  BELLY" — and the group header hides.
+
+                                  It is display:none above 720px, so on desktop
+                                  the name is printed once, by the group. Here
+                                  it makes every row self-describing, which is
+                                  also what a screen reader wants out of a link
+                                  that opens someone else's article. */}
+                                <span className={styles.coverageRowOutlet}>
+                                  {group.outlet}
+                                </span>
+
                                 {row.restaurants.map((r, i) => (
                                   <span
                                     key={i}

@@ -1935,8 +1935,8 @@
     "semantic_hash": ""
   },
   "components/about/About.tsx": {
-    "mtime": 1787672621.7820861,
-    "ast_hash": "ff2851c22eece0b3ba596b62729bac1c",
+    "mtime": 1787673562.5688667,
+    "ast_hash": "cac9ef041cf25c633483830198308d71",
     "semantic_hash": ""
   },
   "components/analytics/GoogleTag.tsx": {
