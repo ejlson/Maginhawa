@@ -11,7 +11,7 @@
    stack that triggered the forced ones.
 
    Anything above a few percent forced is a read/write interleave worth
-   fixing — see the pan loop in components/Discover.tsx.
+   fixing — see the pan loop in components/home/Discover.tsx.
 
    usage: node scripts/probe-forcedlayout.mjs [port] [throttle] [frac]    */
 import puppeteer from "puppeteer-core";

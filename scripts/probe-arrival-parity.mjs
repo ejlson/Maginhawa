@@ -2,7 +2,7 @@
 
    Discover's eight tiles no longer each hold a `useScroll`; their arrival
    progress is computed from a document offset measured once (see THE
-   ARRIVAL DRIVER in components/Discover.tsx). That is only a legitimate
+   ARRIVAL DRIVER in components/home/Discover.tsx). That is only a legitimate
    swap if the VALUE is unchanged — the arrival line this page shares
    (~87% down the window) was tuned against framer's arithmetic, so a
    driver that is merely "close" retimes eight cards and every constant

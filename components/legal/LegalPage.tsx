@@ -1,10 +1,10 @@
 "use client";
 
 import { useEffect, useState } from "react";
-import Nav from "./Nav";
-import Menu from "./Menu";
-import Footer from "./Footer";
-import DarkZone from "./DarkZone";
+import Nav from "@/components/layout/Nav";
+import Menu from "@/components/layout/Menu";
+import Footer from "@/components/layout/Footer";
+import DarkZone from "@/components/ui/DarkZone";
 import styles from "./LegalPage.module.css";
 import { LEGAL_UPDATED, LEGAL_UPDATED_LABEL } from "@/lib/legal";
 

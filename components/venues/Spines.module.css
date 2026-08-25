@@ -61,6 +61,100 @@
   contain: layout;
 }
 
+/* ═══ FITTED TO ITS BOX — /restaurants ONLY ══════════════════════════════
+   Opt in with `fit` on the component; the home chapter never does, so
+   every number above stands exactly as derived there.
+
+   THE PROBLEM THIS SOLVES. The budget at the top of this file spends a
+   whole 844px screen. /restaurants renders the list inside `.cards`, a
+   100svh sheet — and 100svh on a phone browser is the SMALL viewport,
+   ~652px with both Safari bars up. Take the nav off the top and the view
+   toggle and the walk-in note off the bottom (both `position: absolute`,
+   so neither moves out of the way) and the eight bands had ~486px to live
+   in, not 628. They overflowed, and Bunso printed under the toggle.
+
+   ── THE BAND HEIGHT ──────────────────────────────────────────────────
+   --spine-chrome is what the CALLER says is not the list's: on
+   /restaurants it is the sheet's own two pads, declared once there and
+   read here. What is left divides between eight bands and seven gaps:
+
+     h = (100svh − chrome − 7 × gap) / 8
+
+   clamped at both ends, and both ends are real:
+
+     ⌈ 75px  THE DERIVED BAND. A taller box does not get taller bands — the
+             list stops growing, so a phone that has the room reads exactly
+             like the home page's.
+     ⌊ 56px  WHAT THE CONTENT NEEDS. `.who` is a fixed 49px block (see its
+             own note) and the pill's touch target is 44; 56 is the
+             smallest band that seats the 49 with air on both sides and
+             does not clip a 44px target under `overflow: hidden`. Below
+             this the sheet SCROLLS instead — and its padding-bottom
+             reserves the furniture's strip INSIDE the scroll content, so
+             the last band clears the toggle at the end of the travel.
+
+   ── ⚠️ WHY THE COMPRESSION IS NOT THE FIXED −9 HERE ───────────────────
+   This is the part that a smaller band breaks, and it is not obvious.
+
+   Above, the seven others pay for the open band's 63px at 63 / 7 = 9px
+   each, so open + 7 × shut = 8 × h and the list's box never changes. That
+   arithmetic holds at ANY h. What does not hold is the CONTENT: `.band` is
+   pinned to h and centres a 49px `.who` in it, so the who-block's bottom —
+   which is where the location line hangs — sits at
+
+     (h − 49) / 2 + 49  =  (h + 49) / 2
+
+   while a shut band clips at h − 9. The two cross at h = 67. MEASURED at
+   390 × 652, where h comes out 57.2: the shut band was 48.2 tall against a
+   who-block ending at 53.1, and 4.9px of an 11.2px location line — 44% of
+   it — was cut off on all seven while a band was open.
+
+   So the shut height is the LOWER of what the sums want and what the
+   content allows:
+
+     shut = max(h − 9, (h + 49) / 2)
+
+   At h = 75 that is max(66, 62) = 66 — the derived value, unchanged, and
+   the home list is bit-identical whether or not this rule exists. Below
+   h = 67 the second term takes over: the list compresses as far as the
+   type allows and no further.
+
+   ⚠️ AND THAT IS WHY THE HEIGHT PIN COMES OFF. Once shut stops being
+   h − 9 the two sums no longer match, so a fixed --spine-list-h would clip
+   the open band instead of the shut ones — the same fault one level up.
+   `height: auto` lets the open state take the ~35px it needs and the SHEET
+   scroll it, which costs nothing structurally here: `.cards` is
+   `position: absolute; inset: 0` with `overflow-y: auto`, so this list's
+   layout is already sealed off from the document the pin exists to protect
+   (the `contain: layout` above still stands). The CLOSED state — the one
+   the reader is in — is still exactly one screen with every control clear.
+
+   ⚠️ SPINE_FOCAL SURVIVES THIS. Those Y values are derived against a
+   358 × 75 window, and a SHORTER band cuts a shorter window out of the
+   same fitted picture — it moves down slightly and gets tighter, it does
+   not move up. Re-solved at h = 57: Belly opens at 64% against a sign
+   ending at 52%, Bunso at 53% against one ending at 43%. Both still clear,
+   which is the property those numbers were chosen for.
+
+   ⚠️ EIGHT IS SPELLED OUT, as it is in --spine-list-h above. This list is
+   the venue list on both surfaces; a ninth restaurant re-derives both. */
+.spines[data-fit="screen"] {
+  --spine-h: clamp(
+    56px,
+    (100svh - var(--spine-chrome, 0px) - 7 * var(--spine-gap)) / 8,
+    75px
+  );
+  --spine-open-h: calc(var(--spine-h) + 63px);
+  /* the 49px is `.who`'s --who-h. Two spellings of one number, and the
+     only reason it is not a custom property read from there is that .who
+     is declared BELOW this rule on a descendant — it cannot be read up. */
+  --spine-shut-h: max(
+    calc(var(--spine-h) - 9px),
+    calc((var(--spine-h) + 49px) / 2)
+  );
+  height: auto;
+}
+
 .spine {
   position: relative;
   height: var(--spine-h);

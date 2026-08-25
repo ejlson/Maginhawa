@@ -2,8 +2,8 @@
 
 import { useEffect, useMemo, useState } from "react";
 import Loader from "./Loader";
-import Nav from "./Nav";
-import Menu from "./Menu";
+import Nav from "@/components/layout/Nav";
+import Menu from "@/components/layout/Menu";
 import Hero from "./Hero";
 import Manifesto from "./Manifesto";
 import AboutSplit from "./AboutSplit";
@@ -12,8 +12,8 @@ import Discover from "./Discover";
 import PressWall from "./PressWall";
 import Reservations from "./Reservations";
 import Blog from "./Blog";
-import Footer from "./Footer";
-import DarkZone from "./DarkZone";
+import Footer from "@/components/layout/Footer";
+import DarkZone from "@/components/ui/DarkZone";
 import type { HeroInsets } from "./types";
 import type { BlogEntry } from "@/lib/blog";
 
@@ -173,7 +173,7 @@ export default function Experience({ journal }: { journal?: BlogEntry[] }) {
               completely — but both counted toward the dark share and both
               flashed dark for the length of a decode.
 
-              MaroonZone.tsx is now unreferenced. It is left in the tree
+              MaroonZone.tsx is now unreferenced and sits in components/archive/. It is left in the tree
               deliberately rather than deleted: it is the only component
               that knows how to seat two chapters on one continuous ground
               without a seam, and that is worth keeping if a dark register
@@ -198,7 +198,7 @@ export default function Experience({ journal }: { journal?: BlogEntry[] }) {
               strip's "Learn more about us" — one link where there was a
               whole chapter.
 
-              AboutIntro.tsx IS NOT DELETED. It is the only component that
+              AboutIntro.tsx IS NOT DELETED — it sits in components/archive/. It is the only component that
               knows the two-frame portrait/scene spread with the clip-wipe
               entrance, and /about may want that layout. Nothing imports it
               now, so it is dead code until it is either reused or removed
@@ -272,7 +272,7 @@ export default function Experience({ journal }: { journal?: BlogEntry[] }) {
               inherits the gap. About-split → journal is type-under-picture
               where it used to be broken by a second full-screen image, so
               the page's picture count is still down one at its quietest
-              point. (Interlude.tsx is imported by nothing and remains dead
+              point. (Interlude.tsx, in components/archive/, is imported by nothing and remains dead
               code with a stay of execution — see the note under PressWall.)
 
               THE SEAM ABOVE IS NOT 12px, AND THAT IS DELIBERATE. AboutSplit
@@ -342,7 +342,7 @@ export default function Experience({ journal }: { journal?: BlogEntry[] }) {
 
               Interlude.tsx is still not deleted and still imported by
               nothing — it remains dead code with a stay of execution,
-              alongside AboutIntro and MaroonZone. */}
+              alongside AboutIntro and MaroonZone in components/archive/. */}
           <PressWall />
           {/* ══════ THE HANDOVER, AND IT NO LONGER HANDS OVER TO THE JOURNAL ══════
               Two lines of display type on an empty screen. MOVED HERE from

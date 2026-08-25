@@ -30,15 +30,15 @@ import styles from "./Discover.module.css";
    duplication this whole pass deletes. `.blockLarge` is the fourth: the
    expansion prints the card's BLOCK now, and the block's larger type scale
    belongs beside the block it scales. */
-import card from "./VenueCard.module.css";
-import VenueCard, { VenueBlock } from "./VenueCard";
+import card from "@/components/venues/VenueCard.module.css";
+import VenueCard, { VenueBlock } from "@/components/venues/VenueCard";
 /* THE PHONE'S LAYOUT — eight full-width bands instead of eight stacked
    cards. It is a different arrangement of the same eight records, not a
    restyle of this one, so it is a component rather than a media query on
    .grid: a band seats the mark, the neighbourhood and up to three pills on
    ONE line, and there is no rule you can write on the card's DOM that gets
    it there. See the banner in Spines.tsx for the measurements. */
-import Spines from "./Spines";
+import Spines from "@/components/venues/Spines";
 import { venueCards, type VenueCardItem } from "@/lib/venueCards";
 import { lenisRef } from "@/lib/SmoothScroll";
 import { asset } from "@/lib/media";

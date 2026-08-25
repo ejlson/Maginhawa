@@ -12,13 +12,13 @@ import {
   useScroll,
   useTransform,
 } from "framer-motion";
-import Nav from "./Nav";
-import Menu from "./Menu";
-import Footer from "./Footer";
-import DarkZone from "./DarkZone";
-import PillCta from "./PillCta";
-import Reveal from "./Reveal";
-import SplitWords from "./SplitWords";
+import Nav from "@/components/layout/Nav";
+import Menu from "@/components/layout/Menu";
+import Footer from "@/components/layout/Footer";
+import DarkZone from "@/components/ui/DarkZone";
+import PillCta from "@/components/ui/PillCta";
+import Reveal from "@/components/ui/Reveal";
+import SplitWords from "@/components/ui/SplitWords";
 import styles from "./JoinUs.module.css";
 import { asset } from "@/lib/media";
 import { JOBS } from "@/lib/jobs";

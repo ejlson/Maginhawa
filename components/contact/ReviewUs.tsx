@@ -1,4 +1,4 @@
-import Reveal from "./Reveal";
+import Reveal from "@/components/ui/Reveal";
 import styles from "./ReviewUs.module.css";
 import { RESTAURANTS, type Restaurant } from "@/lib/restaurants";
 

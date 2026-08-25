@@ -11,7 +11,7 @@ import {
   type Variants,
 } from "framer-motion";
 import styles from "./Footer.module.css";
-import PillCta from "./PillCta";
+import PillCta from "@/components/ui/PillCta";
 import { useRouteTransition } from "./PageTransition";
 import { CONTACT, SOCIALS } from "@/lib/contact";
 import { JUMP, lenisRef } from "@/lib/SmoothScroll";

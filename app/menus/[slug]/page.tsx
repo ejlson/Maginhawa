@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
-import MenuPage from "@/components/MenuPage";
+import MenuPage from "@/components/venues/MenuPage";
 import { RESTAURANTS, getRestaurant } from "@/lib/restaurants";
 import { SITE_URL } from "@/lib/site";
 import { StructuredData } from "@/lib/StructuredData";

@@ -11,7 +11,7 @@
  * cannot, which is how three rounds of "locked 120fps" missed a reveal that
  * ran a full main-thread frame every displayed frame).
  */
-/* THE INTRO, MEASURED — components/Loader.tsx, postcard choreography.
+/* THE INTRO, MEASURED — components/home/Loader.tsx, postcard choreography.
  *
  * The reveal no longer turns a letter into a window. Its predecessor
  * (probe-loader-film.mjs, since deleted) graded letter/hole congruence off

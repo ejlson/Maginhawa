@@ -1,6 +1,6 @@
 /* THE THREE ACTIONS, SIDE BY SIDE, AT REST AND UNDER THE POINTER.
  *
- * They are one component now (components/PillCta.tsx) and this is the
+ * They are one component now (components/ui/PillCta.tsx) and this is the
  * check that says so from the outside: three clips of the same control in
  * its three chapters, plus a measurement of each one's box, so "identical"
  * is a number rather than an impression. The closing frame's instance is

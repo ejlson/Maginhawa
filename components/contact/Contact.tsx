@@ -8,8 +8,8 @@
 
 import { useRef, useState } from "react";
 import styles from "./Contact.module.css";
-import PillCta from "./PillCta";
-import Reveal from "./Reveal";
+import PillCta from "@/components/ui/PillCta";
+import Reveal from "@/components/ui/Reveal";
 import { CONTACT } from "@/lib/contact";
 
 type ContactProps = {

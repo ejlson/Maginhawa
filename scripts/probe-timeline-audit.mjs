@@ -174,7 +174,7 @@ const CHAIN = `(el) => { let o = 1, n = el;
 
 /* ================================ AC1.4 — seat invariants, pure arithmetic */
 {
-  const src = await readFile(new URL("../components/About.tsx", import.meta.url), "utf8");
+  const src = await readFile(new URL("../components/about/About.tsx", import.meta.url), "utf8");
   const block = src.slice(src.indexOf("const SEATS"), src.indexOf("const STORY"));
   const seats = [
     ...block.matchAll(/span:\s*([\d.]+),\s*offset:\s*(-?[\d.]+),\s*ratio:\s*([\d.]+)[^}]*drift:\s*(-?\d+)/g),

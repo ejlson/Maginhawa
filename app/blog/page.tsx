@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import BlogIndex from "@/components/BlogIndex";
+import BlogIndex from "@/components/blog/BlogIndex";
 import { getJournal } from "@/lib/posts";
 
 export const metadata: Metadata = {

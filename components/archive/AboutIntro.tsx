@@ -3,7 +3,7 @@
 import Image from "next/image";
 import Link from "next/link";
 import styles from "./AboutIntro.module.css";
-import Reveal from "./Reveal";
+import Reveal from "@/components/ui/Reveal";
 
 /**
  * "About Us" — the group's short story, back on the MAROON ground.

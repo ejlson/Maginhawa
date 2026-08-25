@@ -1,5 +1,5 @@
 import type { Metadata } from "next";
-import ContactPage from "@/components/ContactPage";
+import ContactPage from "@/components/contact/ContactPage";
 import { SITE_URL } from "@/lib/site";
 import { StructuredData } from "@/lib/StructuredData";
 
