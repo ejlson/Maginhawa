@@ -305,6 +305,26 @@ export default function Contact({ standalone = false }: ContactProps) {
                 </a>
               </p>
             </Reveal>
+            {/* Press sits directly under general enquiries, in the same
+                label-then-link shape, because the two are the same kind of
+                thing and a journalist should be able to tell them apart at a
+                glance rather than guess which inbox reads their deadline.
+                It is NOT part of `.infoTail`: only the last group in this
+                column takes `margin-top: auto`, and press belongs with the
+                address above it, not pinned to the foot beside the submit
+                pill. Its 0.04 delay slots between Enquiries (0) and Office
+                Hours (0.08) so the column still reveals top to bottom. */}
+            <Reveal delay={0.04}>
+              <div className={styles.label}>Press Enquiries</div>
+              <p>
+                <a
+                  className={styles.infoLink}
+                  href={`mailto:${CONTACT.pressEmail}`}
+                >
+                  {CONTACT.pressEmail}
+                </a>
+              </p>
+            </Reveal>
             {/* THE LABEL IS LOAD-BEARING — do not let it drift back to
                 "Opening Times". On a restaurant group's contact page that
                 wording reads as when the RESTAURANTS are open, and these are
