@@ -8,6 +8,41 @@
    document head, preconnected in layout.tsx; it falls back to a system serif
    if the kit isn't authorised for the current domain. */
 
+/* ══════════ THE REVEAL EDGE, REGISTERED SO IT CAN INTERPOLATE ══════════
+   The page opens its two big plates — About's film and the journal's
+   featured story — by travelling a feathered alpha ramp down the frame.
+   Both draw the ramp the same way: a `linear-gradient` mask whose opaque
+   stop sits at `--sweep` and whose transparent stop sits one
+   `--sweep-feather` below it, so only this one number moves. See
+   `.mediaFrame` in AboutSplit.module.css and `.frontFrame` in
+   Blog.module.css, which declare identical gradients.
+
+   ⚠️ THE REGISTRATION IS NOT DECORATION — the journal's half does not work
+   without it. An UNREGISTERED custom property is a token stream to CSS, and
+   a @keyframes pair that moves one from `-6%` to `100%` therefore does not
+   interpolate: it FLIPS, discretely, halfway through. The plate would stay
+   fully masked for 475ms and then appear whole. Registering it as a
+   `<percentage>` is what makes the browser interpolate the value, and it is
+   the entire reason `blogPlateSweep` can be a keyframe animation rather
+   than a second framer motion value.
+
+   About's half does not depend on this — framer writes `--sweep` into the
+   inline style itself, one value per frame, so it interpolates by hand
+   whatever CSS thinks the property is. The registration is still shared
+   rather than scoped to the journal, because a typed property with an
+   initial value is what makes `--sweep: 100%` (i.e. FULLY UNCOVERED) the
+   answer when no rule has set it — which is the no-JS and reduced-motion
+   state both panels rely on.
+
+   `inherits: false` because a mask belongs to the box that draws it. The
+   ramp is on the frame; the picture, the scrim and the type inside it must
+   not each inherit a copy of the number and re-derive their own edge. */
+@property --sweep {
+  syntax: "<percentage>";
+  inherits: false;
+  initial-value: 100%;
+}
+
 :root {
   /* =========================================================================
      THE KAMAYAN PALETTE.

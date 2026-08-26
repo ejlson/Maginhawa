@@ -14,6 +14,7 @@ import {
 } from "framer-motion";
 import styles from "./AboutSplit.module.css";
 import PillCta from "@/components/ui/PillCta";
+import { gateVideoPlayback } from "@/components/ui/useVisiblePlayback";
 import { asset } from "@/lib/media";
 import { getRestaurant } from "@/lib/restaurants";
 import {
@@ -233,17 +234,60 @@ const SITE_BY_SLUG: Record<string, string> = Object.fromEntries(
 // read the other's spelling (the precedent is SplitWords' EASE/EASE_CSS).
 const EASE = [0.22, 1, 0.36, 1] as const;
 
+/* "this panel has already performed in this tab" — see the effect that reads
+   it. Namespaced and named after the thing it gates, exactly as Blog.tsx's
+   `mgnhw:journal-played` is; the two chapters latch independently because a
+   reader can easily have seen one and not the other.
+   ⚠️ THE KEY IS WRITTEN WHEN THE PICTURE OPENS, not when the chapter comes
+   into view. What must not repeat is the sweep. */
+const PLAYED_KEY = "mgnhw:about-played";
+
 /* WHEN THE PICTURE STARTS, and the one place to change it.
    The panel's arrival is four animations, not one — the mask (MEDIA), the
    counter-drift under it (DRIFT), the card shadow around it (MOUNT) and the
    caption's two line masks (LINE) — and the last two are timed AGAINST the
-   sweep rather than against the gate. Their notes derive +0.4s and +0.55s
-   from where the front-loaded curve has uncovered the frame, so those two
-   offsets are the load-bearing numbers and this is only where the cluster
-   begins. Moving it late (0.1 → 0.45, at the user's instruction: the
-   picture was arriving on top of the gate) carries all four together and
-   keeps every derivation intact. Change this, not the four call sites. */
-const MEDIA_IN = 0.45;
+   sweep rather than against the gate. Their notes derive their offsets from
+   where the curve has uncovered the frame, so those are the load-bearing
+   numbers and this is only where the cluster begins. Change this, not the
+   four call sites.
+
+   ══════════ IT IS ZERO NOW, AND THAT IS A CORRECTNESS FIX ══════════
+   It was 0.45 — moved there from 0.1 at the user's instruction, because
+   "the picture was arriving on top of the gate". The COMPLAINT was real and
+   is answered below; the REMEDY was the wrong kind of number, and it was
+   wrong in a way that only shows up at speed.
+
+   A DELAY MEASURED IN SECONDS, ON AN ANIMATION TRIGGERED BY SCROLL, IS A
+   DELAY MEASURED IN PIXELS OF PAGE — and how many pixels depends entirely
+   on how fast the reader happens to be scrolling. 450ms is 180px of travel
+   at an unhurried 400px/s and 1080px at a trackpad flick. Measured, on the
+   production build (scripts/probe-panel-parity.mjs), as the height of the
+   film's top edge on screen at the instant the sweep first moved:
+
+       400px/s    51.7% down the window
+       900px/s    24.4%
+      2400px/s   −60.9%   ← the top of the frame is off the top of the SCREEN
+
+   At the third of those the reader never sees the reveal begin. The edge
+   starts its run above the window and the panel is simply there. On a phone
+   the same walk reported 0% of the plate on screen when it started to open:
+   the whole ceremony played to nobody. The journal's plate, over the same
+   three walks, opened at 83.1 / 79.5 / 64.8 — because ITS lead is a
+   position and it does not have one of these.
+
+   SO THE LEAD MOVED OUT OF THE CLOCK AND INTO THE GATE. What the user asked
+   for — the picture not opening at the instant the heading lands on it — is
+   a statement about WHERE the two are, so it is expressed where the two are
+   compared: GATE_LEAD holds the picture back by a distance instead of by a
+   duration, and a distance costs the same at every scroll speed.
+
+   IT STAYS A NAMED ZERO rather than being inlined at the four call sites.
+   Every derivation below is spelled as a sum against it (MEDIA_IN + 0.7 for
+   the caption, MEDIA_IN + DRIFT_DUR for the shadow), and those sums are the
+   record of what each offset is measured FROM. Folding a zero away would
+   leave four bare numbers with nothing to say why they are what they are —
+   and would put the next person who wants a lead back into the clock. */
+const MEDIA_IN = 0;
 
 /* REDUCED MOTION IS ONE VARIANT FOR EVERYTHING, and deliberately carries no
    delays. The house pattern is Reveal's 0.4s fade, which keeps its `delay` —
@@ -255,6 +299,36 @@ const FADE: Variants = {
   hidden: { opacity: 0 },
   shown: { opacity: 1, transition: { duration: 0.4, ease: "easeOut" } },
 };
+
+/* THE ALREADY-PLAYED PATH, AS A REWRITE RATHER THAN A FIFTH VARIANT SET.
+   A reader returning to a page they have already scrolled must find the
+   panel finished, not performing — see the sessionStorage effect. What that
+   needs is the EXISTING variants with their clocks removed: the same
+   `hidden`, the same `shown`, and a transition of no duration between them,
+   so framer lands on the resting values in one frame.
+
+   ⚠️ WHY NOT JUST DECLARE THEM FINISHED. Because `initial` is a first-render
+   decision and this is not knowable until after mount (`sessionStorage` does
+   not exist on the server). By the time the flag arrives framer has already
+   committed to `hidden`, so the only thing left to control is how long it
+   takes to leave it. Zero.
+
+   ⚠️ AND WHY NOT A TRANSITION PROP ON THE SECTION. Variant-level transitions
+   beat an inherited one, and all four of these carry their own — that is the
+   whole point of the choreography. Overriding has to happen inside the
+   variant, which is what this does.
+
+   THE FUNCTION FORM IS HANDLED because LINE is one: it takes the caption's
+   line index and returns a transition built from it. Spread the result and
+   replace the transition, rather than assuming an object. */
+const NOW = { duration: 0 } as const;
+const snap = (v: Variants): Variants => ({
+  hidden: v.hidden,
+  shown:
+    typeof v.shown === "function"
+      ? (i: number) => ({ ...(v.shown as (i: number) => object)(i), transition: NOW })
+      : { ...(v.shown as object), transition: NOW },
+});
 
 /* THE RULE NO LONGER DRAWS. It used to be the chapter's curtain-up — a
    `scaleX: 0 → 1` from the left edge, first thing in the sequence — and it
@@ -579,20 +653,60 @@ const BLUR_MAX_EM = 0.11;
 
 /* HOW EARLY THE PICTURE GOES, at the user's instruction. The rule was "when
    the heading's top line is level with the picture's top line", i.e. a gap
-   of exactly zero; this opens it while the heading is still 140px short of
-   that. It is a LEAD, not a different rule — the sweep takes ~1.25s and the
-   heading covers this distance in roughly the same time at an ordinary
-   reading scroll, so the picture is now arriving AS the two edges meet
-   rather than starting there. Raising it much further starts the sweep
-   while the heading is still visibly up in the manifesto, which is the
-   thing the flight exists to avoid. */
-const GATE_LEAD = 140;
+   of exactly zero; this opens it while the heading is still short of that.
+   It is a LEAD, not a different rule.
 
-/* how far back past the crossing the reader has to go before the picture is
-   put away again — see the gate below for why opening and closing cannot
-   share one threshold. It is measured from the LEAD, not from zero, so the
-   dead band travels with the trigger. */
-const GATE_HYSTERESIS = 48;
+   ══════════ 140 → 175, AND IT IS NOW CARRYING TWO JOBS ══════════
+   It was 140 while MEDIA_IN held the picture a further 450ms after this
+   fired. That delay is gone (read its note — it was a duration standing in
+   for a distance, and it put the reveal off the top of the screen at speed)
+   and its job lands HERE, which is the only place on this gate where a
+   hold can be expressed in the units the gate actually thinks in.
+
+   175 IS MEASURED, NOT ESTIMATED. The gate compares `delta`, which is the
+   heading's top edge minus the picture's, and a slow walk down the chapter
+   (scripts/_tmp-map-gate.mjs, since removed; 1440×900) gives the map
+   between that gap and where the picture is sitting on screen:
+
+       gap −216   the flight is still fully applied; the gate cannot fire
+       gap −175   the film's top edge is 86.9% down the window
+       gap −139   74.0%
+       gap −103   61.6%
+       gap    +3  25.0%   ← the true crossing, both edges level
+
+   87% IS THE PAGE'S ARRIVAL LINE and this is the number that puts the film
+   on it. It is not this chapter's preference: lib/drift.ts sets PLATE_AT
+   and RAIL_AT to 0.13 of their own approach for exactly this, Discover's
+   cards use `start 0.92`, the footer uses CLOSE_OFFSET, and the journal's
+   featured plate — the picture this one is now meant to match — measures
+   83–86% at every scroll speed tested. The film was the only large plate on
+   the page not standing on that line.
+
+   ⚠️ WHAT IT COSTS, STATED PLAINLY. At 175 the heading is still 175px above
+   the picture's top when the sweep starts, where at 140 (plus 450ms of
+   travel) it was around 70px at a reading scroll. So the two edges are
+   further apart at the moment the picture opens than they used to be, and
+   the chapter's sentence — "when its top edge draws level, the picture
+   starts its sweep" — is looser by that much. The trade is deliberate and
+   it is the one the parity asks for: the sweep's 0.95s now runs while the
+   heading closes the last 175px, so the two still FINISH together, and they
+   finish together at every speed rather than at one.
+
+   ⚠️ AND IT CANNOT GO MUCH HIGHER. −216 is where the gap is pinned while
+   the flight sits at full lift, i.e. before the chapter's own scroll
+   progress has started moving. A lead past ~200 is a threshold the gap
+   never crosses on the way down; the gate would fire on the first frame
+   instead of never, which is worse. */
+const GATE_LEAD = 175;
+
+/* ── GATE_HYSTERESIS IS DELETED, and the reason is the latch below ──
+   It was 48px of dead band past the crossing, and it existed for exactly
+   one purpose: this gate used to REVERSE, so a reader parked on the
+   threshold — or Lenis's own inertial wobble — could otherwise re-trigger
+   the entrance on every frame. The gate is one-way now (see the handler),
+   so there is no closing edge to separate from the opening one and nothing
+   left for a dead band to protect. STACK_SHUT went with it for the same
+   reason; see STACK_OPEN. */
 
 /* ══════════ THE STACK BREAKPOINT, READ FROM HERE AS WELL ══════════
    AboutSplit.module.css collapses the split to one column at 900px and, in
@@ -615,46 +729,52 @@ const GATE_HYSTERESIS = 48;
    breakpoint from script; change one and change the other. */
 const STACKED = "(max-width: 900px)";
 
-/* the two ends of the stacked gate's dead band, as fractions of the window:
-   the picture opens once its top edge is 95% of the way down the screen and
-   closes again only at 110%, so a reader parked on the boundary — or Lenis's
-   own inertial wobble — cannot re-trigger a 1.15s entrance on every frame.
-   Same job as GATE_HYSTERESIS, expressed in the units this branch measures
-   in.
+/* WHERE THE PICTURE OPENS ON ONE COLUMN, as a fraction of the window: the
+   figure's top edge 87% of the way down the screen.
 
-   ⚠️ THE BAND MOVED DOWN, 0.80/0.95 → 0.95/1.10, AND IT CLOSED A DEAD RUN.
-   At 390×844 the statement above finishes its scrub at scrollY ≈ 3583 and
-   this gate was not opening until the figure's top reached 80% of the
-   window, at ≈ 3719 — with the head's own flight overridden to
-   `transform: none` on this layout, NOTHING on the page moved in between.
-   Measured (scripts/probe-home-flow.mjs at 390×844): scrollY 3600 → 3880,
-   280px at a mean motion energy of 0.6. It was the page's only true dead
-   run on a phone.
+   ⚠️ 0.95 → 0.87, AND IT IS THE SAME CORRECTION GATE_LEAD JUST MADE. This
+   branch was never the velocity-dependent one — it is a position already —
+   but it was placed to compensate for MEDIA_IN sitting downstream of it,
+   and with that delay gone a gate at 0.95 would open the picture a fifth of
+   a screen LOWER than it used to effectively open. 0.87 puts the reveal
+   where it has been landing at a reading scroll, and on the same line as
+   everything else that arrives on this page: the journal's plate and rail
+   at PLATE_AT / RAIL_AT (0.13 of their own approach, i.e. 87% down),
+   Discover's cards at `start 0.92`, the footer at CLOSE_OFFSET.
 
-   0.95 is the fold, which is where every other arrival on this page is now
-   set — Discover's cards at `start 0.92`, the journal's rail at RAIL_AT,
-   the footer's band at CLOSE_OFFSET. The picture sweeps as it comes into
-   the frame rather than a sixth of a screen later.
+   ⚠️ THE GATE MOVED LATER AND THE REVEAL MOVED EARLIER, which sounds like a
+   contradiction and is not. An element below the fold travels UP as the
+   reader scrolls, so its top edge falls from 100% toward 0% — a threshold of
+   0.87 is therefore crossed LATER than one of 0.95. But the 450ms that used
+   to run after the crossing is gone, and at 400px/s that delay was costing
+   14 points of window on its own. Measured, at 390×844, as the height of the
+   film's top edge when the sweep first moved: 71.2% before, 85.4% after. The
+   trigger is later; the picture opens sooner.
 
-   ⚠️ AND THE SHUT END HAD TO MOVE WITH IT, to 1.10, or the band would have
-   collapsed to nothing and taken the anti-flicker guarantee with it. Past
-   1.0 simply means "not until the figure is properly below the screen
-   again", which is the right place to put the closing edge of a gesture
-   that plays on arrival. Keep the 0.15 between them. */
-const STACK_OPEN = 0.95;
-const STACK_SHUT = 1.1;
+   THE DEAD RUN THE OLD NOTE CLOSED STAYS CLOSED, which is the constraint
+   this number had to keep. At 390×844 the statement above finishes its
+   scrub at scrollY ≈ 3583; a gate opening at 80% (≈ 3719) left 280px of
+   page where nothing moved at all, because the head's flight is overridden
+   to `transform: none` on this layout. 85.4% is five points clear of that
+   80% line and a screen below the statement's finish, so the gap the old
+   band opened up is still filled.
+
+   ⚠️ STACK_SHUT IS DELETED. It was the other end of a dead band, and a
+   one-way gate has no other end — see the handler, and GATE_HYSTERESIS
+   above, which went for the same reason. */
+const STACK_OPEN = 0.87;
 
 /* ══════════ THE SETTLE, AS ONE NUMBER BOTH SIDES READ ══════════
    The panel's four animations do not finish together: the mask is done at
-   MEDIA_IN + 1.15, the caption's second line at MEDIA_IN + 1.78, and the
+   MEDIA_IN + 0.95, the caption's second line at MEDIA_IN + 1.78, and the
    counter-drift — the longest of them on purpose — at MEDIA_IN + 1.7.
    THE DRIFT IS THE LAST THING MOVING, so this is the instant the picture is
    genuinely at rest, and it is the instant the shadow is now allowed to
    exist (see MOUNT).
-   It is spelled as a sum of the drift's own two terms rather than as 2.15,
-   so retiming the settle cannot leave the shadow arriving over a picture
-   that is still travelling. DRIFT reads DRIFT_DUR too — change it there and
-   the shadow follows. */
+   It is spelled as a sum of the drift's own two terms rather than as a
+   literal, so retiming the settle cannot leave the shadow arriving over a
+   picture that is still travelling. DRIFT reads DRIFT_DUR too — change it
+   there and the shadow follows. */
 const DRIFT_DUR = 1.7;
 const SETTLED = MEDIA_IN + DRIFT_DUR;
 
@@ -1206,34 +1326,106 @@ export default function AboutSplit() {
      binding the sweep to scroll would throw away the settle this chapter was
      rebuilt around. What scroll decides is WHEN IT RUNS.
 
-     ⚠️ IT REVERSES, AND IT SHIPPED ONCE THAT DIDN'T. As a one-way latch this
-     read correctly on the way down and wrongly ever after: scroll past the
-     chapter and back up, and the heading dutifully returned to its perch in
-     the manifesto while the photograph — which is only supposed to exist
-     once the two are level — stayed fully open behind it. Measured at the
-     same scroll position, `clip-path` read `inset(0% 0 100% 0)` on the first
-     approach and `inset(0%)` on the second. The requirement is a STATE, not
-     an event: the picture is visible exactly while the heading has reached
-     it. So the gate is a comparison evaluated on every frame, in both
-     directions.
+     ══════════ IT IS A ONE-WAY LATCH AGAIN, at the user's instruction ══════
+     The journal's plate opens once per tab and never again — by scrolling
+     back, or by reloading — and the two pictures are to behave the same
+     way. This is the About side of that; Blog.tsx's `plated` / `instant`
+     pair is the other, and the mechanism here is deliberately a copy of it
+     rather than a second invention.
 
-     THE 48px IS HYSTERESIS AND IT IS NOT OPTIONAL. Opening and closing on
-     the same threshold means a reader parked within a pixel of the crossing
-     — or any inertial wobble from Lenis — re-triggers a 1.15s entrance over
-     and over. Opening at 0 and closing at −48 puts a dead band roughly one
-     line of type wide between the two decisions, which no ordinary scroll
-     crosses by accident.
+     ⚠️ WHAT THIS GIVES BACK UP, because it shipped as a reversing gate for
+     a reason and the reason was real. As a latch the picture reads
+     correctly on the way down and loosely ever after: scroll past the
+     chapter and back up, and the heading returns to its perch in the
+     manifesto while the photograph — which the chapter's own sentence says
+     exists only once the two are level — stays open behind it. That was
+     logged as a defect once and fixed by making the gate a STATE. It is
+     accepted now, knowingly, because the competing requirement is stronger:
+     a reveal the reader has already watched must not perform again, and a
+     picture that puts itself away and re-opens on every pass is the more
+     obtrusive of the two faults. The heading's perch is a still frame; the
+     sweep is 0.95s of movement.
+
+     TWO CONSEQUENCES, BOTH DELIBERATE. The hysteresis is gone — a gate with
+     no closing edge has no threshold to separate from a closing one — and
+     so is the stacked branch's dead band. See GATE_HYSTERESIS and
+     STACK_OPEN, where both deletions are recorded.
 
      TWO RECT READS PER FRAME, AND NOTHING WRITTEN BETWEEN THEM, so this
      cannot thrash layout; `useScroll` above is already reading on the same
-     frames. `setSwept` with an updater rather than a comparison against the
-     captured `swept` — the handler closes over a render's value and the gate
-     has to see the current one. */
+     frames.
+
+     ⚠️ THE HANDLER RETURNS EARLY ONCE THE LATCH IS SET, and that is worth
+     more here than it looks. This runs on every scroll frame for the whole
+     length of the chapter, and everything below it is two `getBoundingClientRect`
+     calls, a `getComputedStyle` and a `DOMMatrixReadOnly` parse. Under a
+     reversing gate all of that had to keep running forever because the
+     answer could still change. It cannot now, so it stops. */
   const [swept, setSwept] = useState(false);
+  const sweptRef = useRef(false);
   const headRef = useRef<HTMLHeadingElement>(null);
   const leadRef = useRef<HTMLDivElement>(null);
   const stackedMq = useRef<MediaQueryList | null>(null);
+
+  /* the latch, in one place, so neither branch below can half-set it.
+     ⚠️ A REF ALONGSIDE THE STATE, not instead of it. The state is what
+     re-renders the choreography; the ref is what this handler reads, because
+     it closes over a render's value of `swept` and would otherwise keep
+     doing the work for one more frame after latching — and, worse, keep
+     calling `setSwept(true)` on a value that is already true. */
+  const latch = () => {
+    if (sweptRef.current) return;
+    sweptRef.current = true;
+    setSwept(true);
+  };
+
+  /* ══════════ ALREADY PERFORMED — THE PANEL SKIPS TO THE END ══════════
+     The other half of "once per tab". The latch above covers scrolling back;
+     this covers a RELOAD, because a refresh below this chapter restores the
+     scroll position, finds the crossing already made on the first frame, and
+     would otherwise play the whole 0.95s sweep to a reader who has just
+     watched it. Blog.tsx does exactly this with `mgnhw:journal-played` and
+     the two keys are deliberately parallel — this is that mechanism copied,
+     not a second invention.
+
+     ⚠️ READ IN AN EFFECT, NOT IN useState's INITIALISER, because this
+     component server-renders: `sessionStorage` does not exist there, and an
+     initialiser that read it would either throw on the server or hand the
+     client a first paint that disagrees with the HTML it was sent. Running
+     it after mount costs one frame and hydrates cleanly. Blog.tsx carries
+     the same note over the same call.
+
+     SESSION, NOT LOCAL, and Blog.tsx's note is the argument: one tab, one
+     performance. On `localStorage` the chapter would never animate again on
+     any later visit, which is a different promise from the one being made. */
+  const [instant, setInstant] = useState(false);
+  useEffect(() => {
+    try {
+      if (sessionStorage.getItem(PLAYED_KEY)) {
+        setInstant(true);
+        latch();
+      }
+    } catch {
+      /* private mode, or storage disabled by policy. The panel animates,
+         which is the state it shipped in — this is a preference, not a
+         correctness requirement, and it must not take the chapter down with
+         it. Same swallow, same reason, as Blog.tsx. */
+    }
+  }, []);
+
+  /* and the write, once the picture has actually opened */
+  useEffect(() => {
+    if (!swept) return;
+    try {
+      sessionStorage.setItem(PLAYED_KEY, "1");
+    } catch {
+      /* see above */
+    }
+  }, [swept]);
+
   useMotionValueEvent(chapter, "change", (p) => {
+    if (sweptRef.current) return;
+
     const head = headRef.current;
     const frame = mediaRef.current;
     if (!head || !frame) return;
@@ -1247,16 +1439,12 @@ export default function AboutSplit() {
        `getComputedStyle(lead).transform` reads the string "none", which
        DOMMatrixReadOnly refuses to parse. See STACKED for why the rule is
        wrong on this layout as well as unmeasurable.
-       Still a state and still reversing, exactly as the wide gate is — the
-       picture is open precisely while it is up the screen, so scrolling back
-       puts it away and approaching it again plays the sweep. */
+       A one-way latch on this branch too, exactly as the wide gate is now:
+       the picture opens as it comes into the frame and stays open. */
     stackedMq.current ??= window.matchMedia(STACKED);
     if (stackedMq.current.matches) {
       const top = frame.getBoundingClientRect().top;
-      const vh = window.innerHeight;
-      setSwept((open) =>
-        open ? top < vh * STACK_SHUT : top < vh * STACK_OPEN
-      );
+      if (top < window.innerHeight * STACK_OPEN) latch();
       return;
     }
 
@@ -1295,14 +1483,10 @@ export default function AboutSplit() {
       rendered +
       current;
 
-    setSwept((open) =>
-      open
-        ? delta >= -GATE_LEAD - GATE_HYSTERESIS
-        : delta >= -GATE_LEAD
-    );
+    if (delta >= -GATE_LEAD) latch();
   });
 
-  /* ══════════ THE FILM IS WARMED ON APPROACH AND RUN AT THE GATE ══════════
+  /* ═════ THE FILM IS WARMED ON APPROACH, RUN AT THE GATE, STOPPED AFTER ═════
      THE PANEL SHOWS THE CLIP AND NOTHING ELSE, at the user's instruction.
      It used to show two things in a row: the mask uncovered `poster`, the
      hand-picked photograph, and the film replaced it a beat later when the
@@ -1311,13 +1495,24 @@ export default function AboutSplit() {
      sweep would have uncovered bare --placeholder instead. The element has
      to be holding a frame BEFORE the mask starts to move.
 
-     SO THE WORK IS SPLIT ACROSS THE TWO MOMENTS THE CHAPTER ALREADY HAS:
+     SO THE WORK IS SPLIT ACROSS THE MOMENTS THE CHAPTER ALREADY HAS, and
+     `gateVideoPlayback` (components/ui/useVisiblePlayback.ts) owns two of
+     the three — the same gate Reservations' backdrop runs on:
        · APPROACH (an IntersectionObserver on the figure, with a viewport
          and a half of rootMargin — well below the fold, and a long way
          ahead of the gate). The element is promoted to `preload="auto"` and
          reloaded, so the fetch and the first-frame decode both happen
          during the run-up.
        · THE GATE (`swept`). play(), and the sweep uncovers moving film.
+       · DEPARTURE, WHICH THIS CHAPTER SIMPLY DID NOT HAVE. The observer
+         here was a one-shot warm-up wearing a gate's clothes: it promoted
+         `preload`, called `load()`, and disconnected. Nothing anywhere
+         paused the clip, and `swept` cannot do it — it drives the entrance
+         and reverses on hysteresis, not on leaving the window.
+         MEASURED at 1440×900: about-big.mp4 2,915px above the fold and
+         still DECODING at the foot of the page. Frame cost 0 (it is
+         decoded and never painted), so this was battery and bandwidth
+         rather than jank — which is precisely why no rAF probe caught it.
 
      ⚠️ THIS IS WHAT KEEPS THE OLD PERFORMANCE ARGUMENT INTACT rather than
      discarding it. The note this replaces was right: about-big.mp4 is
@@ -1338,9 +1533,13 @@ export default function AboutSplit() {
      1440×900 ON TOP OF the one viewport the chapter's own range spends
      before the gate.
 
-     ⚠️ `load()` RESTARTS THE ELEMENT, so it is latched and the observer
-     disconnects itself. Called twice it would re-seek to zero and the panel
-     would open on a stuck first frame.
+     ⚠️ `load()` RESTARTS THE ELEMENT, so the warm half is latched — it
+     disconnects itself and re-checks `preload` before firing. Called twice
+     it would re-seek to zero and the panel would open on a stuck first
+     frame. The local `warmed` ref that used to hold that latch is gone: the
+     shared gate holds it, and a `reduce` flip does not defeat it because
+     `{reduce ? <Image/> : <video/>}` keeps the SAME element across
+     null → false, whose `preload` is already `auto` by then.
 
      REDUCED MOTION NEVER GETS HERE. `reduce` renders the <Image> instead
      and `clipRef` is null, so the observer never attaches and the promotion
@@ -1363,23 +1562,16 @@ export default function AboutSplit() {
      is a hydration change with its own trap (a deferred preference strands
      framer's variant keys) and does not belong in a change about a poster
      and a shadow. */
-  const warmed = useRef(false);
   useEffect(() => {
     const clip = clipRef.current;
     const host = mediaRef.current;
-    if (!clip || !host || warmed.current) return;
-    const io = new IntersectionObserver(
-      (entries) => {
-        if (!entries.some((e) => e.isIntersecting) || warmed.current) return;
-        warmed.current = true;
-        clip.preload = "auto";
-        clip.load();
-        io.disconnect();
-      },
-      { rootMargin: "150% 0px" },
-    );
-    io.observe(host);
-    return () => io.disconnect();
+    if (!clip || !host) return;
+    /* THE FIGURE, NOT THE CLIP, is what is watched — and here the two
+       happen to travel together, so it is a preference rather than a
+       correctness fix. `.mediaPan` carries a parallax translate; handing
+       the observer the figure keeps the gate reading the box the LAYOUT
+       puts on the page instead of one an animation is moving. */
+    return gateVideoPlayback(clip, host);
   }, [reduce]);
 
   useEffect(() => {
@@ -1421,8 +1613,15 @@ export default function AboutSplit() {
      untouched — this change is the picture only. */
 
   /* One switch for the whole choreography. Reduced motion gets the same
-     content in the same order and none of the travel. */
-  const pick = (real: Variants): Variants => (reduce ? FADE : real);
+     content in the same order and none of the travel; the already-played
+     path gets the real variants with every clock in them set to zero, so
+     the panel is simply AT its resting state rather than performing to
+     someone who has seen it.
+     ⚠️ THE ORDER MATTERS. `reduce` wins over `instant` — a reader who asked
+     for less movement is answered first, and FADE is already instant enough
+     that snapping it as well would buy nothing. */
+  const pick = (real: Variants): Variants =>
+    reduce ? FADE : instant ? snap(real) : real;
 
   /* THE TRIGGER IS A MARGIN, NOT AN `amount`, AND THAT IS A CORRECTNESS FIX
      RATHER THAN A PREFERENCE. `amount: n` is an IntersectionObserver

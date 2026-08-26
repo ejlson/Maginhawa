@@ -594,6 +594,10 @@
   object-fit: contain;
 }
 
+/* ⚠️ THE WORD'S BOX, AND IT MASKS NOTHING. Kept for the reason .ledeMask
+   is kept: it is the flex item that holds the word beside the mark, and
+   `min-width: 0` is what lets that item shrink. What it must never do again
+   is clip — the lockup inks in place now. See blogInkBleed. */
 .labelWordMask {
   display: block;
   min-width: 0;
@@ -704,9 +708,30 @@
   margin-top: var(--front-drop);
 }
 
+/* ══════════ THE PLATE'S OUTER BOX — IT HOLDS NOTHING BACK ══════════
+   ⚠️ `overflow`, `border-radius`, `background` AND `box-shadow` HAVE ALL
+   LEFT THIS RULE, and they left in two different directions. The first
+   three went DOWN to `.frontFrame`, which is the box that now draws the
+   picture and masks it; the shadow went SIDEWAYS to `.frontShadow`, which
+   is a box of its own precisely so the mask cannot reach it.
+
+   THE REASON IS THE REVEAL CHANGING MATERIAL. This plate opened on a hard
+   `clip-path` for as long as all four lived here, and a clip could share an
+   element with them because it ends at `inset(0)` — a state that clips
+   nothing and therefore leaves nothing behind. The reveal is a feathered
+   `mask-image` now, matched to AboutSplit's film (see `blogPlateSweep`), and
+   a mask does not have that property: it applies to an element's ENTIRE
+   rendering, box-shadow included, and whatever the animation leaves in the
+   inline style stays there. Masking this box would take the card shadow off
+   the journal's lede permanently. AboutSplit's `.mediaFrame` carries the
+   same banner over the same trap.
+
+   WHAT STAYS HERE IS WHAT THE MASK MUST NOT TOUCH: the aspect ratio that
+   gives the plate its height, the container the cqi units inside resolve
+   against, and the hover lift — which scales the shadow and the picture
+   together because both are children of this. */
 .frontPhoto {
   position: relative;
-  overflow: hidden;
 
   /* ⚠️ 3:2, AND IT WAS 24:9 UNTIL THE PICTURE STOPPED BEING FULL WIDTH.
      That crop was chosen to rhyme with AboutSplit's edge-to-edge film on
@@ -730,9 +755,6 @@
      for the other reason: once the row stacks, the plate is full width
      again and a tall crop would fill a phone screen. */
   aspect-ratio: 3 / 2;
-  border-radius: var(--radius-tile);
-  background: var(--placeholder);
-  box-shadow: var(--shadow-card);
 
   /* THE RAMP'S DEPTH — the one variable that crosses into
      VenueCard.module.css's `.rampBlur` / `.rampScrim`, which this chapter
@@ -791,10 +813,88 @@
      same reason, as /blog's `.cardMedia`. */
   container-type: inline-size;
 
+  /* ⚠️ THE box-shadow TRANSITION IS GONE FROM HERE and lives on
+     `.frontShadow`, which is the element that now has a shadow to
+     transition. Leaving it would have been a transition on a property this
+     rule no longer sets — inert, and the kind of leftover that reads as
+     intent to the next person. */
   transform: scale(1);
-  transition:
-    transform var(--dur-slow) var(--ease-drawer),
-    box-shadow var(--dur-slow) var(--ease-drawer);
+  transition: transform var(--dur-slow) var(--ease-drawer);
+}
+
+/* ══════════ THE SHADOW, ON A BOX OF ITS OWN AND OUTSIDE THE MASK ══════════
+   The second half of "the ground is clear until the picture arrives". The
+   fill moved inside the mask (`.frontFrame`) and the shadow could not follow
+   it there — see the banner on `.frontPhoto` — so it is an empty,
+   pointer-transparent rectangle sitting under the frame at the same
+   geometry, and the entrance fades it in.
+
+   THIS IS `.mediaShadow` FROM AboutSplit.module.css, and deliberately so;
+   that file carries the longer derivation, including the two simpler routes
+   that were tried and failed.
+
+   ⚠️ IT MUST KEEP THE SAME RADIUS AS `.frontFrame`. An outer box-shadow is
+   clipped to outside the border box by the spec, so the shadow's own corner
+   rounding is what the reader sees tracing the plate's corner. The two
+   radii disagreeing shows as a shadow that squares off where the picture
+   curves.
+
+   THE HOVER LIVES HERE NOW. `.front:hover` used to raise `.frontPhoto`'s
+   box-shadow; that declaration has nowhere to land any more, so it lands
+   here instead — see the hover block. */
+.frontShadow {
+  position: absolute;
+  inset: 0;
+  border-radius: var(--radius-tile);
+  box-shadow: var(--shadow-card);
+  pointer-events: none;
+  transition: box-shadow var(--dur-slow) var(--ease-drawer);
+}
+
+/* ══════════ THE FRAME — THE MASK, AND EVERYTHING BEHIND IT ══════════
+   `.mediaFrame` from AboutSplit.module.css, with the same gradient written
+   the same way, because the two plates are now one gesture. The picture,
+   the ramp, the venue's mark and the type block are all children of this,
+   which is what puts them behind the reveal rather than beside it.
+
+   THE GRADIENT IS DECLARED HERE AND THE ANIMATION MOVES ONE NUMBER. Only
+   `--sweep` travels; the mask itself never changes. That is the house rule
+   from Framer-owns-the-inline-style — animate a custom property and let CSS
+   own the real one — and here it also buys the no-JS and reduced-motion
+   paths for free: `--sweep` is REGISTERED in globals.css with an initial
+   value of 100%, i.e. fully uncovered, so any reader the animation never
+   reaches sees a whole picture rather than an empty box.
+
+   ⚠️ THE TRAVEL STARTS AT −FEATHER, NOT AT 0, and the keyframe says so. A
+   gradient holds its first colour everywhere above its first stop, so at
+   `--sweep: 0%` the ramp would still be sitting on the frame's top edge and
+   the plate would be part-visible before the reveal began. Starting the
+   opaque stop one feather-height above puts the whole ramp off the top.
+
+   ⚠️ 6% IS AboutSplit's FEATHER and the two must agree — it is the softness
+   of the edge as a share of the frame's own height, so it scales with the
+   plate rather than being a pixel count that reads differently at each
+   crop. Move one and move the other. */
+.frontFrame {
+  position: absolute;
+  inset: 0;
+
+  --sweep: 100%;
+  --sweep-feather: 6%;
+  -webkit-mask-image: linear-gradient(
+    to bottom,
+    #000 var(--sweep),
+    transparent calc(var(--sweep) + var(--sweep-feather))
+  );
+  mask-image: linear-gradient(
+    to bottom,
+    #000 var(--sweep),
+    transparent calc(var(--sweep) + var(--sweep-feather))
+  );
+
+  overflow: hidden;
+  border-radius: var(--radius-tile);
+  background: var(--placeholder);
 }
 
 /* THE PAN LAYER — see .mediaPan in AboutSplit.module.css for the budget
@@ -1271,6 +1371,13 @@
 @media (hover: hover) and (pointer: fine) {
   .front:hover .frontPhoto {
     transform: scale(1.005);
+  }
+  /* ⚠️ THE SHADOW IS ANSWERED ON ITS OWN BOX, because that is where it is
+     now drawn — `.frontPhoto` no longer casts one. Splitting the lift from
+     the shadow across two elements changes nothing the reader can see: both
+     are on the same transition and one is a child of the other, so they
+     move together. */
+  .front:hover .frontShadow {
     box-shadow: var(--shadow-card-hover);
   }
   .front:hover .frontPhotoImg {
@@ -1364,19 +1471,22 @@
   --rail-beat: 80ms;
 }
 
-/* THE MASKS THAT ONLY CLIP. These three wrap a single line that DESCENDS,
+/* THE MASKS THAT ONLY CLIP. These two wrap a single line that DESCENDS,
    so the clip is all they do and it stays put; the masks that SWEEP
    (.frontTitleMask, .entryBodyMask) declare
    no base clip at all, because the animation is their clip and they should
    be unclipped once it ends.
-   (.ledeMask left the sweeping list when the lede went to the ink bleed —
-   it clips NOTHING now, in any state, and must stay that way: a blurred
-   glyph paints its halo outside its own box by the radius, and any clip on
-   this wrapper shears the bleed into hard edges. See blogInkBleed.)
+
+   ⚠️ TWO WRAPPERS HAVE LEFT THIS RULE FOR ONE REASON, and it is the single
+   demand an ink bleed makes of the markup around it: .ledeMask when the
+   sentence took the bleed, and .labelWordMask now that the chapter lockup
+   above it has. A blurred glyph paints its halo OUTSIDE its own box by the
+   blur radius, so a clip on the wrapper — any clip, in any state — shears
+   that soft edge back into hard rectangular sides for the whole entrance.
+   Both clip NOTHING now, and must stay that way. See blogInkBleed.
 
    The negative bottom inset is the descender bleed — 0.3em, the same
    number SplitWords uses, and the one -110% is derived against. */
-.labelWordMask,
 .frontTagMask,
 .dividerLabelMask {
   display: block;
@@ -1390,12 +1500,45 @@
   flex: none;
 }
 
+/* THE HARD EDGE — still the right verb for a line of type coming out of its
+   own mask (`.frontTitleMask`, `.frontCta`, the head's pill). A clip on a
+   single line is a wipe across a few pixels of glyph and there is nothing
+   for a feather to soften.
+   ⚠️ TWO CALLERS HAVE LEFT. The plate ran this for as long as its reveal was
+   a clip and runs `blogPlateSweep` now; the chapter lockup's mark ran it
+   until the head took the ink bleed. */
 @keyframes blogSweepDown {
   from {
     clip-path: inset(0 0 100% 0);
   }
   to {
     clip-path: inset(0 0 0 0);
+  }
+}
+
+/* ══════════ THE PLATE'S EDGE, AND IT IS FEATHERED NOW ══════════
+   The journal's lede opens exactly as About's film does: a soft alpha ramp
+   travelling down the frame, rather than the razor-sharp `clip-path` line
+   this plate used to run. AboutSplit's MEDIA note carries the argument in
+   full and it transfers unchanged — a hard horizontal edge stair-steps as
+   it descends and reads as a rendering artefact rather than as a reveal.
+
+   ⚠️ IT ONLY INTERPOLATES BECAUSE `--sweep` IS REGISTERED. An unregistered
+   custom property is an opaque token stream and this keyframe would FLIP
+   halfway rather than travel — the plate would sit masked for 475ms and
+   then appear whole. The `@property` block is in globals.css, shared with
+   About's half; read the banner there before touching either.
+
+   THE START IS −6%, WHICH IS −FEATHER, so the whole ramp begins off the top
+   of the frame. `.frontFrame` explains why. Both keyframes are percentages
+   for the reason every inset in this file spells all four sides: matched
+   units interpolate, mismatched ones do not. */
+@keyframes blogPlateSweep {
+  from {
+    --sweep: -6%;
+  }
+  to {
+    --sweep: 100%;
   }
 }
 
@@ -1494,29 +1637,58 @@
 }
 
 /* ── THE BEAT MAP ──
-   Seats 0-4 are the head and the card; the four rail rows continue the
-   same count from 5, and because those are computed they are set inline
-   from Blog.tsx (RAIL_BEAT). The row declares --i once and both halves
-   inherit it, so a thumbnail's sweep and its headline's descent cannot
-   drift apart.
+   Seats 0-2 are the head. The plate and the rail each restart their own
+   count from their own gate — see the two notes below, and STRIP_BEAT in
+   Blog.tsx for the rail's, which is computed and so is set inline. A row
+   declares --i once and both halves inherit it, so a thumbnail's sweep and
+   its headline's descent cannot drift apart.
 
-   The two small framed objects in the head open faster than the
-   photographs do — 900ms on a 34px mark reads as a stall, not a reveal. */
-.labelMark {
+   The one small framed object left in the head opens faster than the
+   photographs do — 900ms on a 34px pill reads as a stall, not a reveal.
+   The mark used to be the second of two and no longer sweeps at all.
+
+   ⚠️ THE HEAD IS THREE SEATS NOW, NOT FOUR, and the queue CLOSED UP rather
+   than leaving a hole where the word used to stand. Mark and word held
+   seats 0 and 1; they are one object on seat 0, so the sentence and the
+   pill each move up one and the head's cascade is 70ms shorter. */
+
+/* ⚠️ THE SEAT IS ON THE LOCKUP, NOT ON ITS TWO HALVES, and that is the
+   whole of what the ink bleed forced here. The mark SWEPT and the word
+   DESCENDED — two different verbs, which is what made a 70ms offset between
+   them legible as two objects arriving. Under ONE verb, both resolving in
+   place, that same offset instead reads as the lockup assembling itself:
+   exactly the fault this file already refuses for the tag and the headline
+   on the ramp (see "THE TAG AND THE HEADLINE SHARE SEAT 5" below). A mark
+   and the word set beside it are one identity. One seat, one filter.
+
+   ONE FILTER IS ALSO WHAT A FOCUS PULL ACTUALLY IS. Blurring the halves
+   separately would resolve the same nominal 0.11em against two different
+   font sizes — the mark stands 2.6em tall — and hand them two different
+   radii, so the lockup would come into focus unevenly. Defocusing it as one
+   object gives the whole thing one uniform radius, which is what a lens
+   does. Manifesto's `em` is there to hold softness across a viewport CLAMP,
+   not to equalise pieces inside a single object. And it is one composited
+   layer where two would have been two, which is the budget Finding 02 set.
+
+   THE em RESOLVES AGAINST --t-label (13px), so the radius is ~1.4px: the
+   same fraction of the type's own size that the statement one chapter up
+   carries, which is the entire point of stating it in em. */
+.chapterLabel {
   --i: 0;
-  --enter-d: 700ms;
 }
+/* `display: block` and nothing else — the word stopped carrying a seat of
+   its own when the lockup took one. The block box stays because it is what
+   gives the wrapper around it a line box to be as tall as. */
 .labelWord {
   display: block;
-  --i: 1;
 }
 /* no --i on .ledeMask any more — the wrapper stopped animating when the
    lede went to the ink bleed; the seat belongs to the type alone */
 .lede {
-  --i: 2;
+  --i: 1;
 }
 .ctaHost {
-  --i: 3;
+  --i: 2;
   --enter-d: 700ms;
 }
 
@@ -1534,33 +1706,33 @@
    sentence and the pill — all of which now arrive on the scroll instead,
    under [data-in], a third of the approach earlier. Leaving the plate at 4
    meant 280ms of dead time after its own trigger before anything moved. */
-.frontPhoto,
+.frontFrame,
+.frontShadow,
 .frontPhotoImg {
   --i: 0;
 }
-/* ⚠️ THE LEDE SWEEPS ON AboutSplit's NUMBERS, at the user's instruction
-   that the two pictures move the same. The GESTURE was already identical —
-   a top-anchored clip running down, with the plate drifting −4%/1.1 against
-   it on --ease-drawer — because both were written from the same argument.
-   What differed was the timing: this ran 900ms/1400ms against that
-   chapter's 1150ms/1700ms.
+/* ⚠️ `--enter-d: 1150ms` IS GONE FROM THE PLATE, AND THE 1150 WAS A LIE.
+   It was set here at the user's instruction that the two pictures move the
+   same, with a note claiming it as "AboutSplit's numbers". It was AboutSplit's
+   number when it was written and had not been for some time: that chapter
+   retimed its mask from --dur-chapter (1.15s) to --dur-drawer (0.95s) and
+   this file never followed, so the one declaration whose entire job was to
+   match was the one thing that did not.
 
-   THE OVERHANG IS THE POINT, and it survives the change: the drift outlasts
-   the mask by 550ms either way, so the picture is still settling for half a
-   second after the reveal edge has gone. Matching the two durations instead
-   would give back a panel that simply stops — AboutSplit's own note on
-   DRIFT says exactly that. */
-.frontPhoto {
-  --enter-d: 1150ms;
-}
-/* ⚠️ AND IT HAS TO BE PUT BACK HERE, because --enter-d INHERITS. The block
-   of type sits INSIDE the plate, so raising the picture's sweep to
-   AboutSplit's 1.15s quietly raised the tag's descent and the headline's
-   sweep to 1.15s as well — measured on the render, 1150ms against the
-   700ms a single line of type is tuned for. A descent that long does not
-   read as slower, it reads as stuck.
-   The default is restated rather than unset because `unset` on a custom
-   property makes it inherit, which is the exact behaviour being undone. */
+   THE PLATE READS THE TOKEN DIRECTLY NOW — see the sweep rule below, which
+   spells `var(--dur-drawer)` rather than a number. A duplicated literal is
+   what let the two drift apart in the first place; a shared token cannot.
+
+   ⚠️ THE RESTATEMENT UNDER IT STAYS, and it is no longer only an antidote.
+   `.frontBlock` declares `--enter-d: 700ms` because --enter-d INHERITS and
+   the type block sits INSIDE the plate, so the picture's 1150ms was quietly
+   reaching the tag's descent and the headline's sweep — 1150ms against the
+   700ms a single line of type is tuned for, which does not read as slower,
+   it reads as stuck. With the plate's declaration gone there is nothing left
+   to undo, but deleting this one as well would NOT restore 700ms: it would
+   drop `.frontTitleMask` onto the 900ms written into its own `var()`
+   fallback and retime the headline by 200ms. It is the type's own duration
+   now rather than a correction, which is why it is still here. */
 .frontBlock {
   --enter-d: 700ms;
 }
@@ -1623,8 +1795,8 @@
    element parked forever, so the pairs are kept adjacent and both halves
    name the same attribute. */
 
-/* THE SWEEP — the head's two framed objects and the FEATURED PLATE's
-   lockup, and nothing below the divider.
+/* THE SWEEP — the head's pill and the FEATURED PLATE's lockup, and nothing
+   below the divider.
 
    ⚠️ THE RAIL IS GONE FROM THIS LIST, at the motion crit's Finding 03. The
    settled page ran roughly twenty of these top-anchored reveals between
@@ -1632,23 +1804,81 @@
    same 900ms ceremony as the full-bleed film — which flattens the scale
    hierarchy the sweep exists to serve. The budget now: PLATES SWEEP,
    FURNITURE INKS. The rail's own block is below, on blogFade. */
-/* ⚠️ .ledeMask IS GONE FROM BOTH LISTS — the lede inks in place now (see
-   blogInkBleed) and its wrapper must never clip again: the bleed's halo
-   paints outside the glyph boxes and a sweep here would shear it. */
-.section:not([data-in]) .labelMark,
+/* ⚠️ .ledeMask AND THE CHAPTER MARK ARE BOTH GONE FROM THESE LISTS — the
+   sentence and the lockup above it ink in place now (see blogInkBleed), and
+   neither wrapper may clip again: the bleed's halo paints outside the glyph
+   boxes and a sweep here would shear it. The pill is the head's last
+   sweeping object. */
 .section:not([data-in]) .ctaHost,
-.section:not([data-plate]) .frontPhoto,
 .section:not([data-plate]) .frontTitleMask,
 .section:not([data-plate]) .frontCta {
   clip-path: inset(0 0 100% 0);
 }
-.section[data-in] .labelMark,
 .section[data-in] .ctaHost,
-.section[data-plate] .frontPhoto,
 .section[data-plate] .frontTitleMask,
 .section[data-plate] .frontCta {
   animation: blogSweepDown var(--enter-d, 900ms) var(--ease-entrance)
     calc(var(--i, 0) * var(--cascade-beat)) backwards;
+}
+
+/* ══════════ THE PLATE OPENS, ON AboutSplit's THREE NUMBERS ══════════
+   The journal's lede and About's film are one gesture now, and this is the
+   half of it that lives in CSS. Every value here has a counterpart in
+   AboutSplit.tsx; the pairs are named so a future retime cannot move one
+   without the other being obviously stale.
+
+       this rule          AboutSplit.tsx      what it is
+       --dur-drawer       MEDIA.duration      0.95s — the mask's travel
+       --ease-state       SWEEP               the flatter curve the mask
+                                              is solved against, NOT
+                                              --ease-entrance
+       delay 0            MEDIA_IN            the cluster starts ON the
+                                              gate; the lead is a position
+                                              now, held in the gate itself
+
+   ⚠️ --ease-state, AND NOT --ease-entrance, WHICH IS WHAT THIS USED TO RUN.
+   AboutSplit's note derives the choice rather than picking it: the curve has
+   to be flat enough that the drift underneath still has travel left when the
+   edge finishes, which is the overhang the whole gesture is built on.
+   --ease-entrance is front-loaded enough that it uncovers ~90% of the frame
+   in the first third and the settle has nothing left to do.
+
+   ⚠️ NO --enter-d. The token is read directly so the two plates cannot drift
+   apart again — see the deleted `--enter-d: 1150ms` above for what happened
+   the last time this was a literal. */
+.section:not([data-plate]) .frontFrame {
+  --sweep: -6%;
+}
+.section[data-plate] .frontFrame {
+  animation: blogPlateSweep var(--dur-drawer) var(--ease-state)
+    calc(var(--i, 0) * var(--cascade-beat)) backwards;
+}
+
+/* ══════════ AND THE SHADOW ARRIVES LAST, OVER A SETTLED PLATE ══════════
+   AboutSplit's MOUNT, to the millisecond: 1700ms of delay, which is
+   MEDIA_IN + DRIFT_DUR — the instant the counter-drift under the mask
+   finishes and the picture is genuinely at rest.
+
+   THE ARGUMENT IS THAT A SHADOW ANSWERS AN OBJECT, NOT A TRAVELLING ONE.
+   Opacity ramps around the whole rectangle at once — an element cannot know
+   how much of its sibling is uncovered — so bringing it up with the sweep
+   puts a half-strength shadow around a mostly-empty box. The plate did
+   exactly that until now, for a different reason: its shadow was ON the
+   clipped element, so the reveal edge dragged the shadow down the page with
+   it. Both faults have the same fix.
+
+   ⚠️ THE 1700 IS A LITERAL AND ITS TWIN IS NOT. AboutSplit spells this as a
+   sum so a retime cannot leave the shadow over a moving picture; CSS has no
+   equivalent, so this number and `blogDrift`'s duration below have to be
+   moved together by hand. They are the same 1700ms and they mean the same
+   thing — the end of the drift.
+
+   PLAIN OPACITY, so the reduced-motion block needs no special case for it. */
+.section:not([data-plate]) .frontShadow {
+  opacity: 0;
+}
+.section[data-plate] .frontShadow {
+  animation: blogFade 700ms var(--ease-entrance) 1700ms backwards;
 }
 
 /* THE INK — the rail. Five small cards and the label above them arrive by
@@ -1676,15 +1906,14 @@
     calc(var(--i, 0) * var(--rail-beat)) backwards;
 }
 
-/* THE DESCENT — the two single lines that are part of a plate lockup.
-   Nothing here wraps, so each one's travel is bounded by its own line box;
-   see the rule stated over blogSettle. (The divider label used to be the
-   third — it fades with the rail now, in the ink block above.) */
-.section:not([data-in]) .labelWord,
+/* THE DESCENT — the one single line left that is part of a plate lockup.
+   Nothing here wraps, so its travel is bounded by its own line box; see the
+   rule stated over blogSettle. (It used to be one of three: the divider
+   label fades with the rail now, in the ink block below, and the chapter
+   word resolves in place with the mark beside it.) */
 .section:not([data-plate]) .frontTag {
   transform: translateY(-110%);
 }
-.section[data-in] .labelWord,
 .section[data-plate] .frontTag {
   animation: blogDescend var(--enter-d, 700ms) var(--ease-entrance)
     calc(var(--i, 0) * var(--cascade-beat)) backwards;
@@ -1701,15 +1930,30 @@
     calc(var(--i, 0) * var(--cascade-beat)) backwards;
 }
 
-/* THE INK BLEED — the display line, in place. Parked invisible and out of
-   focus; data-in resolves it on its own seat of the same beat. 900ms on
-   --ease-entrance — the head's sweep duration, so the cascade's rhythm is
-   unchanged even though the verb is not. See the argument over
-   @keyframes blogInkBleed. */
+/* THE INK BLEED — the chapter lockup and the display line beneath it, both
+   in place. Parked invisible and out of focus; data-in resolves each on its
+   own seat of the same beat. 900ms on --ease-entrance — the head's old
+   sweep duration, so the cascade's rhythm is unchanged even though the verb
+   is not. See the argument over @keyframes blogInkBleed.
+
+   ⚠️ THE LOCKUP KEEPS THE 900 AND DOES NOT INHERIT THE MARK'S OLD 700. That
+   700 answered "a clip crossing a 34px object at 900ms reads as a stall" —
+   a duration bounded by the DISTANCE an edge had to travel across a small
+   thing. A blur resolve has no edge and no distance, so the object's size
+   stops bounding it; and a head and a sentence sharing one verb should
+   share its tempo, or the two halves of the same gesture come into focus at
+   visibly different speeds.
+
+   ⚠️ THE FILTER IS ON THE <h2> ITSELF, which is why `.chapterLabel` is named
+   here and neither of its children is — the derivation is on its --i in the
+   beat map. It is also why nothing inside the lockup may clip: see
+   `.labelWordMask`. */
+.section:not([data-in]) .chapterLabel,
 .section:not([data-in]) .lede {
   opacity: 0;
   filter: blur(0.11em);
 }
+.section[data-in] .chapterLabel,
 .section[data-in] .lede {
   animation: blogInkBleed 900ms var(--ease-entrance)
     calc(var(--i, 0) * var(--cascade-beat)) backwards;
@@ -1722,7 +1966,9 @@
   transform: translateY(-4%) scale(1.1);
 }
 .section[data-plate] .frontPhotoImg {
-  /* 1700ms — AboutSplit's DRIFT, not this file's old 1400. See .frontPhoto */
+  /* 1700ms — AboutSplit's DRIFT_DUR. ⚠️ THE SHADOW'S DELAY IS THIS NUMBER:
+     it fades in when the drift ends, so the two move together or the shadow
+     starts landing on a picture that is still travelling. See .frontShadow. */
   animation: blogDrift 1700ms var(--ease-drawer)
     calc(var(--i, 0) * var(--cascade-beat)) backwards;
 }
@@ -1751,11 +1997,11 @@
    and those stop applying the moment the attribute lands, so the elements
    are already at their resting values. The only thing left to remove is the
    animation that would have travelled between them. */
-.section[data-instant] .labelMark,
-.section[data-instant] .labelWord,
+.section[data-instant] .chapterLabel,
 .section[data-instant] .lede,
 .section[data-instant] .ctaHost,
-.section[data-instant] .frontPhoto,
+.section[data-instant] .frontFrame,
+.section[data-instant] .frontShadow,
 .section[data-instant] .frontPhotoImg,
 .section[data-instant] .frontTag,
 .section[data-instant] .frontTitleMask,
@@ -1859,22 +2105,23 @@
 
      The masks are released too — with nothing translating, a clip on the
      type is a crop for no reason. */
-  .labelWordMask,
   .frontTagMask,
   .dividerLabelMask {
     clip-path: none;
   }
-  /* .ledeMask is out of both lists here too — with the ink bleed it has no
-     base clip, transform or animation to neutralise, and fading the
-     wrapper AND its child was compounding two 400ms fades on one line.
+  /* .ledeMask and .labelWordMask are both out of the lists here too — with
+     the ink bleed neither has a base clip, transform or animation left to
+     neutralise, and fading a wrapper AND its child was compounding two
+     400ms fades onto one line.
      `filter: none` joins the park because the ink bleed's base park is
      `opacity + filter` and reduced motion must never blur — the fade
-     alone carries the arrival. */
-  .section:not([data-in]) .labelMark,
-  .section:not([data-in]) .labelWord,
+     alone carries the arrival, for the lockup exactly as for the
+     sentence. */
+  .section:not([data-in]) .chapterLabel,
   .section:not([data-in]) .lede,
   .section:not([data-in]) .ctaHost,
-  .section:not([data-in]) .frontPhoto,
+  .section:not([data-in]) .frontFrame,
+  .section:not([data-in]) .frontShadow,
   .section:not([data-in]) .frontPhotoImg,
   .section:not([data-in]) .frontTagMask,
   .section:not([data-in]) .frontTag,
@@ -1890,11 +2137,11 @@
     filter: none;
     opacity: 0;
   }
-  .section[data-in] .labelMark,
-  .section[data-in] .labelWord,
+  .section[data-in] .chapterLabel,
   .section[data-in] .lede,
   .section[data-in] .ctaHost,
-  .section[data-in] .frontPhoto,
+  .section[data-in] .frontFrame,
+  .section[data-in] .frontShadow,
   .section[data-in] .frontPhotoImg,
   .section[data-in] .frontTagMask,
   .section[data-in] .frontTag,
@@ -1906,6 +2153,32 @@
   .section[data-rail] .entryBodyMask,
   .section[data-rail] .entryBody {
     animation: blogFade 400ms ease-out backwards;
+  }
+
+  /* ══ AND THE PLATE'S TWO PARKS HAVE TO BE RELEASED, NOT JUST UNANIMATED ══
+     This branch answers the whole chapter on [data-in] with one 400ms fade.
+     The plate's own parks are keyed to [data-plate], a DIFFERENT gate that
+     is still latching underneath — so without these two the reduced-motion
+     path breaks in two ways, both of them after the fade rather than during
+     it, which is where they would be easy to miss:
+
+       · `.frontFrame` would fade in still wearing `--sweep: -6%`, i.e.
+         fully masked. The reader sees an empty box arrive, and the picture
+         only appears later when [data-plate] latches and stops parking it.
+       · `.frontShadow` would fade in and then BLINK OUT. The fade fills
+         `backwards`, not forwards, so the instant it ends the animated
+         opacity is dropped and `:not([data-plate]) .frontShadow`'s
+         `opacity: 0` is underneath it, still applying.
+
+     KEYED TO [data-in] AND PLACED AFTER THE FADE, which is what makes them
+     win: same specificity as the parks they override (0,3,0), later in
+     source. Before [data-in] the parks stand, which is correct — everything
+     in this chapter starts invisible on this path too. */
+  .section[data-in] .frontFrame {
+    --sweep: 100%;
+  }
+  .section[data-in] .frontShadow {
+    opacity: 1;
   }
   /* ⚠️ THE RAIL RIDES ITS OWN GATE HERE TOO, and this stopped being a
      nicety when the base rules went to opacity (Finding 03). The base
@@ -1922,11 +2195,11 @@
      400ms fade replay on every reload, which is the thing [data-instant]
      exists to stop. Restated rather than reordered: the selector list above
      has to stay next to the fade it belongs to. */
-  .section[data-instant] .labelMark,
-  .section[data-instant] .labelWord,
+  .section[data-instant] .chapterLabel,
   .section[data-instant] .lede,
   .section[data-instant] .ctaHost,
-  .section[data-instant] .frontPhoto,
+  .section[data-instant] .frontFrame,
+  .section[data-instant] .frontShadow,
   .section[data-instant] .frontPhotoImg,
   .section[data-instant] .frontTag,
   .section[data-instant] .frontTitleMask,

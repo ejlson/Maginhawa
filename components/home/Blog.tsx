@@ -270,63 +270,91 @@ function Front({
       data-cta-hover
     >
       <div className={styles.frontPhoto}>
-        {/* the pan is its own box: `.frontPhotoImg` already carries the
-            entrance's drift keyframe, and one element cannot hold two
-            independent transforms */}
-        <motion.div
-          className={styles.frontPan}
-          style={pan ? { y: pan, scale: PARALLAX_SCALE } : undefined}
-        >
-        <Image
-          className={styles.frontPhotoImg}
-          src={post.image}
-          // DECORATIVE — the headline on the ramp names the story in real
-          // text and the mark above announces the venue. A third
-          // description of the same thing is noise on a screen reader.
-          alt=""
-          fill
-          sizes="calc(100vw - 24px)"
-          priority={false}
-        />
-        </motion.div>
+        {/* ══ THE PLATE, IN THREE BOXES, AND EACH ONE IS LOAD-BEARING ══
+            This is AboutSplit's `.media` / `.mediaShadow` / `.mediaFrame`
+            arrangement, copied deliberately: the two pictures now open with
+            the same feathered mask, and a mask cannot share an element with
+            a shadow. Read the note over `.mediaFrame` in AboutSplit's
+            stylesheet for the full derivation; the short version is that
+            `mask-image` applies to an element's ENTIRE rendering, box-shadow
+            included, so masking the box that casts the shadow would erase
+            the shadow along with the picture — permanently, because whatever
+            the animation leaves behind stays on the element.
 
-        {/* the ramp — blur first, then scrim; see the import note */}
-        <div className={card.rampBlur} aria-hidden />
-        <div className={card.rampScrim} aria-hidden />
+              .frontPhoto   the aspect ratio, the container for the cqi
+                            units inside, and the hover lift. NOTHING is
+                            masked here.
+              .frontShadow  the card shadow, on its own empty box, faded in
+                            once the plate has settled.
+              .frontFrame   the MASK, the radius and the overflow. Everything
+                            that used to be a child of `.frontPhoto` is a
+                            child of this instead, which is what puts it all
+                            behind the reveal.
 
-        <VenueMark slug={post.restaurant} />
+            ⚠️ DO NOT FLATTEN THESE BACK. `.frontPhoto` held all three jobs
+            while the reveal was a hard `clip-path`, which tolerated it only
+            because a clip that ends at `inset(0)` leaves nothing behind. */}
+        <div className={styles.frontShadow} aria-hidden />
 
-        <div className={styles.frontBlock}>
-          {/* THE TAG CARRIES THE CATEGORY PILL'S OLD JOB. An outlined
-              "Feature" chip used to stand here; three facts on one line —
-              in the order /blog states them — say more and take less. The
-              outlet is the part a reader of a press feed actually wants. */}
-          <span className={styles.frontTagMask}>
-            <span className={styles.frontTag}>
-              Latest · {post.dateLabel} · {post.source}
+        <div className={styles.frontFrame}>
+          {/* the pan is its own box: `.frontPhotoImg` already carries the
+              entrance's drift keyframe, and one element cannot hold two
+              independent transforms */}
+          <motion.div
+            className={styles.frontPan}
+            style={pan ? { y: pan, scale: PARALLAX_SCALE } : undefined}
+          >
+          <Image
+            className={styles.frontPhotoImg}
+            src={post.image}
+            // DECORATIVE — the headline on the ramp names the story in real
+            // text and the mark above announces the venue. A third
+            // description of the same thing is noise on a screen reader.
+            alt=""
+            fill
+            sizes="calc(100vw - 24px)"
+            priority={false}
+          />
+          </motion.div>
+
+          {/* the ramp — blur first, then scrim; see the import note */}
+          <div className={card.rampBlur} aria-hidden />
+          <div className={card.rampScrim} aria-hidden />
+
+          <VenueMark slug={post.restaurant} />
+
+          <div className={styles.frontBlock}>
+            {/* THE TAG CARRIES THE CATEGORY PILL'S OLD JOB. An outlined
+                "Feature" chip used to stand here; three facts on one line —
+                in the order /blog states them — say more and take less. The
+                outlet is the part a reader of a press feed actually wants. */}
+            <span className={styles.frontTagMask}>
+              <span className={styles.frontTag}>
+                Latest · {post.dateLabel} · {post.source}
+              </span>
             </span>
-          </span>
 
-          <span className={styles.frontTitleMask}>
-            <h3 className={styles.frontTitle}>{post.title}</h3>
-          </span>
+            <span className={styles.frontTitleMask}>
+              <h3 className={styles.frontTitle}>{post.title}</h3>
+            </span>
 
-          {/* THE HOUSE ACTION — the same control as the archive pill in the
-              head above, About's "Read our story" and the closing frame's
-              "Choose a restaurant" (components/PillCta.tsx). It renders
-              PRESENTATIONALLY because this whole plate is an anchor and an
-              <a> inside an <a> is invalid — the browser closes the outer
-              one and the plate silently stops being one link. /blog's
-              featured lede makes exactly the same trade.
+            {/* THE HOUSE ACTION — the same control as the archive pill in the
+                head above, About's "Read our story" and the closing frame's
+                "Choose a restaurant" (components/PillCta.tsx). It renders
+                PRESENTATIONALLY because this whole plate is an anchor and an
+                <a> inside an <a> is invalid — the browser closes the outer
+                one and the plate silently stops being one link. /blog's
+                featured lede makes exactly the same trade.
 
-              `tone="cream"` because it is standing on the ramp: the default
-              maroon fill is the darkest thing in the palette and the ramp
-              is already dark, so the two would read as one shape. Cream
-              fill, maroon ink — the same inversion the type above it
-              already makes. */}
-          <PillCta presentational tone="cream" className={styles.frontCta}>
-            Read the story
-          </PillCta>
+                `tone="cream"` because it is standing on the ramp: the default
+                maroon fill is the darkest thing in the palette and the ramp
+                is already dark, so the two would read as one shape. Cream
+                fill, maroon ink — the same inversion the type above it
+                already makes. */}
+            <PillCta presentational tone="cream" className={styles.frontCta}>
+              Read the story
+            </PillCta>
+          </div>
         </div>
       </div>
     </a>
@@ -951,6 +979,22 @@ export default function Blog({ journal = BLOG }: { journal?: BlogEntry[] }) {
                 : undefined
             }
           >
+            {/* ⚠️ THE LOCKUP INKS AS ONE OBJECT — mark and word together,
+                arriving out of focus and in place and resolving on a single
+                seat. It is the manifesto statement's entrance (ScrubWord,
+                Manifesto.tsx), the same one the sentence directly below it
+                and About's heading already take, at the user's instruction
+                that the chapter heads share one verb. Both of the gestures
+                this replaces are gone: the mark's clip sweep and the word's
+                descent out of its wrapper.
+
+                THE FILTER IS ON THIS ELEMENT, NOT ON ITS TWO HALVES, and so
+                is the cascade seat. A mark and the word beside it are one
+                identity, and one lens defocuses them by one radius; the
+                derivation, including why the halves must not be staggered
+                under a shared verb, is on `.chapterLabel`'s --i in
+                Blog.module.css. NOTHING INSIDE MAY CLIP — a blurred glyph
+                paints its halo outside its own box. */}
             {/* THE MARK IS DECORATIVE, hence alt="". 1024×1024 is the file's
                 real size — maginhawa.png is a SQUARE mark, not a horizontal
                 lockup; see the same note in Discover.tsx. */}
@@ -967,10 +1011,15 @@ export default function Blog({ journal = BLOG }: { journal?: BlogEntry[] }) {
                 sizes="48px"
                 aria-hidden
               />
-              {/* the word is wrapped because it has to be masked separately
-                  from the mark beside it: the lockup's own box is as tall as
-                  the 2.6em mark, so a clip on <h2> would be nowhere near the
-                  word's line box and the descent would show above it. */}
+              {/* ⚠️ THE WRAPPER STAYS AND NO LONGER MASKS ANYTHING. It was
+                  here because the word DESCENDED and so had to be clipped
+                  separately from the mark beside it — the lockup's own box
+                  is as tall as the 2.6em mark, so a clip on <h2> would have
+                  sat nowhere near the word's line box and the descent would
+                  have shown above it. There is no descent now; the lockup
+                  inks in place. What the span still owns is the word's box
+                  in the flex row, and it must never clip again — see the
+                  note on `.labelWordMask`. */}
               <span className={styles.labelWordMask}>
                 <span className={styles.labelWord}>Blog</span>
               </span>
