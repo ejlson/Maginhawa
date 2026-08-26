@@ -1220,6 +1220,12 @@
   display: block;
 }
 
+/* The in-row copy of the outlet name (see About.tsx). The wide table prints
+   the outlet once, from the group, so here it is nothing at all. */
+.coverageRowOutlet {
+  display: none;
+}
+
 .coverageFeature {
   font-family: var(--font-sans);
   font-style: normal;
@@ -1306,33 +1312,125 @@
 }
 
 @media (max-width: 720px) {
+  /* THE GROUP STOPS BEING A LAYOUT. Its two tracks became two stacked lines
+     here, and the first of them held one word — so every entry paid a whole
+     line of a 358px column, plus a gap, plus the group's own padding, to
+     print a masthead name. The name moves into the row (see .coverageRowOutlet
+     and About.tsx); what is left is a wrapper that owns nothing but the rule
+     under it, so it holds no padding and no gap and lets the rows set the
+     rhythm. */
   .coverageGroup {
     grid-template-columns: 1fr;
-    gap: var(--space-2xs);
-    padding-block: var(--space-xs-y);
+    gap: 0;
+    padding-block: 0;
   }
 
   .coverageOutlet {
-    padding-top: 0;
+    display: none;
   }
 
+  /* TWO COLUMNS, NOT ONE. The single-column stack was the whole of the
+     mobile problem: outlet, restaurant tag, feature and (nothing, the arrow
+     was hidden) landed as four full-width lines of 13px tracked caps, three
+     shades of the same thing with no line to read first. The row keeps its
+     content in column one — one meta line, one headline — and hands column
+     two to the arrow, which spans both and centres against them. */
   .coverageRow {
-    grid-template-columns: 1fr;
-    gap: var(--space-4xs);
-    padding-block: clamp(8px, 1.2vh, 14px);
+    grid-template-columns: minmax(0, 1fr) auto;
+    column-gap: var(--space-xs);
+    /* 2px, and it is a lockup like .coverageRestaurant's own gap: the meta
+       line and the headline under it are ONE entry. The 1.4 and 1.35 leading
+       on the two lines already opens ~7px of air between them; a scale step
+       on top of that would start reading as two rows. */
+    row-gap: 2px;
+    align-items: center;
+    padding-block: clamp(9px, 1.15vh, 13px);
   }
 
-  /* stacked rows have no shared baseline to protect — let the feature
-     line wrap instead of ellipsing away its second half */
+  /* the meta line: outlet, then the restaurants it was about, all on one
+     line of tags. Full ink on the container — the alpha moves down to the
+     restaurant names alone (below) so the outlet can carry the ink its
+     masthead deserves. */
+  .coverageRestaurant {
+    grid-column: 1;
+    grid-row: 1;
+    flex-direction: row;
+    flex-wrap: wrap;
+    gap: 0;
+    opacity: 1;
+  }
+
+  /* the outlet leads the line in medium and full ink, the way it did as a
+     header; the restaurant names keep the 0.78 that measured 5.38:1 on this
+     ground, so the two ranks separate by tone rather than by size */
+  .coverageRowOutlet {
+    display: block;
+    font-weight: var(--w-medium);
+  }
+
+  .coverageRestaurantLine {
+    opacity: 0.78;
+  }
+
+  /* ⚠️ ::after ON THE ITEM BEFORE, NOT ::before ON THE ITEM AFTER, and the
+     two are not interchangeable. These are flex items, so a wrap breaks
+     BETWEEN them — with the dot leading the second item it travelled to the
+     next line and opened it, and at 320 the longest meta line read
+     "TIME OUT · BELLY / · CAFÉ MAMA & SONS". Hung off the item before, the
+     separator ends the line it belongs to, which is where a reader expects
+     to find it. */
+  .coverageRestaurant > *:not(:last-child)::after {
+    content: "·";
+    margin-inline: 0.5em;
+    opacity: 0.55;
+  }
+
+  /* THE HEADLINE, IN ITS OWN VOICE. Uppercase --t-label with 0.07em of
+     tracking is a treatment for a two-word tag; these are sentences up to
+     seven words long, and at that length the caps stopped being emphasis
+     and became a wall — "THE FRENCH BISTRO SERVING FILIPINO FLAVOUR BOMBS"
+     over two wrapped lines. press.ts stores them in sentence case already,
+     so dropping the transform costs nothing and returns the ascenders and
+     descenders the eye reads word-shapes by. Set at --t-body it is the
+     largest thing in the row, which is the correct order: the piece first,
+     then the masthead and the kitchen it was about.
+
+     Wrapping instead of ellipsing, as before — a stacked row has no shared
+     baseline to protect. */
   .coverageFeature {
+    grid-column: 1;
+    grid-row: 2;
+    text-transform: none;
+    letter-spacing: 0;
+    font-size: var(--t-body);
+    line-height: var(--lh-snug);
     white-space: normal;
     overflow: visible;
     text-overflow: clip;
   }
 
-  /* stacked rows — the arrow would sit as its own awkward line */
+  /* THE ARROW COMES BACK, and it was hidden for a reason that the two-column
+     row has just removed — in one column it had to sit as its own line under
+     the feature. Spanning both text rows in column two it is a margin mark,
+     not a line. It has to be here: every row is a link to an outside article,
+     hover is the affordance that says so, and a phone has no hover. It is
+     also the only element that keeps the rest-state ink at 0.4 (it is
+     decoration, not copy, so the 4.5:1 floor is not the measure) — 0.55 so a
+     22px hairline still registers against cream at arm's length. */
   .coverageArrow {
-    display: none;
+    display: flex;
+    grid-column: 2;
+    grid-row: 1 / span 2;
+    align-self: center;
+    opacity: 0.55;
+  }
+
+  /* WITHIN a group the rows still need their own hairline, and 0.08 was
+     tuned for rows one line of type tall. Between groups the rule is the
+     group's own border-bottom at 0.16, which is now the only line most of
+     this table draws — every outlet in press.ts carries a single entry. */
+  .coverageRow + .coverageRow {
+    border-top-color: rgba(47, 0, 0, 0.12);
   }
 }
 

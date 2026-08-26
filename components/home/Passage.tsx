@@ -1124,16 +1124,28 @@ export default function Passage() {
         /* ⚠️ AND THE SAME NUMBER GOES ON THE ROOT, AS A FRACTION, FOR
            <Reservations>. The peep is where the pin starts, so on the
            film's own approach scale it is exactly the progress at which
-           the card is seated under the sentence — which is the earliest
-           the card may begin to grow. Reservations cannot derive it: it
-           depends on this section's slab height, which is measured here.
+           the card is seated under the sentence. Reservations cannot
+           derive it: it depends on this section's slab height, which is
+           measured here.
+
+           ⚠️ IT IS A SAFETY FLOOR OVER THERE NOW, NOT THE DRIVER. The
+           growth used to start a fixed beat after this value, which put
+           its first frame at a different screen height on every viewport;
+           it now starts where the un-grown plate's centre sits at 57.5%
+           of the screen — growStartFor(drop) in Reservations.tsx,
+           (210 − drop)/200: 0.550 on desktop, 0.565 under the ≤980px
+           card — so the plate opens at the same height everywhere, and
+           this fraction only FLOORS that start, so the growth can never
+           begin under a card that has not seated. PEEP_MAX above already
+           guarantees 0.52, under that start's own 0.550 floor; the floor
+           binding at all would mean something here has changed.
 
            It is a unitless fraction of the viewport rather than a length
            because that is the scale the consumer works in, and it is on
            documentElement rather than .scope because the film is this
            section's SIBLING and inherits nothing from it. Written in the
            same pass as --pin-peep so the two can never disagree; see
-           ENTER_HOLD in Reservations.tsx for what reads it and for the
+           growStartFor in Reservations.tsx for what reads it and for the
            fallback that applies if this never lands. */
         const frac = (peep / window.innerHeight).toFixed(4);
         const root = document.documentElement;

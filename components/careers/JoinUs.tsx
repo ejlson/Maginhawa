@@ -21,7 +21,7 @@ import Reveal from "@/components/ui/Reveal";
 import SplitWords from "@/components/ui/SplitWords";
 import styles from "./JoinUs.module.css";
 import { asset } from "@/lib/media";
-import { JOBS } from "@/lib/jobs";
+import { JOBS, type JobOpening } from "@/lib/jobs";
 import { lenisRef } from "@/lib/SmoothScroll";
 
 const PILLARS = [
@@ -431,6 +431,62 @@ function Chevron() {
   );
 }
 
+/* ---- WHICH LAYOUT THIS WIDTH GETS ---------------------------------------
+   Above 900px the index is a list beside a detail pane; below it, the
+   accordion it has always been. Named for the arm the query selects (and not
+   `split` — that is the hero's own MotionValue, twenty lines down), and
+   `false` until the effect proves otherwise — same shape as STACKED in
+   Blog.tsx / AboutSplit.tsx and SPINES in Discover.tsx, and for the same
+   reason: there is no matchMedia on the server, so the exported HTML always
+   carries the ACCORDION with all six details inline. That is the crawlable
+   markup this section has always shipped, and it is the arm that works with
+   no JS at all.
+
+   THE SWAP IS NEVER SEEN. #open-roles sits ~1,080px down the page, so the
+   effect has resolved long before the section is scrolled to.
+
+   900 rather than 780: the pane has to hold `.roleDetail`'s two lists side
+   by side AND the list has to hold a 25.6px title, and below 900 one of
+   those two starts wrapping. */
+const BESIDE = "(min-width: 900px)";
+
+/* THE DETAIL, WRITTEN ONCE. It is the accordion's contents below 900 and
+   the pane's contents above it; only one of the two arms is ever mounted,
+   so this is a single spelling rather than a duplicated subtree. Every
+   class it uses is the one the accordion already used. */
+function RoleDetail({ job, onApply }: { job: JobOpening; onApply: () => void }) {
+  return (
+    <div className={styles.roleDetail}>
+      <p className={styles.roleDetailLead}>{job.summary}</p>
+      <div>
+        <p className={styles.roleDetailHead}>You&apos;ll</p>
+        <ul className={styles.roleDetailList}>
+          {job.responsibilities.map((r) => (
+            <li key={r} className={styles.roleDetailItem}>
+              <span>{r}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div>
+        <p className={styles.roleDetailHead}>We hope</p>
+        <ul className={styles.roleDetailList}>
+          {job.requirements.map((r) => (
+            <li key={r} className={styles.roleDetailItem}>
+              <span>{r}</span>
+            </li>
+          ))}
+        </ul>
+      </div>
+      <div className={styles.roleApply}>
+        <button type="button" className={styles.roleApplyBtn} onClick={onApply}>
+          Apply for this role <span aria-hidden>↓</span>
+        </button>
+      </div>
+    </div>
+  );
+}
+
 /* (`SubmitArrow` lived here — a 24×24 chevron-and-shaft for this form's own
    submit button. The submit is <PillCta> now and brings its own arrow inside
    the closing disc, so the local one went with the button it was drawn for.) */
@@ -482,6 +538,26 @@ function inkBox(el: HTMLElement | null) {
 export default function JoinUs() {
   const [menuOpen, setMenuOpen] = useState(false);
   const [openIdx, setOpenIdx] = useState<number | null>(null);
+  /* ⚠️ STATE AND NOT A REF, AND IT LISTENS RATHER THAN READING ONCE — this
+     decides which subtree renders, so it has to re-render when it changes.
+     A tablet rotated from 834 to 1194 crosses this edge. */
+  const [beside, setBeside] = useState(false);
+  useEffect(() => {
+    const mq = window.matchMedia(BESIDE);
+    const read = () => setBeside(mq.matches);
+    read();
+    mq.addEventListener("change", read);
+    return () => mq.removeEventListener("change", read);
+  }, []);
+
+  /* THE PANE IS NEVER EMPTY. `null` is a real resting state for the
+     accordion — every row closed — but the split has a pane that must be
+     showing something, so crossing INTO it opens the first role. Crossing
+     back out leaves the selection alone: whatever the reader was reading is
+     the row that is open when the accordion returns. */
+  useEffect(() => {
+    if (beside) setOpenIdx((i) => (i === null ? 0 : i));
+  }, [beside]);
   const [position, setPosition] = useState<string>("");
   const [submitted, setSubmitted] = useState(false);
   // name of the CV the applicant picked — referenced in the email body
@@ -1033,9 +1109,6 @@ export default function JoinUs() {
                       />
                     )}
                   </motion.div>
-                  {/* the caption's ground */}
-                  <div className={styles.heroScrim} aria-hidden />
-
                 </motion.div>
               </div>
 
@@ -1074,92 +1147,150 @@ export default function JoinUs() {
                   3.44:1 against the 4.5:1 body minimum. Bracketed
                   right-aligned caps at 40% opacity is the least readable
                   type a page can carry, and this one is an INSTRUCTION: it
-                  is the only thing telling the reader the rows open. */}
-              <Reveal delay={0.1}>
-                <p className={styles.rolesAside}>
-                  Click any role to read the details
-                </p>
-              </Reveal>
+                  is the only thing telling the reader the rows open.
+
+                  IT DOES NOT EXIST ABOVE 900px. The line is an INSTRUCTION,
+                  and in the split arm there is nothing to instruct: the
+                  first role's detail is already open beside the list when
+                  the reader arrives, so the layout has demonstrated itself
+                  before any sentence could describe it. Removed rather than
+                  reworded — a line that narrates what the reader can
+                  already see is the furniture this section keeps shedding.
+                  Below 900px the accordion still needs it, and still has
+                  it. */}
+              {!beside && (
+                <Reveal delay={0.1}>
+                  <p className={styles.rolesAside}>
+                    Click any role to read the details
+                  </p>
+                </Reveal>
+              )}
             </div>
 
-            <ul className={styles.roleList}>
-              {JOBS.map((job, i) => {
-                const isOpen = openIdx === i;
-                return (
-                  /* `i * 0.045`, not `(i % 4) * 0.05`: the modulo restarted
-                     the stagger at row 4, so rows 0/4 and 1/5 began on the
-                     SAME frame — and now that the rows are table-tight,
-                     four of the six cross the viewport threshold together
-                     rather than spread down the screen. */
-                  <Reveal key={job.id} as="li" delay={i * 0.045}>
-                    <div className={styles.roleItem}>
-                      <button
-                        type="button"
-                        className={styles.roleRow}
-                        onClick={() => setOpenIdx(isOpen ? null : i)}
-                        aria-expanded={isOpen}
-                        aria-controls={`role-detail-${i}`}
+            {/* ---- THE INDEX, AND THE TWO SHAPES IT TAKES ----
+                 Below 900px: six rows, each opening in place. Above it: the
+                 six rows hold their column and the detail loads beside them,
+                 so choosing between two roles no longer costs the reader
+                 their place in the list. `beside` picks ONE of the two — not
+                 two subtrees with a `display: none` on the loser, which
+                 would put twelve copies of the detail in the document and
+                 read both to a screen reader. ---- */}
+            <div className={beside ? styles.rolesBodySplit : undefined}>
+              <ul className={styles.roleList}>
+                {JOBS.map((job, i) => {
+                  const isOpen = openIdx === i;
+                  return (
+                    /* `i * 0.045`, not `(i % 4) * 0.05`: the modulo restarted
+                       the stagger at row 4, so rows 0/4 and 1/5 began on the
+                       SAME frame — and now that the rows are table-tight,
+                       four of the six cross the viewport threshold together
+                       rather than spread down the screen. */
+                    <Reveal key={job.id} as="li" delay={i * 0.045}>
+                      <div
+                        className={`${styles.roleItem} ${
+                          beside && isOpen ? styles.roleItemOn : ""
+                        }`}
                       >
-                        <span className={styles.roleTitle}>{job.title}</span>
-                        <span className={styles.roleMeta}>
-                          {job.restaurantName} · {job.location}
-                        </span>
-                        <span className={styles.roleType}>
-                          {job.type} · {job.area}
-                        </span>
-                        <span
-                          className={`${styles.roleChev} ${isOpen ? styles.roleChevOpen : ""}`}
-                          aria-hidden
+                        <button
+                          type="button"
+                          id={`role-row-${i}`}
+                          className={styles.roleRow}
+                          onClick={() => setOpenIdx(beside ? i : isOpen ? null : i)}
+                          /* TWO LAYOUTS, TWO CONTRACTS. The accordion's row
+                             is a disclosure — it owns a region that opens and
+                             closes, so `aria-expanded`. The split's row is a
+                             choice within a set: nothing expands, one of six
+                             is current, so `aria-current` and no
+                             `aria-expanded` at all. Shipping both at once
+                             would promise a reader an expansion that the
+                             layout has no way to perform. */
+                          aria-expanded={beside ? undefined : isOpen}
+                          aria-current={beside && isOpen ? "true" : undefined}
+                          aria-controls={`role-detail-${i}`}
                         >
-                          <Chevron />
-                        </span>
-                      </button>
+                          <span className={styles.roleTitle}>{job.title}</span>
+                          <span className={styles.roleMeta}>
+                            {job.restaurantName} · {job.location}
+                          </span>
+                          {/* two facts, so two objects — the middot was
+                              doing structural work it cannot do. See
+                              `.roleTags` for the type argument. */}
+                          <span className={styles.roleTags}>
+                            <span className={styles.roleTag}>{job.type}</span>
+                            <span className={styles.roleTag}>{job.area}</span>
+                          </span>
+                          <span
+                            className={`${styles.roleChev} ${
+                              beside
+                                ? styles.roleChevSide
+                                : isOpen
+                                  ? styles.roleChevOpen
+                                  : ""
+                            }`}
+                            aria-hidden
+                          >
+                            <Chevron />
+                          </span>
+                        </button>
 
-                      <motion.div
-                        id={`role-detail-${i}`}
-                        initial={false}
-                        animate={{ height: isOpen ? "auto" : 0, opacity: isOpen ? 1 : 0 }}
-                        transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                        style={{ overflow: "hidden" }}
-                      >
-                        <div className={styles.roleDetail}>
-                          <p className={styles.roleDetailLead}>{job.summary}</p>
-                          <div>
-                            <p className={styles.roleDetailHead}>You&apos;ll</p>
-                            <ul className={styles.roleDetailList}>
-                              {job.responsibilities.map((r) => (
-                                <li key={r} className={styles.roleDetailItem}>
-                                  <span>{r}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                          <div>
-                            <p className={styles.roleDetailHead}>We hope</p>
-                            <ul className={styles.roleDetailList}>
-                              {job.requirements.map((r) => (
-                                <li key={r} className={styles.roleDetailItem}>
-                                  <span>{r}</span>
-                                </li>
-                              ))}
-                            </ul>
-                          </div>
-                          <div className={styles.roleApply}>
-                            <button
-                              type="button"
-                              className={styles.roleApplyBtn}
-                              onClick={() => applyFor(job.title, job.restaurantName)}
-                            >
-                              Apply for this role <span aria-hidden>↓</span>
-                            </button>
-                          </div>
-                        </div>
-                      </motion.div>
+                        {!beside && (
+                          <motion.div
+                            id={`role-detail-${i}`}
+                            initial={false}
+                            animate={{ height: isOpen ? "auto" : 0, opacity: isOpen ? 1 : 0 }}
+                            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                            style={{ overflow: "hidden" }}
+                          >
+                            <RoleDetail
+                              job={job}
+                              onApply={() => applyFor(job.title, job.restaurantName)}
+                            />
+                          </motion.div>
+                        )}
+                      </div>
+                    </Reveal>
+                  );
+                })}
+              </ul>
+
+              {/* ALL SIX PANES ARE MOUNTED, FIVE OF THEM INVISIBLE, and that
+                  is the point: the stack's height is the TALLEST role's, so
+                  the pane does not resize under the reader when they move
+                  from a four-line summary to a two-line one. `visibility`
+                  rather than `display` or unmounting, because visibility
+                  still removes the hidden five from the tab order and from
+                  the accessibility tree while keeping their boxes measured. */}
+              {beside && (
+                <div className={styles.rolePanes}>
+                  {JOBS.map((job, i) => (
+                    <div
+                      key={job.id}
+                      id={`role-detail-${i}`}
+                      role="region"
+                      aria-labelledby={`role-row-${i}`}
+                      className={`${styles.rolePane} ${
+                        openIdx === i ? styles.rolePaneOn : ""
+                      }`}
+                    >
+                      {/* The pane has to name what it is showing — the list
+                          beside it can be scrolled past, and a detail with
+                          no title is a column of requirements for an unnamed
+                          job. --t-h2 is the rung between the section title
+                          (--t-display) and the rows (--t-h3), so the three
+                          read as one hierarchy. */}
+                      <h3 className={styles.rolePaneTitle}>{job.title}</h3>
+                      <p className={styles.rolePaneMeta}>
+                        {job.restaurantName} · {job.location} · {job.type}
+                      </p>
+                      <RoleDetail
+                        job={job}
+                        onApply={() => applyFor(job.title, job.restaurantName)}
+                      />
                     </div>
-                  </Reveal>
-                );
-              })}
-            </ul>
+                  ))}
+                </div>
+              )}
+            </div>
           </section>
 
           {/* ---- Application ----
@@ -1442,24 +1573,49 @@ export default function JoinUs() {
                     Send application
                   </PillCta>
 
-                  <AnimatePresence>
-                    {submitted && (
-                      <motion.div
-                        className={styles.successCard}
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.52 }}
-                      >
-                        <strong>Attach your CV, then send.</strong>
-                        Your email client is opening with the application
-                        filled in. The file you chose is named in it but is
-                        not attached - add it before you press send. If no
-                        draft opened, write to careers@mgnhw.com and we&apos;ll get
-                        it either way. We reply within five working days.
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  {/* ── THE LIVE REGION IS THE WRAPPER, NOT THE CARD ──
+                      This whole block used to be the AnimatePresence alone,
+                      with no announcement anywhere on the page: the card
+                      appeared, and an applicant using a screen reader was
+                      told nothing at all — on the one screen where "did that
+                      send?" is the entire question, and where the answer
+                      includes an instruction they MUST act on (the CV is
+                      named in the draft, not attached to it).
+
+                      ⚠️ role/aria-live GO ON A NODE THAT IS ALREADY IN THE
+                      DOM. Putting them on the card itself would look right
+                      and mostly not work: a region that mounts carrying its
+                      own text gives the screen reader nothing to diff
+                      against, so the change is frequently missed entirely.
+                      The wrapper is always rendered and always empty until
+                      `submitted`, which makes the card's arrival a genuine
+                      mutation of an observed region. Contact.tsx's status
+                      paragraph is the same shape for the same reason.
+
+                      `polite` rather than `assertive`: the reader has just
+                      pressed the button themselves, so this confirms an
+                      expected outcome and should wait its turn rather than
+                      interrupt. */}
+                  <div role="status" aria-live="polite">
+                    <AnimatePresence>
+                      {submitted && (
+                        <motion.div
+                          className={styles.successCard}
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.52 }}
+                        >
+                          <strong>Attach your CV, then send.</strong>
+                          Your email client is opening with the application
+                          filled in. The file you chose is named in it but is
+                          not attached - add it before you press send. If no
+                          draft opened, write to careers@mgnhw.com and we&apos;ll get
+                          it either way. We reply within five working days.
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </form>
               </Reveal>
             </div>

@@ -91,51 +91,66 @@
      take a different pair entirely — see the query at the foot of this
      file — because 38vw of a phone is a postage stamp. */
   /* ⚠️ THE SIDES RUN ON --seal-x AND THE BOTTOM ON --enter, AND THE TWO ARE
-     NOT THE SAME RAMP. This is the fix for the plate sitting flush against
-     the bottom of the screen with three hundred pixels of cream still
-     showing either side of it, and the reason it needs two ramps is
-     geometry rather than taste.
+     DELIBERATELY NOT THE SAME NUMBER. The visible bottom edge is `film box
+     top + 125svh − bottom inset`, and BOTH of those terms are moving: the
+     box is climbing while the inset is shrinking. At full bleed the inset
+     must be 0, which puts the box's bottom 25svh BELOW the fold — so the
+     bottom edge has to pass the screen's foot before the plate is sealed,
+     and no single value can drive all four margins. The bottom gets its
+     own, and the point of the split is that the reader must never see a
+     frame with the film flush against the foot and cream still showing
+     either side of it.
 
-     The visible bottom edge is `film box top + 125svh − bottom inset`, and
-     BOTH of those terms are moving: the box is climbing while the inset is
-     shrinking. Working it through, the bottom edge crosses the foot of the
-     screen at approach 0.819 — and that is a constant, independent of
-     --pin-peep, so it does not drift per viewport. It also cannot be
-     deferred: at full bleed the inset must be 0, which puts the box's
-     bottom 25svh BELOW the fold, so the edge has to pass the screen's foot
-     before the plate is sealed. There is no ramp that lands them together.
+     ⚠️ THE NOTE THAT STOOD HERE WAS WRONG, AND THE DEFECT IT INVITED
+     SHIPPED. It said the bottom crosses the foot "at approach 0.819 — and
+     that is a constant, independent of --pin-peep", and sealed the sides
+     at a flat 0.82 to stay ahead of it. The crossing was never a constant:
+     with --enter on its own linear ramp it works out to
+     a_foot = 1.25 − 0.25/holdEnd, and holdEnd moved with the seat per
+     viewport. Measured, the bottom reached the foot at approach 0.692 at
+     1920×1080, 0.725 at 1440×900, 0.375 at 1440×620 — all well before
+     0.82, so every screen showed the forbidden frame after all: 249px of
+     cream a side at 1920×1080, 151px at 1440×900, 455px at 1440×620.
 
-     What can be moved is the SIDES. Sealing them by 0.82 means the plate is
-     already full width at the frame its bottom reaches the foot, so there
-     is never a frame with a flush bottom and inset sides.
+     WHAT HOLDS NOW IS AN IDENTITY, NOT A RACE. Reservations.tsx derives
+     --enter FROM the same eased progress that --seal-x publishes —
+     enter = g · (100a + drop − 125) / drop — so the bottom lands on the
+     foot on the very frame --seal-x reaches 1 (approach GROW_END = 0.90),
+     under any easing and any --card-drop, by construction. The derivation
+     and its guard rails live over `enter` in Reservations.tsx; what this
+     file needs to know is only that the sides and the top spend on
+     --seal-x, the bottom spends on --enter, and the four margins close
+     together — to within a structural 3–5px straggle on the TOP, which
+     arrives at page speed while the other three arrive asymptotically,
+     and therefore lands a frame or two behind them. The ⚠️ over `enter`
+     in Reservations.tsx records the measurement and why that straggle is
+     the floor, not a tuning miss.
 
-     ⚠️ AND THE TOP IS MOVED THE SAME WAY NOW. This note used to end "what
-     follows is a full-width band whose top edge rises the last 18svh —
-     which is the film climbing". That was the argument for leaving the top
-     open, and it was wrong twice over: 18svh of full-width film bled off
-     the bottom with cream along the top alone does not read as a film
-     climbing, it reads as an unfinished edge, and the user rejected it
-     twice. The top now spends --head on --seal-x exactly as the sides spend
-     their clamp, so all four margins reach 0 on one frame. See --head
-     below for why that costs the seated card nothing. */
+     ⚠️ AND THE TOP IS ON --seal-x TOO. An earlier note argued for leaving
+     the top open — "a full-width band whose top edge rises the last 18svh
+     is the film climbing". Wrong twice over: full-width film bled off the
+     bottom with cream along the top alone reads as an unfinished edge, not
+     a climb, and the user rejected it twice. The top spends --head exactly
+     as the sides spend their clamp. See --head below for why that costs
+     the seated card nothing. */
   --side-inset: calc(
     clamp(24px, 38vw, 1000px) * (1 - var(--seal-x, 1)) + var(--pad-x) *
       var(--settle, 0)
   );
 
   /* ══════════ THE STAGE'S HEADROOM ABOVE THE SECTION ══════════
-     ⚠️ THIS IS THE FOURTH MARGIN, AND UNTIL NOW THERE WERE ONLY THREE.
-     --top-inset was `--pad-x * --settle` alone — exactly 0 for the whole of
-     the approach — so the plate's top edge was never an inset at all, only
-     the section's own box climbing, and that box does not reach the
-     viewport's top until approach 1. The sides seal at 0.82 and the bottom
-     crosses the foot at 0.819, so what followed was ~18svh of scrolling
-     with the film full width, bled off the bottom, and carrying a cream
-     band along the TOP alone. That band is the defect. The top has to close
-     WITH the other three, and it cannot do that from inside a box whose own
-     top is still 18svh down the screen — so the box gets headroom.
+     ⚠️ THIS IS THE FOURTH MARGIN, AND UNTIL IT EXISTED THERE WERE ONLY
+     THREE. --top-inset was `--pad-x * --settle` alone — exactly 0 for the
+     whole of the approach — so the plate's top edge was never an inset at
+     all, only the section's own box climbing, and that box does not reach
+     the viewport's top until approach 1. What followed the seal was a run
+     of scrolling with the film full width, bled off the bottom, and
+     carrying a cream band along the TOP alone. That band is the defect.
+     The top has to close WITH the other three, and it cannot do that from
+     inside a box whose own top is still down the screen — so the box gets
+     headroom.
 
-     ⚠️ WHY 18svh, AND IT IS ARITHMETIC RATHER THAN AN AMOUNT SOMEONE LIKED.
+     ⚠️ WHY 10svh, AND IT IS ARITHMETIC RATHER THAN AN AMOUNT SOMEONE LIKED.
      Let `a` be the approach (0 when the section's top is at the viewport's
      bottom, 1 when it reaches the viewport's top). The film travels 1:1
      with the scroll and is never pinned, so the section's top sits at
@@ -147,33 +162,45 @@
                                = [100(1 − a) − head] + head(1 − p)
                                = 100(1 − a) − head·p
 
-     --seal-x reaches 1 at a = 0.82, where 100(1 − a) is 18svh. head = 18svh
-     therefore puts the plate's top edge at exactly 0 on the SAME FRAME the
-     sides seal and the bottom crosses the foot. All four margins close
-     together, which is the entire point of the property.
+     --seal-x reaches 1 at a = GROW_END = 0.90 (Reservations.tsx), where
+     100(1 − a) is 10svh. head = 10svh therefore puts the plate's top edge
+     at exactly 0 on the SAME FRAME the sides seal and the bottom lands on
+     the foot. All four margins close together, which is the entire point
+     of the property — together to within the top's own 3–5px straggle:
+     it arrives at page speed while the others arrive asymptotically, so
+     it lands last by a frame or two, and the note over `enter` in
+     Reservations.tsx records why that cannot be zero and must not be
+     tuned at. (This read 18svh against a seal at 0.82; the identity is
+     unchanged — the endpoint moved when the growth was retimed onto the
+     plate's own screen position rather than the Passage seat.)
 
      ⚠️ AT REST IT MOVES NOTHING, and that is the constraint that mattered
-     most. --seal-x shares --enter's flat first segment — 0 until approach
-     0.58 — so p is 0 for the whole hold, the head term is exactly 0, and
-     the plate's top edge is the section's top edge, where it has always
-     been. The seated frame is untouched at every width. That holds only
-     while the SEAT lands before 0.58, and it cannot land later:
-     Passage.tsx clamps --pin-peep at PEEP_MAX = 0.52 of its stage, so the
-     seat is bounded by construction rather than by measurement. Measured
-     seats anyway, because a bound is not a reading: a = 0.34 at 1920×1080,
-     0.234 at 1440×620, 0.52 at 390×844.
+     most. --seal-x holds a flat 0 until the growth begins — growStart,
+     derived in Reservations.tsx as (210 − drop)/200 so the un-grown
+     plate's centre starts at 57.5% of the screen: 0.550 at drop 100,
+     0.565 under the ≤980px card, floored by the seat and capped at
+     GROW_START_MAX = 0.62 — so p is 0 for the whole hold, the head term
+     is exactly 0, and the plate's top edge is the section's top edge,
+     where it has always been. The seated frame is untouched at every
+     width. That holds only while the SEAT lands before the growth
+     starts, and it cannot land later: Passage.tsx clamps --pin-peep at
+     PEEP_MAX = 0.52, under the derived start's own 0.550 floor, and
+     Reservations.tsx floors the start at seat + MIN_SEAT_HOLD on top of
+     that — bounded twice, by construction rather than by measurement.
+     Measured seats anyway, because a bound is not a reading: a = 0.34 at
+     1920×1080, 0.234 at 1440×620, 0.52 at 390×844.
 
      THE BOTTOM IS UNAFFECTED. The stage grows UPWARD only — see .stage —
      so its bottom edge is still the section's bottom and --bot-inset means
      precisely what it always meant.
 
-     ⚠️ IT IS THE SAME 18svh BELOW 980px, WHICH IS NOT AN OVERSIGHT. The
-     number is derived from --seal-x's 0.82, a position on a JS ramp with no
+     ⚠️ IT IS THE SAME 10svh BELOW 980px, WHICH IS NOT AN OVERSIGHT. The
+     number is derived from GROW_END, a position on a JS ramp with no
      viewport in it — unlike --card-drop below, which is a DISTANCE and
      therefore does get a narrow-screen value. Anything that retunes
-     sealX's 0.82 in Reservations.tsx has to retune this in step: the pair
-     is `head = 100 × (1 − sealEnd)`. */
-  --head: 18svh;
+     GROW_END in Reservations.tsx has to retune this in step: the pair is
+     `head = 100 × (1 − GROW_END)`. */
+  --head: 10svh;
 
   /* ⚠️ THE TOP RUNS ON --seal-x NOW, LIKE THE SIDES, AND NOT ON --settle
      ALONE. THREE terms, and the file's existing rule holds — the approach
@@ -224,7 +251,7 @@
 
    ⚠️ POSITION: ABSOLUTE, NOT RELATIVE, AND THE REASON IS THE SECTION'S BOX.
    `top` applies under either, and relative is the smaller diff — but a
-   relatively positioned stage keeps a 143svh FLOW box inside a 125svh
+   relatively positioned stage keeps a 135svh FLOW box inside a 125svh
    section, and the only thing stopping that from mattering is .section's
    explicit height. Out of flow, the section has no in-flow children at all,
    so its height is its declared 125svh by construction instead of by
@@ -406,7 +433,7 @@
      would paint a dark band along the viewport's own edge. --enter is the
      plate's SIZE (0 = the small card, 1 = full bleed), so the shadow is
      simply the card's own presence: full strength for the whole hold, then
-     spent linearly as the plate opens out, and exactly zero at the frame it
+     spent as the plate opens out, and exactly zero at the frame it
      seals. The default --enter of 1 also means the pre-hydration paint —
      which is full bleed — carries no shadow at all.
 
@@ -440,12 +467,14 @@
   /* ⚠️ IT RIDES --seal-x AND NOT --enter, AND THE DIFFERENCE IS TWO PIXELS
      OF MAROON DOWN BOTH SCREEN EDGES. Both reach 1 at full bleed, so either
      looks right in a still; they do not get there together. --seal-x closes
-     at approach 0.82, which is the frame the plate's four margins all reach
-     zero — from there it IS the viewport, and a shadow cast by something
-     with no edge on the page is a dark rim painted along the screen. --enter
-     runs on to 1.0, so on that ramp the shadow was still at 43% strength
-     across the whole of the last 18svh, measured as a ~2px maroon rim on
-     the left and right edges of an otherwise full-bleed film.
+     at approach GROW_END = 0.90, the frame all four margins reach zero —
+     genuinely all four now that --enter is derived from the same eased
+     progress — and from there the plate IS the viewport: a shadow cast by
+     something with no edge on the page is a dark rim painted along the
+     screen. --enter runs on to 1.0, and when this rode it the shadow was
+     still at 43% strength after the seal (measured under the pre-retime
+     linear ramp), a ~2px maroon rim down both edges of an otherwise
+     full-bleed film.
      ⚠️ TIE THIS TO WHATEVER TERM CLOSES THE PLATE'S MARGINS. If the sides
      ever move to a different ramp, this follows them, not the size. */
   --plate-shade: calc(1 - var(--seal-x, 1));
@@ -492,7 +521,7 @@
     /* ⚠️ --head, NOT 0, AND THIS BRANCH IS THE ONE PLACE THE HEADROOM CAN
        BITE UNNOTICED. The stage overhangs the section's top edge by --head
        (see .stage), so pinning this plate to `top: 0` would seat the film a
-       fifth of a screen ABOVE the section and leave a matching band of bare
+       tenth of a screen ABOVE the section and leave a matching band of bare
        cream along the section's bottom — on a reader who asked for LESS
        motion, i.e. the one branch nobody scrolls through while tuning. The
        three insets are still 0 because the section's other three edges are
@@ -636,11 +665,20 @@
      TWO THINGS FIX IT AND BOTH ARE NEEDED. The extents now exceed the box
      on both axes, so the frame only ever shows the gentle inner part of the
      falloff and there is no edge to see; and the opacity is tied to
-     --enter, so while the plate is a small card there is no scrim at all
+     --seal-x, so while the plate is a small card there is no scrim at all
      and the photograph is clean. It has nothing to do while the card is
      small — the invitation it exists to carry is withheld until the plate
      has sealed (see .cta) — so this costs nothing and removes the last
      frame in which a shape could be read.
+
+     ⚠️ --seal-x, NOT --enter, AND IT USED TO BE --enter. --seal-x is the
+     eased progress that closes the plate's margins, so the wash completes
+     on the very frame the plate seals; --enter runs on past that frame (it
+     is 0.65 at the seal — see its derivation in Reservations.tsx), so
+     riding it meant the film kept darkening through the post-seal tail
+     with a rate change at the seal — a fade finishing after the thing it
+     dresses had stopped moving. The default of 1 is unchanged, so the
+     pre-hydration and no-JS paint — full bleed, full wash — is identical.
 
      ⚠️ IT STILL HAS TO CARRY THE TYPE, which is the constraint the old
      numbers were tuned against: the heading is the only text node on the
@@ -651,7 +689,7 @@
      tint to be rid of the shape entirely without re-measuring: a uniform
      wash heavy enough for the heading is heavy enough to mute the whole
      film, which is the trade the vignette exists to avoid. */
-  opacity: var(--enter, 1);
+  opacity: var(--seal-x, 1);
   background: radial-gradient(
     118% 108% at 50% 52%,
     rgba(18, 0, 0, 0.68) 0%,
@@ -722,8 +760,8 @@
      This was `inset: 0` while .stage was the section box and the two were
      the same rectangle. They are not any more: the stage overhangs the
      section's top by --head, so `inset: 0` would centre the invitation in
-     the 143svh STAGE instead of the 125svh SECTION — lifting it head/2 =
-     9svh up the screen and falsifying every figure in the note below,
+     the 135svh STAGE instead of the 125svh SECTION — lifting it head/2 =
+     5svh up the screen and falsifying every figure in the note below,
      including the one thing that note exists to guarantee (that the block
      crosses the viewport's own centre at the midpoint of the full-bleed
      beat). Offsetting the top by --head makes this box exactly the section

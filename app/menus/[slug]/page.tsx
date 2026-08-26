@@ -1,8 +1,9 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import MenuPage from "@/components/venues/MenuPage";
-import { RESTAURANTS, getRestaurant } from "@/lib/restaurants";
+import { getRestaurant, withMenus } from "@/lib/restaurants";
 import { SITE_URL } from "@/lib/site";
+import { ogImage, OG_W, OG_H } from "@/lib/media";
 import { StructuredData } from "@/lib/StructuredData";
 
 /* ═══ ONE ROUTE PER MENU, WRITTEN AT BUILD TIME ═══
@@ -13,10 +14,16 @@ import { StructuredData } from "@/lib/StructuredData";
  * folder of HTML per answer. /menus/hoodwood is a real
  * out/menus/hoodwood/index.html on Cloudflare's edge.
  *
- * ⚠️ WHICH MEANS THE LIST BELOW IS THE WHOLE ROUTE TABLE. A venue that
- * gains `menuPages` after a deploy has no page until the next build, and a
- * URL not in this list is served by the static 404 — the `notFound()` here
- * only ever fires in development.
+ * ⚠️ WHICH MEANS withMenus() IS THE WHOLE ROUTE TABLE. A venue that gains
+ * `menuPages` after a deploy has no page until the next build, and a URL not
+ * in that list is served by the static 404 — the `notFound()` here only ever
+ * fires in development.
+ *
+ * IT LIVES IN lib/restaurants.ts AND NOT HERE, though it was a private const
+ * in this file until 2026-08-25. app/sitemap.ts needs the same list, and the
+ * copy it would otherwise keep is one that disagrees the first time a venue
+ * gains or loses a menu — which is exactly how all seven of these pages came
+ * to be exported and canonical while missing from the sitemap entirely.
  *
  * ── WHY `/menus/`, NOT `/restaurants/<slug>/menu` ──
  * The nested form reads better and was the first choice. It was dropped on
@@ -32,9 +39,6 @@ import { StructuredData } from "@/lib/StructuredData";
  * Plural `menus` for routes, singular `menu` for assets — different words,
  * no collision, no orphan.
  */
-
-/** the venues that actually have a menu on file — Bunso has none */
-const withMenus = () => RESTAURANTS.filter((r) => r.menuPages?.length);
 
 export function generateStaticParams() {
   return withMenus().map((r) => ({ slug: r.slug }));
@@ -85,10 +89,17 @@ export async function generateMetadata({
         {
           /* the VENUE's photograph, not a menu page. A share card wants the
              room; a 4961x7016 sheet of A4 cropped to 1200x630 is an
-             unreadable band of the middle of a menu. */
-          url: r.image,
-          width: 1200,
-          height: 630,
+             unreadable band of the middle of a menu.
+
+             ⚠️ AND IT IS CROPPED TO THE SIZE DECLARED BELOW, which it was
+             not: `r.image` is the full-resolution source, so /menus/ramo
+             declared images/ramoramen.JPG — 7008x4672, 8.69MB — as a
+             1200x630 card. Over Twitter's 5MB ceiling and twenty-eight
+             times WhatsApp's, i.e. no card at all on the two surfaces a
+             restaurant is shared on most. See ogImage() in lib/media.ts. */
+          url: ogImage(r.image),
+          width: OG_W,
+          height: OG_H,
           alt: `${r.name} — ${r.tagline}`,
         },
       ],

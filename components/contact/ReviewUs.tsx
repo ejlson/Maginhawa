@@ -43,19 +43,6 @@ export default function ReviewUs() {
               Loved your visit? Leave us a Google review.
             </h2>
           </Reveal>
-          <Reveal delay={0.1} className={styles.ledeWrap}>
-            {/* Was right-aligned all-caps in brackets at 0.4 opacity, which
-                measured 3.4:1 against the maroon — the least legible text on
-                the page, and four ragged lines of it. Now it is a sentence
-                that does a job: it says what a card does when you click it.
-                No `aria-hidden` any more either; when it was decorative
-                punctuation that was right, but this is the only place the
-                interaction is explained. */}
-            <p className={styles.lede}>
-              Pick the restaurant you visited and we&apos;ll take you straight
-              there.
-            </p>
-          </Reveal>
         </div>
 
         <Reveal>

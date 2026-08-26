@@ -22,6 +22,7 @@ import Nav from "@/components/layout/Nav";
 import Menu from "@/components/layout/Menu";
 import Footer from "@/components/layout/Footer";
 import DarkZone from "@/components/ui/DarkZone";
+import { gateVideoPlayback } from "@/components/ui/useVisiblePlayback";
 import Reveal from "@/components/ui/Reveal";
 import styles from "./About.module.css";
 /* the native-cursor opt-out that has to travel with every
@@ -492,12 +493,13 @@ export default function About() {
   const videoRef = useRef<HTMLVideoElement>(null);
   const heroVideoRef = useRef<HTMLVideoElement>(null);
   useEffect(() => {
-    /* BOTH FILMS, ONE RULE. The hero's portrait clip was carrying `autoPlay`
-       in the markup, which no preference can reach — it played under
-       prefers-reduced-motion while the backdrop behind it correctly did not,
-       which is the one combination worse than either alone. Neither element
-       autoplays from markup now; both start here, and neither is fetched at
-       all when the preference is set. */
+    /* BOTH FILMS, ONE RULE — FOR STARTING. The hero's portrait clip was
+       carrying `autoPlay` in the markup, which no preference can reach — it
+       played under prefers-reduced-motion while the backdrop behind it
+       correctly did not, which is the one combination worse than either
+       alone. Neither element autoplays from markup now; both start here, and
+       neither is fetched at all when the preference is set.
+       STOPPING IS NOT ONE RULE, and the effect below is where they part. */
     const els = [videoRef.current, heroVideoRef.current].filter(
       (v): v is HTMLVideoElement => !!v,
     );
@@ -511,6 +513,46 @@ export default function About() {
          screen in both cases, so there is nothing to recover */
       void v.play().catch(() => {});
     }
+  }, [reduceMotion]);
+
+  /* ══════════ THE ASIDE STOPS WHEN IT LEAVES; THE BACKDROP CANNOT ══════════
+     NOTHING ABOVE EVER PAUSES. The loop starts both films at mount and the
+     only branch that stops one is the preference — so `about-big.mp4`, a
+     304×380 aside sitting in the FIRST screen, went on decoding for the
+     whole page. MEASURED at 1440×900: 2,900px above the fold and still
+     DECODING, 6,302px above it at the foot. Frame cost 0 — it is decoded and
+     never painted — so the bill is battery and bandwidth, and no rAF probe
+     was ever going to see it.
+
+     THE ASIDE IS `position: absolute` AND TRAVELS WITH THE PAGE, so it is
+     its own honest anchor and the shared gate needs nothing else from it.
+     That gate is the one Reservations' backdrop already runs on
+     (components/ui/useVisiblePlayback.ts) rather than a fourth hand-rolled
+     observer — this page had two of the four.
+
+     ⚠️ THE BACKDROP IS DELIBERATELY NOT GATED, and it is not an oversight
+     that it is missing from this effect. `.heroVideo` is a STICKY 100svh
+     frame: it is pinned to the window by design, so its own box never leaves
+     and an IntersectionObserver on it can only ever report `isIntersecting`.
+     Anchoring it to `.videoScope` instead — the box that does scroll away —
+     compiles and measures as a fix while buying nearly nothing: the scope
+     opens ~900px down, which is inside the gate's own 200px margin at
+     scrollY 0, and it CLOSES below the Awards sheet, so the one stretch that
+     actually wastes a 1440×900 decode (the film running under an opaque
+     sheet) stays exactly as it is. Stopping it there is a decision about
+     where the film's job ends, not a gate that can be dropped in — see the
+     note left with this change.
+
+     ⚠️ ORDER MATTERS, AND IT IS THE DECLARATION ORDER THAT SUPPLIES IT. The
+     effect above has already set `preload = "auto"`, so the gate's warm half
+     re-reads it, finds it promoted and skips its `load()` — which on an
+     element that has just been told to play would re-seek it to zero. Under
+     the preference this returns before observing anything, so the aside is
+     still never fetched. */
+  useEffect(() => {
+    const clip = heroVideoRef.current;
+    if (!clip || reduceMotion) return;
+    return gateVideoPlayback(clip);
   }, [reduceMotion]);
 
   useEffect(() => {
@@ -819,6 +861,25 @@ export default function About() {
                               className={styles.coverageRow}
                             >
                               <span className={styles.coverageRestaurant}>
+                                {/* THE OUTLET AGAIN, AND ONLY THE PHONE EVER
+                                  SEES IT. The wide table gives the outlet a
+                                  column of its own beside the group; stacked
+                                  into one column that column became a header
+                                  line above each entry, and a masthead name
+                                  costs a whole line of a 358px row to say one
+                                  word. Repeated inside the row it shares the
+                                  restaurant tag's line — "MICHELIN GUIDE ·
+                                  BELLY" — and the group header hides.
+
+                                  It is display:none above 720px, so on desktop
+                                  the name is printed once, by the group. Here
+                                  it makes every row self-describing, which is
+                                  also what a screen reader wants out of a link
+                                  that opens someone else's article. */}
+                                <span className={styles.coverageRowOutlet}>
+                                  {group.outlet}
+                                </span>
+
                                 {row.restaurants.map((r, i) => (
                                   <span
                                     key={i}

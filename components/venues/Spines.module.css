@@ -63,7 +63,9 @@
 
 /* ═══ FITTED TO ITS BOX — /restaurants ONLY ══════════════════════════════
    Opt in with `fit` on the component; the home chapter never does, so
-   every number above stands exactly as derived there.
+   every number above stands exactly as derived there — and every number
+   below reproduces those values at h = 75, which is the test each of these
+   expressions was written to pass.
 
    THE PROBLEM THIS SOLVES. The budget at the top of this file spends a
    whole 844px screen. /restaurants renders the list inside `.cards`, a
@@ -93,41 +95,55 @@
              reserves the furniture's strip INSIDE the scroll content, so
              the last band clears the toggle at the end of the travel.
 
-   ── ⚠️ WHY THE COMPRESSION IS NOT THE FIXED −9 HERE ───────────────────
-   This is the part that a smaller band breaks, and it is not obvious.
+   ── ⚠️ THE OPEN BAND IS NOT A FIXED 138 ──────────────────────────────
+   MEASURED: `.more` — two address lines and the hours — is 32px, in every
+   state and at every phone width. The derived 138 hands it 63, so 31 of
+   those 63 are TAIL: empty plate under the copy carrying the gradient.
+   Generous at h = 75 and unaffordable at h = 57, where 63px of growth is
+   more than the whole gutter under the list.
 
-   Above, the seven others pay for the open band's 63px at 63 / 7 = 9px
-   each, so open + 7 × shut = 8 × h and the list's box never changes. That
-   arithmetic holds at ANY h. What does not hold is the CONTENT: `.band` is
+   So the open band is twice the closed band less 12:
+
+     open = 2h − 12     138 at h = 75 — exactly the derived value — and
+                        102 at h = 57, which still leaves the 32px panel
+                        13px of tail.
+
+   The tail now scales with the band instead of being spent before the
+   bands are. That is why the growth is an expression and not `h + 63px`.
+
+   ── ⚠️ AND THE COMPRESSION IS NOT A FIXED −9 ─────────────────────────
+   Above, the seven others pay for the open band's growth G at G / 7 each,
+   so open + 7 × shut = 8 × h and the list's box never changes. That
+   arithmetic holds at any h. What does not hold is the CONTENT: `.band` is
    pinned to h and centres a 49px `.who` in it, so the who-block's bottom —
-   which is where the location line hangs — sits at
+   where the location line hangs — sits at
 
      (h − 49) / 2 + 49  =  (h + 49) / 2
 
-   while a shut band clips at h − 9. The two cross at h = 67. MEASURED at
-   390 × 652, where h comes out 57.2: the shut band was 48.2 tall against a
-   who-block ending at 53.1, and 4.9px of an 11.2px location line — 44% of
-   it — was cut off on all seven while a band was open.
+   which a shut band must not clip. MEASURED at 390 × 652 with the fixed
+   −9 in place: the shut band came out 48.2 tall against a who-block ending
+   at 53.1, and 4.9px of an 11.2px location line — 44% of it — was cut off
+   on all seven while a band was open.
 
-   So the shut height is the LOWER of what the sums want and what the
-   content allows:
+   So the shut height is the LARGER of what the sums want and what the type
+   allows:
 
-     shut = max(h − 9, (h + 49) / 2)
+     shut = max(h − G/7, (h + 49) / 2)
 
-   At h = 75 that is max(66, 62) = 66 — the derived value, unchanged, and
-   the home list is bit-identical whether or not this rule exists. Below
-   h = 67 the second term takes over: the list compresses as far as the
-   type allows and no further.
+   At h = 75, G = 63: max(66, 62) = 66. The derived value, unchanged.
 
-   ⚠️ AND THAT IS WHY THE HEIGHT PIN COMES OFF. Once shut stops being
-   h − 9 the two sums no longer match, so a fixed --spine-list-h would clip
-   the open band instead of the shut ones — the same fault one level up.
-   `height: auto` lets the open state take the ~35px it needs and the SHEET
-   scroll it, which costs nothing structurally here: `.cards` is
+   ── WHAT THAT COSTS, AND WHERE IT IS PAID ────────────────────────────
+   Where the second term wins the two sums no longer match, so the list
+   grows on opening rather than holding still — 16.5px at 390 × 652, which
+   the 19px gutter the sheet reserves under the list absorbs whole. The
+   pin therefore comes off (`height: auto`): a fixed --spine-list-h would
+   clip the open band instead, which is the same fault one level up.
+
+   THE PIN COSTS NOTHING HERE. It is a performance decision — it stops an
+   animated height re-solving the document below the list — and `.cards` is
    `position: absolute; inset: 0` with `overflow-y: auto`, so this list's
-   layout is already sealed off from the document the pin exists to protect
-   (the `contain: layout` above still stands). The CLOSED state — the one
-   the reader is in — is still exactly one screen with every control clear.
+   layout is already sealed off from that document. `contain: layout` above
+   still stands.
 
    ⚠️ SPINE_FOCAL SURVIVES THIS. Those Y values are derived against a
    358 × 75 window, and a SHORTER band cuts a shorter window out of the
@@ -144,12 +160,13 @@
     (100svh - var(--spine-chrome, 0px) - 7 * var(--spine-gap)) / 8,
     75px
   );
-  --spine-open-h: calc(var(--spine-h) + 63px);
-  /* the 49px is `.who`'s --who-h. Two spellings of one number, and the
-     only reason it is not a custom property read from there is that .who
-     is declared BELOW this rule on a descendant — it cannot be read up. */
+  --spine-open-h: calc(var(--spine-h) * 2 - 12px);
+  /* the 49px is `.who`'s --who-h, and the 12px is the open band's above.
+     Two spellings of each, and the only reason neither is read from its
+     own declaration is that both sit BELOW this rule on descendants — a
+     custom property cannot be read up the tree. */
   --spine-shut-h: max(
-    calc(var(--spine-h) - 9px),
+    calc(var(--spine-h) - (var(--spine-h) - 12px) / 7),
     calc((var(--spine-h) + 49px) / 2)
   );
   height: auto;

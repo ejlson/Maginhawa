@@ -85,7 +85,8 @@ const textFace = Figtree({
 export const metadata: Metadata = {
   metadataBase: new URL(SITE_URL),
   title: {
-    default: "Maginhawa Group — Filipino, Filipino-Japanese & Caribbean restaurants in London",
+    default:
+      "Maginhawa Group — Filipino, Caribbean, Pan-Asian & Japanese Restaurants by Chef Omar Shah",
     template: "%s — Maginhawa Group",
   },
   description:
@@ -133,7 +134,8 @@ export const metadata: Metadata = {
   openGraph: {
     type: "website",
     siteName: "Maginhawa Group",
-    title: "Maginhawa Group — London's Filipino, Filipino-Japanese & Caribbean restaurants",
+    title:
+      "Maginhawa Group — Filipino, Caribbean, Pan-Asian & Japanese Restaurants by Chef Omar Shah",
     description:
       "A London family of restaurants featured in The Times, Time Out, BBC Good Food, Forbes and Evening Standard. Home to Belly (Michelin Guide), Café Mama & Sons, Mamasons and more.",
     url: SITE_URL,
@@ -149,7 +151,8 @@ export const metadata: Metadata = {
   },
   twitter: {
     card: "summary_large_image",
-    title: "Maginhawa Group — London Restaurants",
+    title:
+      "Maginhawa Group — Filipino, Caribbean, Pan-Asian & Japanese Restaurants by Chef Omar Shah",
     description:
       "Belly (Michelin Guide), Café Mama & Sons, Mamasons, Bintang, Guanabana, Ramo Ramen and Hoodwood.",
     images: ["/og/maginhawa-og.jpg"],

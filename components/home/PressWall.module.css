@@ -209,8 +209,8 @@
   color: var(--maroon);
   /* THE PRESS INK — the one colour all the masked marks paint in (see
      .logo below). One step deeper than --maroon so it reads as an INK
-     beside the type rather than as the brand colour repeated thirteen
-     times; Michelin is exempt and keeps its red. */
+     beside the type rather than as the brand colour repeated twelve
+     times; Michelin and The Independent are exempt and keep their red. */
   --press-ink: color-mix(in srgb, var(--maroon) 82%, #000);
 }
 
@@ -509,20 +509,29 @@
   height: calc(var(--press-base) * var(--s, 1));
 }
 
-/* ── MICHELIN KEEPS ITS RED AND NOTHING ELSE, at the user's instruction ──
-   The flower IS the credential, so this is the one mark exempt from the
-   ink below. It is NOT exempt from the lane's size: it sat at x1.18 on top
-   of its scale (≈26px against the lane's 22) for one pass and the boost is
-   removed as visually inert — Michelin is a compact near-square among
-   thirteen wide wordmarks, so extra HEIGHT reads as a slightly bigger
-   square rather than as emphasis, while costing the lane its one common
-   x-height. The colour alone carries the accent, which is the thing a
-   reader actually notices.
+/* ── THE RED MARKS KEEP THEIR COLOUR, at the user's instruction ──
+   Michelin's flower and The Independent's eagle are the two exemptions
+   from the ink below: in both the red IS the credential, and it is the
+   only colour left in the lane that a reader recognises before they have
+   read the name.
 
-   The seat hook is data-mark="michelin" (set in PressWall.tsx, where the
-   same test picks the raw <img> branch — the exemption is one condition in
-   two places; keep them agreeing). */
-.logoSeat[data-mark="michelin"] .logo {
+   NEITHER IS EXEMPT FROM THE LANE'S SIZE. Michelin sat at x1.18 on top of
+   its scale (≈26px against the lane's 22) for one pass and the boost is
+   removed as visually inert — it is a compact near-square among thirteen
+   wide wordmarks, so extra HEIGHT reads as a slightly bigger square rather
+   than as emphasis, while costing the lane its one common x-height. The
+   colour alone carries the accent, which is the thing a reader actually
+   notices — and that is the argument that extends the exemption to The
+   Independent without extending any size boost with it.
+
+   ⚠️ ALL FOUR DECLARATIONS BELONG TOGETHER. Three of them undo the ink;
+   `opacity: 1` undoes the step back, because .logo rests at 0.85 and a
+   full-colour mark left at 0.85 is a washed red, not the file's red.
+
+   The seat hook is data-colour="own" (set in PressWall.tsx from
+   FULL_COLOUR, where the same test picks the raw <img> branch — the
+   exemption is one condition in two places; keep them agreeing). */
+.logoSeat[data-colour="own"] .logo {
   background-color: transparent;
   -webkit-mask: none;
   mask: none;
@@ -648,7 +657,7 @@
    venue-card logos use. No filter chain can do this: the sources are
    rasters with fourteen different baked-in colours and no shared channel
    but alpha. 0.85 alpha is the "ink, not sticker" step back into the
-   page; Michelin is exempt above and keeps full colour.
+   page; the two red marks are exempt above and keep full colour.
 
    ⚠️ A MASKED SPAN HAS NO INTRINSIC SIZE — `aspect-ratio: var(--ar)`
    (the embedded PNG's measured w/h from lib/press.ts) is what gives the
@@ -660,8 +669,11 @@
    22 it is 343px and the widest mark (The Independent, aspect 10.29 x
    seat 31.7px = 326px) clears it by 17px. Re-check on any base change:
    this cap has silently shrunk a mark before (see the note above).
-   `object-fit: contain` is inert on the spans and kept for the one
-   <img> in the lane (Michelin). */
+   `object-fit: contain` is inert on the spans and kept for the two raw
+   <img>s in the lane (Michelin and The Independent). Note that The
+   Independent is on BOTH lists — the cap's tightest mark and now a raw
+   <img> — so the cap is the thing to re-measure if that seat ever looks
+   short of its neighbours. */
 .logo {
   height: 100%;
   aspect-ratio: var(--ar, auto);

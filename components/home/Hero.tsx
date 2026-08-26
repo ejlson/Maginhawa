@@ -2,6 +2,7 @@
 
 import {
   motion,
+  useMotionValueEvent,
   useReducedMotion,
   useScroll,
   useTransform,
@@ -114,6 +115,59 @@ export default function Hero({ started }: { started: boolean }) {
   }, []);
   const lockupY = useTransform(scrollY, [0, vh], [0, -vh * 0.18], {
     clamp: true,
+  });
+
+  /* ══════════ THE FILM STOPS DECODING ONCE IT IS COVERED ══════════
+     ⚠️ A SCROLL GATE, NOT AN IntersectionObserver, BECAUSE THIS SECTION IS
+     STICKY UNDER THE WHOLE DOCUMENT. .hero is `position: sticky; top: 0;
+     z-index: 0` — it sits across y 0..100vh for the entire page and the
+     chapters above simply paint over it, so it INTERSECTS the viewport at
+     every scroll position and an observer on it never fires. "Covered" here
+     is a scroll depth: past one viewport of travel .afterHero overlaps the
+     hero completely and no pixel of either clip can be seen.
+
+     WHAT THIS BUYS IS NOT THE HERO'S OWN FRAME RATE — IT IS EVERY SECTION
+     BELOW IT. A <video> that is painted over still DECODES, so a reader
+     three screens down was paying for the hero's clip plus whichever film
+     they were actually looking at. Measured on the Reservations growth
+     window (1440×900, headful): 30.7fps with the hero decoding, 119.3fps
+     with it paused, flipped four times in one session with controls — two
+     concurrent decodes are fine on that machine, three are not.
+
+     ⚠️ THE TWO THRESHOLDS ARE HYSTERESIS, NOT SLOP. Pause when the scroll
+     passes 1.15 × vh (cover completes at 1.0 — the margin is for seams and
+     fractional viewports), resume when it comes back under 0.9 × vh, and a
+     reader parked between the two keeps whichever state they arrived with —
+     otherwise a wheel tick at the boundary strobes play/pause. The ref is a
+     LATCH for the same reason: play() and pause() run on the crossings
+     only, never per scroll frame. The 0.1vh of hero that can peek before
+     the resume lands is one still frame at the screen's edge mid-flick;
+     what the reader parks on at the top is always running film.
+
+     ⚠️ IT CANNOT FIRE DURING THE LOADER'S HAND-OFF, BY CONSTRUCTION. The
+     intro plays out with the scroll pinned at 0, a full viewport below the
+     pause threshold — and this gate touches only the <video> elements. The
+     .zoom wrapper that registerIntroFilm hands to lib/introWindow.ts, and
+     the WAAPI transform the intro runs on it, are not involved.
+
+     ⚠️ THE CLIP CAROUSEL STALLS WHILE PAUSED, AND THAT IS ACCEPTED. A
+     paused clip never fires `ended`, so the cut waits for the reader to
+     come back — who was, by definition, not looking. Only the ACTIVE clip
+     is resumed: the other is either un-fetched (preload="none" — resuming
+     it would START a download) or mid-carousel, and advance() starts it
+     itself when its turn comes. warmNext degrades the same way: pausing
+     before WARM_AT defers the second clip's fetch until the reader is next
+     at the top, a deferral rather than a loss. */
+  const covered = useRef(false);
+  useMotionValueEvent(scrollY, "change", (y) => {
+    if (!covered.current && y > vh * 1.15) {
+      covered.current = true;
+      for (const v of videoRefs.current) v?.pause();
+    } else if (covered.current && y < vh * 0.9) {
+      covered.current = false;
+      const active = videoRefs.current[clip];
+      if (active) void active.play().catch(() => {});
+    }
   });
 
   /* the second clip's fetch, started WARM_AT seconds into the first — see the

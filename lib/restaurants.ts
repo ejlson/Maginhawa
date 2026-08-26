@@ -250,6 +250,24 @@ export const getRestaurant = (slug: string) =>
   RESTAURANTS.find((r) => r.slug === slug);
 
 /**
+ * The venues that actually have a menu on file — Bunso has none.
+ *
+ * ⚠️ THIS IS THE /menus ROUTE TABLE, AND IT NOW HAS EXACTLY ONE DEFINITION.
+ * It lived as a private const inside app/menus/[slug]/page.tsx, whose banner
+ * calls its output "the whole route table" — true, and the reason it could
+ * not stay private: app/sitemap.ts has to list the same pages, and a second
+ * copy of this filter is a list that silently disagrees the first time a
+ * venue gains or loses `menuPages`. That is not hypothetical, it is how the
+ * seven menu pages came to be exported, linked and canonical while being
+ * absent from the sitemap entirely.
+ *
+ * Both callers now read this, so a venue moves in both places on one build
+ * or in neither.
+ */
+export const withMenus = (): Restaurant[] =>
+  RESTAURANTS.filter((r) => r.menuPages?.length);
+
+/**
  * THE ONE THING A READER CAN DO FROM A TILE, chosen by what the venue is.
  *
  * The grid used to hand an inline pill only to the four rooms that take

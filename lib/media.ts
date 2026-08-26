@@ -179,3 +179,49 @@ export function asset(path: string | undefined, opts: AssetOptions = {}): string
   // no extension: naming a format is what would stop f_auto negotiating one
   return `https://res.cloudinary.com/${CLOUD}/image/upload/${t.join(",")}/${publicId(path)}`;
 }
+
+/** The 1200x630 share card for a photograph that is not shaped like one. */
+export const OG_W = 1200;
+export const OG_H = 630;
+
+/* ── THE SHARE CARD FOR AN ARBITRARY PHOTOGRAPH ────────────────────────────
+   app/layout.tsx already tells this story for the SITE card, and the short
+   version is: every `openGraph` block on this site declares
+   `width: 1200, height: 630` while pointing at a portrait photograph.
+   images/bintang.jpg is 1614x2421 — an aspect of 0.67:1, described to every
+   platform as a 1.91:1 landscape. The declared numbers are what the card is
+   laid out against BEFORE the bytes arrive, so the shape is wrong wherever
+   it renders, and `summary_large_image` in particular wants 2:1.
+
+   The root layout solved its own case by hand-cropping one file to
+   `public/og/maginhawa-og.jpg`. That does not scale to eight venues, and the
+   per-page blocks were left pointing at the raw photographs — which is also
+   how images/ramoramen.JPG, at 7008x4672 and 8.69MB, became the declared
+   share card for /menus/ramo. WhatsApp does not fetch a preview over
+   roughly 300KB and Twitter caps at 5MB, so the heaviest cards render as
+   nothing at all rather than as the wrong shape.
+
+   ⚠️ `c_fill` IS THE ONE THAT CROPS; `c_limit` WOULD NOT. c_limit only ever
+   shrinks within the box and preserves aspect, which is right for a photo
+   on a page and useless here — it would return a 1200x1800 portrait and
+   leave the declaration lying exactly as before. c_fill fills the stated box
+   and discards what does not fit, and `g_auto` is what chooses WHAT it
+   discards: Cloudinary's content-aware gravity keeps the subject rather than
+   the geometric centre, which on a portrait of a dining room is the
+   difference between the table and a band of ceiling.
+
+   ── THE UNCONFIGURED BRANCH RETURNS THE SITE CARD, NOT THE PHOTOGRAPH ──
+   Everything else in this file degrades to "the path you gave me", because
+   the local file is a correct if unoptimised answer. Here it is not: the
+   local file is the portrait whose shape is the defect, so handing it back
+   would preserve the bug in the one branch that cannot be measured. The
+   hand-cropped site card is genuinely 1200x630, so an unconfigured build
+   gets a correctly-shaped card of the group rather than a mis-shaped one of
+   the venue. Less specific, still true. */
+export function ogImage(path: string | undefined): string {
+  if (!path || !CLOUD || isRemote(path) || kindOf(path) !== "image") {
+    return "/og/maginhawa-og.jpg";
+  }
+  const t = ["f_auto", "q_auto", `w_${OG_W}`, `h_${OG_H}`, "c_fill", "g_auto"];
+  return `https://res.cloudinary.com/${CLOUD}/image/upload/${t.join(",")}/${publicId(path)}`;
+}

@@ -1,7 +1,7 @@
 "use client";
 
 import Link from "next/link";
-import { useEffect, useState } from "react";
+import { useEffect, useRef, useState } from "react";
 import styles from "./CookieBanner.module.css";
 import {
   analyticsConfigured,
@@ -75,6 +75,51 @@ export default function CookieBanner() {
     return subscribeConsent(setLocal);
   }, []);
 
+  /* ── THE CARD PUBLISHES THE STRIP IT OCCUPIES, AS `--consent-h` ──
+   * It is `position: fixed`, so it is outside every page's flow and no
+   * layout can see it. On most routes that is fine — the content underneath
+   * scrolls and the reader passes it. On the 404 it was not: that page's
+   * doors are its ONLY navigation and they sit on the bottom edge, so on a
+   * phone, where this card is full-bleed, it buried two of the five exits at
+   * 375x812 and all five in landscape. app/not-found.module.css reserves
+   * this value under the doors.
+   *
+   * The number is the card's height PLUS its gap to the bottom of the
+   * window, i.e. the whole strip it makes unusable, not just its box.
+   *
+   * ⚠️ THE EFFECT IS DECLARED HERE, ABOVE THE EARLY RETURNS BELOW, because
+   * hooks cannot live after a conditional return. It therefore also runs on
+   * the renders where the card is NOT drawn — which is what removes the
+   * property again the moment consent is given or the × is pressed. The
+   * fallback in the consuming rule is 0px, so a route that reserves space
+   * for this reserves nothing when the card is gone.
+   *
+   * The observer watches the CARD and writes to the ROOT — two different
+   * elements, so expanding Preferences re-measures without feeding itself. */
+  const cardRef = useRef<HTMLElement | null>(null);
+  useEffect(() => {
+    const root = document.documentElement;
+    const card = cardRef.current;
+    if (!card) {
+      root.style.removeProperty("--consent-h");
+      return;
+    }
+    const publish = () => {
+      const box = card.getBoundingClientRect();
+      const strip = box.height + Math.max(0, window.innerHeight - box.bottom);
+      root.style.setProperty("--consent-h", `${Math.ceil(strip)}px`);
+    };
+    publish();
+    const ro = new ResizeObserver(publish);
+    ro.observe(card);
+    window.addEventListener("resize", publish);
+    return () => {
+      ro.disconnect();
+      window.removeEventListener("resize", publish);
+      root.style.removeProperty("--consent-h");
+    };
+  }, [ready, dismissed, consent, showPrefs]);
+
   if (!consentRequired) return null;
   if (!ready) return null;
   /* ⚠️ needsAsking, NOT `consent !== null`. A stored record does not mean
@@ -102,7 +147,12 @@ export default function CookieBanner() {
     });
 
   return (
-    <aside className={styles.banner} role="region" aria-label="Cookie choices">
+    <aside
+      ref={cardRef}
+      className={styles.banner}
+      role="region"
+      aria-label="Cookie choices"
+    >
       {/* ⚠️ THE × WRITES NO CONSENT. It records only that this visitor has
           been asked, in session storage, so the banner does not reappear on
           the next route change. Nothing is enabled and nothing is refused.

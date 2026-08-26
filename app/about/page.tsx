@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import About from "@/components/about/About";
 import { SITE_URL } from "@/lib/site";
+import { ogImage, OG_W, OG_H } from "@/lib/media";
 import { StructuredData } from "@/lib/StructuredData";
 
 const jsonLd = {
@@ -27,9 +28,13 @@ export const metadata: Metadata = {
     url: "/about",
     images: [
       {
-        url: "/images/bintang.jpg",
-        width: 1200,
-        height: 630,
+        /* CROPPED TO THE DECLARATION, not merely pointed at. This read
+           `/images/bintang.jpg` with these same numbers under it — a
+           1614x2421 portrait described to every platform as a 1.91:1
+           landscape. See ogImage() in lib/media.ts. */
+        url: ogImage("/images/bintang.jpg"),
+        width: OG_W,
+        height: OG_H,
         alt: "Maginhawa Group origin story",
       },
     ],

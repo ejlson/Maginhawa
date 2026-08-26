@@ -125,17 +125,22 @@
 
    ⚠️ SO THE CURVE IS NOT A TASTE DECISION, it is a reading of that table,
    and --ease-fuse below is written against it: the contact at p = 0.21 is
-   held back to 55% of the duration so the approach is the long, quiet part
-   and the fuse is the fast one, which is the order surface tension does it
-   in. Change --cta-gap or --cta-h enough to move p(contact) and the curve
-   wants re-fitting — the fuse would land early and read as a stumble.
+   held back to 43.1% of the duration so the approach is the long, quiet
+   part and the fuse is the fast one, which is the order surface tension
+   does it in. Change --cta-gap or --cta-h enough to move p(contact) and
+   the curve wants re-fitting — the fuse would land early and read as a
+   stumble.
 
    .large ALREADY MOVES IT, AND THAT IS THE TOLERANCE. p(contact) is
    gap / (gap + h), so the 52px body against the same gap contacts at
-   p = 0.163 rather than 0.213 — measured at 48% of the duration instead of
-   55%. Seven points early, the fuse still strictly after the touch, and it
-   does not read as anything. Roughly: the curve holds while p(contact)
-   stays inside 0.15–0.28, and --cta-gap is the knob that puts it back. */
+   p = 0.163 rather than 0.213 — measured, against the PREVIOUS fit, at
+   48% of the duration instead of that fit's 55%. Those two figures belong
+   to the old time axis; the seven-points-early relationship they record
+   is the curve's own and carries over to the re-mapped one — the re-map
+   moves both landings in the same breath, the fuse stays strictly after
+   the touch, and it does not read as anything. So the tolerance stands
+   unchanged: the curve holds while p(contact) stays inside 0.15–0.28,
+   and --cta-gap is the knob that puts it back. */
 
 /* THE HOST — the magnet's measuring box, and it is NEVER transformed. Its
    border rect is the control's REST rectangle however far the pill has
@@ -257,8 +262,35 @@
      than its own number, so a future retune of the site's register carries
      the CTA with it instead of leaving it behind. The 700ms floor still
      stands underneath: going back BELOW it is still the edit this comment
-     says not to make with a bare number. */
-  --cta-dur: var(--dur-drawer);
+     says not to make with a bare number.
+
+     ── --dur-slow NOW, i.e. 620ms — AND THE CURVE MOVED WITH IT ──
+     At the user's instruction (the merge read as sluggish, and it was the
+     approach: 523ms of the 950 before anything touched anything). This
+     pass IS the different edit the 700ms note above demands — the curve
+     was re-fitted, not the number retyped. linear() is normalised, so a
+     bare 620 would have shrunk all four stages by the same third and left
+     the relax ~99ms, under the ~112ms the 700 fit held it at. Instead the
+     TIME AXIS was re-mapped piecewise: every progress value in the curve
+     below is exactly what it was — geometry, d(p) table and overshoot all
+     untouched — only the timestamps moved, taking clock out of the
+     approach and handing every stage after contact slightly more of a
+     shorter total:
+       approach   0 → 43.1%   267ms   (was 523ms at 950; 385ms at 700)
+       fuse    43.1 → 74.1%   192ms   (was 238ms;        175ms)
+       relax   74.1 → 94.8%   128ms   (was 152ms;        112ms)
+       settled 94.8 → 100%     32ms   (was  38ms;         28ms)
+     Read the parentheses: the total is BELOW the old 700ms "floor", yet
+     every post-contact stage holds MORE clock than the 700ms fit gave it.
+     Only the approach pays. That is why this is legal where a bare
+     `--cta-dur: 620ms` was not — the floor was a fact about a FIXED
+     curve. The thing it protected was the relax's absolute milliseconds,
+     and at 128ms the relax has more of them than it did at 700, so the
+     floor no longer applies as stated. The prohibition survives in its
+     new form: the next request for a faster merge moves the stage
+     boundaries again — the approach gives up more of its own — and does
+     not simply type a smaller number here. */
+  --cta-dur: var(--dur-slow);
 
   /* ── THE FUSION CURVE ──
      Two droplets do not meet at a constant speed. They drift, they touch,
@@ -269,14 +301,24 @@
      overshoot, so this is a linear() sampling of that curve, fitted to the
      table in the header comment:
 
-       0 → 55%    the approach. 21% of the distance in 55% of the time,
-                  accelerating gently the whole way, so the cells read as
-                  drawn together rather than driven. Contact lands at 55%.
-       55 → 80%   the fuse. Peak speed at ~72%, roughly six times the
-                  approach's. The neck opens and closes inside this window.
-       80 → 96%   the relax, overshooting to 1.019 — which is ~0.9px of the
-                  right cap standing proud of the disc before it draws in.
-       96 → 100%  settled.
+       0 → 43.1%    the approach. 21% of the distance in 43.1% of the
+                    time, accelerating gently the whole way, so the cells
+                    read as drawn together rather than driven. Contact
+                    lands at 43.1% now, not the 55% of the first fit.
+       43.1 → 74.1% the fuse. Peak speed at ~65%, roughly four times the
+                    approach's — the ratio narrowed in the re-fit,
+                    because the approach is where the clock came from.
+                    The neck opens and closes inside this window.
+       74.1 → 94.8% the relax, overshooting to 1.019 — which is ~0.9px of
+                    the right cap standing proud of the disc before it
+                    draws in.
+       94.8 → 100%  settled.
+
+     THE RE-MAP WAS PIECEWISE, AND ON THE TIME AXIS ONLY (see the duration
+     note above): every progress value below is the 55/80/96 fit's own,
+     which is why the d(p) table in the header comment is still exact to
+     the digit — contact is still the same 21% of the distance, it simply
+     arrives twelve points sooner on the clock.
 
      ⚠️ THE OVERSHOOT IS SAFE ON THE JOIN, and this is not luck. Every one
      of the three moves is start + p × (end − start) off this SAME curve,
@@ -291,27 +333,27 @@
      nothing away from them; the header comment says what re-fits it. */
   --ease-fuse: linear(
     0,
-    0.006 5%,
-    0.016 10%,
-    0.03 15%,
-    0.046 20%,
-    0.064 25%,
-    0.083 30%,
-    0.103 35%,
-    0.124 40%,
-    0.147 45%,
-    0.174 50%,
-    0.212 55%,
-    0.275 60%,
-    0.372 65%,
-    0.5 70%,
-    0.648 75%,
-    0.788 80%,
-    0.898 85%,
-    0.968 90%,
-    1.011 94%,
-    1.019 96%,
-    1.004 98%,
+    0.006 3.9%,
+    0.016 7.8%,
+    0.03 11.8%,
+    0.046 15.7%,
+    0.064 19.6%,
+    0.083 23.5%,
+    0.103 27.4%,
+    0.124 31.3%,
+    0.147 35.3%,
+    0.174 39.2%,
+    0.212 43.1%,
+    0.275 49.3%,
+    0.372 55.5%,
+    0.5 61.7%,
+    0.648 67.9%,
+    0.788 74.1%,
+    0.898 80.6%,
+    0.968 87%,
+    1.011 92.2%,
+    1.019 94.8%,
+    1.004 97.4%,
     1
   );
   /* THE TWO COLOURS ARE THE ONLY THING A CONSUMER MAY VARY, and only one
@@ -520,14 +562,19 @@
    ── AND THE ARROW STILL WAITS ──
    It steps forward at 74% of the close — after the neck has snapped shut
    and while the merged body is still relaxing, so the sequence reads
-   join-then-point rather than two unrelated things moving at once.
+   join-then-point rather than two unrelated things moving at once. The
+   0.74 predates the re-fit and is deliberately unchanged by it, but the
+   re-fit moved the fuse underneath it: the multiplier used to land
+   mid-fuse and now sits almost exactly on the fuse's own end (74.1%), so
+   join-then-point is more literally true than it was when the number was
+   chosen. Only the absolute wait moved with the clock: 703ms → 459ms.
 
    ⚠️ THE DELAY IS DECLARED HERE, IN THE HOVER STATE, AND THAT IS WHAT
    MAKES THE EXIT RIGHT. A transition reads its timing from the state it is
-   heading TO, so the forward move is delayed by three quarters of a second
-   and the return — heading back to `.arrow`'s own rule, which carries no
-   delay — is immediate. Move it into the base rule and the arrow hangs
-   there for three quarters of a second after the pointer has gone. */
+   heading TO, so the forward move is delayed by those 459ms and the
+   return — heading back to `.arrow`'s own rule, which carries no delay —
+   is immediate. Move it into the base rule and the arrow hangs there for
+   nearly half a second after the pointer has gone. */
 .cta:hover .body,
 .cta:focus-visible .body,
 [data-cta-hover]:hover .body {

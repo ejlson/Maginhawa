@@ -122,6 +122,20 @@ const MARKS = ORDER.map((name) =>
   FEATURED_OUTLETS.find((o) => o.name === name),
 ).filter((o): o is NonNullable<typeof o> => Boolean(o?.logo));
 
+/* ── THE MARKS THAT KEEP THEIR OWN COLOUR, at the user's instruction ──
+   Two of the fourteen carry RED in the file and the red is the thing a
+   reader recognises: Michelin's flower, and The Independent's eagle
+   (#E60004 in its palette, against a black wordmark). Both are exempt
+   from the ink below and render on the raw <img> path; the other twelve
+   are masked spans in one ink.
+
+   ⚠️ THIS SET IS HALF OF A PAIR. The stylesheet's exemption keys off
+   data-colour="own", written from this same test a few lines down — two
+   places, one condition, and they have to keep agreeing. Names must match
+   FEATURED_OUTLETS exactly (a typo here silently inks the mark instead of
+   erroring). */
+const FULL_COLOUR = new Set<string>(["Michelin Guide", "The Independent"]);
+
 export default function PressWall() {
   /* ── THE INK'S GATE — the journal's three-latch pattern, cut to one ──
      `inked` never comes back off (scrolling away and returning must not
@@ -202,7 +216,7 @@ export default function PressWall() {
               <li
                 key={`${copy}-${outlet.name}`}
                 className={styles.logoSeat}
-                data-mark={outlet.name === "Michelin Guide" ? "michelin" : undefined}
+                data-colour={FULL_COLOUR.has(outlet.name) ? "own" : undefined}
                 style={
                   {
                     "--s": outlet.scale ?? 1,
@@ -241,15 +255,17 @@ export default function PressWall() {
                     background-color is the ink, masked by the mark's own
                     alpha (see .logo in the stylesheet).
 
-                    MICHELIN KEEPS ITS RED, at the user's instruction — the
-                    flower is the credential — so that one mark stays on the
-                    raw <img> path below. Two branches in one map is honest
-                    and cheaper than a filter chain.
+                    TWO MARKS KEEP THEIR RED, at the user's instruction —
+                    Michelin's flower and The Independent's eagle, where the
+                    red IS the credential — so those two stay on the raw
+                    <img> path below (see FULL_COLOUR at the top of the
+                    file). Two branches in one map is honest and cheaper
+                    than a filter chain.
 
                     The mask/img sources still route through asset(), which
                     returns .svg paths untouched — origin-served, never
                     /_next/image, static-export safe. */}
-                {outlet.name === "Michelin Guide" ? (
+                {FULL_COLOUR.has(outlet.name) ? (
                   /* eslint-disable-next-line @next/next/no-img-element */
                   <img
                     className={styles.logo}
@@ -268,7 +284,7 @@ export default function PressWall() {
                        viewport check, so it would defer and then pop into a
                        lane that is supposed to be seamless. `fetchPriority`
                        changes only the ORDER — the mark still loads
-                       eagerly, behind the things on screen. (The thirteen
+                       eagerly, behind the things on screen. (The twelve
                        masked marks load via CSS mask-image, which the
                        browser fetches lazily by its own rules; they share
                        the same origin path.) */
