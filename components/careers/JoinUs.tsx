@@ -1033,9 +1033,6 @@ export default function JoinUs() {
                       />
                     )}
                   </motion.div>
-                  {/* the caption's ground */}
-                  <div className={styles.heroScrim} aria-hidden />
-
                 </motion.div>
               </div>
 

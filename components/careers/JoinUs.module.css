@@ -193,7 +193,7 @@
      one measured offset from it rather than an offset plus whatever padding
      `.hero` happens to carry.
      Safe to position — every absolute box already inside the hero
-     (`.heroFrame`, `.heroPan`, `.heroScrim`) resolves to `.heroBand` or to
+     (`.heroFrame`, `.heroPan`) resolves to `.heroBand` or to
      `.heroFrame`, both of which are positioned and both of which are nested
      deeper than this. Nothing re-parents. */
   position: relative;
@@ -386,27 +386,13 @@
   user-select: none;
 }
 
-/* THE SCRIM STAYS, WITHOUT THE CAPTION IT WAS DRAWN FOR. It was built to
-   make the bottom-right corner reliably dark enough for cream type; the type
-   has moved out (see `.heroStand`), and the gradient is kept because it is
-   also what seats the photograph's bottom-right corner against the cream
-   page — this frame of video is bright there, and without it the picture's
-   corner glares against the paper. It is now a light fall-off rather than a
-   contrast device, so it could be lightened; it is left alone because
-   probe-join-caption.mjs's numbers were taken with it and changing it in the
-   same pass would make the before/after unreadable. Flagged. */
-.heroScrim {
-  position: absolute;
-  inset: 0;
-  pointer-events: none;
-  background: linear-gradient(
-    to top left,
-    rgba(16, 0, 0, 0.72) 0%,
-    rgba(16, 0, 0, 0.46) 18%,
-    rgba(16, 0, 0, 0.12) 38%,
-    rgba(16, 0, 0, 0) 56%
-  );
-}
+/* THE SCRIM IS GONE. It was drawn to make the bottom-right corner dark
+   enough for cream type, the type moved out to `.heroStand`, and what was
+   left was a corner gradient reaching 56% across the diagonal — read from
+   the outside as a dark border around the film rather than as a fall-off.
+   The band is footage now, not a photograph waiting for a caption, and it
+   sits against the cream unassisted. probe-join-caption.mjs's numbers were
+   taken WITH it, so any before/after from that probe predates this. */
 
 /* ---- THE STANDFIRST — OUT OF THE PHOTOGRAPH, AND THE COPY IS WHY ----
    This line used to live INSIDE the picture, bottom-right, cream on the
