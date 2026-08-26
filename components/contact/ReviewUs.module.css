@@ -48,46 +48,40 @@
    that is what put it off: a gapless grid divides its own width into thirds,
    landing its columns at 488 and 896 while every other block on this page,
    and the Footer directly under it, sits at 503 and 929. Ten and thirty-three
-   pixels out is exactly the "reads as a mistake" distance. So the table was
-   traded for the Footer's underlined columns instead, and the rules went.
+   pixels out is exactly the "reads as a mistake" distance.
 
-   Neither trade was necessary, because the two things want DIFFERENT boxes.
-   The rail governs where TEXT starts. The table governs where RULES fall. Set
-   them separately: the grid keeps `var(--rail)` and `var(--rail-gap)` exactly
-   as every other block in the dark zone has them, so the tracks — and the
-   text in them — are unmoved at 40 / 503 / 929. Each cell then reaches half a
-   gap outward on both sides and gives the same half back as padding, so
-   neighbouring cells MEET at the gap's midpoint and their hairlines join into
-   one continuous table while the type never budges.
+   The fix is that the two things want DIFFERENT boxes. The rail governs where
+   TEXT starts. The table governs where RULES fall. Set them separately: the
+   grid keeps `var(--rail)` and `var(--rail-gap)` exactly as every other block
+   in the dark zone has them, so the tracks — and the text in them — are
+   unmoved at 40 / 503 / 929. Each cell then reaches half a gap outward on
+   both sides and gives the same half back as padding, so neighbouring cells
+   MEET at the gap's midpoint and their hairlines join into one continuous
+   table while the type never budges.
 
-   THE OUTER RULES. This table used to have none: the cells' overhang was
-   clipped flush at 40 and 1400 and the left/right boundaries were the page
-   margin, on the reasoning that a rule at x=40 would sit inside the first
-   restaurant name's own sidebearing. True — but only if the rule has to be AT
-   40. It doesn't. The interior verticals aren't at a column's text edge
-   either; they sit half a gutter to its left, and that half-gutter is the
-   single measurement this whole table is built on. Applying the same rule to
-   the outer pair puts them half a gutter OUTSIDE the rail — at 18.4 and
-   1421.6 on a 1440 — which closes the box, keeps every rule in the table the
-   same distance from the type it precedes, and leaves the type exactly where
-   it was at 40 / 503 / 929. The table ends up marginally wider than the text
-   column, which is what a table is: rules are furniture, not text, and they
-   are allowed to stand outside the rail the words hang on.
+   THE OUTER RULES SIT ON THE CONTENT WIDTH. They used to stand half a gutter
+   further out — at 18.4 and 1421.6 on a 1440 — on the argument that every
+   rule in the table should keep the same distance from the type it precedes.
+   Internally consistent, but it made the table the widest thing in the dark
+   zone: the headline directly above it and the Footer's rails directly below
+   it both stop at 1400, so the frame read as an overhang rather than as
+   furniture. The frame is now the container's content box, and only the
+   interior verticals keep the half-gutter offset.
 
    The frame is drawn by the grid itself rather than by the edge cells, so
    there are no per-column selectors to keep in sync with the orphan rules
    below. The geometry, left to right:
-     · margin-inline pulls the border box out by one --cell-reach
-     · the 1px border sits in the first pixel of that reach
-     · padding-inline gives back --cell-reach minus that pixel, so the TRACKS
-       — and the text in them — land back on 40 / 1400 exactly. (The minus-one
-       is the same border-box compensation `.item` makes; without it every
-       entry starts one pixel right of the rail, which is precisely the
-       40-vs-41 pair this section was already fixed for once.)
-     · the clip edge is the padding box, which now falls just INSIDE the
-       frame: the first column's own left border is clipped away by it, so the
-       outer left rule is a single hairline rather than a doubled one, and the
-       cells' backgrounds and bottom borders stop flush against the frame.
+     · margin-inline pulls the border box out by exactly one border-width, so
+       the two hairlines occupy the single pixel just OUTSIDE 40 and 1400 and
+       the content box lands back on 40 / 1400. Zero would not do: the box is
+       border-box, so the borders would eat into the content box and start
+       every entry at 41 — precisely the 40-vs-41 pair this section was
+       already fixed for once.
+     · padding-inline is therefore zero, which puts the clip edge (the padding
+       box) on 40 / 1400: the first column's own left border and the last
+       column's overhang are clipped away, so each outer rule is a single
+       hairline and the cells' backgrounds and bottom borders stop flush
+       against the frame.
    No bottom border here — the last row's cells draw it, and a second one
    would double it.
 
@@ -95,18 +89,16 @@
    any sticky descendant and is the reason the dark zone above uses clip too. */
 .grid {
   /* Half of the column gap, and the single number the whole table is built
-     on: how far each cell (and the frame) reaches past the rail, and how much
-     padding puts the text back where the rail wants it.
-     The `min()` is the page edge's veto. Half a gutter is 21.6px at 1440 and
-     28px at 1920, both comfortably inside a 40px page margin — but on a phone
-     the gutter is floored at 24px while the margin has dropped to 16, which
-     would leave the frame 4px from the screen edge, reading as a bleed that
-     didn't quite make it. Capped at the margin less 8px, the frame always
-     keeps a deliberate-looking standoff. */
-  --cell-reach: min(
-    calc(var(--rail-gap) / 2),
-    calc(var(--grid-margin) - 8px)
-  );
+     on: how far each cell reaches past its track, and how much padding puts
+     the text back where the rail wants it.
+     This used to be capped at `--grid-margin - 8px`, which was the page
+     edge's veto on a frame that stood outside the rail — without it, a phone's
+     24px gutter floor against a 16px margin left the frame 4px from the screen
+     edge. The frame is inside the content box now and the cells' overhang is
+     clipped at it, so there is no page edge left to hit and the cap only
+     served to knock the interior verticals a few pixels off the gutter
+     midpoint between roughly 561 and 700px wide. */
+  --cell-reach: calc(var(--rail-gap) / 2);
 
   list-style: none;
   margin: 0;
@@ -119,8 +111,8 @@
   row-gap: 0;
   overflow: clip;
   /* the frame — see the geometry note above */
-  margin-inline: calc(var(--cell-reach) * -1);
-  padding-inline: calc(var(--cell-reach) - 1px);
+  margin-inline: -1px;
+  padding-inline: 0;
   /* THE LITERAL IS GONE, AND THE ALPHA DELIBERATELY DID NOT MOVE WITH IT.
      Every rule in this table was `rgba(250, 247, 241, 0.22)` — #faf7f1, the
      cream from TWO palettes ago. It never referenced --cream, so the palette
