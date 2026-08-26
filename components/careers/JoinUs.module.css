@@ -1390,11 +1390,30 @@
      line — it is that every size inside a card is a fraction of THAT CARD
      rather than of the viewport. See `.reason`'s container. */
   grid-template-columns: repeat(3, minmax(0, 1fr));
-  /* the gap is PAGE showing between cards now, not mount, so it stays tight:
-     the cards' own padding does most of the separating. 24 + 34 + 34 is
-     already 92px between the two columns of text at 1440, against the 64px
-     the bare band had. */
-  gap: clamp(6px, 1.6vw, 24px);
+
+  /* ── ONE PLATE, NOT THREE ──────────────────────────────────────────────
+     The surface moved up here from `.reason`. It was three cards with the
+     cream page showing between them; it is one card with the three reasons
+     as columns inside it. Everything the long note above says about WHY the
+     ground is the ink — 13.06:1, readable at any width, the weight that
+     closes the roles index — is unchanged. What changed is the count.
+
+     AND THIS ELEMENT NOW TELLS THE TRUTH. `data-nav-theme="dark"` has always
+     been on this <ul>, but the <ul> was transparent and was claiming a
+     darkness that only its children had. It is the dark thing now, so the
+     navbar's sampler and the attribute finally describe the same box.
+
+     THE INSET AND THE GAP ARE THE SAME VALUE, deliberately: the air between
+     two reasons is exactly the air between a reason and the card's edge, so
+     the three columns sit on one rhythm instead of two competing ones. It
+     is a single custom property so they cannot drift apart. */
+  --reason-inset: clamp(10px, 3.2vw, 56px);
+  background: var(--plate);
+  /* the plate's corner, same token and same argument as before — see the
+     note that used to sit on `.reason` */
+  border-radius: var(--radius-tile);
+  padding: var(--reason-inset);
+  gap: var(--reason-inset);
 }
 
 /* ---- THE PLATE, AND THE ONE THING THAT MAKES A THREE-UP SURVIVE A PHONE ----
@@ -1425,20 +1444,20 @@
   display: flex;
   flex-direction: column;
   gap: clamp(4px, 1vw, 14px);
+  /* ⚠️ STILL A QUERY CONTAINER, AND THAT IS THE LOAD-BEARING LINE. The
+     surface went up to `.reasons`, but the container CANNOT follow it: every
+     `cqi` below sizes against ONE REASON, and hoisting the container to the
+     card would resolve them against the full measure — 22cqi of 1360px is a
+     299px numeral. It stays here, and what it measures is now the column
+     rather than the card.
+
+     WHAT THAT COSTS, MEASURED. The query box was the card's content: 374px
+     at 1440, 98px at 390. It is now the column: 392px at 1440 (the mark was
+     already pinned at --t-h2's 3rem ceiling there, so desktop is unchanged
+     to the pixel) and ~103px at 390 — five pixels WIDER than the three-card
+     arrangement, because one inset replaced two. The phone mark lands at
+     ~22.7px against the 21.6px the note below quotes. */
   container-type: inline-size;
-  background: var(--plate);
-  /* 2px — and it is --radius-tile rather than a literal, because that token
-     is already this project's word for exactly this: "photography +
-     editorial frames — a printed plate, not an app-card curve". The reasons
-     are now plates, so they take the plate's corner. */
-  border-radius: var(--radius-tile);
-  /* 34px at 1440 down to ~8.6px at 390, tracking the card's own width. At
-     the bottom it is small in absolute terms and correct in proportion: 9px
-     on a 115px card is the same inset 34px is on a 437px one. The 2.2vw is
-     a shade under the 2.4 it was — it buys the phone ~2px of measure, which
-     is a fifth of a line and the only thing padding can usefully contribute
-     to making this shorter. */
-  padding: clamp(8px, 2.2vw, 34px);
 }
 
 /* the mark is a numeral in the display face at heading scale — the same
