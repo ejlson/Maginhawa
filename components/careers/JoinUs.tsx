@@ -1573,24 +1573,49 @@ export default function JoinUs() {
                     Send application
                   </PillCta>
 
-                  <AnimatePresence>
-                    {submitted && (
-                      <motion.div
-                        className={styles.successCard}
-                        initial={{ opacity: 0, y: 8 }}
-                        animate={{ opacity: 1, y: 0 }}
-                        exit={{ opacity: 0 }}
-                        transition={{ duration: 0.52 }}
-                      >
-                        <strong>Attach your CV, then send.</strong>
-                        Your email client is opening with the application
-                        filled in. The file you chose is named in it but is
-                        not attached - add it before you press send. If no
-                        draft opened, write to careers@mgnhw.com and we&apos;ll get
-                        it either way. We reply within five working days.
-                      </motion.div>
-                    )}
-                  </AnimatePresence>
+                  {/* ── THE LIVE REGION IS THE WRAPPER, NOT THE CARD ──
+                      This whole block used to be the AnimatePresence alone,
+                      with no announcement anywhere on the page: the card
+                      appeared, and an applicant using a screen reader was
+                      told nothing at all — on the one screen where "did that
+                      send?" is the entire question, and where the answer
+                      includes an instruction they MUST act on (the CV is
+                      named in the draft, not attached to it).
+
+                      ⚠️ role/aria-live GO ON A NODE THAT IS ALREADY IN THE
+                      DOM. Putting them on the card itself would look right
+                      and mostly not work: a region that mounts carrying its
+                      own text gives the screen reader nothing to diff
+                      against, so the change is frequently missed entirely.
+                      The wrapper is always rendered and always empty until
+                      `submitted`, which makes the card's arrival a genuine
+                      mutation of an observed region. Contact.tsx's status
+                      paragraph is the same shape for the same reason.
+
+                      `polite` rather than `assertive`: the reader has just
+                      pressed the button themselves, so this confirms an
+                      expected outcome and should wait its turn rather than
+                      interrupt. */}
+                  <div role="status" aria-live="polite">
+                    <AnimatePresence>
+                      {submitted && (
+                        <motion.div
+                          className={styles.successCard}
+                          initial={{ opacity: 0, y: 8 }}
+                          animate={{ opacity: 1, y: 0 }}
+                          exit={{ opacity: 0 }}
+                          transition={{ duration: 0.52 }}
+                        >
+                          <strong>Attach your CV, then send.</strong>
+                          Your email client is opening with the application
+                          filled in. The file you chose is named in it but is
+                          not attached - add it before you press send. If no
+                          draft opened, write to careers@mgnhw.com and we&apos;ll get
+                          it either way. We reply within five working days.
+                        </motion.div>
+                      )}
+                    </AnimatePresence>
+                  </div>
                 </form>
               </Reveal>
             </div>
