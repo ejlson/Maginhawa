@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import MenuPage from "@/components/venues/MenuPage";
-import { RESTAURANTS, getRestaurant } from "@/lib/restaurants";
+import { getRestaurant, withMenus } from "@/lib/restaurants";
 import { SITE_URL } from "@/lib/site";
 import { StructuredData } from "@/lib/StructuredData";
 
@@ -13,10 +13,16 @@ import { StructuredData } from "@/lib/StructuredData";
  * folder of HTML per answer. /menus/hoodwood is a real
  * out/menus/hoodwood/index.html on Cloudflare's edge.
  *
- * ⚠️ WHICH MEANS THE LIST BELOW IS THE WHOLE ROUTE TABLE. A venue that
- * gains `menuPages` after a deploy has no page until the next build, and a
- * URL not in this list is served by the static 404 — the `notFound()` here
- * only ever fires in development.
+ * ⚠️ WHICH MEANS withMenus() IS THE WHOLE ROUTE TABLE. A venue that gains
+ * `menuPages` after a deploy has no page until the next build, and a URL not
+ * in that list is served by the static 404 — the `notFound()` here only ever
+ * fires in development.
+ *
+ * IT LIVES IN lib/restaurants.ts AND NOT HERE, though it was a private const
+ * in this file until 2026-08-25. app/sitemap.ts needs the same list, and the
+ * copy it would otherwise keep is one that disagrees the first time a venue
+ * gains or loses a menu — which is exactly how all seven of these pages came
+ * to be exported and canonical while missing from the sitemap entirely.
  *
  * ── WHY `/menus/`, NOT `/restaurants/<slug>/menu` ──
  * The nested form reads better and was the first choice. It was dropped on
@@ -32,9 +38,6 @@ import { StructuredData } from "@/lib/StructuredData";
  * Plural `menus` for routes, singular `menu` for assets — different words,
  * no collision, no orphan.
  */
-
-/** the venues that actually have a menu on file — Bunso has none */
-const withMenus = () => RESTAURANTS.filter((r) => r.menuPages?.length);
 
 export function generateStaticParams() {
   return withMenus().map((r) => ({ slug: r.slug }));

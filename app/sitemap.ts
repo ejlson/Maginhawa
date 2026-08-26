@@ -2,6 +2,7 @@ import type { MetadataRoute } from "next";
 import { getPosts } from "@/lib/posts";
 import { LEGAL_UPDATED } from "@/lib/legal";
 import { SITE_URL } from "@/lib/site";
+import { withMenus } from "@/lib/restaurants";
 
 /* ── THE SITEMAP, GENERATED RATHER THAN WRITTEN ──
  *
@@ -85,5 +86,24 @@ export default function sitemap(): MetadataRoute.Sitemap {
     lastModified: post.entry.date,
   }));
 
-  return [...pages, ...posts];
+  /* One entry per menu page, read from the SAME withMenus() that
+     app/menus/[slug]/page.tsx hands to generateStaticParams. That file's
+     banner calls its list "the whole route table"; this reads the table
+     rather than copying it, so a venue that gains or loses `menuPages`
+     moves in both places on the same build.
+
+     ⚠️ THESE WERE MISSING UNTIL 2026-08-25 and the omission was invisible:
+     all seven pages export, carry correct canonicals and are linked from
+     the restaurants grid, so nothing 404s and nothing looks wrong — they
+     were simply never declared. A crawler had to find them by following
+     links, which is exactly the discovery a sitemap exists to not depend on.
+
+     No lastModified, for the reason the banner above gives: this repository
+     does not know when a menu was last reprinted, and inventing the build
+     date is how the whole file stops being trusted. */
+  const menus: MetadataRoute.Sitemap = withMenus().map((r) => ({
+    url: `${SITE_URL}/menus/${r.slug}`,
+  }));
+
+  return [...pages, ...menus, ...posts];
 }
