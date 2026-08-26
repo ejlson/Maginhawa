@@ -92,7 +92,10 @@ await s(600);
 
 const before = await state();
 await page.mouse.move(box.aim.x, box.aim.y);
-await s(1600); // past --cta-dur (700ms) and the arrow's 74% delay + 340ms
+await s(1600); // the LAST thing to finish is the arrow, not the close: it waits
+               // 0.74 × --cta-dur (459ms) and then runs --dur-mid (520ms), so the
+               // control is settled at 979ms. 1600 has always cleared it — at the
+               // old 950ms duration the arrow landed at 703 + 520 = 1223.
 const after = await state();
 
 console.log("aimed at", box.aim, "— pill is at", box.pill);
