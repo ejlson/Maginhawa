@@ -214,9 +214,29 @@ function Spine({
            the band's growth is a clip the compositor does for free. See the
            block over .photo in the stylesheet for what that measured. */
         <span className={styles.frame}>
+          {/* ⚠️ THE RAW PUBLIC PATH, NOT `asset()`, AND THE DIFFERENCE IS
+              MEGABYTES. `asset()` returns an ALREADY-ABSOLUTE Cloudinary
+              URL, and lib/cloudinaryLoader.ts bails on absolute URLs in its
+              first line — "nothing here owns it" — handing it straight back.
+              So wrapping the src here did not add a transform, it DISABLED
+              the one next/image was about to build: no `w_`, no srcset worth
+              the name, and the browser fetched the original.
+
+              Measured on the home page under mobile emulation before this
+              changed: 4.80MB across 16 unsized requests, against 0.23MB
+              across the 11 that were sized. images/ramoramen alone is
+              7008×4672 and arrived as 1,470KiB — on a phone, for a band
+              75px tall. It was the bulk of a 6.4s LCP.
+
+              Passing the path lets the loader do its job, which is the whole
+              reason `loader: "custom"` is installed. `asset()` is still
+              right at line 282 below and everywhere else in this codebase —
+              it exists for raw <img>, posters, video and CSS urls, which are
+              next/image's blind spot. It is only <Image> that must not
+              receive its output. */}
           <Image
             className={styles.photo}
-            src={asset(item.image)}
+            src={item.image}
             alt=""
             fill
             // one band, full measure, at every phone width
