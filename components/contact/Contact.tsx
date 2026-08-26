@@ -359,7 +359,24 @@ export default function Contact({ standalone = false }: ContactProps) {
                  render as a white OS tooltip that belongs to no design
                  system at all. The validation itself did not go away; it
                  moved into validate() below, which is what fills the
-                 messages under each field. */
+                 messages under each field.
+
+                 ⚠️ WHICH IS WHY THE THREE ENFORCED FIELDS CARRY
+                 `aria-required` AND NOT `required`. A deploy audit read the
+                 built HTML, found no `required` anywhere, and reported that
+                 an empty enquiry could be submitted. It cannot — validate()
+                 blocks it, focuses the first offender in DOM order and
+                 announces the count through the live region at the foot of
+                 the form. But `noValidate` also removes the only thing that
+                 was telling assistive tech a field was REQUIRED IN ADVANCE,
+                 and a screen-reader user was learning it by hitting the
+                 error. aria-required restores exactly that announcement and
+                 nothing else: it carries no behaviour, so it cannot bring
+                 the vendor bubbles back with it.
+
+                 It is on firstName, email and message — the three validate()
+                 actually enforces — and deliberately NOT on lastName. See
+                 the note over validate() for why a mononym is allowed. */
               noValidate
             >
               {/* ── THE HONEYPOT ──
@@ -417,6 +434,7 @@ export default function Contact({ standalone = false }: ContactProps) {
                     placeholder="First name"
                     value={values.firstName}
                     onChange={onChange("firstName")}
+                    aria-required
                     aria-invalid={errors.firstName ? true : undefined}
                     aria-describedby={
                       errors.firstName ? "contact-first-error" : undefined
@@ -462,6 +480,7 @@ export default function Contact({ standalone = false }: ContactProps) {
                   placeholder="you@example.com"
                   value={values.email}
                   onChange={onChange("email")}
+                  aria-required
                   aria-invalid={errors.email ? true : undefined}
                   aria-describedby={
                     errors.email ? "contact-email-error" : undefined
@@ -484,6 +503,7 @@ export default function Contact({ standalone = false }: ContactProps) {
                   placeholder="Tell us a little about your enquiry"
                   value={values.message}
                   onChange={onChange("message")}
+                  aria-required
                   aria-invalid={errors.message ? true : undefined}
                   aria-describedby={
                     errors.message ? "contact-message-error" : undefined
