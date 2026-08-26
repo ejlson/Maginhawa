@@ -641,6 +641,10 @@
    sides back out of step, which is the exact thing that was wrong. */
 .roles {
   padding-block: var(--section-y) 0;
+  /* THE ROW'S OPTICAL AIR, declared on the section because two different
+     boxes have to agree on it: `.roleRow` pays it out as padding, and
+     `.rolePanes` aligns its first line to the same value. See both. */
+  --row-air: clamp(14px, 1.7vh, 22px);
 }
 
 .rolesHead {
@@ -696,15 +700,32 @@
    around it is already three times its neighbours' leading).
 
    The floor is 13px, not lower, because on a phone the row is the touch
-   target: 13 + 13 + three stacked lines lands at ~105px, comfortably past
-   the 44px minimum with the padding alone contributing 26px. */
+   target: three stacked lines plus this padding lands at ~98px, comfortably
+   past the 44px minimum.
+
+   ---- THE PADDING IS ASYMMETRIC, AND THE NUMBER IS MEASURED ----
+   It was symmetric, and the row read bottom-heavy at every width. The cause
+   is that only one of the two gaps is bounded by TYPE. `.roleTitle` is
+   FreightBig at --t-h3 on --lh-heading, and its ink starts 7.13px below its
+   line box's top edge (canvas actualBoundingBoxAscent against the computed
+   half-leading, measured on the running page at 1440). The pills below are
+   bordered boxes: their visible edge IS their box edge, inset zero. So
+   equal padding produced a 20.6px gap above the title and a 13.5px gap
+   under the pills — a 7px lean that reads as the content sitting low in
+   its row.
+
+   --row-air is therefore the OPTICAL gap, the one a reader actually sees,
+   and the top padding pays the leading back out of it. 6.5px rather than
+   7.13: the offset is a constant fraction of the title's size (0.2785em)
+   and --t-h3 clamps between 20px and 25.6px, so the true compensation runs
+   5.6→7.1px across the range. One value sits inside a pixel of both ends. */
 .roleRow {
   width: 100%;
   display: grid;
   grid-template-columns: minmax(0, 2.2fr) minmax(0, 1.4fr) minmax(0, 1fr) auto;
   gap: clamp(16px, 3vw, 40px);
   align-items: baseline;
-  padding: clamp(13px, 1.5vh, 20px) 0;
+  padding: calc(var(--row-air) - 6.5px) 0 var(--row-air);
   background: none;
   border: none;
   color: inherit;
@@ -727,7 +748,7 @@
    of `S` fr total, moves by P·(S − 2·Pfx)/S. For the `2.2fr 1.4fr 1fr auto`
    above (S = 4.6) that is exactly
 
-     .roleTitle  +P              .roleType  −2.6/4.6 · P
+     .roleTitle  +P              .roleTags  −2.6/4.6 · P
      .roleMeta   +0.2/4.6 · P    .roleChev  −P
 
    which is why those four numbers are written as their fractions rather
@@ -762,16 +783,46 @@
   transition: translate var(--dur-base) var(--ease-out);
 }
 
-.roleType {
-  font-family: var(--font-display-xs);
-  font-weight: var(--w-medium);
-  font-size: var(--t-label);
-  letter-spacing: 0.1em;
-  text-transform: uppercase;
-  opacity: 0.62;
-  white-space: nowrap;
+/* ---- THE CONTRACT AND THE SECTION, AS TWO PILLS ----
+   This was one span — "FULL-TIME · KITCHEN" — set in the display face,
+   uppercase, tracked 0.1em, at 62% opacity. Two things were wrong with it
+   and the second is the reason it changed: a middot was carrying the whole
+   distinction between two unrelated facts (how the job is contracted, and
+   which part of the house it is in), and FreightBig at 13px uppercase is a
+   display face doing a label's job next to a line of Figtree that is
+   already doing it better.
+
+   THE FONT IS THE META LINE'S OWN — --font-sans, the same Figtree the
+   restaurant · location line above these pills is set in. Sentence case
+   rather than uppercase, because that is how lib/jobs.ts spells the values
+   ("Full-time", "Front of House") and how the line above reads; the caps
+   were a second voice for no gain.
+
+   HOLLOW, AND THE SHAPE IS ALREADY IN THIS FILE. 1px border, 999px radius,
+   transparent ground: `.roleApplyBtn` twenty lines down is the same object
+   at button scale, so the section has one pill and two sizes of it rather
+   than two pills. The border is --rule, not --maroon: twelve full-strength
+   outlines down a six-row index would out-shout the titles they sit under,
+   and --rule is the hairline this index is already ruled with. */
+.roleTags {
+  display: flex;
+  flex-wrap: wrap;
+  gap: clamp(5px, 0.5vw, 8px);
   translate: calc(var(--role-indent) * -2.6 / 4.6);
   transition: translate var(--dur-base) var(--ease-out);
+}
+
+.roleTag {
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  /* flush: the pill's own padding is the leading here, so a 1 rather than a
+     --lh- token — anything taller re-centres the text off the pill's axis */
+  line-height: 1;
+  color: var(--maroon);
+  border: 1px solid var(--rule);
+  border-radius: 999px;
+  padding: 0.44em 0.86em 0.5em;
+  white-space: nowrap;
 }
 
 .roleChev {
@@ -868,6 +919,249 @@
   background: var(--saffron);
   color: var(--cream);
   outline: none;
+}
+
+/* ═══ THE INDEX BESIDE ITS DETAIL — the ≥900px arm ═══════════════════════
+ *
+ * WHAT IT CHANGES, AND WHAT IT DELIBERATELY DOES NOT. Every type decision
+ * below is a token this section already sets: the rows keep .roleTitle
+ * (--t-h3 / --w-medium), .roleMeta (--t-small) and the .roleTag pills
+ * (--font-sans / --t-label), and the pane's own contents ARE
+ * .roleDetail* — the same components the accordion renders. The only new
+ * type in the whole arm is .rolePaneTitle, and it is --t-h2, the scale's
+ * existing rung between the section title's --t-display and the rows'
+ * --t-h3. Nothing here introduces a size, a weight or a family.
+ *
+ * WHAT IT COSTS. Two layouts to maintain rather than one — the honest price
+ * of this shape, and the reason the swap is a single boolean rather than a
+ * fork that spreads. Below 900px NONE of these rules apply and the
+ * accordion is byte-for-byte what it was.
+ * ═══════════════════════════════════════════════════════════════════════ */
+
+.rolesBodySplit {
+  display: grid;
+  /* the list takes a little over a third: enough for a 25.6px title to sit
+     on one line at 1440 without the pane losing the width its two lists
+     need side by side */
+  grid-template-columns: minmax(0, 0.72fr) minmax(0, 1fr);
+  gap: clamp(32px, 4vw, 72px);
+  align-items: start;
+}
+
+/* THE ROW, RESTACKED FOR A THIRD OF THE MEASURE. The four-across
+   `2.2fr 1.4fr 1fr auto` is a full-width table and it has no business in a
+   490px column, so the three labels stack and the chevron spans them. The
+   type is untouched — only the tracks are. */
+/* ---- THE THREE LINES, GROUPED BY THE GAPS BETWEEN THEM ----
+   The row is a title, the place it is in, and two pills. The first two are
+   ONE fact — the role and where it is — and the pills are a different
+   register, so the gaps have to say so. They were saying the opposite: the
+   row-gap was 2px and the pills' margin 4px, which after each line's own
+   leading is subtracted came out as 11.9px between title and place and only
+   8.0px between place and pills. The tight pair was the loose one.
+
+   ⚠️ AND THE GAP IS SET BY THE DESCENDERS, NOT THE AVERAGE. Half these
+   titles carry one — Head **P**a**y**stry, Front of House Mana**g**er,
+   Ma**rketing** Coordinator — and a descender eats about 6px of the gap
+   under the title. Measured across all six rows at a 2px row-gap: the three
+   clean titles leave 11.9px of visible air above the meta line, the three
+   with descenders leave 5.8px. That spread is not a bug to be flattened —
+   the BASELINE rhythm is identical in both cases, which is what actually
+   governs how a stack reads — but it does mean the gap has to be chosen
+   against the tight case, or three of six rows go cramped.
+
+   2px is that number: it holds the descender rows at 5.8px, which is what
+   they had before any of this and was never the complaint, while the pills'
+   10px margin opens a 16.7px step below.
+
+   The row therefore ascends 11.9 → 16.7 → 31.2: inside the pair, then to
+   the pills, then to the next row. It was 11.9 → 10.7 → 27, which put the
+   widest gap of the three INSIDE the pair that was supposed to bind. */
+.rolesBodySplit .roleRow {
+  grid-template-columns: minmax(0, 1fr) auto;
+  grid-template-rows: auto auto auto;
+  gap: 2px clamp(16px, 2vw, 28px);
+  align-items: baseline;
+}
+.rolesBodySplit .roleTitle { grid-column: 1; grid-row: 1; }
+.rolesBodySplit .roleMeta  { grid-column: 1; grid-row: 2; }
+.rolesBodySplit .roleTags { grid-column: 1; grid-row: 3; margin-top: 10px; }
+.rolesBodySplit .roleChev  { grid-column: 2; grid-row: 1 / -1; align-self: center; }
+
+/* THE INDENT STAYS, BUT ITS ARITHMETIC DOES NOT. The four displacement
+   fractions above `.roleRow:hover` are derived from the `2.2fr 1.4fr 1fr
+   auto` track list — change the tracks and they are wrong. In one column
+   every label wants the same nudge, and the chevron the opposite one. */
+.rolesBodySplit .roleMeta,
+.rolesBodySplit .roleTags { translate: var(--role-indent); }
+.rolesBodySplit .roleChev { translate: calc(var(--role-indent) * -1); }
+
+/* THE CURRENT ROW, MARKED WITHOUT A GROUND. It carried the row's own hover
+   tint — rgba(47,0,0,0.04) — and that is removed: a wash that pale is a
+   smudge rather than a state, and it put selection and hover in the same
+   currency, so the two could not be told apart on the row that had both.
+
+   WHAT MARKS IT NOW is the rule in the margin and the chevron at full
+   strength. That leaves the tint free to mean one thing only — the pointer
+   is here — and the marker to mean the other: this is the one you are
+   reading. Two signals, two jobs, no overlap.
+
+   --saffron because it is already this section's accent: .roleDetailHead is
+   set in it and every → bullet is drawn in it. */
+.rolesBodySplit .roleItem { position: relative; }
+.rolesBodySplit .roleItemOn .roleChev { opacity: 1; }
+
+.rolesBodySplit .roleItem::before {
+  content: "";
+  position: absolute;
+  /* outside the measure, so the rows stay flush with the section title's
+     left edge and the marker reads as a margin mark rather than an indent */
+  left: calc(-1 * clamp(10px, 1.2vw, 16px));
+  top: 0;
+  bottom: 0;
+  width: 2px;
+  background: var(--saffron);
+  /* scale, not width or height: this runs on every selection change */
+  scale: 1 0;
+  transform-origin: top;
+  transition: scale var(--dur-base) var(--ease-out);
+}
+.rolesBodySplit .roleItemOn::before { scale: 1 1; }
+
+/* THE CHEVRON POINTS AT THE PANE. It is the same 16px glyph the accordion
+   rotates 180° to say "this is open"; a quarter turn says "this opens
+   beside", which is what the layout actually does. */
+.roleChevSide { transform: rotate(-90deg); }
+
+/* ---- THE PANE ----
+   All six stacked in one grid cell, so the cell is as tall as the tallest
+   role and the column never resizes under the reader. */
+/* ---- THE PANE'S FIRST LINE SITS ON THE INDEX'S FIRST LINE ----
+   It did not, and a screenshot is the only thing that showed it: the pane
+   title was landing ~12px below the first row's title, which on two columns
+   that start at the same grid line reads as one of them having slipped.
+
+   The cause is that both boxes were given the same PADDING while holding
+   different type. Ink does not start at a box's top edge — FreightBig's
+   begins 0.2785em below it — so a 48px pane title starts 13.4px in while a
+   25.6px row title starts 7.1px in, and equal padding therefore cannot
+   produce equal ink.
+
+   So the padding is matched to the row's optical air and the title pays its
+   own leading back in `em`, which resolves against the title's OWN size and
+   so stays correct as --t-h2 clamps from 27.2px up to 48px:
+
+     row ink, from the grid line   = 1px border + (--row-air − 6.5px) + 0.2785 × 25.6
+                                   = --row-air + 1.63px
+     pane ink, from the grid line  = --row-air + M + 0.2785em
+     ⇒ M = 1.63px − 0.2785em                                              */
+.rolePanes {
+  display: grid;
+  padding-top: var(--row-air);
+}
+
+.rolePane {
+  grid-area: 1 / 1;
+  opacity: 0;
+  visibility: hidden;
+  translate: 0 6px;
+  /* opacity and translate only — nothing here touches layout. `visibility`
+     is stepped at the END of the fade out and at the START of the fade in,
+     which is what keeps the outgoing pane clickable-through and the
+     incoming one in the tab order the moment it starts arriving. */
+  transition:
+    opacity var(--dur-base) var(--ease-out),
+    translate var(--dur-base) var(--ease-out),
+    visibility 0s linear var(--dur-base);
+}
+
+.rolePaneOn {
+  opacity: 1;
+  visibility: visible;
+  translate: 0 0;
+  transition:
+    opacity var(--dur-base) var(--ease-out),
+    translate var(--dur-base) var(--ease-out),
+    visibility 0s;
+}
+
+/* --t-h2 is the scale's existing rung between the section title and the
+   rows — see the note in the JSX. Weight, family and tracking are the
+   section title's own. */
+.rolePaneTitle {
+  font-family: var(--font-display);
+  font-weight: var(--w-medium);
+  font-size: var(--t-h2);
+  line-height: var(--lh-heading);
+  letter-spacing: var(--tr-display);
+  /* ⚠️ ONE `margin`, NOT `margin: 0` PLUS A `margin-top`. Written as two
+     declarations the shorthand wins whatever the order looks like, the
+     compensation silently resolves to zero, and the pane goes back to
+     sitting 11.9px low — which is exactly what it did on the first attempt.
+     The negative top is the leading compensation derived above
+     `.rolePanes`; it is in `em` so it tracks --t-h2 rather than assuming
+     that token's 48px ceiling. */
+  margin: calc(1.63px - 0.2785em) 0 0;
+}
+
+/* .roleMeta's voice exactly — same family, size, leading and tone. It was
+   matched to .roleType instead, and when that became two Figtree pills this
+   was left as the only thing in the section still speaking in 13px tracked
+   display caps. It is the same information as the list's meta line, so it
+   is now the same line, one rung up. */
+.rolePaneMeta {
+  font-family: var(--font-sans);
+  font-size: var(--t-small);
+  line-height: var(--lh-snug);
+  opacity: 0.82;
+  margin: var(--space-xs-y) 0 0;
+}
+
+/* THE DETAIL, IN A NARROWER MEASURE. `1.4fr 1fr 1fr` is a full-width row;
+   in a pane the lead takes the top and the two lists sit under it as a
+   pair. Only the tracks change — every type rule inside is untouched. */
+.rolePane .roleDetail {
+  grid-template-columns: minmax(0, 1fr) minmax(0, 1fr);
+  padding: clamp(20px, 2.6vh, 32px) 0 0;
+}
+.rolePane .roleDetailLead {
+  grid-column: 1 / -1;
+  max-width: 52ch;
+}
+
+/* ---- THE RECORD'S JOINTS ----
+   Three hairlines, in the section's own --rule — the same 1px the index
+   above is ruled with, so the pane is separated by the page's existing
+   device rather than a new one. Each marks a seam that is really there and
+   none marks a gap that is only whitespace:
+
+     1. under the title and its meta line — identity, then description
+     2. over each of the two column heads — the summary, then the specifics.
+        Two column-width rules rather than one across the pane, so the pair
+        also does the work a vertical divider would have done between
+        "You'll" and "We hope", without drawing one.
+     3. over the apply row — content, then action. It is also the pane's
+        bottom edge; without it the record trailed off into the cream with
+        the button floating under nothing.
+
+   ⚠️ SCOPED TO .rolePane. `.roleDetailHead` and `.roleApply` are the
+   accordion's classes too, and the accordion's detail already sits between
+   two row rules — a third and fourth inside it would be ruling a box that
+   is already ruled. */
+.rolePane .rolePaneMeta {
+  padding-bottom: clamp(16px, 2vh, 24px);
+  border-bottom: 1px solid var(--rule);
+}
+
+.rolePane .roleDetailHead {
+  border-top: 1px solid var(--rule);
+  padding-top: clamp(12px, 1.6vh, 18px);
+}
+
+.rolePane .roleApply {
+  justify-content: flex-start;
+  border-top: 1px solid var(--rule);
+  padding-top: clamp(16px, 2.2vh, 26px);
 }
 
 /* ---- THE APPLICATION SECTION, SECOND ATTEMPT ----
@@ -1717,18 +2011,20 @@
   .roleRow {
     grid-template-columns: 1fr auto;
     grid-template-rows: auto auto auto;
-    gap: 6px 16px;
+    /* the split arm's rhythm, and for the same reason — this stack is the
+       same three registers, so the pair binds and the pills step away */
+    gap: 2px 16px;
   }
   .roleTitle { grid-column: 1; grid-row: 1; }
   .roleChev { grid-column: 2; grid-row: 1; }
   .roleMeta { grid-column: 1 / -1; grid-row: 2; }
-  .roleType { grid-column: 1 / -1; grid-row: 3; }
+  .roleTags { grid-column: 1 / -1; grid-row: 3; margin-top: 10px; }
   /* The tracks changed, so the indent's coefficients change with them: the
-     meta and the type now start at the row's leading edge like the title,
+     meta and the pills now start at the row's leading edge like the title,
      not part-way across it, so all three move the full P. The chevron is
      still the trailing `auto` track and still pulls the other way. */
   .roleMeta,
-  .roleType { translate: var(--role-indent); }
+  .roleTags { translate: var(--role-indent); }
   .roleDetail {
     grid-template-columns: 1fr;
   }
