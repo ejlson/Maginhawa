@@ -1,7 +1,8 @@
 "use client";
 
-import { useCallback, useEffect, useRef, useState } from "react";
+import { useEffect, useState } from "react";
 import { asset } from "@/lib/media";
+import { useVisiblePlayback } from "./useVisiblePlayback";
 
 type Clip = { src: string; rotate: number };
 
@@ -32,129 +33,6 @@ function clipStyle(c: Clip, show: boolean, duration: number): React.CSSPropertie
   };
 }
 
-
-/* ── PLAY ONLY WHAT IS ON SCREEN ────────────────────────────────────────
-   MEASURED (scripts/probe-video-census.mjs): with no gate, the home page ran
-   TWO concurrent 1080p decodes while the reader was still looking at the
-   hero. The second was Reservations — the last band on the page, far below
-   the fold — whose backdrop is `autoPlay loop`, laid out at 2304×1620 after
-   `.bg`'s scale(1.2), decoding and compositing a larger-than-viewport surface
-   that nobody could see. It competed with the hero's own decode for the whole
-   visit.
-
-   That is exactly the kind of load an idle test rig absorbs and a real
-   machine does not: video decode does not show up in main-thread
-   instrumentation, so every rAF-based probe called the page smooth while the
-   hero was sharing a GPU with an invisible film.
-
-   A 200px rootMargin starts the clip just before its band arrives, so the
-   reader never meets a still frame — the section's own entrance animation is
-   longer than the ~2 frames a paused <video> needs to resume. `playsInline`
-   + `muted` mean resuming needs no gesture; the play() promise is swallowed
-   because a pause() landing mid-play rejects it, which is not an error. */
-/* ── AND ONLY FETCH WHAT IS APPROACHING ────────────────────────────────
-   THE GATE ABOVE STOPS THE DECODE AND NOT THE DOWNLOAD, and on a phone the
-   download is the larger bill. `preload="auto"` fetches the WHOLE file the
-   moment the element mounts, so Reservations — the last band on a 9,400px
-   page — pulled 7.4MB down the wire while the reader was still on the hero.
-   Measured on a 390px walk of the home page: 21.5MB of video out of 24MB
-   total, all of it requested inside the first 1.1 seconds.
-
-   150% OF THE VIEWPORT, WHERE PLAYBACK GETS 200px, and the two numbers are
-   different jobs rather than a pair that drifted. Playback needs the clip
-   running by the time its band arrives, which is ~2 frames of work. Fetching
-   several megabytes is not — at 844px tall this starts it 1,266px out, which
-   is a couple of seconds of ordinary scrolling, so the film is buffered
-   before the 200px gate ever asks it to play.
-
-   ⚠️ THE PLAY GATE PROMOTES `preload` TOO, and the warm gate checks before
-   it calls `load()`. Two observers on one element deliver their callbacks
-   independently, so on a backdrop that is already on screen at mount both
-   fire in the same batch in an order nothing guarantees — and `load()` on an
-   element that has just been told to play resets it to zero. The guard is
-   what makes the race harmless rather than a one-frame black frame. */
-const WARM_MARGIN = "150% 0px";
-
-function useVisiblePlayback() {
-  const io = useRef<IntersectionObserver | null>(null);
-  const warm = useRef<IntersectionObserver | null>(null);
-
-  /* ⚠️ LAZILY, INSIDE THE REF CALLBACK — NOT IN AN EFFECT.
-     Ref callbacks fire during commit, effects fire after it, so an observer
-     built in useEffect does not exist yet on the frame the ref runs and every
-     observe() call is silently dropped. Built that way first; the census probe
-     showed the offscreen clip still decoding and the gate doing nothing at
-     all, which is precisely how this mistake presents — no error, no warning,
-     just no effect. */
-  const observer = () => {
-    if (!io.current && typeof IntersectionObserver !== "undefined") {
-      io.current = new IntersectionObserver(
-        (entries) => {
-          for (const e of entries) {
-            const v = e.target as HTMLVideoElement;
-            if (e.isIntersecting) {
-              // the warm gate below normally got here first; this is the
-              // backdrop that mounts already on screen
-              if (v.preload !== "auto") v.preload = "auto";
-              void v.play().catch(() => {});
-            } else if (!v.paused) v.pause();
-          }
-        },
-        { rootMargin: "200px 0px" },
-      );
-    }
-    return io.current;
-  };
-
-  const warmer = () => {
-    if (!warm.current && typeof IntersectionObserver !== "undefined") {
-      warm.current = new IntersectionObserver(
-        (entries) => {
-          for (const e of entries) {
-            if (!e.isIntersecting) continue;
-            const v = e.target as HTMLVideoElement;
-            // once per element: the fetch is not a state to be maintained
-            warm.current?.unobserve(v);
-            if (v.preload === "auto") continue;
-            v.preload = "auto";
-            v.load();
-          }
-        },
-        { rootMargin: WARM_MARGIN },
-      );
-    }
-    return warm.current;
-  };
-
-  useEffect(
-    () => () => {
-      io.current?.disconnect();
-      warm.current?.disconnect();
-    },
-    [],
-  );
-
-  return useCallback((el: HTMLVideoElement | null) => {
-    if (!el) return;
-    const o = observer();
-    // no IntersectionObserver (ancient browser): fall back to the old
-    // behaviour rather than a backdrop that never starts — and that includes
-    // the eager fetch, since nothing else would ever start it
-    if (!o) {
-      el.preload = "auto";
-      void el.play().catch(() => {});
-      return;
-    }
-    o.observe(el);
-    warmer()?.observe(el);
-    // React 19 calls this when the element detaches — the crossfade swaps
-    // layers constantly, so an unobserved corpse would leak an entry per swap.
-    return () => {
-      o.unobserve(el);
-      warm.current?.unobserve(el);
-    };
-  }, []);
-}
 
 /**
  * Full-bleed video that crossfades when `src` changes. Only two <video>
