@@ -31,14 +31,6 @@
   grid-column: span 2;
 }
 
-/* Named and seated explicitly rather than left to auto-placement. It lands in
-   the third track either way today, but only because it happens to be the
-   second child of a two-child head — add anything to .head and the helper
-   line silently moves off the 929 edge it was put there to hold. */
-.ledeWrap {
-  grid-column: 3;
-}
-
 .title {
   font-family: var(--font-display);
   font-weight: var(--w-medium);
@@ -47,25 +39,6 @@
   letter-spacing: var(--tr-display);
   color: var(--cream);
   max-width: 17ch;
-}
-
-/* The helper line. This was the "(Click to learn more)" recipe — right-
-   aligned, uppercase, bracketed, 0.4 opacity — and every one of those four
-   choices fought reading: 0.4 cream on maroon measured 3.4:1, under the 4.5:1
-   body minimum, and the uppercase ran to four ragged lines against the
-   right edge. It now follows the recipe FAQ's `.aside` already settled on
-   (sentence case, left-aligned, ranged left with the column) at 0.7. That
-   measured 8.6:1 on the old ink and 5.68:1 on the softened one — the same
-   comfortable pass, from a pair that is no longer trying to win by the
-   largest possible margin. (0.4 would now be 2.89:1: the rejected value got
-   worse, which is the direction that keeps a rejection correct.) Setting it in --t-small rather than --t-label also stops it
-   competing with the section's actual labels. */
-.lede {
-  font-family: var(--font-sans);
-  font-size: var(--t-small);
-  line-height: var(--lh-body);
-  opacity: 0.7;
-  max-width: 34ch;
 }
 
 /* ---- restaurant grid: a bordered table, ON the rail, and CLOSED ----
@@ -340,8 +313,7 @@
     grid-template-columns: 1fr;
     align-items: start;
   }
-  .headMain,
-  .ledeWrap {
+  .headMain {
     grid-column: auto;
   }
   /* re-derive the orphan rule for two columns — with seven items the last one
