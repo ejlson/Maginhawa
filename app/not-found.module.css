@@ -2,25 +2,44 @@
    page that borrows a section's stylesheet is a section that can no longer
    be changed without checking the error page. */
 
-/* ---- ONE SCREEN, NO SCROLL ----
-   The page is exactly the viewport tall and its two blocks divide it: the
-   hero takes whatever is left after the doors, and the doors sit on the
-   bottom edge. Nothing here may grow past `100svh` — that is the whole
-   requirement, and the two things that threatened it are the numeral (sized
-   off `vw`, so a wide short window made it enormous) and the door rows,
-   which stack on a phone. Both are capped against the HEIGHT below.
+/* ---- ONE SCREEN WHERE IT FITS, AND A SCROLL WHERE IT DOES NOT ----
+   The page is a viewport tall and its two blocks divide it: the hero takes
+   whatever is left after the doors, and the doors sit on the bottom edge.
+   The two things that threatened that are the numeral (sized off `vw`, so a
+   wide short window made it enormous) and the door rows, which stack on a
+   phone. Both are capped against the HEIGHT below.
 
    `svh` rather than `vh`: on a phone `vh` is the toolbar-RETRACTED height,
    so a `100vh` page is taller than the screen for as long as the address bar
    is showing — which on a 404 the reader has just arrived at is the entire
    time they are looking at it.
 
-   `height`, not `min-height`: min-height would let a short window scroll,
-   which is the thing being fixed. Everything inside is sized so it fits;
-   `overflow: hidden` is the backstop that keeps a fallback font or a
-   translated string from turning a near-miss into a scrollbar. */
+   ⚠️ THIS READ `height: 100svh` WITH `overflow: hidden`, AND ON A PHONE THAT
+   COST THE PAGE THE THING IT EXISTS FOR. The argument for it was that
+   min-height "would let a short window scroll, which is the thing being
+   fixed", and that clipping was a backstop against a fallback font turning a
+   near-miss into a scrollbar. What it actually backstopped was not a
+   near-miss: on a one-column phone the doors are 374px of a 568px screen, the
+   hero is handed less space than its own content, and a fixed-height flex
+   column shrinks a child's BOX without shrinking its CONTENT. The remainder
+   spilled out of the hero onto the doors — the door list's top rule was drawn
+   through the middle of the "Back to the home page" pill at 375x812, and at
+   320x568 the pill and the lede's last line were drawn over the first two
+   doors — and `overflow: hidden` then quietly ate whatever passed the page's
+   own edge. See the phone block at the foot of this file for the measurements.
+
+   So the page is `min-height` now, and it scrolls rather than clips. A page
+   that is six pixels taller than the window is a cosmetic imperfection; an
+   error page whose only navigation is underneath the fold with no way to
+   reach it is a functional failure, and that is the trade the old rule made.
+   Everything inside is still sized to fit, and on every window measured it
+   does — desktop hero overflow is 0px at all twelve shapes probed.
+
+   `overflow-x: clip` keeps the horizontal guard the old shorthand carried
+   without taking the vertical axis with it. `hidden` on one axis forces the
+   other to `auto` and would trap the scroll again; `clip` does not. */
 .page {
-  height: 100svh;
+  min-height: 100svh;
   display: flex;
   flex-direction: column;
   background: var(--cream);
@@ -28,7 +47,7 @@
   /* the nav is fixed and overlays the page; this is the clearance every
      other route gives it */
   padding-top: clamp(56px, 7vh, 92px);
-  overflow: hidden;
+  overflow-x: clip;
 }
 
 /* THE HERO OWNS THE FIRST SCREEN and centres in it, the same arrangement
@@ -36,13 +55,20 @@
    the middle of the window rather than crowding the nav. `svh` because on a
    phone `vh` is the toolbar-retracted height, which is not the height the
    reader is looking at. */
-/* THE HERO IS THE REMAINDER. `flex: 1` and `min-height: 0` — without the
-   second one a flex item refuses to shrink below its content's intrinsic
-   height, which is exactly how a "fixed height" column ends up overflowing
-   anyway. */
+/* THE HERO IS THE REMAINDER — BUT IT NEVER GIVES UP MORE THAN IT HAS.
+   `flex: 1 0 auto`: grow into whatever the doors leave, and refuse to shrink.
+
+   ⚠️ IT WAS `flex: 1 1 auto` WITH `min-height: 0`, WHICH IS THE OPPOSITE
+   INSTRUCTION AND IS WHAT BROKE EVERY PHONE. `min-height: 0` exists to let a
+   flex item shrink below its content's intrinsic height — and a flex item
+   that shrinks below its content does not scale that content down, it simply
+   draws it outside its own box. Under the old fixed-height `.page` that put
+   up to 111px of hero on top of the doors. Shrink 0 is the whole fix: when
+   there is free space the hero still takes it and the doors still sit on the
+   bottom edge, and when there is not, the PAGE grows and scrolls instead of
+   the hero being crushed into the nav below it. */
 .hero {
-  flex: 1 1 auto;
-  min-height: 0;
+  flex: 1 0 auto;
   display: flex;
   flex-direction: column;
   align-items: center;
@@ -209,5 +235,87 @@
   .door,
   .doorArrow {
     transition: none;
+  }
+}
+
+
+/* ═══ PHONES, AND SHORT LANDSCAPE ════════════════════════════════════════
+   The rules above make the page CORRECT on a phone — nothing is drawn over
+   anything and nothing is out of reach. This block is what keeps it on ONE
+   SCREEN there, which is the page's brief and worth most of a scroll.
+
+   The weight is not the hero, it is the doors: below the grid's `min(100%,
+   15rem)` they are one column and five rows, 374px of a 568px screen, and
+   the hero was handed what was left. Hero content minus the space it had,
+   measured against the dev server with scripts/probe-404.mjs's viewport
+   list, BEFORE the flex fix above:
+
+       430x932    0px  ·  393x852    2px  ·  390x844    5px
+       375x812   13px  ·  360x740   36px  ·  375x667   65px
+       320x568  104px  ·  844x390   76px  ·  667x375  111px
+
+   Every desktop shape read 0. This is a phone failure end to end, which is
+   why the compaction is scoped here and the twelve desktop shapes are left
+   exactly as they were.
+
+   ⚠️ scripts/probe-404.mjs PASSED THROUGHOUT — `clipped` never went above
+   -20. Its assertion is the LAST DOOR'S bottom edge, and the doors are
+   `flex: 0 0 auto`: they are pinned to the bottom and cannot move. It was
+   the hero that failed, above them, and no measurement in that file looks
+   at it. A probe that only watches the thing that cannot move will report
+   green while the page is unusable.
+
+   The four levers below come to ~98px on a 568px screen — enough that
+   everything from a 360x740 Android upwards now fits with room over. An SE
+   and any landscape phone still scroll a little, and for a page carrying a
+   headline, a paragraph, a CTA and five destinations that is the honest
+   answer rather than a hidden one.
+
+   `max-height: 520px` catches landscape phones (390 and 375 tall) and stops
+   short of the short DESKTOP windows, which measure 0 overflow and are not
+   in the one-column regime — 1024x600 and 1280x620 keep the desktop rules. */
+@media (max-width: 640px), (max-height: 520px) {
+  /* 3.2vh is 26px at 812 and 18px at 568, and there are four of them — the
+     single biggest line item in the hero after the type itself. */
+  .hero {
+    gap: clamp(12px, 2.2vh, 24px);
+    /* the hero used to inherit its breathing room from the free space it
+       filled; on a screen with none it needs its own. Small, because this
+       padding is only ever VISIBLE on the screens that have no room to give
+       it — where there is free space the hero grows into it and centres, and
+       the padding is absorbed. 3vh here cost 360x740 its one screen by 21px. */
+    padding-block: clamp(10px, 1.8vh, 24px);
+  }
+
+  .cta {
+    margin-top: clamp(6px, 1.2vh, 14px);
+  }
+
+  .door {
+    padding-block: clamp(7px, 1.2vh, 14px);
+  }
+
+  .doorNote {
+    margin-top: 3px;
+    font-size: 0.75rem;
+    line-height: 1.35;
+  }
+
+  /* ⚠️ THE CONSENT CARD LANDS ON TOP OF THE DOORS, and on this page that is
+     not a cosmetic overlap — the doors are the only way out of a 404. The
+     card is `position: fixed` at the bottom and on a phone it is full-bleed
+     (`min(420px, 100vw - 2 * --pad-x)`), so it does not merely clip a corner
+     the way it does on a desktop row: on a first visit it buried Careers and
+     Contact Us at 375x812, three of the five at 320x568, and all five in
+     landscape. Scrolling alone does not answer it either — the card is fixed,
+     so the last door sits under it at the bottom of the scroll as surely as
+     at the bottom of a static page.
+
+     `--consent-h` is published on the root by CookieBanner for exactly as
+     long as it is mounted, and the fallback is 0px — so this padding exists
+     while the card does and vanishes the moment it is dismissed, rather than
+     costing every reader a scroll for a card most of them never see. */
+  .doors {
+    padding-bottom: calc(clamp(12px, 2.2vh, 32px) + var(--consent-h, 0px));
   }
 }
