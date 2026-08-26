@@ -25,36 +25,75 @@ import PillCta from "@/components/ui/PillCta";
    the choice of room is editorial and belongs to the page. */
 const CLIP = "/videos/mamasons-hero.mp4";
 
-/* ══════════ WHERE THE GROWTH IS ALLOWED TO START ══════════
-   ⚠️ THIS WAS A FLAT 0.58 AND IT WAS COSTING THE DESKTOP HALF ITS RUNWAY.
-   The plate must still be a small card at the frame the reader first sees
-   it, which is the frame it is seated under the sentence — and that frame
-   is `--pin-peep` as a fraction of the viewport, which <Passage> derives
-   per screen and now publishes on documentElement. Measured, it runs 0.30
-   at 1920 to 0.52 on a phone.
+/* ══════════ WHERE THE GROWTH RUNS — A WINDOW ON THE APPROACH ══════════
+   ⚠️ THE START USED TO BE KEYED TO THE SEAT, AND THAT PUT THE GROWTH IN THE
+   WRONG PLACE ON THE SCREEN. It was derived as seat + POST_SEAT under an
+   ENTER_HOLD_MAX = 0.58 cap — a number about where <Passage>'s SENTENCE
+   ends, not about where the PLATE is. The film travels 1:1 and is never
+   pinned, so the un-grown plate's centre sits at exactly 112.5 − 100a svh;
+   a start that moves with the seat is a start at a different screen height
+   on every viewport. Measured at the first growing frame: centre 67.8%
+   down the screen at 1920×1080, 64.8% at 1440×900, 55.9% at 390×844 — and
+   83.3% at 1440×620, the bottom sixth of the screen. The expansion this
+   section is built around never once began near the middle of the screen,
+   and at 1440×900 its centre ran 65% → 54% over the whole growth.
 
-   A single constant therefore has to clear the PHONE, and 0.58 did. On a
-   1440 desktop, where the card is seated at 0.334, that spent 0.25 of the
-   approach — 225px of scroll — holding a card still that had been sitting
-   there since it appeared, and left the growth itself only 0.42 to run in.
-   That is why the plate opened out as fast as it did: not because the
-   animation was quick, but because it was starting late.
+   THE WINDOW IS ONE CONSTANT AND ONE DERIVED VALUE — both positions on
+   the approach itself, because the approach IS screen position:
 
-   POST_SEAT IS THE BEAT THAT REMAINS, and it is deliberately not zero. The
-   card holding its small size for a moment AFTER it has begun to cross the
-   sentence is the composition study 12 showed; deriving the start without
-   it would delete that beat rather than shorten it. 0.14 keeps about 126px
-   of it at 1440 where there used to be 225.
+     growStartFor(drop) ⇒ the a at which the un-grown plate's centre
+                          sits at CENTRE_AT_START = 57.5% of the screen,
+                          just under the middle. The un-grown plate runs
+                          from 100(1 − a) down to 225 − 100a − drop, so
 
-   ⚠️ THE CAP IS WHAT MAKES THIS SAFE, AND IT IS THE OLD CONSTANT. On a
-   narrow screen the seat is already at 0.52 and 0.52 + 0.14 would push the
-   hold PAST where it is now, i.e. make the phone's growth faster — the
-   opposite of what was asked. Clamping to the old value means no screen
-   can come out worse than it was: the phone lands exactly where it did,
-   the desktop gets the runway back, and the fallback below (used if the
-   fraction never arrives) is the old behaviour exactly. */
-const ENTER_HOLD_MAX = 0.58;
-const POST_SEAT = 0.14;
+                            centre(a) = (325 − 200a − drop) / 2
+                            centre = 57.5  ⇒  a = (210 − drop) / 200
+
+                          = 0.550 at drop 100, 0.565 at the ≤980px
+                          branch's drop 97.
+     GROW_END = 0.90    ⇒ all four margins reach 0 here (see the derived
+                          `enter` below for how the bottom is made to
+                          agree). The eased centre track between the two
+                          dips to 47.8% and lands at 50.0% at drop 100.
+
+   ⚠️ THE START WAS A FLAT 0.55 FOR ONE ROUND, AND THAT WAS A DROP-100
+   SPECIAL CASE WEARING A CONSTANT'S CLOTHES. 0.55 solves the centre
+   equation only while the card is 25svh tall; under the phone branch's
+   97svh drop the card is 28svh, and the same start put its centre at
+   59.0% — measured 58.96% at a = 0.550 on 390×844, a 1.5-point miss,
+   and WORSE than the seat-keyed scheme it replaced had managed at that
+   width (55.9%). Deriving the start from the drop the same effect below
+   already reads is what makes 57.5% a property of the design rather
+   than of one viewport. The phone pays 0.015 of runway for it
+   (0.350 → 0.335), which is the right trade: runway spent on starting
+   in the right place.
+
+   ⚠️ GROW_END IS HALF OF A PAIR, AND IT STAYS A CONSTANT. The plate's
+   top edge reaches the viewport's top exactly when 100(1 − a) = head, a
+   relation with no drop in it — so --head in Reservations.module.css
+   MUST equal 100 × (1 − GROW_END) svh = 10svh, and neither number moves
+   with the breakpoint. Move either and the other moves with it, or the
+   top seals early (edge off-screen while cream still shows at the
+   sides) or late (a cream band along the top of an otherwise sealed
+   film).
+
+   ⚠️ THE SEAT IS A SAFETY FLOOR NOW, NOT THE DRIVER. The card must still
+   be at rest at the frame the reader first sees it seated under the
+   sentence, so the growth may never start before the seat lands.
+   <Passage> clamps the seat at PEEP_MAX = 0.52 of the viewport, and the
+   derived start never falls below 0.550 (drop never exceeds 100svh as
+   shipped), so it clears the seat by construction and the floor below
+   never binds in practice — it exists so a change over THERE cannot
+   silently start the growth under a still-arriving card. The floor is
+   seat + MIN_SEAT_HOLD, capped at GROW_START_MAX so a bad reading can
+   delay the start by at most 0.07 of the approach (0.055 under drop
+   97), never swallow the runway. */
+const CENTRE_AT_START = 57.5;
+const growStartFor = (drop: number) =>
+  (325 - 2 * CENTRE_AT_START - drop) / 200;
+const GROW_END = 0.9;
+const MIN_SEAT_HOLD = 0.03;
+const GROW_START_MAX = 0.62;
 
 export default function Reservations() {
   const ref = useRef<HTMLElement>(null);
@@ -80,63 +119,64 @@ export default function Reservations() {
     offset: ["start end", "start start"],
   });
 
-  /* ⚠️ --enter IS NOT THE APPROACH ANY MORE, AND THE REMAP IS THE WHOLE
-     REASON THE CARD CAN BE SMALL. --enter drives the clip-path's insets, so
-     it is the plate's SIZE; the approach is the plate's POSITION, because
-     the film travels 1:1 with the scroll and is not pinned. Wiring size
-     directly to position means the two cannot be chosen independently — by
-     the time the card has risen far enough to sit below the passage's last
-     line it has already spent that much of its inset, so a card small
-     enough to be a card at that moment has to start absurdly small, and one
-     that starts at a sane size is most of the screen by the time you see
-     it. That is exactly what the section looked like.
+  /* ⚠️ --enter IS NOT THE APPROACH, AND THE SEPARATION IS THE WHOLE REASON
+     THE CARD CAN BE SMALL. The insets are the plate's SIZE; the approach is
+     its POSITION, because the film travels 1:1 with the scroll and is not
+     pinned. Wiring size directly to position means the two cannot be chosen
+     independently — by the time the card has risen far enough to sit below
+     the passage's last line it has already spent that much of its inset, so
+     a card small enough to be a card at that moment has to start absurdly
+     small, and one that starts at a sane size is most of the screen by the
+     time you see it. Holding the size ramps flat until growStart keeps the
+     plate a genuinely small rectangle while it rises into the cream beneath
+     the sentence, and only then opens it out.
 
-     Holding --enter at 0 for the first stretch separates them: the plate
-     keeps its full inset — a genuinely small rectangle — while it rises
-     into the cream beneath the sentence, and only then begins to open out.
+     ⚠️ READ AFTER PAINT, NOT DURING THE EFFECT. <Passage> writes
+     --pin-peep-frac from its own layout effect and the two components'
+     effects are not ordered, so a synchronous read here can miss the first
+     write. A rAF defer puts this after the frame that write lands in, and
+     the resize path is deferred the same way for the same reason. Until it
+     lands the state seeds are the desktop pair — drop 100 and
+     growStartFor(100) = 0.550 — and the first read replaces both with the
+     derived values for the real drop, one frame after mount.
 
-     ⚠️ 0.58 IS SET BY THE SEATING, NOT BY TASTE, AND IT MOVED ONCE ALREADY.
-     Progress runs 0 at the frame before the pin and 1 at the frame it
-     releases, so where the PIN STARTS on this scale is `--pin-peep` as a
-     fraction of the viewport — and Passage.tsx derives that per viewport
-     now, in order to seat this card under the sentence at the moment the
-     type locks. Measured, it runs from 0.23 on a short laptop to 0.52 on a
-     phone.
-
-     The hold therefore has to end AFTER the largest of those, or the card
-     is already growing at the frame the reader first sees it. It was 0.45,
-     tuned when the peep was a flat 12svh, and on a phone that put the card
-     at 349x319 at rest — very nearly a square, and not the shape anyone
-     designed. 0.58 clears the 0.52 ceiling on the peep (see PEEP_MAX in
-     Passage.tsx) with a little to spare, so the plate is at its small size
-     when it is seated on every screen measured.
-
-     What it costs on a big screen, stated so it is a decision and not a
-     surprise: the card also stays small for a stretch AFTER it has begun
-     to cross the sentence — about 20svh at 1920 — and only then opens out.
-     That is the composition study 12 showed and it reads well; it is not
-     an oversight. Seal it earlier and the plate is already growing while
-     it is still the thing being looked at. */
-  /* ⚠️ READ AFTER PAINT, NOT DURING THE EFFECT. <Passage> writes the
-     fraction from its own layout effect and the two components' effects
-     are not ordered, so a synchronous read here can miss the first write.
-     A rAF defer puts this after the frame that write lands in, and the
-     resize path is deferred the same way for the same reason. Until it
-     lands the fallback is ENTER_HOLD_MAX, which is the behaviour this
-     section shipped with. */
-  const [holdEnd, setHoldEnd] = useState(ENTER_HOLD_MAX);
+     ⚠️ --card-drop IS READ HERE TOO, AND IT IS LOAD-BEARING TWICE. The
+     derived `enter` below divides by the drop, and the CSS spends
+     `--card-drop × (1 − enter)` on the bottom inset — if the two disagreed,
+     the bottom edge would miss the foot at the seal. And growStart is
+     DERIVED from the drop now, so this read also decides where the growth
+     begins. Reading the property off the section keeps one source of
+     truth, and the fallback is exact rather than lenient: above 980px the
+     stylesheet never DECLARES --card-drop (the CSS leans on the 100svh
+     fallback inside its var()), so getComputedStyle returns "" — parseFloat
+     gives NaN and the 100 here IS the value the CSS is using, not a guess
+     at it. The ≤980px query's 97svh parses to 97. Crossing 980px in either
+     direction fires the resize listener, and the deferred read re-derives
+     BOTH drop and growStart against the newly matching styles. The parse
+     takes the leading number and ASSUMES svh, which is the unit the whole
+     derivation runs in — do not put a px length in that property. */
+  const [growStart, setGrowStart] = useState(growStartFor(100));
+  const [drop, setDrop] = useState(100);
   useEffect(() => {
     let raf = 0;
     const read = () => {
+      const dropRead = ref.current
+        ? parseFloat(
+            getComputedStyle(ref.current).getPropertyValue("--card-drop")
+          )
+        : NaN;
+      const d = Number.isFinite(dropRead) && dropRead > 0 ? dropRead : 100;
+      setDrop(d);
+      const base = growStartFor(d);
       const seat = parseFloat(
         getComputedStyle(document.documentElement).getPropertyValue(
           "--pin-peep-frac"
         )
       );
-      setHoldEnd(
+      setGrowStart(
         Number.isFinite(seat) && seat > 0
-          ? Math.min(seat + POST_SEAT, ENTER_HOLD_MAX)
-          : ENTER_HOLD_MAX
+          ? Math.min(Math.max(base, seat + MIN_SEAT_HOLD), GROW_START_MAX)
+          : base
       );
     };
     const defer = () => {
@@ -151,28 +191,110 @@ export default function Reservations() {
     };
   }, []);
 
-  const enter = useTransform(approach, [0, holdEnd, 1], [0, 0, 1]);
+  /* ══════════ ONE EASED RAMP FOR THE PLATE'S GEOMETRY ══════════
+     ⚠️ THE OLD PIECEWISE-LINEAR RAMP HAD INFINITE ACCELERATION AT BOTH
+     ENDS, and that — not the four layout-dirtying insets, which cost a
+     measured ~0.18ms/frame — was the visible pop. [0, hold, end] → [0, 0, 1]
+     takes the plate from stationary-relative-to-the-page to full growth
+     speed in ONE frame and back to zero in one frame: measured at 0.35px/ms
+     of scroll, the width deltas ran 0 0 0 21.9 42.2 … 42.2 3.5 0 — two hard
+     velocity steps bracketing a constant-velocity slab. The fix is a curve
+     whose ENDPOINT SLOPE IS ZERO, so the plate's velocity matches the
+     page's at both ends of the growth.
 
-  /* ⚠️ THE SIDES SEAL EARLY, ON THEIR OWN RAMP. The plate's bottom edge
-     crosses the foot of the screen at approach 0.819 and cannot be made to
-     do otherwise — see the note over --side-inset in the stylesheet for the
-     arithmetic. Sealing the sides by 0.82 means the plate is already full
-     width by then, so the reader never sees a frame with the picture flush
-     against the bottom of the screen and cream still showing either side of
-     it, which is what this fixes. Same flat first segment as --enter, and
-     the same seeding requirement because of it.
+     cubicBezier(0.33, 0, 0.67, 1): symmetric, zero slope at entry and exit,
+     peak speed only 1.49× linear. If the middle ever reads too fast, step
+     DOWN to (0.25, 0, 0.75, 1) (peak ~1.36×); never past (0.42, 0, 0.58, 1)
+     (1.72×); and never back to linear — that reinstates both kinks.
 
-     ⚠️ IT IS NOT ONLY THE SIDES ANY MORE — THIS RAMP NOW CLOSES THE TOP AS
-     WELL, and the name is the only thing left saying otherwise. --top-inset
-     rides it too, spending 18svh of stage headroom (--head) over the same
-     0.58 → 0.82 stretch. The two numbers are locked to one another:
-     head = 100svh × (1 − 0.82), because the section's top sits exactly
-     100svh × (1 − approach) down the viewport, so this endpoint is where
-     the plate's top edge reaches the viewport's top. MOVE 0.82 AND --head
-     IN Reservations.module.css MUST MOVE WITH IT, or the top will seal
-     early (leaving the plate's top edge off-screen while cream still shows
-     at the sides) or late (the band this whole arrangement removes). */
-  const sealX = useTransform(approach, [0, holdEnd, 0.82], [0, 0, 1]);
+     ⚠️ THIS IS THE OPPOSITE CASE TO --ease-entrance, deliberately. An
+     entrance curve arrives fast and settles, so on a scrubbed edge its
+     start IS a velocity step — the exact trap the journal rail paid for.
+     A scrub whose endpoints must match the page needs zero-slope ENDS,
+     which no entrance curve has.
+
+     The identity function is the flat first segment's "easing": this
+     framer-motion exports no `linear`, the ease array must be one item
+     shorter than the range, and any curve on a 0 → 0 segment is a no-op
+     anyway. clamp holds the output at 1 past GROW_END — it is the option's
+     default, stated because the derived tail below RELIES on it. */
+  const grow = useTransform(approach, [0, growStart, GROW_END], [0, 0, 1], {
+    clamp: true,
+    ease: [(v: number) => v, cubicBezier(0.33, 0, 0.67, 1)],
+  });
+
+  /* ⚠️ THE SIDES AND THE TOP ARE THE GROWTH ITSELF — sealX IS grow, not a
+     second ramp that happens to agree. The stylesheet spends the side clamp
+     and --head on --seal-x, so publishing the one eased progress under this
+     name means those margins cannot drift from the growth by construction.
+
+     ⚠️ THE COMMENT THAT STOOD HERE DOCUMENTED A DEFECT AS AN INVARIANT. It
+     said the plate's bottom edge crosses the foot of the screen "at
+     approach 0.819" and that this was a constant, independent of
+     --pin-peep — and sealed the sides at a flat 0.82 to stay ahead of it.
+     That was wrong: with the bottom on its own linear ramp the crossing was
+     a_foot = 1.25 − 0.25 / holdEnd, a FUNCTION of the seat, and the seat
+     moves per viewport. Measured against that relation: crossing at 0.692
+     on 1920×1080 (predicted 0.688), 0.725 at 1440×900 (0.723), 0.375 at
+     1440×620 (0.372) — all well before 0.82, so every screen showed the
+     exact frame the two-ramp scheme exists to forbid: the film flush
+     against the foot with cream still showing either side (249px a side at
+     1920×1080, 151px at 1440×900, 455px at 1440×620). The repair is not a
+     better constant — it is deriving the bottom from this same progress,
+     which `enter` below does. */
+  const sealX = grow;
+
+  /* ══════════ THE BOTTOM EDGE, DERIVED RATHER THAN TIMED ══════════
+     The plate's visible bottom is `film box top + 125svh − bottom inset`,
+     the CSS spends `drop × (1 − enter)` on that inset (drop = --card-drop
+     in svh), and the section's top sits at 100(1 − a)svh, so the bottom
+     edge is at
+
+         B(a) = 225 − 100a − drop + drop·enter          [svh]
+
+     Ask for the one thing that matters — that the bottom travel from its
+     un-grown track B0(a) = 225 − 100a − drop to the foot of the screen on
+     exactly the eased progress g the other three margins ride,
+     B = B0 + (100 − B0)·g — and solve for enter:
+
+         enter(a) = g(a) · (100a + drop − 125) / drop
+
+     That lands the bottom on the foot at PRECISELY a = GROW_END, with zero
+     velocity (g's endpoint slope is zero), under ANY easing and ANY
+     --card-drop — the desync between the bottom and the sides is exact
+     now, not a pair of hand-tuned endpoints. At the seal enter has reached
+     (100·GROW_END + drop − 125) / drop = 0.65 at drop 100 and 0.639 at
+     drop 97; the tail then runs linearly to 1 by a = 1, so everything
+     still spending --enter (the bottom inset — 35svh of it, all below the
+     fold — and the last 0.7px of corner radius) finishes exactly at full
+     view. enter is strictly increasing across the whole approach — g and
+     the bracket both rise over the growth and the bracket is positive
+     wherever g is — so nothing riding it can ever run backwards on the
+     way in.
+
+     ⚠️ THE TOP CLOSES LAST, BY 3–5px OF SCROLL, AND THAT IS THE FLOOR —
+     DO NOT TUNE AT IT. Measured at every viewport: the sides and the
+     bottom arrive together within 0.6px, then the top's last 3.1–5.2px
+     close over the following frame or two (rows y = 0–3 still cream at
+     1440×620 while the other three edges are flush). Structural, not a
+     miss: the top edge is 100(1 − a) − head·g, so it approaches the seal
+     at 100 + head·g′ — the PAGE's own speed plus a term that has died by
+     the endpoint, because g′ → 0 there is exactly what removes the
+     growth's exit kink. Landing the top with zero velocity would need
+     g′ = −100/head at the seal — a DECREASING seal, on a value that also
+     carries the scrim and must stay monotone. So the sides and bottom
+     close asymptotically, the top closes at page speed, and page speed
+     means last. Growing --head to start the top earlier only trades a
+     3–5px sliver for a longer window of flush-top-with-inset-sides — the
+     mirror of the 151–455px cream-band defect this derivation removed —
+     and the same straggle existed under the old 0.82 seal. It is the
+     price of a top edge that must travel with the page. */
+  const enterAtSeal = (100 * GROW_END + drop - 125) / drop;
+  const enter = useTransform([approach, grow], ([a, g]: number[]) =>
+    a <= GROW_END
+      ? (g * (100 * a + drop - 125)) / drop
+      : enterAtSeal + ((1 - enterAtSeal) * (a - GROW_END)) / (1 - GROW_END)
+  );
 
   /* ══════════ THE INVITATION'S ENTRANCE ══════════
      "Where will you begin?" and its pill are sized for full bleed and
