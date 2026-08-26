@@ -252,6 +252,22 @@ export default function Nav({
          app/layout.tsx keys off this; see the long note in Reveal.tsx. */
       data-entrance="rise"
     >
+      {/* ── WHY THIS IS AN <a> AND MUST STAY ONE ──
+          @next/next/no-html-link-for-pages fires here and is wrong, so the
+          rule is disabled on the line rather than the code changed to suit
+          it. The anchor never navigates: onLogoClick calls preventDefault()
+          and then routes through `navigate()` from useRouteTransition, which
+          is what draws the page-transition curtain. A <Link> would hand the
+          navigation to the router directly and the curtain would never run —
+          the rule cannot see a preventDefault'd handler, so it reads a
+          deliberate fallback as a mistake.
+
+          `href="/"` earns its place twice over: it is what makes this a real
+          link to the browser (middle-click, ⌘-click, "copy link address",
+          and the status bar all work), and it is the no-JS path home. This
+          file already treats that reader as real — see the <noscript> note
+          on the nav above and the hideLogo note below. */}
+      {/* eslint-disable-next-line @next/next/no-html-link-for-pages */}
       <a
         className={[styles.logo, hideLogo && styles.logoStood]
           .filter(Boolean)
