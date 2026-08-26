@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import JoinUs from "@/components/careers/JoinUs";
 import { JOBS } from "@/lib/jobs";
 import { SITE_URL } from "@/lib/site";
+import { ogImage, OG_W, OG_H } from "@/lib/media";
 import { StructuredData } from "@/lib/StructuredData";
 
 // Schema.org ItemList of open JobPostings — Google can lift this into the
@@ -53,9 +54,11 @@ export const metadata: Metadata = {
     url: "/careers",
     images: [
       {
-        url: "/images/cafemama.jpg",
-        width: 1200,
-        height: 630,
+        /* CROPPED TO THE DECLARATION — this was a 1605x2407 portrait
+           declared as a 1.91:1 landscape. See ogImage() in lib/media.ts. */
+        url: ogImage("/images/cafemama.jpg"),
+        width: OG_W,
+        height: OG_H,
         alt: "Join the Maginhawa Group team",
       },
     ],

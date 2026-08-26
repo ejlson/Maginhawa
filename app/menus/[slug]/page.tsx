@@ -3,6 +3,7 @@ import { notFound } from "next/navigation";
 import MenuPage from "@/components/venues/MenuPage";
 import { getRestaurant, withMenus } from "@/lib/restaurants";
 import { SITE_URL } from "@/lib/site";
+import { ogImage, OG_W, OG_H } from "@/lib/media";
 import { StructuredData } from "@/lib/StructuredData";
 
 /* ═══ ONE ROUTE PER MENU, WRITTEN AT BUILD TIME ═══
@@ -88,10 +89,17 @@ export async function generateMetadata({
         {
           /* the VENUE's photograph, not a menu page. A share card wants the
              room; a 4961x7016 sheet of A4 cropped to 1200x630 is an
-             unreadable band of the middle of a menu. */
-          url: r.image,
-          width: 1200,
-          height: 630,
+             unreadable band of the middle of a menu.
+
+             ⚠️ AND IT IS CROPPED TO THE SIZE DECLARED BELOW, which it was
+             not: `r.image` is the full-resolution source, so /menus/ramo
+             declared images/ramoramen.JPG — 7008x4672, 8.69MB — as a
+             1200x630 card. Over Twitter's 5MB ceiling and twenty-eight
+             times WhatsApp's, i.e. no card at all on the two surfaces a
+             restaurant is shared on most. See ogImage() in lib/media.ts. */
+          url: ogImage(r.image),
+          width: OG_W,
+          height: OG_H,
           alt: `${r.name} — ${r.tagline}`,
         },
       ],
