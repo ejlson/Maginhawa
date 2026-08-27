@@ -53,33 +53,41 @@ directory = "./out"
 not_found_handling = "404-page"
 
 
-# ── THE ENQUIRY FORM'S THROTTLE ──────────────────────────────────────────────
-# Read by the CONTACT_RATELIMIT binding in functions/api/contact.ts, which
-# spends one token per POST keyed on the sender's CF-Connecting-IP. Three a
-# minute is far more than a person writing to a restaurant will ever need and
-# far less than a flood needs to be worth running.
+# ═══════════ THERE IS NO REQUEST-TIME CODE HERE, AND THAT IS DELIBERATE ══════
 #
-# ⚠️ `period` TAKES 10 OR 60 AND NOTHING ELSE. The platform rejects any other
-# value; there is no 30 and no 300.
+# This config briefly carried `main = "./worker/index.ts"`, an `[assets]`
+# `binding`, `run_worker_first = ["/api/*"]`, a `[[send_email]]` binding and
+# a `[[ratelimits]]` block — all of it to serve ONE endpoint, POST
+# /api/contact, which delivered the enquiry form. Every bit of it was removed
+# on 2026-08-27 at the user's instruction, because the form now hands off to
+# the reader's own mail client with a `mailto:` and asks nothing of the
+# server. The site is a folder of static files again, start to finish.
 #
-# ⚠️ AND IT IS DUPLICATED IN CODE. contact.ts carries WINDOW_SECONDS purely so
-# its 429 can name a number in `Retry-After`. The counting is done here, not
-# there — change one and change the other, because nothing detects the
-# disagreement and the only symptom is a Retry-After that lies.
+# ⚠️ THE FILES ARE STILL IN THE REPOSITORY AND ARE NOW INERT.
+# worker/index.ts, functions/api/contact.ts and scripts/probe-contact-fn.mjs
+# are not referenced by anything and are not deployed — nothing loads a
+# Worker without `main`. They are kept because the handler is complete and
+# tested, and re-adding it is a config change rather than a rewrite.
 #
-# ⚠️ THE COUNTERS ARE PER-LOCATION, NOT GLOBAL, and that is the platform's
-# design rather than a setting: each colo counts its own. A distributed flood
-# therefore gets three per minute per colo it reaches. This is abuse
-# mitigation, not an accounting boundary — Cloudflare says as much — and the
-# alternative that IS global is a Durable Object per key, which is a stateful
-# paid dependency for a form that takes a handful of messages a week.
+# ── IF SERVER-SIDE DELIVERY IS EVER WANTED AGAIN, THIS IS THE WHOLE LIST ──
+#   1. main = "./worker/index.ts"
+#   2. binding = "ASSETS" under [assets]        — without it the Worker
+#      cannot hand ordinary page requests back and every miss 500s
+#   3. run_worker_first = ["/api/*"] under [assets]
+#   4. [[send_email]] name = "EMAIL", destination_address = "info@mgnhw.com"
+#   5. [vars] CONTACT_TO / CONTACT_FROM
+#   6. [[ratelimits]] name = "CONTACT_RATELIMIT", namespace_id = "1001",
+#      [ratelimits.simple] limit = 3, period = 60   (period takes 10 or 60,
+#      nothing else) — and contact.ts's WINDOW_SECONDS must match it
+#   7. onboard a SENDING domain in the dashboard (Compute → Email Service →
+#      Email Sending). Use a subdomain such as send.maginhawagroup.co.uk:
+#      onboarding writes `_dmarc.<domain>` at the ROOT, and this zone already
+#      has one — `v=DMARC1; p=reject; adkim=r; aspf=r; rua=…` — governing the
+#      group's real Microsoft 365 mail. Apex onboarding overwrites it. The
+#      apex SPF and apex MX are NOT touched either way.
+#   8. point Contact.tsx's handleSubmit back at fetch("/api/contact")
 #
-# `namespace_id` is an account-wide integer, and two bindings sharing one
-# share their counters. Nothing else on this account uses 1001.
-[[ratelimits]]
-name = "CONTACT_RATELIMIT"
-namespace_id = "1001"
-
-  [ratelimits.simple]
-  limit = 3
-  period = 60
+# ⚠️ AND DO NOT REACH FOR EMAIL ROUTING TO DO IT. That is the INBOUND feature
+# and cannot send; enabling it takes over the ROOT domain's MX records, which
+# on both maginhawagroup.co.uk and mgnhw.com currently point at Microsoft 365
+# — it would redirect the group's real incoming mail.

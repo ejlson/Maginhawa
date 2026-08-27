@@ -5,6 +5,15 @@
 .DS_Store
 *.pem
 .env*
+
+# Wrangler's local secrets file, read by `npx wrangler dev`. NOT covered by
+# `.env*` above — the names do not match — so it needs its own line, and it is
+# the file any real credential lands in while testing a Worker locally.
+.dev.vars
+.dev.vars.*
+
+# Wrangler's local state — created by `wrangler dev`, machine-specific.
+.wrangler/
 # …but the template is documentation, not a secret. See CLOUDINARY.md.
 !.env.example
 

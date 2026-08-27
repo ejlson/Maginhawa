@@ -1,14 +1,17 @@
 /* ── WHAT THIS PROTECTS: THE ONE PIECE OF THIS SITE THAT RUNS AT REQUEST TIME ──
  *
- * functions/api/contact.ts is a Cloudflare Pages Function, so `npm run build`
- * never executes it and no page renders it — it type-checks and is otherwise
- * invisible until a real enquiry hits production. This exercises it the only
+ * functions/api/contact.ts runs on the host, not in the Next build, so
+ * `npm run build` never executes it and no page renders it — it type-checks
+ * and is otherwise invisible until a real enquiry hits production. (It is
+ * routed by worker/index.ts, named by `main` in wrangler.toml; the
+ * functions/ path is a leftover of the Pages convention and routes nothing
+ * by itself. Move this file and the compile path below must move too.) This exercises it the only
  * way that is honest without deploying: import the handler, hand it a Request,
- * and stub `fetch` so nothing reaches Resend and no key is needed.
+ * and stub the EMAIL binding so nothing is actually sent.
  *
  * What it holds down is every branch a reader can land in — an unconfigured
  * deployment, a bot, a half-filled form, a provider outage — plus the two
- * details that matter in the delivered mail: reply_to is the sender's address,
+ * details that matter in the delivered mail: replyTo is the sender's address,
  * and the body is plain text with no markup built from what they typed.
  *
  *   node scripts/probe-contact-fn.mjs
@@ -29,20 +32,32 @@ execFileSync("npx", ["--yes", "tsc", "functions/api/contact.ts",
   "--outDir", out, "--module", "esnext", "--target", "es2022",
   "--moduleResolution", "bundler", "--skipLibCheck"], { stdio: "inherit" });
 
+/* ── THE MAILER IS A BINDING NOW, SO IT IS STUBBED LIKE ONE ──
+   This used to override `globalThis.fetch`, because the handler POSTed to
+   Resend's REST API. It sends through `env.EMAIL.send()` instead, which is
+   a binding the platform injects — so the stub is an object on the env,
+   exactly like CONTACT_RATELIMIT below.
+
+   ⚠️ `send` REJECTS ON FAILURE rather than returning a status. That is why
+   `stubThrows` throws instead of setting a status code: a stub that resolved
+   with an error-shaped object would pass while the real binding threw. */
 let sentPayload = null;
-let stubStatus = 200;
-globalThis.fetch = async (_url, init) => {
-  sentPayload = JSON.parse(init.body);
-  return { ok: stubStatus < 400, status: stubStatus, text: async () => "stub" };
+let stubThrows = null;
+const mailer = {
+  send: async (message) => {
+    if (stubThrows) throw stubThrows;
+    sentPayload = message;
+    return { messageId: "stub-message-id" };
+  },
 };
 
 const { onRequest } = await import(pathToFileURL(join(out, "contact.js")).href);
 rmSync(out, { recursive: true, force: true });
 
 const ENV = {
-  RESEND_API_KEY: "re_test",
+  EMAIL: mailer,
   CONTACT_TO: "info@mgnhw.com",
-  CONTACT_FROM: "Maginhawa Group <website@mgnhw.com>",
+  CONTACT_FROM: "Maginhawa Group <website@send.maginhawagroup.co.uk>",
 };
 const OLD = Date.now() - 60_000;
 const post = (body, env = ENV) =>
@@ -81,7 +96,8 @@ sentPayload = null;
 const okRes = await post(good);
 const okBody = await okRes.json();
 check("valid enquiry → 200 ok:true", okRes.status === 200 && okBody.ok === true);
-check("reply_to is the sender, not us", sentPayload?.reply_to === good.email, JSON.stringify(sentPayload?.reply_to));
+check("replyTo is the sender, not us", sentPayload?.replyTo === good.email, JSON.stringify(sentPayload?.replyTo));
+check("to is the configured destination", sentPayload?.to === ENV.CONTACT_TO, JSON.stringify(sentPayload?.to));
 check("from is the verified sender", sentPayload?.from === ENV.CONTACT_FROM);
 check("body is plain text only", !!sentPayload?.text && sentPayload.html === undefined);
 check("the message survives intact", sentPayload?.text.includes(good.message));
@@ -116,13 +132,17 @@ sentPayload = null;
 await post({ ...good, lastName: "" });
 check("mononym is accepted", sentPayload !== null && sentPayload.subject.endsWith("Ada"));
 
-// 9 — the provider falls over
-stubStatus = 422;
+// 9 — the sending binding falls over. E_SENDER_NOT_VERIFIED is the real one
+//     this will hit: it is what an un-onboarded sending domain throws.
+stubThrows = Object.assign(new Error("Please verify your sender domain first"), {
+  code: "E_SENDER_NOT_VERIFIED",
+});
 const bad = await post(good);
 const badBody = await bad.json();
-check("provider failure → 502 retry:true", bad.status === 502 && badBody.retry === true);
-check("provider's reason is not leaked to the browser", !JSON.stringify(badBody).includes("stub"));
-stubStatus = 200;
+check("send failure → 502 retry:true", bad.status === 502 && badBody.retry === true);
+check("the platform's reason is not leaked to the browser",
+  !JSON.stringify(badBody).includes("verify") && !JSON.stringify(badBody).includes("E_SENDER"));
+stubThrows = null;
 
 // 10 — an oversized message is truncated, not rejected
 sentPayload = null;
@@ -133,7 +153,7 @@ const longestX = Math.max(...(sentPayload?.text.match(/x+/g) ?? [""]).map((m) =>
 check("9000-char message is clamped to 5000", longestX === 5000, `longest run ${longestX}`);
 
 /* ── 11-16, THE THROTTLE ───────────────────────────────────────────────────
-   The limiter is a binding, so it is stubbed the same way `fetch` is: the
+   The limiter is a binding, so it is stubbed the same way the mailer is: the
    handler cannot tell this from the platform's, which is what makes these
    cases worth anything. `asked` records the key so the IP-header case can
    assert on WHICH identity was counted, not merely that counting happened. */
