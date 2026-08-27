@@ -80,6 +80,42 @@ export type PressMention = {
 //   Hypebeast               1.000   1/r                     1.000
 //   That's Up               0.681   1/r                     1.468
 //
+// ── MICHELIN IS A BADGE NOW, NOT A MARK, AND IT BREAKS TWO RULES ABOVE ──
+// The seat carries press-logo/michelin-2026-selection.png: the supplied 2026
+// plaque — a filled red rounded rectangle, white type, three lines
+// (RESTAURANT SELECTION / MICHELIN GUIDE / 2026) at 2396x1024. Every other
+// entry in this table is a mark on transparency; this one brings its own
+// background, and both of the rules above assume it does not.
+//
+// `w`/`h` ARE 2396x1024 AND GETTING THEM WRONG IS THE SILENT FAILURE. They
+// were 292x320 when the logo path was first swapped — the ROSETTE's shape,
+// left behind on the new file. The seat takes `aspect-ratio: w / h`, so the
+// plaque would have been poured into a 0.91:1 portrait box at 2.34:1 of its
+// own: squashed, with nothing erroring. Same trap the note below the table
+// describes for timeout and forbes.
+//
+// `scale: 2` IS JUDGED, AND THE PLAIN RULE CANNOT PRODUCE IT. inkRatio is
+// the alpha bbox over the PNG height, and this PNG's alpha covers the WHOLE
+// image — it is a filled rectangle — so it reads 1.000 for the PLAQUE rather
+// than for its type, and 1/r would size the red rectangle to the lane's 22px
+// with MICHELIN GUIDE inside it at 2.9px and RESTAURANT SELECTION at 1.8px.
+// Measured line heights as a fraction of the plaque: 8.0%, 13.3%, 12.1%.
+//
+// Standing the dominant line on the lane's 22px ink the way every wordmark
+// stands needs scale 4.02 — an 88.5px plaque against a lane of 22-28px, four
+// times the tallest thing beside it. 2 is the compromise the wall was shown
+// and the user chose: a 44px badge, ~1.8x the wordmarks, with MICHELIN GUIDE
+// at 5.9px. The words are small on purpose; what identifies this credential
+// at a glance is the red plaque, not the reading of it. THIS NUMBER IS THE
+// ONE DIAL — nothing else needs to move to make it bigger or smaller.
+//
+// ⚠️ IT IS ALSO THE ONLY NON-SVG IN /public/press-logo, AND THAT CHANGES HOW
+// IT IS SERVED. The other fourteen are SVG, which asset() returns untouched
+// — origin-served, never the CDN. A .png goes through the Cloudinary loader,
+// so this file 404s silently (naturalWidth 0, no console error) until
+// scripts/cloudinary-upload.mjs has run for it. It has been uploaded; if the
+// mark ever vanishes from the wall, check the CDN before checking the CSS.
+//
 // MICHELIN'S +15% IS GONE TOO, and the reasoning that justified it is worth
 // keeping because it was not wrong, it was answering a question the lane no
 // longer asks. It read: Michelin is the only mark here that is not type — a
@@ -119,7 +155,7 @@ export const FEATURED_OUTLETS: {
   h?: number;
 }[] = [
   { name: "The Sunday Times", tier: "headline", logo: "/press-logo/thesundaytimes.svg", scale: 1.104, w: 1400, h: 180 },
-  { name: "Michelin Guide", tier: "headline", logo: "/press-logo/michelin.svg", scale: 1, w: 292, h: 320 },
+  { name: "Michelin Guide", tier: "headline", logo: "/press-logo/michelin-2026-selection.png", scale: 2, w: 2396, h: 1024 },
   { name: "The Guardian", logo: "/press-logo/theguardian.svg", scale: 1, w: 973, h: 320 },
   { name: "The Independent", logo: "/press-logo/theindependent.svg", scale: 1.432, w: 1400, h: 136 },
   { name: "BBC Good Food", logo: "/press-logo/bbcgoodfood.svg", scale: 1.275, w: 1065, h: 320 },
