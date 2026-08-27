@@ -1365,28 +1365,28 @@
     "semantic_hash": ""
   },
   "public/videos/tile-bintang.mp4": {
-    "mtime": 1787060560.2955031,
-    "ast_hash": "7e2034b4bec275221c2caa92fac812d1",
+    "mtime": 1787842609.1855764,
+    "ast_hash": "a1210c676fd0ebe2c2611de6e53b50cd",
     "semantic_hash": ""
   },
   "public/videos/tile-cafemama.mp4": {
-    "mtime": 1787060560.8672218,
-    "ast_hash": "f980f0f415f55395ca16a78516323588",
+    "mtime": 1787842613.959219,
+    "ast_hash": "10837ec9889767b8ed044df925eaaf28",
     "semantic_hash": ""
   },
   "public/videos/tile-guanabana.mp4": {
-    "mtime": 1787060561.4938102,
-    "ast_hash": "08dceef10cfacc156c00dd09fa4c298c",
+    "mtime": 1787841808.882214,
+    "ast_hash": "1a9ab4117c4068f31af72e3b37c7ca49",
     "semantic_hash": ""
   },
   "public/videos/tile-mamasons.mp4": {
-    "mtime": 1787060561.8311718,
-    "ast_hash": "727d3c2e18ce6f51e48452d53bdc00eb",
+    "mtime": 1787842610.9672053,
+    "ast_hash": "4328c50d0837887bc3c65991d554775e",
     "semantic_hash": ""
   },
   "public/videos/tile-ramo.mp4": {
-    "mtime": 1787060562.3263268,
-    "ast_hash": "f5811443e4ec0e7b8f37be122c40d160",
+    "mtime": 1787842619.4620373,
+    "ast_hash": "6df05a4351b3c76c824b61c2eb978df3",
     "semantic_hash": ""
   },
   "scripts/seek-offset-search.mjs": {
@@ -1935,8 +1935,8 @@
     "semantic_hash": ""
   },
   "components/about/About.tsx": {
-    "mtime": 1787737437.477678,
-    "ast_hash": "b986da59292bb9e9957c38ade6bbf05c",
+    "mtime": 1787842796.323489,
+    "ast_hash": "af4602e0efa62048fabec36092f7cf32",
     "semantic_hash": ""
   },
   "components/analytics/GoogleTag.tsx": {
@@ -1980,13 +1980,13 @@
     "semantic_hash": ""
   },
   "components/careers/JoinUs.tsx": {
-    "mtime": 1787753114.6003113,
-    "ast_hash": "9fd65f23822765ebe51974625740a97e",
+    "mtime": 1787841544.3082743,
+    "ast_hash": "eb04c605a79ae444334a27d82953daf1",
     "semantic_hash": ""
   },
   "components/contact/Contact.tsx": {
-    "mtime": 1787826852.3017519,
-    "ast_hash": "988ab747050249bc54bdf4af42b7caf4",
+    "mtime": 1787827955.6771314,
+    "ast_hash": "a7a0d8d4b51279dbea26dd47ca4978cc",
     "semantic_hash": ""
   },
   "components/contact/ContactPage.tsx": {
@@ -2015,8 +2015,8 @@
     "semantic_hash": ""
   },
   "components/home/Discover.tsx": {
-    "mtime": 1787672621.7751691,
-    "ast_hash": "0db9d4e6111211a29c65637e328bca83",
+    "mtime": 1787843341.2084005,
+    "ast_hash": "09bd2988e07bc4b13995a7929febdb6a",
     "semantic_hash": ""
   },
   "components/home/Experience.tsx": {
@@ -2045,7 +2045,7 @@
     "semantic_hash": ""
   },
   "components/home/PressWall.tsx": {
-    "mtime": 1787734479.57651,
+    "mtime": 1787827454.5696857,
     "ast_hash": "9aa092e8fc3ecb710cd34f4d90454bf0",
     "semantic_hash": ""
   },
@@ -2145,8 +2145,8 @@
     "semantic_hash": ""
   },
   "components/venues/RestaurantsShowcase.tsx": {
-    "mtime": 1787758365.520136,
-    "ast_hash": "d706ffa3e0a5e6ba0df461b7766c6d51",
+    "mtime": 1787842629.9497628,
+    "ast_hash": "0ae4510f402c4a9f070b33b6ffe360b3",
     "semantic_hash": ""
   },
   "components/venues/Spines.tsx": {
@@ -2247,6 +2247,36 @@
   "public/googlea67aee79f36dbf92.html": {
     "mtime": 1787822821.4320648,
     "ast_hash": "3e475382bd40c9551d96042116753d57",
+    "semantic_hash": ""
+  },
+  "public/videos/guanabana-vid.mp4": {
+    "mtime": 1787841544.245569,
+    "ast_hash": "9583653f8be32868fc45b4a31a4f40c2",
+    "semantic_hash": ""
+  },
+  "public/videos/hoodwood-vid.mp4": {
+    "mtime": 1787841544.2679412,
+    "ast_hash": "d99d801cde1befe4a2a12a81a029ae50",
+    "semantic_hash": ""
+  },
+  "public/videos/ramo-vid.mp4": {
+    "mtime": 1787841544.2908702,
+    "ast_hash": "ada8ed88d630a7c0a53b89e4ea9fea80",
+    "semantic_hash": ""
+  },
+  "public/videos/tile-hoodwood.mp4": {
+    "mtime": 1787842623.3408253,
+    "ast_hash": "79285527c029448ded7ad72147b3e595",
+    "semantic_hash": ""
+  },
+  "public/videos/tile-belly.mp4": {
+    "mtime": 1787842615.9210687,
+    "ast_hash": "1320195a702c3173cf0f3f32aa5d7586",
+    "semantic_hash": ""
+  },
+  "public/videos/tile-bunso.mp4": {
+    "mtime": 1787842625.7097425,
+    "ast_hash": "ab92a566f3aceffa28039eedbb8c4c34",
     "semantic_hash": ""
   }
 }
