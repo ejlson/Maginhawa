@@ -1,7 +1,7 @@
 # Graph Report - Maginhawa  (2026-08-27)
 
 ## Corpus Check
-- 264 files · ~5,059,840 words
+- 264 files · ~5,060,019 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
@@ -10,7 +10,7 @@
 - Token cost: 0 input · 0 output
 
 ## Graph Freshness
-- Built from commit: `58cbda1e`
+- Built from commit: `92abd21d`
 - Run `git rev-parse HEAD` and compare to check if the graph is stale.
 - Run `graphify update .` after code changes (no API cost).
 

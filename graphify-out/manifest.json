@@ -1375,8 +1375,8 @@
     "semantic_hash": ""
   },
   "public/videos/tile-guanabana.mp4": {
-    "mtime": 1787060561.4938102,
-    "ast_hash": "08dceef10cfacc156c00dd09fa4c298c",
+    "mtime": 1787841808.882214,
+    "ast_hash": "1a9ab4117c4068f31af72e3b37c7ca49",
     "semantic_hash": ""
   },
   "public/videos/tile-mamasons.mp4": {
@@ -1385,8 +1385,8 @@
     "semantic_hash": ""
   },
   "public/videos/tile-ramo.mp4": {
-    "mtime": 1787060562.3263268,
-    "ast_hash": "f5811443e4ec0e7b8f37be122c40d160",
+    "mtime": 1787841812.5451124,
+    "ast_hash": "5ad23931117dc72611b97c4f13076a2c",
     "semantic_hash": ""
   },
   "scripts/seek-offset-search.mjs": {
@@ -1980,13 +1980,13 @@
     "semantic_hash": ""
   },
   "components/careers/JoinUs.tsx": {
-    "mtime": 1787753114.6003113,
-    "ast_hash": "9fd65f23822765ebe51974625740a97e",
+    "mtime": 1787841544.3082743,
+    "ast_hash": "eb04c605a79ae444334a27d82953daf1",
     "semantic_hash": ""
   },
   "components/contact/Contact.tsx": {
-    "mtime": 1787826852.3017519,
-    "ast_hash": "988ab747050249bc54bdf4af42b7caf4",
+    "mtime": 1787827955.6771314,
+    "ast_hash": "a7a0d8d4b51279dbea26dd47ca4978cc",
     "semantic_hash": ""
   },
   "components/contact/ContactPage.tsx": {
@@ -2015,8 +2015,8 @@
     "semantic_hash": ""
   },
   "components/home/Discover.tsx": {
-    "mtime": 1787672621.7751691,
-    "ast_hash": "0db9d4e6111211a29c65637e328bca83",
+    "mtime": 1787841845.2033663,
+    "ast_hash": "c749a2b6ca7aff6d5cec2aed33d55106",
     "semantic_hash": ""
   },
   "components/home/Experience.tsx": {
@@ -2045,7 +2045,7 @@
     "semantic_hash": ""
   },
   "components/home/PressWall.tsx": {
-    "mtime": 1787734479.57651,
+    "mtime": 1787827454.5696857,
     "ast_hash": "9aa092e8fc3ecb710cd34f4d90454bf0",
     "semantic_hash": ""
   },
@@ -2145,8 +2145,8 @@
     "semantic_hash": ""
   },
   "components/venues/RestaurantsShowcase.tsx": {
-    "mtime": 1787758365.520136,
-    "ast_hash": "d706ffa3e0a5e6ba0df461b7766c6d51",
+    "mtime": 1787841544.2363896,
+    "ast_hash": "d46eb1e65546052b90574433b47dd109",
     "semantic_hash": ""
   },
   "components/venues/Spines.tsx": {
@@ -2247,6 +2247,26 @@
   "public/googlea67aee79f36dbf92.html": {
     "mtime": 1787822821.4320648,
     "ast_hash": "3e475382bd40c9551d96042116753d57",
+    "semantic_hash": ""
+  },
+  "public/videos/guanabana-vid.mp4": {
+    "mtime": 1787841544.245569,
+    "ast_hash": "9583653f8be32868fc45b4a31a4f40c2",
+    "semantic_hash": ""
+  },
+  "public/videos/hoodwood-vid.mp4": {
+    "mtime": 1787841544.2679412,
+    "ast_hash": "d99d801cde1befe4a2a12a81a029ae50",
+    "semantic_hash": ""
+  },
+  "public/videos/ramo-vid.mp4": {
+    "mtime": 1787841544.2908702,
+    "ast_hash": "ada8ed88d630a7c0a53b89e4ea9fea80",
+    "semantic_hash": ""
+  },
+  "public/videos/tile-hoodwood.mp4": {
+    "mtime": 1787841815.7975361,
+    "ast_hash": "4fa4f1c72048fb75fe2d7e1360526d8e",
     "semantic_hash": ""
   }
 }
