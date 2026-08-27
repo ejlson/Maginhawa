@@ -2,6 +2,7 @@ import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import MenuPage from "@/components/venues/MenuPage";
 import { getRestaurant, withMenus } from "@/lib/restaurants";
+import { intrinsicSize } from "@/lib/intrinsicSize";
 import { SITE_URL } from "@/lib/site";
 import { ogImage, OG_W, OG_H } from "@/lib/media";
 import { StructuredData } from "@/lib/StructuredData";
@@ -143,7 +144,23 @@ export default async function VenueMenuPage({
   return (
     <>
       <StructuredData data={jsonLd} />
-      <MenuPage restaurant={r} pages={r.menuPages} />
+      {/* ⚠️ THE DIMENSIONS ARE READ HERE, IN THE SERVER COMPONENT, AND THAT
+          IS THE WHOLE POINT. lib/intrinsicSize.ts touches the filesystem, so
+          it cannot be called from MenuPage (which is "use client") — and it
+          does not need to be: these routes are prerendered by
+          generateStaticParams, so every read happens once at build time and
+          nothing about it reaches the browser except two integers per sheet.
+
+          They exist to stop the sheets collapsing the page. The tags are
+          `width: 100%; height: auto`, so without an intrinsic ratio each one
+          is zero pixels tall until it decodes and everything below it jumps
+          — measured at CLS 0.227 on /menus/cafemama (390x844, CPU 4x),
+          against Google's 0.1 "needs improvement" line. A sheet whose header
+          cannot be read comes back null and simply renders as it did before. */}
+      <MenuPage
+        restaurant={r}
+        pages={r.menuPages.map((src) => ({ src, ...(intrinsicSize(src) ?? {}) }))}
+      />
     </>
   );
 }

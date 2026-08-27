@@ -180,7 +180,33 @@ export default function CookieBanner() {
         {marketingConfigured
           ? "Our partners and we use cookies and other technologies to enhance your experience, measure performance, and tailor marketing."
           : "We and the services that deliver this site use cookies and similar technologies to measure how it performs. We do not use them for advertising."}{" "}
-        <Link className={styles.link} href="/privacy">
+        {/* ⚠️ `prefetch={false}`, AND IT IS A MEASUREMENT RATHER THAN A
+            PREFERENCE.
+
+            Under `output: "export"` each route's RSC payload is written
+            beside its HTML as `<route>.txt`, and <Link> fetches that payload
+            as soon as the link scrolls into view. This banner sits in the
+            shared shell, so its one link prefetches /privacy — 38KB — on
+            EVERY route on the site.
+
+            MEASURED on a 390px walk (scripts/probe-prefetch.mjs): the home
+            page pulled ELEVEN payloads, 234KB — seven menu routes at 22KB
+            each plus this one — and /restaurants pulled 189KB of the same.
+            758KB across seven routes, paid again on every route a reader
+            lands on.
+
+            WHAT IT BUYS ON THIS SITE IS NOTHING THE READER CAN SEE. A
+            navigation here is not a swap, it is PageTransition's curtain:
+            640ms cover, 250ms hold, 720ms reveal. The payload is fetched the
+            moment the click lands and has the whole 640ms cover to arrive
+            in — 38KB over any connection that can load this site at all. A
+            prefetched payload and a fetched one produce the identical frame.
+            And the case where it does NOT arrive in time is already designed
+            for: `slow` in PageTransition raises the waiting indicator.
+
+            So the prefetch is bytes spent to save a wait that is already
+            being spent on an animation. */}
+        <Link className={styles.link} href="/privacy" prefetch={false}>
           Privacy notice
         </Link>
       </p>

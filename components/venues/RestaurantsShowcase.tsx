@@ -1097,6 +1097,11 @@ export default function RestaurantsShowcase() {
                 <motion.div custom={2} initial={{ opacity: 0, y: 10 }} animate={actionsCtl}>
                   <Link
                     href={menuLink(item.name)!}
+                    /* see the prefetch note in components/layout/CookieBanner.tsx.
+                       The showcase's own Menu control — the same 22KB payload
+                       per venue as VenueCard's and Spines', against the same
+                       640ms curtain. */
+                    prefetch={false}
                     className={styles.actBtn}
                     aria-label={`${item.name} menu`}
                   >

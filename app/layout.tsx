@@ -5,7 +5,7 @@ import CustomCursor from "@/components/ui/CustomCursor";
 import GlassFilters from "@/components/ui/GlassFilters";
 import SmoothScroll from "@/lib/SmoothScroll";
 import { OrganizationJsonLd, WebSiteJsonLd } from "@/lib/jsonld";
-import { SITE_URL } from "@/lib/site";
+import { GOOGLE_SITE_VERIFICATION, SITE_URL } from "@/lib/site";
 import GoogleTag from "@/components/analytics/GoogleTag";
 import MarketingPixels from "@/components/analytics/MarketingPixels";
 import CookieBanner from "@/components/layout/CookieBanner";
@@ -168,6 +168,12 @@ export const metadata: Metadata = {
       "max-video-preview": -1,
     },
   },
+  /* Empty until the token is pasted into lib/site.ts, and undefined here means
+     Next emits no tag at all. See the note there for why Search Console's
+     recommended HTML-file method cannot work on this host. */
+  verification: GOOGLE_SITE_VERIFICATION
+    ? { google: GOOGLE_SITE_VERIFICATION }
+    : undefined,
   category: "Food & Drink",
 };
 

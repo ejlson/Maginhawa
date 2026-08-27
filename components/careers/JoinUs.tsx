@@ -1570,7 +1570,7 @@ export default function JoinUs() {
                       own `.host` is already shrink-wrapped and a flex row with
                       one child in it was a box around a box. */}
                   <PillCta type="submit" className={styles.submitRow}>
-                    Send application
+                    Submit application
                   </PillCta>
 
                   {/* ── THE LIVE REGION IS THE WRAPPER, NOT THE CARD ──

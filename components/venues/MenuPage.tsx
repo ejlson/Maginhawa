@@ -36,13 +36,20 @@ import type { Restaurant } from "@/lib/restaurants";
  * The site FOOTER is deliberately absent — that is furniture, and it is
  * the largest piece of it.
  */
+
+/* A sheet, and the box it needs reserved before it has decoded. `width` and
+   `height` are optional because lib/intrinsicSize.ts returns null for a
+   header it cannot read, and one unreadable file must degrade to the old
+   behaviour rather than take the page down. */
+export type MenuSheet = { src: string; width?: number; height?: number };
+
 export default function MenuPage({
   restaurant,
   pages,
 }: {
   restaurant: Restaurant;
   /** already narrowed by the route — this component never renders empty */
-  pages: string[];
+  pages: MenuSheet[];
 }) {
   const [menuOpen, setMenuOpen] = useState(false);
 
@@ -90,7 +97,7 @@ export default function MenuPage({
           </p>
 
           <div className={styles.pages}>
-            {pages.map((src, i) => (
+            {pages.map(({ src, width, height }, i) => (
               <figure key={src} className={styles.sheet}>
                 {/* ⚠️ RAW TAG, NOT next/image, AND THE REASON IS THE SET.
                     These are 2481x1754 landscape, 4961x7016 A4 and 1080x1920
@@ -113,6 +120,17 @@ export default function MenuPage({
                      times the width anything can show. */
                   src={asset(src, { width: 2400 })}
                   alt={`${restaurant.name} menu — page ${i + 1} of ${pages.length}`}
+                  /* ⚠️ THE SOURCE'S OWN PIXELS, NOT THE DELIVERED WIDTH.
+                     These two attributes are read as a RATIO — the CSS above
+                     is `width: 100%; height: auto`, which overrides both as
+                     lengths — so what matters is that they match the file,
+                     not that they match the 2400px Cloudinary is asked for.
+                     Writing 2400 here with the file's real height would
+                     reserve a box of the wrong shape, which is a worse bug
+                     than reserving none: the page would settle and then jump.
+                     Read at build time — see the note at the call site. */
+                  width={width}
+                  height={height}
                   loading={i === 0 ? "eager" : "lazy"}
                   fetchPriority={i === 0 ? "high" : "auto"}
                   decoding="async"

@@ -327,6 +327,10 @@ function Spine({
                any other link on the site. A <button> could do none of it. */
             <Link
               href={menuHref(item.slug)}
+              /* see the prefetch note in components/layout/CookieBanner.tsx.
+                 This is the PHONE path (Spines replaces the card grid below
+                 461px), i.e. exactly the reader the 154KB is worst for. */
+              prefetch={false}
               className={`${styles.pill} ${styles.pillGhost}`}
               aria-label={`Menu — ${item.name}`}
             >

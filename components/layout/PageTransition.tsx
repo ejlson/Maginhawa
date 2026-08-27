@@ -217,20 +217,48 @@ export default function PageTransition({
      bearing. This one cannot. */
   const [slow, setSlow] = useState(false);
 
-  // warm the browser cache once so the first curtain never shows a
-  // half-loaded image
+  /* warm the browser cache once so the first curtain never shows a
+     half-loaded image.
+
+     ⚠️ ON AN IDLE CALLBACK, NOT ON MOUNT, AND `fetchPriority` IS NOT A
+     SUBSTITUTE FOR IT. The hint reorders the six transfers against
+     everything else in flight; it does not stop the six requests being
+     ISSUED, and issuing them is itself work on the thread that is at that
+     moment hydrating the largest component tree on the site. This effect
+     runs in the shared shell, so it fired during hydration of EVERY route —
+     six `new Image()` constructions plus six srcset candidate selections,
+     landing in the same frames as the hero's own film and photography.
+
+     The curtain is not needed until the reader clicks a link, so anything
+     before the main thread goes quiet is early. `requestIdleCallback` is
+     exactly that promise, with a timeout so a page that never idles still
+     warms the cache before a plausible first navigation.
+
+     THE `setTimeout` BRANCH IS NOT DEAD CODE. Safari only shipped
+     `requestIdleCallback` in 17.4; on anything older — and on every iOS
+     browser, which is Safari's engine whatever the badge says — the name is
+     undefined and the curtain would never warm at all. */
   useEffect(() => {
-    CURTAIN.forEach(({ src, srcSet, sizes }) => {
-      const i = new window.Image();
-      // the curtain is only needed on the NEXT navigation, so it must not
-      // contend with this page's own photography for bandwidth
-      i.fetchPriority = "low";
-      // sizes before srcset — the candidate is picked the moment srcset is
-      // set, so this has to warm the same URL the markup will request
-      if (sizes) i.sizes = sizes;
-      if (srcSet) i.srcset = srcSet;
-      i.src = src;
-    });
+    const warm = () => {
+      CURTAIN.forEach(({ src, srcSet, sizes }) => {
+        const i = new window.Image();
+        // the curtain is only needed on the NEXT navigation, so it must not
+        // contend with this page's own photography for bandwidth
+        i.fetchPriority = "low";
+        // sizes before srcset — the candidate is picked the moment srcset is
+        // set, so this has to warm the same URL the markup will request
+        if (sizes) i.sizes = sizes;
+        if (srcSet) i.srcset = srcSet;
+        i.src = src;
+      });
+    };
+
+    if (typeof window.requestIdleCallback === "function") {
+      const id = window.requestIdleCallback(warm, { timeout: 3000 });
+      return () => window.cancelIdleCallback?.(id);
+    }
+    const id = window.setTimeout(warm, 1200);
+    return () => window.clearTimeout(id);
   }, []);
 
   const push = useCallback(
