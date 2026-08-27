@@ -98,7 +98,7 @@ const RESTAURANTS = [
     name: "Guanabana",
     tag: "Caribbean Cuisine",
     location: "Kentish Town, London",
-    video: "/videos/guanabana.mp4",
+    video: "/videos/guanabana-vid.mp4",
   },
   {
     name: "Mamasons",
@@ -110,13 +110,13 @@ const RESTAURANTS = [
     name: "Ramo Ramen",
     tag: "Filipino-Japanese Ramen",
     location: "Kentish Town · Soho",
-    video: "/videos/hero-ramo.mp4",
+    video: "/videos/ramo-vid.mp4",
   },
   {
     name: "Hoodwood",
     tag: "Caribbean Takeaway",
     location: "London",
-    video: "/videos/hero-draft3-1080.mp4",
+    video: "/videos/hoodwood-vid.mp4",
   },
   {
     name: "Café Mama & Sons",
