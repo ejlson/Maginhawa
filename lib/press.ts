@@ -81,9 +81,12 @@ export type PressMention = {
 //   That's Up               0.681   1/r                     1.468
 //
 // ── MICHELIN IS A BADGE NOW, NOT A MARK, AND IT BREAKS TWO RULES ABOVE ──
-// The seat carries press-logo/michelin-2026-selection.png: the supplied 2026
+// The seat carries press-logo/michelin-2026-selection.svg: the supplied 2026
 // plaque — a filled red rounded rectangle, white type, three lines
-// (RESTAURANT SELECTION / MICHELIN GUIDE / 2026) at 2396x1024. Every other
+// (RESTAURANT SELECTION / MICHELIN GUIDE / 2026) at 2396x1024, carried
+// unchanged inside the wrapper (the loose .png lived here for one pass and
+// is gone; the same bytes are still at /logo/michelin-2026-selection.png,
+// which is where the supplied file belongs). Every other
 // entry in this table is a mark on transparency; this one brings its own
 // background, and both of the rules above assume it does not.
 //
@@ -109,12 +112,20 @@ export type PressMention = {
 // at a glance is the red plaque, not the reading of it. THIS NUMBER IS THE
 // ONE DIAL — nothing else needs to move to make it bigger or smaller.
 //
-// ⚠️ IT IS ALSO THE ONLY NON-SVG IN /public/press-logo, AND THAT CHANGES HOW
-// IT IS SERVED. The other fourteen are SVG, which asset() returns untouched
-// — origin-served, never the CDN. A .png goes through the Cloudinary loader,
-// so this file 404s silently (naturalWidth 0, no console error) until
-// scripts/cloudinary-upload.mjs has run for it. It has been uploaded; if the
-// mark ever vanishes from the wall, check the CDN before checking the CSS.
+// ⚠️ IT IS THE SUPPLIED PNG, WRAPPED IN AN SVG, AND THE WRAPPER IS THE POINT.
+// michelin-2026-selection.svg is one <image> carrying the supplied file's
+// bytes unchanged — same 20,963 bytes, same sha1 — in the identical shape as
+// the other fourteen files here. The artwork is not touched; only the
+// container is.
+//
+// It was pointed at the raw .png for one pass and that is the thing to avoid.
+// asset() returns .svg untouched — ORIGIN-SERVED, never the CDN — but sends a
+// .png through the Cloudinary loader, so the mark becomes a third-party
+// request that 404s SILENTLY (naturalWidth 0, no console error, alt text and
+// a broken-image glyph) on a wall where all fourteen neighbours still work,
+// for as long as it takes an upload to happen. Wrapped, there is no upload
+// step, no CDN, and no way for this seat to depend on anything the other
+// marks do not. The upload was done anyway and is harmless; nothing reads it.
 //
 // MICHELIN'S +15% IS GONE TOO, and the reasoning that justified it is worth
 // keeping because it was not wrong, it was answering a question the lane no
@@ -155,7 +166,7 @@ export const FEATURED_OUTLETS: {
   h?: number;
 }[] = [
   { name: "The Sunday Times", tier: "headline", logo: "/press-logo/thesundaytimes.svg", scale: 1.104, w: 1400, h: 180 },
-  { name: "Michelin Guide", tier: "headline", logo: "/press-logo/michelin-2026-selection.png", scale: 2, w: 2396, h: 1024 },
+  { name: "Michelin Guide", tier: "headline", logo: "/press-logo/michelin-2026-selection.svg", scale: 2, w: 2396, h: 1024 },
   { name: "The Guardian", logo: "/press-logo/theguardian.svg", scale: 1, w: 973, h: 320 },
   { name: "The Independent", logo: "/press-logo/theindependent.svg", scale: 1.432, w: 1400, h: 136 },
   { name: "BBC Good Food", logo: "/press-logo/bbcgoodfood.svg", scale: 1.275, w: 1065, h: 320 },
