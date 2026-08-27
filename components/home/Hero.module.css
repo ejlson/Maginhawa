@@ -6,7 +6,35 @@
   position: sticky;
   top: 0;
   width: 100%;
-  height: 100svh;
+  /* ── THE FIRST SCREEN IS THE *LARGE* VIEWPORT, NOT THE SMALL ONE ──
+     ⚠️ THIS READ `100svh` AND IT PUT A STRIP OF "OUR RESTAURANTS" ON THE
+     PHONE'S FIRST SCREEN. `svh` is the viewport with the browser chrome at
+     its LARGEST — the smallest the page is ever given — so a 100svh hero
+     falls short of what is actually painted in every chrome state but one.
+     On current iOS it is short even at scroll 0: the bottom bar FLOATS over
+     the web view rather than sitting under it, so the layout viewport
+     already runs behind the bar while `svh` still deducts its whole height.
+     The cream chapter under the sticky hero shows through the difference.
+
+     `lvh` is the other end of the same pair — the viewport with the chrome
+     retracted — so the film always covers the screen and the difference
+     becomes overscan hidden BEHIND the toolbars instead of a gap under
+     them. It is also a CONSTANT, which `dvh` is not: dvh grows as the bar
+     collapses, and since .afterHero's flow position is measured from this
+     box's bottom, that would drop the cream sheet ~90px mid-scroll — a
+     document-height jump under a hero the sheet is riding up over.
+
+     WHAT PAYS FOR THE OVERSCAN IS .lockup's padding, which lifts the type
+     by exactly `100lvh - 100svh` so the wordmark and the control still
+     clear the toolbars at scroll 0. Both terms are the same number on
+     desktop, so nothing above 1100px moves by a pixel.
+
+     THE PLAIN `100vh` UNDER IT IS THE FALLBACK, and it is the right one: on
+     a phone `vh` has always been the chrome-RETRACTED height — `lvh` under
+     an older name — so an engine without the new units lands in the same
+     place. */
+  height: 100vh;
+  height: 100lvh;
   overflow: hidden;
   z-index: 0;
 }
@@ -90,6 +118,14 @@
      wordmark's left now line up with the navbar's own two ends, which they
      cannot do from a different inset. */
   padding: 0 var(--pad-x) clamp(20px, 3vh, 40px);
+  /* ＋ THE CHROME THE HERO NOW OVERSCANS — see .hero. The box is 100lvh, so
+     its last `100lvh - 100svh` sit behind the phone's toolbars whenever
+     those toolbars are out. Lifting the type by the same figure keeps the
+     seat the design has — a hair above the frame's floor — in BOTH chrome
+     states rather than only in the retracted one. The term is 0px on every
+     desktop viewport, and the whole declaration is dropped at parse time on
+     an engine without the units, which leaves the line above standing. */
+  padding-bottom: calc(clamp(20px, 3vh, 40px) + (100lvh - 100svh));
   display: grid;
   /* ── SIDE BY SIDE AGAIN, WITH THE WORDMARK SIZED TO THE SPACE LEFT OVER ──
      at the user's instruction, and it resolves the conflict below rather
@@ -395,6 +431,11 @@
        a local clamp here put the hero's left edge at 15.6px where every
        cream chapter below it opens at --pad-x (16px at 390). One edge. */
     padding: 0 var(--pad-x) clamp(20px, 3vh, 40px);
+    /* ⚠️ AND THE OVERSCAN COMPENSATION AGAIN, because the shorthand above
+       has just reset the padding-bottom the two-column rule set. This is the
+       breakpoint the phone is actually on, so dropping it here would drop it
+       everywhere it matters. */
+    padding-bottom: calc(clamp(20px, 3vh, 40px) + (100lvh - 100svh));
   }
   .mark {
     font-size: clamp(2.75rem, 15vw, 7rem);
