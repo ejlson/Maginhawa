@@ -155,7 +155,7 @@ const DISPLAY: Record<string, DiscoverDisplay> = {
     blurb:
       "Kentish Town's Caribbean and Latin American room, best known for its oak-smoked Island Roast - since 2007.",
     est: 2007,
-    clip: "/videos/guanabana-vid.mp4",
+    clip: "/videos/tile-guanabana.mp4",
   },
   mamasons: {
     tag: "London's First Filipino Ice Cream Parlor",
@@ -171,14 +171,14 @@ const DISPLAY: Record<string, DiscoverDisplay> = {
     blurb:
       "The world's first Filipino-Japanese ramen joint - Originally from Kentish Town, since 2018, with our current location in Soho.",
     est: 2018,
-    clip: "/videos/ramo-vid.mp4",
+    clip: "/videos/tile-ramo.mp4",
   },
   hoodwood: {
     tag: "Caribbean Takeaway",
     location: "81 Kentish Town Rd, London NW1 8NY",
     blurb:
       "Oak-smoked jerk plates and handmade patties, fire-kissed over an open flame - Caribbean takeaway, done honestly.",
-    clip: "/videos/hoodwood-vid.mp4",
+    clip: "/videos/tile-hoodwood.mp4",
   },
   cafemama: {
     tag: "Filipino x Japanese Café",
