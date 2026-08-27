@@ -207,15 +207,25 @@
   }
 }
 
-.item:hover,
-.item:focus-visible {
-  background: var(--saffron);
-  color: var(--maroon);
-  outline: none;
-}
+/* ---- THE LIT ENTRY, AND WHY IT IS WRITTEN OUT TWICE ----------------------
+   ⚠️ `:hover` IS GATED ON A DEVICE THAT HAS ONE. It was not, and on a phone
+   that is not a missing nicety — it is a row that STAYS lit. A touch that
+   follows a link leaves the entry in Safari's sticky hover state, so the
+   reader comes back (or swipes back from Google) to one saffron row sitting
+   in the middle of a maroon table with its text nudged 5px right of every
+   other row's. That is exactly what was reported: one green entry, indented,
+   with no way to clear it but scrolling it out of the compositor's hands.
 
-/* The inset on hover used to be an animated `padding-inline`, which relayouts
-   the entry — and re-wraps the restaurant name — on every frame of the
+   The two halves cannot share a rule. There is no selector that means "hover,
+   but only where hover exists" — the capability is a media feature, so the
+   hover arm has to live inside `@media (hover: hover)` and the focus arm has
+   to live outside it (a keyboard is not a pointer, and `:focus-visible` must
+   keep working on a phone with a Bluetooth keyboard attached). So the
+   declarations are duplicated, deliberately, and any change to the lit state
+   has to be made in both places. They are kept adjacent so that is obvious.
+
+   The inset used to be an animated `padding-inline`, which relayouts the
+   entry — and re-wraps the restaurant name — on every frame of the
    transition. FAQ's `.row` had the same bug and settled it the same way:
    translate the two ends instead, which runs on the compositor. The saffron
    fill reaches the cell's rules on both sides, so the entry reads as lighting
@@ -223,18 +233,39 @@
    Halved (was clamp(10px, 1.2vw, 18px)) now the cell has ~21px of standing
    padding of its own: the nudge is a nudge against a rule, not the entry's
    only inset, and at the old amount the text ended up nearly 40px in. */
-.item:hover .itemMain,
+@media (hover: hover) {
+  .item:hover {
+    background: var(--saffron);
+    color: var(--maroon);
+    outline: none;
+  }
+  .item:hover .itemMain,
+  .item:hover .itemCta {
+    transform: translateX(clamp(5px, 0.6vw, 9px));
+  }
+  /* the muted opacities on tag + CTA wash out against saffron — bring them
+     up so everything reads at full maroon */
+  .item:hover .itemTag,
+  .item:hover .itemCta {
+    opacity: 1;
+  }
+  .item:hover .itemArrow {
+    transform: translateX(6px);
+  }
+}
+
+.item:focus-visible {
+  background: var(--saffron);
+  color: var(--maroon);
+  outline: none;
+}
+
 .item:focus-visible .itemMain,
-.item:hover .itemCta,
 .item:focus-visible .itemCta {
   transform: translateX(clamp(5px, 0.6vw, 9px));
 }
 
-/* on hover, the muted opacities on tag + CTA wash out against saffron —
-   bring them up so everything reads at full maroon */
-.item:hover .itemTag,
 .item:focus-visible .itemTag,
-.item:hover .itemCta,
 .item:focus-visible .itemCta {
   opacity: 1;
 }
@@ -280,17 +311,16 @@
   height: 12px;
 }
 
-.item:hover .itemCta,
-.item:focus-visible .itemCta {
-  opacity: 1;
-}
+/* (A second `.item:hover .itemCta { opacity: 1 }` stood here — the same
+   declaration the lit block above already makes, written twice. Removed with
+   the hover gate rather than gated twice.) */
 
 .itemArrow {
   display: inline-block;
   transition: transform var(--dur-base) var(--ease-out);
 }
 
-.item:hover .itemArrow,
+/* the hover half of this lives in the `@media (hover: hover)` block above */
 .item:focus-visible .itemArrow {
   transform: translateX(6px);
 }
@@ -319,12 +349,86 @@
   }
 }
 
+/* ---- ONE COLUMN, AND EVERY MEASURE IN THE SECTION IS RE-DERIVED FOR IT ----
+   The table's geometry above is a THREE-COLUMN geometry: `--cell-reach` is
+   half a gutter, the title's measure is a desktop measure, and the row's
+   padding was set against a cell that sits beside two others. At one column
+   none of those three are describing anything that is on screen, and all
+   three were measurably wrong on a phone. Measured at 390px before this
+   block existed:
+
+     the headline    17ch capped it at 252px inside a 358px column, so
+                     "Loved your visit? Leave us a Google review." set as
+                     THREE ragged lines with 106px of the measure unused.
+     the entry inset 11px of padding, which is half the desktop gutter and
+                     not a decision about a phone — it put the restaurant
+                     names 11px right of the headline directly above them,
+                     which is the "reads as a mistake" distance again.
+     the row rhythm  15.2px of padding-block against a 13.5px gap inside the
+                     entry and 8px between the name and its location. Three
+                     gaps within 7px of each other do not group anything: an
+                     entry read as three loose lines that happened to have a
+                     rule under them, rather than as one entry. This is the
+                     same fault the `.item` note says was fixed by dropping
+                     `space-between` — it was fixed for the DESKTOP cell and
+                     came straight back at one column. */
 @media (max-width: 560px) {
+  /* ---- THE FRAME COMES OFF, AND THAT IS WHAT SETTLES THE INSET ----
+     The box was never the point — the RULES were. A frame divides columns,
+     and at one column there are no columns to divide: what is left is an
+     outline drawn around a list, on the one screen size with no width to
+     spare for it. Worse, it forces a choice with no good answer. Type flush
+     to the frame sits ON its own left rule; type inset from the frame no
+     longer starts where the headline starts. Neither is right, and both were
+     only ever being asked because of a border that is doing no work.
+
+     So below 560 the table is a RULED LIST: the top rule and the entries'
+     own bottom rules stay (they are what separates one restaurant from the
+     next), the verticals go, and the type lands at the container's content
+     edge — the same x as the headline above it and the Footer's rails below
+     it, which is the alignment the whole three-column geometry above exists
+     to protect. Nothing about the desktop table moves.
+
+     `margin-inline` goes back to zero with them: it exists to pull the
+     border box out by one border-width so the two hairlines fall just
+     outside the content box, and with no left or right border there is
+     nothing left to compensate for. Left in, it would hang the entries'
+     bottom rules 1px past the page margin on both sides. */
   .grid {
     grid-template-columns: 1fr;
+    /* the half-gutter is a three-column measure: it is how far a cell reaches
+       to MEET its neighbour. There is no neighbour here. */
+    --cell-reach: 0px;
+    margin-inline: 0;
+    border-left: 0;
+    border-right: 0;
+  }
+  .item {
+    /* the interior vertical, gone with the frame */
+    border-left: 0;
+    /* ---- THE ENTRY GROUPS ITSELF ----
+       padding-block was 15.2px against a 13.5px gap inside the entry: three
+       gaps within 7px of each other, so an entry read as three loose lines
+       that happened to have a rule under them. It is ~1.9x the largest inner
+       gap now, so the rules separate ENTRIES and the air inside one belongs
+       to it. vh-tracked like every other vertical measure in this file.
+       Zero inline: the frame is gone, so the container's padding is the
+       entry's inset and the names start on the page margin. */
+    padding: clamp(18px, 2.5vh, 26px) 0;
+    gap: var(--space-xs-y);
   }
   /* single column: every cell is already full width, so no orphan to stretch */
   .grid > li:last-child:nth-child(2n + 1) {
     grid-column: auto;
+  }
+  /* 17ch is a measure for a headline with two more tracks beside it. On a
+     358px column it capped the line at 252px and set the headline as three
+     ragged lines with 106px of the measure unused. */
+  .title {
+    max-width: none;
+  }
+  /* the name and its location are one lockup, not two lines */
+  .itemMain {
+    gap: var(--space-4xs);
   }
 }

@@ -1004,7 +1004,32 @@ export default function JoinUs() {
                   middle of a word mask. Line two's delay is line one's word
                   count, so the stagger runs unbroken across the two — and it
                   has to, because at this point in the beat the two lines are
-                  sitting against each other as a single block of type. */}
+                  sitting against each other as a single block of type.
+
+                  ⚠️ `on`, NOT `whileInView`, AND THAT IS A BUG FIX RATHER
+                  THAN A PREFERENCE. These two lines were the ONLY part of
+                  this entrance still driven by an IntersectionObserver:
+                  everything else in the composition — the corner labels, the
+                  photograph's split, the standfirst — reads the clock that
+                  starts at mount. On iOS the observer was not firing for
+                  them, so the later beats arrived on time and the <h1> was
+                  left parked at translateY(145%) inside its own masks: the
+                  page's own headline, invisible, with the space it occupies
+                  sitting empty between the labels and the photograph.
+
+                  Driving them from the clock is also what this file argues
+                  for everywhere else — SplitWords' own header says an
+                  observer inside a step machine is racing it. `on` is
+                  constant rather than a state flip because beat 1 IS the
+                  mount: Motion animates `initial` -> `animate` on the first
+                  commit, so HEAD_DELAY and the stagger below still own the
+                  timing and not one frame of the choreography moves. The
+                  headline is above the fold on every viewport in the matrix,
+                  so there was never a scroll position at which the observer
+                  was buying anything.
+
+                  `amount` went with it — it is the whileInView threshold and
+                  means nothing on the driven path. */}
               <h1 className={styles.heroTitle}>
                 <motion.span
                   className={`${styles.heroLineTop} ${settled ? styles.heroRested : ""}`}
@@ -1017,7 +1042,7 @@ export default function JoinUs() {
                     delay={HEAD_DELAY}
                     stagger={WORD_STAGGER}
                     duration={WORD_DURATION}
-                    amount={0.2}
+                    on
                   />
                 </motion.span>
                 <motion.span
@@ -1035,7 +1060,7 @@ export default function JoinUs() {
                     }
                     stagger={WORD_STAGGER}
                     duration={WORD_DURATION}
-                    amount={0.2}
+                    on
                   />
                 </motion.span>
               </h1>

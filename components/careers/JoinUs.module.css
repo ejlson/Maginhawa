@@ -1593,6 +1593,99 @@
   text-wrap: pretty;
 }
 
+/* ---- ON A PHONE THE THREE-UP TURNS ON ITS SIDE -------------------------
+   ⚠️ THIS REVERSES "THREE ACROSS AT EVERY WIDTH" BELOW 620px, AND ONLY THERE.
+   The instruction is kept everywhere it was working; what it could not
+   survive was the phone, and the numbers are why. Measured at 390:
+
+     the column   103px — about 17 characters of measure.
+     the body     11.9px type on a 15.9px leading, ten to eleven lines deep.
+     the setting  `hyphens: auto` doing the only thing it can at 17ch, which
+                  is to break a word on most lines: "Magin-hawa",
+                  "res-taurants", "kit-chen", "to-gether", "ser-vice". Five
+                  broken words in ninety is not setting, it is a column that
+                  is too narrow for its copy.
+
+   The container-query mechanism above is what made the three-up SURVIVE the
+   phone, and it did its job — nothing overflowed, nothing collided. But
+   surviving is the wrong bar for the one block of argument on this page, and
+   no type ramp can buy measure that the viewport does not have: three
+   columns of ~30 words each need roughly 40ch apiece, and a 390pt screen has
+   about 45ch in total.
+
+   SO THE ROW ROTATES RATHER THAN THE CARD BREAKING UP. Each reason becomes
+   [mark] [title] over [body] — the numerals keep their column and read down
+   the card as a spine, which is the thing the three-up was for, and the copy
+   gets ~43ch instead of 17. The plate, the ground, the accent mix and every
+   ratio measured against them are untouched: this is a change of
+   arrangement, not of material.
+
+   THE TYPE IS RE-SIZED IN rem, NOT LEFT IN cqi, AND THAT IS LOAD-BEARING.
+   `.reason` is still the query container — deliberately, per the ⚠️ on it —
+   but the box it measures has just gone from 103px to ~315px, so every `cqi`
+   above would resolve against three times the width it was calibrated for:
+   the mark alone would clamp out at its 3rem desktop ceiling on a phone.
+   Every cqi-sized property below is therefore overridden with a flat value.
+   If a size is ever added to a `.reason` child, it needs a line here too. */
+@media (max-width: 620px) {
+  .reasons {
+    grid-template-columns: 1fr;
+    /* the card's own air opens up with the arrangement — 12.5px of inset at
+       390 was set for three columns that needed every pixel of measure back,
+       and a rotated row is not competing for width any more */
+    --reason-inset: clamp(18px, 5.4vw, 30px);
+  }
+
+  .reason {
+    display: grid;
+    /* A FIXED FIRST TRACK, NOT `auto`. Each reason is its own grid, so `auto`
+       sizes three tracks independently and any difference between "01", "02"
+       and "03" would start each body at a different x. 2.4rem clears the
+       widest pair the display face sets at this size — its digits run about
+       0.58em each, so "01" is ~1.16em of a 1.75rem mark, or 32.5px. */
+    grid-template-columns: 2.4rem 1fr;
+    column-gap: var(--space-sm);
+    row-gap: var(--space-4xs);
+    /* the mark hangs off the title's baseline rather than its box top, so the
+       numeral's cap rises above the title's — the drop-numeral this section
+       has always been drawing, now that the two are on one line */
+    align-items: baseline;
+  }
+
+  .reasonMark {
+    grid-column: 1;
+    grid-row: 1;
+    font-size: 1.75rem;
+  }
+
+  .reasonTitle {
+    grid-column: 2;
+    grid-row: 1;
+    font-size: 1.375rem;
+    /* the measure is wide enough that nothing needs breaking now, and a
+       hyphenated display serif reads as a fault — same argument as the base
+       rule, which is why that one has no `hyphens` either */
+    overflow-wrap: normal;
+  }
+
+  .reasonBody {
+    grid-column: 2;
+    grid-row: 2;
+    font-size: 0.875rem;
+    line-height: var(--lh-body);
+    /* THE HYPHENS COME OFF WITH THE NARROW COLUMN. They earned their place at
+       ~17ch, where "restaurants." was a third of a line and the rag without
+       them was worse; at ~43ch there is nothing left for them to rescue and
+       every break they make is now a break the measure did not need. */
+    -webkit-hyphens: manual;
+    hyphens: manual;
+    /* the only cap in the stacked branch, and it is the top of the range it
+       is for: the column is ~43ch on a 390pt phone and never reaches this,
+       so it binds only in the last 100px before the three-up takes over */
+    max-width: 52ch;
+  }
+}
+
 /* (`.threshold` lived here — one hairline at the full measure, a sibling of
    the column rather than a border on it so that the narrowing would be
    visible AGAINST it. Removed on request, along with its <hr>. The note it
