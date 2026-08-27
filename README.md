@@ -7,17 +7,36 @@ editor and published by committing. That sounds intimidating and isn't — most
 edits are copying an existing block, changing the words inside the quote marks,
 and saving.
 
-There are two kinds of content file:
+---
 
-- **Journal posts we write** are Markdown — `content/posts/<name>.md`. One file
-  per post, and it becomes its own page. See [The Journal](#3-the-journal-blog).
-- **Everything else** is a TypeScript data file in `lib/` — restaurants, jobs,
-  contact details, press coverage. Lists of facts, not prose.
+## Start here
+
+**Changing words on a page?** Find the page in the table in
+[Where everything lives](#2-where-everything-lives), open that file, change the
+text between the quote marks, save. The browser updates itself.
+
+**Writing a new Journal post?** Make a file in `content/posts/` and write in it.
+[Jump to the instructions](#write-a-post).
+
+**Everything else** — a new restaurant, a closed job, a menu — is a short
+checklist in the section for it below.
 
 > **The one rule that matters:** content is data, and the data lives in `lib/`
-> (or, for a post, in `content/posts/`). If you find yourself editing a component
-> in `components/` to change a sentence, check the table below first — there's
-> often a data file that owns it.
+> (or, for a post, in `content/posts/`). If you find yourself editing something
+> in `components/` to change a sentence, check the table in section 2 first —
+> there is usually a data file that owns it.
+
+### A note on how this guide points at things
+
+This guide names files and **the constant inside them** — `RESTAURANTS`,
+`HOME_SLUGS`, `CHAPTERS` — and never a line number. Line numbers rot the moment
+anyone edits above them, and an earlier version of this file was full of numbers
+that had drifted by hundreds of lines. A name you can search for stays true.
+
+To find one, open the file and search (⌘F / Ctrl-F) for the name in CAPITALS.
+It is always declared as `const NAME = [` near the top of its section.
+
+**Please don't add line numbers back.**
 
 ---
 
@@ -29,17 +48,17 @@ There are two kinds of content file:
 4. [Restaurants](#4-restaurants)
 5. [Careers](#5-careers)
 6. [Contact details & socials](#6-contact-details--socials)
-7. [Press, awards & quotes](#7-press-awards--quotes)
-8. [FAQ](#8-faq)
-9. [The About page timeline](#9-the-about-page-timeline)
-10. [Home page copy](#10-home-page-copy)
-11. [Navigation & footer links](#11-navigation--footer-links)
-12. [Images & video](#12-images--video)
-13. [Page titles & SEO](#13-page-titles--seo)
-14. [Publishing your changes](#14-publishing-your-changes)
-15. [Known placeholders](#15-known-placeholders)
-16. [Troubleshooting](#16-troubleshooting)
-17. [The enquiry form](#17-the-enquiry-form)
+7. [The enquiry form](#7-the-enquiry-form)
+8. [Press, awards & quotes](#8-press-awards--quotes)
+9. [FAQ](#9-faq)
+10. [The About page timeline](#10-the-about-page-timeline)
+11. [Home page copy](#11-home-page-copy)
+12. [Navigation & footer links](#12-navigation--footer-links)
+13. [Images & video](#13-images--video)
+14. [Page titles & SEO](#14-page-titles--seo)
+15. [Publishing your changes](#15-publishing-your-changes)
+16. [Known placeholders & gaps](#16-known-placeholders--gaps)
+17. [Troubleshooting](#17-troubleshooting)
 
 ---
 
@@ -65,8 +84,8 @@ Before publishing, check the site still builds:
 npm run build
 ```
 
-**Never run `npm run build` while `npm run dev` is running** — they write to the
-same `.next` folder and will corrupt each other. Stop the dev server first.
+> **Never run `npm run build` while `npm run dev` is running.** They write to the
+> same `.next` folder and will corrupt each other. Stop the dev server first.
 
 `npm run build` writes a folder of finished files to `out/`, which is exactly
 what the live site serves. To look at that rather than the dev server:
@@ -78,10 +97,6 @@ npx serve out -l 3100
 One difference to know about: the dev server and the live site both understand
 `/blog/a-note-on-service`, but a plain local file server does not — open
 `/blog/a-note-on-service.html` there instead.
-
-> **After pulling these changes for the first time, run `npm install` again.**
-> Writing posts added two packages (`gray-matter` for the post facts, and the `remark`/`rehype` family for the writing), and
-> without them the site won't start.
 
 ### How to read the data files
 
@@ -115,27 +130,53 @@ line. Nothing is lost — fix the line and it recovers.
 
 ## 2. Where everything lives
 
-| What you want to change | File | The bit to edit |
+| What you want to change | File | The constant to edit |
 | --- | --- | --- |
 | **Journal posts we write** | `content/posts/<name>.md` | the whole file — one per post |
-| Which posts appear on the home page | [components/Blog.tsx](components/Blog.tsx) | `HOME_SLUGS` |
+| Which posts appear on the home page | [components/home/Blog.tsx](components/home/Blog.tsx) | `HOME_SLUGS` |
 | Press coverage & other links in the Journal | [lib/blog.ts](lib/blog.ts) | `BLOG` |
-| Restaurant facts, addresses, booking links, menus | [lib/restaurants.ts](lib/restaurants.ts) | `RESTAURANTS` (L40) |
-| Restaurant tiles on the home page | [components/Discover.tsx](components/Discover.tsx) | `ITEMS` (L48) |
-| Restaurant carousel on `/restaurants` | [components/RestaurantsShowcase.tsx](components/RestaurantsShowcase.tsx) | `RESTAURANTS` (L79) |
-| Job openings | [lib/jobs.ts](lib/jobs.ts) | `JOBS` (L17) |
-| Phone, email, office hours | [lib/contact.ts](lib/contact.ts) | `CONTACT` (L7) |
-| Social media links | [lib/contact.ts](lib/contact.ts) | `SOCIALS` (L30) |
-| Press coverage & logos | [lib/press.ts](lib/press.ts) | `FEATURED_OUTLETS` (L26), `PRESS` (L143) |
-| FAQ questions | [components/FAQ.tsx](components/FAQ.tsx) | `ITEMS` (L10) |
-| About page story timeline | [components/About.tsx](components/About.tsx) | `CHAPTERS` (L68) |
-| Careers page headline & values | [components/JoinUs.tsx](components/JoinUs.tsx) | `PILLARS` (L24), `HERO_LINES` (L110) |
-| Home page opening statement | [components/Manifesto.tsx](components/Manifesto.tsx) | `PARTS` (L35) |
-| Top navigation links | [components/Nav.tsx](components/Nav.tsx) | `LINKS` (L15) |
-| Full-screen menu links | [components/Menu.tsx](components/Menu.tsx) | `ITEMS` (L10) |
-| Footer links | [components/Footer.tsx](components/Footer.tsx) | `EXPLORE` (L18) |
+| Restaurant facts, addresses, booking links, menus | [lib/restaurants.ts](lib/restaurants.ts) | `RESTAURANTS` |
+| Restaurant card details (address lines, hours, badge) | [lib/venueCards.ts](lib/venueCards.ts) | `EXTRAS` |
+| Home page restaurant blurbs & hover clips | [components/home/Discover.tsx](components/home/Discover.tsx) | `DISPLAY` |
+| Restaurant carousel on `/restaurants` | [components/venues/RestaurantsShowcase.tsx](components/venues/RestaurantsShowcase.tsx) | `RESTAURANTS` |
+| Job openings | [lib/jobs.ts](lib/jobs.ts) | `JOBS` |
+| Phone, email, press email, office hours | [lib/contact.ts](lib/contact.ts) | `CONTACT` |
+| Social media links | [lib/contact.ts](lib/contact.ts) | `SOCIALS` |
+| Press coverage & logos | [lib/press.ts](lib/press.ts) | `FEATURED_OUTLETS`, `PRESS` |
+| FAQ questions | [components/contact/FAQ.tsx](components/contact/FAQ.tsx) | `ITEMS` |
+| About page story timeline | [components/about/About.tsx](components/about/About.tsx) | `CHAPTERS` |
+| Careers page headline & values | [components/careers/JoinUs.tsx](components/careers/JoinUs.tsx) | `PILLARS`, `HERO_LINES` |
+| Home page opening statement | [components/home/Manifesto.tsx](components/home/Manifesto.tsx) | `WORDS` |
+| Top navigation links | [components/layout/Nav.tsx](components/layout/Nav.tsx) | `LINKS` |
+| Full-screen menu links | [components/layout/Menu.tsx](components/layout/Menu.tsx) | `ITEMS` |
+| Footer links | [components/layout/Footer.tsx](components/layout/Footer.tsx) | `EXPLORE` |
+| Legal entity, privacy/terms dates | [lib/legal.ts](lib/legal.ts) | `LEGAL_ENTITY`, `LEGAL_UPDATED` |
 | Page titles & search descriptions | `app/*/page.tsx` | `metadata` |
-| Site-wide title & description | [app/layout.tsx](app/layout.tsx) | `metadata` (L25) |
+| Site-wide title & description | [app/layout.tsx](app/layout.tsx) | `metadata` |
+| The site's own web address | [lib/site.ts](lib/site.ts) | `SITE_URL` |
+
+### The pages that exist
+
+Every page on the site, and the file that makes it:
+
+| Address | File |
+| --- | --- |
+| `/` | [app/page.tsx](app/page.tsx) → [components/home/Experience.tsx](components/home/Experience.tsx) |
+| `/restaurants` | [app/restaurants/page.tsx](app/restaurants/page.tsx) |
+| `/menus/<slug>` | [app/menus/[slug]/page.tsx](app/menus/[slug]/page.tsx) — one per venue with menu pages |
+| `/blog` | [app/blog/page.tsx](app/blog/page.tsx) |
+| `/blog/<slug>` | [app/blog/[slug]/page.tsx](app/blog/[slug]/page.tsx) — one per post in `content/posts/` |
+| `/about` | [app/about/page.tsx](app/about/page.tsx) |
+| `/careers` | [app/careers/page.tsx](app/careers/page.tsx) |
+| `/contact` | [app/contact/page.tsx](app/contact/page.tsx) |
+| `/privacy`, `/terms` | [app/privacy/page.tsx](app/privacy/page.tsx), [app/terms/page.tsx](app/terms/page.tsx) |
+| `/lab/…` | Internal type and hero experiments. Not linked from anywhere; ignore. |
+
+> **There is no `/restaurants/<slug>` page.** Individual restaurants are
+> presented on the `/restaurants` carousel and on their own **menu** page at
+> `/menus/<slug>`. Adding a restaurant does not create a detail page, because
+> there is no such page type. If you have seen an older note claiming otherwise,
+> it was wrong.
 
 ---
 
@@ -161,8 +202,7 @@ newest first, automatically**:
 
 ### Write a post
 
-**1. Make the file.** Anywhere in `content/posts/`, named for the web address you
-want:
+**1. Make the file.** In `content/posts/`, named for the web address you want:
 
 ```
 content/posts/a-note-on-service.md   →   /blog/a-note-on-service
@@ -199,7 +239,7 @@ Everything since has been an attempt to write that down without killing it.
 | `title` | yes | The headline. Shown on the card and as the page's heading. |
 | `date` | yes | **`YYYY-MM-DD`**. Drives the ordering of the whole Journal. |
 | `excerpt` | yes | The standfirst under the headline on the card, and the description Google shows. Two sentences reads best. |
-| `image` | yes | The photograph at the top of the post and on its card. A path under `public/` — see [Images & video](#12-images--video). |
+| `image` | yes | The photograph at the top of the post and on its card. A path under `public/` — see [Images & video](#13-images--video). |
 | `category` | yes | One of `news`, `feature`, `review`, `inclusion`. Nothing else is accepted. |
 | `author` | no | The byline. Defaults to `Maginhawa Group`. |
 | `restaurant` | no | A restaurant slug from [lib/restaurants.ts](lib/restaurants.ts) — `belly`, `mamasons`, `guanabana`… Puts the venue's mark on the card and files the post under that room in the `/blog` filter. |
@@ -281,8 +321,8 @@ Delete the file. The index re-paginates itself.
 ### Put a post on the home page
 
 The "Latest" rail on the home page is **hand-picked, not automatic** — it shows
-four chosen stories rather than the four newest. The list is `HOME_SLUGS` near the
-top of [components/Blog.tsx](components/Blog.tsx):
+chosen stories rather than the newest ones. The list is `HOME_SLUGS` near the top
+of [components/home/Blog.tsx](components/home/Blog.tsx):
 
 ```ts
 const HOME_SLUGS = [
@@ -292,9 +332,10 @@ const HOME_SLUGS = [
 ] as const;
 ```
 
-Add the post's slug (its filename without `.md`) and remove one, since only four
-fit. Whichever entry in that list is **newest by date** becomes the big
-photograph above the rail.
+Add the post's slug — for one of our posts that is its filename without `.md`;
+for coverage it is the `slug` in `lib/blog.ts`. Whichever entry in that list is
+**newest by date** becomes the big photograph above the rail, regardless of where
+it sits in the list.
 
 ---
 
@@ -343,24 +384,36 @@ the publication. Copy an existing block inside the `BLOG` array in
 
 ## 4. Restaurants
 
-Restaurants are the one piece of content that lives in **three places**. This is
-deliberate — each surface shows different things — but it means adding or
-removing a restaurant is a checklist, not a single edit.
+There is **one source of truth** for a restaurant — [lib/restaurants.ts](lib/restaurants.ts) —
+and two files that add things only their own surface prints. Learning which is
+which is the whole of this section.
 
-| File | What it controls |
+| File | What it owns |
 | --- | --- |
-| [lib/restaurants.ts](lib/restaurants.ts) → `RESTAURANTS` (L40) | **The source of truth.** Detail pages and their web addresses, Google/SEO data, the booking section, the Google-review picker, the address list on `/contact`. |
-| [components/Discover.tsx](components/Discover.tsx) → `ITEMS` (L48) | The photo tiles on the **home page** — longer blurbs, founding year, hover video. |
-| [components/RestaurantsShowcase.tsx](components/RestaurantsShowcase.tsx) → `RESTAURANTS` (L79) | The scrolling carousel on **`/restaurants`** — display order and background video. |
+| [lib/restaurants.ts](lib/restaurants.ts) → `RESTAURANTS` | **The source of truth.** Name, tagline, cuisine, description, postal address, photograph, logo, website, booking link, menu pages, `bookable`, `comingSoon`. Feeds Google/SEO data, the booking section, the review picker, `/contact`, and the menu pages. |
+| [lib/venueCards.ts](lib/venueCards.ts) → `venueCards()` | **The card record.** Reads the file above and adds only what a *card* prints and nothing else carries: the three printable address lines, opening hours, the Michelin sticker, and a focal point for off-centre photographs. Both card grids read this one function. |
+| [components/home/Discover.tsx](components/home/Discover.tsx) → `DISPLAY` | **Home page copy only.** The five things unique to the home grid: `tag`, one-line `location`, `blurb`, founding year `est`, and the hover `clip`. |
+| [components/venues/RestaurantsShowcase.tsx](components/venues/RestaurantsShowcase.tsx) → `RESTAURANTS` | **The `/restaurants` carousel.** Display order, the short tag and location as the carousel prints them, and the full-screen background `video`. |
+
+> **Why it is split this way:** two spellings of one fact are two facts that will
+> eventually disagree. This file used to hold duplicate `LOGOS` and `PHOTOS`
+> tables, and one of them had already drifted — the carousel was showing a
+> different photograph of Ramo Ramen from the one the home page showed, and
+> because both files existed nothing 404'd and nothing caught it. Those tables
+> are gone; the card now reads one record.
 
 ### Change a fact about an existing restaurant
 
-Most fields — booking link, address, description, price range, menus — only need
-`lib/restaurants.ts`.
+Start in [lib/restaurants.ts](lib/restaurants.ts). Booking link, address,
+description, cuisine, menus and `bookable` all live there and nowhere else.
 
-But **the home page tiles carry their own copy.** If the change is to the blurb,
-the address line or the tagline as shown on the home page, edit `ITEMS` in
-`Discover.tsx` too. Search for the restaurant name in both files to be sure.
+**The exception is the home page's marketing copy.** The blurb, the tag line and
+the one-line location as shown on the home grid are written in `DISPLAY` in
+[components/home/Discover.tsx](components/home/Discover.tsx), and the carousel's
+short tag and location are in `RESTAURANTS` in
+[components/venues/RestaurantsShowcase.tsx](components/venues/RestaurantsShowcase.tsx).
+If your change is to a *sentence a visitor reads on the home page or the
+carousel*, search for the restaurant's name in those two files too.
 
 Useful fields in `lib/restaurants.ts`:
 
@@ -396,31 +449,49 @@ means the doors haven't opened. A venue that is `bookable: false` *and*
 the "leave us a review" picker — don't set `comingSoon` on an open restaurant to
 hide it from bookings.
 
+> **`priceRange` no longer exists.** The group does not publish a price band
+> anywhere on the site. Don't re-add the field expecting it to appear.
+
 ### Update a menu
 
 1. Export each menu page as a PNG or JPG.
 2. Drop the files in `public/menu/<restaurant>/`.
-3. List them, in reading order, in `menuPages` in **both** `lib/restaurants.ts`
-   and `ITEMS` in `Discover.tsx`.
+3. List them, in reading order, in `menuPages` in
+   **[lib/restaurants.ts](lib/restaurants.ts)** — this is the only place they go.
 4. Update `menuLabel` to the new month, e.g. `"August 2026"`.
+
+Adding `menuPages` to a venue that had none also **creates its menu page** at
+`/menus/<slug>` — that route is built from whichever venues have menu pages.
+Removing them removes the page, so check nothing still links to it.
 
 ### Add a restaurant
 
 Work through all of these:
 
 1. **[lib/restaurants.ts](lib/restaurants.ts)** — add an entry to `RESTAURANTS`.
-   This alone creates the page at `/restaurants/<slug>`.
 2. **[lib/restaurants.ts](lib/restaurants.ts)** — add the display name to
-   `SLUG_BY_NAME` (L201). The carousel matches on the name, so this must be
+   `SLUG_BY_NAME`. The carousel matches on the name, so this must be
    character-for-character identical to step 4.
-3. **[components/Discover.tsx](components/Discover.tsx)** — add an entry to
-   `ITEMS` for the home page tile.
-4. **[components/RestaurantsShowcase.tsx](components/RestaurantsShowcase.tsx)** —
-   add an entry to `RESTAURANTS` (L79), a line to `LOGOS` (L136) and, if you have
-   photography, a line to `PHOTOS` (L148).
-5. Add the images — see [Images & video](#12-images--video).
+3. **[components/home/Discover.tsx](components/home/Discover.tsx)** — add an
+   entry to `DISPLAY` for the home page tile's copy and hover clip. *(A venue
+   with no entry here still renders — it just carries no blurb and no film, and
+   falls back to its own postal address for the location line.)*
+4. **[components/venues/RestaurantsShowcase.tsx](components/venues/RestaurantsShowcase.tsx)**
+   — add an entry to `RESTAURANTS` for the carousel.
+5. **[lib/venueCards.ts](lib/venueCards.ts)** — add the three printable address
+   lines, and a Michelin badge or photo focal point if it needs one.
+6. **`public/llms.txt`** — see the warning below.
+7. Add the images — see [Images & video](#13-images--video).
 
-Then check the home page, `/restaurants`, `/restaurants/<slug>` and `/contact`.
+Then check the home page, `/restaurants`, `/menus/<slug>` and `/contact`.
+
+> ⚠️ **`public/llms.txt` restates the whole restaurant list by hand.** It is the
+> plain-text summary that AI assistants read, it ships out of `public/`
+> uncompiled, and so it cannot import the array — it names every venue, its
+> cuisine, whether it takes bookings, and the addresses of those that publish
+> one. **Nothing in the build checks it.** Add, rename or close a venue and that
+> file is silently wrong until you edit it too. It is short, and the list is near
+> the top.
 
 > The name string is the join key across steps 2–4. `"Café Mama & Sons"` with a
 > plain `e` instead of `é`, or `and` instead of `&`, silently produces a card
@@ -428,24 +499,27 @@ Then check the home page, `/restaurants`, `/restaurants/<slug>` and `/contact`.
 
 ### Delete a restaurant
 
-Remove it from the three files above **and** search the repo for its `slug` —
-it may be referenced in:
+Remove it from the files above **and** search the repo for its `slug` — it may be
+referenced in:
 
 - `lib/blog.ts` (`restaurant: "..."` on posts),
+- `content/posts/*.md` (`restaurant:` in the frontmatter),
 - `lib/press.ts` (`restaurants: [...]` on coverage),
 - `lib/jobs.ts` (`restaurantSlug`),
-- `components/About.tsx` (`slug` on a timeline chapter),
-- `components/FAQ.tsx` and `components/JoinUs.tsx`, where restaurant names appear
-  in prose.
+- `components/about/About.tsx` (`slug` on a timeline chapter),
+- `components/contact/FAQ.tsx` and `components/careers/JoinUs.tsx`, where
+  restaurant names appear in prose,
+- `public/llms.txt`.
 
-Leaving a stale slug behind won't crash the site, but it will point readers at a
-page that no longer exists.
+A stale slug in a post's frontmatter is a **build error** — the build refuses a
+`restaurant` that isn't one of ours, which is the good case. The others fail
+quietly.
 
 ---
 
 ## 5. Careers
 
-**File:** [lib/jobs.ts](lib/jobs.ts) → `JOBS` (L17)
+**File:** [lib/jobs.ts](lib/jobs.ts) → `JOBS`
 
 Openings appear on `/careers` and are also published as structured job data that
 Google can lift into its jobs panel — so keep them accurate and remove them when
@@ -485,22 +559,22 @@ themselves; there's nothing else to switch off.
 ### Where applications go
 
 The application form on `/careers` opens the reader's email client with a
-pre-filled message to **hr@mgnhw.com** ([JoinUs.tsx:697](components/JoinUs.tsx#L697)).
-Nothing is stored on the website and no server receives it.
+pre-filled message to **careers@mgnhw.com**. Nothing is stored on the website and no
+server receives it — search [components/careers/JoinUs.tsx](components/careers/JoinUs.tsx)
+for `mailto:` to change the recipient.
 
 Because it's an email draft, **a CV cannot be attached automatically** — the form
 names the file the applicant chose and asks them to attach it themselves before
-sending. To change the recipient address, edit the `mailto:` line in
-[components/JoinUs.tsx:697](components/JoinUs.tsx#L697).
+sending.
 
 ### Careers page copy
 
-Also in [components/JoinUs.tsx](components/JoinUs.tsx):
+Also in [components/careers/JoinUs.tsx](components/careers/JoinUs.tsx):
 
-- `HERO_LINES` (L110) — the two-line headline. It's split across a photograph, so
-  keep it as two strings. The animation re-times itself to whatever you write.
-- `HERO_STAND` (L115) — the paragraph beneath it.
-- `PILLARS` (L24) — the three numbered "why work here" blocks.
+- `HERO_LINES` — the two-line headline. It's split across a photograph, so keep
+  it as two strings. The animation re-times itself to whatever you write.
+- `HERO_STAND` — the paragraph beneath it.
+- `PILLARS` — the three numbered "why work here" blocks.
 
 ---
 
@@ -510,17 +584,25 @@ Also in [components/JoinUs.tsx](components/JoinUs.tsx):
 
 ```ts
 export const CONTACT = {
-  phone: "+44 01234 5678",
-  email: "info@mgnhw.com",
-  officeHours: { days: "Mon – Fri", time: "09:00 – 17:00" },
+  phone: null,                          // no number on file — see below
+  email: "info@mgnhw.com",              // PLACEHOLDER
+  pressEmail: "lily@amywilliamsconsultancy.com",   // real
+  officeHours: { days: "Mon – Fri", time: "09:00 – 17:00" },  // PLACEHOLDER
 };
 ```
 
 Change it here and it updates on the contact page, in the footer, and in the
 clickable phone/email links everywhere — they're generated from these values.
 
-⚠️ **All three are currently placeholders and are not real.** See
-[Known placeholders](#15-known-placeholders).
+**`phone` is deliberately `null`.** It used to hold `+44 01234 5678` and rendered
+it as a live `tel:` link in the footer of every page — so a reader tapping it
+dialled a stranger. The footer row and the contact entry both guard on it and are
+simply dropped while it is null. **Supply the real number here and both come back
+on their own.**
+
+**`pressEmail` is real** and is not a placeholder — don't sweep it up with the
+others. It is deliberately absent from the footer: the footer offers one way in,
+and journalists arrive via `/contact` where the two inboxes are labelled apart.
 
 `officeHours` is head-office hours, not restaurant service hours.
 
@@ -536,30 +618,81 @@ export const SOCIALS = [
 
 `url: null` renders the label as plain text rather than a link. Supply a real URL
 and it becomes clickable automatically. LinkedIn and Facebook are deliberately
-blank rather than guessed.
-
-### The enquiry form
-
-The contact form on `/contact` currently **does nothing at all**. Pressing Send
-is intentionally stopped ([Contact.tsx:88](components/Contact.tsx#L88)) because no
-form service is connected yet — the reader gets no confirmation, no error, and the
-message goes nowhere. Until a form service is wired up, the only working route for
-enquiries is the email address shown beside the form.
+blank rather than guessed — a social link that lands on the wrong company's page
+is worse than one that isn't clickable yet.
 
 ---
 
-## 7. Press, awards & quotes
+## 7. The enquiry form
+
+The form on `/contact` **opens a draft in the reader's own email app**, pre-filled with
+everything they typed. There is no server, no email service, no account and no API key —
+the site is static from end to end.
+
+**Enquiries go to `info@mgnhw.com`**, taken from `CONTACT.email` in
+[lib/contact.ts](lib/contact.ts). Change it there and the form follows, along with every
+other place the address appears.
+
+> ⚠️ **Nothing is sent until the reader presses send in their own mail app.** That is the
+> one thing to understand about this form, and it is why the button says *"Open in your
+> email app"* rather than "Submit", why the fields are **not** cleared afterwards, and why
+> the confirmation card says *"ready — but not sent yet"*. Every one of those is load-bearing:
+> a form that reads as delivered when it is not is the failure this design exists to avoid.
+
+The careers form on `/careers` works the same way, sending to `careers@mgnhw.com`.
+
+### What it costs you
+
+Worth knowing, because it is a real trade:
+
+- A reader with **no mail app configured** — webmail in a browser tab, or a phone with no
+  account set up — may see nothing happen. The card covers this: it repeats the link and
+  prints the address in full so the message can be copied by hand.
+- There is **a step where people drop off.** Some will compose the message and never press
+  send, and nothing on this site can tell you that happened.
+
+Both are the price of having no server. If enquiries ever start feeling thin, that is the
+first thing to suspect, and [section 15](#15-publishing-your-changes) records what a
+server-side version would take.
+
+### Changing where enquiries go
+
+Change `email` in [lib/contact.ts](lib/contact.ts). That single value is the address printed
+on the page, the address in the footer, and the recipient the draft is addressed to.
+
+### If you ever want it to send by itself
+
+The machinery for server-side delivery was built and then removed on purpose. The handler
+([functions/api/contact.ts](functions/api/contact.ts)), the Worker entry
+([worker/index.ts](worker/index.ts)) and its 28-assertion test suite
+([scripts/probe-contact-fn.mjs](scripts/probe-contact-fn.mjs)) are all **still in the
+repository and all inert** — nothing loads a Worker without `main` in
+[wrangler.toml](wrangler.toml), and that key is gone.
+
+The full list of what to put back is written in the comment block in
+[wrangler.toml](wrangler.toml). Two things from it are worth knowing before you start:
+
+- It needs a **sending domain onboarded** in Cloudflare, on a subdomain such as
+  `send.maginhawagroup.co.uk` — onboarding writes `_dmarc.<domain>` at the root, and this
+  zone already has one governing the group's real Microsoft 365 mail.
+- ⚠️ **Do not reach for Email Routing.** That is the *inbound* feature and cannot send;
+  turning it on takes over the root domain's MX records, which currently point at
+  Microsoft 365, and would redirect the group's real incoming mail.
+
+---
+
+## 8. Press, awards & quotes
 
 **File:** [lib/press.ts](lib/press.ts)
 
 Four separate lists, each feeding a different surface:
 
-| List | Line | Where it appears |
-| --- | --- | --- |
-| `FEATURED_OUTLETS` | L26 | The scrolling masthead logos ("As seen in") |
-| `HIGHLIGHT_QUOTES` | L49 | The rotating pull-quote beneath the logos |
-| `PRESS_INDEX` | L87 | The compact outlet/year/quote list |
-| `PRESS` | L143 | Full coverage — the Awards & Recognition table on `/about`, and the structured data search engines read |
+| List | Where it appears |
+| --- | --- |
+| `FEATURED_OUTLETS` | The scrolling masthead logos ("As seen in") |
+| `HIGHLIGHT_QUOTES` | The rotating pull-quote beneath the logos |
+| `PRESS_INDEX` | The compact outlet/year/quote list |
+| `PRESS` | Full coverage — the Awards & Recognition table on `/about`, and the structured data search engines read |
 
 **To add a logo to the masthead:** save the outlet's SVG into
 `public/press-logo/`, then add a line to `FEATURED_OUTLETS`:
@@ -594,9 +727,9 @@ that's expected and the table doesn't render a date column.
 
 ---
 
-## 8. FAQ
+## 9. FAQ
 
-**File:** [components/FAQ.tsx](components/FAQ.tsx) → `ITEMS` (L10)
+**File:** [components/contact/FAQ.tsx](components/contact/FAQ.tsx) → `ITEMS`
 
 Shown on `/contact`, and also published as structured data so Google can show the
 questions directly in search results.
@@ -617,9 +750,9 @@ date.
 
 ---
 
-## 9. The About page timeline
+## 10. The About page timeline
 
-**File:** [components/About.tsx](components/About.tsx) → `CHAPTERS` (L68)
+**File:** [components/about/About.tsx](components/about/About.tsx) → `CHAPTERS`
 
 The scrolling year-by-year story on `/about`.
 
@@ -631,7 +764,7 @@ The scrolling year-by-year story on `/about`.
   image: "/images/belly.jpg",
   imageAlt: "Belly dining room, Kentish Town",
   place: "Kentish Town",
-  slug: "belly",          // optional — links the card to the restaurant page
+  slug: "belly",          // optional — files the chapter under that venue
   wordmark: true,         // optional — for venues with no photography yet
 },
 ```
@@ -639,60 +772,93 @@ The scrolling year-by-year story on `/about`.
 Entries appear in the order written, so add new chapters at the **end** of the
 array.
 
-Each card is randomly dealt a landscape or portrait shape, derived from its
-`title`. This is deterministic, not random per visit — but it does mean
-**changing a chapter's title can change its card shape**. That's harmless; it just
-means the layout may look slightly different after a copy edit.
+Each card is dealt a landscape or portrait shape derived from its `title`. This is
+deterministic, not random per visit — but it does mean **changing a chapter's
+title can change its card shape**. That's harmless; it just means the layout may
+look slightly different after a copy edit.
 
 ---
 
-## 10. Home page copy
+## 11. Home page copy
 
-The home page is assembled in [components/Experience.tsx](components/Experience.tsx),
-which is where sections are switched on and off — it renders the page top to
-bottom, so reading it tells you the running order.
+The home page is assembled in
+[components/home/Experience.tsx](components/home/Experience.tsx), which is where
+sections are switched on and off — it renders the page top to bottom, so reading
+it tells you the running order.
 
 | Section | File | Constant |
 | --- | --- | --- |
-| Hero background videos | [components/Hero.tsx](components/Hero.tsx) | `CLIPS` (L16) |
-| The opening statement | [components/Manifesto.tsx](components/Manifesto.tsx) | `PARTS` (L35) |
-| Restaurant tiles | [components/Discover.tsx](components/Discover.tsx) | `ITEMS` (L48) |
-| Booking section video | [components/Reservations.tsx](components/Reservations.tsx) | `CLIP` (L23) |
+| Hero background videos | [components/home/Hero.tsx](components/home/Hero.tsx) | `CLIPS` |
+| The opening statement | [components/home/Manifesto.tsx](components/home/Manifesto.tsx) | `WORDS` |
+| Restaurant tiles | [components/home/Discover.tsx](components/home/Discover.tsx) | `DISPLAY` |
+| The "Latest" rail | [components/home/Blog.tsx](components/home/Blog.tsx) | `HOME_SLUGS` |
+| Booking section video | [components/home/Reservations.tsx](components/home/Reservations.tsx) | `CLIP` |
 
 ### The opening statement
 
-`PARTS` is the sentence written as a list of words with photographs laid between
-them, so the pictures read as words in the sentence:
+The statement is built from **two constants that work together**.
+
+`WORDS` is the sentence, one word per line:
 
 ```ts
-const PARTS = [
-  "A", "vibrant", "Filipino",
-  { img: "/blog/DSC07739-web.jpg", w: 0.62, enter: "drop" },
-  "and", "pan-Asian", "collective", "of", "restaurants,", "cafés",
+const WORDS = [
+  "Maginhawa", "is", "Tagalog", "for", "comfort.",
+  "A", "quiet", "idea", "that", "shapes", "every", "room", "we", "create,",
   ...
 ];
 ```
 
-Each word is its own string — including its punctuation, so `"London."` keeps its
-full stop. `w` is the picture's width and `enter` is how it arrives (`"drop"`,
-`"slide"` or `"rise"`). Just below, `KEY_WORDS` (L63) lists the words printed in
-the accent colour; they must match the strings in `PARTS` exactly, full stop
-included. `SUPPORT` (L66) is the sentence underneath.
+Each word is its own string — **including its punctuation**, so `"comfort."`
+keeps its full stop. To reword the statement, edit this array.
 
-Three photographs is a deliberate maximum — one per line. More turns the sentence
+`INLINE` places the photographs. It is keyed by the **position of the word each
+picture follows**, counting from `0`:
+
+```ts
+const INLINE = new Map([
+  [4,  { src: "/images/manifesto/mamasons-web.jpg", alt: "" }],  // after "comfort."
+  [11, { src: "/images/manifesto/belly-web.jpg", alt: "", portrait: true }],
+  ...
+]);
+```
+
+> ⚠️ **Those numbers count words, so rewording `WORDS` moves every picture.**
+> Add a word near the start and all four photographs slide one word later. After
+> any edit to `WORDS`, re-count and update the keys — the comment beside each
+> line names the word it should follow, which is how you check.
+
+`portrait: true` is for a photograph that is natively portrait. It is a
+description of the file, not a crop instruction — setting it on a landscape image
+does not crop it, so re-crop the source first.
+
+Every picture is `alt: ""` on purpose. They illustrate nothing the sentence
+doesn't already say, and a screen reader announcing four descriptions mid-sentence
+would break the statement into pieces. The statement carries its own
+`aria-label`.
+
+Two more constants sit just below:
+
+- `KEY_WORDS` — the words printed in the accent colour, as a `Set`. Write them
+  **without punctuation**: the lookup strips trailing punctuation, so `"comfort"`
+  matches the word `"comfort."` in the sentence. Three accents across twenty
+  words is the deliberate ceiling — accent most of a sentence and it stops being
+  an accent.
+- `EYEBROW` — the small line above the statement.
+
+Four photographs is the working maximum — one per line. More turns the sentence
 into a contact sheet.
 
 ---
 
-## 11. Navigation & footer links
+## 12. Navigation & footer links
 
 The same navigation is written in three places, and all three need to agree:
 
 | Where | File | Constant |
 | --- | --- | --- |
-| Top bar | [components/Nav.tsx](components/Nav.tsx) | `LINKS` (L15) |
-| Full-screen menu | [components/Menu.tsx](components/Menu.tsx) | `ITEMS` (L10) — also carries "Home" |
-| Footer | [components/Footer.tsx](components/Footer.tsx) | `EXPLORE` (L18) |
+| Top bar | [components/layout/Nav.tsx](components/layout/Nav.tsx) | `LINKS` |
+| Full-screen menu | [components/layout/Menu.tsx](components/layout/Menu.tsx) | `ITEMS` |
+| Footer | [components/layout/Footer.tsx](components/layout/Footer.tsx) | `EXPLORE` |
 
 ```ts
 { label: "Restaurants", href: "/restaurants" },
@@ -700,7 +866,7 @@ The same navigation is written in three places, and all three need to agree:
 
 Internal links start with `/`. External links use the full `https://...` address
 and open in a new tab automatically. The footer's email and phone links are
-generated from `lib/contact.ts` — don't type them in by hand.
+generated from `lib/contact.ts` (`CONTACT_LINKS`) — don't type them in by hand.
 
 ### Adding a new page
 
@@ -710,7 +876,7 @@ easiest start — it already has the title and search-description block set up.
 
 ---
 
-## 12. Images & video
+## 13. Images & video
 
 Everything the site serves lives in `public/`. A file at
 `public/images/belly.jpg` is written in the data as `"/images/belly.jpg"`.
@@ -723,6 +889,7 @@ Everything the site serves lives in `public/`. A file at
 | `public/press-logo/` | Publication wordmarks (SVG) |
 | `public/menu/<restaurant>/` | Menu pages as PNG/JPG |
 | `public/videos/` | Background and hover clips |
+| `public/og/` | Share-preview images |
 
 **Before adding a photograph:** resize and compress it first. Aim for **under
 400KB** and no wider than **2400px**. The repo already carries a lot of oversized
@@ -738,19 +905,23 @@ it.
 
 ### Video
 
-`public/videos/` **is committed to git and ships with the site** — that changed
-when the site moved to Cloudflare Pages, whose bandwidth is free and unmetered.
-The one hard rule is Cloudflare's: **no single file over 25MB**, or the whole
-deploy is refused. `scripts/compress-media.mjs` is what brings clips under it.
+`public/videos/` **is committed to git and ships with the site.** The one hard
+rule is Cloudflare's: **no single file over 25MB**, or the whole deploy is
+refused. `scripts/compress-media.mjs` is what brings clips under it.
 
 Photographs can optionally be served from a CDN instead of `public/` — set
 `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` at build time. Leaving it unset serves them
 from `public/` at their original size, which works but is heavier. See
 `.env.example` and `CLOUDINARY.md`.
 
+> ⚠️ That variable must be set as a **build** variable in Cloudflare
+> (Settings → Build → "Build variables and secrets"), not a runtime one. Next
+> inlines `NEXT_PUBLIC_*` at build time, so one set in the runtime section is read
+> by nothing and every photograph silently stays local.
+
 ---
 
-## 13. Page titles & SEO
+## 14. Page titles & SEO
 
 Each page owns the title and description shown in Google and in link previews.
 
@@ -773,11 +944,14 @@ preview and structured data all come from the frontmatter at the top of its
 Change `title` or `excerpt` in the post and everything follows.
 
 The address the site calls home — used in every canonical link, share preview and
-piece of structured data — is the single line in [lib/site.ts](lib/site.ts).
+piece of structured data — is `SITE_URL` in [lib/site.ts](lib/site.ts).
+
+`public/llms.txt` is the plain-text summary AI assistants read. It is maintained
+by hand — see the warning in [Restaurants](#add-a-restaurant).
 
 ---
 
-## 14. Publishing your changes
+## 15. Publishing your changes
 
 1. Check the site locally with `npm run dev` — look at every page your change
    touches, and check a narrow browser window as well as a wide one.
@@ -793,7 +967,7 @@ npm run build
 git add -A && git commit -m "Update August menus and close the Sous Chef role" && git push
 ```
 
-**Cloudflare Pages builds from the push** and the new version is live a couple of
+**Cloudflare builds from the push** and the new version is live a couple of
 minutes later at <https://www.maginhawagroup.co.uk>. A failed build does **not**
 replace the live site — the previous version stays up, and the failure is
 reported in the Cloudflare dashboard.
@@ -801,6 +975,20 @@ reported in the Cloudflare dashboard.
 There is nothing to press: committing a post is publishing it. If you are not
 ready for that, rename the file with a leading underscore (see
 [Drafts](#drafts)) and commit it that way.
+
+### How the deploy is wired
+
+Worth knowing before you change anything about it:
+
+- This is a **Workers** project, not a Pages project, even though the two look
+  similar in the dashboard. [wrangler.toml](wrangler.toml) declares
+  `[assets] directory = "./out"`.
+- `npm run build` runs `next build`, which — because `next.config.mjs` sets
+  `output: "export"` — writes a folder of plain HTML into `out/`. That folder is
+  the website.
+- **The build command is a dashboard setting**, not something in this repo.
+  Settings → Build → Build command: `npm run build`.
+- Per-file ceiling is **25 MiB**. Exceed it and the whole deploy is refused.
 
 If you changed component files rather than just data, refresh the project's code
 map afterwards:
@@ -811,66 +999,23 @@ graphify update .
 
 ---
 
-## 15. Known placeholders
+## 16. Known placeholders & gaps
 
-Things that are visibly wrong on the live site and need real values.
+Things that are visibly wrong or missing on the live site.
 
 | What | Where | Note |
 | --- | --- | --- |
-| Phone number `+44 01234 5678` | [lib/contact.ts:9](lib/contact.ts#L9) | Not a real number. Shown on the contact page and in the footer. |
-| Email `info@mgnhw.com` | [lib/contact.ts:11](lib/contact.ts#L11) | Not a real inbox. Careers mail goes to `hr@mgnhw.com`, which is real. |
-| Office hours | [lib/contact.ts:16](lib/contact.ts#L16) | Assumed, not confirmed. |
-| LinkedIn & Facebook | [lib/contact.ts:31](lib/contact.ts#L31) | Blank, so they show as plain text. Add URLs to make them links. |
-| Mamasons & Bunso photography | `lib/restaurants.ts` | `image` points at `mamasons-placeholder.jpg` and `bunso-placeholder.jpg`, **which don't exist**. The site is written to skip them rather than show a broken image, so this is invisible today — but adding the two files (under those exact names) turns the photography on everywhere at once. |
+| Enquiry form needs a mail app | [components/contact/Contact.tsx](components/contact/Contact.tsx) | Not a defect — a deliberate trade. The form opens a draft in the reader's own email app rather than sending, so a visitor with no mail account configured must copy the address instead. See [section 7](#7-the-enquiry-form). |
+| No phone number | [lib/contact.ts](lib/contact.ts) | `phone: null`. The footer row and contact entry are hidden rather than showing a fake number. Supply it and they return. |
+| Email `info@mgnhw.com` | [lib/contact.ts](lib/contact.ts) | Not a real inbox. Careers mail goes to `careers@mgnhw.com`, which is real, as is `pressEmail`. |
+| Office hours | [lib/contact.ts](lib/contact.ts) | Assumed, not confirmed. |
+| LinkedIn & Facebook | [lib/contact.ts](lib/contact.ts) | Blank, so they show as plain text. Add URLs to make them links. |
+| **Opening hours on every venue card** | [lib/venueCards.ts](lib/venueCards.ts) | ⚠️ Every venue carries an invented `"12–11"`. No venue's real hours are on file anywhere in this repo. Get the real hours before anything on the site presents them as live data. |
+| Mamasons & Bunso photography | [lib/restaurants.ts](lib/restaurants.ts) | `image` points at `-placeholder.jpg` files **which don't exist**. The site is written to skip them rather than show a broken image, so this is invisible today — but adding the files under those exact names turns the photography on everywhere at once. |
 
 ---
 
-## 17. The enquiry form
-
-`/contact` sends for real. The form posts to `/api/contact`, which is a
-**Cloudflare Pages Function** — [functions/api/contact.ts](functions/api/contact.ts) —
-that runs beside the site and hands the message to **Resend**, which emails it
-to you. Nothing is stored anywhere.
-
-That function is the only part of this site that runs when someone visits. The
-pages are all static files; this is one small script the host runs on request.
-
-### It needs three settings, in Cloudflare
-
-Pages → your project → **Settings** → **Environment variables**:
-
-| Name | Type | Value |
-| --- | --- | --- |
-| `RESEND_API_KEY` | **Secret** | The key from [resend.com/api-keys](https://resend.com/api-keys) |
-| `CONTACT_TO` | Plain text | Where enquiries should land, e.g. `info@mgnhw.com` |
-| `CONTACT_FROM` | Plain text | The address they are sent *from*, e.g. `Maginhawa Group <website@mgnhw.com>` |
-
-Set them for **Production** (and Preview, if you want the form working on
-preview deploys), then redeploy — environment variables are read when the
-function runs, but a redeploy is the reliable way to be sure.
-
-> **`CONTACT_FROM` has to be a domain you have verified in Resend.** Resend
-> gives you a few DNS records to add; until they are in place, every message
-> fails. This is the single most likely reason the form stops working, and it
-> is not something a code change can fix.
-
-### What a reader sees if it is not set up
-
-Nothing dishonest, which is the point. The form does not claim to have sent
-anything: it says it could not send, leaves everything they typed in the
-fields, and offers a link that opens the same message in their own email app
-with all of it filled in. Same on a network failure.
-
-### Changing where enquiries go
-
-Change `CONTACT_TO` in Cloudflare. Do **not** change the email in
-[lib/contact.ts](lib/contact.ts) expecting it to move the form — that address
-is the one printed on the page for people who prefer to write directly, and it
-is fine for the two to differ.
-
----
-
-## 16. Troubleshooting
+## 17. Troubleshooting
 
 **A red error appears and the page won't load.**
 Read the file and line number in the message — it's nearly always a missing comma,
@@ -887,9 +1032,9 @@ Check the file is really in `public/`, and that the path in the data starts with
 (`.jpg` vs `.jpeg`).
 
 **I changed a restaurant blurb and the home page still shows the old one.**
-The home page tiles keep their own copy in `ITEMS` in
-[components/Discover.tsx](components/Discover.tsx). See
-[Restaurants](#4-restaurants).
+The home page tiles keep their own marketing copy in `DISPLAY` in
+[components/home/Discover.tsx](components/home/Discover.tsx), and the carousel
+keeps its own in `RestaurantsShowcase.tsx`. See [Restaurants](#4-restaurants).
 
 **A new blog post isn't at the top.**
 Check `date` is in `YYYY-MM-DD` form. `"01-08-2026"` sorts as if it were the year 1.
@@ -898,7 +1043,7 @@ Check `date` is in `YYYY-MM-DD` form. `"01-08-2026"` sorts as if it were the yea
 Three things to check, in order: the filename does not start with `_` (that means
 draft), it ends in `.md`, and it is inside `content/posts/`.
 
-**`content/posts/….md: \`category\` must be one of feature, review, news, inclusion`**
+**`content/posts/....md: category must be one of feature, review, news, inclusion`**
 The build checks a post's facts and stops rather than publishing something
 broken. The message names the file and the field. The same happens for a missing
 `title`, `excerpt` or `image`, a `date` that isn't `YYYY-MM-DD`, and a
@@ -913,15 +1058,29 @@ Markdown needs a **blank line** between paragraphs. A single newline is only a
 line wrap.
 
 **A restaurant card has no logo, or its link goes nowhere.**
-Its display name doesn't match across `SLUG_BY_NAME`, `LOGOS`, `PHOTOS` and the
-carousel's `RESTAURANTS`. Compare the strings character by character — accents and
-`&` are the usual culprits.
+Its display name doesn't match between `SLUG_BY_NAME` in `lib/restaurants.ts` and
+the carousel's `RESTAURANTS`. Compare the strings character by character —
+accents and `&` are the usual culprits.
+
+**A restaurant's menu page 404s.**
+Menu pages exist only for venues with `menuPages` in `lib/restaurants.ts`. No
+menu pages, no `/menus/<slug>` page.
 
 **Everything looks broken after pulling changes.**
 Run `npm install` — someone may have added a dependency.
 
-**The contact form says it could not send.**
-Almost always one of the three Cloudflare settings in
-[section 17](#17-the-enquiry-form) — most often `CONTACT_FROM` on a domain
-Resend has not verified yet. Nothing the reader typed is lost when this
-happens; they are offered the email address instead.
+**Someone says they filled in the contact form but we never got it.**
+Expected, occasionally, and not a bug. The form hands a draft to the reader's own email
+app; if they never press send there, nothing reaches you and nothing on this site can
+know. If it happens often, that is the argument for server-side delivery — see
+[section 7](#if-you-ever-want-it-to-send-by-itself).
+
+**The contact form does not open anything when I press the button.**
+The reader has no application registered for `mailto:` — common with webmail in a browser
+tab. The card that appears after pressing carries the link again and prints the address in
+full, so the message can still be copied across. Check the fields are all valid first: an
+invalid form reports the problem instead of handing off.
+
+**`npm run build` fails or behaves strangely.**
+Check `npm run dev` isn't running in another terminal. They share `.next` and
+corrupt each other.

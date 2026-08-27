@@ -28,6 +28,26 @@ type Errors = Partial<Record<"firstName" | "email" | "message", string>>;
 
 const EMPTY: Values = { firstName: "", lastName: "", email: "", message: "" };
 
+/* ── THE DRAFT THE READER'S MAIL APP OPENS ──
+   One builder, because two things need the identical draft: the hand-off on
+   submit, and the "if nothing opened" link in the card afterwards. If those
+   two ever composed different bodies, the reader who fell through to the
+   link would send a different message from the one they thought they had
+   already written.
+
+   ⚠️ encodeURIComponent ON EACH PART, NOT ON THE WHOLE STRING. `&` and `?`
+   are how a mailto separates its own fields, so a diner who writes "table
+   for 4 & a highchair?" would otherwise truncate their own message at the
+   ampersand and lose everything after it. Newlines survive as %0A. */
+const mailtoHref = (v: Values) => {
+  const name = `${v.firstName} ${v.lastName}`.trim();
+  return `mailto:${CONTACT.email}?subject=${encodeURIComponent(
+    `Website enquiry — ${name}`,
+  )}&body=${encodeURIComponent(
+    [`Name: ${name}`, `Email: ${v.email}`, "", v.message].join("\n"),
+  )}`;
+};
+
 /* THE EMAIL TEST IS DELIBERATELY LOOSE.
    It asks for something before an @, something after it, a dot, and
    something after that — and nothing else. The temptation is RFC 5322,
@@ -57,27 +77,27 @@ export default function Contact({ standalone = false }: ContactProps) {
   const [values, setValues] = useState<Values>(EMPTY);
   const [errors, setErrors] = useState<Errors>({});
   const [status, setStatus] = useState("");
-  /* ── A PHASE, NOT A BOOLEAN ──
-     `sent` used to be true/false because there were only two outcomes: the
-     draft opened, or the form had errors. Real delivery has four states a
-     reader must be able to tell apart — idle, in flight, delivered, and
-     failed-but-your-words-are-safe — and the last two look nothing alike.
-     A boolean would have had to be two booleans, and two booleans have a
-     fourth combination that means nothing. */
-  const [phase, setPhase] = useState<"idle" | "sending" | "sent" | "failed">(
-    "idle",
-  );
+  /* ── TWO STATES, BECAUSE THERE ARE ONLY TWO ──
+     This carried four — idle, in flight, delivered, failed — while the form
+     POSTed to a server that delivered the mail. It hands off to the
+     reader's own mail app now, and that has no in-flight and no delivered:
+     the draft is composed or it is not. There is no third outcome to
+     report, because nothing on this page ever learns whether the reader
+     pressed send.
+
+     ⚠️ SO "handed" MUST NOT BE READ AS "sent" ANYWHERE. It means a draft
+     was handed to the operating system, which is the last thing this code
+     knows. */
+  const [phase, setPhase] = useState<"idle" | "handed">("idle");
   const formRef = useRef<HTMLFormElement>(null);
 
-  /* Stamped when the form mounts and sent with the message: the function
-     rejects anything that arrives within three seconds of the page
-     rendering, which no human typing an enquiry ever does. See the note on
-     it in functions/api/contact.ts. */
-  const mountedAt = useRef(Date.now());
-
-  /* the honeypot, kept out of React's controlled-input dance — nothing
-     should ever type into it, so nothing needs to re-render when it changes */
-  const trapRef = useRef<HTMLInputElement>(null);
+  /* ⚠️ THE HONEYPOT AND THE THREE-SECOND TIMER ARE GONE WITH THE SERVER, and
+     that is not an oversight. Both existed to protect an endpoint: they were
+     checked server-side, and what they bought was not sending mail on a
+     bot's behalf. Nothing is sent from here now — a bot that "submits" this
+     form gets a draft in its own mail client, which costs us nothing and
+     reaches nobody. A trap that catches something no longer worth catching
+     is just an unlabelled input in the page. */
 
   /* ── WHEN A FIELD RE-VALIDATES ──
      On change, but ONLY once it has already failed. Validating every
@@ -139,98 +159,35 @@ export default function Contact({ standalone = false }: ContactProps) {
       return;
     }
 
-    /* ── DELIVERY ──
-       POST to /api/contact, which is a Cloudflare Pages Function sitting
-       beside the exported site (functions/api/contact.ts). It is the same
-       origin, so `connect-src \'self\'` in public/_headers already allows it
-       and no CSP change was needed to turn this on.
+    /* ── THE HAND-OFF ──
+       No server and no service: the message is composed into a `mailto:`
+       and the reader's own mail app finishes the job. This is what the form
+       did originally, was moved off, and is now back on at the user's
+       instruction.
 
-       ⚠️ THIS REPLACED A `mailto:` HAND-OFF, and the reason is the sentence
-       that hand-off had to print: "nothing reaches us until you press send".
-       It was honest, and it meant a form on a restaurant\'s contact page did
-       not contact anybody — it opened a draft, and a reader on a phone with
-       no mail account configured got nothing at all.
+       ⚠️ NOTHING HAS BEEN SENT WHEN THIS RETURNS, and every word on screen
+       afterwards has to say so. The failure this design must survive is not
+       a network error — it is a reader who believes they have written to us
+       and has not, because the draft is sitting unsent in their own outbox,
+       or because no mail app opened at all. Hence: the fields are not
+       cleared, the button does not say "Submit", and the card repeats that
+       it is not sent yet.
 
-       WHAT SURVIVES OF IT is the failure branch below. If the function
-       cannot deliver, the message is not lost and the reader is not told it
-       was sent: they get the address and the words they typed, still in the
-       fields, to copy. A form that lies about delivery is worse than one
-       that does not send. */
-    setPhase("sending");
-    setStatus("Sending your message…");
-
-    /* A REQUEST THAT CANNOT HANG. Without this, a dead network leaves the
-       button spinning for the browser\'s own timeout — over a minute on some
-       — with nothing on screen to say so. Fifteen seconds is far longer than
-       the function needs and short enough to still feel like an answer. */
-    const abort = new AbortController();
-    const timer = window.setTimeout(() => abort.abort(), 15000);
-
-    try {
-      const res = await fetch("/api/contact", {
-        method: "POST",
-        headers: { "content-type": "application/json" },
-        signal: abort.signal,
-        body: JSON.stringify({
-          firstName: values.firstName,
-          lastName: values.lastName,
-          email: values.email,
-          message: values.message,
-          startedAt: mountedAt.current,
-          // the honeypot: empty for every human who ever fills this in
-          company: trapRef.current?.value ?? "",
-        }),
-      });
-
-      const data = (await res.json().catch(() => ({}))) as {
-        ok?: boolean;
-        error?: string;
-        retry?: boolean;
-      };
-
-      if (res.ok && data.ok) {
-        setPhase("sent");
-        /* THE FIELDS ARE CLEARED ONLY HERE. On failure they are deliberately
-           left full — see the branch below. */
-        setValues(EMPTY);
-        setStatus(
-          `Thank you — your message has been sent. We reply to ${CONTACT.email} enquiries within a couple of days.`,
-        );
-        return;
-      }
-
-      /* ⚠️ THE TEST IS THE STATUS, NOT THE `retry` FLAG, and that distinction
-         is a bug that was here for about ten minutes. `retry` only exists in
-         responses OUR function writes. Anything else that can answer this
-         URL — the host\'s 404 page when the function is not deployed, a proxy
-         error, a 502 from the edge — has no such field, so `!data.retry` was
-         true for all of them and every infrastructure failure was reported to
-         the reader as "please check the form", pointing them at fields that
-         were perfectly correct.
-
-         A 400 is the only answer that means the form is wrong, and even then
-         only when it arrives with a sentence to show. Everything else is our
-         problem and gets the fallback. */
-      if (res.status === 400 && data.error) {
-        setPhase("idle");
-        setStatus(data.error);
-        return;
-      }
-
-      setPhase("failed");
-      setStatus(
-        `We could not send that just now. Your message is still in the form — please email it to ${CONTACT.email} instead.`,
-      );
-    } catch {
-      /* An abort and a dead network land here alike, and to the reader they
-         are the same event: it did not go. */
-      setPhase("failed");
-      setStatus(
-        `We could not reach the site just now. Your message is still in the form — please email it to ${CONTACT.email} instead.`,
-      );
-    } finally {
-      window.clearTimeout(timer);
-    }
+       ⚠️ THE FIELDS MUST NOT BE CLEARED HERE. Clearing a form is the
+       universal signal for "accepted", and on this one it would be a lie.
+       They also have to stay because a reader whose mail app did not open
+       needs to be able to copy what they wrote. */
+    setPhase("handed");
+    setStatus(
+      "Your email app is opening with this message ready. It is not sent until you press send there.",
+    );
+    /* Assignment rather than window.open: a popup blocker can swallow the
+       latter silently, and a mailto has nothing to paint in a tab anyway.
+       If no application is registered for the scheme the browser simply
+       does nothing, and there is no event for that — which is exactly why
+       the card below carries the same link and the plain address rather
+       than trusting this line to have worked. */
+    window.location.href = mailtoHref(values);
   };
 
   return (
@@ -379,34 +336,6 @@ export default function Contact({ standalone = false }: ContactProps) {
                  the note over validate() for why a mononym is allowed. */
               noValidate
             >
-              {/* ── THE HONEYPOT ──
-                  A real field, in the DOM, that no person can see, reach by
-                  keyboard or hear: `.trap` takes it out of the layout,
-                  tabIndex -1 skips it, and aria-hidden keeps it out of the
-                  accessibility tree. The simplest bots fill every input they
-                  find, and the function drops anything that arrives with
-                  this one filled.
-
-                  ⚠️ NOT `type="hidden"` and NOT `display: none`. Both are
-                  the first things a scraper learns to skip; a text input
-                  that is merely positioned away is not. `autoComplete="off"`
-                  stops a password manager helpfully filling it for someone.
-                  The label exists because an unlabelled input is a defect
-                  even when it is a trap. */}
-              <div className={styles.trap} aria-hidden>
-                <label htmlFor="contact-company">
-                  Company — please leave this empty
-                </label>
-                <input
-                  ref={trapRef}
-                  id="contact-company"
-                  name="company"
-                  type="text"
-                  tabIndex={-1}
-                  autoComplete="off"
-                  defaultValue=""
-                />
-              </div>
 
               <div className={styles.field}>
                 <span className={styles.fieldLabel} id="contact-name-label">
@@ -546,17 +475,19 @@ export default function Contact({ standalone = false }: ContactProps) {
                     type="submit" rather than an href: this posts the form.
                     See the note on Props in PillCta.tsx for why that is a
                     separate arm of the union rather than an `as` prop. */}
-                {/* THE LABEL IS THE PROGRESS INDICATOR. A spinner beside an
-                    unchanged "Submit" leaves the button looking pressable and
-                    invites the second press that sends the message twice;
-                    `disabled` plus a label that has changed says the same
-                    thing once, in the place the reader is already looking. */}
-                <PillCta
-                  type="submit"
-                  tone="cream"
-                  disabled={phase === "sending"}
-                >
-                  {phase === "sending" ? "Sending…" : "Submit"}
+                {/* ⚠️ THE LABEL NAMES WHAT ACTUALLY HAPPENS. "Submit" and
+                    "Send" both promise delivery, and this button delivers
+                    nothing — it opens a draft the reader still has to send
+                    themselves. Naming that on the button is the earliest
+                    place the expectation can be set correctly, and it is
+                    cheaper than correcting it afterwards in a card.
+
+                    There is no disabled/in-flight state left to show: the
+                    hand-off is synchronous, so there is no moment between
+                    the press and the outcome for a second press to land
+                    in. */}
+                <PillCta type="submit" tone="cream">
+                  Open in your email app
                 </PillCta>
               </div>
 
@@ -573,55 +504,40 @@ export default function Contact({ standalone = false }: ContactProps) {
                 {status}
               </p>
 
-              {phase === "sent" && (
+              {/* ── THE ONE OUTCOME CARD ──
+                  This replaced two — a "delivered" card and a
+                  "we-could-not-send" card — because the hand-off has only
+                  one outcome this page can observe. It deliberately reads
+                  closer to the old FAILURE card than the old success one:
+                  the reader is told what is still required of them, and
+                  given the address in plain text as well as the link.
+
+                  ⚠️ THE FIRST LINE MUST NOT CONGRATULATE. "Thank you, your
+                  message is on its way" was true when a server had accepted
+                  it and is false now. Anything that reads as completion here
+                  produces the exact failure this form has to avoid: a diner
+                  who never presses send in their mail app and believes they
+                  have already written to us. */}
+              {phase === "handed" && (
                 <div className={styles.sentCard}>
-                  <strong>Thank you — your message is on its way.</strong>
+                  <strong>Your message is ready — but not sent yet.</strong>
                   <span>
-                    It has been sent to {CONTACT.email}, and we usually reply
-                    within a couple of days. If it is urgent, or you would
-                    rather not wait, write to us directly at{" "}
+                    Your email app should have opened with everything filled
+                    in. <strong>Press send there</strong> to deliver it;
+                    nothing has left this page on its own.
+                    {" "}
+                    If nothing opened,{" "}
+                    <a className={styles.sentLink} href={mailtoHref(values)}>
+                      open the draft again
+                    </a>{" "}
+                    — or copy what you wrote above and send it to{" "}
                     <a
                       className={styles.sentLink}
                       href={`mailto:${CONTACT.email}`}
                     >
                       {CONTACT.email}
                     </a>
-                    .
-                  </span>
-                </div>
-              )}
-
-              {/* ── THE FAILURE CARD ──
-                  ⚠️ THE FIELDS ARE STILL FULL BEHIND THIS, deliberately. The
-                  worst version of this moment is a form that clears itself
-                  and then admits it could not send: the reader has lost what
-                  they wrote and has to type it again to complain about it.
-                  The mailto link carries the whole message as well, so one
-                  press moves it into their own mail app with nothing
-                  retyped. */}
-              {phase === "failed" && (
-                <div className={styles.sentCard}>
-                  <strong>We could not send that.</strong>
-                  <span>
-                    Nothing has been lost — your message is still in the form
-                    above. Please send it to{" "}
-                    <a
-                      className={styles.sentLink}
-                      href={`mailto:${CONTACT.email}?subject=${encodeURIComponent(
-                        `Website enquiry — ${values.firstName} ${values.lastName}`.trim(),
-                      )}&body=${encodeURIComponent(
-                        [
-                          `Name: ${values.firstName} ${values.lastName}`.trim(),
-                          `Email: ${values.email}`,
-                          "",
-                          values.message,
-                        ].join("\n"),
-                      )}`}
-                    >
-                      {CONTACT.email}
-                    </a>{" "}
-                    instead — that link opens a draft with everything already
-                    filled in.
+                    . We usually reply within a couple of days.
                   </span>
                 </div>
               )}
