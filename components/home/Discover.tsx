@@ -110,6 +110,22 @@ import { menuHref } from "@/lib/menu";
                 11.9MB against the 44.3MB it would cost pointed at the
                 masters directly.
 
+                ⚠️ THE `-2026` IS A CACHE-BUST, NOT DECORATION. These
+                films are served by Cloudflare Pages under
+                `Cache-Control: public, max-age=2592000` (public/_headers),
+                and five of these names — bintang, guanabana, mamasons,
+                ramo, cafemama — were already live carrying the OLD tile
+                clips. Replacing those files in place changed the bytes and
+                left every returning reader on a thirty-day-old copy: the
+                edge served the new cut, the browser kept the old one, and
+                the page looked simply unchanged. public/_headers says this
+                in its own words — "IF YOU REPLACE A FILE AND NEED IT LIVE
+                TODAY, change its name and change the reference. That is
+                the only reliable cache-bust; purging the edge does not
+                reach a browser that already has it." All eight carry the
+                suffix, not just the five, so the set stays one thing.
+                Re-cut these again and they need a new name again.
+
    ⚠️ TWO FIELDS ARE NO LONGER PRINTED ANYWHERE, and they are kept rather
    than deleted because they are CONTENT and only this file holds them:
 
@@ -153,7 +169,7 @@ const DISPLAY: Record<string, DiscoverDisplay> = {
     blurb:
       "A Kentish Town staple since 1987 - Chef Omar's family kitchen, blending Malay, Indonesian, Japanese, Vietnamese and Filipino cooking.",
     est: 1987,
-    clip: "/videos/tile-bintang.mp4",
+    clip: "/videos/tile-bintang-2026.mp4",
   },
   guanabana: {
     tag: "Caribbean Cuisine",
@@ -161,7 +177,7 @@ const DISPLAY: Record<string, DiscoverDisplay> = {
     blurb:
       "Kentish Town's Caribbean and Latin American room, best known for its oak-smoked Island Roast - since 2007.",
     est: 2007,
-    clip: "/videos/tile-guanabana.mp4",
+    clip: "/videos/tile-guanabana-2026.mp4",
   },
   mamasons: {
     tag: "London's First Filipino Ice Cream Parlor",
@@ -169,7 +185,7 @@ const DISPLAY: Record<string, DiscoverDisplay> = {
     blurb:
       "London's first Filipino ice cream parlour — Manila-style dirty ice cream, scooped fresh across two sites.",
     est: 2017,
-    clip: "/videos/tile-mamasons.mp4",
+    clip: "/videos/tile-mamasons-2026.mp4",
   },
   ramo: {
     tag: "Filipino-Japanese Ramen",
@@ -177,27 +193,27 @@ const DISPLAY: Record<string, DiscoverDisplay> = {
     blurb:
       "The world's first Filipino-Japanese ramen joint - Originally from Kentish Town, since 2018, with our current location in Soho.",
     est: 2018,
-    clip: "/videos/tile-ramo.mp4",
+    clip: "/videos/tile-ramo-2026.mp4",
   },
   hoodwood: {
     tag: "Caribbean Takeaway",
     location: "81 Kentish Town Rd, London NW1 8NY",
     blurb:
       "Oak-smoked jerk plates and handmade patties, fire-kissed over an open flame - Caribbean takeaway, done honestly.",
-    clip: "/videos/tile-hoodwood.mp4",
+    clip: "/videos/tile-hoodwood-2026.mp4",
   },
   cafemama: {
     tag: "Filipino x Japanese Café",
     location: "83 Kentish Town Rd, London NW1 8NY",
     blurb:
       "Hand-crafted sandos, all-day pandesal breakfasts, homemade baked treats, and quality coffee - your daily escape from the ordinary.",
-    clip: "/videos/tile-cafemama.mp4",
+    clip: "/videos/tile-cafemama-2026.mp4",
   },
   belly: {
     tag: "Modern Filipino Bistro",
     location: "157 Kentish Town Rd, London NW1 8PD",
     blurb: "A modern Filipino bistro drawing on French technique.",
-    clip: "/videos/tile-belly.mp4",
+    clip: "/videos/tile-belly-2026.mp4",
   },
   bunso: {
     // the coming-soon room: no founding year, and the card takes the
@@ -208,7 +224,7 @@ const DISPLAY: Record<string, DiscoverDisplay> = {
     location: "1a Hawley Rd, London NW1 8RP",
     blurb:
       "Bunso — 'the youngest' - is the newest member of the Maginhawa family. Full details, menu and location coming soon.",
-    clip: "/videos/tile-bunso.mp4",
+    clip: "/videos/tile-bunso-2026.mp4",
   },
 };
 

@@ -33,7 +33,7 @@
    of broken images. Set the variable and the same paths resolve to the CDN.
 
    ── THE PATHS THEMSELVES NEVER CHANGE ──
-   Every caller still writes `/videos/tile-bintang.mp4` and
+   Every caller still writes `/videos/tile-bintang-2026.mp4` and
    `/images/bintang.jpg`. That is deliberate: those strings are also in
    lib/restaurants.ts, lib/blog.ts, lib/press.ts and half the components, and
    a migration that rewrote all of them into CDN URLs would be
