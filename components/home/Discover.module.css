@@ -829,19 +829,50 @@
 
 .grid[data-dimmed="on"] .cell:not([data-open]) {
   transform: scale(0.94);
+  transition-delay: var(--recede-delay, 0s);
+}
+
+/* ── THE DIM RIDES THE PLATE, NOT THE CELL ──
+   `opacity: 0.42` stood on the rule above and NEVER APPLIED: Tile writes
+   an inline `opacity` on the cell (the entrance ink, `cardInk`) whenever
+   the settle has run, and inline beats the rule — measured, every
+   sibling's computed opacity was 1 on every frame of the morph, so only
+   the scale was landing. [data-plate] is `.tileMedia`, the seat inside
+   the cell, and framer writes no inline opacity to a SIBLING'S seat (its
+   inline styles are custom properties and the radius), so a stylesheet
+   opacity there actually lands.
+
+   ⚠️ THE TRANSITION IS GATED INSIDE THE DIMMED STATE ON PURPOSE — the
+   opposite of the `.cell` rule above, for a hazard the cell does not
+   have. The pressed cell drops [data-open] in the same commit that
+   starts the close, so `:not([data-open])` matches the RETURNING plate
+   mid-crossfade, and framer writes per-frame inline opacity to a
+   crossfading plate — an always-on transition would smear those writes
+   into a visible lag. Scoped like this it only ever exists on sibling
+   plates while the grid is dimmed. The cost is stated, not hidden: the
+   un-dim SNAPS when [data-dimmed] clears. It snaps under the backdrop,
+   which now holds its dark 0.1s and lifts over 0.34s on close (see the
+   exit table in Discover.tsx) — the lift is the un-dim the reader sees. */
+.grid[data-dimmed="on"] .cell:not([data-open]) [data-plate] {
   opacity: 0.42;
+  transition: opacity var(--dur-slow) var(--ease-entrance);
   transition-delay: var(--recede-delay, 0s);
 }
 
 @media (prefers-reduced-motion: reduce) {
-  /* the backdrop does the whole job here. Nothing moves, and nothing has to
-     be un-moved on the way back either. */
+  /* the backdrop does the whole job here. Nothing moves, nothing dims, and
+     nothing has to be un-moved on the way back either. The component never
+     writes data-dimmed="on" under reduced motion, so these rules are the
+     stylesheet's own copy of a promise Discover.tsx already keeps. */
   .cell {
     transition: none;
   }
   .grid[data-dimmed="on"] .cell:not([data-open]) {
     transform: none;
+  }
+  .grid[data-dimmed="on"] .cell:not([data-open]) [data-plate] {
     opacity: 1;
+    transition: none;
   }
 }
 
@@ -1070,6 +1101,15 @@
   /* the block inherits it, and every word on this card is cream — the
      ground is a photograph now, not the retired cream sheet */
   color: var(--cream);
+  /* ── DEAD TO THE POINTER; THE CHILDREN OPT BACK IN ──
+     AnimatePresence keeps this stage mounted while the close runs, and
+     this box is a 981×552 rectangle parked dead centre with nothing left
+     in it once the plate has flown: measured, elementFromPoint over a
+     tile 220ms after Escape still answered `.expandCard` — ~500ms of a
+     grid the reader can see but cannot press. `none` here; the plate,
+     the block and the close take `pointer-events: auto` back, so
+     everything visible stays pressable and the empty seat stops being. */
+  pointer-events: none;
 }
 
 /* ── THE PLATE. `inset: 0`, so the seat above owns the shape and this owns
@@ -1084,6 +1124,10 @@
   overflow: hidden;
   background: var(--placeholder);
   z-index: 1;
+  /* the seat above is pointer-dead; the plate is a real object and takes
+     its own clicks back — and carries them with it through the flight,
+     because hit-testing follows the transform */
+  pointer-events: auto;
 }
 
 /* ── THE COUNTER-PROJECTION, and it is the one rule here that exists purely
@@ -1178,11 +1222,13 @@
    THE MOVE PUT AN OPACITY BETWEEN THEM AND THE PAGE, AND IT WAS MEASURED
    RATHER THAN ASSUMED. A `layoutId` morph is a CROSSFADE: framer writes an
    inline opacity on .expandMedia — the new plate's own ancestor — that ramps
-   0.26 → 1 over roughly the first 130ms of the 550ms flight (sampled per
-   frame at 1440×900; .expandFrame is never given one). So .expandMedia IS a
-   backdrop root for that window. It is harmless here, and the distinction is
-   the one the paragraph above turns on: a backdrop root starves the blur
-   only when there is nothing painted UNDER the blurred element inside it.
+   0.26 → 1 over roughly the first 130ms (sampled per frame at 1440×900
+   under the old 0.72s `duration` tune; the window rides EXPAND_SPRING, so
+   the 0.45s retune only tightens it — .expandFrame is never given one).
+   So .expandMedia IS a backdrop root for that window. It is harmless here,
+   and the distinction is the one the paragraph above turns on: a backdrop
+   root starves the blur only when there is nothing painted UNDER the
+   blurred element inside it.
    .expandMedia contains the photograph and the film, which is precisely what
    this ramp is meant to be sampling — so the root simply narrows the sample
    to the picture. Belt and braces anyway: `rampFade` opens at 0.12s and the
@@ -1464,6 +1510,8 @@
     0 0 0 1px color-mix(in srgb, var(--maroon) 30%, transparent),
     0 2px 12px color-mix(in srgb, var(--maroon) 34%, transparent);
   cursor: pointer;
+  /* the seat is pointer-dead (see .expandCard); the control opts back in */
+  pointer-events: auto;
   transition:
     transform var(--dur-tap) cubic-bezier(0.23, 1, 0.32, 1),
     background-color var(--dur-quick) var(--ease-state);
@@ -1569,8 +1617,7 @@
    `useReducedMotion` — the morph is swapped for a crossfade and the
    furniture's delay drops to zero — because it is spring and variant work
    rather than anything a stylesheet can pin.
-   ⚠️ ONE THING IS NOT DECLINED, and it predates this pass: the block's
-   16px entrance rise is stated inline on `.expandBody` and is NOT gated on
-   `reduce`. Small, but it is motion under a preference that asked for
-   none. Gate it in the component, not with a rule here — an inline
-   `transform` from framer beats any stylesheet. */
+   ⚠️ THE ONE STRAGGLER THIS NOTE USED TO FLAG IS ANSWERED: the block's
+   entrance rise (10px now, 16 then) is stated inline on `.expandBody` and
+   IS gated on `reduce` — in the component, which is the only place it
+   could be: an inline `transform` from framer beats any stylesheet. */

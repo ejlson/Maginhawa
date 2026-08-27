@@ -102,7 +102,13 @@ import { menuHref } from "@/lib/menu";
                 split address itself was written to avoid.
      blurb      the story: the card's hover copy, and the expansion's own
                 row above the hairline
-     clip       the muted film that wipes open under the pointer
+     clip       the muted film that wipes open under the pointer. Each
+                one is a 12s, 960-wide cut of the very film /restaurants
+                plays for that venue, so the two surfaces show the same
+                room; the full-length 1080p masters stay on the showcase,
+                where they play full-bleed. Cut this way the grid totals
+                11.9MB against the 44.3MB it would cost pointed at the
+                masters directly.
 
    ⚠️ TWO FIELDS ARE NO LONGER PRINTED ANYWHERE, and they are kept rather
    than deleted because they are CONTENT and only this file holds them:
@@ -191,16 +197,18 @@ const DISPLAY: Record<string, DiscoverDisplay> = {
     tag: "Modern Filipino Bistro",
     location: "157 Kentish Town Rd, London NW1 8PD",
     blurb: "A modern Filipino bistro drawing on French technique.",
-    clip: "/videos/belly-hero.mp4",
+    clip: "/videos/tile-belly.mp4",
   },
   bunso: {
-    // the coming-soon room: no film, no founding year, and the card takes
-    // the maroon field venueCards() gives it in place of a photograph
+    // the coming-soon room: no founding year, and the card takes the
+    // maroon field venueCards() gives it in place of a photograph — but
+    // no longer no film: the hover clip is Bunso's own bakery footage,
+    // in the same 12s tile cut as the rest of the row
     tag: "The Youngest of the Family",
     location: "1a Hawley Rd, London NW1 8RP",
     blurb:
       "Bunso — 'the youngest' - is the newest member of the Maginhawa family. Full details, menu and location coming soon.",
-    clip: "/videos/bunso-bakery.mp4",
+    clip: "/videos/tile-bunso.mp4",
   },
 };
 
@@ -747,20 +755,29 @@ const PHOTO_PAN_RATIO = 0.024;
    that is still true of a large overshoot. What it got wrong is that a
    critically damped spring has no settle at all — it decelerates into its
    target and simply stops, which is the one thing that reads as software
-   rather than as an object. 0.06 is roughly a 94% damping ratio: the plate
-   passes its final edge by well under a pixel at these travel distances, so
-   there is nothing to SEE overshooting, and what the eye gets instead is the
-   arrival taking a moment to finish. That is the difference the request was
+   rather than as an object. The first fix, bounce: 0.04, only restated the
+   problem: measured, it passed the final edge by 0.017px on an 800px
+   flight — nothing to SEE overshooting, a long tail rather than a settle.
+   0.1 (ζ ≈ 0.90) is what buys one the eye can find: 1.2px past the final
+   edge on the same flight, enough to watch the arrival finish and nowhere
+   near enough to read as rubber. That is the difference the request was
    asking for.
 
-   0.55s rather than 0.62s for the same reason — the perceived length of a
-   spring is dominated by its tail, and adding a settle to a 0.62 made the
-   whole thing feel slow. The two changes are one change.
+   `visualDuration: 0.45`, NOT `duration` — the perceived length of a
+   spring is its flight, not its tail, and `duration` prices the whole
+   settle envelope (this spring shipped at duration: 0.72 while the notes
+   here still said 0.55s). visualDuration prices what the reader watches:
+   first arrival at 0.45s, 99.8% settled at 0.499s — framer 11.18 resolves
+   it to stiffness ≈ 135, damping ≈ 20.9. The two changes are one change.
 
    ⚠️ NOT for anything that lands against a hard edge (a drawer on a
-   viewport wall, a sheet at the top of the screen). This plate lands in open
-   air on both axes, which is what makes even a sub-pixel overshoot safe. */
-const EXPAND_SPRING = { type: "spring", duration: 0.72, bounce: 0.04 } as const;
+   viewport wall, a sheet at the top of the screen). This plate lands in
+   open air on both axes, which is what makes a 1.2px overshoot safe. */
+const EXPAND_SPRING = {
+  type: "spring",
+  visualDuration: 0.45,
+  bounce: 0.1,
+} as const;
 
 /* ── HOW THE GRID GETS OUT OF THE WAY ──
    The room lights drop AND the shelf steps back. Doing both is the point,
@@ -901,6 +918,15 @@ export default function Discover() {
   // the App Store expansion — which tile's plate is currently open as the
   // full detail card (null = none)
   const [active, setActive] = useState<DiscoverItem | null>(null);
+  /* ONE IDENTITY FOR THE LIFE OF THE COMPONENT, not a fresh arrow per
+     render: <ExpandedCard> keys its housekeeping effect on `onClose`, so
+     a new identity while the card is open tears that effect down and
+     runs it again — lenis started and re-stopped, the overflow lock
+     released and retaken, focus yanked back to the close button off
+     whatever the reader had tabbed to. Reachable in practice: the grid's
+     ResizeObserver fires setCols on any window resize and re-renders
+     this component. */
+  const closeExpanded = useCallback(() => setActive(null), []);
 
   /* ---- WHICH LAYOUT THIS WIDTH GETS ----
      ⚠️ STATE AND NOT A REF, AND IT LISTENS RATHER THAN READING ONCE. This
@@ -1600,7 +1626,7 @@ export default function Discover() {
           <ExpandedCard
             key={active.slug}
             item={active}
-            onClose={() => setActive(null)}
+            onClose={closeExpanded}
             menuHref={menuHref(active.slug)}
           />
         )}
@@ -1803,6 +1829,15 @@ function Tile({
            break every one of them silently. */
         data-plate={index}
         layoutId={reduce ? undefined : `card-${item.slug}`}
+        /* THE RETURN FLIGHT IS DRIVEN FROM HERE. A shared-layoutId flight
+           takes its transition from the element it lands ON: the
+           expansion's plate declares EXPAND_SPRING for the way out, and
+           with nothing declared here the way back fell through to
+           framer's defaultLayoutTransition — a 0.45s [0.4, 0, 0.1, 1]
+           tween — so the card sprang open and tweened shut, by accident.
+           One curve, both directions. Inert under `reduce`, exactly like
+           the layoutId above. */
+        transition={EXPAND_SPRING}
         /* padding-top carries the plate's aspect from PLATE_RATIO — the
            stylesheet's 143.33% is only the fallback. Inline because the
            same number must also size the expansion, and a value stated in
@@ -1879,8 +1914,14 @@ function Tile({
    The card element shares the plate's layoutId, so Framer Motion FLIPs it
    from the tile's bounds to the card's — transform-only, spring-driven,
    interruptible — while the body content fades up a beat behind. Closing
-   (backdrop, ×, or Escape) runs the same morph in reverse. Reduced motion
-   swaps the morph for a plain crossfade.
+   (backdrop, ×, or Escape) runs the same morph in reverse — TRUE ONLY
+   SINCE THE TILE'S SEAT DECLARED THE SAME EXPAND_SPRING. A shared-layoutId
+   flight is driven by the element it lands ON, and the tile's end declared
+   no transition, so every close fell through to framer's
+   defaultLayoutTransition — a 0.45s [0.4, 0, 0.1, 1] tween. The card
+   sprang open and tweened shut, by accident, until the seat's own
+   `transition` prop closed the gap. Reduced motion swaps the morph for a
+   plain crossfade.
 
    ═══ THE EXPANSION IS ONE PORTRAIT OBJECT NOW, at the user's instruction.
    It was a TRANSPARENT COLUMN: a 1.32 landscape photo plate with a separate
@@ -1949,9 +1990,11 @@ function Tile({
      ⚠️ THE MOVE PUTS THEM UNDER ONE MORE ANCESTOR AND THAT ANCESTOR DOES
      TAKE AN OPACITY — measured, not assumed. A `layoutId` morph is a
      crossfade, and framer writes an inline opacity on `.expandMedia` that
-     ramps 0.26 → 1 over the first ~130ms of the 550ms flight (`.expandFrame`
-     never gets one). So .expandMedia is a backdrop root for that window —
-     and harmlessly, because it CONTAINS the photograph and the film, which
+     ramps 0.26 → 1 over roughly the first 130ms (sampled under the old
+     0.72s `duration` tune; the window rides EXPAND_SPRING, so the 0.45s
+     retune only tightens it — `.expandFrame` never gets one). So
+     .expandMedia is a backdrop root for that window — and harmlessly,
+     because it CONTAINS the photograph and the film, which
      is exactly what the blur is there to sample. A backdrop root only
      starves the filter when nothing is painted under it inside that root,
      which was the wrapper case. The ramp is at ~1% opacity anyway when the
@@ -1978,17 +2021,31 @@ function ExpandedCard({
      pointer — one asset, two presentations — and it is not hover furniture
      here: opening the card IS the request for it, so it needs no
      pointer-capability test. Reduced motion declines it and keeps the
-     still; a venue with no clip on file (Hoodwood today) does the same.
-     Seven of the eight carry one, so this is the ordinary path. */
+     still; a venue with no clip on file does the same — none is missing
+     one today, so this is the ordinary path for all eight. */
   const film = !reduce && item.clip ? item.clip : null;
 
-  // modal housekeeping: hold the page still underneath, close on Escape,
-  // and land keyboard focus on the close control
+  /* modal housekeeping: hold the page still underneath, close on Escape,
+     land keyboard focus on the close control — and hand it BACK on close.
+     Focus was moved here by force, so it returns by force: left alone the
+     browser drops it on <body> when the button unmounts, and a keyboard
+     reader resumes tabbing from the top of the document instead of from
+     the tile they opened.
+     ⚠️ KEYED ON `onClose`, so Discover memoises it (see closeExpanded) —
+     a fresh identity per render would tear this effect down and run it
+     again mid-open: lenis started and re-stopped, the overflow lock
+     released and retaken, and focus yanked back to the close button off
+     whatever the reader had tabbed to. */
   useEffect(() => {
     const lenis = lenisRef.current;
     lenis?.stop();
     const prevOverflow = document.documentElement.style.overflow;
     document.documentElement.style.overflow = "hidden";
+    // the tile's pressable, in practice — read before focus is moved
+    const prevFocus =
+      document.activeElement instanceof HTMLElement
+        ? document.activeElement
+        : null;
     closeRef.current?.focus({ preventScroll: true });
     const onKey = (e: KeyboardEvent) => {
       if (e.key === "Escape") onClose();
@@ -1998,6 +2055,7 @@ function ExpandedCard({
       window.removeEventListener("keydown", onKey);
       document.documentElement.style.overflow = prevOverflow;
       lenis?.start();
+      prevFocus?.focus({ preventScroll: true });
     };
   }, [onClose]);
 
@@ -2011,14 +2069,14 @@ function ExpandedCard({
      was making them share a schedule that only ever suited one of them.
 
      WHAT EACH CLOCK IS FOR:
-       `rampFade`   the ramp, travelling with the plate. EARLY, unchanged at
-                    0.12 + 0.26, because it cannot overhang anything any
+       `rampFade`   the ramp, travelling with the plate. EARLY, on
+                    0.12 + 0.34, because it cannot overhang anything any
                     more — it is clipped to the picture at every size. It is
                     what keeps the flying plate from being a bare photograph.
        `furniture`  the mark, the close and the block, still at the final
                     rectangle. LATE.
 
-     WHY THE TYPE MOVED LATE. The old 0.12 + 0.26 put it at full opacity at
+     WHY THE TYPE MOVED LATE. Its old 0.12 + 0.26 put it at full opacity at
      ~0.38s, which was the right instinct — the type must arrive DURING the
      flight, not after it, or the card lands empty and then fills and the
      opening reads as two events. But at the final rectangle "during the
@@ -2028,25 +2086,45 @@ function ExpandedCard({
      spending its whole first half on ink standing off the card — worst at
      t≈186–237ms, and the close button, which rides a corner, was 100%
      outside the plate for the whole of it.
-     0.30 + 0.22 finishes at ~0.52s, just under the spring's 0.55s: the type
-     is still arriving while the plate is visibly moving, so it is still one
-     event, but it starts at travel ~0.95 where there is a card underneath it
-     to arrive onto. The ramp is what buys the delay — the plate is no longer
-     bare while the type waits, so the wait costs nothing.
+     0.30 + 0.30 measures out at 596ms — nominally 146ms past the spring's
+     0.45s arrival, but the ease below is front-loaded enough that the ink
+     is at ~0.96 when the plate lands: what spills past the landing is the
+     last few percent, not a second event. The fade opens at travel ≈ 0.91
+     and reads 0.5 by ~0.34s with the plate still closing its final ~5%
+     (travel figures derived from the retuned spring's constants rather
+     than re-measured), so the type still arrives DURING the flight, onto
+     a card that is underneath it from the fade's first frame. The ramp is
+     what buys the delay — the plate is no longer bare while the type
+     waits, so the wait costs nothing.
 
      ⚠️ TUNED AGAINST EASE, WHICH IS FRONT-LOADED. cubic-bezier(.22,1,.36,1)
-     is at half opacity a quarter of the way through, so 0.30 + 0.22 reads at
-     0.5 by ~0.354s (travel ~0.986) rather than at 0.41s. Lengthening the
-     duration does not delay the ink; moving `delay` does.
+     is at half opacity ~13% of the way in, so 0.30 + 0.30 reads at 0.5 by
+     ~0.34s rather than at 0.45s. Lengthening the duration does not delay
+     the ink; moving `delay` does.
 
-     The exit is quicker than the entrance and carries no delay at all — the
-     system responding, not deciding. It is UNCHANGED and shared by both
-     clocks: closing runs a ~470ms return against a 0.15s fade, so the ink is
-     gone long before the plate is, and there was nothing to fix there. */
+     ── THE EXIT IS A SEQUENCE NOW, NOT ONE QUICK FADE ──
+     This note used to end "there was nothing to fix there", and the
+     measurements disagreed: the backdrop's 0.2s exit hit 0 at ~250ms with
+     the plate still 50% from home, so the last ~220ms of the return flew
+     over a fully lit grid, and the ramp's 0.15s exit was gone at ~180ms,
+     so the plate finished the journey as a bare photograph. Three exits
+     now, in the order the eye should lose them:
+       `furniture`  0.15s, no delay, UNCHANGED — the words leave first,
+                    quicker than they arrived: the system responding, not
+                    deciding.
+       `rampFade`   0.12 + 0.26, done at 0.38s — the picture keeps its
+                    ground most of the way home and sheds it into the
+                    landing.
+       backdrop     0.10 + 0.34 easeIn, done at 0.44s, against the
+                    return's ~0.45s arrival — the lights come up LAST.
+                    See its exit prop. */
   const rampFade = {
     initial: { opacity: 0 },
     animate: { opacity: 1 },
-    exit: { opacity: 0, transition: { duration: 0.15, ease: "easeOut" } },
+    exit: {
+      opacity: 0,
+      transition: { duration: 0.26, ease: "easeOut", delay: 0.12 },
+    },
     transition: {
       duration: 0.34,
       ease: EASE,
@@ -2079,14 +2157,20 @@ function ExpandedCard({
         className={styles.expandBackdrop}
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
-        // exits quicker than it enters — the system responding, not deciding
-        exit={{ opacity: 0, transition: { duration: 0.2, ease: "easeOut" } }}
-        /* THE LIGHTS DROP FIRST. 0.28s against the plate's 0.55s spring, and
-           with no delay: the dim is the room acknowledging the press, so it
-           has to be underway before the card has gone anywhere. At the old
-           0.35s it finished at roughly the same moment the plate landed and
-           read as part of the card's arrival rather than as the response to
-           the press. */
+        /* THE LIGHTS COME UP LAST on the way out — see the exit table on
+           the clocks above. easeIn is the point: a departure curve holds
+           the dark while the plate covers most of its travel and spends
+           the fade where the flight is slowing. 0.10 + 0.34 ends at
+           0.44s, with the ~0.45s landing; the old 0.2s easeOut was gone
+           at ~250ms with the plate still 50% from home. */
+        exit={{
+          opacity: 0,
+          transition: { duration: 0.34, ease: "easeIn", delay: 0.1 },
+        }}
+        /* THE LIGHTS DROP FIRST on the way in. 0.36s against the plate's
+           0.45s spring, and with no delay: the dim is the room
+           acknowledging the press, so it has to be underway before the
+           card has gone anywhere. */
         transition={{ duration: 0.36, ease: "easeOut" }}
         onClick={onClose}
       />
@@ -2280,9 +2364,10 @@ function ExpandedCard({
                DURING the flight now (see `furniture`), and a rise that ran
                longer than the fade left the block still climbing under a
                plate that had already stopped. Still 10px on the later
-               0.30 + 0.22 clock: the rise takes its timing from the same
-               transition, so it lands at ~0.52s with the fade, and a longer
-               throw over a shorter tween would only make it faster. */
+               0.30 + 0.30 clock: the rise takes its timing from the same
+               transition, so it lands with the fade at the measured 596ms,
+               and a longer throw over a shorter tween would only make it
+               faster. */
             initial={{
               opacity: 0,
               transform: reduce ? "translateY(0px)" : "translateY(10px)",
