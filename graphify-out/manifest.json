@@ -625,8 +625,8 @@
     "semantic_hash": ""
   },
   "README.md": {
-    "mtime": 1787826179.3985689,
-    "ast_hash": "8845f74cc8433d9784fff2451eb9e23f",
+    "mtime": 1787827121.8200336,
+    "ast_hash": "077f27c41b82d97493fb420d85f7f6e6",
     "semantic_hash": ""
   },
   "public/images/mamasons.jpg": {
@@ -1725,8 +1725,8 @@
     "semantic_hash": ""
   },
   "functions/api/contact.ts": {
-    "mtime": 1787826006.1528935,
-    "ast_hash": "6af55797c67a72c174b68821bd648884",
+    "mtime": 1787826574.4522626,
+    "ast_hash": "201ac8ff8ff77bf06fcb033cb5d498f5",
     "semantic_hash": ""
   },
   "scripts/probe-contact-fn.mjs": {
@@ -1985,8 +1985,8 @@
     "semantic_hash": ""
   },
   "components/contact/Contact.tsx": {
-    "mtime": 1787823735.3994145,
-    "ast_hash": "94e9e0b23facd19d0dd39a4582df28d1",
+    "mtime": 1787826852.3017519,
+    "ast_hash": "988ab747050249bc54bdf4af42b7caf4",
     "semantic_hash": ""
   },
   "components/contact/ContactPage.tsx": {

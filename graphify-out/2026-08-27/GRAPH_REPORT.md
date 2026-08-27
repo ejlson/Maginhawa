@@ -1,11 +1,11 @@
 # Graph Report - Maginhawa  (2026-08-27)
 
 ## Corpus Check
-- 264 files · ~5,060,093 words
+- 264 files · ~5,060,383 words
 - Verdict: corpus is large enough that graph structure adds value.
 
 ## Summary
-- 1836 nodes · 2320 edges · 202 communities (149 shown, 53 thin omitted)
+- 1839 nodes · 2323 edges · 213 communities (154 shown, 59 thin omitted)
 - Extraction: 98% EXTRACTED · 2% INFERRED · 0% AMBIGUOUS · INFERRED: 49 edges (avg confidence: 0.67)
 - Token cost: 0 input · 0 output
 
@@ -114,6 +114,7 @@
 - page.tsx
 - page.tsx
 - page.tsx
+- 3. The Journal (blog)
 - probe-screencast-control.mjs
 - shoot-reveal-filmstrip.mjs
 - probe-loader-hold.mjs
@@ -122,6 +123,7 @@
 - probe-manifesto-order.mjs
 - probe-video-census.mjs
 - VideoBackdrop.tsx
+- 7. The enquiry form
 - page.tsx
 - dependencies
 - VideoBackdrop.tsx
@@ -131,6 +133,7 @@
 - probe-timeline-contrast.mjs
 - Blog.tsx
 - optimize-press-logos.mjs
+- probe-loader-hold.mjs
 - PillCta.tsx
 - scripts
 - gray-matter
@@ -141,6 +144,7 @@
 - layout.tsx
 - CustomCursor.tsx
 - VideoBackdrop.tsx
+- 4. Restaurants
 - Menu.tsx
 - Contact.tsx
 - _tmp-seam-lr.mjs
@@ -164,7 +168,9 @@
 - VideoBackdrop.tsx
 - restaurants.ts
 - probe-bytecensus.mjs
+- 5. Careers
 - venueCards.ts
+- 12. Navigation & footer links
 - shoot-sections.mjs
 - probe-routeload.mjs
 - probe-grain-parity.mjs
@@ -173,6 +179,11 @@
 - probe-videofit.mjs
 - remark-parse
 - gray-matter
+- 13. Images & video
+- 15. Publishing your changes
+- 2. Where everything lives
+- 6. Contact details & socials
+- Start here
 
 ## God Nodes (most connected - your core abstractions)
 1. `asset()` - 33 edges
@@ -201,15 +212,15 @@
 ## Import Cycles
 - None detected.
 
-## Communities (202 total, 53 thin omitted)
+## Communities (213 total, 59 thin omitted)
 
 ### Community 0 - "user-account-core-06dbaa1bcfe1a542-min.en-US.js"
-Cohesion: 0.04
-Nodes (48): 10. The About page timeline, 11. Home page copy, 12. Navigation & footer links, 13. Images & video, 14. Page titles & SEO, 15. Publishing your changes, 16. Known placeholders & gaps, 17. Troubleshooting (+40 more)
+Cohesion: 0.15
+Nodes (12): 10. The About page timeline, 11. Home page copy, 14. Page titles & SEO, 16. Known placeholders & gaps, 17. Troubleshooting, 1. Before you start, 8. Press, awards & quotes, 9. FAQ (+4 more)
 
 ### Community 1 - "common-dabb52f27fbf7211-min.en-US.js"
-Cohesion: 0.10
-Nodes (16): Arrival, arrivalProgress(), CAPTION_SLOT, Discover(), DiscoverDisplay, DiscoverItem, DISPLAY, EASE (+8 more)
+Cohesion: 0.14
+Nodes (14): Arrival, arrivalProgress(), CAPTION_SLOT, Discover(), DiscoverDisplay, DiscoverItem, DISPLAY, EASE (+6 more)
 
 ### Community 2 - "8018.js"
 Cohesion: 0.20
@@ -241,7 +252,7 @@ Nodes (3): H, stops, W
 
 ### Community 13 - "Discover.tsx"
 Cohesion: 0.09
-Nodes (15): argv, bands, clips, errors, failed, inlines, lefts, R (+7 more)
+Nodes (16): argv, bands, clips, docTop(), errors, failed, inlines, lefts (+8 more)
 
 ### Community 14 - "probe-timeline-audit.mjs"
 Cohesion: 0.12
@@ -280,8 +291,8 @@ Cohesion: 0.12
 Nodes (20): dotSlots(), em(), filmReaches(), Line, LINE_SLOTS_NARROW, LINE_SLOTS_WIDE, LINE_TRACK, LINE_TRACK_NARROW (+12 more)
 
 ### Community 31 - "BlogIndex.tsx"
-Cohesion: 0.14
-Nodes (20): Entry(), Front(), HOME_SLUGS, seat(), HERO_INSETS, FULL_COLOUR, MARKS, ORDER (+12 more)
+Cohesion: 0.21
+Nodes (10): Front(), HOME_SLUGS, ActionBand(), PlateDate(), ARRIVAL_IN, ARRIVAL_OFFSET, ARRIVAL_SLOT, DRIFT_OFFSET (+2 more)
 
 ### Community 33 - "compilerOptions"
 Cohesion: 0.05
@@ -300,8 +311,8 @@ Cohesion: 0.13
 Nodes (14): argv, brightestGround(), CR(), failed, HOME, L(), lin(), open() (+6 more)
 
 ### Community 41 - "PageTransition.tsx"
-Cohesion: 0.12
-Nodes (19): Film(), metadata, generateMetadata(), CardMedia(), ExpandedCard(), Clip, clipStyle(), VideoBackdrop() (+11 more)
+Cohesion: 0.14
+Nodes (17): Film(), metadata, CardMedia(), Clip, clipStyle(), VideoBackdrop(), houseRules(), pipeline (+9 more)
 
 ### Community 42 - "probe-videoscale.mjs"
 Cohesion: 0.17
@@ -321,7 +332,7 @@ Nodes (6): failed, open(), R, s(), seatGrid(), walk()
 
 ### Community 51 - "probe-timeline-contrast.mjs"
 Cohesion: 0.05
-Nodes (42): docTop(), CASES, centreOf(), diff(), frame(), layoutCost(), layoutCount(), midFlight() (+34 more)
+Nodes (41): CASES, centreOf(), diff(), frame(), layoutCost(), layoutCount(), midFlight(), open() (+33 more)
 
 ### Community 55 - "probe-about-open.mjs"
 Cohesion: 0.07
@@ -332,20 +343,20 @@ Cohesion: 0.22
 Nodes (8): Blog section — not started, Discover: the fit-one-screen arithmetic, Do these first — ALL THREE DONE (2026-08-06), Handoff — home page redesign (2026-08-06), Known costs, accepted deliberately, The spacing system that now governs, Things that will waste your time if you don't know them, Where the home page stands
 
 ### Community 59 - "ContactPage.tsx"
-Cohesion: 0.18
-Nodes (6): breaches, fail, flat, restaurants, travel, worst
+Cohesion: 0.20
+Nodes (10): CLIPS, CURTAIN, IMAGES, Navigate, PageTransition(), Phase, TransitionCtx, WIPES (+2 more)
 
 ### Community 60 - "jsonld.tsx"
 Cohesion: 0.11
 Nodes (17): armReveals(), consoleErrors, failures, L, lin(), lum(), newErrors, out (+9 more)
 
 ### Community 61 - "RestaurantsShowcase.tsx"
-Cohesion: 0.18
-Nodes (13): clean(), Ctx, EmailSender, Env, handlePost(), json(), MAX, onRequest() (+5 more)
+Cohesion: 0.17
+Nodes (14): clean(), Ctx, EmailSender, Env, handlePost(), json(), MAX, onRequest() (+6 more)
 
 ### Community 62 - "jsonld.tsx"
-Cohesion: 0.17
-Nodes (10): DOORS, growStartFor(), Reservations(), Common, MAGNET, PillCta(), Props, MAGNET_SPRING (+2 more)
+Cohesion: 0.15
+Nodes (11): DOORS, seat(), growStartFor(), Reservations(), Common, MAGNET, PillCta(), Props (+3 more)
 
 ### Community 63 - "Product"
 Cohesion: 0.18
@@ -376,8 +387,8 @@ Cohesion: 0.22
 Nodes (9): accents, FACES, flat, LADDER, lum(), PANELS, ratio(), SHEET_FACES (+1 more)
 
 ### Community 74 - "Interlude.tsx"
-Cohesion: 0.06
-Nodes (40): About(), ChapterRow(), CHAPTERS, COVERAGE_GROUPS, CoverageRow, COVERED_RESTAURANTS, INSETS, MISSING_IMAGES (+32 more)
+Cohesion: 0.05
+Nodes (44): About(), ChapterRow(), CHAPTERS, COVERAGE_GROUPS, CoverageRow, COVERED_RESTAURANTS, INSETS, MISSING_IMAGES (+36 more)
 
 ### Community 75 - ".closeMenuOverlay"
 Cohesion: 0.22
@@ -392,8 +403,8 @@ Cohesion: 0.16
 Nodes (11): CARDS, LOOP, MID, nameList(), project(), NOTE: one video ships today (hero-draft3). Drop a per-restaurant clip in, RESTAURANTS, RestaurantsShowcase() (+3 more)
 
 ### Community 83 - "shoot-about-rules.mjs"
-Cohesion: 0.19
-Nodes (12): ContactPage(), mapUrl(), VISITABLE, ITEMS, Menu(), getNavTheme(), LINKS, Nav() (+4 more)
+Cohesion: 0.15
+Nodes (16): HERO_INSETS, Hero(), FootLinkA(), ITEMS, Menu(), getNavTheme(), LINKS, Nav() (+8 more)
 
 ### Community 84 - "BlogIndex.tsx"
 Cohesion: 0.29
@@ -408,8 +419,8 @@ Cohesion: 1.00
 Nodes (3): s(), shoot(), walk()
 
 ### Community 91 - "RestaurantsShowcase.tsx"
-Cohesion: 0.18
-Nodes (20): GoogleTag(), Window, MarketingPixels(), Window, ConsentControl(), CookieBanner(), analyticsConfigured, CategoryKey (+12 more)
+Cohesion: 0.17
+Nodes (21): GoogleTag(), Window, MarketingPixels(), Window, ConsentControl(), CookieBanner(), analyticsConfigured, CategoryKey (+13 more)
 
 ### Community 92 - "press.ts"
 Cohesion: 0.13
@@ -432,24 +443,24 @@ Cohesion: 0.18
 Nodes (14): CLAUSE_BREAK, EYEBROW_IN, INLINE, KEY_WORDS, Manifesto(), Piece, PIECES, SCRUB_OFFSET (+6 more)
 
 ### Community 101 - "q"
-Cohesion: 0.16
-Nodes (20): BlogPage(), metadata, generateMetadata(), generateStaticParams(), JournalPostPage(), Home(), sitemap(), renderMarkdown() (+12 more)
+Cohesion: 0.23
+Nodes (11): BlogPage(), metadata, Home(), CATEGORIES, DATE_LABEL, fail(), getJournal(), JournalPost (+3 more)
 
 ### Community 102 - "Reveal.tsx"
 Cohesion: 0.12
 Nodes (12): boardGone, firstFilm, frames, fullBleed, maxDrift, n1(), parseHole(), recorder() (+4 more)
 
 ### Community 103 - "getRestaurant"
-Cohesion: 0.40
-Nodes (3): EASE, emWordStart(), SplitWords()
+Cohesion: 0.35
+Nodes (9): generateMetadata(), generateStaticParams(), JournalPostPage(), sitemap(), renderMarkdown(), getAdjacentPosts(), getPost(), getPosts() (+1 more)
 
 ### Community 104 - "zoom-loader-handover.mjs"
 Cohesion: 0.22
 Nodes (5): CREAM, frames, MAROON, report, trace
 
 ### Community 106 - "Placeholder.tsx"
-Cohesion: 0.19
-Nodes (9): jsonLd, metadata, jsonLd, metadata, Pending(), marketingConfigured, CONTACT, SOCIALS (+1 more)
+Cohesion: 0.21
+Nodes (8): jsonLd, metadata, jsonLd, metadata, Pending(), CONTACT, SOCIALS, LEGAL_ENTITY
 
 ### Community 108 - "Passage.tsx"
 Cohesion: 0.25
@@ -464,8 +475,8 @@ Cohesion: 0.11
 Nodes (15): all, analyse(), argv, CATS, FAT, LABEL, NAMES, NOGPURASTER (+7 more)
 
 ### Community 112 - "page.tsx"
-Cohesion: 0.22
-Nodes (4): ENV, good, longestX, out
+Cohesion: 0.20
+Nodes (5): ENV, good, longestX, mailer, out
 
 ### Community 113 - "page.tsx"
 Cohesion: 0.33
@@ -474,6 +485,10 @@ Nodes (5): bytes, rows, t0, total, urls
 ### Community 114 - "page.tsx"
 Cohesion: 0.07
 Nodes (27): ALPHABET, EASE_OUT, FlipLetter(), LETTERS, Loader(), SHUTTERS, SMOOTH, Vp (+19 more)
+
+### Community 116 - "3. The Journal (blog)"
+Cohesion: 0.20
+Nodes (10): 3. The Journal (blog), Add a link to someone else's article, Delete a post, Drafts, Edit a post, Look at it before you publish, Put a post on the home page, What you do **not** have to write (+2 more)
 
 ### Community 118 - "probe-screencast-control.mjs"
 Cohesion: 0.22
@@ -491,6 +506,10 @@ Nodes (3): ebDone, samples, wordStart
 Cohesion: 0.18
 Nodes (10): displayFace, metadata, textFace, CustomCursor(), Mode, GroupPressJsonLd(), OrganizationJsonLd(), orgSameAs (+2 more)
 
+### Community 134 - "7. The enquiry form"
+Cohesion: 0.29
+Nodes (7): 7. The enquiry form, Changing where enquiries go, Everything except the DNS is in the repo, How to tell whether it is deployed, If it is not set up, Testing it locally, The one manual step: onboard the sending domain
+
 ### Community 135 - "page.tsx"
 Cohesion: 0.22
 Nodes (7): byTid, longTasks, main, nodes, self, st2, stack
@@ -500,20 +519,24 @@ Cohesion: 0.10
 Nodes (21): framer-motion, dependencies, framer-motion, react, react-dom, rehype-stringify, remark-gfm, remark-parse (+13 more)
 
 ### Community 137 - "VideoBackdrop.tsx"
-Cohesion: 0.16
-Nodes (9): Contact(), ContactProps, EMPTY, Errors, validate(), Values, ITEMS, Reveal() (+1 more)
+Cohesion: 0.11
+Nodes (16): Contact(), ContactProps, EMPTY, Errors, validate(), Values, ContactPage(), mapUrl() (+8 more)
 
 ### Community 142 - "probe-mobile-weight.mjs"
 Cohesion: 0.40
 Nodes (4): by, bytes, rows, total
 
 ### Community 144 - "probe-404.mjs"
-Cohesion: 0.16
-Nodes (13): BlogIndexInner(), buildFilters(), navigate(), pageCountFor(), postsForPage(), queryListeners, ROOM_NAME, ROOM_ORDER (+5 more)
+Cohesion: 0.19
+Nodes (14): BlogIndexInner(), buildFilters(), navigate(), pageCountFor(), postsForPage(), queryListeners, ROOM_NAME, ROOM_ORDER (+6 more)
 
 ### Community 152 - "Blog.tsx"
-Cohesion: 0.09
-Nodes (27): CLIPS, Hero(), CLOSE_CTA, CLOSE_INVITE, CLOSE_MARK, CLOSE_OFFSET, closeInk(), CONTACT_LINKS (+19 more)
+Cohesion: 0.14
+Nodes (14): CLOSE_CTA, CLOSE_INVITE, CLOSE_MARK, CLOSE_OFFSET, closeInk(), CONTACT_LINKS, EASE, EXPLORE (+6 more)
+
+### Community 154 - "probe-loader-hold.mjs"
+Cohesion: 0.33
+Nodes (3): argv, MARKS, PORT
 
 ### Community 155 - "PillCta.tsx"
 Cohesion: 0.18
@@ -543,6 +566,10 @@ Nodes (5): clean(), handlePost(), json(), MAX, onRequest()
 Cohesion: 0.32
 Nodes (7): num(), perPlate, sa, sb, sleep(), spread(), walk()
 
+### Community 167 - "4. Restaurants"
+Cohesion: 0.40
+Nodes (5): 4. Restaurants, Add a restaurant, Change a fact about an existing restaurant, Delete a restaurant, Update a menu
+
 ### Community 168 - "Menu.tsx"
 Cohesion: 0.29
 Nodes (5): blame, JS, RECALC, stack, X
@@ -560,8 +587,8 @@ Cohesion: 0.40
 Nodes (4): REGIONS, run(), sleep(), SUSPECTS
 
 ### Community 173 - "site.ts"
-Cohesion: 0.15
-Nodes (7): jsonLd, metadata, jsonLd, metadata, jsonLd, metadata, StructuredData()
+Cohesion: 0.13
+Nodes (9): jsonLd, metadata, jsonLd, metadata, jsonLd, metadata, jsonLd, metadata (+1 more)
 
 ### Community 174 - "framer-motion"
 Cohesion: 0.33
@@ -572,8 +599,8 @@ Cohesion: 0.33
 Nodes (4): bandVariants, frameVariants, MARKS, PRINTS
 
 ### Community 178 - "JoinUs.tsx"
-Cohesion: 0.13
-Nodes (13): clamp01(), DIAL_CODES, DIGITS, FlipDigit(), HERO_LINES, inkBox(), INTRO_ENDS_AT, JoinUs() (+5 more)
+Cohesion: 0.07
+Nodes (22): clamp01(), DIAL_CODES, DIGITS, FlipDigit(), HERO_LINES, inkBox(), INTRO_ENDS_AT, JoinUs() (+14 more)
 
 ### Community 179 - "SplitWords.tsx"
 Cohesion: 0.50
@@ -588,8 +615,8 @@ Cohesion: 0.40
 Nodes (3): samples, uniq, vals
 
 ### Community 186 - "PressWall.tsx"
-Cohesion: 0.33
-Nodes (7): generateStaticParams(), VenueMenuPage(), MenuPage(), Intrinsic, intrinsicSize(), isJpegFrame(), parse()
+Cohesion: 0.21
+Nodes (12): generateMetadata(), generateStaticParams(), VenueMenuPage(), VenueMark(), JournalPost(), VenueMark(), MenuPage(), Intrinsic (+4 more)
 
 ### Community 189 - "Experience.tsx"
 Cohesion: 0.32
@@ -600,16 +627,20 @@ Cohesion: 0.32
 Nodes (6): acc, CSS, PAUSE_VIDEO, sample(), sleep(), VARIANTS
 
 ### Community 191 - "restaurants.ts"
-Cohesion: 0.17
-Nodes (10): jsonLd, metadata, REVIEWABLE, reviewUrl(), ReviewUs(), Restaurant, RESTAURANTS, SLUG_BY_NAME (+2 more)
+Cohesion: 0.23
+Nodes (8): VenueBlock(), VenueCard(), VenueCardProps, primaryAction(), Restaurant, SLUG_BY_NAME, VenueAction, VenueAction
 
 ### Community 192 - "probe-bytecensus.mjs"
 Cohesion: 0.29
 Nodes (5): got, per, rows, total, urlOf
 
+### Community 193 - "5. Careers"
+Cohesion: 0.67
+Nodes (3): 5. Careers, Careers page copy, Where applications go
+
 ### Community 195 - "venueCards.ts"
-Cohesion: 0.15
-Nodes (15): VenueMark(), JournalPost(), VenueMark(), VenueBlock(), VenueCard(), VenueCardProps, getRestaurant(), primaryAction() (+7 more)
+Cohesion: 0.29
+Nodes (7): Extras, LOGO_INK, LOGO_OPTICS, VenueAddress, venueCard(), VenueCardItem, venueCards()
 
 ### Community 198 - "shoot-sections.mjs"
 Cohesion: 0.29
@@ -624,24 +655,24 @@ Cohesion: 0.83
 Nodes (3): armReveals(), open(), s()
 
 ## Knowledge Gaps
-- **840 isolated node(s):** `jsonLd`, `metadata`, `metadata`, `jsonLd`, `metadata` (+835 more)
+- **843 isolated node(s):** `jsonLd`, `metadata`, `metadata`, `jsonLd`, `metadata` (+838 more)
   These have ≤1 connection - possible missing edges or undocumented components.
-- **53 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
+- **59 thin communities (<3 nodes) omitted from report** — run `graphify query` to explore isolated nodes.
 
 ## Suggested Questions
 _Questions this graph is uniquely positioned to answer:_
 
 - **Why does `JoinUs()` connect `JoinUs.tsx` to `probe-band-about-press.mjs`, `PageTransition.tsx`, `probe-timeline-contrast.mjs`?**
-  _High betweenness centrality (0.052) - this node is a cross-community bridge._
-- **Why does `q()` connect `probe-timeline-contrast.mjs` to `JoinUs.tsx`, `press.ts`?**
-  _High betweenness centrality (0.036) - this node is a cross-community bridge._
+  _High betweenness centrality (0.055) - this node is a cross-community bridge._
+- **Why does `q()` connect `probe-timeline-contrast.mjs` to `JoinUs.tsx`, `press.ts`, `Discover.tsx`?**
+  _High betweenness centrality (0.040) - this node is a cross-community bridge._
 - **Why does `dependencies` connect `dependencies` to `probe-loader-hold.mjs`, `Contact.tsx`, `package.json`, `gray-matter`?**
-  _High betweenness centrality (0.035) - this node is a cross-community bridge._
+  _High betweenness centrality (0.036) - this node is a cross-community bridge._
 - **What connects `jsonLd`, `metadata`, `metadata` to the rest of the system?**
-  _840 weakly-connected nodes found - possible documentation gaps or missing edges._
-- **Should `user-account-core-06dbaa1bcfe1a542-min.en-US.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.04081632653061224 - nodes in this community are weakly interconnected._
+  _843 weakly-connected nodes found - possible documentation gaps or missing edges._
 - **Should `common-dabb52f27fbf7211-min.en-US.js` be split into smaller, more focused modules?**
-  _Cohesion score 0.10476190476190476 - nodes in this community are weakly interconnected._
+  _Cohesion score 0.14166666666666666 - nodes in this community are weakly interconnected._
 - **Should `probe-timeline.mjs` be split into smaller, more focused modules?**
   _Cohesion score 0.05 - nodes in this community are weakly interconnected._
+- **Should `probe-band-about-press.mjs` be split into smaller, more focused modules?**
+  _Cohesion score 0.06666666666666667 - nodes in this community are weakly interconnected._

@@ -487,7 +487,7 @@ export default function Contact({ standalone = false }: ContactProps) {
                     the press and the outcome for a second press to land
                     in. */}
                 <PillCta type="submit" tone="cream">
-                  Open in your email app
+                  Submit
                 </PillCta>
               </div>
 

@@ -53,3 +53,46 @@
  * trailing slash here would produce `//path` in canonicals and @ids.
  */
 export const SITE_URL = "https://www.maginhawagroup.co.uk";
+
+/* ── GOOGLE SEARCH CONSOLE, VERIFIED BY META TAG AND NOT BY FILE ─────────────
+ *
+ * Search Console offers an HTML file — `public/googlea67aee79f36dbf92.html` —
+ * as its recommended method, and that file is in this repository. IT CANNOT BE
+ * THE METHOD THAT VERIFIES THIS SITE, because Cloudflare will not serve it at
+ * the URL Google asks for.
+ *
+ * Workers Static Assets runs with `html_handling = "auto-trailing-slash"` (the
+ * default; wrangler.toml does not set it), which strips `.html` from every
+ * request path. Measured against the live site, 2026-08-27:
+ *
+ *     /about.html    → 307 https://www.maginhawagroup.co.uk/about
+ *     /contact.html  → 307 https://www.maginhawagroup.co.uk/contact
+ *
+ * So Google's fetch of /googlea67aee79f36dbf92.html is answered with a redirect
+ * rather than the file, and a host that strips `.html` is a known cause of
+ * failed file verification. No fix on the serving side is worth taking:
+ * `html_handling = "none"` stops the redirect and simultaneously 404s every
+ * pretty URL on the site, `_redirects` cannot rewrite (Workers supports real
+ * redirects only, not 200-proxying), and special-casing the one path needs a
+ * `main` Worker script in a project that deliberately has none.
+ *
+ * The meta tag has none of those problems: Next emits it into the <head> of
+ * every exported page, so there is no redirect for anything to strip.
+ *
+ * ⚠️ THE ANALYTICS METHOD WOULD ALSO FAIL, and not for a reason a glance
+ * catches. GA4 is installed, but components/analytics/GoogleTag.tsx renders no
+ * script until the reader accepts analytics consent — so gtag.js is absent from
+ * the exported HTML, and Google's verifier does not click cookie banners.
+ *
+ * ⚠️ THIS IS NOT THE TOKEN IN THE FILENAME. The file method's token
+ * (`a67aee79f36dbf92`) and the tag method's token are separately issued and
+ * different; the tag's is the `content` value shown under Search Console's
+ * "HTML tag" method. While this constant is empty the `verification` key in
+ * app/layout.tsx stays undefined and NO meta tag is emitted — the correct inert
+ * state, because a wrong token reads to Search Console as a FAILED
+ * verification rather than an absent one.
+ *
+ * Once verified, LEAVE IT HERE. Google re-checks periodically and revokes
+ * ownership when the tag disappears.
+ */
+export const GOOGLE_SITE_VERIFICATION = "";

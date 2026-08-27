@@ -702,6 +702,10 @@ export function VenueBlock({
         {menu && menuHref ? (
           <Link
             href={menuHref}
+            /* see the prefetch note in components/layout/CookieBanner.tsx —
+               seven of these per page, 22KB of RSC payload each, against a
+               640ms curtain that covers the fetch */
+            prefetch={false}
             className={`${styles.cardBtn} ${styles.cardBtnGhost}`}
             data-act="menu"
             aria-label={`Menu — ${item.name}`}
@@ -741,6 +745,10 @@ export function VenueBlock({
         {menu && menuHref ? (
           <Link
             href={menuHref}
+            /* see the prefetch note in components/layout/CookieBanner.tsx —
+               seven of these per page, 22KB of RSC payload each, against a
+               640ms curtain that covers the fetch */
+            prefetch={false}
             className={`${styles.cardBtn} ${styles.cardBtnGhost}`}
             aria-label={`Menu — ${item.name}`}
           >
