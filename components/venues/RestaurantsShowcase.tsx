@@ -131,13 +131,15 @@ const RESTAURANTS = [
     video: "/videos/belly-hero.mp4",
   },
   {
-    // coming-soon — no photography, logo or clip yet; the card view renders
-    // a typographic wordmark on a maroon field, and thes wheel falls back to
-    // the generic house clip
+    // still coming-soon for STILLS — no photography or logo yet, so the card
+    // view renders a typographic wordmark on a maroon field. The film is no
+    // longer the generic house clip though: bunso-bakery.mp4 is Bunso's own
+    // footage, and it is what the home grid's hover has been playing all
+    // along. The two surfaces show the same room now.
     name: "Bunso",
     tag: "Filipino-Japanese Kissaten Listening Jazz Bar",
     location: "London",
-    video: "/videos/forpilot1.mp4",
+    video: "/videos/bunso-bakery.mp4",
   },
 ];
 
