@@ -38,16 +38,19 @@ export const CONTACT = {
 /**
  * Social profiles for the footer's "Follow us" column.
  *
- * `url: null` means we do not have a real profile URL yet — those render as
- * plain text rather than links. Instagram is the group's one confirmed
- * account (it's also the one referenced in lib/jsonld.tsx).
+ * All three are confirmed group accounts and render as links. The `| null`
+ * stays on the type: a profile that is retired or not yet opened goes back to
+ * `null` and the footer renders it as plain text rather than a link to
+ * nowhere. A social link that lands on the wrong company's page is worse than
+ * one that isn't clickable — so never guess a URL to fill a row.
  *
- * ⚠️ Supply the LinkedIn and Facebook URLs and they become links automatically.
- * They are deliberately NOT guessed: a social link that lands on the wrong
- * company's page is worse than one that isn't clickable yet.
+ * The LinkedIn URL is the bare company path. LinkedIn hands out
+ * `?originalSubdomain=uk` when you arrive from uk.linkedin.com; it is a
+ * marker of how THAT visit reached the page, not part of the address, and it
+ * is dropped here so every reader gets the same canonical link.
  */
 export const SOCIALS: { label: string; url: string | null }[] = [
-  { label: "LinkedIn", url: null },
-  { label: "Facebook", url: null },
+  { label: "LinkedIn", url: "https://www.linkedin.com/company/maginhawa-group/" },
+  { label: "Facebook", url: "https://www.facebook.com/MaginhawaGroup/" },
   { label: "Instagram", url: "https://www.instagram.com/maginhawagroup/" },
 ];
