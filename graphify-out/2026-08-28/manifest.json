@@ -50,8 +50,8 @@
     "semantic_hash": ""
   },
   "lib/press.ts": {
-    "mtime": 1787845249.4090838,
-    "ast_hash": "0e5c62cf1031bf64fea07c57279c257c",
+    "mtime": 1787657765.643388,
+    "ast_hash": "bf1c65fcdfeda988c31faca968f22a1e",
     "semantic_hash": ""
   },
   "lib/restaurants.ts": {
@@ -550,8 +550,8 @@
     "semantic_hash": ""
   },
   "lib/contact.ts": {
-    "mtime": 1787908970.4993806,
-    "ast_hash": "f456d377558761885b6e971f04f058da",
+    "mtime": 1787657765.6425548,
+    "ast_hash": "e6f2345b5490985d345d198c276d29f3",
     "semantic_hash": ""
   },
   "assets/menu/cafe_mama/wall-panel-40-2017-Corona.pdf": {
@@ -1285,8 +1285,8 @@
     "semantic_hash": ""
   },
   "lib/media.ts": {
-    "mtime": 1787845712.4961898,
-    "ast_hash": "cb44fb1ba37435a97dd5fecc10ccbc61",
+    "mtime": 1787674964.7674894,
+    "ast_hash": "0e364b01f8ecfa376b743ea3effdc802",
     "semantic_hash": ""
   },
   "scripts/cloudinary-upload.mjs": {
@@ -1315,8 +1315,8 @@
     "semantic_hash": ""
   },
   "cloudinary-manifest.json": {
-    "mtime": 1787844634.5036044,
-    "ast_hash": "f7e768266465ca9a3bc05ee0d82cc3b6",
+    "mtime": 1787666851.2889402,
+    "ast_hash": "c8306ae0abf8f45b9667363cdaa55a0b",
     "semantic_hash": ""
   },
   "public/videos/belly-hero.mp4": {
@@ -1362,6 +1362,31 @@
   "public/videos/mamasons-hero.mp4": {
     "mtime": 1787599711.5899866,
     "ast_hash": "b9337625035c310870a89fda62a7603b",
+    "semantic_hash": ""
+  },
+  "public/videos/tile-bintang.mp4": {
+    "mtime": 1787842609.1855764,
+    "ast_hash": "a1210c676fd0ebe2c2611de6e53b50cd",
+    "semantic_hash": ""
+  },
+  "public/videos/tile-cafemama.mp4": {
+    "mtime": 1787842613.959219,
+    "ast_hash": "10837ec9889767b8ed044df925eaaf28",
+    "semantic_hash": ""
+  },
+  "public/videos/tile-guanabana.mp4": {
+    "mtime": 1787841808.882214,
+    "ast_hash": "1a9ab4117c4068f31af72e3b37c7ca49",
+    "semantic_hash": ""
+  },
+  "public/videos/tile-mamasons.mp4": {
+    "mtime": 1787842610.9672053,
+    "ast_hash": "4328c50d0837887bc3c65991d554775e",
+    "semantic_hash": ""
+  },
+  "public/videos/tile-ramo.mp4": {
+    "mtime": 1787842619.4620373,
+    "ast_hash": "6df05a4351b3c76c824b61c2eb978df3",
     "semantic_hash": ""
   },
   "scripts/seek-offset-search.mjs": {
@@ -1990,8 +2015,8 @@
     "semantic_hash": ""
   },
   "components/home/Discover.tsx": {
-    "mtime": 1787845726.8980021,
-    "ast_hash": "0a08f2869974ed81c6c4229de0737a0a",
+    "mtime": 1787843506.2513258,
+    "ast_hash": "028b9cdb9fe90050b9591027b18a0b28",
     "semantic_hash": ""
   },
   "components/home/Experience.tsx": {
@@ -2020,7 +2045,7 @@
     "semantic_hash": ""
   },
   "components/home/PressWall.tsx": {
-    "mtime": 1787844494.360706,
+    "mtime": 1787827454.5696857,
     "ast_hash": "9aa092e8fc3ecb710cd34f4d90454bf0",
     "semantic_hash": ""
   },
@@ -2239,49 +2264,19 @@
     "ast_hash": "ada8ed88d630a7c0a53b89e4ea9fea80",
     "semantic_hash": ""
   },
-  "public/press-logo/michelin-2026-selection.svg": {
-    "mtime": 1787845182.81906,
-    "ast_hash": "d4da064dbdf85026cd02c3faa44b8fc2",
-    "semantic_hash": ""
-  },
-  "public/videos/tile-belly-2026.mp4": {
-    "mtime": 1787843635.8890512,
-    "ast_hash": "1320195a702c3173cf0f3f32aa5d7586",
-    "semantic_hash": ""
-  },
-  "public/videos/tile-bintang-2026.mp4": {
-    "mtime": 1787843630.1139295,
-    "ast_hash": "a1210c676fd0ebe2c2611de6e53b50cd",
-    "semantic_hash": ""
-  },
-  "public/videos/tile-bunso-2026.mp4": {
-    "mtime": 1787843637.9266376,
-    "ast_hash": "d401e6af3a3a401f50ec9ed100bcf705",
-    "semantic_hash": ""
-  },
-  "public/videos/tile-cafemama-2026.mp4": {
-    "mtime": 1787843634.0856342,
-    "ast_hash": "10837ec9889767b8ed044df925eaaf28",
-    "semantic_hash": ""
-  },
-  "public/videos/tile-guanabana-2026.mp4": {
-    "mtime": 1787841808.882214,
-    "ast_hash": "1a9ab4117c4068f31af72e3b37c7ca49",
-    "semantic_hash": ""
-  },
-  "public/videos/tile-hoodwood-2026.mp4": {
+  "public/videos/tile-hoodwood.mp4": {
     "mtime": 1787842623.3408253,
     "ast_hash": "79285527c029448ded7ad72147b3e595",
     "semantic_hash": ""
   },
-  "public/videos/tile-mamasons-2026.mp4": {
-    "mtime": 1787843631.7782805,
-    "ast_hash": "4328c50d0837887bc3c65991d554775e",
+  "public/videos/tile-belly.mp4": {
+    "mtime": 1787842615.9210687,
+    "ast_hash": "1320195a702c3173cf0f3f32aa5d7586",
     "semantic_hash": ""
   },
-  "public/videos/tile-ramo-2026.mp4": {
-    "mtime": 1787842619.4620373,
-    "ast_hash": "6df05a4351b3c76c824b61c2eb978df3",
+  "public/videos/tile-bunso.mp4": {
+    "mtime": 1787842625.7097425,
+    "ast_hash": "ab92a566f3aceffa28039eedbb8c4c34",
     "semantic_hash": ""
   }
 }
