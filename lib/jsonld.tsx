@@ -5,13 +5,28 @@
 
 import { RESTAURANTS } from "./restaurants";
 import { PRESS } from "./press";
+import { SOCIALS } from "./contact";
 
 import { SITE_URL } from "./site";
 import { StructuredData } from "./StructuredData";
 
+/* `sameAs` is how a crawler joins this record to the group's profiles
+   elsewhere — it is the claim "the Maginhawa Group here and the Maginhawa
+   Group on LinkedIn are one organisation", and it is what lets Google and
+   the LLM-based engines above resolve the brand rather than guess at it.
+
+   It is DERIVED from the footer's SOCIALS rather than listed again here.
+   The two drifted before: the footer gained profiles and this array kept
+   claiming Instagram alone. Adding a row to SOCIALS now feeds both.
+
+   `url: null` rows are dropped. A `sameAs` entry is an assertion of
+   identity, so an unconfirmed or guessed URL is worse here than in the
+   footer — there it renders as plain text, here it would tell a crawler
+   the group owns a page it does not. */
 const orgSameAs = [
-  "https://www.instagram.com/maginhawagroup/",
-  // add Facebook, LinkedIn, TripAdvisor profiles as they go live
+  ...SOCIALS.map((s) => s.url).filter((url): url is string => url !== null),
+  // Profiles the footer does not carry — TripAdvisor, Google Business —
+  // belong here directly as they go live.
 ];
 
 export function OrganizationJsonLd() {

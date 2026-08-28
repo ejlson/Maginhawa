@@ -44,6 +44,11 @@ export const CONTACT = {
  * nowhere. A social link that lands on the wrong company's page is worse than
  * one that isn't clickable — so never guess a URL to fill a row.
  *
+ * This list is also the source for the Organization `sameAs` array in
+ * lib/jsonld.tsx, which derives from it and drops the `null` rows — so a
+ * profile added here is claimed in the structured data too, and one that
+ * goes back to `null` stops being claimed. Nothing to keep in step by hand.
+ *
  * The LinkedIn URL is the bare company path. LinkedIn hands out
  * `?originalSubdomain=uk` when you arrive from uk.linkedin.com; it is a
  * marker of how THAT visit reached the page, not part of the address, and it
