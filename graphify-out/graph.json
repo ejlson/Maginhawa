@@ -54,8 +54,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_blog_slug_page",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "page.tsx"
     },
     {
@@ -65,8 +65,8 @@
       "source_location": "L23",
       "_origin": "ast",
       "id": "app_blog_slug_page_generatestaticparams",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "generatestaticparams()"
     },
     {
@@ -76,8 +76,8 @@
       "source_location": "L27",
       "_origin": "ast",
       "id": "app_blog_slug_page_generatemetadata",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "generatemetadata()"
     },
     {
@@ -87,8 +87,8 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "app_blog_slug_page_journalpostpage",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "journalpostpage()"
     },
     {
@@ -98,8 +98,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_blog_page",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "page.tsx"
     },
     {
@@ -109,8 +109,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "app_blog_page_metadata",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "metadata"
     },
     {
@@ -120,8 +120,8 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "app_blog_page_blogpage",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "blogpage()"
     },
     {
@@ -747,8 +747,8 @@
       "source_location": "L44",
       "_origin": "ast",
       "id": "app_menus_slug_page_generatestaticparams",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "generatestaticparams()"
     },
     {
@@ -813,8 +813,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_page",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "page.tsx"
     },
     {
@@ -824,8 +824,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "app_page_home",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "home()"
     },
     {
@@ -879,8 +879,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_restaurants_page",
-      "community": 82,
-      "community_name": "Manifesto.tsx",
+      "community": 137,
+      "community_name": "VideoBackdrop.tsx",
       "norm_label": "page.tsx"
     },
     {
@@ -890,8 +890,8 @@
       "source_location": "L45",
       "_origin": "ast",
       "id": "app_restaurants_page_jsonld",
-      "community": 82,
-      "community_name": "Manifesto.tsx",
+      "community": 137,
+      "community_name": "VideoBackdrop.tsx",
       "norm_label": "jsonld"
     },
     {
@@ -901,8 +901,8 @@
       "source_location": "L71",
       "_origin": "ast",
       "id": "app_restaurants_page_metadata",
-      "community": 82,
-      "community_name": "Manifesto.tsx",
+      "community": 137,
+      "community_name": "VideoBackdrop.tsx",
       "norm_label": "metadata"
     },
     {
@@ -912,8 +912,8 @@
       "source_location": "L94",
       "_origin": "ast",
       "id": "app_restaurants_page_restaurantspage",
-      "community": 82,
-      "community_name": "Manifesto.tsx",
+      "community": 137,
+      "community_name": "VideoBackdrop.tsx",
       "norm_label": "restaurantspage()"
     },
     {
@@ -945,8 +945,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "app_sitemap",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "sitemap.ts"
     },
     {
@@ -956,8 +956,8 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "app_sitemap_sitemap",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "sitemap()"
     },
     {
@@ -1253,8 +1253,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_archive_aboutintro",
-      "community": 137,
-      "community_name": "VideoBackdrop.tsx",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "aboutintro.tsx"
     },
     {
@@ -1264,8 +1264,8 @@
       "source_location": "L95",
       "_origin": "ast",
       "id": "components_archive_aboutintro_aboutintro",
-      "community": 137,
-      "community_name": "VideoBackdrop.tsx",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "aboutintro()"
     },
     {
@@ -1869,8 +1869,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_contact_contactpage",
-      "community": 84,
-      "community_name": "BlogIndex.tsx",
+      "community": 83,
+      "community_name": "shoot-about-rules.mjs",
       "norm_label": "contactpage.tsx"
     },
     {
@@ -1880,8 +1880,8 @@
       "source_location": "L20",
       "_origin": "ast",
       "id": "components_contact_contactpage_visitable",
-      "community": 84,
-      "community_name": "BlogIndex.tsx",
+      "community": 83,
+      "community_name": "shoot-about-rules.mjs",
       "norm_label": "visitable"
     },
     {
@@ -1891,8 +1891,8 @@
       "source_location": "L26",
       "_origin": "ast",
       "id": "components_contact_contactpage_mapurl",
-      "community": 84,
-      "community_name": "BlogIndex.tsx",
+      "community": 83,
+      "community_name": "shoot-about-rules.mjs",
       "norm_label": "mapurl()"
     },
     {
@@ -1902,8 +1902,8 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "components_contact_contactpage_contactpage",
-      "community": 84,
-      "community_name": "BlogIndex.tsx",
+      "community": 83,
+      "community_name": "shoot-about-rules.mjs",
       "norm_label": "contactpage()"
     },
     {
@@ -1913,8 +1913,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_contact_faq",
-      "community": 137,
-      "community_name": "VideoBackdrop.tsx",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "faq.tsx"
     },
     {
@@ -1924,8 +1924,8 @@
       "source_location": "L12",
       "_origin": "ast",
       "id": "components_contact_faq_items",
-      "community": 137,
-      "community_name": "VideoBackdrop.tsx",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "items"
     },
     {
@@ -1935,8 +1935,8 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "components_contact_faq_plusminus",
-      "community": 137,
-      "community_name": "VideoBackdrop.tsx",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "plusminus()"
     },
     {
@@ -1946,8 +1946,8 @@
       "source_location": "L68",
       "_origin": "ast",
       "id": "components_contact_faq_faq",
-      "community": 137,
-      "community_name": "VideoBackdrop.tsx",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "faq()"
     },
     {
@@ -2276,8 +2276,8 @@
       "source_location": "L165",
       "_origin": "ast",
       "id": "components_home_blog_buildchapter",
-      "community": 144,
-      "community_name": "probe-404.mjs",
+      "community": 167,
+      "community_name": "Spines.tsx",
       "norm_label": "buildchapter()"
     },
     {
@@ -2320,8 +2320,8 @@
       "source_location": "L466",
       "_origin": "ast",
       "id": "components_home_blog_blog",
-      "community": 144,
-      "community_name": "probe-404.mjs",
+      "community": 167,
+      "community_name": "Spines.tsx",
       "norm_label": "blog()"
     },
     {
@@ -2496,8 +2496,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_home_experience",
-      "community": 83,
-      "community_name": "shoot-about-rules.mjs",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "experience.tsx"
     },
     {
@@ -2507,8 +2507,8 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "components_home_experience_hero_insets",
-      "community": 83,
-      "community_name": "shoot-about-rules.mjs",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "hero_insets"
     },
     {
@@ -2518,8 +2518,8 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "components_home_experience_experience",
-      "community": 83,
-      "community_name": "shoot-about-rules.mjs",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "experience()"
     },
     {
@@ -2562,8 +2562,8 @@
       "source_location": "L96",
       "_origin": "ast",
       "id": "components_home_hero_hero",
-      "community": 83,
-      "community_name": "shoot-about-rules.mjs",
+      "community": 59,
+      "community_name": "ContactPage.tsx",
       "norm_label": "hero()"
     },
     {
@@ -2573,8 +2573,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_home_loader",
-      "community": 114,
-      "community_name": "page.tsx",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "loader.tsx"
     },
     {
@@ -2584,8 +2584,8 @@
       "source_location": "L15",
       "_origin": "ast",
       "id": "components_home_loader_letters",
-      "community": 114,
-      "community_name": "page.tsx",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "letters"
     },
     {
@@ -2595,8 +2595,8 @@
       "source_location": "L16",
       "_origin": "ast",
       "id": "components_home_loader_alphabet",
-      "community": 114,
-      "community_name": "page.tsx",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "alphabet"
     },
     {
@@ -2606,8 +2606,8 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "components_home_loader_ease_out",
-      "community": 114,
-      "community_name": "page.tsx",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "ease_out"
     },
     {
@@ -2617,8 +2617,8 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "components_home_loader_smooth",
-      "community": 114,
-      "community_name": "page.tsx",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "smooth"
     },
     {
@@ -2628,8 +2628,8 @@
       "source_location": "L205",
       "_origin": "ast",
       "id": "components_home_loader_shutters",
-      "community": 114,
-      "community_name": "page.tsx",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "shutters"
     },
     {
@@ -2639,8 +2639,8 @@
       "source_location": "L284",
       "_origin": "ast",
       "id": "components_home_loader_vp",
-      "community": 114,
-      "community_name": "page.tsx",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "vp"
     },
     {
@@ -2650,8 +2650,8 @@
       "source_location": "L299",
       "_origin": "ast",
       "id": "components_home_loader_flipletter",
-      "community": 114,
-      "community_name": "page.tsx",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "flipletter()"
     },
     {
@@ -2661,8 +2661,8 @@
       "source_location": "L391",
       "_origin": "ast",
       "id": "components_home_loader_loader",
-      "community": 114,
-      "community_name": "page.tsx",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "loader()"
     },
     {
@@ -3178,8 +3178,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_home_types",
-      "community": 114,
-      "community_name": "page.tsx",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "types.ts"
     },
     {
@@ -3189,8 +3189,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_home_types_heroinsets",
-      "community": 114,
-      "community_name": "page.tsx",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "heroinsets"
     },
     {
@@ -3387,8 +3387,8 @@
       "source_location": "L152",
       "_origin": "ast",
       "id": "components_layout_footer_footlinka",
-      "community": 83,
-      "community_name": "shoot-about-rules.mjs",
+      "community": 59,
+      "community_name": "ContactPage.tsx",
       "norm_label": "footlinka()"
     },
     {
@@ -3442,8 +3442,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_layout_nav",
-      "community": 83,
-      "community_name": "shoot-about-rules.mjs",
+      "community": 59,
+      "community_name": "ContactPage.tsx",
       "norm_label": "nav.tsx"
     },
     {
@@ -3453,8 +3453,8 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "components_layout_nav_theme",
-      "community": 83,
-      "community_name": "shoot-about-rules.mjs",
+      "community": 59,
+      "community_name": "ContactPage.tsx",
       "norm_label": "theme"
     },
     {
@@ -3475,8 +3475,8 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "components_layout_nav_links",
-      "community": 83,
-      "community_name": "shoot-about-rules.mjs",
+      "community": 59,
+      "community_name": "ContactPage.tsx",
       "norm_label": "links"
     },
     {
@@ -3486,8 +3486,8 @@
       "source_location": "L43",
       "_origin": "ast",
       "id": "components_layout_nav_uselinksleft",
-      "community": 83,
-      "community_name": "shoot-about-rules.mjs",
+      "community": 59,
+      "community_name": "ContactPage.tsx",
       "norm_label": "uselinksleft()"
     },
     {
@@ -3497,8 +3497,8 @@
       "source_location": "L65",
       "_origin": "ast",
       "id": "components_layout_nav_nav",
-      "community": 83,
-      "community_name": "shoot-about-rules.mjs",
+      "community": 59,
+      "community_name": "ContactPage.tsx",
       "norm_label": "nav()"
     },
     {
@@ -3574,8 +3574,8 @@
       "source_location": "L182",
       "_origin": "ast",
       "id": "components_layout_pagetransition_useroutetransition",
-      "community": 83,
-      "community_name": "shoot-about-rules.mjs",
+      "community": 59,
+      "community_name": "ContactPage.tsx",
       "norm_label": "useroutetransition()"
     },
     {
@@ -3607,8 +3607,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_legal_legalpage",
-      "community": 83,
-      "community_name": "shoot-about-rules.mjs",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "legalpage.tsx"
     },
     {
@@ -3618,8 +3618,8 @@
       "source_location": "L38",
       "_origin": "ast",
       "id": "components_legal_legalpage_legalpage",
-      "community": 83,
-      "community_name": "shoot-about-rules.mjs",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "legalpage()"
     },
     {
@@ -3904,8 +3904,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_ui_reveal",
-      "community": 137,
-      "community_name": "VideoBackdrop.tsx",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "reveal.tsx"
     },
     {
@@ -3915,8 +3915,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "components_ui_reveal_revealprops",
-      "community": 137,
-      "community_name": "VideoBackdrop.tsx",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "revealprops"
     },
     {
@@ -3926,8 +3926,8 @@
       "source_location": "L41",
       "_origin": "ast",
       "id": "components_ui_reveal_reveal",
-      "community": 137,
-      "community_name": "VideoBackdrop.tsx",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "reveal()"
     },
     {
@@ -4289,8 +4289,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "components_venues_spines",
-      "community": 1,
-      "community_name": "common-dabb52f27fbf7211-min.en-US.js",
+      "community": 167,
+      "community_name": "Spines.tsx",
       "norm_label": "spines.tsx"
     },
     {
@@ -4300,8 +4300,8 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "components_venues_spines_spine_focal",
-      "community": 1,
-      "community_name": "common-dabb52f27fbf7211-min.en-US.js",
+      "community": 167,
+      "community_name": "Spines.tsx",
       "norm_label": "spine_focal"
     },
     {
@@ -4311,8 +4311,8 @@
       "source_location": "L90",
       "_origin": "ast",
       "id": "components_venues_spines_spineitem",
-      "community": 1,
-      "community_name": "common-dabb52f27fbf7211-min.en-US.js",
+      "community": 167,
+      "community_name": "Spines.tsx",
       "norm_label": "spineitem"
     },
     {
@@ -4322,8 +4322,8 @@
       "source_location": "L92",
       "_origin": "ast",
       "id": "components_venues_spines_spines",
-      "community": 1,
-      "community_name": "common-dabb52f27fbf7211-min.en-US.js",
+      "community": 167,
+      "community_name": "Spines.tsx",
       "norm_label": "spines()"
     },
     {
@@ -4333,8 +4333,8 @@
       "source_location": "L172",
       "_origin": "ast",
       "id": "components_venues_spines_frame",
-      "community": 144,
-      "community_name": "probe-404.mjs",
+      "community": 167,
+      "community_name": "Spines.tsx",
       "norm_label": "frame()"
     },
     {
@@ -4344,8 +4344,8 @@
       "source_location": "L176",
       "_origin": "ast",
       "id": "components_venues_spines_spine",
-      "community": 1,
-      "community_name": "common-dabb52f27fbf7211-min.en-US.js",
+      "community": 167,
+      "community_name": "Spines.tsx",
       "norm_label": "spine()"
     },
     {
@@ -4968,7 +4968,7 @@
       "label": "SOCIALS",
       "file_type": "code",
       "source_file": "lib/contact.ts",
-      "source_location": "L52",
+      "source_location": "L57",
       "_origin": "ast",
       "id": "lib_contact_socials",
       "community": 106,
@@ -5114,8 +5114,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_introwindow",
-      "community": 114,
-      "community_name": "page.tsx",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "introwindow.ts"
     },
     {
@@ -5125,8 +5125,8 @@
       "source_location": "L69",
       "_origin": "ast",
       "id": "lib_introwindow_registerintrofilm",
-      "community": 114,
-      "community_name": "page.tsx",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "registerintrofilm()"
     },
     {
@@ -5136,8 +5136,8 @@
       "source_location": "L74",
       "_origin": "ast",
       "id": "lib_introwindow_windowtimeline",
-      "community": 114,
-      "community_name": "page.tsx",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "windowtimeline"
     },
     {
@@ -5147,8 +5147,8 @@
       "source_location": "L137",
       "_origin": "ast",
       "id": "lib_introwindow_playintrowindow",
-      "community": 114,
-      "community_name": "page.tsx",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "playintrowindow()"
     },
     {
@@ -5158,8 +5158,8 @@
       "source_location": "L191",
       "_origin": "ast",
       "id": "lib_introwindow_releaseintrofilm",
-      "community": 114,
-      "community_name": "page.tsx",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "releaseintrofilm()"
     },
     {
@@ -5202,26 +5202,26 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_jsonld",
-      "community": 91,
-      "community_name": "RestaurantsShowcase.tsx",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "jsonld.tsx"
     },
     {
       "label": "orgSameAs",
       "file_type": "code",
       "source_file": "lib/jsonld.tsx",
-      "source_location": "L12",
+      "source_location": "L26",
       "_origin": "ast",
       "id": "lib_jsonld_orgsameas",
-      "community": 91,
-      "community_name": "RestaurantsShowcase.tsx",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "orgsameas"
     },
     {
       "label": "OrganizationJsonLd()",
       "file_type": "code",
       "source_file": "lib/jsonld.tsx",
-      "source_location": "L17",
+      "source_location": "L32",
       "_origin": "ast",
       "id": "lib_jsonld_organizationjsonld",
       "community": 91,
@@ -5232,7 +5232,7 @@
       "label": "WebSiteJsonLd()",
       "file_type": "code",
       "source_file": "lib/jsonld.tsx",
-      "source_location": "L54",
+      "source_location": "L69",
       "_origin": "ast",
       "id": "lib_jsonld_websitejsonld",
       "community": 91,
@@ -5243,11 +5243,11 @@
       "label": "GroupPressJsonLd()",
       "file_type": "code",
       "source_file": "lib/jsonld.tsx",
-      "source_location": "L82",
+      "source_location": "L97",
       "_origin": "ast",
       "id": "lib_jsonld_grouppressjsonld",
-      "community": 91,
-      "community_name": "RestaurantsShowcase.tsx",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "grouppressjsonld()"
     },
     {
@@ -5312,8 +5312,8 @@
       "source_location": "L110",
       "_origin": "ast",
       "id": "lib_markdown_rendermarkdown",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "rendermarkdown()"
     },
     {
@@ -5433,8 +5433,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_menu",
-      "community": 1,
-      "community_name": "common-dabb52f27fbf7211-min.en-US.js",
+      "community": 167,
+      "community_name": "Spines.tsx",
       "norm_label": "menu.ts"
     },
     {
@@ -5444,8 +5444,8 @@
       "source_location": "L17",
       "_origin": "ast",
       "id": "lib_menu_menuhref",
-      "community": 1,
-      "community_name": "common-dabb52f27fbf7211-min.en-US.js",
+      "community": 167,
+      "community_name": "Spines.tsx",
       "norm_label": "menuhref()"
     },
     {
@@ -5455,8 +5455,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_posts",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "posts.ts"
     },
     {
@@ -5466,8 +5466,8 @@
       "source_location": "L52",
       "_origin": "ast",
       "id": "lib_posts_posts_dir",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "posts_dir"
     },
     {
@@ -5477,8 +5477,8 @@
       "source_location": "L58",
       "_origin": "ast",
       "id": "lib_posts_journalpost",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "journalpost"
     },
     {
@@ -5488,8 +5488,8 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "lib_posts_categories",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "categories"
     },
     {
@@ -5499,8 +5499,8 @@
       "source_location": "L87",
       "_origin": "ast",
       "id": "lib_posts_date_label",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "date_label"
     },
     {
@@ -5510,8 +5510,8 @@
       "source_location": "L98",
       "_origin": "ast",
       "id": "lib_posts_wordstominutes",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "wordstominutes()"
     },
     {
@@ -5521,8 +5521,8 @@
       "source_location": "L108",
       "_origin": "ast",
       "id": "lib_posts_fail",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "fail()"
     },
     {
@@ -5532,8 +5532,8 @@
       "source_location": "L112",
       "_origin": "ast",
       "id": "lib_posts_toentry",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "toentry()"
     },
     {
@@ -5543,8 +5543,8 @@
       "source_location": "L207",
       "_origin": "ast",
       "id": "lib_posts_getposts",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "getposts()"
     },
     {
@@ -5554,8 +5554,8 @@
       "source_location": "L236",
       "_origin": "ast",
       "id": "lib_posts_getpost",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "getpost()"
     },
     {
@@ -5565,8 +5565,8 @@
       "source_location": "L250",
       "_origin": "ast",
       "id": "lib_posts_getjournal",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "getjournal()"
     },
     {
@@ -5576,8 +5576,8 @@
       "source_location": "L279",
       "_origin": "ast",
       "id": "lib_posts_getadjacentposts",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "getadjacentposts()"
     },
     {
@@ -5642,8 +5642,8 @@
       "source_location": "L279",
       "_origin": "ast",
       "id": "lib_press_press",
-      "community": 91,
-      "community_name": "RestaurantsShowcase.tsx",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "press"
     },
     {
@@ -5664,8 +5664,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_restaurants",
-      "community": 191,
-      "community_name": "restaurants.ts",
+      "community": 137,
+      "community_name": "VideoBackdrop.tsx",
       "norm_label": "restaurants.ts"
     },
     {
@@ -5675,8 +5675,8 @@
       "source_location": "L5",
       "_origin": "ast",
       "id": "lib_restaurants_restaurant",
-      "community": 191,
-      "community_name": "restaurants.ts",
+      "community": 137,
+      "community_name": "VideoBackdrop.tsx",
       "norm_label": "restaurant"
     },
     {
@@ -5686,8 +5686,8 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "lib_restaurants_restaurants",
-      "community": 82,
-      "community_name": "Manifesto.tsx",
+      "community": 137,
+      "community_name": "VideoBackdrop.tsx",
       "norm_label": "restaurants"
     },
     {
@@ -5708,8 +5708,8 @@
       "source_location": "L267",
       "_origin": "ast",
       "id": "lib_restaurants_withmenus",
-      "community": 101,
-      "community_name": "q",
+      "community": 106,
+      "community_name": "Placeholder.tsx",
       "norm_label": "withmenus()"
     },
     {
@@ -5719,8 +5719,8 @@
       "source_location": "L299",
       "_origin": "ast",
       "id": "lib_restaurants_venueaction",
-      "community": 191,
-      "community_name": "restaurants.ts",
+      "community": 137,
+      "community_name": "VideoBackdrop.tsx",
       "norm_label": "venueaction"
     },
     {
@@ -5741,8 +5741,8 @@
       "source_location": "L336",
       "_origin": "ast",
       "id": "lib_restaurants_slug_by_name",
-      "community": 191,
-      "community_name": "restaurants.ts",
+      "community": 137,
+      "community_name": "VideoBackdrop.tsx",
       "norm_label": "slug_by_name"
     },
     {
@@ -5807,8 +5807,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "lib_venueactions",
-      "community": 191,
-      "community_name": "restaurants.ts",
+      "community": 137,
+      "community_name": "VideoBackdrop.tsx",
       "norm_label": "venueactions.ts"
     },
     {
@@ -5818,8 +5818,8 @@
       "source_location": "L35",
       "_origin": "ast",
       "id": "lib_venueactions_venueaction",
-      "community": 191,
-      "community_name": "restaurants.ts",
+      "community": 137,
+      "community_name": "VideoBackdrop.tsx",
       "norm_label": "venueaction"
     },
     {
@@ -5862,8 +5862,8 @@
       "source_location": "L53",
       "_origin": "ast",
       "id": "lib_venuecards_venuecarditem",
-      "community": 1,
-      "community_name": "common-dabb52f27fbf7211-min.en-US.js",
+      "community": 195,
+      "community_name": "venueCards.ts",
       "norm_label": "venuecarditem"
     },
     {
@@ -9492,8 +9492,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scripts_probe_discover_arrival",
-      "community": 103,
-      "community_name": "getRestaurant",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "probe-discover-arrival.mjs"
     },
     {
@@ -9503,8 +9503,8 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "scripts_probe_discover_arrival_fail",
-      "community": 103,
-      "community_name": "getRestaurant",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "fail"
     },
     {
@@ -9514,8 +9514,8 @@
       "source_location": "L56",
       "_origin": "ast",
       "id": "scripts_probe_discover_arrival_ok",
-      "community": 103,
-      "community_name": "getRestaurant",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "ok()"
     },
     {
@@ -9525,8 +9525,8 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "scripts_probe_discover_arrival_openpage",
-      "community": 103,
-      "community_name": "getRestaurant",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "openpage()"
     },
     {
@@ -9536,8 +9536,8 @@
       "source_location": "L83",
       "_origin": "ast",
       "id": "scripts_probe_discover_arrival_seatto",
-      "community": 103,
-      "community_name": "getRestaurant",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "seatto()"
     },
     {
@@ -9547,8 +9547,8 @@
       "source_location": "L97",
       "_origin": "ast",
       "id": "scripts_probe_discover_arrival_sample",
-      "community": 103,
-      "community_name": "getRestaurant",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "sample()"
     },
     {
@@ -9558,8 +9558,8 @@
       "source_location": "L231",
       "_origin": "ast",
       "id": "scripts_probe_discover_arrival_restaurants",
-      "community": 103,
-      "community_name": "getRestaurant",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "restaurants"
     },
     {
@@ -9569,8 +9569,8 @@
       "source_location": "L278",
       "_origin": "ast",
       "id": "scripts_probe_discover_arrival_travel",
-      "community": 103,
-      "community_name": "getRestaurant",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "travel"
     },
     {
@@ -9580,8 +9580,8 @@
       "source_location": "L291",
       "_origin": "ast",
       "id": "scripts_probe_discover_arrival_flat",
-      "community": 103,
-      "community_name": "getRestaurant",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "flat"
     },
     {
@@ -9602,8 +9602,8 @@
       "source_location": "L302",
       "_origin": "ast",
       "id": "scripts_probe_discover_arrival_breaches",
-      "community": 103,
-      "community_name": "getRestaurant",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "breaches"
     },
     {
@@ -9613,8 +9613,8 @@
       "source_location": "L318",
       "_origin": "ast",
       "id": "scripts_probe_discover_arrival_worst",
-      "community": 103,
-      "community_name": "getRestaurant",
+      "community": 178,
+      "community_name": "JoinUs.tsx",
       "norm_label": "worst"
     },
     {
@@ -11021,8 +11021,8 @@
       "source_location": "L217",
       "_origin": "ast",
       "id": "scripts_probe_flatband_aboutraise_pressrange_doctop",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 103,
+      "community_name": "getRestaurant",
       "norm_label": "doctop()"
     },
     {
@@ -12693,8 +12693,8 @@
       "source_location": "L91",
       "_origin": "ast",
       "id": "scripts_probe_loader_jank_t_win_open",
-      "community": 114,
-      "community_name": "page.tsx",
+      "community": 101,
+      "community_name": "q",
       "norm_label": "t_win_open()"
     },
     {
@@ -13738,8 +13738,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scripts_probe_panel_parity",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 193,
+      "community_name": "probe-panel-parity.mjs",
       "norm_label": "probe-panel-parity.mjs"
     },
     {
@@ -13749,8 +13749,8 @@
       "source_location": "L55",
       "_origin": "ast",
       "id": "scripts_probe_panel_parity_sleep",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 193,
+      "community_name": "probe-panel-parity.mjs",
       "norm_label": "sleep()"
     },
     {
@@ -13760,8 +13760,8 @@
       "source_location": "L60",
       "_origin": "ast",
       "id": "scripts_probe_panel_parity_speeds",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 193,
+      "community_name": "probe-panel-parity.mjs",
       "norm_label": "speeds"
     },
     {
@@ -13771,8 +13771,8 @@
       "source_location": "L62",
       "_origin": "ast",
       "id": "scripts_probe_panel_parity_viewports",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 193,
+      "community_name": "probe-panel-parity.mjs",
       "norm_label": "viewports"
     },
     {
@@ -13782,8 +13782,8 @@
       "source_location": "L84",
       "_origin": "ast",
       "id": "scripts_probe_panel_parity_panels",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 193,
+      "community_name": "probe-panel-parity.mjs",
       "norm_label": "panels"
     },
     {
@@ -13793,8 +13793,8 @@
       "source_location": "L99",
       "_origin": "ast",
       "id": "scripts_probe_panel_parity_walk",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 193,
+      "community_name": "probe-panel-parity.mjs",
       "norm_label": "walk()"
     },
     {
@@ -14068,8 +14068,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scripts_probe_passage_setting",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 134,
+      "community_name": "probe-passage-setting.mjs",
       "norm_label": "probe-passage-setting.mjs"
     },
     {
@@ -14079,8 +14079,8 @@
       "source_location": "L37",
       "_origin": "ast",
       "id": "scripts_probe_passage_setting_helpers",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 134,
+      "community_name": "probe-passage-setting.mjs",
       "norm_label": "helpers()"
     },
     {
@@ -14090,8 +14090,8 @@
       "source_location": "L53",
       "_origin": "ast",
       "id": "scripts_probe_passage_setting_boot",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 134,
+      "community_name": "probe-passage-setting.mjs",
       "norm_label": "boot()"
     },
     {
@@ -14101,8 +14101,8 @@
       "source_location": "L61",
       "_origin": "ast",
       "id": "scripts_probe_passage_setting_seat",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 134,
+      "community_name": "probe-passage-setting.mjs",
       "norm_label": "seat()"
     },
     {
@@ -14112,8 +14112,8 @@
       "source_location": "L70",
       "_origin": "ast",
       "id": "scripts_probe_passage_setting_seatp",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 134,
+      "community_name": "probe-passage-setting.mjs",
       "norm_label": "seatp()"
     },
     {
@@ -14123,8 +14123,8 @@
       "source_location": "L76",
       "_origin": "ast",
       "id": "scripts_probe_passage_setting_widths",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 134,
+      "community_name": "probe-passage-setting.mjs",
       "norm_label": "widths"
     },
     {
@@ -14134,8 +14134,8 @@
       "source_location": "L85",
       "_origin": "ast",
       "id": "scripts_probe_passage_setting_perwidth",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 134,
+      "community_name": "probe-passage-setting.mjs",
       "norm_label": "perwidth"
     },
     {
@@ -14145,8 +14145,8 @@
       "source_location": "L197",
       "_origin": "ast",
       "id": "scripts_probe_passage_setting_partials",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 134,
+      "community_name": "probe-passage-setting.mjs",
       "norm_label": "partials"
     },
     {
@@ -14156,8 +14156,8 @@
       "source_location": "L230",
       "_origin": "ast",
       "id": "scripts_probe_passage_setting_gapat",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 134,
+      "community_name": "probe-passage-setting.mjs",
       "norm_label": "gapat()"
     },
     {
@@ -14167,8 +14167,8 @@
       "source_location": "L332",
       "_origin": "ast",
       "id": "scripts_probe_passage_setting_d0",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 134,
+      "community_name": "probe-passage-setting.mjs",
       "norm_label": "d0"
     },
     {
@@ -14178,8 +14178,8 @@
       "source_location": "L343",
       "_origin": "ast",
       "id": "scripts_probe_passage_setting_fb",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 134,
+      "community_name": "probe-passage-setting.mjs",
       "norm_label": "fb"
     },
     {
@@ -16389,8 +16389,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scripts_probe_timeline",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 173,
+      "community_name": "probe-timeline.mjs",
       "norm_label": "probe-timeline.mjs"
     },
     {
@@ -16400,8 +16400,8 @@
       "source_location": "L9",
       "_origin": "ast",
       "id": "scripts_probe_timeline_results",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 173,
+      "community_name": "probe-timeline.mjs",
       "norm_label": "results"
     },
     {
@@ -16411,8 +16411,8 @@
       "source_location": "L10",
       "_origin": "ast",
       "id": "scripts_probe_timeline_ok",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 173,
+      "community_name": "probe-timeline.mjs",
       "norm_label": "ok()"
     },
     {
@@ -16422,8 +16422,8 @@
       "source_location": "L18",
       "_origin": "ast",
       "id": "scripts_probe_timeline_consoleerrors",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 173,
+      "community_name": "probe-timeline.mjs",
       "norm_label": "consoleerrors"
     },
     {
@@ -16433,8 +16433,8 @@
       "source_location": "L24",
       "_origin": "ast",
       "id": "scripts_probe_timeline_sel",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 173,
+      "community_name": "probe-timeline.mjs",
       "norm_label": "sel"
     },
     {
@@ -16444,8 +16444,8 @@
       "source_location": "L28",
       "_origin": "ast",
       "id": "scripts_probe_timeline_q",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 103,
+      "community_name": "getRestaurant",
       "norm_label": "q()"
     },
     {
@@ -16455,8 +16455,8 @@
       "source_location": "L29",
       "_origin": "ast",
       "id": "scripts_probe_timeline_part",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 103,
+      "community_name": "getRestaurant",
       "norm_label": "part()"
     },
     {
@@ -16466,8 +16466,8 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "scripts_probe_timeline_stateat",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 173,
+      "community_name": "probe-timeline.mjs",
       "norm_label": "stateat()"
     },
     {
@@ -16477,8 +16477,8 @@
       "source_location": "L87",
       "_origin": "ast",
       "id": "scripts_probe_timeline_box",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 173,
+      "community_name": "probe-timeline.mjs",
       "norm_label": "box"
     },
     {
@@ -16488,8 +16488,8 @@
       "source_location": "L174",
       "_origin": "ast",
       "id": "scripts_probe_timeline_rmbox",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 173,
+      "community_name": "probe-timeline.mjs",
       "norm_label": "rmbox"
     },
     {
@@ -16499,8 +16499,8 @@
       "source_location": "L182",
       "_origin": "ast",
       "id": "scripts_probe_timeline_fails",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 173,
+      "community_name": "probe-timeline.mjs",
       "norm_label": "fails"
     },
     {
@@ -17555,8 +17555,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scripts_shoot_cta_fuse",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 103,
+      "community_name": "getRestaurant",
       "norm_label": "shoot-cta-fuse.mjs"
     },
     {
@@ -17566,8 +17566,8 @@
       "source_location": "L40",
       "_origin": "ast",
       "id": "scripts_shoot_cta_fuse_nth",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 103,
+      "community_name": "getRestaurant",
       "norm_label": "nth"
     },
     {
@@ -17577,8 +17577,8 @@
       "source_location": "L47",
       "_origin": "ast",
       "id": "scripts_shoot_cta_fuse_frames",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 103,
+      "community_name": "getRestaurant",
       "norm_label": "frames"
     },
     {
@@ -17588,8 +17588,8 @@
       "source_location": "L57",
       "_origin": "ast",
       "id": "scripts_shoot_cta_fuse_s",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 103,
+      "community_name": "getRestaurant",
       "norm_label": "s()"
     },
     {
@@ -17599,8 +17599,8 @@
       "source_location": "L109",
       "_origin": "ast",
       "id": "scripts_shoot_cta_fuse_read",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 103,
+      "community_name": "getRestaurant",
       "norm_label": "read()"
     },
     {
@@ -17610,8 +17610,8 @@
       "source_location": "L161",
       "_origin": "ast",
       "id": "scripts_shoot_cta_fuse_clip",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 103,
+      "community_name": "getRestaurant",
       "norm_label": "clip"
     },
     {
@@ -17621,8 +17621,8 @@
       "source_location": "L205",
       "_origin": "ast",
       "id": "scripts_shoot_cta_fuse_progress",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 103,
+      "community_name": "getRestaurant",
       "norm_label": "progress()"
     },
     {
@@ -17632,8 +17632,8 @@
       "source_location": "L222",
       "_origin": "ast",
       "id": "scripts_shoot_cta_fuse_t0",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 103,
+      "community_name": "getRestaurant",
       "norm_label": "t0"
     },
     {
@@ -17720,8 +17720,8 @@
       "source_location": "L1",
       "_origin": "ast",
       "id": "scripts_shoot_indent_hover",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 197,
+      "community_name": "shoot",
       "norm_label": "shoot-indent-hover.mjs"
     },
     {
@@ -17731,8 +17731,8 @@
       "source_location": "L13",
       "_origin": "ast",
       "id": "scripts_shoot_indent_hover_s",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 197,
+      "community_name": "shoot",
       "norm_label": "s()"
     },
     {
@@ -17742,8 +17742,8 @@
       "source_location": "L31",
       "_origin": "ast",
       "id": "scripts_shoot_indent_hover_shoot",
-      "community": 51,
-      "community_name": "probe-timeline-contrast.mjs",
+      "community": 197,
+      "community_name": "shoot",
       "norm_label": "shoot()"
     },
     {
@@ -30833,7 +30833,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "lib/jsonld.tsx",
-      "source_location": "L10",
+      "source_location": "L11",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_jsonld",
@@ -30856,7 +30856,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "lib/jsonld.tsx",
-      "source_location": "L10",
+      "source_location": "L11",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_jsonld",
@@ -31204,10 +31204,34 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/contact.ts",
-      "source_location": "L52",
+      "source_location": "L57",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_contact",
+      "target": "lib_contact_socials",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports_from",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/jsonld.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "lib_jsonld",
+      "target": "lib_contact",
+      "confidence_score": 1.0
+    },
+    {
+      "relation": "imports",
+      "context": "import",
+      "confidence": "EXTRACTED",
+      "source_file": "lib/jsonld.tsx",
+      "source_location": "L8",
+      "weight": 1.0,
+      "_origin": "ast",
+      "source": "lib_jsonld",
       "target": "lib_contact_socials",
       "confidence_score": 1.0
     },
@@ -31427,7 +31451,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/jsonld.tsx",
-      "source_location": "L82",
+      "source_location": "L97",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_jsonld",
@@ -31438,7 +31462,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/jsonld.tsx",
-      "source_location": "L17",
+      "source_location": "L32",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_jsonld",
@@ -31449,7 +31473,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/jsonld.tsx",
-      "source_location": "L12",
+      "source_location": "L26",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_jsonld",
@@ -31460,7 +31484,7 @@
       "relation": "contains",
       "confidence": "EXTRACTED",
       "source_file": "lib/jsonld.tsx",
-      "source_location": "L54",
+      "source_location": "L69",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_jsonld",
@@ -31520,7 +31544,7 @@
       "context": "import",
       "confidence": "EXTRACTED",
       "source_file": "lib/jsonld.tsx",
-      "source_location": "L9",
+      "source_location": "L10",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_jsonld",
@@ -31533,7 +31557,7 @@
       "confidence": "EXTRACTED",
       "confidence_score": 1.0,
       "source_file": "lib/jsonld.tsx",
-      "source_location": "L92",
+      "source_location": "L107",
       "weight": 1.0,
       "_origin": "ast",
       "source": "lib_jsonld_grouppressjsonld",
@@ -46566,5 +46590,5 @@
     }
   ],
   "hyperedges": [],
-  "built_at_commit": "6c648556d019a491b88987adf438da04acdb1f9a"
+  "built_at_commit": "f6db1a1865d49f7d4982eba7d257bde049cac6a6"
 }
