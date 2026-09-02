@@ -68,9 +68,12 @@
    furniture. The frame is now the container's content box, and only the
    interior verticals keep the half-gutter offset.
 
-   The frame is drawn by the grid itself rather than by the edge cells, so
-   there are no per-column selectors to keep in sync with the orphan rules
-   below. The geometry, left to right:
+   The frame is drawn by the grid itself rather than by the edge cells: one
+   pair of borders instead of a border per edge cell, so the frame cannot
+   come apart wherever the orphan rules below re-shape a row. (The edge cells
+   are still named per column — see `--edge-l` / `--edge-r` on `.grid > li` —
+   but only to buy padding, and a missed selector there costs a cell some air
+   rather than a broken box.) The geometry, left to right:
      · margin-inline pulls the border box out by exactly one border-width, so
        the two hairlines occupy the single pixel just OUTSIDE 40 and 1400 and
        the content box lands back on 40 / 1400. Zero would not do: the box is
@@ -162,19 +165,47 @@
 .grid > li {
   display: grid;
   margin-inline: calc(var(--cell-reach) * -1);
+  /* ---- THE EDGE CELLS BUY THE INSET THE INTERIOR ONES GET FREE ----
+     Every rule in this table is meant to sit half a gutter from the type it
+     precedes. Interior cells get that for nothing: the rule lands at the
+     gutter's midpoint and the cell's own padding puts the text back on the
+     track, so there is always a half-gap of air between the two. The FRAME
+     has no gutter to fall into — it is the content edge — so the first
+     column's rule stood at x=40 with "Bintang" starting at x=40, and the
+     last column's right rule stood at 1400 with the wide row's CTA ending at
+     1400. Measured at 1440: 21.6px of air beside every interior rule, zero
+     beside all four frame rules. One column of the table read as jammed
+     against the box while the other two breathed.
+     The fix is padding, not a wider frame. Standing the frame back out at
+     18.4 / 1421.6 would restore the air without moving any type, but it also
+     restores what that geometry was undone for: the table becomes the widest
+     thing in the dark zone, and on a large screen the box would clear the
+     viewport edge by 12px where every other block clears it by 40. So the
+     type steps in instead, and the frame keeps the content width it shares
+     with the headline above and the Footer's rails below.
+     Set on the <li> as custom properties rather than as padding on the
+     <a>: the one-column block below rewrites `.item`'s padding wholesale,
+     and a per-column `padding-left` would outrank that shorthand and
+     survive into a layout with no frame to be inset from. These collapse on
+     their own there too — `--cell-reach` is 0px at one column — so the
+     inset is off twice over. */
+  --edge-l: 0px;
+  --edge-r: 0px;
 }
 
 .item {
   display: flex;
   flex-direction: column;
   gap: clamp(12px, 1.6vh, 18px);
-  /* The half-gap given back. `- 1px` on the left is the border's own width:
-     with border-box the hairline eats into the padding, and without the
+  /* The half-gap given back, plus whatever the cell's edge asks for on top
+     (zero everywhere but against the frame — see `--edge-l` / `--edge-r` on
+     `.grid > li`). `- 1px` on the left is the border's own width: with
+     border-box the hairline eats into the padding, and without the
      compensation every entry's text would start one pixel right of the rail —
      which is precisely the 40-vs-41 pair this section was already fixed for
-     once. The right side has no border, so it takes the plain half gap. */
-  padding: clamp(14px, 1.8vh, 20px) var(--cell-reach) clamp(14px, 1.8vh, 20px)
-    calc(var(--cell-reach) - 1px);
+     once. The right side has no border, so it takes its half gap plain. */
+  padding: clamp(14px, 1.8vh, 20px) calc(var(--cell-reach) + var(--edge-r))
+    clamp(14px, 1.8vh, 20px) calc(var(--cell-reach) + var(--edge-l) - 1px);
   /* No min-height, and no `justify-content: space-between`. Both existed to
      make a bordered cell feel like a card, and with or without rules they
      push the CTA ~60px away from the name it belongs to, so each entry reads
@@ -204,6 +235,19 @@
     flex-direction: row;
     align-items: center;
     justify-content: space-between;
+  }
+
+  /* which cells touch the frame, at three columns. The two stretched orphans
+     are listed with them because a row that spans to `-1` ends at the right
+     frame however it started, and the one that spans from column 1 is
+     already carrying the left inset from the `3n + 1` rule above it. */
+  .grid > li:nth-child(3n + 1) {
+    --edge-l: var(--cell-reach);
+  }
+  .grid > li:nth-child(3n),
+  .grid > li:last-child:nth-child(3n + 1),
+  .grid > li:last-child:nth-child(3n + 2) {
+    --edge-r: var(--cell-reach);
   }
 }
 
@@ -346,6 +390,16 @@
   }
   .grid > li:last-child:nth-child(2n + 1) {
     grid-column: 1 / -1;
+  }
+  /* which cells touch the frame at TWO columns — the odd ones are the left
+     column here, not every third one. Nothing to undo from the three-column
+     set: those rules live inside `min-width: 981px`. */
+  .grid > li:nth-child(2n + 1) {
+    --edge-l: var(--cell-reach);
+  }
+  .grid > li:nth-child(2n),
+  .grid > li:last-child:nth-child(2n + 1) {
+    --edge-r: var(--cell-reach);
   }
 }
 
