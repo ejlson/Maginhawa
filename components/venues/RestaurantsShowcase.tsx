@@ -344,9 +344,21 @@ export default function RestaurantsShowcase() {
 
   /* the snap grid, measured once: the first row's centre inside the scroll
      content and the uniform row pitch. Every snap target is
-     rowC0 + n·rowH − clientHeight/2, so a projection of any length resolves
+     rowC0 + n·rowH − halfH, so a projection of any length resolves
      analytically instead of by walking 77 elements. */
   const rowC0 = useRef(0);
+  /* HALF THE SCROLLPORT, and there is exactly one of it now. This used to be
+     spelled two ways: `clientHeight / 2` in render()/snapTop() and
+     `getBoundingClientRect().height / 2` in selectEl(). clientHeight is an
+     integer, the rect is not — measured at 1440×900 they read 293 and 292.5,
+     which put a clicked row and a stepped-to row on grids a quarter-pixel
+     apart (n·58.5 against −0.25 + n·58.5). At dpr 2 snapToDevice rounded the
+     difference away; at dpr 1 the same name seated differently depending on
+     how you reached it. The band is centred on the BORDER box — its centre
+     minus the scroller's rect centre measures 0.000 — so the rect is the
+     honest one and the integer paths were the ones drifting. Cached in
+     measure() because render() must stay at zero layout reads per frame. */
+  const halfH = useRef(0);
   const shaded = useRef<{ lo: number; hi: number }>({ lo: 0, hi: -1 });
 
   const drag = useRef<{
@@ -359,8 +371,22 @@ export default function RestaurantsShowcase() {
   } | null>(null);
   /* set the moment a drag commits and cleared on the next frame after the
      gesture ends — it is what stops the pointerup that finished a 200px
-     throw from also counting as a click on whichever name it landed under */
+     throw from also counting as a click on whichever name it landed under.
+
+     THE "NEXT FRAME" HALF USED TO BE A LIE, and it cost a tap: the flag was
+     only ever cleared inside onClickCapture, i.e. only if a click actually
+     arrived. On touch, the preventDefault() this file calls on pointermove
+     suppresses the compatibility click in some engines — so the flag
+     survived the gesture and swallowed the NEXT genuine tap, leaving the
+     wheel sitting off-grid with no second net behind it. endDrag now arms
+     the frame-later clear as well; the click-time clear stays, because the
+     swallow is still one-shot and the click still has to be eaten before the
+     button's own handler sees it. */
   const dragged = useRef(false);
+  /* the rAF id of that one-shot clear, kept ONLY so unmount can cancel it.
+     It is deliberately not `raf` — that ref is the motion loop's latch (see
+     below) and writing a second id into it wedges the wheel shut. */
+  const dragClear = useRef(0);
 
   /* A reduced-motion reader gets a DIFFERENT wheel, not this one with the
      animation stripped out: native scrolling, no pointer drag, no wheel
@@ -422,11 +448,12 @@ export default function RestaurantsShowcase() {
         change a pixel. Only the live window is written; rows that have just
         left it are pushed to the floor once and then left alone. */
   const render = useCallback(() => {
-    const root = scrollerRef.current;
     const unit = rowH.current;
-    if (!root || !unit) return;
+    if (!scrollerRef.current || !unit) return;
 
-    const center = pos.current + root.clientHeight / 2;
+    // halfH, not clientHeight: one grid for the whole component (see the ref)
+    // and, just as importantly, no layout read on this path
+    const center = pos.current + halfH.current;
     const fi = (center - rowC0.current) / unit; // fractional row index at centre
     const mid = Math.round(fi);
     const items = itemRefs.current;
@@ -539,10 +566,9 @@ export default function RestaurantsShowcase() {
      for a projection of any length, including one that runs past the ends of
      the 77 rendered rows — the copy recentring in write() folds it back. */
   const snapTop = useCallback((p: number) => {
-    const root = scrollerRef.current;
     const r = rowH.current;
-    if (!root || !r) return p;
-    const base = rowC0.current - root.clientHeight / 2;
+    if (!r) return p;
+    const base = rowC0.current - halfH.current;
     return snapToDevice(base + Math.round((p - base) / r) * r);
   }, []);
 
@@ -575,10 +601,19 @@ export default function RestaurantsShowcase() {
     [kick, render, write],
   );
 
-  // snap whatever we are nearest to, dead centre
+  /* Snap whatever we are nearest to, dead centre.
+
+     MEASURED FROM THE TARGET WHEN ONE IS LIVE, exactly as step() is and for
+     the same reason. This is a safety net that can now fire while a spring
+     is still travelling (see onUp), and snapping from `pos` in that state
+     seats whichever row happens to be passing under the band right now —
+     the net would steal the destination it was meant to protect. Reading
+     targetTop instead makes it idempotent: a spring already aimed at a snap
+     point is re-aimed at exactly the same one. */
   const settleNow = useCallback(() => {
     if (mode.current === "drag") return; // the finger is still in charge
-    glideTo(snapTop(pos.current));
+    const from = mode.current === "spring" ? targetTop.current : pos.current;
+    glideTo(snapTop(from));
   }, [glideTo, snapTop]);
 
   const scheduleSettle = useCallback(() => {
@@ -593,12 +628,16 @@ export default function RestaurantsShowcase() {
     clearTimeout(settle.current);
     const rootRect = root.getBoundingClientRect();
     const c = rowCenter(el, rootRect.top, root.scrollTop);
-    glideTo(snapToDevice(c - rootRect.height / 2));
+    glideTo(snapToDevice(c - halfH.current));
   };
 
   /* Step one restaurant. Measured from the TARGET when one is live, so a
      reader tapping the chevron four times quickly travels four names rather
-     than four times the same partial distance. */
+     than four times the same partial distance.
+
+     The whole sum is device-snapped, not just snapTop's half of it: rowH is
+     fractional wherever --row is (58.5px at 768), so adding it to an
+     already-rounded base put the target back off the device grid. */
   const step = useCallback(
     (dir: number) => {
       const root = scrollerRef.current;
@@ -606,7 +645,7 @@ export default function RestaurantsShowcase() {
       clearTimeout(settle.current);
       const from =
         mode.current === "spring" ? targetTop.current : pos.current;
-      glideTo(snapTop(from) + dir * rowH.current);
+      glideTo(snapToDevice(snapTop(from) + dir * rowH.current));
     },
     [glideTo, snapTop],
   );
@@ -699,15 +738,38 @@ export default function RestaurantsShowcase() {
     const root = scrollerRef.current;
     if (!root) return;
 
+    /* THE ONE WAY OUT of a gesture, whichever way it ended. Everything a
+       release has to undo lives here so no exit can forget half of it. */
     const endDrag = (d: NonNullable<typeof drag.current>) => {
       drag.current = null;
       if (root.hasPointerCapture(d.id)) root.releasePointerCapture(d.id);
       root.removeAttribute("data-dragging");
+      /* "the finger is in charge" has to end WITH the finger. settleNow()
+         declines to act while mode is "drag" and every caller below is about
+         to ask it to — onCancel did already, and got a silent no-op plus a
+         rAF loop with nothing left to animate, spinning on a frozen `pos`
+         until the next input. onUp's live branch overwrites this with
+         "spring" on the very next lines, so the momentum path is unchanged. */
+      if (mode.current === "drag") mode.current = "idle";
+      /* Make the sentence on `dragged` true: the swallow expires one frame
+         after the gesture, not "whenever a click finally turns up". The
+         click this gesture produced still arrives first — it is dispatched
+         in the same task as the pointerup — so the one-shot still lands. */
+      cancelAnimationFrame(dragClear.current);
+      dragClear.current = requestAnimationFrame(() => {
+        dragClear.current = 0;
+        if (!drag.current) dragged.current = false; // a fresh gesture owns it
+      });
     };
 
     const onDown = (e: PointerEvent) => {
       if (reduced.current) return;
       if (e.pointerType === "mouse" && e.button !== 0) return;
+      /* A press while a gesture is still open means we never heard the last
+         release — see the buttons check in onMove for how that happens. The
+         new press is the truth; abandon the old gesture outright rather than
+         letting two of them share one set of anchors. */
+      if (drag.current) endDrag(drag.current);
       clearTimeout(settle.current);
       dragged.current = false;
       // adopt what is ON SCREEN, then drop the spring
@@ -727,6 +789,21 @@ export default function RestaurantsShowcase() {
     const onMove = (e: PointerEvent) => {
       const d = drag.current;
       if (!d || e.pointerId !== d.id) return;
+
+      /* A RELEASE WE WERE NEVER TOLD ABOUT. Before the gesture commits there
+         is no pointer capture — that is the whole point of the threshold —
+         so a button let go outside the window delivers neither pointerup nor
+         pointercancel and `drag.current` is left standing. The id check above
+         cannot see it: a mouse always reports pointerId 1, so the next
+         button-less move back over the scroller matched the corpse and
+         dragged the list with no button held. `buttons` is the only witness,
+         and only for a mouse — a finger reports 0 while it is still down. */
+      if (e.pointerType === "mouse" && e.buttons === 0) {
+        endDrag(d);
+        settleNow();
+        return;
+      }
+
       const dy = e.clientY - d.y0;
       const dx = e.clientX - d.x0;
 
@@ -762,7 +839,28 @@ export default function RestaurantsShowcase() {
       const live = d.live;
       endDrag(d);
       if (!live) {
-        mode.current = "idle";
+        /* A TAP — AND THE ONE PATH IN THIS MACHINE THAT USED TO END WITH THE
+           WHEEL OFF-GRID. It forced mode to "idle" here, which killed
+           whatever spring was running wherever it had reached. There nearly
+           always IS one: onDown cancels the pending settle and drops the
+           spring, then Chrome focuses the pressed button and onFocusIn →
+           selectEl starts a fresh one — so the release was aiming a spring
+           and then shooting it. The click that follows normally calls
+           selectEl again and rescues the seat, which is why this only ever
+           showed up when no click arrived: press in the dead strip to the
+           right of a short name (the scroller is `max-content`, sized to
+           "Café Mama & Sons", so a shorter row leaves 140–170px that looks
+           like list and has no button under it) and the wheel froze off-grid
+           permanently — measured 27px off, and 1000 frames later still 27px
+           off. Half a row is the bound; a 167ms press measured −26px.
+
+           So: leave the mode alone — a tap started no spring of its own and
+           a focus spring has every right to finish — and re-arm the settle
+           onDown cancelled. The happy path is untouched, because selectEl
+           clears this timer first: a press that does reach a name cancels
+           the net before it can fire, and one that reaches nothing gets
+           snapped 130ms later instead of never. */
+        scheduleSettle();
         return;
       }
 
@@ -803,7 +901,11 @@ export default function RestaurantsShowcase() {
        the button's own handler runs — and it swallows exactly ONE click, the
        one this gesture produced. Leaving the flag up for the length of the
        glide would eat a real click made while the list was still coasting,
-       which is the interruption the whole model is built to welcome. */
+       which is the interruption the whole model is built to welcome.
+
+       This is no longer the only place the flag is lowered — endDrag arms a
+       frame-later clear for the gestures that never produce a click at all —
+       but it is still the one that runs in time to be one-shot. */
     const onClickCapture = (e: MouseEvent) => {
       if (!dragged.current) return;
       dragged.current = false;
@@ -822,8 +924,11 @@ export default function RestaurantsShowcase() {
       root.removeEventListener("pointerup", onUp);
       root.removeEventListener("pointercancel", onCancel);
       root.removeEventListener("click", onClickCapture, true);
+      // the swallow's one-shot must not outlive the listeners that arm it
+      cancelAnimationFrame(dragClear.current);
+      dragClear.current = 0;
     };
-  }, [kick, settleNow, snapTop]);
+  }, [kick, scheduleSettle, settleNow, snapTop]);
 
   /* ---- keyboard ----
      The names are real buttons and Tab/Enter already worked; this adds the
@@ -856,6 +961,12 @@ export default function RestaurantsShowcase() {
       const li = root.querySelector("li");
       rowH.current = li?.getBoundingClientRect().height ?? 0;
       copyH.current = rowH.current * N;
+      /* THE OTHER HALF OF THE GRID, and the same rect the rows are measured
+         against — border-box and fractional, which is what the selection
+         band is centred on. Every centring path reads this one number; see
+         the ref for the two-grid drift it replaced. */
+      const rootRect = root.getBoundingClientRect();
+      halfH.current = rootRect.height / 2;
       root.scrollTop = snapToDevice(MID * copyH.current); // park on the middle copy
       pos.current = root.scrollTop;
       targetTop.current = pos.current;
@@ -864,7 +975,7 @@ export default function RestaurantsShowcase() {
       if (li) {
         rowC0.current = rowCenter(
           li.firstElementChild as HTMLElement,
-          root.getBoundingClientRect().top,
+          rootRect.top,
           root.scrollTop,
         );
       }
@@ -892,16 +1003,6 @@ export default function RestaurantsShowcase() {
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, []);
 
-  /* ---- the actions arrive ----
-     Selection changes, and Visit / Book / Menu rise the last 10px into place
-     rather than blinking to the new restaurant. Critically damped with a
-     ~360ms response: a control that springs past its position and comes back
-     reads as unserious on something you are about to click.
-
-     `useAnimationControls` rather than a `key` remount, deliberately. A
-     remount on every selection would drop focus out of whichever action a
-     keyboard reader was on the instant the wheel moved. The DOM identity
-     stays; only transform and opacity are touched. */
   /* ---- the film follows the CHOICE, not the blur ----
 
      VideoBackdrop mounts a fresh <video> with a new src every time this
@@ -914,22 +1015,76 @@ export default function RestaurantsShowcase() {
 
      140ms of quiet before the film commits. Below the threshold at which a
      background crossfade reads as lagging the name, and long enough that a
-     throw loads ONE clip instead of five. The name, the actions and the
-     selection band all still track `active` on the frame it changes — this
-     delays the film and nothing else. */
-  const [filmFor, setFilmFor] = useState(0);
+     throw loads ONE clip instead of five.
+
+     THIS TIMER NOW SPEAKS FOR THE ACTIONS TOO, and the sentence that used to
+     stand here — "the name, the actions and the selection band all still
+     track `active` on the frame it changes; this delays the film and nothing
+     else" — is no longer true of the actions' ENTRANCE. Their labels and
+     hrefs still track `active` on the frame it changes, and must: a pill
+     reading "Visit Bintang" while the band is on Bunso is a lie about what
+     you are about to click. It is only the arrival animation that waits for
+     the wheel to stop. The name and the band are untouched.
+
+     TWO THINGS COME OUT OF THE ONE TIMER because they are two different
+     questions. `settledOn` is WHICH venue has been settled on — the film's
+     src, which must not churn when the answer has not changed. `quiet` is
+     THAT the wheel went still, counted rather than compared, because the
+     answer can be the same venue as last time and the actions still need to
+     hear about it: a flick out to Bintang and back inside 140ms unmounts and
+     remounts Book/Menu, and a remounted pill carries `initial: opacity 0`
+     with no animation of its own. Keyed on the venue alone, that pill would
+     never be told to arrive. */
+  const [settledOn, setSettledOn] = useState(0);
+  const [quiet, setQuiet] = useState(0);
   useEffect(() => {
-    const t = window.setTimeout(() => setFilmFor(active), 140);
+    const t = window.setTimeout(() => {
+      setSettledOn(active);
+      setQuiet((n) => n + 1);
+    }, 140);
     return () => clearTimeout(t);
   }, [active]);
-  const film = RESTAURANTS[filmFor];
+  const film = RESTAURANTS[settledOn];
 
+  /* ---- the actions arrive, ONCE THE WHEEL HAS STOPPED ----
+     Visit / Book / Menu rise the last 10px into place rather than blinking to
+     the new restaurant. Critically damped with a ~360ms response: a control
+     that springs past its position and comes back reads as unserious on
+     something you are about to click.
+
+     IT RUNS ON THE QUIET, NOT ON `active`. Wired to `active` this reset the
+     pills to invisible and replayed the whole entrance for every name the
+     wheel crossed — a flick over five names strobed them through five
+     entrances, which is most of what "the buttons fly in from nowhere" was.
+     While the list is moving the pills are now left exactly where they are,
+     at rest, with their labels swapping under the reader.
+
+     `useAnimationControls` rather than a `key` remount, deliberately. A
+     remount on every selection would drop focus out of whichever action a
+     keyboard reader was on the instant the wheel moved. The DOM identity
+     stays; only transform and opacity are touched.
+
+     THE DEPENDENCY LIST CARRIES `active` FOR THE REDUCED-MOTION BRANCH ALONE.
+     That path animates nothing — it puts the pills at rest on the frame they
+     mount — so it must not wait 140ms to do it, and running it again on a
+     name change costs nothing. The latch below is what keeps the animated
+     path off that trigger. */
   const actionsCtl = useAnimationControls();
+  /* SEEDED TO THE FIRST `quiet`, NOT TO -1, so the pills arrive once. The
+     mount arms the same 140ms timer everything else does, so a latch that
+     fired on mount would be overtaken 140ms later by that first quiet tick —
+     the entrance would start, be reset to invisible a fifth of a second in,
+     and play again. The pills now sit at their `initial` for that one quiet
+     interval and rise exactly once, on the same signal every later arrival
+     uses. */
+  const arrived = useRef(0);
   useEffect(() => {
     if (reduced.current) {
       actionsCtl.set({ opacity: 1, y: 0 });
       return;
     }
+    if (arrived.current === quiet) return; // an `active` change, not a settle
+    arrived.current = quiet;
     actionsCtl.set({ opacity: 0, y: 10 });
     actionsCtl.start((i: number) => ({
       opacity: 1,
@@ -941,7 +1096,7 @@ export default function RestaurantsShowcase() {
         delay: i * 0.05,
       },
     }));
-  }, [active, actionsCtl]);
+  }, [active, quiet, actionsCtl]);
 
   const item = RESTAURANTS[active];
 
@@ -982,7 +1137,7 @@ export default function RestaurantsShowcase() {
       <section className={styles.hero} data-nav-theme="blend">
         {/* full-bleed background; the active restaurant's clip crossfades in */}
         <div className={styles.bg} aria-hidden>
-          {/* `film`, not `item` — see the note by filmFor: the clip commits
+          {/* `film`, not `item` — see the note by settledOn: the clip commits
               140ms after the list settles so a flick loads one video and not
               one per name it flew past. */}
           <VideoBackdrop src={film.video} className={styles.bgVideo} />

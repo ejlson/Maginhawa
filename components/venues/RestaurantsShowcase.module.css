@@ -9,7 +9,15 @@
      the cap-height→baseline ink block sits equidistant from the two
      hairlines (measured at the glyph level via canvas TextMetrics).
      Em-based → identical for every name, no jitter between selections.
-     Tune this one value. */
+
+     ⚠️ THIS IS NOW THE FALLBACK, NOT THE MECHANISM, and "tune this one
+     value" is no longer the advice. One em constant cannot centre eight
+     names: it lifts the line box, and a name with a descender therefore
+     reads ~4px lower than one without (measured spread 4.7px). Browsers
+     that support `text-box` trim the cap band instead and ignore this — see
+     the @supports block on .name, which also records why no constant typed
+     here can be trusted. Retuning this changes what Firefox sees and
+     nothing else. */
   --wheel-name-nudge: -0.095em;
 }
 
@@ -658,12 +666,18 @@
   padding-block: calc(var(--row) * 2);
 }
 
+/* the fixed pitch the JS snap grid is measured from — rowH is this box's
+   rect height, so nothing inside a row may change its height */
 .row {
   height: var(--row);
   display: grid;
   align-items: center;
   justify-items: start;
-  scroll-snap-align: center;
+  /* ⚠️ NO `scroll-snap-align` HERE. It was, and it did nothing: snapping is
+     opted into by the SCROLL CONTAINER via scroll-snap-type, there is none
+     anywhere in this tree, and the property does not inherit down to one.
+     The wheel's snapping is the spring in RestaurantsShowcase.tsx — a
+     scroll-snap-type on .scroller would fight it, not help it. */
 }
 
 .name {
@@ -709,23 +723,113 @@
   outline: 1px solid color-mix(in srgb, var(--cream) 67%, transparent);
   outline-offset: 4px;
 }
+
+/* OPTICAL CENTRING, DERIVED FROM THE FACE THAT ACTUALLY LOADS.
+   --wheel-name-nudge is one constant for eight names and it cannot be right
+   for all of them, because what it lifts is the LINE BOX and the line box
+   carries descender space most of these names never use. Measured at the
+   rendered face, ink-centre against band-centre: Bintang +2.36 and Belly
+   +1.81 sit low, Café Mama & Sons −2.33 and Hoodwood −2.24 sit high — a
+   4.7px spread that tracks exactly whether the name has a g or a y in it.
+   The line box itself is identical for all eight (resting text-centre offset
+   −3.191px everywhere, i.e. precisely the authored −0.095em), so there is no
+   em constant that fixes this; it is descender ink.
+
+   `trim-both cap alphabetic` centres the CAP BAND instead — baseline to cap
+   height — which every one of the eight shares. It also reads the metrics
+   off whatever face the browser actually resolved, and that matters here
+   more than usual: the nudge was tuned against metrics attributed to
+   Contralto, but --font-display-small resolves to FreightBig Pro and the
+   Typekit `freight-big-pro` family is genuinely unavailable to this site (it
+   measures identically to `serif`). A local copy renders on the machine it
+   was tuned on; a visitor gets a different face. No hand-typed constant can
+   be verified against a face you cannot see — a derived trim can.
+
+   PURE PROGRESSIVE ENHANCEMENT. Firefox and older Safari fall through to the
+   nudge above, unchanged and still correct-ish for them. Do NOT retune that
+   constant to match what you see here. The trim changes the button's box
+   only; .row keeps its explicit `height: var(--row)`, which is the box the
+   JS measures, so the snap grid does not move. */
+@supports (text-box: trim-both cap alphabetic) {
+  .name {
+    text-box: trim-both cap alphabetic;
+    /* the trimmed box IS the cap band — lifting it as well double-counts */
+    top: 0;
+  }
+}
+
 .nameActive {
   font-weight: var(--w-medium);
 }
 
 /* ---- per-restaurant actions beside the wheel ---- */
+/* ---- THE COLUMN IS SIZED FOR THREE ACTIONS EVEN WHEN IT RENDERS ONE ----
+
+   Not every venue has three. All eight have a `website`, four have a
+   `bookingUrl` and only some have a menu, so this box renders 3 children for
+   Bintang and 1 for Bunso. It used to shrink-wrap them, and .panel centres it,
+   so the box's own height swung between 125.4px and 35.8px and its top jumped
+   44.8px (387.3 → 432.1, measured at 1440×900) on the same frame a button
+   unmounted and the survivors were re-fired from `opacity: 0, y: 10`. A box
+   changing size under an entrance is what read as the pills "flying in".
+
+   THE HEIGHT IS DERIVED, NOT TYPED. Three pills plus the two gaps between
+   them, where a pill is its own line box plus its own padding and border —
+   the same declarations .actBtn uses below, so the two cannot drift. Setting
+   `font-size` to the pill's token is what makes `1lh` and `em` here mean what
+   they mean down there. (A browser without the `lh` unit drops the whole
+   declaration and gets today's shrink-wrap back — the degradation is the old
+   behaviour, not a broken layout.)
+
+   `flex-start`, NOT `center`, AND THE DIFFERENCE IS THE WHOLE POINT. Reserving
+   the height stops the BOX resizing; only the anchor stops the PILLS moving.
+   Centred, the group re-centres inside its own reserve exactly as it used to
+   re-centre inside the panel — a lone Visit lands where the middle of three
+   sits, so the first pill still travels 44.8px between a three-action venue
+   and a one-action one, which is the jump this rule exists to remove.
+   Anchored to the top, each action keeps one slot:
+
+     Visit  slot 1, all 8 venues                     — never moves
+     Book   slot 2, the 4 with a bookingUrl          — never moves
+     Menu   slot 2 or 3, depending on that bookingUrl
+
+   THE COST, STATED SO IT IS NOT REDISCOVERED AS A BUG. Bunso is the only
+   venue with neither a bookingUrl nor menuPages, so its lone Visit pill sits
+   at the top of the reserve, 44.8px above the wheel's centre line rather than
+   level with it. That is one venue reading slightly high against eight venues
+   reading still, and stillness won.
+
+   MENU IS THE ONE ACTION STILL FREE TO SHIFT — slot 3 behind a Book, slot 2
+   without one, so it moves 44.8px between the bookable four and the walk-in
+   rooms. Ordering Menu ahead of Book in the JSX would pin all three (Visit /
+   Menu / Book, and the only venue missing Menu is also missing Book), which
+   is a zero-movement column for the price of demoting a reservation below a
+   menu. That is a hierarchy decision, not a layout one, so it is written down
+   here rather than taken quietly. */
 .actions {
   flex: 0 0 auto;
   display: flex;
   flex-direction: column;
   align-items: flex-start;
-  gap: clamp(8px, 1vh, 12px);
+  justify-content: flex-start;
+  /* the pill's own metrics, named once so the reserve can be built from them */
+  --act-pad-y: 0.6em;
+  --act-border: 1px;
+  --act-gap: clamp(8px, 1vh, 12px);
+  gap: var(--act-gap);
+  font-size: var(--t-label);
+  min-height: calc(
+    3 * (1lh + 2 * var(--act-pad-y) + 2 * var(--act-border)) + 2 *
+      var(--act-gap)
+  );
 }
 .actBtn {
   display: inline-flex;
   align-items: center;
   gap: var(--lockup-gap-sm);
-  padding: 0.6em 1.3em;
+  /* the fallbacks are the authored values, kept literal for a stray .actBtn
+     outside .actions — there is none today */
+  padding: var(--act-pad-y, 0.6em) 1.3em;
   /* the pill's edge is the only thing drawing this button — background is
      `none` — so it is the boundary 1.4.11 means. 0.5 -> 0.56 on the same
      ×1.115. Measured 2.52:1 with the old literal. NOTE the sibling
@@ -733,7 +837,8 @@
      never one of the stranded literals; matching them by substring picks it
      first, which is how a first pass at this measured a migration that had
      already happened. */
-  border: 1px solid color-mix(in srgb, var(--cream) 56%, transparent);
+  border: var(--act-border, 1px) solid
+    color-mix(in srgb, var(--cream) 56%, transparent);
   border-radius: 999px;
   background: none;
   color: var(--cream);
