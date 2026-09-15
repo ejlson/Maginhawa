@@ -96,7 +96,6 @@
   "94": "probe-cta-instances.mjs",
   "95": "page.tsx",
   "96": "compress-media.mjs",
-  "97": "About.tsx",
   "98": "seek-offset-search.mjs",
   "99": "PillCta.tsx",
   "100": "getRestaurant",
@@ -115,7 +114,6 @@
   "113": "page.tsx",
   "114": "page.tsx",
   "115": "probe-passage.mjs",
-  "116": "PressWall.tsx",
   "117": "PressWall.tsx",
   "118": "probe-screencast-control.mjs",
   "119": "shoot-reveal-filmstrip.mjs",
@@ -136,7 +134,6 @@
   "134": "probe-passage-setting.mjs",
   "135": "page.tsx",
   "136": "dependencies",
-  "137": "Spines.tsx",
   "138": "VenueCard.tsx",
   "139": "probe-mark-ink.mjs",
   "140": "page.tsx",
@@ -208,6 +205,5 @@
   "206": "probe-loadergate.mjs",
   "207": "page.tsx",
   "208": "SplitWords.tsx",
-  "209": "shoot-sections.mjs",
-  "210": "probe-join-band-width.mjs"
+  "209": "shoot-sections.mjs"
 }
