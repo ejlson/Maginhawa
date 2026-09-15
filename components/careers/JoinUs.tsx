@@ -21,7 +21,7 @@ import Reveal from "@/components/ui/Reveal";
 import SplitWords from "@/components/ui/SplitWords";
 import styles from "./JoinUs.module.css";
 import { asset } from "@/lib/media";
-import { JOBS, type JobOpening } from "@/lib/jobs";
+import { JOBS, jobTypeLabel, type JobOpening } from "@/lib/jobs";
 import { lenisRef } from "@/lib/SmoothScroll";
 
 const PILLARS = [
@@ -1241,7 +1241,7 @@ export default function JoinUs() {
                               doing structural work it cannot do. See
                               `.roleTags` for the type argument. */}
                           <span className={styles.roleTags}>
-                            <span className={styles.roleTag}>{job.type}</span>
+                            <span className={styles.roleTag}>{jobTypeLabel(job)}</span>
                             <span className={styles.roleTag}>{job.area}</span>
                           </span>
                           <span
@@ -1305,7 +1305,7 @@ export default function JoinUs() {
                           read as one hierarchy. */}
                       <h3 className={styles.rolePaneTitle}>{job.title}</h3>
                       <p className={styles.rolePaneMeta}>
-                        {job.restaurantName} · {job.location} · {job.type}
+                        {job.restaurantName} · {job.location} · {jobTypeLabel(job)}
                       </p>
                       <RoleDetail
                         job={job}

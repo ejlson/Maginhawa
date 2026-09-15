@@ -532,7 +532,7 @@ filled.
   restaurantSlug: "belly",              // optional; matches lib/restaurants.ts
   restaurantName: "Belly",
   location: "Kentish Town, London",
-  type: "Full-time",                    // Full-time | Part-time | Casual
+  type: "Full-time",                    // Full-time | Part-time | Casual, or a list: ["Full-time", "Part-time"]
   area: "Kitchen",                      // Kitchen | Front of House | Bar | Group
   summary: "One or two sentences — this is the line on the listing card.",
   responsibilities: [

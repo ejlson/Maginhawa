@@ -1,9 +1,19 @@
 import type { Metadata } from "next";
 import JoinUs from "@/components/careers/JoinUs";
-import { JOBS } from "@/lib/jobs";
+import { JOBS, jobTypes, type EmploymentType } from "@/lib/jobs";
 import { SITE_URL } from "@/lib/site";
 import { ogImage, OG_W, OG_H } from "@/lib/media";
 import { StructuredData } from "@/lib/StructuredData";
+
+// One schema.org value per type, and a list only when a role is offered on
+// more than one basis, so single-type postings serialise exactly as before.
+// Casual -> CONTRACTOR is the existing mapping (known wrong, out of scope).
+function schemaEmploymentType(types: EmploymentType[]) {
+  const values = types.map((t) =>
+    t === "Full-time" ? "FULL_TIME" : t === "Part-time" ? "PART_TIME" : "CONTRACTOR",
+  );
+  return values.length === 1 ? values[0] : values;
+}
 
 // Schema.org ItemList of open JobPostings — Google can lift this into the
 // careers job search panel and AI search summaries.
@@ -20,8 +30,7 @@ const jsonLd = {
       "@type": "JobPosting",
       title: j.title,
       description: j.summary,
-      employmentType:
-        j.type === "Full-time" ? "FULL_TIME" : j.type === "Part-time" ? "PART_TIME" : "CONTRACTOR",
+      employmentType: schemaEmploymentType(jobTypes(j)),
       hiringOrganization: {
         "@type": "Organization",
         name: "Maginhawa Group",
@@ -44,13 +53,13 @@ export const metadata: Metadata = {
   // the route, the nav item and the page title now all say the same word
   title: "Careers",
   description:
-    "Open positions across the Maginhawa Group — kitchens, front of house, bar and the small Camden HQ behind the restaurants.",
+    "Open positions across the Maginhawa Group's restaurants in Kentish Town and Soho, London. See what each role involves and how to apply.",
   alternates: { canonical: "/careers" },
   openGraph: {
     type: "website",
     title: "Careers — Maginhawa Group",
     description:
-      "Hiring across seven restaurants and a small Camden HQ — kitchens, front of house, bar, and the team behind the scenes.",
+      "Join the teams at the Maginhawa Group's restaurants in Kentish Town and Soho, London.",
     url: "/careers",
     images: [
       {
