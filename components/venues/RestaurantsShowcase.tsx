@@ -137,8 +137,8 @@ const RESTAURANTS = [
     // footage, and it is what the home grid's hover has been playing all
     // along. The two surfaces show the same room now.
     name: "Bunso",
-    tag: "Filipino-Japanese Kissaten Listening Jazz Bar",
-    location: "London",
+    tag: "Filipino-Inspired All-Day Restaurant",
+    location: "Kentish Town, London",
     video: "/videos/bunso-bakery.mp4",
   },
 ];
