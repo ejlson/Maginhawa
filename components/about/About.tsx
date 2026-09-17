@@ -133,7 +133,7 @@ const CHAPTERS: {
   {
     year: "2026",
     title: "Bunso",
-    body: "The youngest of the family: a Filipino-Japanese kissaten and listening jazz bar, opening in London in 2026.",
+    body: "The youngest of the family: a Filipino-inspired all-day restaurant opening in Kentish Town, London. Bakery by day, Pizza by night.",
     /* ⚠️ `-shopfront`, AND THE SUFFIX IS LOAD-BEARING — this row read
        /images/bunso.png, the 670x141 wordmark, and rendered as the
        coming-soon maroon field instead of a picture. The photograph cannot
