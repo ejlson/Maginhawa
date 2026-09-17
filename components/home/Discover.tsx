@@ -223,7 +223,7 @@ const DISPLAY: Record<string, DiscoverDisplay> = {
     tag: "The Youngest of the Family",
     location: "1a Hawley Rd, London NW1 8RP",
     blurb:
-      "Bunso — 'the youngest' - is the newest member of the Maginhawa family. Full details, menu and location coming soon.",
+      "The youngest of the family: a Filipino-inspired all-day restaurant opening in Kentish Town, London. Bakery by day, Pizza by night.",
     clip: "/videos/tile-bunso-2026.mp4",
   },
 };
