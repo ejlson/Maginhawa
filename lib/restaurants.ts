@@ -230,7 +230,7 @@ export const RESTAURANTS: Restaurant[] = [
     tagline: "The Youngest of the Family",
     cuisine: "Filipino",
     description:
-      "Bunso — 'the youngest' — is the newest member of the Maginhawa family. Full details, menu and location coming soon.",
+      "The youngest of the family: a Filipino-inspired all-day restaurant opening in Kentish Town, London. Bakery by day, Pizza by night.",
     location: "Kentish Town, London",
     /* `-shopfront`, because Cloudinary public ids drop the extension: this
        was /images/bunso.jpg, which collided with the /images/bunso.png
