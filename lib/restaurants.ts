@@ -60,7 +60,7 @@ export const RESTAURANTS: Restaurant[] = [
     tagline: "Filipino Fusion Restaurant",
     cuisine: "Filipino · Fusion",
     description:
-      "A Kentish Town mainstay pairing Filipino classics with a fusion kitchen — long-standing favourite of the Maginhawa family.",
+      "A Kentish Town mainstay pairing Filipino classics with a fusion kitchen - long-standing favourite of the Maginhawa family.",
     location: "Kentish Town, London",
     // split from the string Discover's index already carried — derived, not
     // sourced afresh, so the two can be diffed against each other

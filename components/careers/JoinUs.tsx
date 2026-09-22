@@ -223,8 +223,11 @@ const INTRO_ENDS_AT = Math.max(SPLIT_ENDS_AT, STAND_ENDS_AT);
    centre if the two lines are the same height and the two margins are the
    same, and neither is guaranteed by anything. So the picture rides the
    GAP'S OWN CENTRE (`pullFrom`, measured) and its scale is clamped by a hard
-   CEILING equal to the clearance the lines have actually opened. Overlap is
-   then impossible by construction rather than by tuning.
+   CEILING: the clearance the lines have actually opened, as a fraction of
+   the clearance they open to. The picture then keeps at least SPLIT_AIR off
+   each line, or the settled composition's own clearance where that is the
+   less — which the stylesheet owns via `--band-air` — by construction
+   rather than by tuning.
 
    SPLIT_SEED  the size it is born at. Almost irrelevant in practice: the
                ceiling is tighter than the curve for the first third of the
@@ -238,12 +241,17 @@ const INTRO_ENDS_AT = Math.max(SPLIT_ENDS_AT, STAND_ENDS_AT);
                the same frame.
    SPLIT_DAWN
    SPLIT_LIT   the slice of progress the picture fades up over.
-   SPLIT_AIR   the air the ceiling keeps above and below. Measured against
-               the WORD MASKS, not the line boxes: SplitWords pads its clip
-               window out by 0.14em top and bottom precisely because these
-               display line-heights are below 1 and the glyphs overflow the
-               line box — so the line box is 28px optimistic at 100px type
-               and the mask box is the real ink boundary. */
+   SPLIT_AIR   the air the ceiling keeps above and below on the film's first
+               frame — the ceiling crosses zero at q = 2·SPLIT_AIR / gapRest.
+               Measured against `inkBox()`'s FATTENED box, not the word
+               masks: the mask's 0.30em clip padding is peeled off and the
+               type's own overshoot put back, see INK_OVERSHOOT_EM. It holds
+               on every ceiling-bound frame only where the band fits with
+               that air to spare (phones); elsewhere the settled `--band-air`
+               is the floor. For these caps the ink facing the film sits
+               INSIDE the line box — ~0.06em above line 1's bottom, ~0.19em
+               below line 2's top, at 1512 — so the fat box is a margin
+               around the ink, not the ink. */
 const SPLIT_SEED = 0.06;
 const SPLIT_BIAS = 1.15;
 const SPLIT_DAWN = 0.04;
@@ -493,9 +501,9 @@ function RoleDetail({ job, onApply }: { job: JobOpening; onApply: () => void }) 
 
 const clamp01 = (v: number) => (v < 0 ? 0 : v > 1 ? 1 : v);
 
-/** The union of a line's word-mask boxes — the real ink boundary. See
- *  SPLIT_AIR: SplitWords pads its clip window past the line box, so the line
- *  box is the wrong rectangle to keep a photograph out of. */
+/** The union of a line's word-mask content boxes ± INK_OVERSHOOT_EM — a
+ *  fattened ink box, not the real ink. Falls back to the element's own box
+ *  when SplitWords renders no masks (reduced motion). */
 /* How far the display face's glyphs actually overflow their line box, per
    side, in em. These lines run `line-height: 0.98`, so the box is optimistic
    and the ink stands proud of it — measured at ~0.14em each side at this size.
@@ -759,13 +767,26 @@ export default function JoinUs() {
             measured offset at p = 0 and the term is zero at p = 1 — and the
             seam's centre is linear in p by construction, so the two agree at
             every frame in between rather than approximately.
-     scale  the growth curve, under a hard CEILING of the clearance the lines
-            have actually opened, less its air. Centred on that same
-            clearance, a photograph at or under this ceiling literally cannot
-            reach either line. The guarantee is geometric, not a tuning —
-            which is the point, because a contact sheet cannot catch a
-            one-frame intrusion and this is measured per frame in
-            scripts/probe-join-split.mjs. */
+     scale  the growth curve, under a hard CEILING: the clearance the lines
+            have actually opened, less its air, as a fraction of the settled
+            clearance less the same air — or of the band's height, where
+            that is the smaller. It is exactly 1 as the split lands, so the
+            film rests at the band's full measure, edges on the corner
+            labels and the grid margins, `transform: none`. DIVIDING BY THE
+            BAND'S HEIGHT ALONE rests below 1 whenever `--band-air` is under
+            0.14em + SPLIT_AIR, which it has been since dc1dd8c halved it:
+            the film settled at 0.949–0.968, 25–32px inside the labels. The
+            settled gap is a safe divisor because `inkBox()` is already fat
+            — for these caps ~0.20em past line 1's real ink and ~0.33em past
+            line 2's — so a film filling its band touches neither. Still
+            geometric, not a tuning: each side's air on every frame is at
+            least the smaller of SPLIT_AIR and the settled air. Where the
+            old ceiling fell short (≥ 768px) the film is never nearer a
+            line than at rest; at phone sizes SPLIT_AIR still binds, 1–2.5px
+            tighter mid-split, unchanged. The ceiling holds to progress
+            ≈ 0.35–0.46; after that SPLIT_BIAS's curve is the smaller and
+            trails the gap by ≤ ~3.7px a side before landing on 1. Measured
+            per frame in scripts/probe-join-band-width.mjs. */
   const frameY = useTransform(split, (p) =>
     geom ? geom.pullFrom * (1 - clamp01(p)) : 0,
   );
@@ -773,9 +794,10 @@ export default function JoinUs() {
     const q = clamp01(p);
     const want = SPLIT_SEED + (1 - SPLIT_SEED) * Math.pow(q, SPLIT_BIAS);
     if (!geom || !geom.frameH) return want;
+    const span = Math.min(geom.frameH, geom.gapRest - SPLIT_AIR * 2);
+    if (!(span > 0)) return 0;
     const room =
-      (geom.gapRest - (geom.d1 + geom.d2) * (1 - q) - SPLIT_AIR * 2) /
-      geom.frameH;
+      (geom.gapRest - (geom.d1 + geom.d2) * (1 - q) - SPLIT_AIR * 2) / span;
     return Math.min(want, Math.max(0, room));
   });
   const frameFade = useTransform(split, (p) =>

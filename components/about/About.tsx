@@ -97,7 +97,7 @@ const CHAPTERS: {
   {
     year: "2025",
     title: "Hoodwood",
-    body: "A Caribbean takeaway opens with the Jacket Exchange — trade a winter coat, take a free jerk jacket potato.",
+    body: "A Caribbean takeaway serving oak-smoked chicken, handmade Caribbean patties and bold, fire-kissed island flavours. Neighbourhood Caribbean food made with real smoke, spice and soul.",
     image: "/images/hoowood.jpg",
     imageAlt: "Hoodwood, Kentish Town",
     place: "Kentish Town",
@@ -106,7 +106,7 @@ const CHAPTERS: {
   {
     year: "2025",
     title: "Café Mama & Sons",
-    body: "A Filipino-Japanese café and bakery brings hand-crafted sandos and the award-winning Longanisa Breakfast Burger to the morning crowd.",
+    body: "A Filipino-Japanese café and bakery serving hand-crafted sandos, all-day Filipino breakfast, freshly baked goods, drinks and our award-winning Longanisa Breakfast Burger.",
     image: "/images/cafemama.jpg",
     imageAlt: "Café Mama & Sons storefront",
     place: "Kentish Town",
@@ -115,7 +115,7 @@ const CHAPTERS: {
   {
     year: "2025",
     title: "Belly",
-    body: "A modern Filipino bistro opens in Kentish Town — Chef Omar's most personal kitchen, reading Filipino flavour through a French lens.",
+    body: "A modern Filipino bistro opens in Kentish Town - Chef Omar's most personal kitchen, reading Filipino flavour through a French lens.",
     image: "/images/belly3.jpg",
     imageAlt: "Belly dining room, Kentish Town",
     place: "Kentish Town",
@@ -124,7 +124,7 @@ const CHAPTERS: {
   {
     year: "2026",
     title: "Belly enters the Michelin Guide",
-    body: "Belly is added to the Michelin Guide for Greater London — recognising thirty-eight years of Filipino kitchens in London.",
+    body: "A modern Filipino bistro in Kentish Town from Chef Omar Shah, serving Filipino flavours through a French lens. A personal take on Filipino cuisine, blending bold traditional flavours with refined French-inspired cooking.",
     image: "/images/belly.jpg",
     imageAlt: "Belly added to the Michelin Guide",
     place: "Kentish Town",

@@ -62,15 +62,20 @@
   display: flex;
   flex-direction: column;
   justify-content: center;
-  /* the air between each line's ink and the photograph when settled. It is
-     also the floor on the ceiling that keeps them apart during the split —
-     see SPLIT_AIR in JoinUs.tsx — so it may not go to zero.
+  /* the air between each line's box and the photograph when settled — and,
+     now that the film rests at the band's full size, literally the gap on
+     screen. It no longer sets the film's size; it is the closest the film
+     comes to either line on any frame, bar mid-split at phone sizes (see
+     `frameScale` in JoinUs.tsx). It may not go to zero: at zero the film
+     sits on the line boxes and only the caps' inset keeps the ink off.
 
      clamp(10px, 1.4vh, 20px), roughly halved. Asked for directly — the
      headline should sit ON the photograph's edge rather than float near it —
      and the bigger type is what makes it affordable: at About's ramp the two
      lines are ~40% taller than they were, so the seam between type and
-     picture reads as tight rather than as cramped. */
+     picture reads as tight rather than as cramped. The halving is also what
+     pulled the film 25–32px in from the grid margins, until `frameScale`
+     stopped dividing by the band's height. */
   --band-air: clamp(10px, 1.4vh, 20px);
   /* HOISTED OUT OF `.heroLineTop/.heroLineBot`, where it was written inline,
      because the corner labels' seat is now a fraction of it — see the cap-top
