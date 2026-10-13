@@ -3,12 +3,13 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "next dev",
-    "build": "next build",
+    "dev": "node scripts/pull-cms.mjs --dev && next dev",
+    "build": "node scripts/pull-cms.mjs && next build",
     "start": "next start",
     "lint": "eslint .",
     "press-logos": "node scripts/optimize-press-logos.mjs",
-    "lighthouse": "lighthouse --quiet --chrome-flags=\"--headless=new\" --output=html --output-path=./lighthouse-report.html"
+    "lighthouse": "lighthouse --quiet --chrome-flags=\"--headless=new\" --output=html --output-path=./lighthouse-report.html",
+    "pull-cms": "node scripts/pull-cms.mjs"
   },
   "dependencies": {
     "framer-motion": "^11.18.0",

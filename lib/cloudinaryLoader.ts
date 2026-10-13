@@ -54,6 +54,16 @@ export default function cloudinaryLoader({ src, width, quality }: LoaderArgs): s
      with an SVG unless `dangerouslyAllowSVG` is set. */
   if (src.toLowerCase().split(/[?#]/)[0].endsWith(".svg")) return src;
 
+  /* THE CMS'S PHOTOGRAPHS STAY LOCAL TOO. scripts/pull-cms.mjs saves each
+     one into public/cms/ at two widths, `<hash>-800` and `<hash>-1600`, at
+     build time — they were never uploaded to Cloudinary, so a URL there
+     would 404. Picking the narrower file for a narrow slot is the resizing
+     this loader would otherwise have bought. The two widths are a contract
+     with that script. */
+  if (src.startsWith("/cms/")) {
+    return width <= 800 ? src.replace(/-1600(\.\w+)$/, "-800$1") : src;
+  }
+
   // unreachable in a correctly-configured build; see the banner
   if (!CLOUD) return src;
 

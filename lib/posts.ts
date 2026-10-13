@@ -47,9 +47,43 @@ import path from "node:path";
 import matter from "gray-matter";
 
 import { BLOG, type BlogEntry } from "./blog";
+import cms from "./cms.json";
 import { RESTAURANTS } from "./restaurants";
 
 const POSTS_DIR = path.join(process.cwd(), "content", "posts");
+
+/* ── THE CMS, SINCE 2026-10 ──
+ * The press, the links out and our own posts are edited in the group's
+ * shared Sanity Studio (github.com/ejlson/maginhawa-cms), the same posts
+ * BUNSO's website reads. scripts/pull-cms.mjs saves them, with their
+ * photographs, before every build and every `npm run dev`; this file only
+ * ever reads that snapshot, so the build never talks to Sanity and neither
+ * does a visitor.
+ *
+ * content/posts/*.md still works and still wins its slug. It is how a post
+ * reaches the site before it is moved into the Studio.
+ *
+ * MAGINHAWA_BLOG_SOURCE=local builds from the hand-kept list in lib/blog.ts
+ * instead: a way back if the CMS is ever unreachable. It is not kept in sync
+ * with the Studio. */
+const FROM_CMS = process.env.MAGINHAWA_BLOG_SOURCE !== "local";
+
+/** One post as scripts/pull-cms.mjs saved it. */
+type CmsPost = {
+  kind: "press" | "ours" | "link";
+  slug: string;
+  title: string;
+  date: string;
+  summary: string;
+  restaurants: string[];
+  author: string | null;
+  url: string | null;
+  coverage: "story" | "list" | "listing" | null;
+  outlet: string | null;
+  image: { src: string | null; alt: string };
+  /** markdown, for "ours" only */
+  body: string | null;
+};
 
 /* A post carries everything a feed card needs (that is `entry`) PLUS the
    things only the post's own page renders. Keeping them apart is what lets
@@ -198,6 +232,86 @@ function toEntry(file: string, raw: Record<string, unknown>, body: string) {
   return post;
 }
 
+/* ── A CMS POST INTO THE FEED'S SHAPE ──
+ * The Studio refuses to publish a post without a photograph, a summary or
+ * (for press) a publication, so a gap here means its rules were changed —
+ * the build says which post rather than shipping a card with a hole in it. */
+function fromCms(p: CmsPost): JournalPost {
+  const where = `CMS post "${p.title}" (${p.slug})`;
+  if (!p.image.src) throw new Error(`${where} has no main photo.`);
+  if (p.kind === "press" && !p.outlet) throw new Error(`${where} has no publication.`);
+  if (p.kind !== "ours" && !p.url) throw new Error(`${where} has no link.`);
+
+  /* A card carries ONE venue mark, so it takes the first restaurant ticked.
+     A value this site does not know (a restaurant added to the Studio
+     before it was added to lib/restaurants.ts) leaves the card unmarked
+     rather than failing every build until someone notices. */
+  const restaurant = p.restaurants.find((r) => RESTAURANTS.some((v) => v.slug === r));
+  const venue = RESTAURANTS.find((v) => v.slug === restaurant);
+
+  /* The source line is the credential the card leads with: the publication
+     for press, the writer for our own posts, and for a link out whoever
+     made it — or, failing that, the venue it is about. */
+  const source =
+    p.kind === "press"
+      ? p.outlet!
+      : p.author?.trim() || (p.kind === "link" ? venue?.name : undefined) || "Maginhawa Group";
+
+  /* `category` is only ever printed on our own post's page ("Journal" for
+     news, see components/blog/JournalPost.tsx), and the Studio has no such
+     field, so it is derived: a mention in a round-up is an inclusion. */
+  const category: BlogEntry["category"] =
+    p.kind === "ours"
+      ? "news"
+      : p.coverage === "list" || p.coverage === "listing"
+        ? "inclusion"
+        : "feature";
+
+  const entry: BlogEntry = {
+    slug: p.slug,
+    title: p.title,
+    date: p.date,
+    dateLabel: DATE_LABEL.format(new Date(`${p.date}T00:00:00Z`)),
+    excerpt: p.summary,
+    source,
+    /* ROOT-RELATIVE for our own posts, which is what opens them in this tab
+       — see entryLinkProps in lib/blog.ts. */
+    url: p.kind === "ours" ? `/blog/${p.slug}` : p.url!,
+    image: p.image.src,
+    ...(restaurant ? { restaurant } : {}),
+    category,
+    kind: p.kind === "ours" ? "post" : p.kind === "link" ? "native" : "press",
+  };
+
+  const body = p.body ?? "";
+  return {
+    entry,
+    body,
+    author: source,
+    imageAlt: p.image.alt,
+    readingMinutes: wordsToMinutes(body),
+  };
+}
+
+let cmsCache: JournalPost[] | null = null;
+
+function getCms(): JournalPost[] {
+  if (!FROM_CMS) return [];
+  if (cmsCache) return cmsCache;
+
+  const file = path.join(process.cwd(), cms.snapshot);
+  if (!fs.existsSync(file)) {
+    throw new Error(
+      `No CMS snapshot at ${cms.snapshot}. Run \`npm run build\` or \`npm run dev\`, which pull it ` +
+        "first (scripts/pull-cms.mjs), not `next build` or `next dev` on their own. " +
+        "(MAGINHAWA_BLOG_SOURCE=local builds from lib/blog.ts instead.)",
+    );
+  }
+  const snap = JSON.parse(fs.readFileSync(file, "utf8")) as { posts: CmsPost[] };
+  cmsCache = snap.posts.map(fromCms);
+  return cmsCache;
+}
+
 /* Read once per process. The build calls into this from generateStaticParams,
    generateMetadata and the page body — three times per post, plus once per
    route that renders the feed — and re-reading the folder each time is
@@ -210,26 +324,36 @@ export function getPosts(): JournalPost[] {
   /* A missing folder is not an error. The site shipped for a year with no
      posts of its own and must keep building the day someone deletes the
      last one. */
-  if (!fs.existsSync(POSTS_DIR)) {
-    cache = [];
-    return cache;
+  const files = fs.existsSync(POSTS_DIR)
+    ? fs
+        .readdirSync(POSTS_DIR)
+        .filter((f) => /\.mdx?$/.test(f))
+        /* Anything beginning with an underscore is a DRAFT and is skipped —
+           _tomorrows-post.md can sit in the repository, be committed, be
+           reviewed in a pull request, and not be published. Renaming it is
+           what publishes it. */
+        .filter((f) => !f.startsWith("_"))
+        .map((file) => {
+          const source = fs.readFileSync(path.join(POSTS_DIR, file), "utf8");
+          const { data, content } = matter(source);
+          return toEntry(file, data as Record<string, unknown>, content);
+        })
+    : [];
+
+  /* Our own posts from the Studio join the files. A file wins its slug — it
+     is a post on its way into the CMS, or a deliberate override — and the
+     build says so rather than choosing silently. */
+  const taken = new Set(files.map((p) => p.entry.slug));
+  const fromStudio = getCms().filter((p) => p.entry.kind === "post");
+  for (const p of fromStudio) {
+    if (taken.has(p.entry.slug)) {
+      console.warn(`content/posts/${p.entry.slug}.md overrides the CMS post of the same slug.`);
+    }
   }
 
-  cache = fs
-    .readdirSync(POSTS_DIR)
-    .filter((f) => /\.mdx?$/.test(f))
-    /* Anything beginning with an underscore is a DRAFT and is skipped —
-       _tomorrows-post.md can sit in the repository, be committed, be
-       reviewed in a pull request, and not be published. Renaming it is what
-       publishes it. */
-    .filter((f) => !f.startsWith("_"))
-    .map((file) => {
-      const source = fs.readFileSync(path.join(POSTS_DIR, file), "utf8");
-      const { data, content } = matter(source);
-      return toEntry(file, data as Record<string, unknown>, content);
-    })
-    .sort((a, b) => (a.entry.date < b.entry.date ? 1 : -1));
-
+  cache = [...files, ...fromStudio.filter((p) => !taken.has(p.entry.slug))].sort((a, b) =>
+    a.entry.date < b.entry.date ? 1 : -1,
+  );
   return cache;
 }
 
@@ -251,15 +375,21 @@ export function getJournal(): BlogEntry[] {
   const posts = getPosts().map((p) => p.entry);
   const taken = new Set(posts.map((p) => p.slug));
 
-  for (const entry of BLOG) {
+  const others = FROM_CMS
+    ? getCms()
+        .map((p) => p.entry)
+        .filter((e) => e.kind !== "post")
+    : BLOG;
+  for (const entry of others) {
     if (taken.has(entry.slug)) {
       throw new Error(
-        `content/posts/${entry.slug}.md collides with the "${entry.title}" entry in lib/blog.ts — rename one of them.`,
+        `Our post "${entry.slug}" collides with the "${entry.title}" entry ` +
+          `${FROM_CMS ? "in the CMS" : "in lib/blog.ts"} — rename one of them.`,
       );
     }
   }
 
-  return [...posts, ...BLOG].sort((a, b) => (a.date < b.date ? 1 : -1));
+  return [...posts, ...others].sort((a, b) => (a.date < b.date ? 1 : -1));
 }
 
 /* ── THE TWO POSTS EITHER SIDE OF THIS ONE ──
