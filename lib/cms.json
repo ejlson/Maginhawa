@@ -7,6 +7,7 @@
   "imageDir": "public/cms",
   "imagePath": "/cms",
   "postHomes": {
-    "bunso": "https://www.bybunso.com"
+    "bunso": "https://www.bybunso.com",
+    "cafemama": "https://cafemamasons.com"
   }
 }
