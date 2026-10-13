@@ -140,6 +140,11 @@ export function asset(path: string | undefined, opts?: AssetOptions): string | u
 export function asset(path: string | undefined, opts: AssetOptions = {}): string | undefined {
   if (!CLOUD || !path || isRemote(path)) return path;
 
+  /* The CMS's photographs are saved into public/cms/ at build time and were
+     never uploaded to Cloudinary — see scripts/pull-cms.mjs and the same
+     exemption in lib/cloudinaryLoader.ts. */
+  if (path.startsWith("/cms/")) return path;
+
   const kind = kindOf(path);
   if (kind === "other") return path;
 

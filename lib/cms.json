@@ -1,0 +1,12 @@
+{
+  "project": "xts9qlfm",
+  "dataset": "production",
+  "apiVersion": "2025-02-19",
+  "query": "*[_type == \"post\" && !(hideFromGroup == true) && defined(slug.current)] | order(date desc) { kind, \"slug\": slug.current, title, date, summary, restaurants, author, url, coverage, \"outlet\": outlet->name, body[]{ ..., _type == \"figure\" => { alt, caption, \"asset\": asset->{ _id, url, \"w\": metadata.dimensions.width, \"h\": metadata.dimensions.height } } }, \"image\": image{ alt, \"asset\": asset->{ _id, url, \"w\": metadata.dimensions.width, \"h\": metadata.dimensions.height } } }",
+  "snapshot": ".cms/journal.json",
+  "imageDir": "public/cms",
+  "imagePath": "/cms",
+  "postHomes": {
+    "bunso": "https://www.bybunso.com"
+  }
+}

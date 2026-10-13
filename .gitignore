@@ -69,3 +69,9 @@ scripts/_tmp-*
 
 # Lighthouse reports (npm run lighthouse -- <url>)
 lighthouse-report.html
+
+# the CMS snapshot and its photographs — written by scripts/pull-cms.mjs on
+# every build and every `npm run dev`, never committed (see that file)
+/.cms
+/public/cms
+/public/cms.partial
