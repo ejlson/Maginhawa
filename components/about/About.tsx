@@ -133,7 +133,7 @@ const CHAPTERS: {
   {
     year: "2026",
     title: "Bunso",
-    body: "The youngest of the family: a Filipino-inspired all-day restaurant opening in Kentish Town, London. Bakery by day, Pizza by night.",
+    body: "The youngest of the family opens on Hawley Road — a Filipino bakery by day and a pizzeria by night.",
     /* ⚠️ `-shopfront`, AND THE SUFFIX IS LOAD-BEARING — this row read
        /images/bunso.png, the 670x141 wordmark, and rendered as the
        coming-soon maroon field instead of a picture. The photograph cannot
@@ -148,7 +148,7 @@ const CHAPTERS: {
        "BUNS". 71% slides the window to 29.4%-88%, which holds the whole
        wordmark with air after it. Re-measure if the photograph is replaced. */
     focus: "71% 50%",
-    place: "London",
+    place: "Kentish Town",
     slug: "bunso",
   },
 ];

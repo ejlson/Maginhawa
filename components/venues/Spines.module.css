@@ -523,6 +523,15 @@
 .pillGhost { composes: cardBtnGhost from "./VenueCard.module.css"; }
 .pillFill { composes: cardBtnFill from "./VenueCard.module.css"; }
 
+/* THE STATUS IS THE CARD'S TOO, at the band's pill size. No ::after hit
+   area: it is not a target, so it cannot overlap one. */
+.status {
+  composes: cardStatus from "./VenueCard.module.css";
+  min-height: 30px;
+  padding: 0 0.72em;
+  font-size: 0.625rem;
+}
+
 /* ── what the band gives up when it opens ───────────────────────────── */
 .more {
   position: absolute;

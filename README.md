@@ -436,6 +436,7 @@ Useful fields in `lib/restaurants.ts`:
     "/menu/belly/drinks-1.png",
   ],
   menuLabel: "February 2026",                // small caption above the menu
+  menuUrl: "https://example.com/menu",       // optional; the venue's OWN menu when it has no menuPages
   bookable: true,                            // false = walk-in only
   bookingUrl: "https://booking.resdiary.com/...",
   googleReviewUrl: "...",                    // optional; falls back to a Maps search
@@ -445,9 +446,15 @@ Useful fields in `lib/restaurants.ts`:
 
 **`bookable` vs `comingSoon`.** `bookable: false` means walk-in. `comingSoon: true`
 means the doors haven't opened. A venue that is `bookable: false` *and*
-`comingSoon: true` (Bunso) is correctly excluded from both the walk-in list and
-the "leave us a review" picker — don't set `comingSoon` on an open restaurant to
-hide it from bookings.
+`comingSoon: true` is correctly excluded from both the walk-in list and the
+"leave us a review" picker (Bunso was, until it opened in October 2026; no venue
+carries the flag today) — don't set `comingSoon` on an open restaurant to hide
+it from bookings.
+
+**`menuUrl`.** A venue with no `menuPages` but a menu on its own site (Bunso:
+`https://www.bybunso.com/menu`) gets a Menu control that opens that URL in a
+new tab. It does **not** get a `/menus/<slug>` page or a sitemap entry — only
+`menuPages` does that. `lib/menu.ts` → `menuLink()` is the one rule.
 
 > **`priceRange` no longer exists.** The group does not publish a price band
 > anywhere on the site. Don't re-add the field expecting it to appear.

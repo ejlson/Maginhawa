@@ -42,7 +42,6 @@ import Spines from "@/components/venues/Spines";
 import { venueCards, type VenueCardItem } from "@/lib/venueCards";
 import { lenisRef } from "@/lib/SmoothScroll";
 import { asset } from "@/lib/media";
-import { menuHref } from "@/lib/menu";
 
 /* ══════════════════════════════════════════════════════════════════════
    THE ASSEMBLY INTRO IS GONE, and this note is here so nobody rebuilds it
@@ -216,14 +215,15 @@ const DISPLAY: Record<string, DiscoverDisplay> = {
     clip: "/videos/tile-belly-2026.mp4",
   },
   bunso: {
-    // the coming-soon room: no founding year, and the card takes the
-    // maroon field venueCards() gives it in place of a photograph — but
-    // no longer no film: the hover clip is Bunso's own bakery footage,
-    // in the same 12s tile cut as the rest of the row
-    tag: "The Youngest of the Family",
+    // the youngest room — open since October 2026. No founding year yet
+    // (it would print "Est. 2026" beside the name of a room that opened
+    // last week); the card otherwise carries the same five fields as the
+    // rest, the shopfront photograph included, and the hover clip is
+    // Bunso's own bakery footage in the row's 12s tile cut.
+    tag: "Filipino Bakery & Pizzeria",
     location: "1a Hawley Rd, London NW1 8RP",
     blurb:
-      "The youngest of the family: a Filipino-inspired all-day restaurant opening in Kentish Town, London. Bakery by day, Pizza by night.",
+      "A Filipino bakery by day and a pizzeria by night — Bunso, ‘the youngest’, is the newest member of the Maginhawa family.",
     clip: "/videos/tile-bunso-2026.mp4",
   },
 };
@@ -1616,7 +1616,6 @@ export default function Discover() {
                    constraint Manifesto.tsx records over its own ScrubWord. */
                 col={reduce ? undefined : col}
                 onOpen={() => setActive(it)}
-                menuHref={menuHref(it.slug)}
                 open={openIndex === i}
                 recedeDelay={step * RECEDE_STEP_S}
               />
@@ -1643,7 +1642,6 @@ export default function Discover() {
             key={active.slug}
             item={active}
             onClose={closeExpanded}
-            menuHref={menuHref(active.slug)}
           />
         )}
       </AnimatePresence>
@@ -1661,7 +1659,6 @@ function Tile({
   index,
   col,
   onOpen,
-  menuHref: href,
   open,
   recedeDelay,
   registerArrival,
@@ -1678,9 +1675,10 @@ function Tile({
    *  computed; the rest is the card's own position on the page. */
   col?: number;
   onOpen: () => void;
-  /** where this venue's menu lives — /menus/<slug>, built by the grid from
-   *  lib/menu so the route is spelled once */
-  menuHref: string;
+  /* ⚠️ `menuHref` IS GONE FROM HERE. The grid used to spell every tile's
+     menu route from lib/menu and hand it down; the card reads lib/menu's
+     menuLink() off the canonical record itself now, because Bunso's menu
+     is an external URL and the destination stopped being one spelling. */
   /** this is the tile whose plate is currently expanded. It is EXEMPT from
    *  the recede — see RECEDE_STEP_S: framer re-measures this exact cell to
    *  fly the card home, and a transform on it at that moment is a transform
@@ -1899,10 +1897,6 @@ function Tile({
              to open a modal and the attribute said so; it opens a PAGE
              now, and a control that announces a dialog and then navigates
              is a lie told to exactly the readers who most depend on it. */
-          /* passed unconditionally: the card is what knows whether there
-             are menu pages behind the control, so the rule lives in one
-             place for both grids. */
-          menuHref={href}
           clip={item.clip}
           blurb={item.blurb}
           /* THE SPLIT ACTIONS — home grid only. One cream Book pill at
@@ -2018,12 +2012,9 @@ function Tile({
 function ExpandedCard({
   item,
   onClose,
-  menuHref: href,
 }: {
   item: DiscoverItem;
   onClose: () => void;
-  /** see Tile's copy of this prop */
-  menuHref: string;
 }) {
   const reduce = useReducedMotion();
   const closeRef = useRef<HTMLButtonElement>(null);
@@ -2404,11 +2395,11 @@ function ExpandedCard({
               plate
               story={item.blurb}
               addressLines={[item.location]}
-              /* the same destination the tile links to. It NAVIGATES now
-                 rather than painting over this card, so the expansion is
-                 left behind rather than returned to — which is the honest
+              /* the Menu control is the card's own read of lib/menu, the
+                 same destination the tile links to. It NAVIGATES rather
+                 than painting over this card, so the expansion is left
+                 behind rather than returned to — which is the honest
                  behaviour for a control that changes the page. */
-              menuHref={href}
             />
           </motion.div>
         </div>

@@ -877,6 +877,53 @@
   opacity: 0.88;
 }
 
+/* ---- the "Now open" status beside Book a Table ---- */
+/* the pair's row; the status reads first, in the decision's order */
+.actPair {
+  display: flex;
+  align-items: center;
+  gap: 8px;
+}
+/* Stacks on phones: .actions is content-sized, so a wrap never triggers,
+   and on one line the pair (238px from x≈194 at 390) ran Book a Table
+   off the screen below ~450px. The status sits above Book, as on the
+   square cards. */
+@media (max-width: 599px) {
+  .actPair {
+    flex-direction: column;
+    align-items: flex-start;
+    gap: 6px;
+  }
+}
+/* THE SAME BOX AND VOICE AS .actBtn, but a SOFT cream fill with no edge
+   — the card's .cardStatus in this page's type. Not a control: nothing
+   under the pointer, no hover, no focus. The dot is a static 6px disc. */
+.actStatus {
+  display: inline-flex;
+  align-items: center;
+  gap: 0.5em;
+  padding: 0.6em 1.1em;
+  border: 1px solid transparent;
+  border-radius: 999px;
+  background: color-mix(in srgb, var(--cream) 14%, transparent);
+  color: var(--cream);
+  font-family: var(--font-sans);
+  font-size: var(--t-label);
+  letter-spacing: var(--tr-label);
+  white-space: nowrap;
+  cursor: default;
+  pointer-events: none;
+  user-select: none;
+}
+.actStatus::before {
+  content: "";
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cream);
+}
+
 @media (prefers-reduced-motion: reduce) {
   .bgVideo,
   .name {

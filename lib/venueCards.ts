@@ -7,7 +7,7 @@
  * lib/restaurants.ts does NOT carry is small and specific:
  *
  *   · the ADDRESS as three printable lines. The canonical record has
- *     `addresses[]` for the four bookable venues only, and it is a postal
+ *     `addresses[]` for the five bookable venues only, and it is a postal
  *     address rather than a typographic one — three lines that must not
  *     wrap, one of which is the venue's name.
  *   · HOURS. Nowhere canonical, and see the warning below.
@@ -293,10 +293,11 @@ const EXTRAS: Record<string, Extras> = {
       road: "1a Hawley Rd",
       city: "London NW1 8RP",
     },
-    /* NO hours — it has not opened, so its block prints the address alone
-       and the stat does not render. That is the card being uniform, not
-       failing: a venue with no datum gives the whole measure to its
-       address. (This note also described a `priceRange` that no longer
+    /* NO hours — only the bakery's are known (and not the pizzeria's), so
+       nothing goes on the card and its block prints the address alone; the
+       stat does not render. That is the card being uniform, not failing: a
+       venue with no datum gives the whole measure to its address. (This
+       note also described a `priceRange` that no longer
        exists on the type, and an `image: null` pointing at a
        /images/bunso-placeholder.jpg that was never in public/ — both were
        describing a state this entry had already left.)

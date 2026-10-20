@@ -29,14 +29,16 @@ import {
   SLUG_BY_NAME,
   getRestaurant,
 } from "@/lib/restaurants";
-import { menuHref } from "@/lib/menu";
+import { menuLink } from "@/lib/menu";
+import { splitActions, venueStatus } from "@/lib/venueActions";
 
 // The venues you can simply turn up to. DERIVED, never typed out: booking
 // policy already lives in lib/restaurants.ts, and this page has only just
 // finished deleting the last hardcoded copy of it (the old NO_BOOKING set).
-// `comingSoon` is excluded on purpose — Bunso is `bookable: false` because it
-// has not opened, which is not a walk-in policy, and telling a reader to walk
-// into it would be a lie. ReviewUs.tsx:11 draws the same distinction.
+// `comingSoon` is excluded on purpose — a room that has not opened is
+// `bookable: false` for want of doors, which is not a walk-in policy, and
+// telling a reader to walk into it would be a lie. (Bunso sat there until
+// October 2026.) ReviewUs.tsx:11 draws the same distinction.
 const WALK_IN = CANONICAL.filter((r) => !r.bookable && !r.comingSoon);
 
 // "A, B and C" — an editorial list, not a comma-joined array dump.
@@ -131,13 +133,12 @@ const RESTAURANTS = [
     video: "/videos/belly-hero.mp4",
   },
   {
-    // still coming-soon for STILLS — no photography or logo yet, so the card
-    // view renders a typographic wordmark on a maroon field. The film is no
-    // longer the generic house clip though: bunso-bakery.mp4 is Bunso's own
-    // footage, and it is what the home grid's hover has been playing all
-    // along. The two surfaces show the same room now.
+    // the youngest room, open since October 2026. The wheel takes the
+    // bakery clip the home grid's card already wipes open on hover — the
+    // same local /videos/ film as the rest of this list, which replaced the
+    // generic house clip the entry fell back to before it opened.
     name: "Bunso",
-    tag: "Filipino-Inspired All-Day Restaurant",
+    tag: "Filipino Bakery & Pizzeria",
     location: "Kentish Town, London",
     video: "/videos/bunso-bakery.mp4",
   },
@@ -278,8 +279,8 @@ export default function RestaurantsShowcase() {
   /* ⚠️ `menuFor` AND `openMenuFor` ARE GONE. This page owned the slug of
      whichever venue's menu modal was open, and a helper that resolved a
      display name to it. The menu is a route now (/menus/<slug>), so there
-     is no open menu to be the state of — `menuLink` below resolves the
-     same display name to an href instead. */
+     is no open menu to be the state of — `menuFor` below resolves the same
+     display name to lib/menu's link instead. */
 
   /* THE SITE'S OWN NAVIGATION, not router.push — every internal press on
      this site runs through the curtain (Nav, Hero, Footer and Menu all take
@@ -288,16 +289,12 @@ export default function RestaurantsShowcase() {
      handler on a div and has no href to be. */
   const navigate = useRouteTransition();
 
-  /** the display name's menu page, or null where the venue has no menu */
-  const menuLink = (name: string) => {
+  /** the display name's menu — a page here, or the venue's own online
+   *  menu (Bunso) — or null where it has neither. One read of lib/menu, so
+   *  the wheel cannot disagree with the cards about where a menu is. */
+  const menuFor = (name: string) => {
     const slug = SLUG_BY_NAME[name];
-    const r = slug ? getRestaurant(slug) : undefined;
-    return slug && r?.menuPages?.length ? menuHref(slug) : null;
-  };
-  const hasMenu = (name: string) => {
-    const slug = SLUG_BY_NAME[name];
-    const r = slug ? getRestaurant(slug) : undefined;
-    return !!(r?.menuPages && r.menuPages.length > 0);
+    return splitActions(slug ? getRestaurant(slug) : undefined).menu;
   };
   // A Book action exists exactly when lib/restaurants.ts says the venue takes
   // bookings AND gives somewhere to send them. Both halves are checked here so
@@ -305,16 +302,24 @@ export default function RestaurantsShowcase() {
   // display names that restated `bookable: false` verbatim — with the
   // Reservations index now reading the same field, a second restatement was a
   // copy waiting to drift.
+  // ⚠️ ALL THREE NOW READ splitActions(), the one availability rule the
+  // cards and the band list print — so a room that has withheld its
+  // controls (Ramo, relocating) withholds them here too without this page
+  // knowing why.
   const getBookingUrl = (name: string) => {
     const slug = SLUG_BY_NAME[name];
-    const restaurant = slug ? getRestaurant(slug) : undefined;
-    return restaurant?.bookable ? restaurant.bookingUrl : undefined;
+    return splitActions(slug ? getRestaurant(slug) : undefined).book?.href;
   };
-  // the restaurant's own site for the Visit actions — entries without one
-  // fall back to the internal detail page
+  // the restaurant's own site for the Visit actions
   const getWebsite = (name: string) => {
     const slug = SLUG_BY_NAME[name];
-    return slug ? getRestaurant(slug)?.website : undefined;
+    return splitActions(slug ? getRestaurant(slug) : undefined).visit?.href;
+  };
+  // "Now open" beside Book a Table, or nothing — one read of the same rule
+  // the cards and the band list print (lib/venueActions).
+  const getStatus = (name: string) => {
+    const slug = SLUG_BY_NAME[name];
+    return venueStatus(slug ? getRestaurant(slug) : undefined);
   };
   const scrollerRef = useRef<HTMLDivElement>(null);
   const itemRefs = useRef<(HTMLButtonElement | null)[]>([]);
@@ -1231,18 +1236,39 @@ export default function RestaurantsShowcase() {
                   <span aria-hidden>→</span>
                 </motion.a>
               )}
-              {getBookingUrl(item.name) && (
-                <motion.a
-                  custom={1}
-                  initial={{ opacity: 0, y: 10 }}
-                  animate={actionsCtl}
-                  href={getBookingUrl(item.name)}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className={styles.actBtn}
-                >
-                  Book a Table
-                </motion.a>
+              {(getBookingUrl(item.name) || getStatus(item.name)) && (
+                /* THE CHIP SITS BESIDE BOOK, not above it: the column
+                   stacks one control per row, and a chip is not a
+                   control, so the two share a row and the same entrance
+                   index. Where the room has withheld Book (relocating)
+                   the chip is the row's only member. The wrapper is a
+                   plain div — it is the pair's row, not a third animated
+                   thing. */
+                <div className={styles.actPair}>
+                  {getStatus(item.name) && (
+                    <motion.span
+                      custom={1}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={actionsCtl}
+                      className={styles.actStatus}
+                    >
+                      {getStatus(item.name)}
+                    </motion.span>
+                  )}
+                  {getBookingUrl(item.name) && (
+                    <motion.a
+                      custom={1}
+                      initial={{ opacity: 0, y: 10 }}
+                      animate={actionsCtl}
+                      href={getBookingUrl(item.name)}
+                      target="_blank"
+                      rel="noopener noreferrer"
+                      className={styles.actBtn}
+                    >
+                      Book a Table
+                    </motion.a>
+                  )}
+                </div>
               )}
               {/* ⚠️ RENDERED, NOT DISABLED. This was a <button> that stayed
                   in place greyed out for the venues with no menu — a dead
@@ -1250,22 +1276,40 @@ export default function RestaurantsShowcase() {
                   survived here because a modal has nowhere to send a press.
                   A route does, so the control is a link where there is a
                   menu and absent where there is not. */}
-              {hasMenu(item.name) && (
-                <motion.div custom={2} initial={{ opacity: 0, y: 10 }} animate={actionsCtl}>
-                  <Link
-                    href={menuLink(item.name)!}
-                    /* see the prefetch note in components/layout/CookieBanner.tsx.
-                       The showcase's own Menu control — the same 22KB payload
-                       per venue as VenueCard's and Spines', against the same
-                       640ms curtain. */
-                    prefetch={false}
-                    className={styles.actBtn}
-                    aria-label={`${item.name} menu`}
-                  >
-                    Menu
-                  </Link>
-                </motion.div>
-              )}
+              {(() => {
+                const link = menuFor(item.name);
+                if (!link) return null;
+                return (
+                  <motion.div custom={2} initial={{ opacity: 0, y: 10 }} animate={actionsCtl}>
+                    {/* an external menu leaves the site in a new tab, as
+                        the Visit and Book controls above it already do */}
+                    {link.external ? (
+                      <motion.a
+                        href={link.href}
+                        target="_blank"
+                        rel="noopener noreferrer"
+                        className={styles.actBtn}
+                        aria-label={`${item.name} menu — opens their website in a new tab`}
+                      >
+                        Menu
+                      </motion.a>
+                    ) : (
+                      <Link
+                        href={link.href}
+                        /* see the prefetch note in components/layout/CookieBanner.tsx.
+                           The showcase's own Menu control — the same 22KB payload
+                           per venue as VenueCard's and Spines', against the same
+                           640ms curtain. */
+                        prefetch={false}
+                        className={styles.actBtn}
+                        aria-label={`${item.name} menu`}
+                      >
+                        Menu
+                      </Link>
+                    )}
+                  </motion.div>
+                );
+              })()}
             </div>
           </div>
         </div>
@@ -1297,13 +1341,13 @@ export default function RestaurantsShowcase() {
             press goes where a reader on this page expects — the venue's own
             site, or its menu where there is no site.
 
-            THE MENU CONTROL NAVIGATES to /menus/<slug>,
-            which is this page's own behaviour and is better than the home
-            card's link: the pages are already mounted here. It renders
-            only where the venue carries `menuPages`; Bunso, the one venue
-            that does not, gets one control and no disabled stub. That is a
-            real change from the retired tile, which rendered a greyed-out
-            `Menu` button on every venue but Bunso.
+            THE MENU CONTROL NAVIGATES to /menus/<slug> where the venue
+            carries `menuPages`, and opens the venue's own menu in a new
+            tab where it carries a `menuUrl` instead (Bunso) — the card
+            reads lib/menu's menuLink() for both. A venue with neither gets
+            one control fewer and no disabled stub. That is a real change
+            from the retired tile, which rendered a greyed-out `Menu`
+            button on every venue but Bunso.
 
             `data-lenis-prevent`: below 980px this box becomes its own
             scroller (see the media query in the stylesheet), and Lenis
@@ -1387,10 +1431,12 @@ export default function RestaurantsShowcase() {
                        the only one.
 
                        A VENUE WITH NO `website` FALLS BACK TO THE MENU,
-                       which is now a page on this site rather than an
-                       overlay — so the fallback navigates like the primary
-                       case does. If there are no menu pages either, the card
-                       prints no press at all; `hasMenu` gates it.
+                       wherever lib/menu says it is: a page on this site
+                       goes through the curtain, an external menu opens in
+                       a new tab like the site would have. (Nothing takes
+                       the fallback today — every venue has a `website`,
+                       Bunso included, so its external menu never reaches
+                       `navigate`.) With neither, the press is a no-op.
 
                        A NEW TAB, because every other external destination
                        on this site opens in one (the wheel's Visit, the
@@ -1401,9 +1447,15 @@ export default function RestaurantsShowcase() {
                        this one. */
                     onPress={() => {
                       const site = getRestaurant(v.slug)?.website;
-                      if (site)
+                      if (site) {
                         window.open(site, "_blank", "noopener,noreferrer");
-                      else navigate(menuHref(v.slug));
+                        return;
+                      }
+                      const link = menuLink(getRestaurant(v.slug));
+                      if (!link) return;
+                      if (link.external)
+                        window.open(link.href, "_blank", "noopener,noreferrer");
+                      else navigate(link.href);
                     }}
                     /* names the DESTINATION, since the press no longer opens
                        a page on this site */
@@ -1412,10 +1464,6 @@ export default function RestaurantsShowcase() {
                         ? `Visit ${v.name} — opens their website in a new tab`
                         : `${v.name} menu`
                     }
-                    /* passed unconditionally: the card itself is what knows
-                       whether there is a menu behind the control, so the
-                       rule lives in one place for both grids */
-                    menuHref={menuHref(v.slug)}
                   />
                 </article>
               ))}

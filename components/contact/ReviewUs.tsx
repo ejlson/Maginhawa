@@ -7,7 +7,8 @@ import { RESTAURANTS, type Restaurant } from "@/lib/restaurants";
 // link isn't set yet — works for every restaurant out of the box, and the
 // data field is there to upgrade with real Place IDs later.
 
-// Coming-soon venues have no doors open yet — nothing to review.
+// Coming-soon venues have no doors open yet — nothing to review. (None
+// today: Bunso joined the list when it opened in October 2026.)
 const REVIEWABLE = RESTAURANTS.filter((r) => !r.comingSoon);
 
 const reviewUrl = (r: Restaurant) =>

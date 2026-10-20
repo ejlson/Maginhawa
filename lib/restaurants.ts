@@ -39,15 +39,30 @@ export type Restaurant = {
   menuPages?: string[];
   // Optional small-caps subtitle shown above the menu pages — e.g. "February 2026"
   menuLabel?: string;
+  // The venue's own online menu, for a venue we host no pages for. Every
+  // Menu control reads lib/menu's menuLink(): `menuPages` wins and goes to
+  // /menus/<slug>; otherwise this opens in a new tab; neither and the
+  // control does not render. It does NOT put the venue in withMenus() —
+  // that is the route table, and there is no page here to route to.
+  menuUrl?: string;
   // Marks placeholder content for a venue that hasn't opened yet — hides the
-  // entry from review prompts while keeping it routable/discoverable.
+  // entry from review prompts while keeping it routable/discoverable. No
+  // venue carries it today (Bunso did until it opened, October 2026); it
+  // stays on the type for the next room before its doors open.
   comingSoon?: boolean;
+  // A one-word notice the venue's controls carry (lib/venueActions
+  // venueStatus). "now-open": a "Now open" chip beside Book on a room that
+  // has just opened. "relocating": the room is between addresses — every
+  // control (Menu, Visit, Book) is withheld and the chip stands alone; the
+  // record's address and bookingUrl stay on file for the return. Delete
+  // the field and every chip goes with it.
+  status?: "now-open" | "relocating";
 };
 
 /* ⚠️ THIS LIST IS RESTATED BY HAND IN public/llms.txt — the plain-text
    summary assistants read (llmstxt.org). That file ships out of `public/`
    uncompiled, so it cannot import this array: it names every venue, its
-   cuisine, whether it takes bookings, and the addresses of the four that
+   cuisine, whether it takes bookings, and the addresses of the five that
    publish one.
 
    ADD, RENAME OR CLOSE A VENUE HERE AND public/llms.txt IS WRONG until it is
@@ -153,6 +168,10 @@ export const RESTAURANTS: Restaurant[] = [
     menuLabel: "February 2026",
     bookable: true,
     bookingUrl: "https://www.sevenrooms.com/reservations/ramosoho/",
+    /* between addresses, October 2026 — the controls withhold themselves
+       while this stands (see the field's note); the host above is kept
+       for the return. */
+    status: "relocating",
   },
   {
     slug: "hoodwood",
@@ -227,11 +246,14 @@ export const RESTAURANTS: Restaurant[] = [
   {
     slug: "bunso",
     name: "Bunso",
-    tagline: "The Youngest of the Family",
-    cuisine: "Filipino",
+    tagline: "Filipino Bakery & Pizzeria",
+    cuisine: "Bakery · Pizzeria",
     description:
-      "The youngest of the family: a Filipino-inspired all-day restaurant opening in Kentish Town, London. Bakery by day, Pizza by night.",
+      "A Filipino bakery by day and a pizzeria by night — Bunso, ‘the youngest’, is the newest member of the Maginhawa family.",
     location: "Kentish Town, London",
+    addresses: [
+      { street: "1a Hawley Rd", locality: "London", postcode: "NW1 8RP" },
+    ],
     /* `-shopfront`, because Cloudinary public ids drop the extension: this
        was /images/bunso.jpg, which collided with the /images/bunso.png
        wordmark About.tsx uses and resolved to the same
@@ -241,8 +263,17 @@ export const RESTAURANTS: Restaurant[] = [
     image: "/images/bunso-shopfront.jpg",
     logo: "/logo/bunso.png",
     website: "https://www.bybunso.com/",
-    bookable: false,
-    comingSoon: true,
+    /* NO `menuPages` — the group has supplied no menu artwork for Bunso, so
+       the Menu controls go to the venue's own menu page instead (see
+       menuLink in lib/menu.ts). It is the one venue on an external menu;
+       hand it pages and this line is the one to delete. */
+    menuUrl: "https://www.bybunso.com/menu",
+    bookable: true,
+    /* The OpenTable page, without the share link's `corrid` (one session's
+       id) and `sd` (a pinned 2026-10-20 19:00 slot that would go stale). */
+    bookingUrl: "https://www.opentable.co.uk/r/bunso-london",
+    // opened October 2026 — the "Now open" chip beside its Book controls
+    status: "now-open",
   },
 ];
 
@@ -250,7 +281,9 @@ export const getRestaurant = (slug: string) =>
   RESTAURANTS.find((r) => r.slug === slug);
 
 /**
- * The venues that actually have a menu on file — Bunso has none.
+ * The venues that actually have menu PAGES on file. Bunso has none: its
+ * `menuUrl` points at bybunso.com and that is deliberately not a page here,
+ * so it is absent from this list, from /menus and from the sitemap.
  *
  * ⚠️ THIS IS THE /menus ROUTE TABLE, AND IT NOW HAS EXACTLY ONE DEFINITION.
  * It lived as a private const inside app/menus/[slug]/page.tsx, whose banner
@@ -304,8 +337,13 @@ export type VenueAction = {
 };
 
 export function primaryAction(r: Restaurant): VenueAction | null {
+  // between addresses — no control at all; the "Relocating" chip the
+  // surfaces print comes from venueStatus, not from here.
+  if (r.status === "relocating") return null;
+
   // not open yet — say so plainly rather than inviting a visit to a door
-  // that is not there. Bunso's own site is the only place with news.
+  // that is not there; the venue's own site is the only place with news.
+  // (Nothing takes this branch today — Bunso left it when it opened.)
   if (r.comingSoon)
     return r.website
       ? { label: "Opening soon", href: r.website, external: true }

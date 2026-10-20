@@ -6,7 +6,8 @@ import { Fragment, useEffect, useRef, useState } from "react";
 import { motion, useReducedMotion, type MotionProps } from "framer-motion";
 import styles from "./VenueCard.module.css";
 import { getRestaurant, primaryAction } from "@/lib/restaurants";
-import { splitActions } from "@/lib/venueActions";
+import { splitActions, venueStatus } from "@/lib/venueActions";
+import type { MenuLink } from "@/lib/menu";
 import type { VenueCardItem } from "@/lib/venueCards";
 import { asset } from "@/lib/media";
 
@@ -117,16 +118,15 @@ export type VenueCardProps = {
    *  navigates to the venue's page, where the same attribute would be a
    *  lie. It is therefore per-page rather than baked in. */
   pressHasPopup?: React.AriaAttributes["aria-haspopup"];
-  /** THE SECONDARY CONTROL — a cream outline pill that renders only where
-   *  the venue actually carries `menuPages`, because a "Menu" pill on a
-   *  venue with no menu on file is the dead control this design forbids.
-   *
-   *  ⚠️ IT IS A LINK, AND `onMenu` IS GONE. This prop used to have a
-   *  callback twin for the pages that mounted a <MenuOverlay>; that
-   *  component no longer exists. The menu is a route (/menus/<slug>, built
-   *  by lib/menu) and both grids pass an href, so there is one branch here
-   *  instead of two. */
-  menuHref?: string;
+  /* ⚠️ `menuHref` STOOD HERE AND IS GONE, with `onMenu` before it. The
+     secondary Menu control used to take its destination from the page —
+     first a callback into a <MenuOverlay>, then the /menus/<slug> href both
+     grids spelled from lib/menu. The card already reads the canonical
+     record for everything else about the control (whether there are pages
+     behind it), and once Bunso opened on an EXTERNAL menu the destination
+     stopped being one spelling: it is now menuLink() in lib/menu.ts, read
+     inside <VenueBlock>, so a page cannot pass an href that disagrees with
+     the data. */
   /** short muted clip that wipes open from the cursor on hover. Hover
    *  furniture: touch never sees it and nothing depends on it. */
   clip?: string;
@@ -158,7 +158,6 @@ export default function VenueCard({
   onPress,
   pressLabel,
   pressHasPopup,
-  menuHref,
   clip,
   blurb,
   furnitureMotion = {},
@@ -454,7 +453,6 @@ export default function VenueCard({
              THE EXPANSION STILL PASSES ONE — it has the height for the whole
              record, and it is the object a reader opens to get exactly the
              facts this card no longer prints. */
-          menuHref={menuHref}
           actionMotion={actionMotion}
           actions={actions}
         />
@@ -496,7 +494,6 @@ export function VenueBlock({
   story,
   addressLines,
   plate = false,
-  menuHref,
   actionMotion = {},
   actions = "row",
 }: {
@@ -550,7 +547,6 @@ export function VenueBlock({
    *  Requires `story` and `addressLines`. Without them it has no upper half
    *  and the hairline would be a line drawn across a photograph. */
   plate?: boolean;
-  menuHref?: string;
   actionMotion?: MotionProps;
   /** see the prop on VenueCardProps — "split" is the home grid's resting
    *  Book pill that opens into the full set on hover/focus. */
@@ -564,21 +560,18 @@ export function VenueBlock({
   const action = rest ? primaryAction(rest) : null;
 
   /* THE SECOND CONTROL, and it renders only where there is something
-     behind it — both a menu on file AND somewhere for the page to send
-     it. Seven of the eight carry `menuPages` now; Bunso is the one that
-     does not, and it renders one control
-     and that asymmetry costs nothing structurally, because both pills are
-     the same height and the block's height is identical either way (the
-     probe asserts the eight heights agree to within a pixel). */
-  const hasMenu = Boolean(item.menuPages && item.menuPages.length > 0);
+     behind it. Seven of the eight carry `menuPages` and link to their page
+     here; Bunso has none and links OUT to its own menu (lib/menu's
+     menuLink() is where that rule lives — see `menuPill` below). A venue
+     with neither renders one control fewer, and that asymmetry costs
+     nothing structurally, because both pills are the same height and the
+     block's height is identical either way (the probe asserts the eight
+     heights agree to within a pixel). */
   /* ONE READ OF THE AVAILABILITY RULE, shared with <Spines> — see the split
      block below and lib/venueActions.ts. `menu` is the same answer either
      path wants, so both take it from here. */
-  const set = splitActions(rest, {
-    hasMenuPages: hasMenu,
-    menuReachable: Boolean(menuHref),
-  });
-  const menu = set.menu ? "Menu" : null;
+  const set = splitActions(rest);
+  const menu = set.menu;
 
   /* THE VENUE'S OWN SITE, AS A CONTROL OF ITS OWN, at the user's
      instruction: every card offers a way through to the restaurant's
@@ -586,8 +579,9 @@ export function VenueBlock({
      `Visit` for.
 
      IT IS DERIVED, NOT DUPLICATED, and the condition is the whole point.
-     primaryAction() ALREADY sends four of the eight to `r.website` — the
-     three walk-in rooms as "Visit" and Bunso as "Opening soon" — so an
+     primaryAction() ALREADY sends the three walk-in rooms to `r.website`
+     as "Visit" (and sent Bunso there as "Opening soon" before it opened),
+     so an
      unconditional pill would put two controls with one destination on half
      the grid, which is the dead-control rule this block already keeps for
      "Menu". Comparing the HREF rather than the label is what makes that
@@ -595,12 +589,12 @@ export function VenueBlock({
      is a holding label and the intended words are "Order" and "Find us",
      and on the day those land this line still suppresses the duplicate.
 
-     So in practice it renders on the four BOOKABLE venues, which are
+     So in practice it renders on the five BOOKABLE venues, which are
      exactly the ones whose one action was a booking host and whose own
      site was unreachable from the card. */
   const visit =
-    rest?.website && rest.website !== action?.href
-      ? { label: "Visit", href: rest.website }
+    set.visit && set.visit.href !== action?.href
+      ? { label: "Visit", href: set.visit.href }
       : null;
 
   /* ═══ THE SPLIT PATH'S OWN DERIVATIONS — "split" only ═══
@@ -617,6 +611,11 @@ export function VenueBlock({
   const split = actions === "split";
   const book = split ? set.book : null;
   const visitSplit = split ? set.visit : null;
+
+  /* THE CHIP ("Now open" / "Relocating"), on both paths. A label, not a
+     control — it seats immediately before the Book pill, or stands alone
+     where the controls have withheld themselves (lib/venueActions). */
+  const status = venueStatus(rest);
 
   /* THE STAT, right of the name — an icon and a value and NOTHING ELSE.
      No "Per head", no "Today" beneath it: those labels were 40–55px of
@@ -679,8 +678,8 @@ export function VenueBlock({
      EVERY CARD RESTS WITH EXACTLY ONE CONTROL, at the user's instruction:
      the cream Book pill where the venue takes bookings, and otherwise the
      venue's primary available action as a GHOST outline in the same
-     bottom-right seat (Visit for Mamasons/Hoodwood/Café Mama, "Opening
-     soon" for Bunso). Under the pointer — or keyboard focus anywhere in
+     bottom-right seat (Visit for Mamasons/Hoodwood/Café Mama). Under the
+     pointer — or keyboard focus anywhere in
      the card — the rest of the set unfolds to its left, staggered
      Menu-then-Visit, always reading MENU · VISIT · BOOK, right-anchored.
 
@@ -696,23 +695,48 @@ export function VenueBlock({
      get the resting pill and no unfold; the expansion (always "row")
      still offers the full set, and the whole card is the press target
      that opens it. */
+  /* THE MENU PILL, ONCE FOR BOTH ROWS. A <Link> for a page on this site,
+     a plain <a> in a new tab for a venue's own menu — the same split every
+     Visit and Book pill below already makes, and the only place in this
+     file the two element types meet. `data-act="menu"` is the split row's
+     stagger hook; the row path never had it and the stylesheet only ever
+     reads it under [data-split], so it is harmless there. */
+  const menuPill = (link: MenuLink) =>
+    link.external ? (
+      <a
+        href={link.href}
+        target="_blank"
+        rel="noopener noreferrer"
+        className={`${styles.cardBtn} ${styles.cardBtnGhost}`}
+        data-act="menu"
+        aria-label={`Menu — ${item.name} (opens their website in a new tab)`}
+      >
+        Menu
+      </a>
+    ) : (
+      <Link
+        href={link.href}
+        /* see the prefetch note in components/layout/CookieBanner.tsx —
+           seven of these per page, 22KB of RSC payload each, against a
+           640ms curtain that covers the fetch */
+        prefetch={false}
+        className={`${styles.cardBtn} ${styles.cardBtnGhost}`}
+        data-act="menu"
+        aria-label={`Menu — ${item.name}`}
+      >
+        Menu
+      </Link>
+    );
+
   const splitControls =
-    menu || visitSplit || book ? (
+    menu || visitSplit || book || status ? (
       <motion.div className={styles.actionRow} data-split="" {...actionMotion}>
-        {menu && menuHref ? (
-          <Link
-            href={menuHref}
-            /* see the prefetch note in components/layout/CookieBanner.tsx —
-               seven of these per page, 22KB of RSC payload each, against a
-               640ms curtain that covers the fetch */
-            prefetch={false}
-            className={`${styles.cardBtn} ${styles.cardBtnGhost}`}
-            data-act="menu"
-            aria-label={`Menu — ${item.name}`}
-          >
-            Menu
-          </Link>
-        ) : null}
+        {/* FIRST, so the resting row reads [• Now open][Book]; the
+            stylesheet collapses it while the ghosts unfold, so the open
+            set is Menu · Visit · Book at the width it always had. Not a
+            ghost: the `:not(:last-child)` rule must not see it. */}
+        {status ? <span className={styles.cardStatus}>{status}</span> : null}
+        {menu ? menuPill(menu) : null}
         {visitSplit ? (
           <a
             href={visitSplit.href}
@@ -740,21 +764,9 @@ export function VenueBlock({
     ) : null;
 
   const rowControls =
-    action || menu || visit ? (
+    action || menu || visit || status ? (
       <motion.div className={styles.actionRow} {...actionMotion}>
-        {menu && menuHref ? (
-          <Link
-            href={menuHref}
-            /* see the prefetch note in components/layout/CookieBanner.tsx —
-               seven of these per page, 22KB of RSC payload each, against a
-               640ms curtain that covers the fetch */
-            prefetch={false}
-            className={`${styles.cardBtn} ${styles.cardBtnGhost}`}
-            aria-label={`Menu — ${item.name}`}
-          >
-            Menu
-          </Link>
-        ) : null}
+        {menu ? menuPill(menu) : null}
         {/* THE SITE, BETWEEN THE MENU AND THE BOOKING. A second OUTLINE
             pill, not a second fill: the row still has exactly one thing in
             it a reader is meant to press first, and two cream fills on one
@@ -772,6 +784,15 @@ export function VenueBlock({
           >
             {visit.label}
           </a>
+        ) : null}
+        {/* the chip rides with the primary, inside a LINE of its own: where
+            the block cannot seat it beside Book the line goes full-width
+            and the chip stacks above the controls, right-aligned (see
+            .statusLine in the stylesheet) */}
+        {status ? (
+          <span className={styles.statusLine}>
+            <span className={styles.cardStatus}>{status}</span>
+          </span>
         ) : null}
         {action ? (
           <a

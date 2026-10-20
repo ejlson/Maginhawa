@@ -1354,7 +1354,9 @@
   display: flex;
   align-items: center;
   flex: none;
-  gap: clamp(6px, 0.7vw, 8px);
+  /* the gap is a property so the chip's line (below) can read it back */
+  --vc-row-gap: clamp(6px, 0.7vw, 8px);
+  gap: var(--vc-row-gap);
 }
 
 /* THE PRIMARY IS PUSHED RIGHT, BUT ONLY WHEN IT HAS SOMETHING TO BE
@@ -1365,13 +1367,36 @@
 .actionRow:not([data-split]) > :last-child:not(:first-child) {
   margin-left: auto;
 }
+/* WITH A CHIP BESIDE IT, THE AUTO MARGIN MOVES ONTO THE CHIP'S LINE so the
+   pair (• Now open, Book) travels right as one object — on the primary it
+   would tear them apart. The ghosts keep the row's ordinary gap. */
+.actionRow:not([data-split]) > .statusLine:not(:first-child) {
+  margin-left: auto;
+}
+.actionRow:not([data-split]) > .statusLine + .cardBtnFill:last-child {
+  margin-left: 0;
+}
+/* THE CHIP'S LINE, row path only. Content-sized and inert at the widths
+   where the chip sits beside Book; in the two bands below it goes
+   full-width, the row wraps, and the chip stacks ABOVE the controls on
+   the right — directly over Book, which is the row's last member. */
+.actionRow:not([data-split]) {
+  flex-wrap: wrap;
+}
+.statusLine {
+  display: flex;
+  justify-content: flex-end;
+  flex: none;
+}
 
 /* ═══ THE SPLIT ROW — the home grid's actions (`actions="split"`) ═══
    EVERY CARD RESTS WITH EXACTLY ONE CONTROL, at the user's instruction.
-   The booking venues rest on their cream Book pill; the four with no
-   booking (Mamasons, Hoodwood, Café Mama, Bunso — Bunso's reads "Opening
-   soon") rest on their primary available action as a GHOST outline in the
-   same bottom-right seat. On hover or focus the rest of the set unfolds to
+   The booking venues rest on their cream Book pill; the three with no
+   booking (Mamasons, Hoodwood, Café Mama) rest on their primary available
+   action as a GHOST outline in the same bottom-right seat. (Bunso rested
+   on an "Opening soon" ghost until it opened in October 2026; it now rests
+   on [• Now open][Book] — see .cardStatus below, which collapses as the
+   set opens.) On hover or focus the rest of the set unfolds to
    its left, always reading MENU · VISIT · BOOK.
 
    ⚠️ ":not(:last-child)" IS THE WHOLE RULE, and it is worth stating why it
@@ -1426,8 +1451,10 @@
 
 /* the open state — hover for fine pointers, focus-within for keyboards
    (declared separately below, OUTSIDE the media query, so hybrids keep
-   it). 10rem clears the widest label ("Opening soon") while staying tight
-   enough that the max-width animation tracks the real width closely. */
+   it). 10rem clears the widest label the set has carried ("Opening soon",
+   Bunso's before it opened; "• Now open" on the status is narrower) while
+   staying tight enough that the max-width animation tracks the real width
+   closely. */
 @media (hover: hover) and (pointer: fine) {
   .cardSurface:hover .actionRow[data-split] .cardBtnGhost:not(:last-child) {
     max-width: 10rem;
@@ -1466,6 +1493,106 @@
   .actionRow[data-split]
   .cardBtnGhost:not(:last-child)[data-act="visit"] {
   transition-delay: 70ms;
+}
+
+/* THE STATUS IN THE SPLIT ROW runs the ghosts' mechanism in REVERSE: open
+   at rest (it is the first child, so it reads before Book), and collapsed
+   by the same max-width / padding / margin / opacity set while the ghosts
+   unfold, so the open row is Menu · Visit · Book at the width it always
+   had. Its gap is margin-right for the same reason the ghosts' is. */
+.actionRow[data-split] .cardStatus {
+  max-width: 10rem;
+  margin-right: clamp(6px, 0.7vw, 8px);
+  overflow: hidden;
+  transition:
+    max-width var(--dur-mid) var(--ease-drawer),
+    padding var(--dur-mid) var(--ease-drawer),
+    margin var(--dur-mid) var(--ease-drawer),
+    opacity var(--dur-quick) var(--ease-drawer);
+}
+/* ⚠️ ONLY WHERE THERE ARE GHOSTS TO MAKE ROOM FOR. A chip that is the
+   row's lone member (Ramo, relocating) has nothing unfolding beside it
+   and must stay put on hover; `:has()` states exactly that condition, and
+   the chip-only row drops its margin because there is no Book to gap. */
+.actionRow[data-split] .cardStatus:last-child {
+  margin-right: 0;
+}
+@media (hover: hover) and (pointer: fine) {
+  .cardSurface:hover
+    .actionRow[data-split]:has(.cardBtnGhost:not(:last-child))
+    .cardStatus {
+    max-width: 0;
+    padding-inline: 0;
+    margin-right: 0;
+    border-width: 0;
+    opacity: 0;
+  }
+}
+.cardSurface:focus-within
+  .actionRow[data-split]:has(.cardBtnGhost:not(:last-child))
+  .cardStatus {
+  max-width: 0;
+  padding-inline: 0;
+  margin-right: 0;
+  border-width: 0;
+  opacity: 0;
+}
+
+/* ⚠️ THE ROW PATH CANNOT ALWAYS SEAT IT BESIDE BOOK, and where it cannot
+   the chip STACKS above the controls rather than the tagline truncating
+   or the chip hiding. Measured on Bunso's square (/restaurants), tagline
+   "Filipino Bakery & Pizzeria" = 143px: with all four on one line the
+   tagline is whole only from a 465px container up; between 316 and 464
+   the foot is one line and the chip eats the lockup. Below 315 the foot
+   stacks and the row has the block to itself — 235px of controls fit down
+   to 260, and at the ≤250 band's pill sizes (250px) they do not. Hence two
+   bands, not one. Stacked, the row is as wide as it was before the chip
+   existed (Menu · Visit · Book), so the lockup keeps every pixel it had;
+   the cost is one chip of height on that card's block alone. The SPLIT row
+   is untouched: its resting pair is 138px and the lockup stays whole at
+   every width swept (183–520). The expansion plate shares the `card`
+   container name, so a plate block narrower than 465 (a phone) stacks
+   too. */
+/* ⚠️ `width: 0; min-width: 100%` AND NOT `flex-basis: 100%`, because the
+   row is content-sized (`flex: none`) and a multi-line flex container's
+   max-content width is the SUM of its items' — a 100%-basis line still
+   contributes its chip's 85px and the row grew to 235, eating the lockup
+   (measured: 60px left of a 143px tagline at 325). A zero-width item
+   contributes nothing, and the percentage min-width resolves only once
+   the row has its width from the pills, at which point the line fills it.
+   The NEGATIVE margin-left cancels the one column gap the zero-width
+   item still pays in that sum (the row measured 150 for 145px of pills,
+   and Book stopped 5px short of the chip's right edge); laid out, the
+   margin box ends at the row's right so the line's border box is exactly
+   the row. `order: -1` puts the line FIRST: in the DOM the chip sits
+   between Visit and Book, and without it the row broke as Menu · Visit /
+   chip / Book. `:not(:only-child)` — a chip with no controls under it
+   (Ramo, relocating) has nothing to stack over and stays content-sized;
+   stacked, its line would be sizing against a row of nothing. */
+@container card (min-width: 316px) and (max-width: 464px) {
+  .actionRow:not([data-split]) > .statusLine:not(:only-child) {
+    order: -1;
+    flex-basis: 0;
+    width: 0;
+    min-width: 100%;
+    margin-left: calc(-1 * var(--vc-row-gap));
+  }
+  .actionRow:not([data-split]) {
+    justify-content: flex-end;
+    row-gap: 5px;
+  }
+}
+@container card (max-width: 259px) {
+  .actionRow:not([data-split]) > .statusLine:not(:only-child) {
+    order: -1;
+    flex-basis: 0;
+    width: 0;
+    min-width: 100%;
+    margin-left: calc(-1 * var(--vc-row-gap));
+  }
+  .actionRow:not([data-split]) {
+    row-gap: 5px;
+  }
 }
 
 /* THE SHARED PILL. Both controls are the same box; only the fill differs.
@@ -1538,6 +1665,34 @@
   background-color: var(--cream);
   border-color: var(--cream);
   color: var(--maroon);
+}
+
+/* THE STATUS — "Now open", seated beside Book on a room that has just
+   opened (lib/venueActions venueStatus). The pill's box and label voice,
+   composed so the container bands below size it with the controls, but a
+   SOFT fill: cream at 14% with no edge, which is a third register against
+   the fill (solid) and the ghosts (outline) and so cannot be mistaken for
+   a control. Cream on the 14% composite over the dark ground is ~7:1.
+   It is not interactive — no hover, no press, no focus, nothing under the
+   pointer — and the cardBtn transitions it inherits never fire. The dot
+   is a static 6px cream disc. */
+.cardStatus {
+  composes: cardBtn;
+  gap: 0.45em;
+  background-color: color-mix(in srgb, var(--cream) 14%, transparent);
+  border-color: transparent;
+  color: var(--cream);
+  cursor: default;
+  pointer-events: none;
+  user-select: none;
+}
+.cardStatus::before {
+  content: "";
+  flex: none;
+  width: 6px;
+  height: 6px;
+  border-radius: 50%;
+  background: var(--cream);
 }
 
 /* HOVER AND FOCUS. The two pills trade places rather than brightening:
@@ -1909,7 +2064,8 @@
   /* ── PART TWO: THE GAPS ── ~9px more, between the three pills and between
      the lockup and the group. */
   .actionRow {
-    gap: 5px;
+    --vc-row-gap: 5px;
+    gap: var(--vc-row-gap);
   }
   .blockFoot {
     gap: 10px;
@@ -1977,7 +2133,8 @@
      it would tear the group in two — Menu and Visit against the left edge,
      Book against the right. The extra selector is only to outrank the base
      rule further up the file. */
-  .blockFoot .actionRow > :last-child:not(:first-child) {
+  .blockFoot .actionRow > :last-child:not(:first-child),
+  .blockFoot .actionRow:not([data-split]) > .statusLine:not(:first-child) {
     margin-left: 0;
   }
 
@@ -2044,7 +2201,8 @@
     padding: 0 0.8em;
   }
   .actionRow {
-    gap: var(--space-3xs);
+    --vc-row-gap: var(--space-3xs);
+    gap: var(--vc-row-gap);
   }
   /* the sticker comes in — a 64px credential on a 183px card is a quarter
      of its width. The MARK is deliberately not overridden: its box is a
@@ -2132,7 +2290,8 @@
   /* the split row's unfold is stripped the same way: the ghost pills
      still APPEAR on hover/focus — they are state, not animation — they
      simply arrive instantly instead of sliding out. */
-  .actionRow[data-split] .cardBtnGhost:not(:last-child) {
+  .actionRow[data-split] .cardBtnGhost:not(:last-child),
+  .actionRow[data-split] .cardStatus {
     transition: none;
     transform: none;
   }

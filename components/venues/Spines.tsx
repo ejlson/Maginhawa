@@ -44,8 +44,7 @@ import Link from "next/link";
 import styles from "./Spines.module.css";
 import { asset } from "@/lib/media";
 import { getRestaurant } from "@/lib/restaurants";
-import { splitActions } from "@/lib/venueActions";
-import { menuHref } from "@/lib/menu";
+import { splitActions, venueStatus } from "@/lib/venueActions";
 import type { VenueCardItem } from "@/lib/venueCards";
 
 /* THE LETTERBOX'S OWN FOCAL POINTS, and they are a different question from
@@ -185,13 +184,15 @@ function Spine({
   panelId: string;
 }) {
   const rest = getRestaurant(item.slug);
-  const acts = splitActions(rest, {
-    hasMenuPages: Boolean(item.menuPages && item.menuPages.length > 0),
-    /* ALWAYS REACHABLE NOW. This used to say "this list owns an overlay to
-       send the press to"; the destination is a route every venue with
-       pages has, so the answer is the same for a different reason. */
-    menuReachable: true,
-  });
+  /* `acts.menu` carries the DESTINATION now, not a yes/no — this used to
+     pass `hasMenuPages` off the card record and a `menuReachable: true`
+     left over from the overlay days. Where the menu is (a page here, or the
+     venue's own site) is lib/menu's menuLink(), read through splitActions
+     so the band and the card cannot answer differently. */
+  const acts = splitActions(rest);
+  /* "Now open", read before the Book pill — a label the band seats beside
+     the control, never a fourth pill of its own. */
+  const status = venueStatus(rest);
 
   /* THE ADDRESS AS THE CARD PRINTS IT — lines 2 and 3 of the block, because
      line 1 is the venue's NAME and the wordmark above has already said it. */
@@ -324,18 +325,33 @@ function Spine({
             /* A LINK, NOT A BUTTON, and the element change is the whole
                point of the move: this navigates somewhere that exists, so
                it long-presses, opens in a new tab and copies as a URL like
-               any other link on the site. A <button> could do none of it. */
-            <Link
-              href={menuHref(item.slug)}
-              /* see the prefetch note in components/layout/CookieBanner.tsx.
-                 This is the PHONE path (Spines replaces the card grid below
-                 461px), i.e. exactly the reader the 154KB is worst for. */
-              prefetch={false}
-              className={`${styles.pill} ${styles.pillGhost}`}
-              aria-label={`Menu — ${item.name}`}
-            >
-              Menu
-            </Link>
+               any other link on the site. A <button> could do none of it.
+               An EXTERNAL menu (Bunso's, on bybunso.com) is a plain anchor
+               in a new tab, the way the Visit and Book pills beside it
+               already leave the site. */
+            acts.menu.external ? (
+              <a
+                href={acts.menu.href}
+                target="_blank"
+                rel="noopener noreferrer"
+                className={`${styles.pill} ${styles.pillGhost}`}
+                aria-label={`Menu — ${item.name} (opens their website in a new tab)`}
+              >
+                Menu
+              </a>
+            ) : (
+              <Link
+                href={acts.menu.href}
+                /* see the prefetch note in components/layout/CookieBanner.tsx.
+                   This is the PHONE path (Spines replaces the card grid below
+                   461px), i.e. exactly the reader the 154KB is worst for. */
+                prefetch={false}
+                className={`${styles.pill} ${styles.pillGhost}`}
+                aria-label={`Menu — ${item.name}`}
+              >
+                Menu
+              </Link>
+            )
           ) : null}
           {acts.visit ? (
             <a
@@ -352,6 +368,7 @@ function Spine({
               {acts.visit.label}
             </a>
           ) : null}
+          {status ? <span className={styles.status}>{status}</span> : null}
           {acts.book ? (
             <a
               href={acts.book.href}
