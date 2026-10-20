@@ -12,7 +12,7 @@ import { StructuredData } from "@/lib/StructuredData";
 const ITEMS: { q: string; a: string }[] = [
   {
     q: "Do I need to book a table?",
-    a: "Belly, Bintang, Guanabana, Ramo Ramen and Bunso all take reservations - you'll find a booking link on each restaurant's page. Café Mama & Sons, Mamasons and Hoodwood run as walk-in or takeaway, so come as you are.",
+    a: "Belly, Bintang, Guanabana and Bunso all take reservations - you'll find a booking link on each restaurant's page. Café Mama & Sons, Mamasons and Hoodwood run as walk-in or takeaway, so come as you are. Ramo Ramen is relocating, and isn't taking bookings until it reopens.",
   },
   {
     q: "Can you cater for dietary requirements?",
@@ -24,7 +24,7 @@ const ITEMS: { q: string; a: string }[] = [
   },
   {
     q: "Where are your restaurants in London?",
-    a: "We're rooted in north and central London. Belly, Guanabana and Ramo Ramen call Kentish Town home, as does Bunso on Hawley Road; Bintang and Mamasons are in Camden, with Mamasons and Ramo Ramen also in Soho; and Café Mama & Sons and Hoodwood round out the family. Each restaurant's page has its address and directions.",
+    a: "We're rooted in north and central London. Belly and Guanabana call Kentish Town home, as does Bunso on Hawley Road; Bintang and Mamasons are in Camden, with Mamasons also in Soho; Café Mama & Sons and Hoodwood round out the family; and Ramo Ramen is relocating, with its new address to follow. Each restaurant's page has its address and directions.",
   },
   {
     q: "What kind of food does Maginhawa Group serve?",

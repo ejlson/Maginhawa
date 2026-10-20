@@ -188,9 +188,9 @@ const DISPLAY: Record<string, DiscoverDisplay> = {
   },
   ramo: {
     tag: "Filipino-Japanese Ramen",
-    location: "28 Brewer St, Soho, London W1F 0SR",
+    location: "Relocating — new address to follow",
     blurb:
-      "The world's first Filipino-Japanese ramen joint - Originally from Kentish Town, since 2018, with our current location in Soho.",
+      "The world's first Filipino-Japanese ramen joint - Originally from Kentish Town, since 2018, and now relocating.",
     est: 2018,
     clip: "/videos/tile-ramo-2026.mp4",
   },

@@ -250,7 +250,8 @@ const EXTRAS: Record<string, Extras> = {
     focal: "50% 40%",
   },
   ramo: {
-    address: { area: "Soho", road: "28 Brewer St", city: "London W1F 0SR" },
+    // relocating, October 2026 — was 28 Brewer St, Soho, London W1F 0SR
+    address: { area: "London", road: "Relocating", city: "New address to follow" },
     hours: "12-11",
   },
   hoodwood: {

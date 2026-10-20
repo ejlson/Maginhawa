@@ -150,11 +150,10 @@ export const RESTAURANTS: Restaurant[] = [
     tagline: "Filipino-Japanese Ramen",
     cuisine: "Ramen · Filipino",
     description:
-      "Filipino-Japanese ramen in Soho — a tight bowl-led menu with deep, layered broths.",
-    location: "Soho, London",
-    addresses: [
-      { street: "28 Brewer St", locality: "Soho, London", postcode: "W1F 0SR" },
-    ],
+      "Filipino-Japanese ramen — a tight bowl-led menu with deep, layered broths. Relocating; new address to follow.",
+    /* No `addresses` while relocating: 28 Brewer St (Soho, W1F 0SR) was
+       the old room, and the schema must not send anyone there. */
+    location: "London",
     image: "/images/ramoramen.JPG",
     logo: "/logo/ramo.png",
     website: "https://www.ramoramen.com/",
@@ -279,6 +278,13 @@ export const RESTAURANTS: Restaurant[] = [
 
 export const getRestaurant = (slug: string) =>
   RESTAURANTS.find((r) => r.slug === slug);
+
+/* The Schema.org type every JSON-LD block gives a venue. One spelling,
+   because three blocks share each venue's `@id` and must not disagree.
+   A relocating room keeps `bookable` for its return but is not one a
+   reader can book today, so it reads as a FoodEstablishment meanwhile. */
+export const schemaType = (r: Restaurant) =>
+  r.bookable && r.status !== "relocating" ? "Restaurant" : "FoodEstablishment";
 
 /**
  * The venues that actually have menu PAGES on file. Bunso has none: its

@@ -1,7 +1,7 @@
 import type { Metadata } from "next";
 import { notFound } from "next/navigation";
 import MenuPage from "@/components/venues/MenuPage";
-import { getRestaurant, withMenus } from "@/lib/restaurants";
+import { getRestaurant, schemaType, withMenus } from "@/lib/restaurants";
 import { intrinsicSize } from "@/lib/intrinsicSize";
 import { SITE_URL } from "@/lib/site";
 import { ogImage, OG_W, OG_H } from "@/lib/media";
@@ -132,7 +132,7 @@ export default async function VenueMenuPage({
     ...(r.menuLabel ? { dateModified: r.menuLabel } : {}),
     isPartOf: { "@id": `${SITE_URL}/#website` },
     about: {
-      "@type": r.bookable ? "Restaurant" : "FoodEstablishment",
+      "@type": schemaType(r),
       "@id": `${SITE_URL}/restaurants#${r.slug}`,
       name: r.name,
       servesCuisine: r.cuisine,

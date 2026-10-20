@@ -1,6 +1,6 @@
 import type { Metadata } from "next";
 import RestaurantsShowcase from "@/components/venues/RestaurantsShowcase";
-import { RESTAURANTS } from "@/lib/restaurants";
+import { RESTAURANTS, schemaType } from "@/lib/restaurants";
 import { SITE_URL } from "@/lib/site";
 import { StructuredData } from "@/lib/StructuredData";
 
@@ -59,7 +59,7 @@ const jsonLd = {
       "@type": "ListItem",
       position: i + 1,
       item: {
-        "@type": r.bookable ? "Restaurant" : "FoodEstablishment",
+        "@type": schemaType(r),
         "@id": `${SITE_URL}/restaurants#${r.slug}`,
         name: r.name,
         url: r.website ?? `${SITE_URL}/restaurants`,

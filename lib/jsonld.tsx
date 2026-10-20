@@ -3,7 +3,7 @@
 // Perplexity, Google AI Overviews, Bing) ingest reliably. Inject via
 // <script type="application/ld+json"> in a Server Component.
 
-import { RESTAURANTS } from "./restaurants";
+import { RESTAURANTS, schemaType } from "./restaurants";
 import { PRESS } from "./press";
 import { SOCIALS } from "./contact";
 
@@ -57,7 +57,7 @@ export function OrganizationJsonLd() {
        that no longer resolves. A venue with no site of its own keeps the
        index as its url, which is the truest page there is for it. */
     department: RESTAURANTS.map((r) => ({
-      "@type": r.bookable ? "Restaurant" : "FoodEstablishment",
+      "@type": schemaType(r),
       "@id": `${SITE_URL}/restaurants#${r.slug}`,
       name: r.name,
       url: r.website ?? `${SITE_URL}/restaurants`,
