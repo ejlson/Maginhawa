@@ -3,6 +3,8 @@
 import Image from "next/image";
 import {
   AnimatePresence,
+  cancelFrame,
+  frame,
   motion,
   useMotionValue,
   useReducedMotion,
@@ -431,8 +433,43 @@ const ITEMS: DiscoverItem[] = venueCards().map((v) => {
    head. */
 const PLATE_RATIO = 0.82;
 
-// shared enter curve for the head's staged rise
+// shared enter curve for the head's staged rise — globals.css's --ease-entrance
 const EASE = [0.22, 1, 0.36, 1] as const;
+
+/* ── THE MOTION TOKENS, MIRRORED FOR FRAMER ──
+   framer takes seconds and bezier arrays, not `var()`, so the expansion's
+   clocks are spelled here as a copy of the --dur-* / --ease-* scale in
+   app/globals.css (:root). Keep the two in step by hand — a drift here is
+   invisible to the retiming probe, which only walks stylesheets. */
+const DUR = {
+  tap: 0.16, // --dur-tap    :active feedback; never slowed
+  quick: 0.26, // --dur-quick  ink on small type
+  snug: 0.34, // --dur-snug   a small fade, an icon, a dot
+  base: 0.44, // --dur-base   the default state change
+  slow: 0.62, // --dur-slow   transform on a large object: a card
+} as const;
+/* what the pressed tile hands the expansion for the flight's first frame:
+   the picture it is showing (its decoded still, or — if the hover film was
+   playing — that film's current frame, drawn off the video), and the
+   scale and pan the tile's photograph is resting at, so the plate's ground
+   is the tile to the pixel. */
+type Ground = { src: string; scale: string; translate: string };
+
+/* how far home the seat has to be before the tile's furniture starts
+   back — a fraction of the return travel, not a pixel threshold, at the
+   Reviewer's direction: at 2px the tile sat bare for a quarter-second
+   after it looked home. AC1 is judged against the same number. */
+const SETTLE_AT = 0.9;
+
+/* where in the plate's travel the furniture is cued — see the loop in
+   ExpandedCard. --ease-entrance reaches 0.95 ~117ms into --dur-quick; the
+   block follows one --stagger-tight later, so the pair straddles the
+   plate's 0.98. At 0.84 the prod build put the crown 29–62ms ahead
+   (62 on Café Mama & Sons at 768, past the ±60 budget) and the block
+   −4 to +27ms; 0.86 shifts the pair later to centre them. */
+const FURNITURE_AT = 0.86;
+const EASE_OUT = [0.23, 1, 0.32, 1] as const; // --ease-out
+const EASE_STATE = [0.4, 0.05, 0.2, 1] as const; // --ease-state
 
 /* NO VARIANT PAIR HERE ANY MORE. A TITLE_RISE {parked, raised} object stood
    at this spot, unreferenced — the word's park and its release are two CSS
@@ -793,6 +830,23 @@ const EXPAND_SPRING = {
   type: "spring",
   visualDuration: 0.45,
   bounce: 0.1,
+  /* ── WHEN THE FLIGHT IS OVER, as far as framer is concerned ──
+     A layout animation drives a progress value from 0 to 1000 and ends
+     only when the spring's velocity AND displacement are both under
+     threshold — framer's defaults for a value that size are 2/s and 0.5,
+     i.e. 0.05% of travel. Measured on the return flight: visually home at
+     ~0.45s, `onLayoutAnimationComplete` at ~0.95s. That tail is what the
+     reader waits on — the dialog cannot unmount, and the tile's furniture
+     cannot return, until it fires. These end it at 0.3% of travel (3px
+     on the 980px flight, 2px on the tile — the same 2px the eye is
+     judged by, see Tile's landing loop) as soon as the displacement is
+     under it: the velocity bound is loose on purpose, because at 0.3%
+     the spring is still moving at ~6%/s and a tight bound waited ~80ms
+     more for it to slow. Measured, the callback moved from ~0.95s to
+     ~0.52s. 0.3 and not 0.1 because the bounce overshoots by ~0.2% at
+     ~0.64s, and a tighter delta waits for that to come back. */
+  restDelta: 3,
+  restSpeed: 100,
 } as const;
 
 /* ── HOW THE GRID GETS OUT OF THE WAY ──
@@ -839,6 +893,10 @@ const GRID_COLS = 4;
 
    Keep in step with the first @media block in Discover.module.css. */
 const SPINES = "(max-width: 460px)";
+
+/* the cookie banner, as components/layout/CookieBanner.tsx labels it —
+   the one body child the expansion leaves interactive, see `lock` */
+const COOKIE_BANNER = '[aria-label="Cookie choices"]';
 
 /* ══════════════ THE ARRIVAL DRIVER ══════════════
    Eight tiles used to hold eight `useScroll({ target: cellRef })`. This
@@ -934,15 +992,183 @@ export default function Discover() {
   // the App Store expansion — which tile's plate is currently open as the
   // full detail card (null = none)
   const [active, setActive] = useState<DiscoverItem | null>(null);
+  // the same, readable synchronously from the close intent
+  const activeRef = useRef<DiscoverItem | null>(null);
+  /* the tile's already-decoded photograph (its <img>.currentSrc), read at
+     the press and handed to the expansion as the flight's ground — see
+     `ground` on <ExpandedCard> */
+  const [ground, setGround] = useState<Ground | null>(null);
+
+  /* ── THE FLIGHT, AS THE TILE SEES IT ──
+     `data-card-flying` on the pressed CELL withdraws the tile's own
+     furniture (crown, block, ramp, hover layers) for as long as the plate
+     is in the air — VenueCard.module.css owns the rule. It goes on at the
+     press and comes off when the RETURN flight lands, via the seat's
+     onLayoutAnimationComplete; "landed" is the one beat after that in
+     which the furniture fades back in (--dur-quick), then the attribute
+     is dropped so the hover layers get their own transitions back.
+     ⚠️ ON THE CELL, NEVER ON THE SEAT. The seat is the measured box and
+     framer writes its inline opacity (an idle layoutId element is given
+     `opacity: 1` by getProjectionStyles) — a rule there is dead, and a
+     transform there is the 1%-too-big rectangle this card has shipped. */
+  const [flight, setFlight] = useState<
+    { slug: string; phase: "on" | "landed" } | null
+  >(null);
+  /* the slug whose plate is flying HOME. Presses are ignored until it
+     lands — AnimatePresence would otherwise mount a second dialog over
+     the first's exit. Cleared by the TILE when its seat is back within
+     2px (see Tile's landing loop), by the seat's layout callback and by
+     AnimatePresence's onExitComplete — whichever is first; `land` is
+     idempotent — with a timer behind all three. */
+  const exitingRef = useRef<string | null>(null);
+  const landTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  const settleTimer = useRef<ReturnType<typeof setTimeout> | null>(null);
+  /* the tile's pressable, read at the press. Focus is moved to the close
+     control by force, so it returns by force — at close START, not on
+     unmount, or a keyboard reader is left on <body> for the length of the
+     return flight. */
+  const returnFocus = useRef<HTMLElement | null>(null);
+  /* the open dialog's root. Marked `data-exiting` HERE, imperatively, at
+     the close intent — a React render of the exiting dialog for the same
+     attribute re-measured the plate's projection in the close commit and
+     cost the return flight a frame (measured: 0.98 of travel at ~455ms
+     against ~440ms without). */
+  const expandRoot = useRef<HTMLDivElement | null>(null);
+
+  /* ── ONE LOCK OWNER ──
+     The page is held still (lenis stopped, documentElement overflow
+     hidden) from the press until the close is ASKED FOR, not until the
+     dialog unmounts ~0.4s later: the card has visibly landed by then and
+     a wheel that does nothing on a landed card reads as a hang. Both
+     halves live here rather than in <ExpandedCard>'s effect so there is
+     exactly one place that can leave the page locked.
+     `overflow` is restored to "" rather than to a captured previous value
+     — a capture taken on a re-entry mid-close reads "hidden" and would
+     lock the page for good. lenis.start() on a lenis that was never
+     stopped is a no-op, so the release is unconditional. */
+  /* ── AND THE REST OF THE PAGE IS INERT WHILE THE CARD IS UP ──
+     Tab walked out of the dialog — body, the skip link, the nav, then the
+     tiles — and Enter on a tile behind the backdrop opened a second card.
+     `inert` on every child of <body> at the press closes that for the
+     keyboard AND for assistive tech; the dialog is portaled onto <body>
+     AFTER this runs, so it is the one child that is not. It changes
+     nothing about layout, paint or the projection, which measures the
+     tile inside the inert subtree exactly as before (measured). Only
+     what this set is cleared — and cleared HERE, synchronously, before
+     focus goes back to the tile: an inert tile refuses focus. */
+  const inerted = useRef<Element[]>([]);
+  const lock = useCallback(() => {
+    lenisRef.current?.stop();
+    document.documentElement.style.overflow = "hidden";
+    for (const el of Array.from(document.body.children)) {
+      if (el.tagName === "SCRIPT" || el.hasAttribute("inert")) continue;
+      // the cookie banner stays live: it is a notice the reader may need
+      // to answer, and it sits above this dialog (z 250) by design
+      if (el.matches(COOKIE_BANNER)) continue;
+      el.setAttribute("inert", "");
+      inerted.current.push(el);
+    }
+  }, []);
+  const unlock = useCallback(() => {
+    document.documentElement.style.overflow = "";
+    lenisRef.current?.start();
+    inerted.current.forEach((el) => el.removeAttribute("inert"));
+    inerted.current = [];
+  }, []);
+
+  /* the seat is back within 2px (the tile's own loop): the furniture
+     fades back. NOT the moment presses return — see `land`. */
+  const settle = useCallback((slug: string) => {
+    setFlight((f) => {
+      if (f?.slug !== slug || f.phase !== "on") return f;
+      if (settleTimer.current) clearTimeout(settleTimer.current);
+      settleTimer.current = setTimeout(() => {
+        setFlight((g) => (g?.slug === slug && g.phase === "landed" ? null : g));
+      }, DUR.quick * 1000);
+      return { slug, phase: "landed" };
+    });
+  }, []);
+  /* the dialog is gone (AnimatePresence's onExitComplete, the seat's
+     layout callback, or the timer): the grid takes presses again. Later
+     than `settle` by a frame or two — EXPAND_SPRING rests at the same 2px
+     — and it has to be: a press accepted while the old dialog is still
+     exiting mounts a second one beside it. */
+  const land = useCallback(
+    (slug: string) => {
+      if (exitingRef.current !== slug) return;
+      exitingRef.current = null;
+      if (landTimer.current) clearTimeout(landTimer.current);
+      landTimer.current = null;
+      settle(slug);
+    },
+    [settle],
+  );
+
+  const openCard = useCallback(
+    (it: DiscoverItem, pressable: HTMLElement | null, src: Ground | null) => {
+      /* a card is open, or a plate is still flying home — see exitingRef.
+         The open case is reachable from the keyboard only (the grid is
+         inert while a card is up); it must never mount a second dialog. */
+      if (activeRef.current || exitingRef.current) return;
+      if (settleTimer.current) clearTimeout(settleTimer.current);
+      returnFocus.current = pressable;
+      setGround(src);
+      /* no flight under reduced motion — the plate crossfades, the seat's
+         landing callback never fires, and the furniture must not be
+         withheld from a tile nothing is covering */
+      if (!reduce) setFlight({ slug: it.slug, phase: "on" });
+      lock();
+      activeRef.current = it;
+      setActive(it);
+    },
+    [lock, reduce],
+  );
+
   /* ONE IDENTITY FOR THE LIFE OF THE COMPONENT, not a fresh arrow per
-     render: <ExpandedCard> keys its housekeeping effect on `onClose`, so
-     a new identity while the card is open tears that effect down and
-     runs it again — lenis started and re-stopped, the overflow lock
-     released and retaken, focus yanked back to the close button off
-     whatever the reader had tabbed to. Reachable in practice: the grid's
-     ResizeObserver fires setCols on any window resize and re-renders
-     this component. */
-  const closeExpanded = useCallback(() => setActive(null), []);
+     render: it is the Escape listener's dependency and the backdrop's
+     handler, and the grid's ResizeObserver re-renders this component on
+     any window resize. Safe to call twice — the second finds no card. */
+  const closeExpanded = useCallback(() => {
+    const cur = activeRef.current;
+    if (!cur) return;
+    activeRef.current = null;
+    /* in BOTH modes — under reduced motion there is no flight, but there
+       is still an exit, and a press during it mounted a second dialog */
+    exitingRef.current = cur.slug;
+    landTimer.current = setTimeout(() => land(cur.slug), 1000);
+    expandRoot.current?.setAttribute("data-exiting", "on");
+    // the film fades to the still over the return (see .expandRoot
+    // [data-exiting] .expandFilm); it need not keep decoding under that
+    expandRoot.current?.querySelector("video")?.pause();
+    setActive(null);
+    unlock();
+    returnFocus.current?.focus({ preventScroll: true });
+    returnFocus.current = null;
+  }, [unlock, land]);
+
+  /* close on Escape — a window listener for the life of the open card.
+     Here rather than in the dialog so the key reaches the same close
+     intent as the backdrop and the ×, release included. */
+  useEffect(() => {
+    if (!active) return;
+    const onKey = (e: KeyboardEvent) => {
+      if (e.key === "Escape") closeExpanded();
+    };
+    window.addEventListener("keydown", onKey);
+    return () => window.removeEventListener("keydown", onKey);
+  }, [active, closeExpanded]);
+
+  /* leaving the page with a card open — a client-side navigation off the
+     Menu pill does exactly this — must not take the lock with it: lenis
+     is a module singleton that outlives the route. */
+  useEffect(
+    () => () => {
+      unlock();
+      if (landTimer.current) clearTimeout(landTimer.current);
+      if (settleTimer.current) clearTimeout(settleTimer.current);
+    },
+    [unlock],
+  );
 
   /* ---- WHICH LAYOUT THIS WIDTH GETS ----
      ⚠️ STATE AND NOT A REF, AND IT LISTENS RATHER THAN READING ONCE. This
@@ -975,8 +1201,8 @@ export default function Discover() {
      nowhere at the centre of the screen. Closing it on the crossing is one
      line and removes the whole class of it. */
   useEffect(() => {
-    if (spines) setActive(null);
-  }, [spines]);
+    if (spines) closeExpanded();
+  }, [spines, closeExpanded]);
 
   /* ---- THE MENU IS NOT THIS PAGE'S ANY MORE ----
      `menuFor` state and a portaled menu overlay stood here, and the note
@@ -1615,8 +1841,11 @@ export default function Discover() {
                    a hook cannot be called from inside this `.map`, the same
                    constraint Manifesto.tsx records over its own ScrubWord. */
                 col={reduce ? undefined : col}
-                onOpen={() => setActive(it)}
+                onOpen={openCard}
                 open={openIndex === i}
+                flying={flight?.slug === it.slug ? flight.phase : undefined}
+                onSettled={settle}
+                onLanded={land}
                 recedeDelay={step * RECEDE_STEP_S}
               />
             );
@@ -1636,11 +1865,20 @@ export default function Discover() {
 
       {/* the expanded detail card + backdrop — mounted only while open, so
           AnimatePresence can run the morph back into the grid on close */}
-      <AnimatePresence>
+      <AnimatePresence
+        /* the dialog has unmounted: under reduced motion this is the only
+           landing there is (no seat flight, no layout callback); on the
+           morph it is the backstop behind the tile's own 2px test */
+        onExitComplete={() => {
+          if (exitingRef.current) land(exitingRef.current);
+        }}
+      >
         {active && (
           <ExpandedCard
             key={active.slug}
             item={active}
+            ground={ground}
+            rootRef={expandRoot}
             onClose={closeExpanded}
           />
         )}
@@ -1660,6 +1898,9 @@ function Tile({
   col,
   onOpen,
   open,
+  flying,
+  onSettled,
+  onLanded,
   recedeDelay,
   registerArrival,
 }: {
@@ -1674,7 +1915,22 @@ function Tile({
    *  no clip is ever installed. It is the ONLY part of the wave that is
    *  computed; the rest is the card's own position on the page. */
   col?: number;
-  onOpen: () => void;
+  /** the press. The tile hands up its own pressable (focus returns to it
+   *  at close) and the photograph's decoded `currentSrc` (the flight's
+   *  ground) — both read off the DOM at the moment of the press. */
+  onOpen: (
+    item: DiscoverItem,
+    pressable: HTMLElement | null,
+    ground: Ground | null,
+  ) => void;
+  /** the plate is in the air ("on") or has just come home ("landed"):
+   *  the cell's `data-card-flying`, which VenueCard.module.css reads to
+   *  withhold and then return the tile's furniture. See `flight`. */
+  flying?: "on" | "landed";
+  /** the seat is back within 2px of its box — the eye's landing */
+  onSettled: (slug: string) => void;
+  /** the seat's layout animation has rested — framer's landing */
+  onLanded: (slug: string) => void;
   /* ⚠️ `menuHref` IS GONE FROM HERE. The grid used to spell every tile's
      menu route from lib/menu and hand it down; the card reads lib/menu's
      menuLink() off the canonical record itself now, because Bunso's menu
@@ -1773,6 +2029,88 @@ function Tile({
 
   const settled = mounted && !reduce;
 
+  /* the press, with what the expansion needs read off this cell's DOM:
+     the pressable (VenueCard's .plateHit) and the photograph's currentSrc
+     — the w_384 candidate the browser has already decoded, which is what
+     the flight paints from frame 0 while the card's own size loads */
+  const press = useCallback(() => {
+    const cell = cellRef.current;
+    const pressable = cell?.querySelector<HTMLElement>(`.${card.plateHit}`) ?? null;
+    const img = cell?.querySelector<HTMLImageElement>(`.${card.photo}`);
+    let ground: Ground | null = null;
+    if (img && img.complete && img.currentSrc) {
+      const cs = getComputedStyle(img);
+      ground = { src: img.currentSrc, scale: cs.scale, translate: cs.translate };
+    }
+    /* the hover film was playing: its current frame is what the reader is
+       looking at, so it is what the plate takes off with (drawn at the
+       tile's size — a few ms). The film itself is held by the card at
+       this press. A tainted canvas or a cold video falls back to the
+       still above. */
+    const v = cell?.querySelector("video");
+    if (v && !v.paused && v.readyState >= 2 && v.videoWidth) {
+      try {
+        const c = document.createElement("canvas");
+        const r = v.getBoundingClientRect();
+        c.width = Math.round(r.width);
+        c.height = Math.round(r.height);
+        const ctx = c.getContext("2d");
+        if (ctx && c.width && c.height) {
+          // object-fit: cover, by hand
+          const k = Math.max(c.width / v.videoWidth, c.height / v.videoHeight);
+          const dw = v.videoWidth * k;
+          const dh = v.videoHeight * k;
+          ctx.drawImage(v, (c.width - dw) / 2, (c.height - dh) / 2, dw, dh);
+          ground = { src: c.toDataURL("image/jpeg", 0.85), scale: "1", translate: "none" };
+        }
+      } catch {
+        /* cross-origin film: the still is the ground */
+      }
+    }
+    onOpen(item, pressable, ground);
+  }, [onOpen, item]);
+  const landed = useCallback(() => onLanded(item.slug), [onLanded, item.slug]);
+
+  /* ── THE LANDING, JUDGED BY THE EYE'S THRESHOLD ──
+     The seat's onLayoutAnimationComplete fires when the spring RESTS,
+     after the plate looks home. For that time the tile sat bare. So while
+     this seat is flying home, a frame loop measures its width against its
+     own and calls it settled at SETTLE_AT of the travel — the furniture
+     fades back from there, under a plate that is still opaque above it
+     for the last tenth. Presses return when the dialog has actually gone
+     (`land` upstream), a few frames later. */
+  useEffect(() => {
+    if (flying !== "on" || open) return;
+    const seat = cellRef.current?.querySelector<HTMLElement>("[data-plate]");
+    if (!seat) return;
+    let raf = 0;
+    let start: number | null = null;
+    const t0 = performance.now();
+    const tick = () => {
+      const w = seat.getBoundingClientRect().width;
+      const w0 = seat.offsetWidth;
+      /* the flight's own width is its start: the first frame the seat is
+         SEEN away from home. A frame before framer promotes it would
+         otherwise read as an instant landing. */
+      if (start === null && Math.abs(w - w0) > 2) start = w;
+      const travel = start === null ? 0 : (start - w) / (start - w0);
+      const home = Math.abs(w - w0) <= 2;
+      if (travel >= SETTLE_AT || (home && performance.now() - t0 > 600)) {
+        raf = 0;
+        /* written to the DOM now and confirmed by React a commit later
+           (same value): the fade starts this frame, not ~25ms on */
+        if (cellRef.current) cellRef.current.dataset.cardFlying = "landed";
+        onSettled(item.slug);
+        return;
+      }
+      raf = requestAnimationFrame(tick);
+    };
+    raf = requestAnimationFrame(tick);
+    return () => {
+      if (raf) cancelAnimationFrame(raf);
+    };
+  }, [flying, open, onSettled, item.slug]);
+
   /* ═══════════════════════════════════════════════════════════════════
      THE CARD IS <VenueCard> NOW, AND EVERYTHING THIS FUNCTION USED TO DO
      INSIDE IT IS GONE.
@@ -1818,6 +2156,10 @@ function Tile({
          style of its own; the delay is a custom property because the value
          is per-cell and a stylesheet cannot compute a distance. */
       data-open={open ? "on" : undefined}
+      /* the flight, for the stylesheet: the tile's furniture is withheld
+         while its plate is in the air. On the CELL, which framer never
+         measures or writes an opacity to — see `flight` in Discover. */
+      data-card-flying={flying}
       /* ⚠️ THE INK RIDES THE CELL, the one element the morph never
          measures; the settle rides the photograph via --photo-enter on the
          seat below. Both are WITHHELD UNTIL MOUNT — framer renders a motion
@@ -1852,6 +2194,11 @@ function Tile({
            One curve, both directions. Inert under `reduce`, exactly like
            the layoutId above. */
         transition={EXPAND_SPRING}
+        /* the return flight's landing. The seat is the lead on the way
+           home, so this is the one callback that fires when the plate
+           settles; the chapter ignores it unless this slug is the one
+           flying (the open flight's landing arrives here too). */
+        onLayoutAnimationComplete={landed}
         /* padding-top carries the plate's aspect from PLATE_RATIO — the
            stylesheet's 143.33% is only the fallback. Inline because the
            same number must also size the expansion, and a value stated in
@@ -1890,7 +2237,7 @@ function Tile({
              not know its own column count and a wrong `sizes` is a 4K
              decode on a 274px box. */
           sizes="(max-width: 460px) 100vw, (max-width: 700px) 50vw, (max-width: 980px) 34vw, 25vw"
-          onPress={onOpen}
+          onPress={press}
           pressLabel={`Open ${item.name}`}
           // the press expands the card in place rather than navigating
           /* ⚠️ NO `pressHasPopup="dialog"` ANY MORE. The card's press used
@@ -2011,13 +2358,26 @@ function Tile({
      crossfade ends. ═══ */
 function ExpandedCard({
   item,
+  ground,
+  rootRef,
   onClose,
 }: {
   item: DiscoverItem;
+  /** what the tile was showing at the press — its decoded still or the
+   *  hover film's frame, with the photograph's resting scale and pan —
+   *  painted under the card's own image from the first frame of the
+   *  flight; see .expandGround. Null when the tile had nothing decoded. */
+  ground: Ground | null;
+  /** Discover's handle on this dialog's root — it marks the root
+   *  `data-exiting` (pointer-dead) at the close intent, see there */
+  rootRef: React.MutableRefObject<HTMLDivElement | null>;
   onClose: () => void;
 }) {
   const reduce = useReducedMotion();
   const closeRef = useRef<HTMLButtonElement>(null);
+  const cardRef = useRef<HTMLDivElement>(null);
+  const plateRef = useRef<HTMLDivElement>(null);
+  const frameRef = useRef<HTMLDivElement>(null);
 
   /* THE ACTION IS NOT DERIVED HERE ANY MORE. It was a local `getRestaurant`
      + `primaryAction()` read, with a comment saying the expansion and the
@@ -2032,160 +2392,310 @@ function ExpandedCard({
      one today, so this is the ordinary path for all eight. */
   const film = !reduce && item.clip ? item.clip : null;
 
-  /* modal housekeeping: hold the page still underneath, close on Escape,
-     land keyboard focus on the close control — and hand it BACK on close.
-     Focus was moved here by force, so it returns by force: left alone the
-     browser drops it on <body> when the button unmounts, and a keyboard
-     reader resumes tabbing from the top of the document instead of from
-     the tile they opened.
-     ⚠️ KEYED ON `onClose`, so Discover memoises it (see closeExpanded) —
-     a fresh identity per render would tear this effect down and run it
-     again mid-open: lenis started and re-stopped, the overflow lock
-     released and retaken, and focus yanked back to the close button off
-     whatever the reader had tabbed to. */
+  /* land keyboard focus on the close control. THAT IS ALL THIS EFFECT
+     DOES NOW: the scroll lock, lenis, Escape and the focus RETURN all
+     moved up to Discover, keyed on the open and close INTENTS. An unmount
+     cleanup here ran ~0.4s after the card had visibly gone — the page
+     stayed held, and focus sat on <body>, for the length of the return
+     flight. See `lock` / `closeExpanded` in Discover. */
   useEffect(() => {
-    const lenis = lenisRef.current;
-    lenis?.stop();
-    const prevOverflow = document.documentElement.style.overflow;
-    document.documentElement.style.overflow = "hidden";
-    // the tile's pressable, in practice — read before focus is moved
-    const prevFocus =
-      document.activeElement instanceof HTMLElement
-        ? document.activeElement
-        : null;
     closeRef.current?.focus({ preventScroll: true });
-    const onKey = (e: KeyboardEvent) => {
-      if (e.key === "Escape") onClose();
+  }, []);
+
+  /* `inert` on the rest of the page is Discover's — set with the lock at
+     the press, cleared with it at the close intent (see `lock`). */
+
+  /* the Tab trap — belt to inert's braces: with nothing else focusable
+     the browser would otherwise hand Tab to its own chrome */
+  const onKeyDown = (e: KeyboardEvent) => {
+    if (e.key !== "Tab" || !rootRef.current) return;
+    // closing: focus has already gone home to the tile; let it be
+    if (rootRef.current.hasAttribute("data-exiting")) return;
+    const FOCUSABLE = 'a[href], button:not([disabled]), input:not([disabled]), [tabindex]:not([tabindex="-1"])';
+    const banner = document.querySelector<HTMLElement>(COOKIE_BANNER);
+    const items = [
+      ...Array.from(rootRef.current.querySelectorAll<HTMLElement>(FOCUSABLE)),
+      // the one live thing outside the dialog — it is in the cycle, after
+      // the ×, so a keyboard reader can answer it without leaving
+      ...(banner ? Array.from(banner.querySelectorAll<HTMLElement>(FOCUSABLE)) : []),
+    ].filter((el) => el.offsetParent !== null);
+    if (!items.length) {
+      e.preventDefault();
+      return;
+    }
+    /* a full manual cycle: the dialog is the LAST child of <body>, so the
+       browser's own next-after-it is the top of the document, and the
+       banner sits between the two in no useful order */
+    const cur = document.activeElement as HTMLElement | null;
+    const idx = cur ? items.indexOf(cur) : -1;
+    const n = items.length;
+    const next = idx < 0 ? (e.shiftKey ? n - 1 : 0) : (idx + (e.shiftKey ? n - 1 : 1)) % n;
+    e.preventDefault();
+    items[next].focus();
+  };
+
+  /* On the DOCUMENT, not the dialog root: with focus in the cookie banner
+     (outside the dialog) a root handler never saw the key, and Shift+Tab
+     from the banner's first control fell to <body>. And dismissing the
+     banner removes the focused button, which drops focus on <body> — so
+     after any press inside it, a focus left on <body> goes back to ×. */
+  const onKeyDownRef = useRef(onKeyDown);
+  onKeyDownRef.current = onKeyDown;
+  useEffect(() => {
+    const key = (e: KeyboardEvent) => onKeyDownRef.current(e);
+    const click = (e: MouseEvent) => {
+      const banner = document.querySelector(COOKIE_BANNER);
+      if (!banner || !banner.contains(e.target as Node)) return;
+      requestAnimationFrame(() => {
+        const a = document.activeElement;
+        if (rootRef.current?.hasAttribute("data-exiting")) return;
+        if (!a || a === document.body) closeRef.current?.focus({ preventScroll: true });
+      });
     };
-    window.addEventListener("keydown", onKey);
+    document.addEventListener("keydown", key);
+    document.addEventListener("click", click, true);
     return () => {
-      window.removeEventListener("keydown", onKey);
-      document.documentElement.style.overflow = prevOverflow;
-      lenis?.start();
-      prevFocus?.focus({ preventScroll: true });
+      document.removeEventListener("keydown", key);
+      document.removeEventListener("click", click, true);
     };
-  }, [onClose]);
+  }, [rootRef]);
 
-  /* ── THE FURNITURE'S ARRIVAL, AND IT IS TWO CLOCKS NOW ──
-     IT WAS ONE, deliberately: "one clock for the ramp, the mark, the close
-     and the block, so the card 'develops' as one thing rather than in four
-     unrelated fades". That reasoning was sound while all four objects sat at
-     the card's FINAL rectangle, because then they genuinely were one layer.
-     The ramp has moved inside the plate (see the banner), so they are two
-     layers now — the picture's ground, and the words on it — and one clock
-     was making them share a schedule that only ever suited one of them.
+  /* ── THE FRAME LOOP: one rAF for the life of the card, reading the
+     plate's painted rectangle. Three things ride it, none of them a
+     React render (this subtree is a layout projection; a render is a
+     re-measure):
 
-     WHAT EACH CLOCK IS FOR:
-       `rampFade`   the ramp, travelling with the plate. EARLY, on
-                    0.12 + 0.34, because it cannot overhang anything any
-                    more — it is clipped to the picture at every size. It is
-                    what keeps the flying plate from being a bare photograph.
-       `furniture`  the mark, the close and the block, still at the final
-                    rectangle. LATE.
+     1. THE COUNTER-PROJECTION. The plate's morph scales its subtree by
+        (w/W, h/H) — W×H the card's box, w×h the plate's painted one —
+        and the two shapes differ (1.22 tile, 16:9 card), so anything
+        inside squashes. framer's `layout` on the frame answered that on
+        the way OUT and went stale on the way BACK (the picture stayed at
+        the open card's rectangle while the plate shrank past it — a
+        cream band at the plate's top for the first 200ms). The frame is
+        now sized to w×h and scaled by (W/w, H/h) from its top-left, so
+        the picture is laid out — cover-fit — in the box the reader sees,
+        in both directions. framer's reciprocal painted the full card and
+        cropped it top-left; this lands on the tile's own framing.
+     2. THE PLATE STAYS OPAQUE. A shared-layoutId flight is a crossfade;
+        framer writes the plate's inline opacity every frame, and this
+        writes 1 straight after (its loop registered first, so it runs
+        first). The seat is withdrawn for the whole flight (see
+        [data-card-flying="on"] .cardSurface), so there is one picture in
+        the air, not two half ones.
+     3. THE FURNITURE'S CUE. The crown, the × and the block take their cue
+        from the plate itself: `data-furniture` flips on the seat once
+        travel passes FURNITURE_AT, and the stylesheet transitions a
+        registered `--furn` from there (--dur-quick on --ease-entrance,
+        the block one --stagger-tight behind), so the furniture's 0.95
+        lands a fixed ~117ms after a cue that moves with the flight. A
+        fixed delay landed the crown 66ms early on one tile at 768 and on
+        time on the next. Reduced motion flips it at once — the
+        crossfade is `--fade`'s — and takes none of the rest. */
+  useEffect(() => {
+    const card = cardRef.current;
+    const plate = plateRef.current;
+    const box = frameRef.current;
+    if (!card || !plate || !box) return;
+    if (reduce) {
+      card.dataset.furniture = "on";
+      return;
+    }
+    let w0: number | null = null;
+    let cued = false;
+    let played = false;
+    let lastW = -1;
+    let lastH = -1;
+    /* ⚠️ ON FRAMER'S OWN LOOP, IN ITS postRender STEP — not a bare rAF.
+       The projection writes the plate's inline opacity and transform in
+       framer's `render` step; a rAF of our own ran before or after that
+       depending on which loop happened to register first (measured: after
+       on the close, before on the open — where the crossfade then won).
+       postRender is defined to follow render, every frame, so these reads
+       see this frame's box and the opacity write is the last one. */
+    const tick = () => {
+      const c = card.getBoundingClientRect();
+      const p = plate.getBoundingClientRect();
+      const w = p.width;
+      const h = p.height;
+      if (w !== lastW || h !== lastH) {
+        lastW = w;
+        lastH = h;
+        const home = Math.abs(w - c.width) < 0.5 && Math.abs(h - c.height) < 0.5;
+        box.style.width = home ? "" : `${w}px`;
+        box.style.height = home ? "" : `${h}px`;
+        box.style.transform = home ? "" : `scale(${c.width / w}, ${c.height / h})`;
+        /* 4. THE FILM STARTS WHEN THE PLATE HAS LANDED, not at mount. It
+           is invisible until `playing` anyway, and a second live decode
+           beside the sticky hero's is what held the open to 30Hz at 768
+           (measured: 10–12 frames over 32ms per open with it, 0–1
+           without). The reader sees the still land and the film come up
+           over it a beat later. */
+        if (home && !played) {
+          played = true;
+          void plate.querySelector("video")?.play().catch(() => {});
+        }
+      }
+      plate.style.opacity = "1";
+      if (!cued) {
+        if (w0 === null) w0 = w;
+        const span = c.width - w0;
+        if (span < 4 || (w - w0) / span >= FURNITURE_AT) {
+          card.dataset.furniture = "on";
+          cued = true;
+        }
+      }
+    };
+    frame.postRender(tick, true);
+    // the cue must come even if the flight never reads as progress
+    const fallback = setTimeout(() => {
+      card.dataset.furniture = "on";
+      cued = true;
+    }, 700);
+    return () => {
+      cancelFrame(tick);
+      clearTimeout(fallback);
+    };
+  }, [reduce]);
 
-     WHY THE TYPE MOVED LATE. Its old 0.12 + 0.26 put it at full opacity at
-     ~0.38s, which was the right instinct — the type must arrive DURING the
-     flight, not after it, or the card lands empty and then fills and the
-     opening reads as two events. But at the final rectangle "during the
-     flight" also means "over the dimmed grid": measured at 1440×900 on
-     Belly, the plate is only 0.57 of the way across at t≈147ms when the
-     fade begins, and 0.95 of the way across at ~335ms. So the fade was
-     spending its whole first half on ink standing off the card — worst at
-     t≈186–237ms, and the close button, which rides a corner, was 100%
-     outside the plate for the whole of it.
-     0.30 + 0.30 measures out at 596ms — nominally 146ms past the spring's
-     0.45s arrival, but the ease below is front-loaded enough that the ink
-     is at ~0.96 when the plate lands: what spills past the landing is the
-     last few percent, not a second event. The fade opens at travel ≈ 0.91
-     and reads 0.5 by ~0.34s with the plate still closing its final ~5%
-     (travel figures derived from the retuned spring's constants rather
-     than re-measured), so the type still arrives DURING the flight, onto
-     a card that is underneath it from the fade's first frame. The ramp is
-     what buys the delay — the plate is no longer bare while the type
-     waits, so the wait costs nothing.
+  /* the cookie banner, if it is showing, is seated UNDER the card rather
+     than over its bottom-left: the stage keeps the banner's height clear
+     — see --stage-bottom on .expandRoot */
+  useEffect(() => {
+    const root = rootRef.current;
+    const banner = document.querySelector(COOKIE_BANNER);
+    if (!root || !banner) return;
+    const r = banner.getBoundingClientRect();
+    if (r.height) root.style.setProperty("--stage-bottom", `${Math.round(window.innerHeight - r.top)}px`);
+  }, [rootRef]);
 
-     ⚠️ TUNED AGAINST EASE, WHICH IS FRONT-LOADED. cubic-bezier(.22,1,.36,1)
-     is at half opacity ~13% of the way in, so 0.30 + 0.30 reads at 0.5 by
-     ~0.34s rather than at 0.45s. Lengthening the duration does not delay
-     the ink; moving `delay` does.
 
-     ── THE EXIT IS A SEQUENCE NOW, NOT ONE QUICK FADE ──
-     This note used to end "there was nothing to fix there", and the
-     measurements disagreed: the backdrop's 0.2s exit hit 0 at ~250ms with
-     the plate still 50% from home, so the last ~220ms of the return flew
-     over a fully lit grid, and the ramp's 0.15s exit was gone at ~180ms,
-     so the plate finished the journey as a bare photograph. Three exits
-     now, in the order the eye should lose them:
-       `furniture`  0.15s, no delay, UNCHANGED — the words leave first,
-                    quicker than they arrived: the system responding, not
-                    deciding.
-       `rampFade`   0.12 + 0.26, done at 0.38s — the picture keeps its
-                    ground most of the way home and sheds it into the
-                    landing.
-       backdrop     0.10 + 0.34 easeIn, done at 0.44s, against the
-                    return's ~0.45s arrival — the lights come up LAST.
-                    See its exit prop. */
+  /* ── THE CLOCKS, ON THE TOKEN SCALE ──
+     Two layers arrive: the ramp, travelling WITH the plate (it is the
+     picture's own ground, clipped to it at every size), and the type at
+     the card's final rectangle. The rule that sizes them: everything must
+     land within ~0.06s of the plate, which arrives at ~0.45s on
+     EXPAND_SPRING and is 0.98 of the way there by ~0.40s.
+
+       ramp     0.12 + --dur-snug   on --ease-entrance
+       crown, × cued at FURNITURE_AT of the plate's travel, then
+                --dur-quick on --ease-entrance — in the STYLESHEET, off a
+                data attribute this component flips (see the loop below)
+       body     the same cue, one --stagger-tight later, with an 8px rise
+
+     The type waits for most of the flight because at its final rectangle
+     "during the flight" means "over the dimmed grid": measured, the plate
+     is only 0.57 across at 0.15s, and the close button rides a corner
+     that is wholly outside it until ~0.3s. The cue is a fraction of the
+     TRAVEL and not a delay because a delay landed the crown 66ms early on
+     one tile at 768 and on time on the next.
+
+     ── THE EXIT, in the order the eye should lose them ──
+       furniture  0.15s, no delay, on --ease-out — the words leave first,
+                  quicker than they came: the system responding. Off the
+                  token scale on purpose; an exit that lingers blocks.
+       ramp       0.12 + --dur-quick, gone at 0.38s — the picture keeps
+                  its ground most of the way home.
+       backdrop   holds 0.10, then --dur-snug on --ease-state, done at
+                  0.44s against the return's ~0.45s — the lights come up
+                  LAST. See its exit prop.
+
+     REDUCED MOTION: no flight, so nothing to time against. Plate and
+     furniture crossfade together on one --dur-quick tween, the backdrop
+     on --dur-snug; every delay drops to zero. Keyed off `reduce`, never a
+     deferred flag — a variant swapped after mount strands its keys. */
+  /* ⚠️ A CUSTOM PROPERTY, NOT `opacity` — the stylesheet owns opacity and
+     reads `--fade` (see the fade channel in Discover.module.css). framer
+     runs an opacity tween on WAAPI, and WAAPI's finish handler sets the
+     motion value (a deferred render) and then cancels the native
+     animation at once, so the element reverts to its inline value for
+     a frame: measured, the scrim and the backdrop each flashed to 1 for
+     one frame at the end of their exits. A custom property cannot be
+     accelerated, so framer writes it itself, synchronously, to the end. */
+  const EXIT_S = 0.15;
   const rampFade = {
-    initial: { opacity: 0 },
-    animate: { opacity: 1 },
+    initial: { "--fade": 0 },
+    animate: { "--fade": 1 },
     exit: {
-      opacity: 0,
-      transition: { duration: 0.26, ease: "easeOut", delay: 0.12 },
+      "--fade": 0,
+      /* the 0.12 hold is for a plate that is still travelling; with no
+         flight it only held the dialog mounted (measured: 406ms) */
+      transition: reduce
+        ? { duration: DUR.quick, ease: EASE_OUT }
+        : { duration: DUR.quick, ease: EASE_OUT, delay: 0.12 },
     },
-    transition: {
-      duration: 0.34,
-      ease: EASE,
-      delay: reduce ? 0 : 0.12,
-    },
+    transition: reduce
+      ? { duration: DUR.quick, ease: EASE_OUT }
+      : { duration: DUR.snug, ease: EASE, delay: 0.12 },
   } as const;
 
-  const furniture = {
-    initial: { opacity: 0 },
-    animate: { opacity: 1 },
-    exit: { opacity: 0, transition: { duration: 0.15, ease: "easeOut" } },
-    transition: {
-      duration: 0.3,
-      ease: EASE,
-      delay: reduce ? 0 : 0.3,
-    },
-  } as const;
+  /* the crown, the × and the block. On the morph their ENTRANCE is the
+     stylesheet's (`--furn`, cued from the plate — see the loop above), so
+     `--fade` sits at 1 from the first frame and framer owns only the way
+     out. Under reduced motion there is no cue: `--fade` is the crossfade. */
+  const furniture = reduce
+    ? ({
+        initial: { "--fade": 0 },
+        animate: { "--fade": 1 },
+        exit: { "--fade": 0, transition: { duration: EXIT_S, ease: EASE_OUT } },
+        transition: { duration: DUR.quick, ease: EASE_OUT },
+      } as const)
+    : ({
+        initial: { "--fade": 1 },
+        animate: { "--fade": 1 },
+        exit: { "--fade": 0, transition: { duration: EXIT_S, ease: EASE_OUT } },
+      } as const);
 
   // PORTALED to <body>: the section lives inside .afterHero's z-index: 1
   // stacking context, which would trap ANY overlay underneath the fixed
   // nav (z 80) no matter its own z-index. The portal escapes the trap.
   return createPortal(
     <div
+      ref={rootRef}
       className={styles.expandRoot}
       role="dialog"
       aria-modal="true"
       aria-label={item.name}
+      /* the seat photograph's resting scale and pan, for the sharp
+         picture to take on the way home — see .expandRoot[data-exiting] */
+      style={
+        ground
+          ? ({ "--seat-scale": ground.scale, "--seat-translate": ground.translate } as CSSProperties)
+          : undefined
+      }
+      /* `data-exiting` (pointer-dead) arrives on this element from
+         Discover at the close intent — the exit keeps this fixed,
+         full-viewport root mounted for the length of the flight, and it
+         was eating every press on the grid until it unmounted */
     >
       <motion.div
         className={styles.expandBackdrop}
-        initial={{ opacity: 0 }}
-        animate={{ opacity: 1 }}
+        initial={{ "--fade": 0 }}
+        animate={{ "--fade": 1 }}
         /* THE LIGHTS COME UP LAST on the way out — see the exit table on
-           the clocks above. easeIn is the point: a departure curve holds
-           the dark while the plate covers most of its travel and spends
-           the fade where the flight is slowing. 0.10 + 0.34 ends at
-           0.44s, with the ~0.45s landing; the old 0.2s easeOut was gone
-           at ~250ms with the plate still 50% from home. */
+           the clocks above. A 0.10s hold, then --dur-snug on --ease-state
+           (a slow in AND out): the dark holds while the plate covers most
+           of its travel and the lift lands with the plate at ~0.44s. Not
+           easeIn — that curve was a delay wearing a duration's clothes. */
         exit={{
-          opacity: 0,
-          transition: { duration: 0.34, ease: "easeIn", delay: 0.1 },
+          "--fade": 0,
+          /* reduced motion has no flight to hold the dark for: no delay,
+             --dur-quick, and the close is over when the fade is */
+          transition: reduce
+            ? { duration: DUR.quick, ease: EASE_OUT }
+            : { duration: DUR.snug, ease: EASE_STATE, delay: 0.1 },
         }}
-        /* THE LIGHTS DROP FIRST on the way in. 0.36s against the plate's
-           0.45s spring, and with no delay: the dim is the room
-           acknowledging the press, so it has to be underway before the
-           card has gone anywhere. */
-        transition={{ duration: 0.36, ease: "easeOut" }}
+        /* THE LIGHTS DROP FIRST on the way in: --dur-snug on --ease-out
+           and no delay — the dim is the room acknowledging the press, so
+           it is underway before the card has gone anywhere. */
+        transition={{ duration: DUR.snug, ease: EASE_OUT }}
         onClick={onClose}
       />
 
-      <div className={styles.expandCard}>
+      <div ref={cardRef} className={styles.expandCard}>
         {/* ── THE PLATE. The ONLY thing that morphs, and it fills the card:
             the seat above owns the 16:9, this is `inset: 0` inside it. ── */}
         <motion.div
+          ref={plateRef}
           className={styles.expandMedia}
           layoutId={reduce ? undefined : `card-${item.slug}`}
           style={{
@@ -2194,10 +2704,15 @@ function ExpandedCard({
                reads as the corner "growing" independently of the card */
             borderRadius: "var(--radius-tile)",
           }}
-          transition={EXPAND_SPRING}
-          initial={reduce ? { opacity: 0 } : undefined}
-          animate={reduce ? { opacity: 1 } : undefined}
-          exit={reduce ? { opacity: 0 } : undefined}
+          /* the flight's curve — or, under reduced motion, the crossfade's
+             tween: no layoutId, so no spring to ride, and a spring on an
+             opacity would be a fade with a tail */
+          transition={
+            reduce ? { duration: DUR.quick, ease: EASE_OUT } : EXPAND_SPRING
+          }
+          initial={reduce ? { "--fade": 0 } : undefined}
+          animate={reduce ? { "--fade": 1 } : undefined}
+          exit={reduce ? { "--fade": 0 } : undefined}
         >
           {/* THE COUNTER-PROJECTION. See the banner: tile and expansion are
               deliberately different shapes now, so the flight is a
@@ -2207,21 +2722,68 @@ function ExpandedCard({
               through the flight rather than deforming.
               `layout` is dropped under reduced motion because there is no
               morph to correct — the plate crossfades. */}
-          <motion.div className={styles.expandFrame} layout={!reduce}>
+          <div ref={frameRef} className={styles.expandFrame}>
+            {/* THE GROUND: the tile's photograph, at the candidate the
+                browser has ALREADY decoded. The card's own <Image> below
+                asks for a wider candidate — a different URL, first
+                fetched at the press — so without this the first ~40% of
+                the flight painted .expandMedia's placeholder colour. A
+                raw <img> on purpose (it is never server-rendered, so
+                React cannot hoist it into a preload), decoded
+                synchronously, and the sharp image crossfades over it on
+                load — see .expandGround / .expandPhoto. */}
+            {ground ? (
+              /* eslint-disable-next-line @next/next/no-img-element -- the
+                 point is the URL the browser already holds; an <Image>
+                 would re-derive a different one */
+              <img
+                className={styles.expandGround}
+                style={{
+                  ...(item.focal ? { objectPosition: item.focal } : null),
+                  scale: ground.scale,
+                  translate: ground.translate,
+                }}
+                src={ground.src}
+                alt=""
+                aria-hidden
+                decoding="sync"
+                draggable={false}
+              />
+            ) : null}
             {item.image ? (
               <Image
                 // `card`, not `styles` — see the import note: the
                 // photograph's rule belongs to the card and moved to its
-                // stylesheet
-                className={card.photo}
+                // stylesheet. .expandPhoto adds only the crossfade over
+                // the ground.
+                className={`${card.photo} ${styles.expandPhoto}`}
                 style={item.focal ? { objectPosition: item.focal } : undefined}
                 src={item.image}
                 alt=""
                 fill
-                // the card is height-driven; at its tallest it is ~640px
-                // wide on desktop and the full column on a phone
-                sizes="(max-width: 700px) 100vw, 680px"
+                /* the card's real box — see .expandCard: full width
+                   under 700, the padded stage's width on a tablet, and
+                   the 981px print cap (552 ÷ 9 × 16) on any desktop. The
+                   old "680px" was the portrait card's and under-fetched
+                   a 981px box by a third. */
+                sizes="(max-width: 700px) 100vw, (max-width: 1100px) 94vw, 981px"
                 priority
+                /* a data attribute and not state: this subtree is inside
+                   a layout projection and a re-render is a re-measure.
+                   TWO FRAMES LATE on purpose: a cached image loads before
+                   the plate's first paint, and an attribute set then has
+                   no painted start state to transition FROM — the still
+                   replaced the ground in one step (measured at 74→89ms),
+                   which for a ground that was the hover film's frame is
+                   exactly the cut this crossfade exists to remove. */
+                onLoad={(e) => {
+                  const img = e.currentTarget;
+                  requestAnimationFrame(() =>
+                    requestAnimationFrame(() => {
+                      img.dataset.decoded = "true";
+                    }),
+                  );
+                }}
               />
             ) : (
               <div className={card.fallback} aria-hidden />
@@ -2245,7 +2807,10 @@ function ExpandedCard({
                 // path, which is what the record carries and what the tile's
                 // hover clip is keyed on
                 src={asset(film)}
-                autoPlay
+                /* played from the frame loop once the plate has landed —
+                   see there; under reduced motion there is no flight and
+                   no loop, but `film` is null there anyway */
+                autoPlay={reduce ? true : undefined}
                 muted
                 loop
                 playsInline
@@ -2255,7 +2820,7 @@ function ExpandedCard({
                 }}
               />
             ) : null}
-          </motion.div>
+          </div>
 
           {/* ── THE RAMP, INSIDE THE PLATE AND OUTSIDE THE COUNTER-
               PROJECTION. Both halves of that are measured, and the second
@@ -2364,26 +2929,22 @@ function ExpandedCard({
           <motion.div
             className={styles.expandBody}
             {...furniture}
-            /* THE RISE, AND IT IS NOW DECLINED UNDER REDUCED MOTION — the
-               defect the stylesheet's own note flagged and could not fix
-               from a stylesheet, because an inline transform from framer
-               beats any rule. 10px rather than 16: the type is arriving
-               DURING the flight now (see `furniture`), and a rise that ran
-               longer than the fade left the block still climbing under a
-               plate that had already stopped. Still 10px on the later
-               0.30 + 0.30 clock: the rise takes its timing from the same
-               transition, so it lands with the fade at the measured 596ms,
-               and a longer throw over a shorter tween would only make it
-               faster. */
-            initial={{
-              opacity: 0,
-              transform: reduce ? "translateY(0px)" : "translateY(10px)",
-            }}
-            animate={{ opacity: 1, transform: "translateY(0px)" }}
+            /* THE BLOCK FOLLOWS THE CROWN BY ONE --stagger-tight, with an
+               8px rise on the same --dur-quick tween — the one piece of
+               furniture that travels, because it is the one that reads as
+               a paragraph settling. DECLINED UNDER REDUCED MOTION in the
+               component, which is the only place it can be: an inline
+               transform from framer beats any stylesheet. */
+            /* the 8px rise IN is the stylesheet's, on `--furn-late` (one
+               --stagger-tight behind the crown); framer carries only the
+               6px drop OUT — as `--rise`, not `transform`, for the reason
+               `--fade` is not `opacity`: a transform tween is accelerated */
+            initial={{ ...furniture.initial, "--rise": "0px" }}
+            animate={{ ...furniture.animate, "--rise": "0px" }}
             exit={{
-              opacity: 0,
-              transform: reduce ? "translateY(0px)" : "translateY(6px)",
-              transition: { duration: 0.15, ease: "easeOut" },
+              "--fade": 0,
+              "--rise": reduce ? "0px" : "6px",
+              transition: { duration: EXIT_S, ease: EASE_OUT },
             }}
           >
             <VenueBlock

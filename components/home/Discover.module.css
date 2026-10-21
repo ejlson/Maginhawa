@@ -832,30 +832,30 @@
   transition-delay: var(--recede-delay, 0s);
 }
 
-/* ── THE DIM RIDES THE PLATE, NOT THE CELL ──
-   `opacity: 0.42` stood on the rule above and NEVER APPLIED: Tile writes
-   an inline `opacity` on the cell (the entrance ink, `cardInk`) whenever
-   the settle has run, and inline beats the rule — measured, every
-   sibling's computed opacity was 1 on every frame of the morph, so only
-   the scale was landing. [data-plate] is `.tileMedia`, the seat inside
-   the cell, and framer writes no inline opacity to a SIBLING'S seat (its
-   inline styles are custom properties and the radius), so a stylesheet
-   opacity there actually lands.
+/* ── THE DIM RIDES THE SEAT'S CHILD, NOT THE CELL AND NOT THE SEAT ──
+   Twice this rule has stood on a box framer writes an inline opacity to,
+   and twice it was dead code while the comment beside it said otherwise:
+     · on the CELL — Tile writes the entrance ink (`cardInk`) inline there
+       whenever the settle has run, and inline beats the rule;
+     · on the SEAT ([data-plate], the layoutId box) — framer's
+       getProjectionStyles gives every IDLE layoutId element an inline
+       `opacity: 1` (and the crossfade's value while it flies), so the
+       rule lost there too. Measured: siblings at 1.00 on every frame,
+       only the scale landing.
+   `[data-plate] > *` is VenueCard's .cardSurface — the seat's one child,
+   a box nothing writes an inline opacity to. The dim lands.
 
-   ⚠️ THE TRANSITION IS GATED INSIDE THE DIMMED STATE ON PURPOSE — the
-   opposite of the `.cell` rule above, for a hazard the cell does not
-   have. The pressed cell drops [data-open] in the same commit that
-   starts the close, so `:not([data-open])` matches the RETURNING plate
-   mid-crossfade, and framer writes per-frame inline opacity to a
-   crossfading plate — an always-on transition would smear those writes
-   into a visible lag. Scoped like this it only ever exists on sibling
-   plates while the grid is dimmed. The cost is stated, not hidden: the
-   un-dim SNAPS when [data-dimmed] clears. It snaps under the backdrop,
-   which now holds its dark 0.1s and lifts over 0.34s on close (see the
-   exit table in Discover.tsx) — the lift is the un-dim the reader sees. */
-.grid[data-dimmed="on"] .cell:not([data-open]) [data-plate] {
-  opacity: 0.42;
+   THE TRANSITION IS ALWAYS ON, on this child, so the return is eased too
+   and all eight come back together: the cell's own rule above carries a
+   0ms delay for the way back, and this one's per-cell delay lives only
+   inside the dimmed state. The hazard the old seat rule gated against —
+   framer's per-frame writes to a CROSSFADING plate being smeared by an
+   always-on transition — cannot reach a child framer never writes. */
+.cell [data-plate] > * {
   transition: opacity var(--dur-slow) var(--ease-entrance);
+}
+.grid[data-dimmed="on"] .cell:not([data-open]) [data-plate] > * {
+  opacity: 0.42;
   transition-delay: var(--recede-delay, 0s);
 }
 
@@ -867,12 +867,14 @@
   .cell {
     transition: none;
   }
+  .cell [data-plate] > * {
+    transition: none;
+  }
   .grid[data-dimmed="on"] .cell:not([data-open]) {
     transform: none;
   }
-  .grid[data-dimmed="on"] .cell:not([data-open]) [data-plate] {
+  .grid[data-dimmed="on"] .cell:not([data-open]) [data-plate] > * {
     opacity: 1;
-    transition: none;
   }
 }
 
@@ -1032,6 +1034,10 @@
      that drifts. */
   --stage-pad: clamp(16px, 3vw, 48px);
   padding: var(--stage-pad);
+  /* the cookie banner's height plus its gap, when one is showing — set
+     by the component at mount so the card is seated above it rather than
+     under it (it is z 250 to this root's 200, and stays interactive) */
+  padding-bottom: calc(var(--stage-pad) + var(--stage-bottom, 0px));
 }
 
 /* deep ink dim — the room lights dropping, not a grey veil. Mixed from
@@ -1041,6 +1047,87 @@
   position: absolute;
   inset: 0;
   background: color-mix(in srgb, var(--maroon) 50%, transparent);
+}
+
+/* ── THE FADE CHANNEL ──
+   Every fade on the expansion is a custom property framer animates, and
+   this is the one place the real property is written. framer tweens
+   `opacity` itself on WAAPI, and at the end of a WAAPI exit it sets its
+   motion value (a render on the NEXT frame) and cancels the native
+   animation at once — so the element shows its inline value, 1, for one
+   frame: measured on the scrim and the backdrop at the end of every
+   close. A custom property is not accelerated; framer writes it in its
+   own render step and there is no gap. The plate is in the list for the
+   reduced-motion crossfade only — on the morph framer's projection
+   writes the plate's inline opacity and inline wins, which is correct. */
+.expandBackdrop,
+.expandRampBlur,
+.expandRampScrim,
+.expandMedia {
+  opacity: var(--fade, 1);
+}
+
+/* ── THE FURNITURE'S ENTRANCE IS THE STYLESHEET'S, CUED BY THE PLATE ──
+   The crown, the × and the block arrive on `--furn`, a REGISTERED number
+   (@property is what lets a custom property interpolate at all) that the
+   seat transitions from 0 to 1 once the component flips `data-furniture`
+   — which it does from a frame loop reading the plate's own travel, not
+   from a clock. A fixed delay put the crown 66ms early on one tile at 768
+   and on time on the next. The block rides `--furn-late`, the same
+   transition one --stagger-tight later, and spends it on an 8px rise too.
+   The opacity each element paints is the PRODUCT: framer's `--fade` (1
+   on the way in, the exit on the way out) times the stylesheet's cue.
+   The transitions sit on the SEAT and the children inherit the moving
+   value — one transition, three readers. */
+@property --furn {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+@property --furn-late {
+  syntax: "<number>";
+  inherits: true;
+  initial-value: 1;
+}
+.expandCard {
+  --furn: 0;
+  --furn-late: 0;
+  transition:
+    --furn var(--dur-quick) var(--ease-entrance),
+    --furn-late var(--dur-quick) var(--ease-entrance) var(--stagger-tight);
+}
+.expandCard[data-furniture="on"] {
+  --furn: 1;
+  --furn-late: 1;
+}
+.expandCrown,
+.expandClose {
+  opacity: calc(var(--fade, 1) * var(--furn));
+}
+.expandBody {
+  opacity: calc(var(--fade, 1) * var(--furn-late));
+  translate: 0 calc(var(--rise, 0px) + 8px * (1 - var(--furn-late)));
+}
+@media (prefers-reduced-motion: reduce) {
+  /* no plate to take a cue from: the furniture crossfades on `--fade`
+     with the plate, and the cue is simply on */
+  .expandCard {
+    --furn: 1;
+    --furn-late: 1;
+    transition: none;
+  }
+}
+
+/* ── POINTER-DEAD FROM THE CLOSE INTENT ──
+   AnimatePresence keeps this fixed, full-viewport root mounted while the
+   exit runs; until it unmounted it took every press meant for the grid
+   underneath — ~0.4s on the morph, and the whole close under reduced
+   motion. The component marks the root on the close intent and nothing
+   in it, the plate's and the ×'s own `pointer-events: auto` included,
+   takes a pointer again. */
+.expandRoot[data-exiting],
+.expandRoot[data-exiting] * {
+  pointer-events: none;
 }
 
 /* ── THE SEAT, AND IT IS STILL HEIGHT-DRIVEN ──
@@ -1080,9 +1167,14 @@
 
    Viewport units in that third term rather than a percentage, because a
    percentage height resolves against the container's HEIGHT and the quantity
-   needed here is its width. Safe from scrollbar error: the component sets
-   `overflow: hidden` on the documentElement for as long as this card exists,
-   so there is no scrollbar for 100vw to disagree with.
+   needed here is its width. Safe from scrollbar error WHILE OPEN: Discover
+   holds `overflow: hidden` on the documentElement from the press until the
+   close is asked for, so there is no scrollbar for 100vw to disagree with.
+   ⚠️ The lock is released at close START, not at unmount (see
+   `closeExpanded` in Discover.tsx), so on a platform with a classic
+   scrollbar the gutter returns ~0.4s before this card unmounts and this
+   width can change by the gutter mid-flight. Overlay scrollbars (macOS,
+   iOS, Android) have no gutter and never see it.
 
    `max-width: 100%` is the last escape hatch and it BREAKS the aspect when
    it fires — deliberately, and in the right direction: a card TALLER than
@@ -1156,6 +1248,68 @@
   position: absolute;
   inset: 0;
   overflow: hidden;
+  /* the component sizes this box to the plate's PAINTED rectangle each
+     frame and counter-scales it from the top-left — see the frame loop
+     in ExpandedCard, and the note on .expandGround below for why it is
+     no longer a framer `layout` node */
+  transform-origin: 0 0;
+}
+
+/* ── THE PICTURE RIDES THE PLATE HOME ──
+   framer's own counter-projection on this box went stale the moment the
+   dialog started exiting: the photograph and the film stayed where they
+   sat in the open card while the plate shrank and rose past them, and the
+   plate's top painted a cream band over nothing (25–38% of its height at
+   768 for the first 200ms). The frame is now driven by hand both ways,
+   and on the way home the sharp photograph takes the seat's own scale and
+   pan (the parallax overscan the tile is resting at, read at the press)
+   over the flight, so the landing is the same picture at the same crop.
+   The film fades to that photograph over the same flight: the plate is
+   opaque until it unmounts, so without this it cut from a moving frame
+   to the still at the last instant. */
+.expandRoot[data-exiting] .expandPhoto {
+  scale: var(--seat-scale, 1);
+  translate: var(--seat-translate, none);
+}
+.expandRoot[data-exiting] .expandFilm {
+  opacity: 0;
+  transition: opacity var(--dur-snug) var(--ease-out);
+}
+
+/* ── THE GROUND UNDER THE PHOTOGRAPH, for the flight's first frames ──
+   The tile's own decoded candidate (w_384, read off its image element's
+   currentSrc at the press), filling the frame exactly as the card's photograph will.
+   The card's <Image> asks for a wider candidate — a different URL, first
+   fetched when the card mounts — and measured on a warm dev server it was
+   not complete until ~250ms of a ~450ms flight, so the plate flew as
+   .expandMedia's placeholder colour. This is under it from frame 0 and
+   the sharp image fades over it once decoded (`data-decoded`, set from
+   onLoad — an attribute, not state, because this box is inside a layout
+   projection). Soft at 2.5× for a quarter of a second, which is what the
+   tile looked like a frame earlier; a flat #e2cfc1 was not. */
+.expandGround {
+  position: absolute;
+  inset: 0;
+  width: 100%;
+  height: 100%;
+  object-fit: cover;
+  pointer-events: none;
+}
+/* `.expandFrame .expandPhoto`, NOT `.expandPhoto`: the element also wears
+   VenueCard's `.photo`, whose own `transition: scale …` ties a single
+   class here and wins on cascade order — measured, the crossfade over
+   the ground never ran and the still replaced it in one step. The scale
+   and translate legs are the exit's (see [data-exiting] below); stated
+   here so the three never fight over one `transition` shorthand. */
+.expandFrame .expandPhoto {
+  opacity: 0;
+  transition:
+    opacity var(--dur-quick) var(--ease-out),
+    scale var(--dur-base) var(--ease-state),
+    translate var(--dur-base) var(--ease-state);
+}
+.expandFrame .expandPhoto[data-decoded="true"] {
+  opacity: 1;
 }
 
 /* ── THE FILM, FULL BLEED. Over the photograph, never instead of it: the
@@ -1166,9 +1320,13 @@
    a clip that never loads simply never appears. */
 .expandFilm {
   position: absolute;
-  inset: 0;
-  width: 100%;
-  height: 100%;
+  /* a pixel over the frame on every side: the frame is scaled by a
+     non-integer each frame and the film's right edge was rounding a 1px
+     column short of it, leaving a hairline of the still down the open
+     card's edge (x=1210 at 1440, measured) */
+  inset: -1px;
+  width: calc(100% + 2px);
+  height: calc(100% + 2px);
   object-fit: cover;
   opacity: 0;
   transition: opacity var(--dur-glide) var(--ease-drawer);

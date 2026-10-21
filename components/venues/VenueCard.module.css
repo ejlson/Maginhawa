@@ -470,6 +470,15 @@
   transition: clip-path var(--dur-glide) var(--ease-entrance);
 }
 
+/* the film HELD at a press (see holdFilm in VenueCard.tsx): paused, and
+   faded over --dur-tap rather than cut — the plate that takes off a frame
+   later carries this same frame as its ground. Stays until the next real
+   pointer move removes it. */
+.hoverClipPress {
+  opacity: 0;
+  transition: opacity var(--dur-tap) linear;
+}
+
 /* ═══════════════════ THE RAMP — the card's bottom material ═══════════
    TWO LAYERS over the bottom `--vc-ramp-h` of the card. Layer one takes
    the PHOTOGRAPH'S OWN COLOUR; layer two darkens it NEUTRALLY. There is
@@ -2241,6 +2250,66 @@
      the name is still printed, and it is the full-cream 17px line with the
      most headroom on the card. Re-run scripts/probe-square-cards.mjs
      before adding any ramp override back. */
+}
+
+/* ---------- the plate in flight (home grid only) ---------- */
+/* Discover flies this card's seat into its expansion on a shared
+   layoutId, and a layoutId flight is a CROSSFADE of the whole subtree,
+   scaled non-uniformly to ~2.2×. The photograph survives that (a crop
+   cannot squash); the mark, the block, the ramp and the hover layers do
+   not — they were painted at 2.2× and crossfaded against the expansion's
+   own copies. So the CELL carries `data-card-flying` from the press until
+   the return flight lands, and this withholds everything but the picture.
+   ⚠️ `.cardSurface` is named so these TIE the `:hover` / `:focus-within`
+   rules above at (0,3,0) and win on source order — this block must stay
+   BELOW them, or a card pressed under the pointer flies with its shade.
+
+   "on"      hidden, instantly — the press is the cut.
+   "landed"  one --dur-quick beat in which the furniture returns; the cell
+             then drops the attribute so the hover layers get their own
+             transitions back. The hover layers are left to their own
+             state on landing — the pointer has usually left the card.
+   The photograph, the fallback field and the grade are NOT in this list
+   and must not be: they are what flies. */
+[data-card-flying="on"] .cardSurface .cardCrown,
+[data-card-flying="on"] .cardSurface .glass,
+[data-card-flying="on"] .cardSurface .rampBlur,
+[data-card-flying="on"] .cardSurface .rampScrim,
+[data-card-flying="on"] .cardSurface .hoverShade,
+[data-card-flying="on"] .cardSurface .hoverClip,
+[data-card-flying="on"] .cardSurface .hoverBlurb {
+  opacity: 0;
+  transition: none;
+}
+/* ── AND THE WHOLE SURFACE IS WITHDRAWN WHILE THE PLATE FLIES ──
+   Not only the furniture: the chapter's section carries `overflow-x:
+   clip`, so this seat, scaled ~2.8× by the shared-layout projection, is
+   clipped to its own cell — and framer's crossfade was fading the
+   expansion's plate out over a seat that painted only a cell's worth of
+   picture, with the grid showing through the rest. The plate now carries
+   both flights opaque (Discover forces its opacity; see ExpandedCard's
+   frame loop) and this seat is simply not painted until it is home. The
+   seat's BOX is untouched — visibility does not move a rectangle — so
+   the projection measures exactly what it did. */
+[data-card-flying="on"] .cardSurface {
+  opacity: 0;
+}
+/* no transition in EITHER state: the seat's child carries the sibling
+   dim's always-on --dur-slow transition (Discover.module.css), which
+   would otherwise fade this withdrawal out over 620ms and fade the
+   return in under a plate that unmounts long before it finished.
+   `opacity`, not `visibility`: the pressable inside must stay focusable,
+   because focus returns to it at the close intent, mid-flight. */
+[data-card-flying] .cardSurface {
+  transition: none;
+}
+[data-card-flying="landed"] .cardSurface .cardCrown,
+[data-card-flying="landed"] .cardSurface .glass,
+[data-card-flying="landed"] .cardSurface .rampBlur,
+[data-card-flying="landed"] .cardSurface .rampScrim {
+  /* --dur-tap, not --dur-quick: the fade cannot start before the seat is
+     within 2px (~525ms), and on --dur-quick the tile sat bare to ~675ms */
+  transition: opacity var(--dur-tap) var(--ease-out);
 }
 
 /* ---------- reduced motion ---------- */

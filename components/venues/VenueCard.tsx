@@ -206,10 +206,21 @@ export default function VenueCard({
      actually touched rather than always from the middle. Stored on the
      element as custom properties — a ref, not state, for the reason
      above. */
+  /* the pointer's last real position. Chrome re-dispatches enter/over
+     under a STATIONARY pointer whenever the element beneath it changes —
+     which is exactly what happens when the home grid's dialog unmounts
+     over this card — so a synthetic enter is told from a real one by
+     whether the pointer has actually moved. */
+  const lastPointer = useRef<[number, number] | null>(null);
+  /* true while the home grid is flying this card's seat (the cell carries
+     `data-card-flying`): the film must neither start nor restart then */
+  const flying = () => Boolean(clipRef.current?.closest("[data-card-flying]"));
   const onEnter = (e: React.MouseEvent) => {
     const v = clipRef.current;
-    if (!filmable || !v) return;
+    if (!filmable || !v || flying()) return;
+    lastPointer.current = [e.clientX, e.clientY];
     wantClip.current = true;
+    v.classList.remove(styles.hoverClipPress);
     const host = v.parentElement;
     if (host) {
       const r = host.getBoundingClientRect();
@@ -223,9 +234,35 @@ export default function VenueCard({
     if (!v.src) v.src = asset(clip!);
     void v.play().catch(() => {});
   };
+  /* a REAL move over a card whose film is held (after the expansion has
+     come home with the pointer still on it) is the re-entry: the film
+     wipes open from where the pointer is now. A synthetic one is not. */
+  const onMove = (e: React.MouseEvent) => {
+    if (!filmable || wantClip.current) return;
+    const last = lastPointer.current;
+    if (last && last[0] === e.clientX && last[1] === e.clientY) return;
+    if (!last) {
+      lastPointer.current = [e.clientX, e.clientY];
+      return;
+    }
+    onEnter(e);
+  };
+  /* the press: the film is held — paused, faded over --dur-tap rather
+     than cut, and left that way until the next real move. The expansion
+     carries its own copy of the clip, so two of them decoding side by
+     side (three, with the hero) is what this stops. */
+  const holdFilm = () => {
+    const v = clipRef.current;
+    wantClip.current = false;
+    if (!v) return;
+    v.classList.remove(styles.hoverClipOn, styles.hoverClipEnter);
+    v.classList.add(styles.hoverClipPress);
+    v.pause();
+  };
   const onLeave = () => {
     const v = clipRef.current;
     wantClip.current = false;
+    lastPointer.current = null;
     if (!v) return;
     // back to the resting class, whose clip is already OPEN — so this is a
     // fade-out of a full frame, not a circle collapsing into the cursor
@@ -252,6 +289,7 @@ export default function VenueCard({
       className={`${styles.cardSurface}${square ? ` ${styles.square}` : ""}`}
       data-grade={grade ? "on" : undefined}
       onMouseEnter={filmable ? onEnter : undefined}
+      onMouseMove={filmable ? onMove : undefined}
       onMouseLeave={filmable ? onLeave : undefined}
     >
       {item.image ? (
@@ -335,7 +373,13 @@ export default function VenueCard({
         <button
           type="button"
           className={styles.plateHit}
-          onClick={onPress}
+          /* the page's press FIRST — on the home grid it reads this film's
+             current frame off the element while it is still playing — and
+             the hold after */
+          onClick={() => {
+            onPress();
+            holdFilm();
+          }}
           aria-haspopup={pressHasPopup}
           aria-label={pressLabel ?? item.name}
         />
