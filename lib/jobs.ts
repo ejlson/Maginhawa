@@ -151,4 +151,56 @@ export const JOBS: JobOpening[] = [
       "Right to work in the UK",
     ],
   },
+  {
+    id: "bartender-guanabana",
+    title: "Bartender",
+    restaurantSlug: "guanabana",
+    restaurantName: "Guanabana",
+    location: "85 Kentish Town Road, London NW1 8NY",
+    address: { street: "85 Kentish Town Road", locality: "London", postcode: "NW1 8NY" },
+    type: ["Full-time", "Part-time"],
+    area: "Bar",
+    summary:
+      "Make drinks behind the bar at Guanabana, our Caribbean restaurant in Kentish Town. We're hiring more than one bartender.",
+    responsibilities: [
+      "Make cocktails and drinks to a consistent standard",
+      "Look after guests at the bar and talk them through the drinks list",
+      "Keep the bar clean, stocked and ready for service",
+      "Work with the floor team to keep service moving",
+    ],
+    // the user's own requirements, like the Assistant Restaurant Manager's
+    requirements: [
+      "1–2 years' bartending experience",
+      "Confident making cocktails",
+      "A solid knowledge of the classics",
+      "Right to work in the UK",
+    ],
+  },
+  {
+    id: "bartender-belly",
+    title: "Bartender",
+    restaurantSlug: "belly",
+    restaurantName: "Belly",
+    location: "157 Kentish Town Road, London NW1 8PD",
+    address: { street: "157 Kentish Town Road", locality: "London", postcode: "NW1 8PD" },
+    type: ["Full-time", "Part-time"],
+    area: "Bar",
+    summary:
+      "Run the bar at Belly, our modern Filipino bistro in Kentish Town, where cocktails sit alongside the food.",
+    responsibilities: [
+      "Make cocktails and drinks to a high, consistent standard",
+      "Look after guests at the bar and talk them through the drinks list",
+      "Create new cocktails for the list, drawing on Asian flavours",
+      "Keep the bar clean, stocked and ready for service",
+    ],
+    // the user's own requirements, like the Assistant Restaurant Manager's
+    requirements: [
+      "2–5 years' bartending experience",
+      "Extensive knowledge of cocktails",
+      "Knows all the classics",
+      "Experience with Asian flavours",
+      "Experience creating cocktails",
+      "Right to work in the UK",
+    ],
+  },
 ];
