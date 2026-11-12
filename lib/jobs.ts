@@ -153,7 +153,7 @@ export const JOBS: JobOpening[] = [
   },
   {
     id: "bartender-guanabana",
-    title: "Bartender",
+    title: "Bartender — Guanabana",
     restaurantSlug: "guanabana",
     restaurantName: "Guanabana",
     location: "85 Kentish Town Road, London NW1 8NY",
@@ -178,7 +178,7 @@ export const JOBS: JobOpening[] = [
   },
   {
     id: "bartender-belly",
-    title: "Bartender",
+    title: "Bartender — Belly",
     restaurantSlug: "belly",
     restaurantName: "Belly",
     location: "157 Kentish Town Road, London NW1 8PD",

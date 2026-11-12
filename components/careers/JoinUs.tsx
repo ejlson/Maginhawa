@@ -1503,7 +1503,11 @@ export default function JoinUs() {
                         Select a role…
                       </option>
                       {JOBS.map((j) => {
-                        const label = `${j.title} — ${j.restaurantName}`;
+                        // a title that already names its restaurant
+                        // ("Bartender — Belly") is not suffixed twice
+                        const label = j.title.includes(j.restaurantName)
+                          ? j.title
+                          : `${j.title} — ${j.restaurantName}`;
                         return (
                           <option key={j.id} value={label}>
                             {label}
