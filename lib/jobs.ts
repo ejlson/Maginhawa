@@ -9,6 +9,9 @@ export type JobOpening = {
   restaurantSlug?: string; // matches a slug in lib/restaurants.ts
   restaurantName: string;
   location: string;
+  // the full address for the JSON-LD, when `location` is a street address
+  // rather than "Area, City" (the page otherwise reads the area from it)
+  address?: { street: string; locality: string; postcode: string };
   // one type, or a list when a role is offered on more than one basis
   type: EmploymentType | [EmploymentType, ...EmploymentType[]];
   area: "Kitchen" | "Front of House" | "Bar" | "Group";
@@ -120,6 +123,31 @@ export const JOBS: JobOpening[] = [
       "Care and attention to detail",
       "Reliability and a willingness to learn",
       "Baking experience at any level",
+      "Right to work in the UK",
+    ],
+  },
+  {
+    id: "assistant-restaurant-manager-bunso",
+    title: "Assistant Restaurant Manager",
+    restaurantSlug: "bunso",
+    restaurantName: "Bunso",
+    location: "1a Hawley Road, London NW1 8RP",
+    address: { street: "1a Hawley Road", locality: "London", postcode: "NW1 8RP" },
+    type: "Full-time",
+    area: "Front of House",
+    summary:
+      "We are still looking for an Assistant Restaurant Manager at Bunso. It's a key role with room for growth and development.",
+    responsibilities: [
+      "Help run service day to day alongside the Restaurant Manager",
+      "Lead and support the front of house team",
+      "Look after guests and the experience they have with us",
+      "Step up and run the floor when needed",
+    ],
+    // the user's own requirements: a firmer bar than the other roles, on purpose
+    requirements: [
+      "2+ years' experience as a head waiter or supervisor",
+      "Great customer service skills",
+      "A great work ethic",
       "Right to work in the UK",
     ],
   },

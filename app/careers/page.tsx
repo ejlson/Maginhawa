@@ -38,11 +38,19 @@ const jsonLd = {
       },
       jobLocation: {
         "@type": "Place",
-        address: {
-          "@type": "PostalAddress",
-          addressLocality: j.location.split(",")[0].trim(),
-          addressCountry: "GB",
-        },
+        address: j.address
+          ? {
+              "@type": "PostalAddress",
+              streetAddress: j.address.street,
+              addressLocality: j.address.locality,
+              postalCode: j.address.postcode,
+              addressCountry: "GB",
+            }
+          : {
+              "@type": "PostalAddress",
+              addressLocality: j.location.split(",")[0].trim(),
+              addressCountry: "GB",
+            },
       },
       url: `${SITE_URL}/careers#${j.id}`,
     },
