@@ -127,7 +127,7 @@ export const RESTAURANTS: Restaurant[] = [
     location: "Kentish Town · Soho, London",
     image: "/images/mamasons.jpg",
     logo: "/logo/mamasons.png",
-    website: "http://dirtyicecream.co.uk/",
+    website: "https://mamasonsdirtyicecream.com/",
     /* THE PARLOUR'S THREE IN-STORE SCREENS, in the order a counter reads
        them: the ice cream first because that is what the room is, then the
        cold desserts and drinks, then the bakery. They were supplied as
