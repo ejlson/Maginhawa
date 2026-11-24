@@ -1,6 +1,7 @@
 import type { Metadata } from "next";
 import JoinUs from "@/components/careers/JoinUs";
-import { JOBS, jobTypes, type EmploymentType } from "@/lib/jobs";
+import { jobTypes, type EmploymentType, type JobOpening } from "@/lib/jobs";
+import { getJobs } from "@/lib/jobsSource";
 import { SITE_URL } from "@/lib/site";
 import { ogImage, OG_W, OG_H } from "@/lib/media";
 import { StructuredData } from "@/lib/StructuredData";
@@ -16,20 +17,22 @@ function schemaEmploymentType(types: EmploymentType[]) {
 }
 
 // Schema.org ItemList of open JobPostings — Google can lift this into the
-// careers job search panel and AI search summaries.
-const jsonLd = {
+// careers job search panel and AI search summaries. `datePosted` is one of
+// the fields Google requires of a JobPosting; it comes from the Studio.
+const jobsJsonLd = (jobs: JobOpening[]) => ({
   "@context": "https://schema.org",
   "@type": "ItemList",
   "@id": `${SITE_URL}/careers#openings`,
   name: "Open positions — Maginhawa Group",
-  numberOfItems: JOBS.length,
-  itemListElement: JOBS.map((j, i) => ({
+  numberOfItems: jobs.length,
+  itemListElement: jobs.map((j, i) => ({
     "@type": "ListItem",
     position: i + 1,
     item: {
       "@type": "JobPosting",
       title: j.title,
       description: j.summary,
+      datePosted: j.posted,
       employmentType: schemaEmploymentType(jobTypes(j)),
       hiringOrganization: {
         "@type": "Organization",
@@ -55,7 +58,7 @@ const jsonLd = {
       url: `${SITE_URL}/careers#${j.id}`,
     },
   })),
-};
+});
 
 export const metadata: Metadata = {
   // the route, the nav item and the page title now all say the same word
@@ -83,10 +86,13 @@ export const metadata: Metadata = {
 };
 
 export default function CareersPage() {
+  const jobs = getJobs();
   return (
     <>
-      <StructuredData data={jsonLd} />
-      <JoinUs />
+      {/* No open roles, no job data: an empty list of postings tells Google
+          nothing and is not worth the bytes. */}
+      {jobs.length > 0 && <StructuredData data={jobsJsonLd(jobs)} />}
+      <JoinUs jobs={jobs} />
     </>
   );
 }

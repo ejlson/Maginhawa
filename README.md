@@ -139,7 +139,7 @@ line. Nothing is lost — fix the line and it recovers.
 | Restaurant card details (address lines, hours, badge) | [lib/venueCards.ts](lib/venueCards.ts) | `EXTRAS` |
 | Home page restaurant blurbs & hover clips | [components/home/Discover.tsx](components/home/Discover.tsx) | `DISPLAY` |
 | Restaurant carousel on `/restaurants` | [components/venues/RestaurantsShowcase.tsx](components/venues/RestaurantsShowcase.tsx) | `RESTAURANTS` |
-| Job openings | [lib/jobs.ts](lib/jobs.ts) | `JOBS` |
+| Job openings | the Studio's Job board ([§5](#5-careers)) | |
 | Phone, email, press email, office hours | [lib/contact.ts](lib/contact.ts) | `CONTACT` |
 | Social media links | [lib/contact.ts](lib/contact.ts) | `SOCIALS` |
 | Press coverage & logos | [lib/press.ts](lib/press.ts) | `FEATURED_OUTLETS`, `PRESS` |
@@ -512,7 +512,7 @@ referenced in:
 - `lib/blog.ts` (`restaurant: "..."` on posts),
 - `content/posts/*.md` (`restaurant:` in the frontmatter),
 - `lib/press.ts` (`restaurants: [...]` on coverage),
-- `lib/jobs.ts` (`restaurantSlug`),
+- the Studio's Job board (each role's restaurant),
 - `components/about/About.tsx` (`slug` on a timeline chapter),
 - `components/contact/FAQ.tsx` and `components/careers/JoinUs.tsx`, where
   restaurant names appear in prose,
@@ -526,42 +526,28 @@ quietly.
 
 ## 5. Careers
 
-**File:** [lib/jobs.ts](lib/jobs.ts) → `JOBS`
+**Where:** the Studio → **Job board** (maginhawa.sanity.studio)
 
-Openings appear on `/careers` and are also published as structured job data that
-Google can lift into its jobs panel — so keep them accurate and remove them when
-filled.
+The open roles on `/careers` are edited in the Studio, in the one Job board
+document: every field of a role (title, restaurant, location, hours, team,
+summary, responsibilities, requirements, link name, date posted), and the
+order of the roles (drag them). Publishing rebuilds this site; the page
+updates a few minutes later. The roles are also published as structured job
+data that Google can lift into its jobs panel, so keep them accurate.
 
-```ts
-{
-  id: "sous-chef-belly",
-  title: "Sous Chef",
-  restaurantSlug: "belly",              // optional; matches lib/restaurants.ts
-  restaurantName: "Belly",
-  location: "Kentish Town, London",
-  type: "Full-time",                    // Full-time | Part-time | Casual, or a list: ["Full-time", "Part-time"]
-  area: "Kitchen",                      // Kitchen | Front of House | Bar | Group
-  summary: "One or two sentences — this is the line on the listing card.",
-  responsibilities: [
-    "One bullet per line",
-    "Four or five reads best",
-  ],
-  requirements: [
-    "3+ years as Sous, or strong Chef de Partie ready to step up",
-    "Right to work in the UK",
-  ],
-},
-```
+- **To close a role,** untick **Open** and publish. It leaves the page, the
+  form's role picker and the job data, and stays in the Studio to reopen.
+- **To add a role,** add one to the list, fill it in, press **Generate** on
+  the link name, and publish. The link name becomes the link to that role,
+  e.g. `/careers#head-baker-bunso`; changing it later breaks shared links.
+- **No roles open:** the page says so and keeps the CV form.
+- A role at a restaurant this site's [lib/restaurants.ts](lib/restaurants.ts)
+  does not list stops the build, as does a role with a missing field. The
+  build log names the role.
 
-- `type` and `area` must be **exactly** one of the listed values — they're used
-  for filtering, and a typo is a build error.
-- `id` must be unique. It becomes the link to that role, e.g.
-  `/careers#sous-chef-belly`.
-- For a group role with no single restaurant, leave out `restaurantSlug` and set
-  `restaurantName: "Maginhawa Group"`.
-
-**To close a role,** delete the whole block. The page and the job listings update
-themselves; there's nothing else to switch off.
+How it gets here: `scripts/pull-cms.mjs` writes the open roles to
+`.cms/jobs.json` before every build, and [lib/jobsSource.ts](lib/jobsSource.ts)
+reads them. The role's shape and helpers are in [lib/jobs.ts](lib/jobs.ts).
 
 ### Where applications go
 
