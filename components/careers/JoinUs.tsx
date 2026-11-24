@@ -21,7 +21,7 @@ import Reveal from "@/components/ui/Reveal";
 import SplitWords from "@/components/ui/SplitWords";
 import styles from "./JoinUs.module.css";
 import { asset } from "@/lib/media";
-import { JOBS, jobTypeLabel, type JobOpening } from "@/lib/jobs";
+import { jobTypeLabel, type JobOpening } from "@/lib/jobs";
 import { lenisRef } from "@/lib/SmoothScroll";
 
 const PILLARS = [
@@ -378,7 +378,7 @@ function FlipDigit({
  * whole line of flapping serif reads as a gimmick where one flapping digit
  * reads as a departures board counting the openings.
  *
- * Derived from `value` end to end, so it is correct at any JOBS.length: 12
+ * Derived from `value` end to end, so it is correct at any jobs.length: 12
  * mounts two cells and each locks on its own digit.
  */
 function PositionCount({ value }: { value: number }) {
@@ -457,6 +457,9 @@ function Chevron() {
    by side AND the list has to hold a 25.6px title, and below 900 one of
    those two starts wrapping. */
 const BESIDE = "(min-width: 900px)";
+/* Room above a role opened from its link, so the fixed nav does not sit on
+   its title. */
+const ROLE_LINK_OFFSET = 96;
 
 /* THE DETAIL, WRITTEN ONCE. It is the accordion's contents below 900 and
    the pane's contents above it; only one of the two arms is ever mounted,
@@ -543,7 +546,10 @@ function inkBox(el: HTMLElement | null) {
   return { top, bottom };
 }
 
-export default function JoinUs() {
+/* `jobs` are the open roles from the Studio's Job board, read at build time
+   by app/careers/page.tsx (lib/jobsSource.ts). It can be empty: see the
+   no-roles branch of the index below. */
+export default function JoinUs({ jobs }: { jobs: JobOpening[] }) {
   const [menuOpen, setMenuOpen] = useState(false);
   const [openIdx, setOpenIdx] = useState<number | null>(null);
   /* ⚠️ STATE AND NOT A REF, AND IT LISTENS RATHER THAN READING ONCE — this
@@ -564,9 +570,52 @@ export default function JoinUs() {
      back out leaves the selection alone: whatever the reader was reading is
      the row that is open when the accordion returns. */
   useEffect(() => {
-    if (beside) setOpenIdx((i) => (i === null ? 0 : i));
-  }, [beside]);
-  const [position, setPosition] = useState<string>("");
+    if (beside && jobs.length) setOpenIdx((i) => (i === null ? 0 : i));
+  }, [beside, jobs.length]);
+
+  /* A LINK TO ONE ROLE. /careers#head-baker-bunso is what the Studio's
+     "Link name" promises and what Google's job data points at, so it opens
+     that role, in either layout, and brings it into view. The row carries
+     the id; the browser's own jump to it is not enough, because the
+     accordion would land on a closed row, and Lenis pulls a plain scroll
+     straight back to its own target on the next frame. Lenis is built by
+     SmoothScroll, an ANCESTOR, whose effect runs after this one — so the
+     scroll waits for it, a bounded number of frames as the entrance lock
+     above does (under reduced motion it never comes, and the native scroll
+     is the right one). Listens for later hash changes too, so a link from
+     elsewhere on the page works the same. */
+  useEffect(() => {
+    let raf = 0;
+    const openFromHash = () => {
+      const id = decodeURIComponent(window.location.hash.slice(1));
+      const i = jobs.findIndex((j) => j.id === id);
+      if (i < 0) return;
+      setOpenIdx(i);
+      cancelAnimationFrame(raf);
+      let tries = 60;
+      const go = () => {
+        const el = document.getElementById(id);
+        if (!el) return;
+        if (lenisRef.current) {
+          lenisRef.current.scrollTo(el, { offset: -ROLE_LINK_OFFSET, immediate: true });
+        } else if (--tries > 0) {
+          raf = requestAnimationFrame(go);
+        } else {
+          window.scrollTo({ top: el.getBoundingClientRect().top + window.scrollY - ROLE_LINK_OFFSET });
+        }
+      };
+      raf = requestAnimationFrame(go);
+    };
+    openFromHash();
+    window.addEventListener("hashchange", openFromHash);
+    return () => {
+      cancelAnimationFrame(raf);
+      window.removeEventListener("hashchange", openFromHash);
+    };
+  }, [jobs]);
+  /* With no roles open, the form's only real choice is "Other", so it starts
+     there rather than on a "Select a role…" with nothing to select. */
+  const [position, setPosition] = useState<string>(jobs.length ? "" : "Other");
   const [submitted, setSubmitted] = useState(false);
   // name of the CV the applicant picked — referenced in the email body
   const [cvName, setCvName] = useState<string>("");
@@ -1183,10 +1232,18 @@ export default function JoinUs() {
             <div className={styles.rolesHead}>
               <div>
                 <Reveal>
-                  <h2 className={styles.sectionTitle}>
-                    <PositionCount value={JOBS.length} /> positions across the
-                    group.
-                  </h2>
+                  {jobs.length ? (
+                    <h2 className={styles.sectionTitle}>
+                      <PositionCount value={jobs.length} /> positions across the
+                      group.
+                    </h2>
+                  ) : (
+                    /* NO OPEN ROLES. Every role in the Studio's Job board
+                       can be closed at once; the page then says so plainly
+                       and keeps the form, rather than showing a "0" and an
+                       empty list. */
+                    <h2 className={styles.sectionTitle}>No open roles right now.</h2>
+                  )}
                 </Reveal>
               </div>
               {/* Sentence case, left-aligned, no brackets, one line — the
@@ -1205,12 +1262,22 @@ export default function JoinUs() {
                   already see is the furniture this section keeps shedding.
                   Below 900px the accordion still needs it, and still has
                   it. */}
-              {!beside && (
+              {jobs.length === 0 ? (
                 <Reveal delay={0.1}>
                   <p className={styles.rolesAside}>
-                    Click any role to read the details
+                    We&apos;re always glad to hear from good people.{" "}
+                    <a href="#apply">Send us your CV</a> and we&apos;ll be in
+                    touch when something opens.
                   </p>
                 </Reveal>
+              ) : (
+                !beside && (
+                  <Reveal delay={0.1}>
+                    <p className={styles.rolesAside}>
+                      Click any role to read the details
+                    </p>
+                  </Reveal>
+                )
               )}
             </div>
 
@@ -1222,122 +1289,125 @@ export default function JoinUs() {
                  two subtrees with a `display: none` on the loser, which
                  would put twelve copies of the detail in the document and
                  read both to a screen reader. ---- */}
-            <div className={beside ? styles.rolesBodySplit : undefined}>
-              <ul className={styles.roleList}>
-                {JOBS.map((job, i) => {
-                  const isOpen = openIdx === i;
-                  return (
-                    /* `i * 0.045`, not `(i % 4) * 0.05`: the modulo restarted
-                       the stagger at row 4, so rows 0/4 and 1/5 began on the
-                       SAME frame — and now that the rows are table-tight,
-                       four of the six cross the viewport threshold together
-                       rather than spread down the screen. */
-                    <Reveal key={job.id} as="li" delay={i * 0.045}>
+            {jobs.length > 0 && (
+              <div className={beside ? styles.rolesBodySplit : undefined}>
+                <ul className={styles.roleList}>
+                  {jobs.map((job, i) => {
+                    const isOpen = openIdx === i;
+                    return (
+                      /* `i * 0.045`, not `(i % 4) * 0.05`: the modulo restarted
+                         the stagger at row 4, so rows 0/4 and 1/5 began on the
+                         SAME frame — and now that the rows are table-tight,
+                         four of the six cross the viewport threshold together
+                         rather than spread down the screen. */
+                      <Reveal key={job.id} as="li" delay={i * 0.045}>
+                        <div
+                          id={job.id}
+                          className={`${styles.roleItem} ${
+                            beside && isOpen ? styles.roleItemOn : ""
+                          }`}
+                        >
+                          <button
+                            type="button"
+                            id={`role-row-${i}`}
+                            className={styles.roleRow}
+                            onClick={() => setOpenIdx(beside ? i : isOpen ? null : i)}
+                            /* TWO LAYOUTS, TWO CONTRACTS. The accordion's row
+                               is a disclosure — it owns a region that opens and
+                               closes, so `aria-expanded`. The split's row is a
+                               choice within a set: nothing expands, one of six
+                               is current, so `aria-current` and no
+                               `aria-expanded` at all. Shipping both at once
+                               would promise a reader an expansion that the
+                               layout has no way to perform. */
+                            aria-expanded={beside ? undefined : isOpen}
+                            aria-current={beside && isOpen ? "true" : undefined}
+                            aria-controls={`role-detail-${i}`}
+                          >
+                            <span className={styles.roleTitle}>{job.title}</span>
+                            <span className={styles.roleMeta}>
+                              {job.restaurantName} · {job.location}
+                            </span>
+                            {/* two facts, so two objects — the middot was
+                                doing structural work it cannot do. See
+                                `.roleTags` for the type argument. */}
+                            <span className={styles.roleTags}>
+                              <span className={styles.roleTag}>{jobTypeLabel(job)}</span>
+                              <span className={styles.roleTag}>{job.area}</span>
+                            </span>
+                            <span
+                              className={`${styles.roleChev} ${
+                                beside
+                                  ? styles.roleChevSide
+                                  : isOpen
+                                    ? styles.roleChevOpen
+                                    : ""
+                              }`}
+                              aria-hidden
+                            >
+                              <Chevron />
+                            </span>
+                          </button>
+
+                          {!beside && (
+                            <motion.div
+                              id={`role-detail-${i}`}
+                              initial={false}
+                              animate={{ height: isOpen ? "auto" : 0, opacity: isOpen ? 1 : 0 }}
+                              transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
+                              style={{ overflow: "hidden" }}
+                            >
+                              <RoleDetail
+                                job={job}
+                                onApply={() => applyFor(job.title, job.restaurantName)}
+                              />
+                            </motion.div>
+                          )}
+                        </div>
+                      </Reveal>
+                    );
+                  })}
+                </ul>
+
+                {/* ALL SIX PANES ARE MOUNTED, FIVE OF THEM INVISIBLE, and that
+                    is the point: the stack's height is the TALLEST role's, so
+                    the pane does not resize under the reader when they move
+                    from a four-line summary to a two-line one. `visibility`
+                    rather than `display` or unmounting, because visibility
+                    still removes the hidden five from the tab order and from
+                    the accessibility tree while keeping their boxes measured. */}
+                {beside && (
+                  <div className={styles.rolePanes}>
+                    {jobs.map((job, i) => (
                       <div
-                        className={`${styles.roleItem} ${
-                          beside && isOpen ? styles.roleItemOn : ""
+                        key={job.id}
+                        id={`role-detail-${i}`}
+                        role="region"
+                        aria-labelledby={`role-row-${i}`}
+                        className={`${styles.rolePane} ${
+                          openIdx === i ? styles.rolePaneOn : ""
                         }`}
                       >
-                        <button
-                          type="button"
-                          id={`role-row-${i}`}
-                          className={styles.roleRow}
-                          onClick={() => setOpenIdx(beside ? i : isOpen ? null : i)}
-                          /* TWO LAYOUTS, TWO CONTRACTS. The accordion's row
-                             is a disclosure — it owns a region that opens and
-                             closes, so `aria-expanded`. The split's row is a
-                             choice within a set: nothing expands, one of six
-                             is current, so `aria-current` and no
-                             `aria-expanded` at all. Shipping both at once
-                             would promise a reader an expansion that the
-                             layout has no way to perform. */
-                          aria-expanded={beside ? undefined : isOpen}
-                          aria-current={beside && isOpen ? "true" : undefined}
-                          aria-controls={`role-detail-${i}`}
-                        >
-                          <span className={styles.roleTitle}>{job.title}</span>
-                          <span className={styles.roleMeta}>
-                            {job.restaurantName} · {job.location}
-                          </span>
-                          {/* two facts, so two objects — the middot was
-                              doing structural work it cannot do. See
-                              `.roleTags` for the type argument. */}
-                          <span className={styles.roleTags}>
-                            <span className={styles.roleTag}>{jobTypeLabel(job)}</span>
-                            <span className={styles.roleTag}>{job.area}</span>
-                          </span>
-                          <span
-                            className={`${styles.roleChev} ${
-                              beside
-                                ? styles.roleChevSide
-                                : isOpen
-                                  ? styles.roleChevOpen
-                                  : ""
-                            }`}
-                            aria-hidden
-                          >
-                            <Chevron />
-                          </span>
-                        </button>
-
-                        {!beside && (
-                          <motion.div
-                            id={`role-detail-${i}`}
-                            initial={false}
-                            animate={{ height: isOpen ? "auto" : 0, opacity: isOpen ? 1 : 0 }}
-                            transition={{ duration: 0.55, ease: [0.22, 1, 0.36, 1] }}
-                            style={{ overflow: "hidden" }}
-                          >
-                            <RoleDetail
-                              job={job}
-                              onApply={() => applyFor(job.title, job.restaurantName)}
-                            />
-                          </motion.div>
-                        )}
+                        {/* The pane has to name what it is showing — the list
+                            beside it can be scrolled past, and a detail with
+                            no title is a column of requirements for an unnamed
+                            job. --t-h2 is the rung between the section title
+                            (--t-display) and the rows (--t-h3), so the three
+                            read as one hierarchy. */}
+                        <h3 className={styles.rolePaneTitle}>{job.title}</h3>
+                        <p className={styles.rolePaneMeta}>
+                          {job.restaurantName} · {job.location} · {jobTypeLabel(job)}
+                        </p>
+                        <RoleDetail
+                          job={job}
+                          onApply={() => applyFor(job.title, job.restaurantName)}
+                        />
                       </div>
-                    </Reveal>
-                  );
-                })}
-              </ul>
-
-              {/* ALL SIX PANES ARE MOUNTED, FIVE OF THEM INVISIBLE, and that
-                  is the point: the stack's height is the TALLEST role's, so
-                  the pane does not resize under the reader when they move
-                  from a four-line summary to a two-line one. `visibility`
-                  rather than `display` or unmounting, because visibility
-                  still removes the hidden five from the tab order and from
-                  the accessibility tree while keeping their boxes measured. */}
-              {beside && (
-                <div className={styles.rolePanes}>
-                  {JOBS.map((job, i) => (
-                    <div
-                      key={job.id}
-                      id={`role-detail-${i}`}
-                      role="region"
-                      aria-labelledby={`role-row-${i}`}
-                      className={`${styles.rolePane} ${
-                        openIdx === i ? styles.rolePaneOn : ""
-                      }`}
-                    >
-                      {/* The pane has to name what it is showing — the list
-                          beside it can be scrolled past, and a detail with
-                          no title is a column of requirements for an unnamed
-                          job. --t-h2 is the rung between the section title
-                          (--t-display) and the rows (--t-h3), so the three
-                          read as one hierarchy. */}
-                      <h3 className={styles.rolePaneTitle}>{job.title}</h3>
-                      <p className={styles.rolePaneMeta}>
-                        {job.restaurantName} · {job.location} · {jobTypeLabel(job)}
-                      </p>
-                      <RoleDetail
-                        job={job}
-                        onApply={() => applyFor(job.title, job.restaurantName)}
-                      />
-                    </div>
-                  ))}
-                </div>
-              )}
-            </div>
+                    ))}
+                  </div>
+                )}
+              </div>
+            )}
           </section>
 
           {/* ---- Application ----
@@ -1502,7 +1572,7 @@ export default function JoinUs() {
                       <option value="" disabled>
                         Select a role…
                       </option>
-                      {JOBS.map((j) => {
+                      {jobs.map((j) => {
                         // a title that already names its restaurant
                         // ("Bartender — Belly") is not suffixed twice
                         const label = j.title.includes(j.restaurantName)

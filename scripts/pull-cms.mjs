@@ -1,4 +1,4 @@
-/* ═══ PULL THE JOURNAL FROM THE CMS, BEFORE `next build` ═══
+/* ═══ PULL THE JOURNAL AND THE JOB BOARD FROM THE CMS, BEFORE `next build` ═══
  *
  * `npm run build` runs this first. It asks the Maginhawa Group's shared
  * Sanity project (edited in the group's Studio, github.com/ejlson/maginhawa-cms)
@@ -25,6 +25,14 @@
  * markdown here so that lib/markdown.ts renders it exactly as it renders
  * content/posts/*.md: one pipeline, one set of house rules.
  *
+ * ── THE JOB BOARD ──
+ * The open roles on /careers are one "Job board" document in the Studio.
+ * Its open roles are written to .cms/jobs.json, which lib/jobsSource.ts
+ * reads. A role with a missing or unknown field stops the build, naming the
+ * role, rather than putting a broken card or bad job data on the page.
+ * MAGINHAWA_BLOG_SOURCE=local skips the journal only: the roles have no
+ * other home than the CMS.
+ *
  * ── WHAT IT REFUSES ──
  * It only downloads from Sanity's own image host for this project, only
  * files Sanity reports as WebP/JPEG, only up to MAX_BYTES, never follows a
@@ -33,18 +41,15 @@
  *
  *   node scripts/pull-cms.mjs          fails loudly (the build)
  *   node scripts/pull-cms.mjs --dev    keeps the last snapshot if offline
- *   MAGINHAWA_BLOG_SOURCE=local        skips it (lib/blog.ts is used instead)
+ *   MAGINHAWA_BLOG_SOURCE=local        skips the journal (lib/blog.ts is used
+ *                                      instead); the job board is still pulled
  */
 import fs from "node:fs/promises";
 import { existsSync } from "node:fs";
 import path from "node:path";
 import cms from "../lib/cms.json" with { type: "json" };
 
-if (process.env.MAGINHAWA_BLOG_SOURCE === "local") {
-  console.log("pull-cms: MAGINHAWA_BLOG_SOURCE=local, skipped.");
-  process.exit(0);
-}
-
+const JOURNAL = process.env.MAGINHAWA_BLOG_SOURCE !== "local";
 const DEV = process.argv.includes("--dev");
 const ROOT = path.resolve(import.meta.dirname, "..");
 const IMAGE_DIR = path.join(ROOT, cms.imageDir);
@@ -52,6 +57,7 @@ const IMAGE_DIR = path.join(ROOT, cms.imageDir);
    arrived, so a pull that fails halfway leaves the last good set alone. */
 const WORK_DIR = `${IMAGE_DIR}.partial`;
 const SNAPSHOT = path.join(ROOT, cms.snapshot);
+const JOBS_SNAPSHOT = path.join(ROOT, cms.jobsSnapshot);
 const CDN = `https://cdn.sanity.io/images/${cms.project}/${cms.dataset}/`;
 const MAX_BYTES = 15 * 1024 * 1024;
 const TYPES = { "image/webp": "webp", "image/jpeg": "jpg" };
@@ -61,11 +67,11 @@ const TYPES = { "image/webp": "webp", "image/jpeg": "jpg" };
 const WIDE = 1600;
 const NARROW = 800;
 
-async function query() {
+async function query(groq) {
   const url = new URL(
     `https://${cms.project}.api.sanity.io/v${cms.apiVersion}/data/query/${cms.dataset}`,
   );
-  url.searchParams.set("query", cms.query);
+  url.searchParams.set("query", groq);
   url.searchParams.set("perspective", "published");
   const res = await fetch(url, { signal: AbortSignal.timeout(30_000) });
   if (!res.ok) throw new Error(`Sanity query failed (${res.status}): ${await res.text()}`);
@@ -191,7 +197,7 @@ async function toMarkdown(slug, body, home) {
 }
 
 async function pull() {
-  const posts = await query();
+  const posts = await query(cms.query);
   slugs = new Set(posts.map((p) => p.slug));
   await fs.rm(WORK_DIR, { recursive: true, force: true });
   await fs.mkdir(WORK_DIR, { recursive: true });
@@ -227,16 +233,90 @@ async function pull() {
   console.log(`pull-cms: ${shaped.length} posts, ${images.size} photographs -> ${cms.imageDir}`);
 }
 
-try {
-  await pull();
-} catch (err) {
-  /* Offline on a laptop is not a reason to refuse to start the dev server,
-     as long as there is a previous snapshot to show. A build never gets
-     this pass: deploying yesterday's journal without saying so is worse
-     than a failed deploy. */
-  if (DEV && existsSync(SNAPSHOT)) {
-    console.warn(`pull-cms: could not reach the CMS, using the last snapshot.\n  ${err.message}`);
-  } else {
-    throw err;
+/* ── THE JOB BOARD ──
+   The site types these exactly (lib/jobs.ts): its filters and Google's job
+   data read them. */
+const EMPLOYMENT = ["Full-time", "Part-time", "Casual"];
+const AREAS = ["Kitchen", "Front of House", "Bar", "Group"];
+const LINK_NAME = /^[a-z0-9]+(?:-[a-z0-9]+)*$/;
+
+/** Something in the CMS this site will not build, as opposed to the CMS
+ *  being out of reach. */
+class ContentError extends Error {}
+
+const text = (v) => typeof v === "string" && v.trim() !== "";
+const lines = (v) => Array.isArray(v) && v.length > 0 && v.every(text);
+
+/* The role as lib/jobs.ts types it, or an error naming the role and what
+   is wrong, so the person who published it can find it in the Studio. */
+function checkRole(r, i) {
+  if (!r || typeof r !== "object") {
+    throw new ContentError(`pull-cms: job board role ${i + 1} is empty. Fix it in the Studio.`);
+  }
+  const fail = (what) => {
+    throw new ContentError(`pull-cms: job board role ${i + 1} ("${r?.title ?? "untitled"}") ${what}. Fix it in the Studio.`);
+  };
+  for (const f of ["title", "restaurant", "location", "summary"]) if (!text(r[f])) fail(`has no ${f}`);
+  if (!text(r.id) || !LINK_NAME.test(r.id)) fail("has no valid link name");
+  if (!/^[a-z0-9]+$/.test(r.restaurant)) fail(`has an unknown restaurant "${r.restaurant}"`);
+  if (!Array.isArray(r.employment) || !r.employment.length || !r.employment.every((t) => EMPLOYMENT.includes(t)))
+    fail("needs Full-time, Part-time or Casual ticked");
+  if (new Set(r.employment).size !== r.employment.length) fail("has an hours option ticked twice");
+  if (!AREAS.includes(r.area)) fail("has no team");
+  if (!lines(r.responsibilities)) fail("has no responsibilities, or an empty line in them");
+  if (!lines(r.requirements)) fail("has no requirements, or an empty line in them");
+  if (!/^\d{4}-\d{2}-\d{2}$/.test(r.posted ?? "")) fail("has no date posted");
+  const a = r.address ?? {};
+  const filled = [a.street, a.locality, a.postcode].filter(text).length;
+  if (filled !== 0 && filled !== 3) fail("has part of a street address");
+  return {
+    id: r.id,
+    title: r.title.trim(),
+    restaurant: r.restaurant,
+    location: r.location.trim(),
+    ...(filled ? { address: { street: a.street.trim(), locality: a.locality.trim(), postcode: a.postcode.trim() } } : {}),
+    type: r.employment,
+    area: r.area,
+    summary: r.summary.trim(),
+    responsibilities: r.responsibilities.map((l) => l.trim()),
+    requirements: r.requirements.map((l) => l.trim()),
+    posted: r.posted,
+  };
+}
+
+async function pullJobs() {
+  const board = await query(cms.jobsQuery);
+  /* No document at all is a broken CMS, not "no open roles": refuse it
+     rather than tell visitors nobody is hiring. */
+  if (!board) throw new ContentError('pull-cms: there is no published "Job board" in the CMS.');
+  const roles = (board.roles ?? []).map(checkRole);
+  const seen = new Set();
+  for (const r of roles) {
+    if (seen.has(r.id)) throw new ContentError(`pull-cms: two open roles share the link name "${r.id}". Fix it in the Studio.`);
+    seen.add(r.id);
+  }
+  await fs.mkdir(path.dirname(JOBS_SNAPSHOT), { recursive: true });
+  await fs.writeFile(JOBS_SNAPSHOT, JSON.stringify({ pulledAt: new Date().toISOString(), roles }, null, 2));
+  console.log(`pull-cms: ${roles.length} open roles -> ${cms.jobsSnapshot}`);
+}
+
+/* Offline on a laptop is not a reason to refuse to start the dev server, as
+   long as there is a previous snapshot to show. A build never gets this
+   pass: deploying yesterday's journal or roles without saying so is worse
+   than a failed deploy. A role the CMS holds but this site refuses is not
+   "offline": it fails even with --dev, so it is seen before it deploys. */
+async function attempt(step, snapshot) {
+  try {
+    await step();
+  } catch (err) {
+    if (DEV && !(err instanceof ContentError) && existsSync(snapshot)) {
+      console.warn(`pull-cms: could not reach the CMS, using the last snapshot.\n  ${err.message}`);
+    } else {
+      throw err;
+    }
   }
 }
+
+if (JOURNAL) await attempt(pull, SNAPSHOT);
+else console.log("pull-cms: MAGINHAWA_BLOG_SOURCE=local, journal skipped.");
+await attempt(pullJobs, JOBS_SNAPSHOT);
